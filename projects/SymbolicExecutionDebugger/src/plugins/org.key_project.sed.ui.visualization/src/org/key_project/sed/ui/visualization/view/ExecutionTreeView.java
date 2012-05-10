@@ -1,5 +1,6 @@
 package org.key_project.sed.ui.visualization.view;
 
+import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
+import org.eclipse.jface.viewers.ILazyTreePathContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -56,6 +58,8 @@ import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 
 /**
  * This view shows the symbolic execution tree of selected {@link ISEDDebugTarget}s
@@ -226,7 +230,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                      TreeViewer treeViewer = (TreeViewer)debugViewer;
                      for (Object element : businessObjects) {
                         try {
-                           expandTreeUpToElement(treeViewer, element);
+                           makeSureThatElementIsKnownInDebugTree(treeViewer, element);
                         }
                         catch (DebugException e) {
                            LogUtil.getLogger().logError("Can't expand debug view to element \"" + element + "\".", e);
@@ -246,37 +250,68 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    }
 
    /**
-    * Expands the shown tree in the given {@link TreeViewer} until
-    * the given element is visible.
-    * @param treeViewer The {@link TreeViewer} to expand in.
-    * @param element The element to make visible.
+    * <p>
+    * Makes sure that he given element is known in the given {@link TreeViewer}
+    * which is used in view Debug. The used content provider is an
+    * {@link ILazyTreePathContentProvider} and for this reason it some
+    * elements might be unknown in the tree.
+    * </p>
+    * <p>
+    * This method makes sure that the given element is known in the tree
+    * by expanding and showing all parents to the user until a parent was
+    * found that is known in tree.
+    * </p>
+    * @param treeViewer The {@link TreeViewer} to work with.
+    * @param element The element which must be known by the {@link TreeViewer}.
     * @throws DebugException Occurred Exception.
     */
-   protected void expandTreeUpToElement(final TreeViewer treeViewer, Object element) throws DebugException {
-      // List parents to expand them from root up to element to select.
-      LinkedList<Object> expandQue = new LinkedList<Object>();
-      boolean afterFirst = false;
+   protected void makeSureThatElementIsKnownInDebugTree(final TreeViewer treeViewer, Object element) throws DebugException {
+      // List parents to expand them first unknown element up to the given element.
+      Deque<Object> expandQue = new LinkedList<Object>();
+      Object previous = null;
       while (element != null) {
-         if (afterFirst) { // Ignore first element
-            expandQue.addFirst(element);
+         boolean goOn = true;
+         if (previous != null) { // Ignore first element
+            // Check if the previous element is known in tree
+            final Object toTest = previous;
+            IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+               @Override
+               public void run() {
+                  Widget item = treeViewer.testFindItem(toTest);
+                  setResult(item == null);
+               }
+            };
+            treeViewer.getControl().getDisplay().syncExec(run);
+            if (run.getResult() != null && run.getResult().booleanValue()) {
+               // Previous element is not known, add to Deque and continue with parent.
+               expandQue.addFirst(element);
+            }
+            else {
+               // Previous element is known in tree, search can be stopped.
+               goOn = false;
+            }
          }
-         else {
-            afterFirst = true;
-         }
-         if (element instanceof ISEDThread) {
-            element = ((ISEDThread)element).getDebugTarget();
-         }
-         else if (element instanceof ISEDDebugNode) {
-            element = ((ISEDDebugNode)element).getParent();
-         }
-         else if (element instanceof ISEDDebugTarget) {
-            element = ((ISEDDebugTarget)element).getLaunch();
+         // Update previous and current element for next iteration.
+         if (goOn) {
+            previous = element;
+            if (element instanceof ISEDThread) {
+               element = ((ISEDThread)element).getDebugTarget();
+            }
+            else if (element instanceof ISEDDebugNode) {
+               element = ((ISEDDebugNode)element).getParent();
+            }
+            else if (element instanceof ISEDDebugTarget) {
+               element = ((ISEDDebugTarget)element).getLaunch();
+            }
+            else {
+               element = null;
+            }
          }
          else {
             element = null;
          }
       }
-      // Expand elements starting at the root
+      // Expand elements starting at the root to make the familiar in tree
       for (final Object toExpand : expandQue) {
          IFilter<Job> jobFilter = new IFilter<Job>() {
             @Override
@@ -295,11 +330,14 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                @Override
                public void run() {
                   if (!treeViewer.getExpandedState(toExpand)) {
+                     // Search item to expand
                      Widget item = treeViewer.testFindItem(toExpand);
                      Assert.isTrue(item instanceof TreeItem);
                      TreeItem treeItem = (TreeItem)item;
+                     // Make item visible and expand it. Invisible elements are not expanded.
                      treeViewer.getTree().showItem(treeItem);
                      treeViewer.setExpandedState(toExpand, true);
+                     // Make all children visible because otherwise lazy loading will not update them if the expanded element is exactly the last visible element.
                      for (TreeItem child : treeItem.getItems()) {
                         treeViewer.getTree().showItem(child);
                      }
