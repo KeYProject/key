@@ -649,7 +649,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
             if (!child.isClosed()) {
                // Check if the current method on stack is not an implicit method
                Node nextSymbolicExecutionNode = searchLinearNextSymbolicExecutionNode(child);
-               if (!isInImplicitMethod(nextSymbolicExecutionNode)) { // Ignore branch conditions from implicit methods (requires runtime option eagerSplitting: on)
+               if (!isInImplicitMethod(nextSymbolicExecutionNode)) {
                   openChildrenCount ++;
                }
             }
