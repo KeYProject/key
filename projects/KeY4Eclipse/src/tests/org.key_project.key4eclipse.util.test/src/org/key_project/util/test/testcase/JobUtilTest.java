@@ -7,16 +7,68 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.junit.Test;
 import org.key_project.util.eclipse.JobUtil;
+import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
  * Tests for {@link JobUtil}.
  * @author Martin Hentschel
  */
 public class JobUtilTest extends TestCase {
+   /**
+    * Tests {@link JobUtil#cancel(Job[])}.
+    */
+   @Test
+   public void testCancel() {
+      Job firstJob = new EndlessJob();
+      Job secondJob = new EndlessJob();
+      firstJob.schedule();
+      secondJob.schedule();
+      Job[] jobs = new Job[] {firstJob, secondJob};
+      JobUtil.cancel(jobs);
+      JobUtil.waitFor(jobs, 20);
+      assertEquals(Job.NONE, firstJob.getState());
+      assertEquals(Job.NONE, secondJob.getState());
+   }
+   
+   /**
+    * A {@link Job} which is endless running.
+    * @author Martin Hentschel
+    */
+   private static class EndlessJob extends Job {
+      /**
+       * Constructor.
+       */
+      public EndlessJob() {
+         super("Endless Job");
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+         try {
+            while (true) {
+               try {
+                  SWTUtil.checkCanceled(monitor);
+                  Thread.sleep(10);
+               }
+               catch (InterruptedException e) {
+                  // Nothing to do
+               }
+            }
+         }
+         catch (OperationCanceledException e) {
+            return Status.CANCEL_STATUS;
+         }
+      }
+   }
+   
    /**
     * Tests {@link JobUtil#waitFor(Job[], int)}.
     */

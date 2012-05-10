@@ -9,6 +9,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.DebugException;
@@ -30,6 +31,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
+import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.ILazyTreePathContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -44,6 +46,7 @@ import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.ui.visualization.execution_tree.editor.AbstractExecutionTreeDiagramEditorJob;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ReadonlyDiagramEditorActionBarContributor;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugTargetConnectFeature;
@@ -222,51 +225,62 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
          ISelection oldSelection = getDebugView().getViewer().getSelection();
          if (!businessObjects.equals(SWTUtil.toList(oldSelection))) {
             // Change selection in debug view if new elements are selected in a Job because the debug view uses Jobs itself to expand the debug model and it is required to wait for them.
-            Job selectJob = new Job("Synchronizing selection") {
+            AbstractExecutionTreeDiagramEditorJob.cancelJobs(getEditorPart());
+            Job selectJob = new AbstractExecutionTreeDiagramEditorJob("Synchronizing selection", getEditorPart()) {
                @Override
                protected IStatus run(IProgressMonitor monitor) {
-                  // Expand viewer up to the elements to select.
-                  final Viewer debugViewer = getDebugView().getViewer();
-                  if (debugViewer instanceof TreeViewer) {
-                     TreeViewer treeViewer = (TreeViewer)debugViewer;
-                     for (Object element : businessObjects) {
-                        try {
-                           makeSureThatElementIsKnownInDebugTree(treeViewer, element);
-                        }
-                        catch (DebugException e) {
-                           LogUtil.getLogger().logError("Can't expand debug view to element \"" + element + "\".", e);
+                  try {
+                     // Expand viewer up to the elements to select.
+                     final Viewer debugViewer = getDebugView().getViewer();
+                     if (debugViewer instanceof TreeViewer) {
+                        TreeViewer treeViewer = (TreeViewer)debugViewer;
+                        for (Object element : businessObjects) {
+                           try {
+                              monitor.beginTask(getName(), IProgressMonitor.UNKNOWN);
+                              monitor.subTask("Collecting unknown elements");
+                              Deque<Object> expandQue = collectUnknownParents(treeViewer, element);
+                              monitor.beginTask(getName(), expandQue.size() + 1);
+                              monitor.subTask("Expanding unknown elements");
+                              expandElements(treeViewer, expandQue, monitor);
+                           }
+                           catch (DebugException e) {
+                              LogUtil.getLogger().logError("Can't expand debug view to element \"" + element + "\".", e);
+                           }
                         }
                      }
+                     // Select new elements
+                     monitor.subTask("Select element");
+                     ISelection newSelection = SWTUtil.createSelection(businessObjects);
+                     SWTUtil.select(debugViewer, newSelection, true);
+                     monitor.worked(1);
+                     monitor.done();
+                     return Status.OK_STATUS;
                   }
-                  // Select new elements
-                  ISelection newSelection = SWTUtil.createSelection(businessObjects);
-                  SWTUtil.select(debugViewer, newSelection, true);
-                  return Status.OK_STATUS;
+                  catch (OperationCanceledException e) {
+                     return Status.CANCEL_STATUS;
+                  }
                }
             };
-            selectJob.setSystem(true);
             selectJob.schedule();
          }
       }
    }
-
+   
    /**
     * <p>
-    * Makes sure that he given element is known in the given {@link TreeViewer}
-    * which is used in view Debug. The used content provider is an
-    * {@link ILazyTreePathContentProvider} and for this reason it some
-    * elements might be unknown in the tree.
+    * Collects all parent elements starting from the given one that
+    * are unknown in the given {@link TreeViewer}.
     * </p>
     * <p>
-    * This method makes sure that the given element is known in the tree
-    * by expanding and showing all parents to the user until a parent was
-    * found that is known in tree.
+    * Unknown elements are possible if an {@link ILazyTreeContentProvider} or
+    * an {@link ILazyTreePathContentProvider} is used.
     * </p>
-    * @param treeViewer The {@link TreeViewer} to work with.
-    * @param element The element which must be known by the {@link TreeViewer}.
+    * @param treeViewer The {@link TreeViewer} to search in.
+    * @param element The element to start search for unknown elements.
+    * @return A {@link Deque} which contains all unknown elements in order from root to given element.
     * @throws DebugException Occurred Exception.
     */
-   protected void makeSureThatElementIsKnownInDebugTree(final TreeViewer treeViewer, Object element) throws DebugException {
+   protected Deque<Object> collectUnknownParents(final TreeViewer treeViewer, Object element) throws DebugException {
       // List parents to expand them first unknown element up to the given element.
       Deque<Object> expandQue = new LinkedList<Object>();
       Object previous = null;
@@ -312,8 +326,22 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
             element = null;
          }
       }
+      return expandQue;
+   }
+
+   /**
+    * Expands all elements in the given {@link Deque}.
+    * @param treeViewer The {@link TreeViewer} to expand in.
+    * @param expandQue The {@link Deque} which defines the elements to expand in order from root to child.
+    * @param monitor The {@link IProgressMonitor} to use.
+    */
+   protected void expandElements(final TreeViewer treeViewer, 
+                                 Deque<Object> expandQue,
+                                 IProgressMonitor monitor) {
+      
       // Expand elements starting at the root to make the familiar in tree
       for (final Object toExpand : expandQue) {
+         SWTUtil.checkCanceled(monitor);
          IFilter<Job> jobFilter = new IFilter<Job>() {
             @Override
             public boolean select(Job element) {
@@ -350,8 +378,14 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
             // Stop collecting update jobs
             collector.stop();
          }
-         // Wait until all update jobs have finished before 
-         JobUtil.waitFor(collector.getJobs(), 10);
+         // Wait until all update jobs have finished before
+         Job[] jobs = collector.getJobs();
+         for (Job job : jobs) {
+            SWTUtil.checkCanceled(monitor);
+            JobUtil.waitFor(job, 10);
+         }
+         // Update monitor
+         monitor.worked(1);
       }
    }
    
@@ -412,6 +446,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                         setEditorEnabled(true);
                      }
                   });
+                  AbstractExecutionTreeDiagramEditorJob.cancelJobs(editor);
                   editor.executeFeatureInJob("Changing Symbolic Execution Tree", feature, context);
                   // Unset message
                   setMessage(null);

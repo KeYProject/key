@@ -12,6 +12,18 @@ public class JobUtil {
     */
    private JobUtil() {
    }
+   
+   /**
+    * Cancels all given {@link Job}s.
+    * @param jobs The {@link Job}s to cancel.
+    */
+   public static void cancel(Job[] jobs) {
+      if (jobs != null) {
+         for (Job job : jobs) {
+            job.cancel();
+         }
+      }
+   }
 
    /**
     * Blocks the current {@link Thread} until all given {@link Job}s 

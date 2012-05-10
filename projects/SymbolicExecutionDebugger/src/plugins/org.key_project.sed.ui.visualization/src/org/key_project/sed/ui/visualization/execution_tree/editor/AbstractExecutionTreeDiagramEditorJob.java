@@ -1,6 +1,7 @@
 package org.key_project.sed.ui.visualization.execution_tree.editor;
 
 import org.eclipse.core.runtime.jobs.Job;
+import org.key_project.util.eclipse.JobUtil;
 import org.key_project.util.eclipse.job.ObjectchedulingRule;
 import org.key_project.util.java.ObjectUtil;
 
@@ -46,11 +47,7 @@ public abstract class AbstractExecutionTreeDiagramEditorJob extends Job {
     */
    public static Job[] cancelJobs(ExecutionTreeDiagramEditor editor) {
       Job[] jobs = getJobs(editor);
-      if (jobs != null) {
-         for (Job job : jobs) {
-            job.cancel();
-         }
-      }
+      JobUtil.cancel(jobs);
       return jobs;
    }
    

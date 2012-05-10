@@ -94,7 +94,6 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
    public void executeFeatureInJob(String jobName, 
                                    final IFeature feature, 
                                    final IContext context) {
-      AbstractExecutionTreeDiagramEditorJob.cancelJobs(this);
       new AbstractExecutionTreeDiagramEditorJob(jobName, this) {
          @Override
          protected IStatus run(IProgressMonitor monitor) {
