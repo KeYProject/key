@@ -34,6 +34,8 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewSite;
 import org.key_project.sed.core.model.ISEDDebugElement;
@@ -51,6 +53,7 @@ import org.key_project.util.eclipse.JobUtil;
 import org.key_project.util.eclipse.job.ScheduledJobCollector;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 
@@ -275,7 +278,15 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
       }
       // Expand elements starting at the root
       for (final Object toExpand : expandQue) {
-         ScheduledJobCollector collector = new ScheduledJobCollector();
+         IFilter<Job> jobFilter = new IFilter<Job>() {
+            @Override
+            public boolean select(Job element) {
+               String className = element.getClass().getName();
+               return className.startsWith("org.eclipse.debug") ||
+                      className.startsWith("org.eclipse.ui.internal.progress");
+            }
+         };
+         ScheduledJobCollector collector = new ScheduledJobCollector(jobFilter);
          try {
             // Start collecting update jobs started by the debug view
             collector.start();
@@ -284,8 +295,14 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                @Override
                public void run() {
                   if (!treeViewer.getExpandedState(toExpand)) {
-                     treeViewer.reveal(toExpand); // Make item visible first, because children are only loaded lazily if they are visible.
+                     Widget item = treeViewer.testFindItem(toExpand);
+                     Assert.isTrue(item instanceof TreeItem);
+                     TreeItem treeItem = (TreeItem)item;
+                     treeViewer.getTree().showItem(treeItem);
                      treeViewer.setExpandedState(toExpand, true);
+                     for (TreeItem child : treeItem.getItems()) {
+                        treeViewer.getTree().showItem(child);
+                     }
                   }
                }
             });
