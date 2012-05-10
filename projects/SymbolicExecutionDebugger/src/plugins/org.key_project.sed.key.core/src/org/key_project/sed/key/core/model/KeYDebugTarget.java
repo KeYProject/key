@@ -629,7 +629,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
          return !isMethodCallNode(callNode, callInfo, callStatement);
       }
       else {
-         return true;
+         return false;
       }
    }
 
