@@ -104,6 +104,11 @@ public String getLogic() {
 	return "AUFLIA";
 }
 
+@Override
+public boolean checkForSupport() {
+	return false;
+}
+
     
 }
 

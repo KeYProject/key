@@ -205,6 +205,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	}
                 for(FieldSpecification field 
                       : ((FieldDeclaration) member).getFieldSpecifications()) {
+                    // add a static invariant for static fields
+                    boolean isStatic = member.isStatic();
                     
                     //add invariant only for fields of reference types
                     //and not for implicit fields.
@@ -216,7 +218,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 		    fileName, member.getEndPosition(),services);
                 	for(PositionedString classInv : nonNullInvs) {
                 	    result = result.add(jsf.createJMLClassInvariant(kjt,
-                		    					    visibility,
+                		    					    visibility, isStatic,
                 		            				    classInv));
                 	}
                     }
@@ -297,9 +299,20 @@ public final class JMLSpecExtractor implements SpecExtractor {
         return result;
     }
 
-    
+
     @Override    
     public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm)
+    throws SLTranslationException {
+        return extractMethodSpecs(pm,true);
+    }
+    
+    /**
+     * Extracts method specifications (i.e., contracts) from Java+JML input.
+     * @param pm method to extract for
+     * @param addInvariant whether to add <i>static</i> invarants to pre- and post-conditions
+     */
+    @Override    
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm, boolean addInvariant)
     throws SLTranslationException {
         ImmutableSet<SpecificationElement> result 
         = DefaultImmutableSet.<SpecificationElement>nil();
@@ -356,15 +369,20 @@ public final class JMLSpecExtractor implements SpecExtractor {
             }
 
             //add invariants
-            if(!pm.isStatic() && !isHelper) {
+            if(!isHelper && (!pm.isStatic() || addInvariant)) {
+                // for a static method translate \inv once again, otherwise use the internal symbol
+                final String invString = pm.isStatic()? "\\inv": "<inv>";
                 if(!pm.isConstructor()) {
-                    specCase.addRequires(new PositionedString("<inv>"));
+                    specCase.addRequires(new PositionedString(invString));
+                } else if (addInvariant) {
+                    // add static invariant to constructor's precondition
+                    specCase.addRequires(new PositionedString(""+pm.getName()+".\\inv"));
                 }
                 if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-                    specCase.addEnsures(new PositionedString("ensures <inv>"));
+                    specCase.addEnsures(new PositionedString("ensures "+invString));
                 }
                 if(specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR) {
-                    specCase.addSignals(new PositionedString("signals (Exception e) <inv>"));
+                    specCase.addSignals(new PositionedString("signals (Exception e) "+invString));
                 }
             }
 

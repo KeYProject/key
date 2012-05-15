@@ -3,9 +3,9 @@ public interface List {
     //@ public ghost instance \locset footprint;
     //@ public ghost instance \seq seq;
 
-    //@ public invariant \subset(\singleton(this.seq), footprint);
-    //@ public invariant \subset(\singleton(this.footprint), footprint);
-    //@ public invariant (\forall int i; 0<=i && i<seq.length; seq[i] instanceof Object);
+    //@ public instance invariant \subset(\singleton(this.seq), footprint);
+    //@ public instance invariant \subset(\singleton(this.footprint), footprint);
+    //@ public instance invariant (\forall int i; 0<=i && i<seq.length; seq[i] instanceof Object);
     //@ public accessible \inv: footprint;
 
     /*@ public normal_behaviour

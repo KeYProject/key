@@ -67,6 +67,14 @@ public interface SolverType extends PipeListener<SolverCommunication> {
          * this method.
          */
         public String modifyProblem(String problem);
+        
+        public String getVersionParameter();
+        public String[] getSupportedVersions();
+        public String getVersion();
+        public boolean isSupportedVersion();
+        public boolean checkForSupport();
+        public boolean supportHasBeenChecked();
+        
 
         /**
          * Class for the Z3 solver. It makes use of the SMT2-format.
@@ -93,6 +101,14 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 public String getName() {
                         return "Z3";
                 }
+        
+                public String getVersionParameter() {
+                	return "-version";
+                };
+                
+                public String[] getSupportedVersions() {
+                	return new String[] {"version 3.2"};
+                };
                 
                 public String[] getDelimiters() {
                 	return new String [] {"\n","\r"};
@@ -110,18 +126,18 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 
                 @Override
                 public String getInfo() {
-
-                        return "Z3 does not use quantifier elimination by default. This means for example that"
-                                        + " the following problem cannot be solved automatically by default:\n\n"
-                                        + "\\functions{\n"
-                                        + "\tint n;\n"
-                                        + "}\n\n"
-                                        + "\\problem{\n"
-                                        + "\t((\\forall int x;(x<=0 | x >= n+1)) & n >= 1)->false\n"
-                                        + "}"
-                                        + "\n\n"
-                                        + "You can activate quantifier elimination by appending QUANT_FM=true to"
-                                        + " the execution command.";
+                			return "";
+//                        return "Z3 does not use quantifier elimination by default. This means for example that"
+//                                        + " the following problem cannot be solved automatically by default:\n\n"
+//                                        + "\\functions{\n"
+//                                        + "\tint n;\n"
+//                                        + "}\n\n"
+//                                        + "\\problem{\n"
+//                                        + "\t((\\forall int x;(x<=0 | x >= n+1)) & n >= 1)->false\n"
+//                                        + "}"
+//                                        + "\n\n"
+//                                        + "You can activate quantifier elimination by appending QUANT_FM=true to"
+//                                        + " the execution command.";
                 }
 
                 private static final int WAIT_FOR_RESULT = 0;
@@ -202,6 +218,14 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 public String[] getDelimiters() {
                 	return new String [] {"CVC>","C>"};
                 };
+                
+                public String[] getSupportedVersions() {
+                	return new String[] {"version 2.2"};
+                };
+                
+                public String getVersionParameter() {
+                	return "-version";
+                };
 
                 @Override
                 public SMTTranslator getTranslator(Services services) {
@@ -226,7 +250,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 				public void messageIncoming(Pipe<SolverCommunication> pipe, String message, int type) {
 					 SolverCommunication sc = pipe.getSession();
 					 sc.addMessage(message);
-					 if(type == Pipe.ERROR_MESSAGE){
+					 if(type == Pipe.ERROR_MESSAGE && message.indexOf("Interrupted by signal")==-1){
 						 throw new RuntimeException("Error while executing CVC:\n" +message);
 					 }
 					 
@@ -284,6 +308,15 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 public String getDefaultSolverParameters() {
                          return "-i -e -smt";
                 }
+                
+                
+                public String getVersionParameter() {
+                	return "--version";
+                };
+                
+                public String[] getSupportedVersions() {
+                	return new String [] {"1.0.34"};
+                };
 
                 @Override
                 public String getInfo() {
@@ -349,12 +382,21 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                     return "simplify";
                 };
                 
+                public String[] getSupportedVersions() {
+                	return new String []{"version 1.5.4"};
+                };
+                
                 public String[] getDelimiters() {
                 	return new String [] {">"};
                 };
                 
                 public String getDefaultSolverParameters() {
                     return "-print";
+                };
+                
+                
+                public String getVersionParameter() {
+                	return "-version";
                 };
 
          
@@ -400,6 +442,9 @@ abstract class AbstractSolverType implements SolverType {
         private boolean isInstalled = false;
         private String solverParameters = getDefaultSolverParameters();
         private String solverCommand    = getDefaultSolverCommand();
+        private String solverVersion    = "";
+        private boolean isSupportedVersion = false;
+        private boolean supportHasBeenChecked = false;
 
 
         public static boolean isInstalled(String cmd) {
@@ -411,7 +456,7 @@ abstract class AbstractSolverType implements SolverType {
 
                         File file = new File(cmd);
 
-                        return file.exists();
+                        return file.exists() && !file.isDirectory();
 
                 }
         }
@@ -433,7 +478,7 @@ abstract class AbstractSolverType implements SolverType {
                     
                         isInstalled = isInstalled(cmd);
                         if (isInstalled) {
-                                installWasChecked = true;
+                        	    installWasChecked = true;
                         }
 
                 }
@@ -455,7 +500,37 @@ abstract class AbstractSolverType implements SolverType {
                 return false;
 
         }
+        
+        public boolean checkForSupport(){
+        	if(!isInstalled){
+        		return false;
+        	}
+        	supportHasBeenChecked = true;
+            solverVersion = VersionChecker.INSTANCE.getVersionFor(getSolverCommand(),getVersionParameter());
+            if(solverVersion == null){
+            	solverVersion = "";
+            	isSupportedVersion = false;
+            	return false;
+            }
+            for(String supportedVersion : getSupportedVersions()){
+              	if(solverVersion.indexOf(supportedVersion)>-1){
+            		isSupportedVersion = true;
+            		return true;
+            	}
+            }
+            isSupportedVersion = false;
+            return false;
+        }
+        
+        @Override
+        public boolean supportHasBeenChecked() {
+             return supportHasBeenChecked;
+        }
   
+        @Override
+        public boolean isSupportedVersion() {
+               return isSupportedVersion;
+        }
 
         public String getSolverParameters() {
                 if(solverParameters == null){
@@ -471,6 +546,7 @@ abstract class AbstractSolverType implements SolverType {
         
         @Override
         public void setSolverCommand(String s) {
+        	supportHasBeenChecked = false;
             solverCommand = s;
         }
         
@@ -481,6 +557,10 @@ abstract class AbstractSolverType implements SolverType {
             }
             return solverCommand;
         }
+        
+        public String getVersion() {
+			return solverVersion;
+		}
         
         
         @Override

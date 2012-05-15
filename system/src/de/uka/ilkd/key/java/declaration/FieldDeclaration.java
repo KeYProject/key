@@ -147,13 +147,13 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
         return parentIsInterfaceDeclaration || super.isPublic();
     }
 
-    /**
-     * Test whether the declaration is static. Fields of interfaces
-     * are always static.
+    /* *
+     * Test whether the declaration is static.
      */
-
     public boolean isStatic() {
-        return parentIsInterfaceDeclaration || super.isStatic();
+//        return parentIsInterfaceDeclaration || super.isStatic();
+     // DB 2012-05-08: interfaces may contain non-static model fields
+        return super.isStatic();
     }
 
     /**

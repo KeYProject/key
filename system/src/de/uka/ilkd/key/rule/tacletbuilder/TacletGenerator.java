@@ -12,7 +12,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -314,11 +313,14 @@ public class TacletGenerator {
 
         //create taclet
         final AntecTacletBuilder tacletBuilder = new AntecTacletBuilder();
-        tacletBuilder.setFind(TB.inv(services,
-                                     TB.var(heapSV),
-                                     eqVersion
-                                     ? TB.var(eqSV)
-                                     : TB.var(selfSV)));
+        final Term invTerm = isStatic? 
+                TB.staticInv(services,TB.var(heapSV),kjt) :
+                    TB.inv(services,
+                            TB.var(heapSV),
+                            eqVersion
+                            ? TB.var(eqSV)
+                            : TB.var(selfSV));
+        tacletBuilder.setFind(invTerm);
         tacletBuilder.addTacletGoalTemplate(
                 new TacletGoalTemplate(addedSeq,
                                        ImmutableSLList.<Taclet>nil()));

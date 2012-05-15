@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.smt;
 
 
+import java.awt.Component;
 import java.awt.Dimension;
 
 import java.awt.event.ActionEvent;
@@ -59,15 +60,17 @@ public abstract class TablePanel extends JPanel{
                 textArea.setEditable(false);
                 textArea.setLineWrap(true);
                 textArea.setWrapStyleWord(true);
-                addComponent(textArea,null);
+                addComponent(null,textArea);
                 return textArea;
         }
         
-        protected Box addComponent(JComponent component, String info){
+        protected Box addComponent(String info,JComponent ... components){
                 Box box = Box.createHorizontalBox();
-                component.setAlignmentX(LEFT_ALIGNMENT);
-                box.add(Box.createHorizontalStrut(STRUT));
-                box.add(component);                
+                for(JComponent component : components){
+                	component.setAlignmentX(LEFT_ALIGNMENT);
+                	box.add(Box.createHorizontalStrut(STRUT));
+                	box.add(component);                
+                }
                 box.add(Box.createHorizontalStrut(STRUT));
                 JButton infoButton = null;
                 if(info != null && info != "" ){
@@ -92,7 +95,7 @@ public abstract class TablePanel extends JPanel{
         
         protected JCheckBox addCheckBox(String title, String info, boolean value, ActionListener changeListener){
                 JCheckBox checkBox = createCheckBox(title, value, changeListener);
-                addComponent(checkBox, info);
+                addComponent(info,checkBox);
                 return checkBox;
         }
         
@@ -103,7 +106,7 @@ public abstract class TablePanel extends JPanel{
               FileChooserPanel fileChooserPanel =  new FileChooserPanel(selected,enabled,title);
               fileChooserPanel.addActionListener(changeListener);
               setMaximumHeight(fileChooserPanel, fileChooserPanel.getPreferredSize().height);
-              addComponent(fileChooserPanel, info);
+              addComponent(info,fileChooserPanel);
               
               return fileChooserPanel;
         }
@@ -112,7 +115,7 @@ public abstract class TablePanel extends JPanel{
                 JComboBox comboBox = new JComboBox(items);
                 comboBox.setSelectedIndex(selectionIndex);
                 comboBox.addActionListener(changeListener);
-                addComponent(comboBox, info);
+                addComponent(info,comboBox);
                 return comboBox;
         }
         
@@ -159,7 +162,7 @@ public abstract class TablePanel extends JPanel{
                 JTextField field = createTextField( text, changeListener);
                 Box box = createTitledComponent(title,minWidthOfTitle, field);
         
-                addComponent(box,info);
+                addComponent(info,box);
                 
                 return field;              
         }

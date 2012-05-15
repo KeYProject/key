@@ -200,9 +200,24 @@ class TacletMenu extends JMenu {
     private void addBuiltInRuleItem(BuiltInRule builtInRule,
 				    MenuControl control) {
         JMenuItem item;
-        item = new DefaultBuiltInRuleMenuItem(builtInRule);                       
-        item.addActionListener(control);
-        add(item);
+        if (builtInRule == WhileInvariantRule.INSTANCE) {
+            // we add to items in this case: one for auto one for interactive
+            item = new MenuItemForTwoModeRules(builtInRule.displayName(), 
+                    "Apply Rule", "Applies a known and complete loop specification immediately.",
+                    "Enter Loop Specification", "Allows to modify an existing or to enter a new loop specification.", builtInRule);
+            item.addActionListener(control);
+            add(item);
+        }  else if (builtInRule == UseOperationContractRule.INSTANCE) {
+            item = new MenuItemForTwoModeRules(builtInRule.displayName(), 
+                    "Apply Contract", "All available contracts of the method are combined and applied.",
+                    "Choose and Apply Contract", "Asks to select the contract to be applied.", builtInRule);
+            item.addActionListener(control);
+            add(item);        
+        } else {
+            item = new DefaultBuiltInRuleMenuItem(builtInRule);        
+            item.addActionListener(control);
+            add(item);
+        }
     }
 
     
@@ -415,10 +430,12 @@ class TacletMenu extends JMenu {
         	thread.start();            
             }           
             else if (e.getSource() instanceof BuiltInRuleMenuItem) {
-        	   
-                   mediator.selectedBuiltInRule
-                    (((BuiltInRuleMenuItem) e.getSource()).connectedTo(), 
-                     pos.getPosInOccurrence());
+
+                final BuiltInRuleMenuItem birmi = (BuiltInRuleMenuItem) e
+                        .getSource();
+                mediator.selectedBuiltInRule(
+                        birmi.connectedTo(), pos.getPosInOccurrence(), 
+                        birmi.forcedApplication());
         	
 	    } else if (e.getSource() instanceof FocussedRuleApplicationMenuItem) {
 	        mediator.getInteractiveProver ()

@@ -4,10 +4,9 @@ import java.io.File;
 import java.util.List;
 
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProblemLoader;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 public abstract class AbstractUserInterface implements UserInterface {
 
@@ -19,10 +18,10 @@ public abstract class AbstractUserInterface implements UserInterface {
 		pl.run();
 	}
 
-	@Override
-	public  RuleApp completeBuiltInRuleApp(RuleApp app, Goal goal, Services services) {
-		if (app instanceof AbstractContractRuleApp) {
-			app = ((AbstractContractRuleApp)app).tryToInstantiate(goal);
+    @Override
+	public  IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced) {
+		if (app instanceof IBuiltInRuleApp) {
+			app = ((IBuiltInRuleApp)app).tryToInstantiate(goal);
 		}
 		// cannot complete that app
 		return app.complete() ? app : null;

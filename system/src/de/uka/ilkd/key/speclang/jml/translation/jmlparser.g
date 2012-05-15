@@ -51,6 +51,7 @@ options {
 
     private Services services;
     private JavaInfo javaInfo;
+    private KeYJavaType containerType;
     private IntegerLDT intLDT;
     private HeapLDT heapLDT;
     private LocSetLDT locSetLDT;
@@ -88,6 +89,7 @@ options {
 	// save parameters
 	this.services       = services;
 	this.javaInfo       = services.getJavaInfo();
+	containerType  =   specInClass;
 	this.intLDT         = services.getTypeConverter().getIntegerLDT();
 	this.heapLDT        = services.getTypeConverter().getHeapLDT();
 	this.locSetLDT      = services.getTypeConverter().getLocSetLDT();
@@ -646,12 +648,7 @@ conditionalexpr returns [SLExpression result=null] throws SLTranslationException
 	(
 	    QUESTIONMARK a=conditionalexpr COLON b=conditionalexpr
 	    {
-	    	Term ife = TB.ife(TB.convertToFormula(result.getTerm(), services), a.getTerm(), b.getTerm());
-	    	if(a.getType() != null && a.getType().equals(b.getType())) {
-		    result = new SLExpression(ife, a.getType());
-		} else {
-		    result = new SLExpression(ife);
-		}
+	    	result = translator.translate(JMLTranslator.JMLKeyWord.CONDITIONAL, services, result, a, b);
 	    }
 	)?
     ;
@@ -1084,22 +1081,7 @@ castexpr returns  [SLExpression result = null] throws SLTranslationException
 :
 LPAREN type=typespec RPAREN result=unaryexpr
 {
-    if (type != null) {
-    if (result.isType()) {
-        raiseError("Casting of type variables not (yet) supported.");
-    }
-    assert result.isTerm();
-    
-    if(intHelper.isIntegerTerm(result)) {
-        result = intHelper.buildCastExpression(type, result);
-    } else {
-        result = new SLExpression(
-            TB.cast(services, type.getSort(), result.getTerm()), 
-            type);
-    }
-    } else {
-        raiseError("Please provide a type to cast to.");
-    }
+    result = translator.translate(JMLTranslator.JMLKeyWord.CAST, services, intHelper, type, result);
 }
 ;
 
@@ -1180,7 +1162,8 @@ primaryexpr returns [SLExpression result=null] throws SLTranslationException
 :
 	result=constant
     |   id:IDENT     { result = lookupIdentifier(id.getText(), null, null, id); }
-    |   INV          { result = new SLExpression(TB.inv(services, TB.var(selfVar)));}
+    |   inv:INV      { result = translator.translate(inv.getText(),services,
+                                selfVar==null? null: TB.var(selfVar),containerType);}
     |   TRUE         { result = new SLExpression(TB.tt()); }
     |   FALSE        { result = new SLExpression(TB.ff()); }
     |   NULL         { result = new SLExpression(TB.NULL(services)); }
@@ -1250,7 +1233,7 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
     |
     DOT INV
     {
-        result = new SLExpression(TB.inv(services, receiver.getTerm()));
+        result = translator.translate("\\inv",services,receiver.getTerm(),receiver.getType());
     }
     |	{
     	    if(receiver != null) {

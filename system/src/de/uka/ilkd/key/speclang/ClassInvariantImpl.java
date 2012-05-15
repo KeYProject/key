@@ -19,7 +19,6 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 
 
@@ -69,7 +68,8 @@ public final class ClassInvariantImpl implements ClassInvariant {
         this.originalSelfVar = selfVar;
         final OpCollector oc = new OpCollector();
         originalInv.execPostOrder(oc);
-        this.isStatic        = !oc.contains(originalSelfVar);
+        this.isStatic        = selfVar == null;
+//        assert isStatic == !oc.contains(originalSelfVar);
     }
     
 

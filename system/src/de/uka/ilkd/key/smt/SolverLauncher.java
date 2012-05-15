@@ -220,6 +220,7 @@ public class SolverLauncher implements SolverListener {
 		    SMTSolver solver = factory.createSolver(problem, this,
 			    services);
 		    problem.addSolver(solver);
+		
 		}
 	    }
 	}
@@ -246,7 +247,10 @@ public class SolverLauncher implements SolverListener {
 	LinkedList<SolverType> installedSolvers = new LinkedList<SolverType>();
 	for (SolverType type : factories) {
 	    if (type.isInstalled(false)) {
-		installedSolvers.add(type);
+	    	installedSolvers.add(type);
+	    	if(settings.checkForSupport()){
+	    		type.checkForSupport();
+	    	}
 	    }
 	}
 	problems = prepareSolvers(installedSolvers, problems, services);

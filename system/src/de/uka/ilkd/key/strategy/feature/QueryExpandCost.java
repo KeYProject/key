@@ -37,6 +37,11 @@ public class QueryExpandCost implements Feature {
     /** Constant that represents the boolean value false */
     public static final RuleAppCost TOP_COST  = TopRuleAppCost.INSTANCE;
     
+    /** If the literals in a query become greater than abs(ConsideredAsBigLiteral), then
+     *  this is interpreted as a "loop smell", i.e. the proof construction is in a loop
+     *  and produces big literals.*/
+    public static final int ConsideredAsBigLiteral = 7;
+    
     private final int baseCost; 
     private final int maxRepetitionsOnSameTerm;
     private final int termAgeFactor;
@@ -78,8 +83,11 @@ public class QueryExpandCost implements Feature {
 		
 		if(useExperimentalHeuristics){
 			// System.out.print("literal sum: "+literalsInArgumentsToCost(t,integerLDT,services));
-			int litcost = literalsInArgumentsToCost(t,integerLDT,services)*10; //If the factor is too small, then higher cost has no effect for some reason.
-			cost += litcost;
+			int litcost = maxIntliteralInArgumentsTimesTwo(t,integerLDT,services); //If the factor is too small, then higher cost has no effect for some reason.
+			if(litcost>ConsideredAsBigLiteral*2){
+				return TOP_COST;
+			}
+			//cost += litcost;
 		}
 			
 		if(maxRepetitionsOnSameTerm!=-1 && maxRepetitionsOnSameTerm<Integer.MAX_VALUE){
@@ -113,7 +121,7 @@ public class QueryExpandCost implements Feature {
 	 * @return Cost that is computed base on the integer literals occurring in the numerical arguments of the query t.
 	 * @see <code>literalsToCost</code>
 	 */
-	private static int literalsInArgumentsToCost(Term t, IntegerLDT iLDT, Services serv){
+	private static int maxIntliteralInArgumentsTimesTwo(Term t, IntegerLDT iLDT, Services serv){
 		final Namespace sorts = serv.getNamespaces().sorts();
 		final Sort intSort = (Sort) sorts.lookup(IntegerLDT.NAME);
 		int cost=0;
@@ -121,7 +129,7 @@ public class QueryExpandCost implements Feature {
 		for(int i=0;i<t.arity();i++){  
 			Term arg = t.sub(i);
 			if(arg.sort()==intSort){
-				cost += literalsToCost(arg, iLDT, serv);
+				cost = Math.max(cost, sumOfAbsLiteralsTimesTwo(arg, iLDT, serv));
 			}
 		}
 		return cost;
@@ -136,7 +144,7 @@ public class QueryExpandCost implements Feature {
               (*) The sum is modified by extrapolating negative numbers from zero by one. The
                   cost of a query f(n-1) a slightly higher cost than the cost of f(n+1).
      */
-	private static int literalsToCost(Term t, IntegerLDT iLDT, Services serv){
+	private static int sumOfAbsLiteralsTimesTwo(Term t, IntegerLDT iLDT, Services serv){
 		//if(t.op() instanceof Function && iLDT.hasLiteralFunction((Function)t.op())){
 		if(t.op() == iLDT.getNumberSymbol()){
 			String strVal = AbstractTermTransformer.convertToDecimalString(t, serv);
@@ -149,7 +157,7 @@ public class QueryExpandCost implements Feature {
 		}else{
 			int sum=0;
 			for(int i=0;i<t.arity();i++){
-				sum  += literalsToCost(t.sub(i), iLDT, serv);
+				sum  += sumOfAbsLiteralsTimesTwo(t.sub(i), iLDT, serv);
 			}
 			return sum;
 		}
@@ -176,15 +184,15 @@ public class QueryExpandCost implements Feature {
 	 */
 	protected int queryExpandAlreadyAppliedAtPos(RuleApp app, PosInOccurrence pos, Goal goal){
 		 int count=0;
-		 ImmutableList<RuleApp> l =goal.appliedRuleApps();
-	        if(l!=null && !l.isEmpty()){
-	        	Iterator<RuleApp> i=l.iterator();
-	        	while(i.hasNext()){
-	        		RuleApp ra = i.next();
-	        		Term raterm = ra.posInOccurrence().subTerm();
+		 ImmutableList<RuleApp> appliedRuleApps =goal.appliedRuleApps();
+	        if(appliedRuleApps!=null && !appliedRuleApps.isEmpty()){
+	        	Iterator<RuleApp> appliedRuleAppIter=appliedRuleApps.iterator();
+	        	while(appliedRuleAppIter.hasNext()){
+	        		RuleApp appliedRuleApp = appliedRuleAppIter.next();
+	        		Term oldterm = appliedRuleApp.posInOccurrence().subTerm();
 	        		Term curterm = pos.subTerm();
-	        		if(raterm.equals(curterm)){
-	        			//System.out.println("Rule already applied:"+app.rule().displayName()+ " on "+raterm.toString());
+	        		if(appliedRuleApp.rule().equals(QueryExpand.INSTANCE) && 
+	        				oldterm.equals(curterm)){
 	        			count++;
 	        			if(count>maxRepetitionsOnSameTerm) break;
 	        		}

@@ -92,6 +92,8 @@ public interface SMTSettings {
     public long getMaximumInteger();
     
     public long getMinimumInteger();
+    
+    public boolean checkForSupport();
   
 
 }

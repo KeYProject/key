@@ -6,7 +6,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
 
-public abstract class AbstractContractRuleApp extends BuiltInRuleApp {
+public abstract class AbstractContractRuleApp extends AbstractBuiltInRuleApp {
 
 	protected final Contract instantiation;
 
@@ -27,21 +27,19 @@ public abstract class AbstractContractRuleApp extends BuiltInRuleApp {
 	}
 
 
-	public Contract getInstantiation() {
+    public Contract getInstantiation() {
         return instantiation;
     }
-	
+		
+    @Override
     public abstract AbstractContractRuleApp tryToInstantiate(Goal goal);
 
-	public abstract AbstractContractRuleApp setContract(Contract contract);
+    public abstract AbstractContractRuleApp setContract(Contract contract);
 
 	public boolean complete() {
-    	return super.complete() && instantiation != null;
+    	return super.complete() && pio != null && instantiation != null;
     }
-    
-    public boolean isSufficientlyComplete() {
-    	return complete();    	
-    }
+
 
     
 }

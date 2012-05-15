@@ -50,6 +50,9 @@ public final class StrategyProperties extends Properties {
     public final static String QUERY_RESTRICTED = "QUERY_RESTRICTED";
     public final static String QUERY_OFF = "QUERY_OFF";
 
+    public final static String QUERYAXIOM_OPTIONS_KEY = "QUERYAXIOM_OPTIONS_KEY";
+    public final static String QUERYAXIOM_ON  = "QUERYAXIOM_ON";
+    public final static String QUERYAXIOM_OFF = "QUERYAXIOM_OFF";
     
     public final static String NON_LIN_ARITH_OPTIONS_KEY = "NON_LIN_ARITH_OPTIONS_KEY";
     public final static String NON_LIN_ARITH_NONE = "NON_LIN_ARITH_NONE";
@@ -70,6 +73,7 @@ public final class StrategyProperties extends Properties {
     //chrisg
     public final static String AUTO_INDUCTION_OPTIONS_KEY          = "AUTO_INDUCTION_OPTIONS_KEY"; 
     public final static String AUTO_INDUCTION_OFF      = "AUTO_INDUCTION_OFF"; 
+    public final static String AUTO_INDUCTION_RESTRICTED      = "AUTO_INDUCTION_RESTRICTED"; 
     public final static String AUTO_INDUCTION_ON       = "AUTO_INDUCTION_ON"; 
     public final static String AUTO_INDUCTION_LEMMA_ON = "AUTO_INDUCTION_LEMMA_ON";
 
@@ -81,6 +85,23 @@ public final class StrategyProperties extends Properties {
     public final static String USER_TACLETS_LOW = "USER_TACLETS_LOW";
     public final static String USER_TACLETS_HIGH = "USER_TACLETS_HIGH";
 
+    //String identities.
+    private static final String[] stringPool = {
+    	STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT, STOPMODE_NONCLOSE,    
+    	SPLITTING_OPTIONS_KEY, SPLITTING_NORMAL, SPLITTING_OFF, SPLITTING_DELAYED,
+    	LOOP_OPTIONS_KEY, LOOP_EXPAND, LOOP_EXPAND_BOUNDED, LOOP_INVARIANT, LOOP_NONE,
+    	METHOD_OPTIONS_KEY, METHOD_EXPAND, METHOD_CONTRACT, METHOD_NONE,
+    	DEP_OPTIONS_KEY, DEP_ON, DEP_OFF,
+    	QUERY_OPTIONS_KEY, QUERY_ON, QUERY_RESTRICTED, QUERY_OFF,
+    	QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON, QUERYAXIOM_OFF,
+    	NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE, NON_LIN_ARITH_DEF_OPS, NON_LIN_ARITH_COMPLETION,
+    	QUANTIFIERS_OPTIONS_KEY, QUANTIFIERS_NONE, QUANTIFIERS_NON_SPLITTING, QUANTIFIERS_NON_SPLITTING_WITH_PROGS, QUANTIFIERS_INSTANTIATE,
+    	VBT_PHASE, VBT_SYM_EX, VBT_QUAN_INST, VBT_MODEL_GEN,
+    	AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF, AUTO_INDUCTION_RESTRICTED, AUTO_INDUCTION_ON,  AUTO_INDUCTION_LEMMA_ON,
+    	USER_TACLETS_OPTIONS_KEY_BASE, USER_TACLETS_OFF, USER_TACLETS_LOW, USER_TACLETS_HIGH, 
+    	USER_TACLETS_OPTIONS_KEY(1), USER_TACLETS_OPTIONS_KEY(2), USER_TACLETS_OPTIONS_KEY(3)};
+    
+   
     private static final Properties defaultMap = new Properties();
     
     static {
@@ -89,6 +110,7 @@ public final class StrategyProperties extends Properties {
         defaultMap.setProperty(METHOD_OPTIONS_KEY, METHOD_CONTRACT);
         defaultMap.setProperty(DEP_OPTIONS_KEY, DEP_ON);
         defaultMap.setProperty(QUERY_OPTIONS_KEY, QUERY_OFF);
+        defaultMap.setProperty(QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON);
         defaultMap.setProperty(NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE);
         defaultMap.setProperty(QUANTIFIERS_OPTIONS_KEY, QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
@@ -104,6 +126,7 @@ public final class StrategyProperties extends Properties {
         put(METHOD_OPTIONS_KEY, defaultMap.get(METHOD_OPTIONS_KEY));
         put(DEP_OPTIONS_KEY, defaultMap.get(DEP_OPTIONS_KEY));
         put(QUERY_OPTIONS_KEY, defaultMap.get(QUERY_OPTIONS_KEY));
+        put(QUERYAXIOM_OPTIONS_KEY, defaultMap.get(QUERYAXIOM_OPTIONS_KEY));
         put(NON_LIN_ARITH_OPTIONS_KEY, defaultMap.get(NON_LIN_ARITH_OPTIONS_KEY));
         put(QUANTIFIERS_OPTIONS_KEY, defaultMap.get(QUANTIFIERS_OPTIONS_KEY));
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
@@ -131,6 +154,7 @@ public final class StrategyProperties extends Properties {
         sp.put(METHOD_OPTIONS_KEY, readSingleOption(p, METHOD_OPTIONS_KEY));
         sp.put(DEP_OPTIONS_KEY, readSingleOption(p,DEP_OPTIONS_KEY));
         sp.put(QUERY_OPTIONS_KEY, readSingleOption(p,QUERY_OPTIONS_KEY));
+        sp.put(QUERYAXIOM_OPTIONS_KEY, readSingleOption(p,QUERYAXIOM_OPTIONS_KEY));
         sp.put(NON_LIN_ARITH_OPTIONS_KEY, readSingleOption(p,NON_LIN_ARITH_OPTIONS_KEY));
         sp.put(QUANTIFIERS_OPTIONS_KEY, readSingleOption(p,QUANTIFIERS_OPTIONS_KEY));
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
@@ -145,9 +169,9 @@ public final class StrategyProperties extends Properties {
      * @param p
      */
     private static Object readSingleOption(Properties p, String key) {
-        Object o = p.get("[StrategyProperty]"+key);
-        if (o == null) o = defaultMap.get(key);
-        return o;
+        String o = (String)p.get("[StrategyProperty]"+key);
+        if (o == null) o = (String)defaultMap.get(key);
+        return getUniqueString(o);
     }
 
     public void write(Properties p) {                
@@ -156,6 +180,7 @@ public final class StrategyProperties extends Properties {
         p.put("[StrategyProperty]"+METHOD_OPTIONS_KEY, get(METHOD_OPTIONS_KEY));
         p.put("[StrategyProperty]"+DEP_OPTIONS_KEY, get(DEP_OPTIONS_KEY));              
         p.put("[StrategyProperty]"+QUERY_OPTIONS_KEY, get(QUERY_OPTIONS_KEY));              
+        p.put("[StrategyProperty]"+QUERYAXIOM_OPTIONS_KEY, get(QUERYAXIOM_OPTIONS_KEY));              
         p.put("[StrategyProperty]"+NON_LIN_ARITH_OPTIONS_KEY, get(NON_LIN_ARITH_OPTIONS_KEY));              
         p.put("[StrategyProperty]"+QUANTIFIERS_OPTIONS_KEY, get(QUANTIFIERS_OPTIONS_KEY));              
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
@@ -184,5 +209,19 @@ public final class StrategyProperties extends Properties {
 	    }
 	}
 	return result;
+    }
+    
+    /** 
+     * @param in A keyword from the strategy properties. It must be registered in <code>stringPool<\code>.
+     * @return Returns the same string but possibly with a different but unique object identity.
+     */
+    private final static String getUniqueString(String in){
+    	for(String id:stringPool){
+    		if(id.equals(in)){
+    			return id; 
+    		}
+    	}
+    	System.err.println("The string \""+in+"\" is not registered in the string pool of StrategyProperties. Update the string pool!");
+    	return null;
     }
 }
