@@ -562,7 +562,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          // Get method
          IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
          // Increase timeout
-         SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 4;
+         SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 6;
          // Launch method
          TestSEDKeyCoreUtil.launchKeY(method, true);
          // Find the launched ILaunch in the debug view

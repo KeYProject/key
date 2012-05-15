@@ -18,7 +18,7 @@ import org.key_project.sed.core.model.impl.AbstractSEDStackFrameCompatibleDebugN
  * <li>{@link ISEDMethodCall} (method call, e.g. {@code foo()})</li>
  * <li>{@link ISEDMethodReturn} (method return, e.g. {@code return 42})</li>
  * <li>{@link ISEDTermination} (termination, e.g. {@code <end>})</li>
- * <li>{@link ISEDExceptionalTermination} (exceptional termination, e.g. {@code throws Exception})</li>
+ * <li>{@link ISEDExceptionalTermination} (exceptional termination, e.g. {@code <uncaught java.lang.NullPointerException>})</li>
  * </ul>
  * </p>
  * <p>

@@ -1,4 +1,4 @@
-package org.key_project.sed.key.core.strategy;
+package org.key_project.sed.key.core.symbolic_execution.strategy;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.DefaultGoalChooserBuilder;

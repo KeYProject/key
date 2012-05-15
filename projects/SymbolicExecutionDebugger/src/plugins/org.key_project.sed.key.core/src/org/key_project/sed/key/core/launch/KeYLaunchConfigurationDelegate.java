@@ -13,8 +13,8 @@ import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.eclipse.jdt.core.IMethod;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.sed.key.core.launch.key.po.SEDFunctionalOperationContractPO;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
+import org.key_project.sed.key.core.symbolic_execution.po.SymbolicExecutionFunctionalOperationContractPO;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.java.StringUtil;
@@ -158,7 +158,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                     // Instantiate proof
                     ProofOblInput input;
                     if (contract instanceof FunctionalOperationContract) {
-                        input = new SEDFunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract);
+                        input = new SymbolicExecutionFunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract);
                     }
                     else {
                         throw new CoreException(LogUtil.getLogger().createErrorStatus("Contract of class \"" + contract.getClass().getCanonicalName() + "\" are not supported."));

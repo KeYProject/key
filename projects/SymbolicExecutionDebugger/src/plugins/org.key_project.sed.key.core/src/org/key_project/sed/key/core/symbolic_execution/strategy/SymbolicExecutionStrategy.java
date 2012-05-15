@@ -1,4 +1,4 @@
-package org.key_project.sed.key.core.strategy;
+package org.key_project.sed.key.core.symbolic_execution.strategy;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Proof;
@@ -11,7 +11,7 @@ import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 /**
  * Strategy tailored to VBT aimed symbolic execution.
  */
-public class DebuggerStrategy extends VBTStrategy {
+public class SymbolicExecutionStrategy extends VBTStrategy {
 
     public static final String VISUAL_DEBUGGER_SPLITTING_RULES_KEY = "VD_SPLITTING_RULES_KEY";
     public static final String VISUAL_DEBUGGER_WATCHPOINTS_KEY = "WATCHPOINTS_KEY";
@@ -24,7 +24,7 @@ public class DebuggerStrategy extends VBTStrategy {
 
     public static final String VISUAL_DEBUGGER_FALSE = "FALSE";
 
-    public static StrategyProperties getDebuggerStrategyProperties(
+    public static StrategyProperties getSymbolicExecutionStrategyProperties(
             boolean splittingRulesAllowed, boolean inUpdateAndAssumes,
             boolean inInitPhase, boolean quantifierInstantiationWithSplitting) { // , List<WatchPoint> watchpoints
         final StrategyProperties res = new StrategyProperties();
@@ -62,7 +62,7 @@ public class DebuggerStrategy extends VBTStrategy {
         return res;
     }
 
-    protected DebuggerStrategy(Proof p_proof, StrategyProperties props) { // ,List<WatchPoint> watchpoints
+    protected SymbolicExecutionStrategy(Proof p_proof, StrategyProperties props) { // ,List<WatchPoint> watchpoints
 
         super(p_proof, props, 0);
 
@@ -141,7 +141,7 @@ public class DebuggerStrategy extends VBTStrategy {
 //                    .get(VISUAL_DEBUGGER_WATCHPOINTS_KEY);
             injectDebuggerDefaultOptionsIfUnset(strategyProperties);
             
-            return new DebuggerStrategy(p_proof, strategyProperties); // ,watchpoints
+            return new SymbolicExecutionStrategy(p_proof, strategyProperties); // ,watchpoints
         }
 
         private void injectDebuggerDefaultOptionsIfUnset(
