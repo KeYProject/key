@@ -10,7 +10,6 @@ import org.key_project.util.test.testcase.ArrayUtilTest;
 import org.key_project.util.test.testcase.BeanTest;
 import org.key_project.util.test.testcase.BundleUtilTest;
 import org.key_project.util.test.testcase.CollectionUtilTest;
-import org.key_project.util.test.testcase.DefaultEntryTest;
 import org.key_project.util.test.testcase.IOUtilTest;
 import org.key_project.util.test.testcase.JDTUtilTest;
 import org.key_project.util.test.testcase.JobUtilTest;
@@ -38,7 +37,6 @@ import org.key_project.util.test.testcase.XMLUtilTest;
     BeanTest.class,
     BundleUtilTest.class,
     CollectionUtilTest.class,
-    DefaultEntryTest.class,
     IOUtilTest.class,
     JDTUtilTest.class,
     JobUtilTest.class,

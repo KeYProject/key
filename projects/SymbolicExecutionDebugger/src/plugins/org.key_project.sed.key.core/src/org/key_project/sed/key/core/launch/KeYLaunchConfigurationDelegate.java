@@ -14,7 +14,6 @@ import org.eclipse.jdt.core.IMethod;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
-import org.key_project.sed.key.core.symbolic_execution.po.SymbolicExecutionFunctionalOperationContractPO;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.java.StringUtil;
@@ -40,6 +39,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
+import de.uka.ilkd.key.symbolic_execution.po.SymbolicExecutionFunctionalOperationContractPO;
 
 /**
  * This {@link LaunchConfigurationDelegate} is responsible to start

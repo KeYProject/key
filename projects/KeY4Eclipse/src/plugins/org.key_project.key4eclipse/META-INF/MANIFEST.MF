@@ -5,8 +5,7 @@ Bundle-SymbolicName: org.key_project.key4eclipse
 Bundle-Version: 1.0.0.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.core.resources;bundle-version="3.7.100",
- org.key_project.util;bundle-version="1.0.0"
+ org.eclipse.core.resources;bundle-version="3.7.100"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: lib/antlr.jar,
  lib/javacc.jar,
@@ -87,6 +86,11 @@ Export-Package: .,
  de.uka.ilkd.key.strategy.termProjection,
  de.uka.ilkd.key.strategy.termfeature,
  de.uka.ilkd.key.strategy.termgenerator,
+ de.uka.ilkd.key.symbolic_execution,
+ de.uka.ilkd.key.symbolic_execution.model,
+ de.uka.ilkd.key.symbolic_execution.model.impl,
+ de.uka.ilkd.key.symbolic_execution.po,
+ de.uka.ilkd.key.symbolic_execution.strategy,
  de.uka.ilkd.key.taclettranslation,
  de.uka.ilkd.key.taclettranslation.assumptions,
  de.uka.ilkd.key.taclettranslation.lemma,

@@ -87,6 +87,13 @@ public class TestKey extends TestCase {
 
     };
 
+    static Class[] setTests = new Class[] {
+       de.uka.ilkd.key.util.TestNodePreorderIterator.class,
+       de.uka.ilkd.key.symbolic_execution.util.TestDefaultEntry.class,
+       de.uka.ilkd.key.symbolic_execution.util.TestEqualsHashCodeResetter.class,
+       de.uka.ilkd.key.symbolic_execution.util.TestJavaUtil.class
+    };
+
      
      public static TestSuite createSuite(Class[] testClasses, final String msg) {
 	TestSuite suite = new TestSuite() {
@@ -118,6 +125,7 @@ public class TestKey extends TestCase {
 	suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
         suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
         suite.addTest(createSuite(smtTests, "Testing SMT backend"));
+        suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
         
 	return suite;
     }

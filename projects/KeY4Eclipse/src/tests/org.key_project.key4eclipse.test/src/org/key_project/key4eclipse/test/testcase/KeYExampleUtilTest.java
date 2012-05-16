@@ -191,4 +191,145 @@ public class KeYExampleUtilTest extends TestCase {
         properties.load(new FileInputStream(exampleFile));
         assertEquals(expectedVersion, properties.get(KeYExampleUtil.VERSION_KEY));
     }
+    
+    /**
+     * Tests {@link KeYExampleUtil#delete(File)}.
+     */
+    @Test
+    public void testDelete() throws IOException {
+        // Test null
+        KeYExampleUtil.delete(null); // No exception expected
+        // Test existing file
+        File tmpFile = File.createTempFile("IOUtilTest", "deleteMe");
+        assertTrue(tmpFile.exists());
+        KeYExampleUtil.delete(tmpFile);
+        assertFalse(tmpFile.exists());
+        // Test empty directory
+        TestUtilsUtil.createFolder(tmpFile);
+        KeYExampleUtil.delete(tmpFile);
+        assertFalse(tmpFile.exists());
+        // Test directory with content
+        TestUtilsUtil.createFolder(tmpFile);
+        File subDir = TestUtilsUtil.createFolder(new File(tmpFile, "subDir"));
+        File subFile = TestUtilsUtil.createFile(new File(tmpFile, "subFile.txt"), "test");
+        File subDir2 = TestUtilsUtil.createFolder(new File(tmpFile, "subDir"));
+        File subSubDir2 = TestUtilsUtil.createFolder(new File(subDir2, "subDir"));
+        File subSubSubDir2 = TestUtilsUtil.createFolder(new File(subSubDir2, "subDir"));
+        File subSubSubDir2File = TestUtilsUtil.createFile(new File(subSubSubDir2, "subFile.txt"), "test");
+        KeYExampleUtil.delete(tmpFile);
+        assertFalse(tmpFile.exists());
+        assertFalse(subDir.exists());
+        assertFalse(subFile.exists());
+        assertFalse(subDir2.exists());
+        assertFalse(subSubDir2.exists());
+        assertFalse(subSubSubDir2.exists());
+        assertFalse(subSubSubDir2File.exists());
+    }
+    
+    /**
+     * Tests {@link KeYExampleUtil#extractFromBundleToFilesystem(String, String, java.io.File)}
+     */
+    @Test
+    public void testExtractFromBundleToFilesystem() throws CoreException, IOException {
+       File tmpDir = File.createTempFile("KeYExampleUtilTest", "testExtractFromBundleToWorkspace_File");
+       try {
+          // Test not existing directory
+          IOUtil.delete(tmpDir);
+          KeYExampleUtil.extractFromBundleToFilesystem(Activator.PLUGIN_ID, "data/extractTest", tmpDir);
+          doTestExtractFromBundleToFilesystem(tmpDir);
+          // Test existing directory
+          IOUtil.delete(tmpDir);
+          tmpDir.mkdirs();
+          File additionalFolder = TestUtilsUtil.createFolder(new File(tmpDir, "EmptyAdditionalDir"));
+          File additionalFile = TestUtilsUtil.createFile(new File(tmpDir, "AdditionalFile.txt"), "AdditionalFile");
+          File existingFolder = TestUtilsUtil.createFolder(new File(tmpDir, "SubFolder"));
+          File existingFile = TestUtilsUtil.createFile(new File(tmpDir, "File.txt"), "ReplacedContent");
+          KeYExampleUtil.extractFromBundleToFilesystem(Activator.PLUGIN_ID, "data/extractTest", tmpDir);
+          doTestExtractFromBundleToFilesystem(tmpDir);
+          assertTrue(additionalFolder.exists());
+          assertTrue(additionalFolder.isDirectory());
+          assertTrue(additionalFile.exists());
+          assertTrue(additionalFile.isFile());
+          assertEquals("AdditionalFile", IOUtil.readFrom(new FileInputStream(additionalFile)));
+          assertTrue(existingFolder.exists());
+          assertTrue(existingFolder.isDirectory());
+          assertTrue(existingFile.exists());
+          assertTrue(existingFile.isFile());
+          assertEquals("File", IOUtil.readFrom(new FileInputStream(existingFile)));
+          // Test null plugin-id
+          try {
+             KeYExampleUtil.extractFromBundleToFilesystem(null, "data/extractTest", tmpDir);
+             fail("Exception expected.");
+          }
+          catch (CoreException e) {
+              assertEquals("No plug-in ID defined.", e.getMessage());
+          }
+          // Test invalid plugin-id
+          try {
+             KeYExampleUtil.extractFromBundleToFilesystem("INVALID", "data/extractTest", tmpDir);
+             fail("Exception expected.");
+          }
+          catch (CoreException e) {
+              assertEquals("Can't find plug-in with ID \"INVALID\".", e.getMessage());
+          }
+          // Test null path
+          try {
+              KeYExampleUtil.extractFromBundleToFilesystem(Activator.PLUGIN_ID, null, tmpDir);
+              fail("Exception expected.");
+          }
+          catch (CoreException e) {
+              assertEquals("No path in plug-in defined.", e.getMessage());
+          }
+          // Test null target
+          try {
+              KeYExampleUtil.extractFromBundleToFilesystem(Activator.PLUGIN_ID, "data/extractTest", null);
+              fail("Exception expected.");
+          }
+          catch (CoreException e) {
+              assertEquals("No target is defined.", e.getMessage());
+          }
+       }
+       finally {
+          IOUtil.delete(tmpDir);
+       }
+    }
+
+    /**
+     * Executes assertions to make sure that the correct files are extracted
+     * for {@link #testExtractFromBundleToFilesystem()}. 
+     * @param folder The target folder.
+     * @throws IOException Occurred Exception
+     */
+    protected static void doTestExtractFromBundleToFilesystem(File folder) throws IOException {
+       // Test container
+       assertNotNull(folder);
+       assertTrue(folder.exists());
+       assertTrue(folder.isDirectory());
+       // Test container/File.txt
+       File file = new File(folder, "File.txt");
+       assertTrue(file.exists());
+       assertTrue(file.isFile());
+       assertEquals("File", IOUtil.readFrom(new FileInputStream(file)));
+       // Test container/EmptyFolder
+       // Test container/SubFolder
+       File subFolder = new File(folder, "SubFolder");
+       assertTrue(subFolder.exists());
+       assertTrue(subFolder.isDirectory());
+       // Test container/SubFolder/EmptySubFolder
+       // Test container/SubFolder/SubSubFolder
+       File subSubFolder = new File(subFolder, "SubSubFolder");
+       assertTrue(subSubFolder.exists());
+       assertTrue(subSubFolder.isDirectory());
+       // Test container/SubFolder/SubSubFolder/EmptySubSubFolder
+       // Test container/SubFolder/SubSubFolder/SubSubFile.txt
+       File subSubFile = new File(subSubFolder, "SubSubFile.txt");
+       assertTrue(subSubFile.exists());
+       assertTrue(subSubFile.isFile());
+       assertEquals("SubSubFile", IOUtil.readFrom(new FileInputStream(subSubFile)));
+       // Test container/SubFolder/SubFile.txt
+       File subFile = new File(subFolder, "SubFile.txt");
+       assertTrue(subFile.exists());
+       assertTrue(subFile.isFile());
+       assertEquals("SubFile", IOUtil.readFrom(new FileInputStream(subFile)));
+    }
 }

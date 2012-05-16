@@ -23,6 +23,5 @@ Export-Package: org.key_project.util.bean,
  org.key_project.util.eclipse.swt.wizard.page,
  org.key_project.util.eclipse.view.editorInView,
  org.key_project.util.java,
- org.key_project.util.java.collection,
  org.key_project.util.java.thread,
  org.key_project.util.jdt

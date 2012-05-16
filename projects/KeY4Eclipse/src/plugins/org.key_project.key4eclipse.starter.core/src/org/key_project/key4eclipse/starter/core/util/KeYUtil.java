@@ -58,8 +58,7 @@ import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * <p>
@@ -584,17 +583,7 @@ public final class KeYUtil {
      * @return The display name of the applied rule in the given {@link Node} or {@code null} if no one exists.
      */
     public static String getRuleDisplayName(Node node) {
-       String name = null;
-       if (node != null) {
-          RuleApp ruleApp = node.getAppliedRuleApp();
-          if (ruleApp != null) {
-             Rule rule = ruleApp.rule();
-             if (rule != null) {
-                name = rule.displayName();
-             }
-          }
-       }
-       return name;
+       return MiscTools.getRuleDisplayName(node);
     }
 
     /**
