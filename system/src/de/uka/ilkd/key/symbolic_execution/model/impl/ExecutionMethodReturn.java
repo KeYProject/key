@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
-import org.eclipse.core.runtime.Assert;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
@@ -225,9 +223,9 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                                                                            Node node,
                                                                            IProgramVariable variable) {
       // Make sure that correct parameters are given
-      Assert.isNotNull(context);
-      Assert.isNotNull(node);
-      Assert.isTrue(variable instanceof ProgramVariable);
+      assert context != null;
+      assert node != null;
+      assert variable instanceof ProgramVariable;
       // Create method frame which will be executed in site proof
       Statement originalReturnStatement = (Statement)node.getNodeInfo().getActiveStatement();
       MethodFrame newMethodFrame = new MethodFrame(variable, context, new StatementBlock(originalReturnStatement));
@@ -304,7 +302,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     */
    protected ApplyStrategyInfo startSiteProof(Sequent sequentToProve) throws ProofInputException {
       // Make sure that valid parameters are given
-      Assert.isNotNull(sequentToProve);
+      assert sequentToProve != null;
       // Create ProofStarter
       ProofStarter starter = new ProofStarter();
       // Configure ProofStarter
@@ -332,7 +330,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     */
    protected Term extractOperatorValue(ApplyStrategyInfo info, final Operator operator) throws ProofInputException {
       // Make sure that valid parameters are given
-      Assert.isNotNull(info);
+      assert info != null;
       if (info.getProof().openGoals().size() != 1) {
          throw new ProofInputException("Assumption that return value extraction has one goal does not hold because " + info.getProof().openGoals().size() + " goals are available.");
       }
