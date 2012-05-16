@@ -89,6 +89,9 @@ public class TestKey extends TestCase {
 
     static Class[] setTests = new Class[] {
        de.uka.ilkd.key.util.TestNodePreorderIterator.class,
+       de.uka.ilkd.key.symbolic_execution.TestExecutionNodePreorderIterator.class,
+       de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
+       de.uka.ilkd.key.symbolic_execution.TestSymbolicExecutionTreeBuilder.class,
        de.uka.ilkd.key.symbolic_execution.util.TestDefaultEntry.class,
        de.uka.ilkd.key.symbolic_execution.util.TestEqualsHashCodeResetter.class,
        de.uka.ilkd.key.symbolic_execution.util.TestJavaUtil.class

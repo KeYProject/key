@@ -461,7 +461,7 @@ public final class ProblemInitializer {
 	alreadyParsed.clear();
 
         //the first time, read in standard rules
-        if(baseConfig == null) {
+        if(baseConfig == null || profile != baseConfig.getProfile()) {
             baseConfig = new InitConfig(services, profile);
 
 	    RuleSource tacletBase = profile.getStandardRules().getTacletBase();

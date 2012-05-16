@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;">
+   <methodCall name="self.main();">
+      <statement name="IllegalArgumentException e = new IllegalArgumentException ();">
+         <statement name="throw e;">
+            <termination name="&lt;uncaught java.lang.IllegalArgumentException&gt;" exceptionalTermination="true">
+            </termination>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>

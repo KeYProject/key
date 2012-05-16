@@ -22,8 +22,6 @@ import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.jdt.JDTUtil;
 
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
@@ -35,11 +33,8 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
-import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.symbolic_execution.po.SymbolicExecutionFunctionalOperationContractPO;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * This {@link LaunchConfigurationDelegate} is responsible to start
@@ -139,17 +134,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                     }
                     else {
                         Services services = initConfig.getServices();
-                        // Create TextualJMLSpecCase
-                        ImmutableList<String> mods = ImmutableSLList.nil();
-                        mods = mods.append("public");
-                        TextualJMLSpecCase textualSpecCase = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
-                        if (!pm.isStatic()) {
-                           textualSpecCase.addRequires(new PositionedString("this.<inv>")); // Assume own invariants
-                        }
-                        // Create contract
-                        JMLSpecFactory factory = new JMLSpecFactory(services);
-                        ImmutableSet<Contract> contracts = factory.createJMLOperationContracts(pm, textualSpecCase);
-                        contract = contracts.iterator().next();
+                        contract = SymbolicExecutionUtil.createDefaultContract(services, pm);
                     }
                     // Make sure that a contract is defined
                     if (contract == null) {

@@ -11,6 +11,38 @@ import junit.framework.TestCase;
  */
 public class TestJavaUtil extends TestCase {
    /**
+    * Tests {@link JavaUtil#createLine(String, int)}
+    */
+   public void testCreateLine() {
+      // Test line with one character
+      assertEquals("", JavaUtil.createLine("#", -1));
+      assertEquals("", JavaUtil.createLine("#", 0));
+      assertEquals("-", JavaUtil.createLine("-", 1));
+      assertEquals("AA", JavaUtil.createLine("A", 2));
+      assertEquals("#####", JavaUtil.createLine("#", 5));
+      // Test line with multiple characters
+      assertEquals("ABABAB", JavaUtil.createLine("AB", 3));
+      // Test null text
+      assertEquals("nullnullnullnull", JavaUtil.createLine(null, 4));
+   }
+   
+   /**
+    * Tests {@link JavaUtil#encodeText(String)}
+    */
+   public void testEncodeText() {
+      // Test null
+      assertNull(JavaUtil.encodeText(null));
+      // Test empty string
+      assertEquals("", JavaUtil.encodeText(""));
+      // Text XML tags
+      assertEquals("&lt;hello&gt;world&lt;/hello&gt;", JavaUtil.encodeText("<hello>world</hello>"));
+      // Test XML attributes
+      assertEquals("&lt;hello a=&quot;A&quot; b=&apos;B&apos;&gt;world&lt;/hello&gt;", JavaUtil.encodeText("<hello a=\"A\" b='B'>world</hello>"));
+      // Test XML entities
+      assertEquals("&lt;hello a=&quot;A&quot; b=&apos;B&apos;&gt;&amp;lt;world&amp;gt;&lt;/hello&gt;", JavaUtil.encodeText("<hello a=\"A\" b='B'>&lt;world&gt;</hello>"));
+   }
+   
+   /**
     * Tests {@link JavaUtil#isEmpty(Object[])}
     */
    public void testIsEmpty() {
