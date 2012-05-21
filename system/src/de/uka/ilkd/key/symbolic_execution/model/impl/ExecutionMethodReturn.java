@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import org.eclipse.core.runtime.Assert;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
@@ -27,12 +29,14 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProofStarter;
 
@@ -153,6 +157,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
                                                                                            resultVar);
             ApplyStrategy.ApplyStrategyInfo info = startSiteProof(sequentToProve.getSequentToProve());
             returnValue = extractOperatorValue(info, sequentToProve.getOperator());
+            Assert.isNotNull(returnValue);
             // Format return vale
             StringBuffer sb = ProofSaver.printTerm(returnValue, info.getProof().getServices(), true);
             formatedReturnValue = sb.toString();
@@ -306,11 +311,12 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
       // Create ProofStarter
       ProofStarter starter = new ProofStarter();
       // Configure ProofStarter
-      starter.init(sequentToProve, getProof().env());
+      ProofEnvironment env = SymbolicExecutionUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(getProof()); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
+      starter.init(sequentToProve, env);
       starter.setMaxRuleApplications(1000);
       StrategyProperties sp = getProof().getSettings().getStrategySettings().getActiveStrategyProperties(); // Is a clone that can be modified
       sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_OFF); // Logical Splitting: Off
-      sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE); // Method Treatement: Off
+      sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE); // Method Treatment: Off
       sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF); // Dependency Contracts: Off
       sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF); // Query Treatment: Off
       sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS); // Arithmetic Treatment: DefOps

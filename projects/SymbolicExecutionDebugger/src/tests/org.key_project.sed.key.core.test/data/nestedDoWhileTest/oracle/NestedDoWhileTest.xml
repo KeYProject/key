@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_7e9f50b3-f183-4e23-9086-f7be69cdaca0" name="NestedDoWhileTest[NestedDoWhileTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_5c64201e-6805-4b09-9fb4-7b34a412d76e" name="KeY Default Thread">
+      <sedThread xml:id="_5c64201e-6805-4b09-9fb4-7b34a412d76e" name="&lt;start&gt;">
          <sedMethodCall xml:id="_33623296-fa22-419d-82c3-9f16ba95e420" name="self.main();" lineNumber="-1" charStart="97" charEnd="101">
             <sedStatement xml:id="_8eba54ed-8093-4604-b815-ffb0b02bba38" name="int result = 0;" lineNumber="-1" charStart="109" charEnd="124">
                <sedStatement xml:id="_8908a187-7c14-462e-aa94-bbe6135ed01c" name="int i = 0;" lineNumber="-1" charStart="128" charEnd="138">

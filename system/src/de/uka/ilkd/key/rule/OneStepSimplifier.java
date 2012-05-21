@@ -69,7 +69,7 @@ public final class OneStepSimplifier implements BuiltInRule,
     //constructors
     //------------------------------------------------------------------------- 
     
-    private OneStepSimplifier() {
+    public OneStepSimplifier() { // Visibility must be public because it is no longer a singleton in general. Site proofs use own OneStepSimplifier instances for parallelization. This is required thanks to the internal state of this rule.
     }
     
     

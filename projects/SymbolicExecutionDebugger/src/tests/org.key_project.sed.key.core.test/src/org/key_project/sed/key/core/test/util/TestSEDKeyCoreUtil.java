@@ -31,6 +31,8 @@ import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.jdt.JDTUtil;
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+
 /**
  * Provides static methods that makes testing easier.
  * @author Martin Hentschel
@@ -118,7 +120,7 @@ public final class TestSEDKeyCoreUtil {
       target.setName(targetName);
       // Add thread
       SEDMemoryThread thread = new SEDMemoryThread(target);
-      thread.setName(KeYDebugTarget.DEFAULT_THREAD_NAME);
+      thread.setName(IExecutionStartNode.DEFAULT_START_NODE_NAME);
       target.addSymbolicThread(thread);
       return target;
    }

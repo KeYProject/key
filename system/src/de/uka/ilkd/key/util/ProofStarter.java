@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.gui.ApplyStrategy;
-import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -15,10 +15,14 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.RuleCollection;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.util.IFilter;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * This class encapsulates the registration of a proof for a given problem.
@@ -171,7 +175,10 @@ public class ProofStarter {
         proof.setActiveStrategy(profile.getDefaultStrategyFactory().create(proof, strategyProperties));
         
         if (proof.getSettings().getGeneralSettings().oneStepSimplification()) {
-        	OneStepSimplifier.INSTANCE.refresh(proof);
+           OneStepSimplifier simplifier = findOneStepSimplifier();
+           if (simplifier != null) {
+              simplifier.refresh(proof);
+           }
         }
         
         profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);        
@@ -192,6 +199,24 @@ public class ProofStarter {
         if (ptl != null) prover.removeProverTaskObserver(ptl);
 
         return result;
+    }
+    
+    /**
+     * Searches the {@link OneStepSimplifier} which is used in the 
+     * {@link ProofEnvironment} of the current proof which is not in general
+     * {@link OneStepSimplifier#INSTANCE}. For instance uses the
+     * symbolic execution tree extraction its own instances of 
+     * {@link OneStepSimplifier} in site proofs for parallelization. 
+     * @return The found {@link OneStepSimplifier}.
+     */
+    public OneStepSimplifier findOneStepSimplifier() {
+       RuleCollection rc = proof.env().getInitConfig().getProfile().getStandardRules();
+       return (OneStepSimplifier)JavaUtil.search(rc.getStandardBuiltInRules(), new IFilter<BuiltInRule>() {
+         @Override
+         public boolean select(BuiltInRule element) {
+            return element instanceof OneStepSimplifier;
+         }
+       });
     }
 
 

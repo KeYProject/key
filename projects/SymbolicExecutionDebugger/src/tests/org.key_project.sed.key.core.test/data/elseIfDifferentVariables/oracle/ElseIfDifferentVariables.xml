@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_83ef919e-a306-4174-a111-aca7d4640887" name="ElseIfDifferentVariables[ElseIfDifferentVariables::main(boolean,boolean)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_ef95e06f-436a-4b9c-933e-1715be91066c" name="KeY Default Thread">
+      <sedThread xml:id="_ef95e06f-436a-4b9c-933e-1715be91066c" name="&lt;start&gt;">
          <sedMethodCall xml:id="_0684e661-2e16-4072-b7f6-b48f59ba0207" name="self.main(_a,_b);" lineNumber="-1" charStart="55" charEnd="59">
             <sedBranchNode xml:id="_71eb8f98-88aa-4a01-a556-e43037e116c0" name="if (_a) {return 1; }else if (_b) {return 2;   }else  {return 3;   }" lineNumber="-1" charStart="87" charEnd="179">
                <sedBranchCondition xml:id="_ae8d79d0-267f-4fca-8696-bc98133901d3" name="if _a true">

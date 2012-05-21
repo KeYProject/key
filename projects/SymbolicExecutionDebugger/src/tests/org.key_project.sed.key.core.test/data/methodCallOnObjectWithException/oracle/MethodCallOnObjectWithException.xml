@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_ad705ea0-fef9-4d5e-9a8c-2a44a18903d2" name="MethodCallOnObjectWithException[MethodCallOnObjectWithException::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_6540b3a5-7dec-4b10-bbba-29527ebfe4c3" name="KeY Default Thread">
+      <sedThread xml:id="_6540b3a5-7dec-4b10-bbba-29527ebfe4c3" name="&lt;start&gt;">
          <sedMethodCall xml:id="_5446d3a6-5cdb-4ae6-9562-1d4a397b83d7" name="MethodCallOnObjectWithException.main();" lineNumber="-1" charStart="69" charEnd="73">
             <sedStatement xml:id="_a89c9d52-d065-4c0b-a8be-177c3f0ac249" name="MethodCallOnObjectWithException x = new MethodCallOnObjectWithException ();" lineNumber="-1" charStart="91" charEnd="165">
                <sedStatement xml:id="_b2ff7300-786e-4787-80a7-562d3203fec3" name="return x.doSomething();" lineNumber="-1" charStart="170" charEnd="193">

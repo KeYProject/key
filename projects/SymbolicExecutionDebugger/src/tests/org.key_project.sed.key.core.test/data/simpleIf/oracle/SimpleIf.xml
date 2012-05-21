@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_50d52ab3-8846-4bfd-a16b-30ec35f5b059" name="SimpleIf[SimpleIf::min(int,int)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_fa156934-cb69-4ec9-89f8-645a2980879a" name="KeY Default Thread">
+      <sedThread xml:id="_fa156934-cb69-4ec9-89f8-645a2980879a" name="&lt;start&gt;">
          <sedMethodCall xml:id="_b50ad9ab-4ba9-4483-ae67-ca94885d0ef9" name="self.min(_i,_j);" lineNumber="-1" charStart="413" charEnd="416">
             <sedStatement xml:id="_a2d7fc1f-1086-499d-885f-bf3954464317" name="int result;" lineNumber="-1" charStart="436" charEnd="447">
                <sedBranchNode xml:id="_568632ea-1ae9-45a2-837a-d1ee01ebf600" name="if (_i&lt;_j) {   result_1=_i; }else  {   result_1=_j; }" lineNumber="-1" charStart="451" charEnd="515">

@@ -28,11 +28,6 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
    private ISEDDebugNode parent;
    
    /**
-    * The name of this debug node.
-    */
-   private String name;
-   
-   /**
     * The thread.
     */
    private ISEDThread thread;
@@ -125,22 +120,6 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
       else {
          return Platform.getAdapterManager().getAdapter(this, adapter);
       }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getName() throws DebugException {
-      return name;
-   }
-
-   /**
-    * Sets the name of this node.
-    * @param name the name to set.
-    */
-   protected void setName(String name) {
-      this.name = name;
    }
    
    /**

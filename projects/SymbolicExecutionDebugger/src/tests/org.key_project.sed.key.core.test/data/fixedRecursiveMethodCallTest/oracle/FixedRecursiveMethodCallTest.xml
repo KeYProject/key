@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_71cb48a0-8fd1-4dde-9264-dcd3b2c1e5d5" name="FixedRecursiveMethodCallTest[FixedRecursiveMethodCallTest::decreaseValue()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_4f5c4144-71c6-4341-b798-1468804d9a28" name="KeY Default Thread">
+      <sedThread xml:id="_4f5c4144-71c6-4341-b798-1468804d9a28" name="&lt;start&gt;">
          <sedMethodCall xml:id="_759bfc6b-f9b9-4b27-92c0-0adc825534b0" name="FixedRecursiveMethodCallTest.decreaseValue();" lineNumber="-1" charStart="66" charEnd="79">
             <sedStatement xml:id="_d0500805-b667-412b-8d2b-965f8cd944ce" name="return decrease(3);" lineNumber="-1" charStart="87" charEnd="106">
                <sedMethodCall xml:id="_dc1cb93e-a434-466a-84b8-78a7fad3c76a" name="FixedRecursiveMethodCallTest.decrease(n);" lineNumber="-1" charStart="134" charEnd="142">
