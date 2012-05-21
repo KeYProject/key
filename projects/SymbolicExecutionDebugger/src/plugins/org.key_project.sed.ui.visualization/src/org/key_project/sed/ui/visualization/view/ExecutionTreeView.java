@@ -361,14 +361,15 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                   if (!treeViewer.getExpandedState(toExpand)) {
                      // Search item to expand
                      Widget item = treeViewer.testFindItem(toExpand);
-                     Assert.isTrue(item instanceof TreeItem);
-                     TreeItem treeItem = (TreeItem)item;
-                     // Make item visible and expand it. Invisible elements are not expanded.
-                     treeViewer.getTree().showItem(treeItem);
-                     treeViewer.setExpandedState(toExpand, true);
-                     // Make all children visible because otherwise lazy loading will not update them if the expanded element is exactly the last visible element.
-                     for (TreeItem child : treeItem.getItems()) {
-                        treeViewer.getTree().showItem(child);
+                     if (item instanceof TreeItem) {
+                        TreeItem treeItem = (TreeItem)item;
+                        // Make item visible and expand it. Invisible elements are not expanded.
+                        treeViewer.getTree().showItem(treeItem);
+                        treeViewer.setExpandedState(toExpand, true);
+                        // Make all children visible because otherwise lazy loading will not update them if the expanded element is exactly the last visible element.
+                        for (TreeItem child : treeItem.getItems()) {
+                           treeViewer.getTree().showItem(child);
+                        }
                      }
                   }
                }
