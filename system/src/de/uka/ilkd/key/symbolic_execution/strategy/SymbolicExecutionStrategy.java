@@ -84,8 +84,6 @@ public class SymbolicExecutionStrategy extends VBTStrategy {
 //                inftyConst(), longConst(0)));
 //        bindRuleSet(d, "method_expand", ifZero(BreakpointFeature.create(),
 //                inftyConst(), longConst(0)));
-        bindRuleSet(d, "debugger", inftyConst());
-      //  bindRuleSet(d, "statement_sep", longConst(-200));
 //        if (!inInitPhase) {
 //            bindRuleSet(d, "simplify_autoname", ifZero(WatchPointFeature.create(watchpoints),
 //                    inftyConst(), longConst(0)));
