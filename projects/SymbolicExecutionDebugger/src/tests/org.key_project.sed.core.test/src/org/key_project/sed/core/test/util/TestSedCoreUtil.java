@@ -76,7 +76,7 @@ public final class TestSedCoreUtil {
    /**
     * Waiting time of the user interface.
     */
-   public static final int USER_INTERFACE_DEBUG_TREE_WAIT_TIME = 1000;
+   public static final int USER_INTERFACE_DEBUG_TREE_WAIT_TIME = 2000;
    
    /**
     * The ID of the fixed example launch configuration type.
