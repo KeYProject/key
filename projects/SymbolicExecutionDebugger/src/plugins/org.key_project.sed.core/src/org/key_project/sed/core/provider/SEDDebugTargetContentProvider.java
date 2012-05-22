@@ -50,13 +50,13 @@ public class SEDDebugTargetContentProvider extends ElementContentProvider {
     * @return The children. 
     * @throws CoreException Occurred Exception.
     */
-   protected Object[] getChildren(Object parent) throws CoreException {
+   protected Object[] getAllChildren(Object parent) throws CoreException {
       if (parent instanceof ISEDDebugTarget) {
          Object[] children = ((ISEDDebugTarget)parent).getSymbolicThreads();
-         return children != null ? children : new Object[0];
+         return children != null ? children : EMPTY;
       }
       else {
-         return new Object[0];
+         return EMPTY;
       }
    }
 
@@ -65,7 +65,7 @@ public class SEDDebugTargetContentProvider extends ElementContentProvider {
     */
    @Override
    protected Object[] getChildren(Object parent, int index, int length, IPresentationContext context, IViewerUpdate monitor) throws CoreException {
-      return getElements(getChildren(parent), index, length);
+      return getElements(getAllChildren(parent), index, length);
    }
 
    /**
@@ -73,7 +73,7 @@ public class SEDDebugTargetContentProvider extends ElementContentProvider {
     */
    @Override
    protected int getChildCount(Object element, IPresentationContext context, IViewerUpdate monitor) throws CoreException {
-      return getChildren(element).length;
+      return getAllChildren(element).length;
    }
 
    /**
