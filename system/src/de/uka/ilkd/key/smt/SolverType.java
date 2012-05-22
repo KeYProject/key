@@ -507,6 +507,11 @@ abstract class AbstractSolverType implements SolverType {
         	}
         	supportHasBeenChecked = true;
             solverVersion = VersionChecker.INSTANCE.getVersionFor(getSolverCommand(),getVersionParameter());
+            if(solverVersion == null){
+            	solverVersion = "";
+            	isSupportedVersion = false;
+            	return false;
+            }
             for(String supportedVersion : getSupportedVersions()){
               	if(solverVersion.indexOf(supportedVersion)>-1){
             		isSupportedVersion = true;

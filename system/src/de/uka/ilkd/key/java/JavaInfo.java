@@ -122,6 +122,7 @@ public final class JavaInfo {
     protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
     
     private ObserverFunction inv;
+    private HashMap<KeYJavaType,ObserverFunction> staticInvs = new HashMap<KeYJavaType,ObserverFunction>();
 
     
     /**
@@ -463,6 +464,10 @@ public final class JavaInfo {
      */
     public boolean isSubtype(KeYJavaType subType, KeYJavaType superType) {
         return kpmi.isSubtype(subType, superType);
+    }
+    
+    public boolean isInterface(KeYJavaType t){
+        return (t.getJavaType() instanceof InterfaceDeclaration);
     }
 
     /** 
@@ -1283,7 +1288,21 @@ public final class JavaInfo {
 	}
 	return inv;
     }
-    
+
+    /**
+     * Returns the special symbol <code>&lt;staticInv&gt;</code> which stands for the static invariant of a type.
+     */
+    public ObserverFunction getStaticInv(KeYJavaType target) {
+        if (!staticInvs.containsKey(target))
+            staticInvs.put(target, new ObserverFunction("<$inv>",
+                           Sort.FORMULA,
+                           null,
+                           services.getTypeConverter().getHeapLDT().targetSort(),
+                           target,
+                           true,
+                           new ImmutableArray<KeYJavaType>()));
+        return staticInvs.get(target);
+    }
     
     /**
      * inner class used to filter certain types of program elements

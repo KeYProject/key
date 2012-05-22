@@ -2,6 +2,8 @@ package org.key_project.util.test.view;
 
 import org.eclipse.ui.IEditorInput;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.editor.TextControlEditor;
 import org.key_project.util.test.editor.TextControlEditorContributor;
 
@@ -45,6 +47,21 @@ public class TextControlEditorInViewView extends AbstractEditorInViewView<TextCo
    @Override
    protected IEditorInput createEditorInput() {
       return null;
+   }
+   
+   /**
+    * Checks if {@link #getEditorComposite()} is enabled or not.
+    * @return {@code true} enabled, {@code false} disabled.
+    */
+   public boolean isEditorCompositeEnabled() {
+      IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+         @Override
+         public void run() {
+            setResult(getEditorComposite().isEnabled());
+         }
+      };
+      getEditorComposite().getDisplay().syncExec(run);
+      return run.getResult() != null && run.getResult().booleanValue();
    }
 
    /**

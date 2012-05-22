@@ -1,7 +1,5 @@
 package org.key_project.sed.ui.visualization.execution_tree.editor;
 
-import java.io.OutputStream;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -11,6 +9,7 @@ import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.context.IContext;
@@ -20,11 +19,10 @@ import org.eclipse.graphiti.notification.INotificationService;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.serialization.SEDXMLWriter;
-import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDNotificationService;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.SaveAsExecutionTreeDiagramWizard;
+import org.key_project.sed.ui.visualization.util.CustomizableDiagramEditorContextMenuProvider;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
@@ -36,8 +34,6 @@ import org.key_project.util.java.ArrayUtil;
  * @author Martin Hentschel
  */
 // TODO: Reload diagram when the domain model file has changed.
-// TODO: Synchronize selection with debug view
-// TODO: Implement outline view
 public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
    /**
     * Indicates that this editor is read-onl or editable otherwise.
@@ -53,32 +49,6 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
          ExecutionTreeDiagramEditor.this.handleDebugEvents(events);
       }
    };
-   
-   /**
-    * {@inheritDoc}
-    */
-   @SuppressWarnings("restriction")
-   @Override
-   public void doSave(IProgressMonitor monitor) {
-      try {
-         // Save diagram file
-         super.doSave(monitor);
-         // Save domain file
-         IDiagramTypeProvider diagramTypeProvider = getDiagramTypeProvider();
-         if (diagramTypeProvider instanceof ExecutionTreeDiagramTypeProvider) {
-            ExecutionTreeDiagramTypeProvider provider = (ExecutionTreeDiagramTypeProvider)diagramTypeProvider;
-            // Open output stream to domain file
-            OutputStream out = ExecutionTreeUtil.writeDomainFile(diagramTypeProvider.getDiagram());
-            // Save domain file
-            SEDXMLWriter writer = new SEDXMLWriter();
-            writer.write(provider.getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, out);
-         }
-      }
-      catch (Exception e) {
-         LogUtil.getLogger().logError(e);
-         throw new RuntimeException(e);
-      }
-   }
 
    /**
     * {@inheritDoc}
@@ -124,7 +94,6 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
    public void executeFeatureInJob(String jobName, 
                                    final IFeature feature, 
                                    final IContext context) {
-      AbstractExecutionTreeDiagramEditorJob.cancelJobs(this);
       new AbstractExecutionTreeDiagramEditorJob(jobName, this) {
          @Override
          protected IStatus run(IProgressMonitor monitor) {
@@ -260,5 +229,17 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
    @Override
    public boolean isDirty() {
       return !isReadOnly() && super.isDirty();
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected ContextMenuProvider createContextMenuProvider() {
+      return new CustomizableDiagramEditorContextMenuProvider(getGraphicalViewer(), 
+                                                              getActionRegistry(), 
+                                                              getConfigurationProvider(),
+                                                              !isReadOnly(),
+                                                              !isReadOnly());
    }
 }

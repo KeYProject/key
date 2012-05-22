@@ -1,7 +1,9 @@
 package org.key_project.util.eclipse.job;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
+import org.key_project.util.java.ArrayUtil;
 
 /**
  * This {@link ISchedulingRule} can be used to let {@link Job}s waiting
@@ -15,12 +17,26 @@ public class ObjectchedulingRule implements ISchedulingRule {
    private Object conflictsWith;
    
    /**
+    * <p>
+    * Contains all {@link IResource}s which also conflicts with this {@link ISchedulingRule}.
+    * </p>
+    * <p>
+    * Only the usage of {@link IResource} in this class makes sure that plug-in
+    * {@code org.eclipse.core.resources} is loaded which avoids some bugs during runtime.
+    * </p>
+    */
+   private IResource[] conflictingResources;
+   
+   /**
     * Constructor.
     * @param conflictsWith The object which causes conflicts.
+    * @param conflictingResources Contains all {@link IResource}s which also conflicts with this {@link ISchedulingRule}.
     */
-   public ObjectchedulingRule(Object conflictsWith) {
+   public ObjectchedulingRule(Object conflictsWith, 
+                              IResource... conflictingResources) {
       super();
       this.conflictsWith = conflictsWith;
+      this.conflictingResources = conflictingResources;
    }
 
    /**
@@ -33,7 +49,12 @@ public class ObjectchedulingRule implements ISchedulingRule {
          return conflictsWith.equals(otherRule.getConflictsWith());
       }
       else {
-         return false;
+         if (rule instanceof IResource) {
+            return ArrayUtil.contains(conflictingResources, (IResource)rule);
+         }
+         else {
+            return false;
+         }
       }
    }
 

@@ -13,7 +13,8 @@ import org.eclipse.graphiti.features.impl.DefaultRemoveFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.util.SEDIterator;
+import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 
 /**
@@ -60,7 +61,7 @@ public class ExecutionTreeRemoveFeature extends DefaultRemoveFeature {
             Object[] businessObjectsForPictogramElement = getAllBusinessObjectsForPictogramElement(pe);
             for (Object businessObject : businessObjectsForPictogramElement) {
                if (businessObject instanceof ISEDDebugElement) {
-                  SEDIterator iter = new SEDIterator((ISEDDebugElement)businessObject);
+                  ISEDIterator iter = new SEDPreorderIterator((ISEDDebugElement)businessObject);
                   while (iter.hasNext()) {
                      ISEDDebugElement next = iter.next();
                      PictogramElement childPe = getFeatureProvider().getPictogramElementForBusinessObject(next);

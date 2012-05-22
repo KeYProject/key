@@ -3,7 +3,12 @@ package org.key_project.sed.ui.visualization.util;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.gef.GraphicalViewer;
+import org.eclipse.gef.SnapToGrid;
 import org.eclipse.gef.commands.CommandStack;
+import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.gef.ui.palette.FlyoutPaletteComposite.FlyoutPreferences;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeature;
@@ -12,12 +17,18 @@ import org.eclipse.graphiti.internal.command.CommandContainer;
 import org.eclipse.graphiti.internal.command.GenericFeatureCommandWithContext;
 import org.eclipse.graphiti.internal.command.ICommand;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.internal.command.GefCommandWrapper;
+import org.eclipse.graphiti.ui.internal.config.IConfigurationProvider;
+import org.eclipse.graphiti.ui.internal.editor.DiagramEditorInternal;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IWorkbenchPart;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
 import org.key_project.util.eclipse.view.editorInView.GlobalEnablementWrapperAction;
 import org.key_project.util.eclipse.view.editorInView.IGlobalEnablement;
+import org.key_project.util.java.CollectionUtil;
 
 /**
  * <p>
@@ -59,6 +70,11 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
    private List<IGlobalEnablement> childGlobalEnablements = new LinkedList<IGlobalEnablement>();
 
    /**
+    * Is the default selection synchronization (e.g. with debug view) enabled?
+    */
+   private boolean defaultSelectionSynchronizationEnabled = true;
+   
+   /**
     * {@inheritDoc}
     */
    @Override
@@ -70,6 +86,59 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
       super.dispose();
    }
    
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+      if (isDefaultSelectionSynchronizationEnabled()) {
+         // Synchronize for instance selection with debug view
+         super.selectionChanged(part, selection);
+      }
+      else {
+         // Code from GraphicalEditor#selectionChanged(...)
+         if (this.equals(getSite().getPage().getActiveEditor())) {
+            updateActions(getSelectionActions());
+         }
+      }
+   }
+
+   /**
+    * Selects all {@link PictogramElement}s of the given business objects.
+    * @param businessObjects The business objects to select their {@link PictogramElement}s.
+    */
+   public void selectBusinessObjects(Object[] businessObjects) {
+      List<PictogramElement> pictogramElements = new LinkedList<PictogramElement>();
+      for (Object bo : businessObjects) {
+         PictogramElement[] referencingPes = getPictogramElements(bo);
+         CollectionUtil.addAll(pictogramElements, referencingPes);
+      }
+      selectPictogramElements(pictogramElements.toArray(new PictogramElement[pictogramElements.size()]));
+   }
+   
+   /**
+    * <p>
+    * Returns all {@link PictogramElement}s for the given business object.
+    * </p>
+    * <p>
+    * The implementation is influenced by the selection synchronization of
+    * {@link DiagramEditorInternal#selectionChanged(IWorkbenchPart, ISelection)}.
+    * </p>
+    * @param bo The given business object for that {@link PictogramElement}s are needed.
+    * @return The found {@link PictogramElement}s.
+    */
+   protected PictogramElement[] getPictogramElements(Object bo) {
+      if (bo instanceof EObject) {
+         // Find the Pictogram Elements for the given domain object via the standard link service
+         List<PictogramElement> referencingPes = Graphiti.getLinkService().getPictogramElements(getDiagramTypeProvider().getDiagram(), (EObject) bo);
+         return referencingPes.toArray(new PictogramElement[referencingPes.size()]);
+      }
+      else {
+         // For non-EMF domain objects use the registered notification service for finding
+         return getDiagramTypeProvider().getNotificationService().calculateRelatedPictogramElements(new Object[] { bo });
+      }
+   }
+
    /**
     * {@inheritDoc}
     */
@@ -104,7 +173,42 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
    protected void executeCommand(ICommand command) {
       CommandStack commandStack = getEditDomain().getCommandStack();
       commandStack.execute(new GefCommandWrapper(command, getEditingDomain()));
-   }   
+   }
+   
+   /**
+    * Checks if the grid is visible.
+    * @return {@code true} grid is visible, {@code false} grid is hidden.
+    */
+   public boolean isGridVisible() {
+      Object prop = getGraphicalViewer().getProperty(SnapToGrid.PROPERTY_GRID_VISIBLE);
+      return prop instanceof Boolean && ((Boolean)prop).booleanValue();
+   }
+   
+   /**
+    * Sets the grid visible or hides it.
+    * @param showGrid {@code true} show grid, {@code false} hide grid.
+    */
+   public void setGridVisible(boolean showGrid) {
+      IAction action = getActionRegistry().getAction(GEFActionConstants.TOGGLE_GRID_VISIBILITY);
+      Assert.isNotNull(action);
+      action.run();
+   }
+   
+   /**
+    * Checks if the default selection synchronization (e.g. with debug view) is enabled.
+    * @return {@code true} do default synchronization, {@code false} don't do synchronization with other workbench parts.
+    */
+   public boolean isDefaultSelectionSynchronizationEnabled() {
+      return defaultSelectionSynchronizationEnabled;
+   }
+
+   /**
+    * Defines if the default selection synchronization (e.g. with debug view) is enabled.
+    * @param defaultSelectionSynchronizationEnabled {@code true} do default synchronization, {@code false} don't do synchronization with other workbench parts.
+    */
+   public void setDefaultSelectionSynchronizationEnabled(boolean defaultSelectionSynchronizationEnabled) {
+      this.defaultSelectionSynchronizationEnabled = defaultSelectionSynchronizationEnabled;
+   }
    
    /**
     * <p>
@@ -273,5 +377,31 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
    @Override
    public boolean isDirty() {
       return super.isDirty();
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Overwritten to ignore warnings.
+    * </p>
+    */   
+   @Override
+   public GraphicalViewer getGraphicalViewer() {
+      return super.getGraphicalViewer();
+   }
+
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Overwritten to ignore warnings.
+    * </p>
+    */   
+   @Override
+   public IConfigurationProvider getConfigurationProvider() {
+      return super.getConfigurationProvider();
    }
 }

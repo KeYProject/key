@@ -43,6 +43,7 @@ import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
 import org.key_project.key4eclipse.starter.ui.provider.KeYClassPathEntryLabelProvider;
 import org.key_project.key4eclipse.starter.ui.util.LogUtil;
+import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.viewer.FileExtensionViewerFilter;
 import org.key_project.util.java.StringUtil;
@@ -444,12 +445,12 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
      * Opens the dialog to add workspace class path entries.
      */
     public void addWorkspaceClassPathEntry() {
-        IContainer[] result = SWTUtil.openFolderSelection(getShell(), 
-                                                          "Select class path to add", 
-                                                          "Select a folder, project or create a new one.", 
-                                                          true,
-                                                          null,
-                                                          null);
+        IContainer[] result = WorkbenchUtil.openFolderSelection(getShell(), 
+                                                                "Select class path to add", 
+                                                                "Select a folder, project or create a new one.", 
+                                                                true,
+                                                                null,
+                                                                null);
         if (result != null) {
             List<KeYClassPathEntry> toSelect = new ArrayList<KeYClassPathEntry>(result.length);
             for (IContainer container : result) {
@@ -470,12 +471,12 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
      */    
     public void addWorkspaceFileClassPathEntry() {
         
-        IFile[] result = SWTUtil.openFileSelection(getShell(),
-                                                   "Select class path file to add",
-                                                   "Select a file.", 
-                                                   true, 
-                                                   null,
-                                                   Collections.singleton(new FileExtensionViewerFilter(new String[] {"jar", "zip"})));
+        IFile[] result = WorkbenchUtil.openFileSelection(getShell(),
+                                                         "Select class path file to add",
+                                                         "Select a file.", 
+                                                         true, 
+                                                         null,
+                                                         Collections.singleton(new FileExtensionViewerFilter(new String[] {"jar", "zip"})));
         if (result != null) {
             List<KeYClassPathEntry> toSelect = new ArrayList<KeYClassPathEntry>(result.length);
             for (IFile file : result) {
@@ -562,12 +563,12 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
     public void selectBootClassPath() {
         if (useWorkspaceBootClassPathButton.getSelection()) {
             IResource currentResource = ResourcesPlugin.getWorkspace().getRoot().findMember(new Path(bootClassPathText.getText()));
-            IContainer[] result = SWTUtil.openFolderSelection(getShell(), 
-                                                              "Select boot class path", 
-                                                              "Select a folder, project or create a new one.", 
-                                                              false, 
-                                                              new Object[] {currentResource}, 
-                                                              null);
+            IContainer[] result = WorkbenchUtil.openFolderSelection(getShell(), 
+                                                                    "Select boot class path", 
+                                                                    "Select a folder, project or create a new one.", 
+                                                                    false, 
+                                                                    new Object[] {currentResource}, 
+                                                                    null);
             if (result != null && result.length == 1) {
                 bootClassPathText.setText(result[0].getFullPath().toString());
             }

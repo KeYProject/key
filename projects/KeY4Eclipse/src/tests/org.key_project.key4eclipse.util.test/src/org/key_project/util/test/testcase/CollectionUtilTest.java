@@ -20,6 +20,56 @@ import org.key_project.util.java.IFilter;
  */
 public class CollectionUtilTest extends TestCase {
    /**
+    * Tests {@link CollectionUtil#removeFirst(Iterable)}
+    */
+   @Test
+   public void testRemoveFirst() {
+      // Test null
+      assertNull(CollectionUtil.removeFirst(null));
+      // Test empty collection
+      Set<String> set = Collections.emptySet();
+      List<String> list = Collections.emptyList();
+      assertNull(CollectionUtil.removeFirst(set));
+      assertNull(CollectionUtil.removeFirst(list));
+      assertTrue(set.isEmpty());
+      assertTrue(list.isEmpty());
+      // Test one element
+      set = CollectionUtil.toSet("A");
+      list = CollectionUtil.toList("A");
+      assertEquals("A", CollectionUtil.removeFirst(set));
+      assertEquals("A", CollectionUtil.removeFirst(list));
+      assertTrue(set.isEmpty());
+      assertTrue(list.isEmpty());
+      // Test more elements
+      set = CollectionUtil.toSet("A", "B");
+      list = CollectionUtil.toList("A", "B");
+      assertEquals("A", CollectionUtil.removeFirst(set));
+      assertEquals("A", CollectionUtil.removeFirst(list));
+      assertEquals("B", CollectionUtil.removeFirst(set));
+      assertEquals("B", CollectionUtil.removeFirst(list));
+      assertTrue(set.isEmpty());
+      assertTrue(list.isEmpty());
+   }
+   
+   /**
+    * Tests {@link CollectionUtil#getFirst(Iterable)}
+    */
+   @Test
+   public void testGetFirst() {
+      // Test null
+      assertNull(CollectionUtil.getFirst(null));
+      // Test empty collection
+      assertNull(CollectionUtil.getFirst(Collections.emptySet()));
+      assertNull(CollectionUtil.getFirst(Collections.emptyList()));
+      // Test one element
+      assertEquals("A", CollectionUtil.getFirst(Collections.singleton("A")));
+      assertEquals("A", CollectionUtil.getFirst(Collections.singletonList("A")));
+      // Test more elements
+      assertEquals("A", CollectionUtil.getFirst(CollectionUtil.toSet("A", "B")));
+      assertEquals("A", CollectionUtil.getFirst(CollectionUtil.toList("A", "B")));
+   }
+   
+   /**
     * Tests {@link CollectionUtil#containsSame(java.util.Set, java.util.Set)}.
     */
    @Test

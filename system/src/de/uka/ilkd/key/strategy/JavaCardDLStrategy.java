@@ -185,7 +185,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         } else if (queryProp.equals(StrategyProperties.QUERY_RESTRICTED)) {
         	// All tests in the example directory pass with this strategy. 
         	//Hence, the old query_on strategy is obsolete.
-    	    queryF = querySpecFeature(new QueryExpandCost(500,0,20,false));  
+    	    queryF = querySpecFeature(new QueryExpandCost(500,0,20,true));  
         } else if (queryProp.equals(StrategyProperties.QUERY_OFF)) {
         	queryF = querySpecFeature(inftyConst());
         } else {
@@ -817,9 +817,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private boolean autoInductionLemmaEnabled () {  //chrisg
+    	final String prop =strategyProperties.getProperty
+                             ( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY ) ;
+    	return prop.equals(StrategyProperties.AUTO_INDUCTION_LEMMA_ON) ||
+    	       prop.equals(StrategyProperties.AUTO_INDUCTION_RESTRICTED);
+    	/*
         return StrategyProperties.AUTO_INDUCTION_LEMMA_ON.equals (
                  strategyProperties.getProperty
                  ( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY ) );
+         */
     }
 
     private Feature allowSplitting(ProjectionToTerm focus) {

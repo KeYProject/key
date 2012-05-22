@@ -8,6 +8,7 @@ import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
+import org.key_project.monkey.product.ui.batch.MonKeYBatchMode;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.SwingUtil;
@@ -26,23 +27,57 @@ import de.uka.ilkd.key.gui.MainWindow;
  * @author Martin Hentschel
  */
 public class MonKeYApplication implements IApplication {
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object start(IApplicationContext context) throws Exception {
-        String[] arguments = getStartArguments(context);
-        Comparator<String> comparator = StringUtil.createIgnoreCaseComparator();
-        if (ArrayUtil.contains(arguments, "keyonly", comparator)) {
-            String[] cleaned = ArrayUtil.remove(arguments, "keyonly", comparator);
-            return startKeYApplication(cleaned, context);
-        }
-        else {
-            return startEclipseApplication(context);
-        }
-    }
+   /**
+    * Parameter to show KeY's {@link MainWindow} instead of MonKeY.
+    */
+   public static final String PARAM_KEY_ONLY = "-keyonly";
+   
+   /**
+    * Parameter to use the batch mode.
+    */
+   public static final String PARAM_BATCH_MODE = "-batch";
+  
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Object start(IApplicationContext context) throws Exception {
+      String[] arguments = getStartArguments(context);
+      Comparator<String> comparator = StringUtil.createIgnoreCaseComparator();
+      if (ArrayUtil.contains(arguments, PARAM_KEY_ONLY, comparator)) {
+         String[] cleaned = ArrayUtil.remove(arguments, PARAM_KEY_ONLY, comparator);
+         return startKeYApplication(cleaned, context);
+      }
+      else if (ArrayUtil.contains(arguments, PARAM_BATCH_MODE, comparator)) {
+         String[] cleaned = ArrayUtil.remove(arguments, PARAM_BATCH_MODE, comparator);
+         return startBatchApplication(cleaned, context);
+      }
+      else {
+         return startEclipseApplication(context);
+      }
+   }
     
-    /**
+   /**
+    * Starts the batch mode.
+    * @param cleanedArguments The cleaned arguments for the batch mode.
+    * @param context The {@link IApplicationContext} to use.
+     * @return The exit result.
+     * @throws Exception Occurred Exception.
+    */
+   protected Object startBatchApplication(String[] cleanedArguments, IApplicationContext context) throws Exception {
+      try {
+         // Close splash screen
+         context.applicationRunning();
+         new MonKeYBatchMode().start(cleanedArguments);
+         return IApplication.EXIT_OK;
+      }
+      catch (Exception e) {
+         e.printStackTrace(); // Throwing the exception opens an UI dialog which should not happen in batch execution.
+         return IApplication.EXIT_OK;
+      }
+   }
+
+   /**
      * Starts the KeY application.
      * @param cleanedArguments The cleaned arguments for KeY.
      * @param context The {@link IApplicationContext} to use.

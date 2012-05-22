@@ -6,12 +6,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.Enumeration;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.key_project.key4eclipse.Activator;
-import org.key_project.util.eclipse.BundleUtil;
-import org.key_project.util.java.IOUtil;
 import org.osgi.framework.Bundle;
 
 /**
@@ -175,9 +178,116 @@ public class KeYExampleUtil {
                 }
                 // Update directory.
                 File dir = new File(keyExampleDir);
-                IOUtil.delete(dir);
+                delete(dir);
                 dir.mkdirs();
-                BundleUtil.extractFromBundleToFilesystem(bundleId, pathInBundle, dir);
+                extractFromBundleToFilesystem(bundleId, pathInBundle, dir);
+            }
+        }
+    }
+    
+    /**
+     * Deletes the given file/folder with all contained sub files/folders.
+     * @param file The file/folder to delete.
+     */
+    public static void delete(File file) {
+        if (file != null && file.exists()) {
+            if (file.isDirectory()) {
+                File[] children = file.listFiles();
+                for (File child : children) {
+                    delete(child);
+                }
+            }
+            file.delete();
+        }
+    }
+
+    /**
+     * Extracts the specified files from the bundle into the target directory.
+     * @param pluginId The ID of the plug-in that contains the data to extract.
+     * @param pathInBundle The path in the bundle to extract.
+     * @param target The target directory in the local file system.
+     * @throws CoreException Occurred Exception.
+     */
+    public static void extractFromBundleToFilesystem(String pluginId, String pathInBundle, File target) throws CoreException {
+        // Make sure that all parameters are defined.
+        if (pluginId == null) {
+            throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "No plug-in ID defined."));
+        }
+        if (pathInBundle == null) {
+            throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "No path in plug-in defined."));
+        }
+        if (target == null) {
+            throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "No target is defined."));
+        }
+        // Get Bundle.
+        Bundle bundle = Platform.getBundle(pluginId);
+        if (bundle == null) {
+            throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Can't find plug-in with ID \"" + pluginId + "\"."));
+        }
+        // Search entries.
+        Enumeration<?> entries = bundle.findEntries(pathInBundle, "*", true);
+        if (entries != null) {
+            // Make sure that target exists
+            target.mkdirs();
+            // Extract entries
+            while (entries.hasMoreElements()) {
+                Object entry = entries.nextElement();
+                if (entry instanceof URL) {
+                    URL url = (URL) entry;
+                    String urlPath = url.getPath();
+                    int pathInBundleIndex = urlPath.indexOf(pathInBundle);
+                    String pathInTarget = urlPath.substring(pathInBundleIndex + pathInBundle.length());
+                    InputStream in = null;
+                    try {
+                        FileOutputStream out = null;
+                        try {
+                            // Check if it is a file or folder by the content size.
+                            URLConnection connection = url.openConnection();
+                            if (connection.getContentLength() > 0) {
+                                in = connection.getInputStream();
+                                File file = new File(target, pathInTarget);
+                                out = new FileOutputStream(file);
+                                int read;
+                                byte[] buffer = new byte[1024 * 10];
+                                while ((read = in.read(buffer)) >= 0) {
+                                    out.write(buffer, 0, read);
+                                }
+                            }
+                            else {
+                                // Handle URL as folder (Happens in product execution)
+                                File folder = new File(target, pathInTarget);
+                                if (!folder.exists()) {
+                                    folder.mkdirs();
+                                }
+                            }
+                        }
+                        finally {
+                            if (out != null) {
+                                out.close();
+                            }
+                        }
+                    }
+                    catch (IOException e) {
+                        // Handle URL as folder (This happens in IDE execution)
+                        File folder = new File(target, pathInTarget);
+                        if (!folder.exists()) {
+                            folder.mkdirs();
+                        }
+                    }
+                    finally {
+                        try {
+                            if (in != null) {
+                                in.close();
+                            }
+                        }
+                        catch (IOException e) {
+                            // Nothing to do.
+                        }
+                    }
+                }
+                else {
+                    throw new IllegalArgumentException("Unsupported bundle entry \"" + entry + "\".");
+                }
             }
         }
     }

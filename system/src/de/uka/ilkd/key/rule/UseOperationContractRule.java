@@ -688,9 +688,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 		= services.getSpecificationRepository()
 		          .getPOForProof(goal.proof());
 	final Term mbyOk;	
-	if(po != null && po.getMbyAtPre() != null && mby != null) {
-	    mbyOk = TB.and(TB.leq(TB.zero(services), mby, services),
-		           TB.lt(mby, po.getMbyAtPre(), services));
+	if(po != null && po.getMbyAtPre() != null && mby != null ) {
+    	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services), 
+    			       TB.lt(mby, po.getMbyAtPre(), services));
 	} else {
 	    mbyOk = TB.tt();
 	}

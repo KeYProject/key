@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;">
+   <methodCall name="self.main();">
+      <statement name="int result = 0;">
+         <statement name="int i = 0;">
+            <loopNode name="while ( i&lt;3 ) {   result_1++;   i++; }">
+               <loopCondition name="i&lt;3">
+                  <statement name="result_1++;">
+                     <statement name="i++;">
+                        <loopCondition name="i&lt;3">
+                           <statement name="result_1++;">
+                              <statement name="i++;">
+                                 <loopCondition name="i&lt;3">
+                                    <statement name="result_1++;">
+                                       <statement name="i++;">
+                                          <loopCondition name="i&lt;3">
+                                             <statement name="return result_1;">
+                                                <methodReturn name="&lt;return of self.main();&gt;" nameIncludingReturnValue="&lt;return &apos;3&apos; as result of self.main();&gt;">
+                                                   <termination name="&lt;end&gt;" exceptionalTermination="false">
+                                                   </termination>
+                                                </methodReturn>
+                                             </statement>
+                                          </loopCondition>
+                                       </statement>
+                                    </statement>
+                                 </loopCondition>
+                              </statement>
+                           </statement>
+                        </loopCondition>
+                     </statement>
+                  </statement>
+               </loopCondition>
+            </loopNode>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>

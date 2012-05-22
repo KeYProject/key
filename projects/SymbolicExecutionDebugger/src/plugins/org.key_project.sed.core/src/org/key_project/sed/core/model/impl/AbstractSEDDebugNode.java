@@ -2,7 +2,14 @@ package org.key_project.sed.core.model.impl;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IDebugElement;
+import org.eclipse.debug.core.model.IStep;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelSelectionPolicy;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IModelSelectionPolicyFactory;
+import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
+import org.eclipse.debug.internal.ui.viewers.update.DefaultSelectionPolicy;
+import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
@@ -69,6 +76,51 @@ public abstract class AbstractSEDDebugNode extends AbstractSEDDebugElement imple
       if (IElementContentProvider.class.equals(adapter)) {
          // Change used content provider to show SED specific children instead of the default one from the debug API.
          return SEDDebugNodeContentProvider.getDefaultInstance();
+      }
+      else if (IModelSelectionPolicyFactory.class.equals(adapter)) {
+         // Custom IModelSelectionPolicy are required because otherwise ISEDDebugNodes which don't implement IStackFrame are not programmatically selectable in debug view.
+         return new IModelSelectionPolicyFactory() {
+            @Override
+            public IModelSelectionPolicy createModelSelectionPolicyAdapter(Object element, IPresentationContext context) {
+               return new DefaultSelectionPolicy((IDebugElement)element) {
+                  @Override
+                  protected boolean overrides(Object existing, Object candidate) {
+                     if (existing instanceof ISEDDebugElement && candidate instanceof ISEDDebugElement) {
+                        // Handle symbolic debug elements like IStackFrames in super implementation
+                        ISEDDebugElement curr = (ISEDDebugElement)existing;
+                        ISEDDebugElement next = (ISEDDebugElement)candidate;
+                        return curr.getDebugTarget().equals(next.getDebugTarget()) || !isSticky(existing);
+                     }
+                     else {
+                        return super.overrides(existing, candidate);
+                     }
+                  }
+
+                  @Override
+                  protected boolean isSticky(Object element) {
+                     if (element instanceof ISEDDebugElement) {
+                        // Handle symbolic debug elements like IStackFrames in super implementation
+                        ISEDDebugElement node = (ISEDDebugElement)element;
+                        ISEDDebugTarget target = node.getDebugTarget();
+                        if (target.isSuspended()) {
+                           return true;
+                        }
+                        else {
+                           if (node instanceof IStep) {
+                              return ((IStep)node).isStepping();
+                           }
+                           else {
+                              return false;
+                           }
+                        }
+                     }
+                     else {
+                        return super.isSticky(element);
+                     }
+                  }
+               };
+            }
+         };
       }
       else {
          return Platform.getAdapterManager().getAdapter(this, adapter);

@@ -623,7 +623,7 @@ public class KeYLaunchConfigurationTab extends AbstractLaunchConfigurationTab {
             updateExistingContractState();
         } 
         catch (CoreException e) {
-            e.printStackTrace();
+           LogUtil.getLogger().logError(e);
         }
     }
 

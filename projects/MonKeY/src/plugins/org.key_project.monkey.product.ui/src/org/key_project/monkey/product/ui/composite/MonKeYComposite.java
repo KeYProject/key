@@ -1,13 +1,8 @@
 package org.key_project.monkey.product.ui.composite;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -39,20 +34,11 @@ import org.key_project.monkey.product.ui.model.MonKeYProof;
 import org.key_project.monkey.product.ui.model.MonKeYProofResult;
 import org.key_project.monkey.product.ui.provider.MonKeYProofLabelProvider;
 import org.key_project.monkey.product.ui.util.LogUtil;
+import org.key_project.monkey.product.ui.util.MonKeYUtil;
+import org.key_project.monkey.product.ui.util.MonKeYUtil.MonKeYProofSums;
 import org.key_project.monkey.product.ui.view.MonKeYView;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.StringUtil;
-
-import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.ClassTree;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.speclang.Contract;
 
 /**
  * Content in the {@link MonKeYView} that contains the whole
@@ -408,23 +394,12 @@ public class MonKeYComposite extends Composite {
      */
     protected void updateSumText() {
        // Compute sums
-       long branches = 0;
-       long nodes = 0;
-       long time = 0;
-       int closedCount = 0;
-       for (MonKeYProof proof : proofs) {
-          branches += proof.getBranches();
-          nodes += proof.getNodes();
-          time += proof.getTime();
-          if (MonKeYProofResult.CLOSED.equals(proof.getResult())) {
-             closedCount ++;
-          }
-       }
+       MonKeYProofSums sums = MonKeYUtil.computeSums(proofs);
        // Compute sum text to show
        StringBuffer sb = new StringBuffer();
        sb.append(proofResultColumn.getColumn().getText());
        sb.append(" = ");
-       sb.append(closedCount);
+       sb.append(sums.getClosedCount());
        sb.append(" / ");
        sb.append(proofs.size());
        sb.append(" ");
@@ -432,21 +407,21 @@ public class MonKeYComposite extends Composite {
        sb.append(", ");
        sb.append(proofNodesColumn.getColumn().getText());
        sb.append(" = ");
-       sb.append(nodes);
+       sb.append(sums.getNodes());
        sb.append(", ");
        sb.append(proofBranchesColumn.getColumn().getText());
        sb.append(" = ");
-       sb.append(branches);
+       sb.append(sums.getBranches());
        sb.append(", ");
        sb.append(proofTimeColumn.getColumn().getText());
        sb.append(" = ");
-       sb.append(time);
+       sb.append(sums.getTime());
        sb.append(", ");
        sb.append(proofTimeColumn.getColumn().getText());
        sb.append(" + ");
        sb.append(loadLabel.getText());
        sb.append(" = ");
-       sb.append(loadingTime + time);
+       sb.append(loadingTime + sums.getTime());
        // Show sum text
        sumText.setText(sb.toString());
     }
@@ -560,7 +535,7 @@ public class MonKeYComposite extends Composite {
                 new AbstractKeYMainWindowJob("Loading in KeY") {
                     @Override
                     protected IStatus run(IProgressMonitor monitor) {
-                       final long loadStartTime = System.currentTimeMillis();
+                        final long loadStartTime = System.currentTimeMillis();
                         try {
                             SWTUtil.checkCanceled(monitor);
                             // Remove old proofs
@@ -585,51 +560,7 @@ public class MonKeYComposite extends Composite {
                                 KeYUtil.openMainWindow();
                             }
                             // Load 
-                            monitor.beginTask("Loading in KeY", IProgressMonitor.UNKNOWN);
-                            InitConfig init = KeYUtil.internalLoad(location, null, bootClassPath, showKeYMainWindow);
-                            Services services = init.getServices();
-                            boolean skipLibraryClasses = true;
-                            // get all classes
-                            SWTUtil.checkCanceled(monitor);
-                            final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
-                            monitor.beginTask("Filtering types", kjts.size());
-                            final Iterator<KeYJavaType> it = kjts.iterator();
-                            while (it.hasNext()) {
-                                SWTUtil.checkCanceled(monitor);
-                               KeYJavaType kjt = it.next();
-                               if (!(kjt.getJavaType() instanceof ClassDeclaration || 
-                                     kjt.getJavaType() instanceof InterfaceDeclaration) || 
-                                   (((TypeDeclaration)kjt.getJavaType()).isLibraryClass() && skipLibraryClasses)) {
-                                  it.remove();
-                               }
-                               monitor.worked(1);
-                            }
-                            monitor.done();
-                            // sort classes alphabetically
-                            SWTUtil.checkCanceled(monitor);
-                            monitor.beginTask("Sorting types", IProgressMonitor.UNKNOWN);
-                            final KeYJavaType[] kjtsarr = kjts.toArray(new KeYJavaType[kjts.size()]);
-                            Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
-                               public int compare(KeYJavaType o1, KeYJavaType o2) {
-                                  return o1.getFullName().compareTo(o2.getFullName());
-                               }
-                            });
-                            monitor.done();
-                            // List all contracts
-                            SWTUtil.checkCanceled(monitor);
-                            proofs = new LinkedList<MonKeYProof>();
-                            monitor.beginTask("Analysing types", kjtsarr.length);
-                            for (KeYJavaType type : kjtsarr) {
-                                SWTUtil.checkCanceled(monitor);
-                                ImmutableSet<ObserverFunction> targets = services.getSpecificationRepository().getContractTargets(type);
-                                for (ObserverFunction target : targets) {
-                                    ImmutableSet<Contract> contracts = services.getSpecificationRepository().getContracts(type, target);
-                                    for (Contract contract : contracts) {
-                                        proofs.add(new MonKeYProof(type.getFullName(), ClassTree.getDisplayName(services, contract.getTarget()), contract.getDisplayName(), init, contract));
-                                    }
-                                }
-                                monitor.worked(1);
-                            }
+                            proofs = MonKeYUtil.loadSourceInKeY(monitor, location, bootClassPath, showKeYMainWindow);
                             SWTUtil.checkCanceled(monitor);
                             if (!getDisplay().isDisposed()) {
                                 getDisplay().syncExec(new Runnable() {
@@ -674,7 +605,7 @@ public class MonKeYComposite extends Composite {
         }
     }
 
-    /**
+   /**
      * Loads the previous state from the given {@link IMemento}.
      * @param memento The {@link IMemento} to load from.
      */

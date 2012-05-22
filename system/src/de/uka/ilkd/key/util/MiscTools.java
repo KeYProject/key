@@ -831,5 +831,31 @@ public final class MiscTools {
         } catch (IndexOutOfBoundsException e){
             return false;
         }
-    }   
+    }
+    
+    /**
+     * <p>
+     * Returns the name of the applied rule in the given {@link Node} of
+     * the proof tree in KeY.
+     * </p>
+     * <p>
+     * This method is required for the symbolic execution tree extraction,
+     * e.g. used in the Symbolic Execution Tree Debugger.
+     * </p>
+     * @param node The given {@link Node}.
+     * @return The display name of the applied rule in the given {@link Node} or {@code null} if no one exists.
+     */
+    public static String getRuleDisplayName(Node node) {
+       String name = null;
+       if (node != null) {
+          RuleApp ruleApp = node.getAppliedRuleApp();
+          if (ruleApp != null) {
+             Rule rule = ruleApp.rule();
+             if (rule != null) {
+                name = rule.displayName();
+             }
+          }
+       }
+       return name;
+    }
 }

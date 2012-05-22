@@ -2,10 +2,12 @@ package org.key_project.sed.ui.visualization.execution_tree.provider;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.graphiti.dt.AbstractDiagramTypeProvider;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -16,11 +18,13 @@ import org.eclipse.graphiti.tb.IToolBehaviorProvider;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLReader;
+import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependenceSolver;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDNotificationService;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * {@link IDiagramTypeProvider} specific implementation for execution tree diagrams.
@@ -47,7 +51,7 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
     * Contains the available {@link IToolBehaviorProvider}s which are instantiated
     * lazily via {@link #getAvailableToolBehaviorProviders()}.
     */
-   private IToolBehaviorProvider[] toolBehaviorProviders;
+   private ExecutionTreeToolBehaviorProvider[] toolBehaviorProviders;
    
    /**
     * Contains the available {@link ISEDDebugTarget}s.
@@ -70,6 +74,14 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
     * {@inheritDoc}
     */
    @Override
+   public ExecutionTreeFeatureProvider getFeatureProvider() {
+      return (ExecutionTreeFeatureProvider)super.getFeatureProvider();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public SEDNotificationService getNotificationService() {
       if (notificationService == null) {
          notificationService = new SEDNotificationService(this);
@@ -81,9 +93,9 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
     * {@inheritDoc}
     */
    @Override
-   public IToolBehaviorProvider[] getAvailableToolBehaviorProviders() {
+   public ExecutionTreeToolBehaviorProvider[] getAvailableToolBehaviorProviders() {
       if (toolBehaviorProviders == null) {
-         toolBehaviorProviders = new IToolBehaviorProvider[] {new ExecutionTreeToolBehaviorProvider(this)};
+         toolBehaviorProviders = new ExecutionTreeToolBehaviorProvider[] {new ExecutionTreeToolBehaviorProvider(this)};
       }
       return toolBehaviorProviders;
    }
@@ -96,6 +108,11 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
       try {
          // Make sure that the editor is compatible with this diagram
          Assert.isTrue(diagramEditor instanceof ExecutionTreeDiagramEditor, "The diagram type " + TYPE + " must be used in ExecutionTreeDiagramEditor instances.");
+         boolean readonly = ((ExecutionTreeDiagramEditor)diagramEditor).isReadOnly();
+         getFeatureProvider().setReadOnly(readonly);
+         for (ExecutionTreeToolBehaviorProvider behaviorProvider : getAvailableToolBehaviorProviders()) {
+            behaviorProvider.setReadOnly(readonly);
+         }
          // Initialize type provider
          super.init(diagram, diagramEditor);
          // Load domain model file
@@ -119,7 +136,28 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
          throw new RuntimeException(e);
       }
    }
-   
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void resourcesSaved(Diagram diagram, Resource[] savedResources) {
+      try {
+         // Super stuff
+         super.resourcesSaved(diagram, savedResources);
+         // Save domain file
+         if (ObjectUtil.equals(getDiagram(), diagram)) {
+            OutputStream out = ExecutionTreeUtil.writeDomainFile(diagram);
+            SEDXMLWriter writer = new SEDXMLWriter();
+            writer.write(getDebugTargets(), SEDXMLWriter.DEFAULT_ENCODING, out);
+         }
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         throw new RuntimeException(e);
+      }
+   }
+
    /**
     * Makes sure that at least one {@link ISEDDebugTarget} is available
     * via {@link #getDebugTargets()}.
@@ -132,7 +170,7 @@ public class ExecutionTreeDiagramTypeProvider extends AbstractDiagramTypeProvide
          debugTargets.add(target);
       }
    }
-   
+
    /**
     * Returns the available {@link ISEDDebugTarget}s.
     * @return The available {@link ISEDDebugTarget}s.

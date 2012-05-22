@@ -19,7 +19,8 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.memory.ISEDMemoryDebugNode;
 import org.key_project.sed.core.model.memory.ISEDMemoryDebugTarget;
-import org.key_project.sed.core.util.SEDIterator;
+import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.util.EditableMultiDeleteInfo;
 
@@ -73,7 +74,7 @@ public class ExecutionTreeDeleteFeature extends DefaultDeleteFeature implements 
             EditableMultiDeleteInfo multiDeleteInfo = new EditableMultiDeleteInfo(true, false);
             for (Object businessObject : businessObjectsForPictogramElement) {
                if (businessObject instanceof ISEDDebugElement) {
-                  SEDIterator iter = new SEDIterator((ISEDDebugElement)businessObject);
+                  ISEDIterator iter = new SEDPreorderIterator((ISEDDebugElement)businessObject);
                   while (iter.hasNext()) {
                      ISEDDebugElement next = iter.next();
                      PictogramElement childPe = getFeatureProvider().getPictogramElementForBusinessObject(next);

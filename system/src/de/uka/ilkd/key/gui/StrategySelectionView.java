@@ -104,6 +104,7 @@ public final class StrategySelectionView extends JPanel {
     private JRadioButtonHashMap quantifierNonSplittingWithProgs;
     private JRadioButtonHashMap quantifierInstantiate;
     private JRadioButtonHashMap autoInductionOff; 
+    private JRadioButtonHashMap autoInductionRestricted; 
     private JRadioButtonHashMap autoInductionOn; 
     private JRadioButtonHashMap autoInductionLemmaOn; 
     
@@ -386,10 +387,12 @@ public final class StrategySelectionView extends JPanel {
         queryRestricted = new JRadioButtonHashMap("Restricted", 
                 StrategyProperties.QUERY_RESTRICTED, false, false);
         queryRestricted.setToolTipText ( "<html>Rewrite query to a method call (expanded) so that contracts or inlining can be used.<br>" +
-                                         "<ul><li> Queries occuring earlier on a branch get a higher chance to be expanded <br>" +
-        		                         " than queries introduced more recently. This results in a breath-first search<br>" +
+                                         "<ul><li> Priority of expanding queries that occuring earlier on a branch is higher than<br>" +
+        		                         " for queries introduced more recently. This approximates in a breath-first search<br>" +
                                          " with respect to query expansion.</li>" +
-        		                         "<li> Reexpansion of the same query is very limited (e.g. one time).</li>" +
+        		                         "<li> Reexpansion of identical query terms is suppressed.</li>" +
+        		                         "<li> A query is not expanded if one of its arguments contains a literal greater<br>" +
+        		                         " than "+QueryExpandCost.ConsideredAsBigLiteral+", or smaller than "+(-QueryExpandCost.ConsideredAsBigLiteral)+". This helps detecting loops in a proof.</li>" +
         		                         "<li> Queries are expanded after the loop body in the \"Preserves Invariant\"<br>" +
         		                         " branch of the loop invariant rule.</li>" +
         		                         "<li> Queries are expanded in the Base Case and the conclusio of the Step Case <br>" +
@@ -557,6 +560,56 @@ public final class StrategySelectionView extends JPanel {
         
         ++yCoord;
 
+        /*  autoInductionOn = new JRadioButtonHashMap("On", 
+        StrategyProperties.AUTO_INDUCTION_ON, false, false);
+        autoInductionOn.setToolTipText ( "<html>" +
+            "Create an inductive proof for formulas of the form:<br>" +
+            "      ==>  \\forall int i; 0&lt;=i->phi <br>" +
+            "and certain other forms. The induction hypothesis<br>" +
+            "is the subformula phi. The rule is applied before<br>" +
+            "beta rules are applied." +
+            "</html>" );
+            autoInductionGroup.add(autoInductionOn);
+            addJavaDLOption ( autoInductionOn, javaDLOptionsLayout, 4, yCoord, 2 );
+          */
+        
+        //The old "use as lemma" setting is now the "on" setting.
+        autoInductionLemmaOn = new JRadioButtonHashMap("On", 
+                StrategyProperties.AUTO_INDUCTION_LEMMA_ON, false, false);
+        
+        autoInductionLemmaOn.setToolTipText ( "<html>" +
+            "Create an inductive proof for formulas of the form:<br>" +
+            "      ==>  \\forall int i; 0&lt;=i->phi <br>" +
+            "and certain other forms. The induction hypothesis<br>" +
+            "is the subformula phi. The rule is applied before<br>" +
+            "beta rules are applied.<br>" +
+            "<br>" +
+            "When encountering a formula of the form<br>" +
+            "      ==>  (\\forall int i; 0&lt;=i->phi) & psi <br>" +
+            "and certain similar forms, then the quantified formula<br>" +
+            "is used in the Use Case branch as a lemma for psi,<br>" +
+            "i.e., the sequent in the Use Case has the form:<br>" +
+            "      (\\forall int i; 0&lt;=i->phi) ==>  psi <br>" +
+            "</html>" );
+            autoInductionGroup.add(autoInductionLemmaOn);
+            addJavaDLOption ( autoInductionLemmaOn, javaDLOptionsLayout, 2, yCoord, 2 );
+            
+        
+       autoInductionRestricted = new JRadioButtonHashMap("Restricted", 
+                    StrategyProperties.AUTO_INDUCTION_RESTRICTED, false, false);
+       autoInductionRestricted.setToolTipText ( "<html>" +
+    		"Performs auto induction only on quantified formulas that<br>" +
+    		"(a) fullfill a certain pattern (as described for the \"on\"option)<br>" +
+    		"and (b) whose quantified variable has the suffix \"Ind\" or \"IND\".<br>" +
+    		"For instance, auto induction will be applied on:<br>" +
+            "      ==>  \\forall int iIND; 0&lt;=iIND->phi <br>" +
+            "but not on: <br>" +
+            "      ==>  \\forall int i; 0&lt;=i->phi <br>" +
+            "</html>" );
+       autoInductionGroup.add(autoInductionRestricted);
+       addJavaDLOption ( autoInductionRestricted, javaDLOptionsLayout, 4, yCoord, 2 );
+
+   
         autoInductionOff = new JRadioButtonHashMap("Off", 
                          StrategyProperties.AUTO_INDUCTION_OFF, true, false);
         autoInductionOff.setToolTipText ( "<html>" +
@@ -569,33 +622,10 @@ public final class StrategySelectionView extends JPanel {
             "limit the number of inductive proofs." +
             "</html>" );
         autoInductionGroup.add(autoInductionOff);
-        addJavaDLOption ( autoInductionOff, javaDLOptionsLayout, 2, yCoord, 2 );
+        addJavaDLOption ( autoInductionOff, javaDLOptionsLayout, 6, yCoord, 2 );
 
-        autoInductionOn = new JRadioButtonHashMap("On", 
-                             StrategyProperties.AUTO_INDUCTION_ON, false, false);
-        autoInductionOn.setToolTipText ( "<html>" +
-            "Create an inductive proof for formulas of the form:<br>" +
-            "      ==>  \\forall int i; 0&lt;=i->phi <br>" +
-            "and certain other forms. The induction hypothesis<br>" +
-            "is the subformula phi. The rule is applied before<br>" +
-            "beta rules are applied." +
-            "</html>" );
-        autoInductionGroup.add(autoInductionOn);
-        addJavaDLOption ( autoInductionOn, javaDLOptionsLayout, 4, yCoord, 2 );
-        
+     
 
-        autoInductionLemmaOn = new JRadioButtonHashMap("Use as Lemma", 
-                             StrategyProperties.AUTO_INDUCTION_LEMMA_ON, false, false);
-        autoInductionLemmaOn.setToolTipText ( "<html>" +
-            "Auto induction is activated on formulas of the form<br>" +
-            "      ==>  (\\forall int i; 0&lt;=i->phi) & psi <br>" +
-            "and certain other forms. The quantified formula<br>" +
-            "is used in the Use Case branch as a lemma for psi,<br>" +
-            "i.e., the sequent in the Use Case has the form:<br>" +
-            "      (\\forall int i; 0&lt;=i->phi) ==>  psi <br>" +
-            "</html>" );
-        autoInductionGroup.add(autoInductionLemmaOn);
-        addJavaDLOption ( autoInductionLemmaOn, javaDLOptionsLayout, 6, yCoord, 2 );
         
         ++yCoord;
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
@@ -730,7 +760,7 @@ public final class StrategySelectionView extends JPanel {
         quantifierNonSplittingWithProgs.addActionListener(optListener);
         quantifierInstantiate.addActionListener(optListener);
         autoInductionOff.addActionListener(optListener);
-        autoInductionOn.addActionListener(optListener);
+        autoInductionRestricted.addActionListener(optListener);
         autoInductionLemmaOn.addActionListener(optListener);
     }
 

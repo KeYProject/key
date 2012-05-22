@@ -73,46 +73,41 @@ public class TestGenericSortInstantiations extends TestCase {
      *    H2 oneof { A2, A3 }
      */
 
-    {
-        // this ensures that necessary Java types are loaded
-        TacletForTests.services ().getJavaInfo().readJavaBlock("{}");        
-    }
     
-    Sort        object       = TacletForTests.services ().getJavaInfo ().objectSort ();
-    Sort        cloneable    = TacletForTests.services ().getJavaInfo ().cloneableSort ();
-    Sort        serializable = TacletForTests.services ().getJavaInfo ().serializableSort();
+    Sort        object;
+    Sort        cloneable;
+    Sort        serializable;
     
-    Sort        objectArray = ArraySort.getArraySort ( object,
-                                                           object, cloneable, serializable );    
+    Sort        objectArray;
     // these sorts are supposed to have no relations to other (object) sorts;
-    Sort A4 = new SortImpl ( new Name ( "A4" ), emptySortSet, false );
-    Sort A3 = new SortImpl ( new Name ( "A3" ), emptySortSet.add ( A4 ), false );
-    Sort A1 = new SortImpl ( new Name ( "A1" ), emptySortSet.add ( A3 ), false );
-    Sort A2 = new SortImpl ( new Name ( "A2" ), emptySortSet.add ( A3 ), false );
-    Sort A6 = new SortImpl ( new Name ( "A6" ), emptySortSet, false );
-    Sort A5 = new SortImpl ( new Name ( "A5" ), emptySortSet.add ( A1 ).add ( A6 ), false );
+    Sort A4;
+    Sort A3;
+    Sort A1;
+    Sort A2;
+    Sort A6;
+    Sort A5;
     
-    Sort A4OBJ = new SortImpl ( new Name ( "A4OBJ" ), emptySortSet.add(object), false );
-    Sort A3OBJ = new SortImpl ( new Name ( "A3OBJ" ), emptySortSet.add ( A4OBJ ), false );
-    Sort A1OBJ = new SortImpl ( new Name ( "A1OBJ" ), emptySortSet.add ( A3OBJ ), false );
-    Sort A2OBJ = new SortImpl ( new Name ( "A2OBJ" ), emptySortSet.add ( A3OBJ ), false );
-    Sort A6OBJ = new SortImpl ( new Name ( "A6OBJ" ), emptySortSet, false );
-    Sort A5OBJ = new SortImpl ( new Name ( "A5OBJ" ), emptySortSet.add ( A1OBJ ).add ( A6OBJ ), false );    
+    Sort A4OBJ;
+    Sort A3OBJ;
+    Sort A1OBJ;
+    Sort A2OBJ;
+    Sort A6OBJ;
+    Sort A5OBJ;    
 
-    Sort B4 = new SortImpl ( new Name ( "B4" ), emptySortSet.add ( object ), false );
-    Sort B2 = new SortImpl ( new Name ( "B2" ), emptySortSet.add ( B4 ), false );
-    Sort B3 = new SortImpl ( new Name ( "B3" ), emptySortSet.add ( B4 ), false );
-    Sort B1 = new SortImpl ( new Name ( "B1" ), emptySortSet.add ( B2 ).add ( B3 ), false );
-    Sort B5 = new SortImpl ( new Name ( "B5" ), emptySortSet.add ( B2 ), false );
+    Sort B4;
+    Sort B2;
+    Sort B3;
+    Sort B1;
+    Sort B5;
 
     // This setup resembles the code of <code>Recoder2KeY</code>
-    Sort  D4 = ArraySort.getArraySort ( B4, object, cloneable, serializable );
-    Sort  D2 = ArraySort.getArraySort ( B2, object, cloneable, serializable );
-    Sort  D3 = ArraySort.getArraySort ( B3, object, cloneable, serializable );
-    Sort  D1 = ArraySort.getArraySort ( B1, object, cloneable, serializable );
-    Sort  D5 = ArraySort.getArraySort ( B5, object, cloneable, serializable );
+    Sort  D4;
+    Sort  D2;
+    Sort  D3;
+    Sort  D1;
+    Sort  D5;
     
-    Sort       C1 = new SortImpl         ( new Name ( "C1" ) );
+    Sort       C1;
 
     GenericSort G3;
     GenericSort G1;
@@ -166,29 +161,77 @@ public class TestGenericSortInstantiations extends TestCase {
 	throws GenericSupersortException {
 	super(name);
 
-	G3 = new GenericSort ( new Name ( "G3" ) );
-	G1 = new GenericSort ( new Name ( "G1" ),
-			       emptySortSet.add ( G3 ),
-			       emptySortSet );
-	G2 = new GenericSort ( new Name ( "G2" ),
-			       emptySortSet.add ( G3 ),
-			       emptySortSet );
-	G4 = new GenericSort ( new Name ( "G4" ),
-			       emptySortSet.add ( G1 ),
-			       emptySortSet );
-
-	H1 = new GenericSort ( new Name ( "H1" ) );
-	H2 = new GenericSort ( new Name ( "H2" ),
-			       emptySortSet.add ( H1 ),
-			       emptySortSet.add ( A2 ).add ( A3 ) );
-	H3 = new GenericSort ( new Name ( "H3" ),
-			       emptySortSet.add ( A3 ).add ( H1 ),
-			       emptySortSet );
-	H4 = new GenericSort ( new Name ( "H4" ),
-			       emptySortSet.add ( H3 ),
-			       emptySortSet );
+	
     }
 
+    @Override
+    public void setUp() {
+       // this ensures that necessary Java types are loaded
+       TacletForTests.services ().getJavaInfo().readJavaBlock("{}");  
+       
+       object       = TacletForTests.services ().getJavaInfo ().objectSort ();
+       cloneable    = TacletForTests.services ().getJavaInfo ().cloneableSort ();
+       serializable = TacletForTests.services ().getJavaInfo ().serializableSort();
+
+       objectArray = ArraySort.getArraySort ( object,
+             object, cloneable, serializable );    
+       // these sorts are supposed to have no relations to other (object) sorts;
+       A4 = new SortImpl ( new Name ( "A4" ), emptySortSet, false );
+       A3 = new SortImpl ( new Name ( "A3" ), emptySortSet.add ( A4 ), false );
+       A1 = new SortImpl ( new Name ( "A1" ), emptySortSet.add ( A3 ), false );
+       A2 = new SortImpl ( new Name ( "A2" ), emptySortSet.add ( A3 ), false );
+       A6 = new SortImpl ( new Name ( "A6" ), emptySortSet, false );
+       A5 = new SortImpl ( new Name ( "A5" ), emptySortSet.add ( A1 ).add ( A6 ), false );
+
+       A4OBJ = new SortImpl ( new Name ( "A4OBJ" ), emptySortSet.add(object), false );
+       A3OBJ = new SortImpl ( new Name ( "A3OBJ" ), emptySortSet.add ( A4OBJ ), false );
+       A1OBJ = new SortImpl ( new Name ( "A1OBJ" ), emptySortSet.add ( A3OBJ ), false );
+       A2OBJ = new SortImpl ( new Name ( "A2OBJ" ), emptySortSet.add ( A3OBJ ), false );
+       A6OBJ = new SortImpl ( new Name ( "A6OBJ" ), emptySortSet, false );
+       A5OBJ = new SortImpl ( new Name ( "A5OBJ" ), emptySortSet.add ( A1OBJ ).add ( A6OBJ ), false );    
+
+       B4 = new SortImpl ( new Name ( "B4" ), emptySortSet.add ( object ), false );
+       B2 = new SortImpl ( new Name ( "B2" ), emptySortSet.add ( B4 ), false );
+       B3 = new SortImpl ( new Name ( "B3" ), emptySortSet.add ( B4 ), false );
+       B1 = new SortImpl ( new Name ( "B1" ), emptySortSet.add ( B2 ).add ( B3 ), false );
+       B5 = new SortImpl ( new Name ( "B5" ), emptySortSet.add ( B2 ), false );
+
+       // This setup resembles the code of <code>Recoder2KeY</code>
+       D4 = ArraySort.getArraySort ( B4, object, cloneable, serializable );
+       D2 = ArraySort.getArraySort ( B2, object, cloneable, serializable );
+       D3 = ArraySort.getArraySort ( B3, object, cloneable, serializable );
+       D1 = ArraySort.getArraySort ( B1, object, cloneable, serializable );
+       D5 = ArraySort.getArraySort ( B5, object, cloneable, serializable );
+
+       C1 = new SortImpl         ( new Name ( "C1" ) );
+
+       try {
+          G3 = new GenericSort ( new Name ( "G3" ) );
+           G1 = new GenericSort ( new Name ( "G1" ),
+                        emptySortSet.add ( G3 ),
+                        emptySortSet );
+           G2 = new GenericSort ( new Name ( "G2" ),
+                        emptySortSet.add ( G3 ),
+                        emptySortSet );
+           G4 = new GenericSort ( new Name ( "G4" ),
+                        emptySortSet.add ( G1 ),
+                        emptySortSet );
+
+           H1 = new GenericSort ( new Name ( "H1" ) );
+           H2 = new GenericSort ( new Name ( "H2" ),
+                        emptySortSet.add ( H1 ),
+                        emptySortSet.add ( A2 ).add ( A3 ) );
+           H3 = new GenericSort ( new Name ( "H3" ),
+                        emptySortSet.add ( A3 ).add ( H1 ),
+                        emptySortSet );
+           H4 = new GenericSort ( new Name ( "H4" ),
+                        emptySortSet.add ( H3 ),
+                        emptySortSet );
+       }
+       catch (GenericSupersortException e) {
+          fail(e.getMessage());
+       }
+    }
 
     public static ImmutableList<GenericSort> sorts ( ImmutableList<GenericSortCondition> p_conditions ) {
 	Iterator<GenericSortCondition> it = p_conditions.iterator ();
