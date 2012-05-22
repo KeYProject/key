@@ -1,19 +1,22 @@
-package de.uka.ilkd.key.gui.smt;
+package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.Color;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 public class ClickableMessageBox extends JTextPane{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public static interface ClickableMessageBoxListener{
 		public void eventMessageClicked(Object object);
 	}
@@ -44,18 +47,31 @@ public class ClickableMessageBox extends JTextPane{
 		});	 
 	}
 	
+	public void clear(){
+		items.clear();
+		this.setText(""); 
+	}
+	
 	public void add(ClickableMessageBoxListener listener){
 		listeners.add(listener);
 	}
 	
 	public void add(Object item, String message, Color color){
-		   try {
+		  try {
+			   if(item != null){
 				kit.insertHTML(doc, doc.getLength(),
-									"<a href=\""+ items.size()+
+									"<u><a href=\""+ items.size()+
 									"\" style=\"color: rgb("+color.getRed()+","+
 															 color.getGreen()+","+
 															 color.getBlue()+")\">"+
-															 		message+"</a>", 0, 0, null);
+															 		message+"</a></u>", 0, 0, null);
+			   }else{
+					kit.insertHTML(doc, doc.getLength(),
+							"<font color= rgb("+color.getRed()+","+
+													 color.getGreen()+","+
+													 color.getBlue()+")\">"+
+													 		message+"</font>", 0, 0, null); 
+			   }
 			} catch(Throwable e){
 				throw new RuntimeException(e);
 			}

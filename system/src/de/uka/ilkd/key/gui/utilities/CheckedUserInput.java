@@ -1,11 +1,13 @@
 package de.uka.ilkd.key.gui.utilities;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -15,6 +17,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+
+import de.uka.ilkd.key.gui.utilities.ClickableMessageBox.ClickableMessageBoxListener;
 
 
 /**
@@ -48,17 +52,32 @@ public class CheckedUserInput extends JPanel{
      * Used for observing the checked user input.
      */
     static public interface CheckedUserInputListener{
-        public void userInputChanged(String input,boolean valid);
+        public void userInputChanged(String input,boolean valid, String reason);
+
       
     }
    
     
     private TrafficLight trafficLight;
     private JTextPane    inputFieldForFormula;
-    private JLabel       infoLabel;
+    private ClickableMessageBox infoBox;
 
-    private final CheckedUserInputInspector inspector; 
+    private JScrollPane  detailScrollPane;
+    
+
+    private CheckedUserInputInspector inspector; 
     private final List<CheckedUserInputListener> listeners = new LinkedList<CheckedUserInputListener>();
+    
+    public CheckedUserInput( boolean showInformation) {
+    	this( new CheckedUserInputInspector() {
+			
+			@Override
+			public String check(String toBeChecked) {
+				return null;
+			}
+		},showInformation);
+    	
+    }
     
     public CheckedUserInput(CheckedUserInputInspector inspector, boolean showInformation) {
         this.inspector = inspector;
@@ -74,14 +93,37 @@ public class CheckedUserInput extends JPanel{
         pane.setMinimumSize(dim);
         this.add(horzBox);
         this.add(Box.createVerticalStrut(2));
-        horzBox = Box.createHorizontalBox();
+
+       
         if(showInformation){
-            horzBox.add(getInfoLabel());
+            horzBox = Box.createHorizontalBox();
+            horzBox.add(Box.createHorizontalStrut(5));
+            horzBox.add(Box.createHorizontalGlue());
+            this.add(horzBox);
+            horzBox = Box.createHorizontalBox();
+            horzBox.add(getDetailScrollPane());
+            horzBox.add(Box.createHorizontalGlue());
+            this.add(horzBox);
+            this.add(Box.createVerticalGlue());
         }
-        horzBox.add(Box.createHorizontalGlue());
-        this.add(horzBox);
+   
         setInput("");
     }
+    
+    public void setInspector(CheckedUserInputInspector inspector) {
+		this.inspector = inspector;
+		checkInput();
+	} 
+    public JScrollPane getDetailScrollPane() {
+    	if(detailScrollPane == null){
+    		detailScrollPane = new JScrollPane(getInfoBox());
+    		detailScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+    		detailScrollPane.setPreferredSize(new Dimension(detailScrollPane.getPreferredSize().width,80));
+    		detailScrollPane.setMinimumSize(new Dimension(detailScrollPane.getPreferredSize().width, 80));
+    		detailScrollPane.setBorder(BorderFactory.createTitledBorder("Details"));
+    	}
+		return detailScrollPane;
+	}
 
     
     private TrafficLight getTrafficLight(){
@@ -91,16 +133,27 @@ public class CheckedUserInput extends JPanel{
         return trafficLight;
     }
     
-    private JLabel getInfoLabel(){
-        if(infoLabel == null){
-            infoLabel = new JLabel();
-            infoLabel.setBackground(this.getBackground());
-            infoLabel.setFont(this.getFont());
-            infoLabel.setText(" ");
+    private ClickableMessageBox getInfoBox(){
+        if(infoBox == null){
+            infoBox = new ClickableMessageBox();
+            infoBox.setBackground(this.getBackground());
+            infoBox.setFont(this.getFont());
+            infoBox.add(new ClickableMessageBoxListener() {
+				
+				@Override
+				public void eventMessageClicked(Object object) {
+					if(object != null){
+						JOptionPane.showMessageDialog(detailScrollPane, object, "Problem Description",
+											JOptionPane.INFORMATION_MESSAGE);
+					}					
+				}
+			});
             
         }
-        return infoLabel;
+        return infoBox;
     }
+    
+
     
     private JTextPane getInputFieldForFormula(){
         if(inputFieldForFormula == null){
@@ -132,7 +185,7 @@ public class CheckedUserInput extends JPanel{
         String result = inspector.check(text);
         setValid(result);
         for(CheckedUserInputListener listener : listeners){
-            listener.userInputChanged(text,result==null);
+            listener.userInputChanged(text,result==null,result);
         }
     }
     
@@ -155,10 +208,11 @@ public class CheckedUserInput extends JPanel{
     }
 
 private void setValid(String result){
-        if(result == null){
-            getInfoLabel().setText(" ");
-        }else{
-            getInfoLabel().setText(result);
+	    getInfoBox().clear();
+        if(result != null){
+           	String [] segments = result.split("#");
+        	getInfoBox().add(segments.length >=2 ? segments[1]:null,segments[0], Color.RED);
+            
         }
         getTrafficLight().setGreen(result == null);
 
@@ -187,9 +241,11 @@ private void setValid(String result){
         userInput.addListener(new CheckedUserInputListener(){
 
             @Override
-            public void userInputChanged(String input, boolean valid) {
+            public void userInputChanged(String input, boolean valid, String reason) {
                dialog.getOkayButton().setEnabled(valid);                
-            }            
+            }
+
+	    
         });
 
         dialog.getHelpButton().addActionListener(new ActionListener() {
@@ -221,7 +277,7 @@ private void setValid(String result){
             @Override
             public String check(String toBeChecked) {
 
-                return toBeChecked.equals("test") ? null : "Syntax Error";
+                return toBeChecked.equals("test") ? null : "Syntax Error#test";
             }
         },true);
     }

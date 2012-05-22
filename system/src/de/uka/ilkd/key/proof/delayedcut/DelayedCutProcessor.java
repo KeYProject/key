@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.proof.delayedcut;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,6 +70,11 @@ public class DelayedCutProcessor implements Runnable {
         listeners.remove(listener);
     }
 
+    public static List<ApplicationCheck> getApplicationChecks(){
+    	List<ApplicationCheck> list = new LinkedList<ApplicationCheck>();
+    	list.add(new ApplicationCheck.NoNewSymbolsCheck());
+    	return list;
+    }
     
     
     public DelayedCutProcessor(Proof proof, Node node, Term descisionPredicate,
@@ -93,7 +99,7 @@ public class DelayedCutProcessor implements Runnable {
         if(used){
             throw new IllegalStateException("For each cut a new object of this class must be created.");
         }
-        used = false;
+        used = true;
         for(DelayedCutListener listener : listeners){
             listener.eventCutting();
         }
