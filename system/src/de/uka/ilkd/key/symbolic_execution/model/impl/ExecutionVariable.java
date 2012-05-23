@@ -1,14 +1,20 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -57,9 +63,24 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * The child {@link IExecutionVariable}s.
     */
    private IExecutionVariable[] childVariables;
+   
+   /**
+    * The index in the parent array.
+    */
+   private int arrayIndex;
 
    /**
-    * Constructor.
+    * Constructor for a "normal" value.
+    * @param proofNodeThe {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
+    * @param parentVariable The parent {@link ExecutionVariable} or {@code null} if not available.
+    * @param programVariable The represented {@link IProgramVariable} which value is shown.
+    */
+   public ExecutionVariable(Node proofNode, IProgramVariable programVariable) {
+      this(proofNode, null, programVariable);
+   }
+   
+   /**
+    * Constructor for a "normal" child value.
     * @param proofNodeThe {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param parentVariable The parent {@link ExecutionVariable} or {@code null} if not available.
     * @param programVariable The represented {@link IProgramVariable} which value is shown.
@@ -69,6 +90,19 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       assert programVariable != null;
       this.parentVariable = parentVariable;
       this.programVariable = programVariable;
+      this.arrayIndex = -1;
+   }
+   
+   /**
+    * Constructor for an array cell value.
+    * @param proofNodeThe {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
+    * @param parentVariable The parent {@link ExecutionVariable} or {@code null} if not available.
+    * @param arrayIndex The index in the parent array.
+    */
+   public ExecutionVariable(Node proofNode, ExecutionVariable parentVariable, int arrayIndex) {
+      super(proofNode);
+      this.parentVariable = parentVariable;
+      this.arrayIndex = arrayIndex;
    }
 
    /**
@@ -86,7 +120,12 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          }
       }
       else {
-         return null;
+         if (parentVariable != null) {
+            return parentVariable.getName() + "[" + arrayIndex + "]";
+         }
+         else {
+            return null;
+         }
       }
    }
 
@@ -149,17 +188,23 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       }
       else {
          Term parentTerm = parentVariable.createSelectTerm();
-         if (getServices().getJavaInfo().getArrayLength() == getProgramVariable()) {
-            // Special handling for length attribute of arrays
-            Function function = getServices().getTypeConverter().getHeapLDT().getLength();
-            return TermBuilder.DF.func(function, parentTerm);
+         if (programVariable != null) {
+            if (getServices().getJavaInfo().getArrayLength() == getProgramVariable()) {
+               // Special handling for length attribute of arrays
+               Function function = getServices().getTypeConverter().getHeapLDT().getLength();
+               return TermBuilder.DF.func(function, parentTerm);
+            }
+            else {
+               // Field access on the parent variable
+               Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), getServices());
+               return TermBuilder.DF.dot(getServices(), getProgramVariable().sort(), parentTerm, function);
+            }
          }
          else {
-            // Field access on the parent variable
-            Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), getServices());
-            return TermBuilder.DF.dot(getServices(), getProgramVariable().sort(), parentTerm, function);
+            // Special handling for array indices.
+            Term idx = TermBuilder.DF.zTerm(getServices(), "" + arrayIndex);
+            return TermBuilder.DF.dotArr(getServices(), parentTerm, idx);
          }
-         
       }
    }
    
@@ -190,7 +235,27 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          if (valueSort != getServices().getJavaInfo().getNullType().getSort()) {
             KeYJavaType keyType = getServices().getJavaInfo().getKeYJavaType(valueSort);
             Type javaType = keyType.getJavaType();
-            if (javaType instanceof ClassType) {
+            if (javaType instanceof ArrayDeclaration) {
+               // Array value
+               ArrayDeclaration ad = (ArrayDeclaration)javaType;
+               Set<IProgramVariable> pvs = getProgramVariables(ad.length());
+               if (pvs.size() == 1) {
+                  ExecutionVariable lengthVariable = new ExecutionVariable(getProofNode(), this, pvs.iterator().next());
+                  children.add(lengthVariable);
+                  try {
+                     int length = Integer.valueOf(lengthVariable.getValueString());
+                     for (int i = 0; i < length; i++) {
+                        ExecutionVariable childI = new ExecutionVariable(getProofNode(), this, i);
+                        children.add(childI);
+                     }
+                  }
+                  catch (NumberFormatException e) {
+                     // Symbolic value, nothing to do.
+                  }
+               }
+            }
+            else if (javaType instanceof ClassType) {
+               // Normal value
                ImmutableList<Field> fields = ((ClassType)javaType).getAllFields(getServices());
                for (Field field : fields) {
                   ImmutableList<ProgramVariable> vars = getServices().getJavaInfo().getAllAttributes(field.getFullName(), keyType);
@@ -206,6 +271,22 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       }
       return childVariables;
    }
+   
+   /**
+    * Collects all {@link IProgramVariable}s of the given {@link FieldDeclaration}.
+    * @param fd The given {@link FieldDeclaration}.
+    * @return The found {@link IProgramVariable}s for the given {@link FieldDeclaration}.
+    */
+   protected Set<IProgramVariable> getProgramVariables(FieldDeclaration fd) {
+      Set<IProgramVariable> result = new HashSet<IProgramVariable>();
+      if (fd != null) {
+         ImmutableArray<FieldSpecification> specifications = fd.getFieldSpecifications();
+         for (FieldSpecification spec : specifications) {
+            result.add(spec.getProgramVariable());
+         }
+      }
+      return result;
+   }
 
    /**
     * {@inheritDoc}
@@ -213,5 +294,21 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    @Override
    public ExecutionVariable getParentVariable() {
       return parentVariable;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getArrayIndex() {
+      return arrayIndex;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isArrayIndex() {
+      return getArrayIndex() >= 0;
    }
 }

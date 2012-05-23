@@ -54,4 +54,16 @@ public interface IExecutionVariable extends IExecutionElement {
     * @return The contained child variables.
     */
    public IExecutionVariable[] getChildVariables() throws ProofInputException;
+   
+   /**
+    * Returns the index in the parent array if an array cell value is represented.
+    * @return The index in the parent array or {@code -1} if no array cell value is represented.
+    */
+   public int getArrayIndex();
+   
+   /**
+    * Checks if the current value is part of a parent array.
+    * @return {@code true} is array cell value, {@code false} is a "normal" value.
+    */
+   public boolean isArrayIndex();
 }

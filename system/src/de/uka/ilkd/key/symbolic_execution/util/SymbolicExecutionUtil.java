@@ -421,7 +421,7 @@ public final class SymbolicExecutionUtil {
          IExecutionVariable[] result = new IExecutionVariable[variables.size()];
          int i = 0;
          for (IProgramVariable var : variables) {
-            result[i] = new ExecutionVariable(proofNode, null, var);
+            result[i] = new ExecutionVariable(proofNode, var);
             i++;
          }
          return result;
