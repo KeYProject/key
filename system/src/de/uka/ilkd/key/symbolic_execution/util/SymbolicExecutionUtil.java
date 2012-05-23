@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -12,11 +14,13 @@ import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -454,7 +458,9 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Utility method of {@link #collectAllElementaryUpdateTerms(Node)}.
+    * Utility method of {@link #collectAllElementaryUpdateTerms(Node)} which
+    * collects all {@link IProgramVariable}s of {@link ElementaryUpdate}s
+    * and static field manipulations.
     * @param services The {@link Services} to use.
     * @param result The result {@link List} to fill.
     * @param term The current term to analyze.
@@ -462,7 +468,14 @@ public final class SymbolicExecutionUtil {
    private static void internalCollectAllElementaryUpdateTerms(Services services, List<IProgramVariable> result, Term term) {
       if (term != null) {
          if (term.op() instanceof ElementaryUpdate) {
-            if (!SymbolicExecutionUtil.isHeapUpdate(services, term)) {
+            if (SymbolicExecutionUtil.isHeapUpdate(services, term)) {
+               // Extract static variables from heap
+               Set<IProgramVariable> staticAttributes = new LinkedHashSet<IProgramVariable>();
+               internalCollectStaticProgramVariablesOnHeap(services, staticAttributes, term);
+               result.addAll(staticAttributes);
+            }
+            else {
+               // Local variable
                ElementaryUpdate eu = (ElementaryUpdate)term.op();
                if (eu.lhs() instanceof IProgramVariable) {
                   result.add((IProgramVariable)eu.lhs());
@@ -477,6 +490,43 @@ public final class SymbolicExecutionUtil {
       }
    }
    
+   /**
+    * Utility method of {@link #internalCollectAllElementaryUpdateTerms(Services, List, Term)}
+    * which collects static field manipulations on the given heap update.
+    * @param services The {@link Services} to use.
+    * @param result The result {@link List} to fill.
+    * @param term The current term to analyze.
+    */
+   private static void internalCollectStaticProgramVariablesOnHeap(Services services, Set<IProgramVariable> result, Term term) {
+      final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+      try {
+         if (term.op() == heapLDT.getStore()) {
+            ImmutableArray<Term> subs = term.subs();
+            if (subs.size() == 4) {
+               Term locationTerm = subs.get(2);
+               if (locationTerm.op() instanceof Function) {
+                  Function function = (Function)locationTerm.op();
+                  String typeName = heapLDT.getClassName(function);
+                  KeYJavaType type = services.getJavaInfo().getKeYJavaType(typeName);
+                  if (type != null) {
+                     String fieldName = heapLDT.getPrettyFieldName(function);
+                     ProgramVariable attribute = services.getJavaInfo().getAttribute(fieldName, type);
+                     if (attribute != null && attribute.isStatic()) {
+                        result.add(attribute);
+                     }
+                  }
+               }
+            }
+         }
+      }
+      catch (Exception e) {
+         // Can go wrong, nothing to do
+      }
+      for (Term sub : term.subs()) {
+         internalCollectStaticProgramVariablesOnHeap(services, result, sub);
+      }
+   }
+
    /**
     * Searches the {@link IProgramVariable} of the current {@code this}/{@code self} reference.
     * @param node The {@link Node} to search in.

@@ -113,7 +113,13 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       IProgramVariable pv = getProgramVariable();
       if (pv != null) {
          if (pv.name() instanceof ProgramElementName) {
-            return ((ProgramElementName)pv.name()).getProgramName();
+            ProgramElementName name = (ProgramElementName)pv.name();
+            if (isStaticVariable()) {
+               return name.toString();
+            }
+            else {
+               return name.getProgramName();
+            }
          }
          else {
             return pv.name().toString();
@@ -161,7 +167,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       JavaBlock jb = getProofNode().getAppliedRuleApp().posInOccurrence().subTerm().javaBlock();
       IExecutionContext context = MiscTools.getInnermostExecutionContext(jb, getServices());
       SiteProofVariableValueInput sequentToProve;
-      if (getParentVariable() != null) {
+      if (getParentVariable() != null || isStaticVariable()) {
          Term selectTerm = createSelectTerm();
          sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), context, getProofNode(), selectTerm);
       }
@@ -182,30 +188,46 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * @return The created term.
     */
    protected Term createSelectTerm() {
-      if (getParentVariable() == null) {
-         // Direct access to a variable, so return it as term
-         return TermBuilder.DF.var((ProgramVariable)getProgramVariable());
+      if (isStaticVariable()) {
+         // Static field access
+         Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), getServices());
+         return TermBuilder.DF.staticDot(getServices(), getProgramVariable().sort(), function);
       }
       else {
-         Term parentTerm = parentVariable.createSelectTerm();
-         if (programVariable != null) {
-            if (getServices().getJavaInfo().getArrayLength() == getProgramVariable()) {
-               // Special handling for length attribute of arrays
-               Function function = getServices().getTypeConverter().getHeapLDT().getLength();
-               return TermBuilder.DF.func(function, parentTerm);
-            }
-            else {
-               // Field access on the parent variable
-               Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), getServices());
-               return TermBuilder.DF.dot(getServices(), getProgramVariable().sort(), parentTerm, function);
-            }
+         if (getParentVariable() == null) {
+            // Direct access to a variable, so return it as term
+            return TermBuilder.DF.var((ProgramVariable)getProgramVariable());
          }
          else {
-            // Special handling for array indices.
-            Term idx = TermBuilder.DF.zTerm(getServices(), "" + arrayIndex);
-            return TermBuilder.DF.dotArr(getServices(), parentTerm, idx);
+            Term parentTerm = parentVariable.createSelectTerm();
+            if (programVariable != null) {
+               if (getServices().getJavaInfo().getArrayLength() == getProgramVariable()) {
+                  // Special handling for length attribute of arrays
+                  Function function = getServices().getTypeConverter().getHeapLDT().getLength();
+                  return TermBuilder.DF.func(function, parentTerm);
+               }
+               else {
+                  // Field access on the parent variable
+                  Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)getProgramVariable(), getServices());
+                  return TermBuilder.DF.dot(getServices(), getProgramVariable().sort(), parentTerm, function);
+               }
+            }
+            else {
+               // Special handling for array indices.
+               Term idx = TermBuilder.DF.zTerm(getServices(), "" + arrayIndex);
+               return TermBuilder.DF.dotArr(getServices(), parentTerm, idx);
+            }
          }
       }
+   }
+   
+   /**
+    * Checks if the modified {@link ProgramVariable} is static or not.
+    * @return {@code true} is static, {@code false} is not static or is array cell.
+    */
+   protected boolean isStaticVariable() {
+      return programVariable instanceof ProgramVariable &&
+             ((ProgramVariable)programVariable).isStatic();
    }
    
    /**
@@ -230,46 +252,55 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    @Override
    public IExecutionVariable[] getChildVariables() throws ProofInputException {
       if (childVariables== null) {
-         List<IExecutionVariable> children = new LinkedList<IExecutionVariable>();
-         Sort valueSort = getValue().sort();
-         if (valueSort != getServices().getJavaInfo().getNullType().getSort()) {
-            KeYJavaType keyType = getServices().getJavaInfo().getKeYJavaType(valueSort);
-            Type javaType = keyType.getJavaType();
-            if (javaType instanceof ArrayDeclaration) {
-               // Array value
-               ArrayDeclaration ad = (ArrayDeclaration)javaType;
-               Set<IProgramVariable> pvs = getProgramVariables(ad.length());
-               if (pvs.size() == 1) {
-                  ExecutionVariable lengthVariable = new ExecutionVariable(getProofNode(), this, pvs.iterator().next());
-                  children.add(lengthVariable);
-                  try {
-                     int length = Integer.valueOf(lengthVariable.getValueString());
-                     for (int i = 0; i < length; i++) {
-                        ExecutionVariable childI = new ExecutionVariable(getProofNode(), this, i);
-                        children.add(childI);
-                     }
-                  }
-                  catch (NumberFormatException e) {
-                     // Symbolic value, nothing to do.
+         childVariables = lazyComputeChildVariables();
+      }
+      return childVariables;
+   }
+   
+   /**
+    * Computes the contained child variables lazily when {@link #getChildVariables()} is called the first time.
+    * @return The contained child {@link IExecutionVariable}s.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected IExecutionVariable[] lazyComputeChildVariables() throws ProofInputException {
+      List<IExecutionVariable> children = new LinkedList<IExecutionVariable>();
+      Sort valueSort = getValue().sort();
+      if (valueSort != getServices().getJavaInfo().getNullType().getSort()) {
+         KeYJavaType keyType = getServices().getJavaInfo().getKeYJavaType(valueSort);
+         Type javaType = keyType.getJavaType();
+         if (javaType instanceof ArrayDeclaration) {
+            // Array value
+            ArrayDeclaration ad = (ArrayDeclaration)javaType;
+            Set<IProgramVariable> pvs = getProgramVariables(ad.length());
+            if (pvs.size() == 1) {
+               ExecutionVariable lengthVariable = new ExecutionVariable(getProofNode(), this, pvs.iterator().next());
+               children.add(lengthVariable);
+               try {
+                  int length = Integer.valueOf(lengthVariable.getValueString());
+                  for (int i = 0; i < length; i++) {
+                     ExecutionVariable childI = new ExecutionVariable(getProofNode(), this, i);
+                     children.add(childI);
                   }
                }
+               catch (NumberFormatException e) {
+                  // Symbolic value, nothing to do.
+               }
             }
-            else if (javaType instanceof ClassType) {
-               // Normal value
-               ImmutableList<Field> fields = ((ClassType)javaType).getAllFields(getServices());
-               for (Field field : fields) {
-                  ImmutableList<ProgramVariable> vars = getServices().getJavaInfo().getAllAttributes(field.getFullName(), keyType);
-                  for (ProgramVariable var : vars) {
-                     if (!var.isImplicit()) {
-                        children.add(new ExecutionVariable(getProofNode(), this, field.getProgramVariable()));
-                     }
+         }
+         else if (javaType instanceof ClassType) {
+            // Normal value
+            ImmutableList<Field> fields = ((ClassType)javaType).getAllFields(getServices());
+            for (Field field : fields) {
+               ImmutableList<ProgramVariable> vars = getServices().getJavaInfo().getAllAttributes(field.getFullName(), keyType);
+               for (ProgramVariable var : vars) {
+                  if (!var.isImplicit() && !var.isStatic()) {
+                     children.add(new ExecutionVariable(getProofNode(), this, field.getProgramVariable()));
                   }
                }
             }
          }
-         childVariables = children.toArray(new IExecutionVariable[children.size()]); 
       }
-      return childVariables;
+      return children.toArray(new IExecutionVariable[children.size()]); 
    }
    
    /**
