@@ -752,12 +752,10 @@ public final class TypeConverter {
 
     
     public boolean isIdentical ( Type from, Type to ) {
-    	System.out.println("original from: "+from+", to: "+to);
-    	System.out.println("kjt from: "+getKeYJavaType(from)+", to: "+getKeYJavaType(to));
     	// XXX causes bug #1163
-//	from = getKeYJavaType ( from );
-//	to   = getKeYJavaType ( to   );
-	return from == to;
+//		from = getKeYJavaType ( from );
+//		to   = getKeYJavaType ( to   );
+    	return from == to;
     }
 
     
