@@ -836,15 +836,6 @@ public final class TypeConverter {
 		    to == PrimitiveType.JAVA_LONG ||
 		    to == PrimitiveType.JAVA_FLOAT);
 	}
-	if (from == PrimitiveType.JAVA_BIGINT) {
-	    return (to == PrimitiveType.JAVA_BYTE ||
-			    to == PrimitiveType.JAVA_SHORT ||
-			    to == PrimitiveType.JAVA_CHAR ||
-			    to == PrimitiveType.JAVA_INT ||
-			    to == PrimitiveType.JAVA_LONG ||
-			    to == PrimitiveType.JAVA_FLOAT ||
-			    to == PrimitiveType.JAVA_DOUBLE);
-		}
 	return false;
     }
     
@@ -919,7 +910,6 @@ public final class TypeConverter {
 	    t == PrimitiveType.JAVA_INT    ||
 	    t == PrimitiveType.JAVA_CHAR   ||
 	    t == PrimitiveType.JAVA_LONG   ||
-	    t == PrimitiveType.JAVA_BIGINT ||
 	    t == PrimitiveType.JAVA_FLOAT  ||
 	    t == PrimitiveType.JAVA_DOUBLE;
     }
@@ -933,8 +923,7 @@ public final class TypeConverter {
 	    t == PrimitiveType.JAVA_SHORT  ||
 	    t == PrimitiveType.JAVA_INT    ||
 	    t == PrimitiveType.JAVA_CHAR   ||
-	    t == PrimitiveType.JAVA_LONG   ||
-	    t == PrimitiveType.JAVA_BIGINT;
+	    t == PrimitiveType.JAVA_LONG;
     }
 
     
