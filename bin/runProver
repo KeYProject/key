@@ -159,8 +159,4 @@ IFS=$IFS_NEW
 -Dkey.simplify.logdir="$KEY_SIMPLIFY_LOG_DIR" \
 -Dkey.ics.logdir="$KEY_ICS_LOG_DIR" \
 -Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
-<<<<<<< HEAD
--classpath $keyclasspath de.uka.ilkd.key.gui.Main "$@"
-=======
 -classpath "$keyclasspath" de.uka.ilkd.key.gui.Main $keyarg
->>>>>>> Added support for spaces in args and $KEY_HOME
