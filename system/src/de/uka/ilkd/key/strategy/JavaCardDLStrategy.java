@@ -103,6 +103,7 @@ import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
+import de.uka.ilkd.key.util.MiscTools;
 
 
 /**
@@ -127,11 +128,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private final StrategyProperties strategyProperties;
+    private OneStepSimplifier oneStepSimplifierRuleInstance;
     
     protected JavaCardDLStrategy(Proof p_proof,
                                  StrategyProperties strategyProperties) {
         
         super ( p_proof );
+        
+        this.oneStepSimplifierRuleInstance = 
+              MiscTools.findOneStepSimplifier(p_proof);
         
         this.strategyProperties =
             (StrategyProperties)strategyProperties.clone ();
@@ -259,7 +264,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     
     private Feature oneStepSimplificationFeature(Feature cost) {
 	SetRuleFilter filter = new SetRuleFilter();
-	filter.addRuleToSet(OneStepSimplifier.INSTANCE);
+	filter.addRuleToSet(oneStepSimplifierRuleInstance);
+
         return ConditionalFeature.createConditional(filter, cost);        
     }
     
