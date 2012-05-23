@@ -46,9 +46,10 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
     	    	
     	final Term result;
     	final StrategyProperties props = services.getProof().getSettings().getStrategySettings().getActiveStrategyProperties();
-    	if(props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_ON || 
+    	final boolean queryTreatmenIsOn = props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_ON;
+    	if(queryTreatmenIsOn || 
     	   props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_RESTRICTED){
-    		result = QueryExpand.INSTANCE.evaluateQueries(services, arg1, positiveContext);
+    		result = QueryExpand.INSTANCE.evaluateQueries(services, arg1, positiveContext, queryTreatmenIsOn);
     	}else{
     		result = arg1;
     	}
