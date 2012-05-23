@@ -41,6 +41,11 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     * The {@link SourceLocation} of this {@link IStackFrame}.
     */
    private SourceLocation sourceLocation;
+   
+   /**
+    * The contained KeY variables.
+    */
+   private KeYVariable[] variables;
 
    /**
     * Constructor.
@@ -174,5 +179,16 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
       catch (Exception e) {
          throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYVariable[] getVariables() throws DebugException {
+      if (variables == null) {
+         variables = KeYModelUtil.createVariables(this, executionNode);
+      }
+      return variables;
    }
 }

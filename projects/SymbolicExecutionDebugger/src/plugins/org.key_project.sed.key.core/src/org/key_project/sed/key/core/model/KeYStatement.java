@@ -37,6 +37,11 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
     * The {@link SourceLocation} of this {@link IStackFrame}.
     */
    private SourceLocation sourceLocation;
+   
+   /**
+    * The contained KeY variables.
+    */
+   private KeYVariable[] variables;
 
    /**
     * Constructor.
@@ -154,5 +159,16 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
    protected SourceLocation computeSourceLocation() throws DebugException {
       SourceLocation location = KeYModelUtil.convertToSourceLocation(executionNode.getActivePositionInfo());
       return KeYModelUtil.updateLocationFromAST(this, location);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYVariable[] getVariables() throws DebugException {
+      if (variables == null) {
+         variables = KeYModelUtil.createVariables(this, executionNode);
+      }
+      return variables;
    }
 }

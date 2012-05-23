@@ -4,6 +4,8 @@ import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The default implementation of {@link IExecutionBranchNode}.
@@ -24,5 +26,13 @@ public class ExecutionBranchNode extends AbstractExecutionStateNode<BranchStatem
    @Override
    protected String lazyComputeName() {
       return getActiveStatement().toString();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionVariable[] lazyComputeVariables() {
+      return SymbolicExecutionUtil.createExecutionVariables(this);
    }
 }

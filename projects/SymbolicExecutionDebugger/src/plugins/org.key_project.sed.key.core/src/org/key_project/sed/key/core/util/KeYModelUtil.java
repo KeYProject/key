@@ -29,6 +29,7 @@ import org.key_project.sed.key.core.model.KeYMethodCall;
 import org.key_project.sed.key.core.model.KeYMethodReturn;
 import org.key_project.sed.key.core.model.KeYStatement;
 import org.key_project.sed.key.core.model.KeYTermination;
+import org.key_project.sed.key.core.model.KeYVariable;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
 
@@ -40,8 +41,10 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
  * Provides utility methods which are used by {@link IKeYSEDDebugNode}
@@ -403,6 +406,33 @@ public final class KeYModelUtil {
        */
       public int getCharEnd() {
          return charEnd;
+      }
+   }
+
+   /**
+    * Creates debug model representations for the {@link IExecutionVariable}s
+    * contained in the given {@link IExecutionStateNode}.
+    * @param debugNode The {@link IKeYSEDDebugNode} which should be used as parent.
+    * @param executionNode The {@link IExecutionStateNode} to return its variables.
+    * @return The contained {@link KeYVariable}s as debug model representation.
+    */
+   public static KeYVariable[] createVariables(IKeYSEDDebugNode<?> debugNode, 
+                                               IExecutionStateNode<?> executionNode) {
+      if (executionNode != null && debugNode != null) {
+         IExecutionVariable[] variables = executionNode.getVariables();
+         if (variables != null) {
+            KeYVariable[] result = new KeYVariable[variables.length];
+            for (int i = 0; i < variables.length; i++) {
+               result[i] = new KeYVariable(debugNode.getDebugTarget(), variables[i]);
+            }
+            return result;
+         }
+         else {
+            return new KeYVariable[0];
+         }
+      }
+      else {
+         return new KeYVariable[0];
       }
    }
 }

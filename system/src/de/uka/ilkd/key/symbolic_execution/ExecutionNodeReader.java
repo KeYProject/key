@@ -43,6 +43,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
  * Allows to read XML files which contains an symbolic execution tree
@@ -414,6 +415,14 @@ public class ExecutionNodeReader {
       @Override
       public PositionInfo getActivePositionInfo() {
          return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionVariable[] getVariables() {
+         return new IExecutionVariable[0];
       }
    }
    

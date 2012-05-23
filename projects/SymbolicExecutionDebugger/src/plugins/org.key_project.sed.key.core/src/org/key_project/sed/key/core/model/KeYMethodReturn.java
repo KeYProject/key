@@ -39,6 +39,11 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
     * The {@link SourceLocation} of this {@link IStackFrame}.
     */
    private SourceLocation sourceLocation;
+   
+   /**
+    * The contained KeY variables.
+    */
+   private KeYVariable[] variables;
 
    /**
     * Constructor.
@@ -180,5 +185,16 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
       else {
          return null;
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYVariable[] getVariables() throws DebugException {
+      if (variables == null) {
+         variables = KeYModelUtil.createVariables(this, executionNode);
+      }
+      return variables;
    }
 }
