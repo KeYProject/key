@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
@@ -258,6 +259,48 @@ public class CollectionUtil {
       }
       else {
          return second == null || second.size() == 0;
+      }
+   }
+
+   /**
+    * Returns the first element from the given {@link Iterable}.
+    * @param iterable The {@link Iterable} to get first element from.
+    * @return The first element or {@code null} if no element is available.
+    */
+   public static <T> T getFirst(Iterable<T> iterable) {
+      try {
+         if (iterable != null) {
+            Iterator<T> iter = iterable.iterator();
+            return iter.next();
+         }
+         else {
+            return null;
+         }
+      }
+      catch (NoSuchElementException e) {
+         return null; // Iterable must be empty.
+      }
+   }
+
+   /**
+    * Removes the first element from the given {@link Iterable}.
+    * @param iterable The {@link Iterable} to remove first element from.
+    * @return The removed first element or {@code null} if no element was removed.
+    */
+   public static <T> T removeFirst(Iterable<T> iterable) {
+      try {
+         if (iterable != null) {
+            Iterator<T> iter = iterable.iterator();
+            T next = iter.next();
+            iter.remove();
+            return next;
+         }
+         else {
+            return null;
+         }
+      }
+      catch (NoSuchElementException e) {
+         return null; // Iterable must be empty.
       }
    }
 }

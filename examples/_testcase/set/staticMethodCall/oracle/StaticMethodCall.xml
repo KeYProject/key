@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;">
+   <methodCall name="StaticMethodCall.main();">
+      <statement name="doSomething();">
+         <methodCall name="StaticMethodCall.doSomething();">
+            <methodReturn name="&lt;return of StaticMethodCall.doSomething();&gt;" nameIncludingReturnValue="&lt;return of StaticMethodCall.doSomething();&gt;">
+               <statement name="int x = sub()+sub();">
+                  <methodCall name="StaticMethodCall.sub();">
+                     <statement name="return subSub()+2;">
+                        <methodCall name="StaticMethodCall.subSub();">
+                           <statement name="return 2;">
+                              <methodReturn name="&lt;return of StaticMethodCall.subSub();&gt;" nameIncludingReturnValue="&lt;return &apos;2&apos; as result of StaticMethodCall.subSub();&gt;">
+                                 <methodReturn name="&lt;return of StaticMethodCall.sub();&gt;" nameIncludingReturnValue="&lt;return &apos;4&apos; as result of StaticMethodCall.sub();&gt;">
+                                    <methodCall name="StaticMethodCall.sub();">
+                                       <statement name="return subSub()+2;">
+                                          <methodCall name="StaticMethodCall.subSub();">
+                                             <statement name="return 2;">
+                                                <methodReturn name="&lt;return of StaticMethodCall.subSub();&gt;" nameIncludingReturnValue="&lt;return &apos;2&apos; as result of StaticMethodCall.subSub();&gt;">
+                                                   <methodReturn name="&lt;return of StaticMethodCall.sub();&gt;" nameIncludingReturnValue="&lt;return &apos;4&apos; as result of StaticMethodCall.sub();&gt;">
+                                                      <statement name="return x;">
+                                                         <methodReturn name="&lt;return of StaticMethodCall.main();&gt;" nameIncludingReturnValue="&lt;return &apos;8&apos; as result of StaticMethodCall.main();&gt;">
+                                                            <termination name="&lt;end&gt;" exceptionalTermination="false">
+                                                            </termination>
+                                                         </methodReturn>
+                                                      </statement>
+                                                   </methodReturn>
+                                                </methodReturn>
+                                             </statement>
+                                          </methodCall>
+                                       </statement>
+                                    </methodCall>
+                                 </methodReturn>
+                              </methodReturn>
+                           </statement>
+                        </methodCall>
+                     </statement>
+                  </methodCall>
+               </statement>
+            </methodReturn>
+         </methodCall>
+      </statement>
+   </methodCall>
+</startNode>

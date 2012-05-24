@@ -23,7 +23,8 @@ import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.util.SEDIterator;
+import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.CreateDebugNodeWizard;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
@@ -237,7 +238,7 @@ public class CreateDebugNodeWizardPage extends WizardPage {
     */
    protected List<ISEDDebugNode> listParents(ISEDThread thread) throws DebugException {
       LinkedList<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
-      SEDIterator iter = new SEDIterator(thread);
+      ISEDIterator iter = new SEDPreorderIterator(thread);
       while (iter.hasNext()) {
          ISEDDebugElement next = iter.next();
          if (next instanceof ISEDDebugNode) {

@@ -68,6 +68,8 @@ public class TacletForTests {
         lastFile = null;
         services = null;
         rules = null;
+        variables = null;
+        scm = new AbbrevMap();
         nss = new NamespaceSet();        
     }
         

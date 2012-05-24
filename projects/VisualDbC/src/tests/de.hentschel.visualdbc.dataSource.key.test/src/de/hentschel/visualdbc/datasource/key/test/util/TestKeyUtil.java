@@ -564,15 +564,14 @@ public final class TestKeyUtil {
       MemoryOperationContract c2 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, "charge(int)", operationContractIDs[2], "normal_behavior"),
                                                                "(  javaAddInt(amount, self.balance) >= self.limit\n" +
                                                                "   | !self.isValid() = TRUE)\n" +
-                                                               "& amount >  0\n" +
-                                                               "& self.<inv>", 
+                                                               "& (amount >  0 & self.<inv>)", 
                                                                "!result = TRUE\n" +
-                                                               "&   self.unsuccessfulOperations\n" +
-                                                               "  = javaAddInt(int::select(heapAtPre,\n" +
-                                                               "                           self,\n" +
-                                                               "                           unsuccessfulOperations),\n" +
-                                                               "               1)\n" +
-                                                               "& self.<inv>\n" +
+                                                               "& (    self.unsuccessfulOperations\n" +
+                                                               "     = javaAddInt(int::select(heapAtPre,\n" +
+                                                               "                              self,\n" +
+                                                               "                              unsuccessfulOperations),\n" +
+                                                               "                  1)\n" +
+                                                               "   & self.<inv>)\n" +
                                                                "& exc = null", 
                                                                "{(self, unsuccessfulOperations)}", 
                                                                "diamond");
@@ -580,13 +579,12 @@ public final class TestKeyUtil {
       MemoryOperationContract c3 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, "charge(int)", operationContractIDs[3], "normal_behavior"),
                                                                "javaAddInt(amount, self.balance) < self.limit\n" +
                                                                "& self.isValid() = TRUE\n" +
-                                                               "& amount >  0\n" +
-                                                               "& self.<inv>", 
+                                                               "& (amount >  0 & self.<inv>)", 
                                                                "result = TRUE\n" +
-                                                               "&   self.balance\n" +
-                                                               "  = javaAddInt(amount,\n" +
-                                                               "               int::select(heapAtPre, self, balance))\n" +
-                                                               "& self.<inv>\n" +
+                                                               "& (    self.balance\n" +
+                                                               "     = javaAddInt(amount,\n" +
+                                                               "                  int::select(heapAtPre, self, balance))\n" +
+                                                               "   & self.<inv>)\n" +
                                                                "& exc = null", 
                                                                "{(self, balance)}", 
                                                                "diamond");
@@ -668,8 +666,9 @@ public final class TestKeyUtil {
                                                                 "                                      currentRecord),\n" +
                                                                 "                          1))\n" +
                                                                 "      \\else (self.currentRecord = 0)\n" +
-                                                                "& self.logArray[self.currentRecord].balance = balance\n" +
-                                                                "& self.<inv>\n" +
+                                                                "& (    self.logArray[self.currentRecord].balance\n" +
+                                                                "     = balance\n" +
+                                                                "   & self.<inv>)\n" +
                                                                 "& exc = null", 
                                                                 "allLocs", 
                                                                 "diamond");
@@ -683,8 +682,7 @@ public final class TestKeyUtil {
                                                                 "\\forall int i;\n" +
                                                                 "    (   0 <= i & i < self.logArray.length & inInt(i)\n" +
                                                                 "     -> self.logArray[i].balance <= result.balance)\n" +
-                                                                "& self.<inv>\n" +
-                                                                "& !result = null\n" +
+                                                                "& (self.<inv> & !result = null)\n" +
                                                                 "& exc = null", 
                                                                 "{}", 
                                                                 "box");

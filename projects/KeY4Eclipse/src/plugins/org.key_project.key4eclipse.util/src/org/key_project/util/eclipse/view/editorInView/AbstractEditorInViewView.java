@@ -9,6 +9,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IActionBars;
@@ -115,6 +116,11 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
    private String messageText;
    
    /**
+    * Indicates if the editor is enabled or not.
+    */
+   private boolean editorEnabled = true;
+   
+   /**
     * {@inheritDoc}
     */
    @Override
@@ -126,6 +132,7 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
       // Create editor
       editorComposite = new Composite(rootComposite, SWT.NONE);
       editorComposite.setLayout(new FillLayout());
+      editorComposite.setEnabled(isEditorEnabled());
       editorPart.createPartControl(editorComposite);
       editorPartControlCreated(editorPart, editorActionBarContributor);
       // Create message label
@@ -291,15 +298,56 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
       }
       root.layout();
       boolean editorShown = isEditorShown();
-      if (editorActionBarContributor instanceof IGlobalEnablement) {
-         ((IGlobalEnablement)editorActionBarContributor).setGlobalEnabled(editorShown);
-      }
-      if (editorPart instanceof IGlobalEnablement) {
-         ((IGlobalEnablement)editorPart).setGlobalEnabled(editorShown);
-      }
+      updateEditorsGlobalEnablement(editorShown && isEditorEnabled());
       firePropertyChange(PROP_EDITOR_SHOWN, oldEditorShown, editorShown);
       firePropertyChange(PROP_MESSAGE_SHOWN, oldMessageShown, isMessageShown());
       firePropertyChange(PROP_DIRTY); // Fire event to update save and saveAs in workbench window
+   }
+   
+   /**
+    * Updates the global enabled state of the editor and his action bar contributor.
+    * @param enabled The global enabled state to set.
+    */
+   protected void updateEditorsGlobalEnablement(boolean enabled) {
+      if (editorActionBarContributor instanceof IGlobalEnablement) {
+         ((IGlobalEnablement)editorActionBarContributor).setGlobalEnabled(enabled);
+      }
+      if (editorPart instanceof IGlobalEnablement) {
+         ((IGlobalEnablement)editorPart).setGlobalEnabled(enabled);
+      }
+   }
+
+   /**
+    * Checks if the editor is enabled or not.
+    * @return {@code true} editor is enabled, {@code false} editor is not enabled.
+    */
+   public boolean isEditorEnabled() {
+      return editorEnabled;
+   }
+
+   /**
+    * Defines if the editor is enabled or not.
+    * @param editorEnabled {@code true} editor is enabled, {@code false} editor is not enabled.
+    */
+   public void setEditorEnabled(boolean editorEnabled) {
+      this.editorEnabled = editorEnabled;
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            if (editorComposite != null) {
+               editorComposite.setEnabled(AbstractEditorInViewView.this.editorEnabled);
+            }
+            updateEditorsGlobalEnablement(AbstractEditorInViewView.this.editorEnabled && isEditorShown());
+         }
+      });
+   }
+
+   /**
+    * Returns the {@link Composite} which contains the created {@link IEditorPart}.
+    * @return The {@link Composite} which contains the created {@link IEditorPart}.
+    */
+   protected Composite getEditorComposite() {
+      return editorComposite;
    }
 
    /**

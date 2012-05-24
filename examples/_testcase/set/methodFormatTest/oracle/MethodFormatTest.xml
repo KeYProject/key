@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;">
+   <methodCall name="MethodFormatTest.main();">
+      <statement name="return a();">
+         <methodCall name="MethodFormatTest.a();">
+            <statement name="return b();">
+               <methodCall name="MethodFormatTest.b();">
+                  <statement name="return c();">
+                     <methodCall name="MethodFormatTest.c();">
+                        <statement name="return d();">
+                           <methodCall name="MethodFormatTest.d();">
+                              <statement name="return e();">
+                                 <methodCall name="MethodFormatTest.e();">
+                                    <statement name="return f();">
+                                       <methodCall name="MethodFormatTest.f();">
+                                          <statement name="return g();">
+                                             <methodCall name="MethodFormatTest.g();">
+                                                <statement name="return 42;">
+                                                   <methodReturn name="&lt;return of MethodFormatTest.g();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.g();&gt;">
+                                                      <methodReturn name="&lt;return of MethodFormatTest.f();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.f();&gt;">
+                                                         <methodReturn name="&lt;return of MethodFormatTest.e();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.e();&gt;">
+                                                            <methodReturn name="&lt;return of MethodFormatTest.d();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.d();&gt;">
+                                                               <methodReturn name="&lt;return of MethodFormatTest.c();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.c();&gt;">
+                                                                  <methodReturn name="&lt;return of MethodFormatTest.b();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.b();&gt;">
+                                                                     <methodReturn name="&lt;return of MethodFormatTest.a();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.a();&gt;">
+                                                                        <methodReturn name="&lt;return of MethodFormatTest.main();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.main();&gt;">
+                                                                           <termination name="&lt;end&gt;" exceptionalTermination="false">
+                                                                           </termination>
+                                                                        </methodReturn>
+                                                                     </methodReturn>
+                                                                  </methodReturn>
+                                                               </methodReturn>
+                                                            </methodReturn>
+                                                         </methodReturn>
+                                                      </methodReturn>
+                                                   </methodReturn>
+                                                </statement>
+                                             </methodCall>
+                                          </statement>
+                                       </methodCall>
+                                    </statement>
+                                 </methodCall>
+                              </statement>
+                           </methodCall>
+                        </statement>
+                     </methodCall>
+                  </statement>
+               </methodCall>
+            </statement>
+         </methodCall>
+      </statement>
+   </methodCall>
+</startNode>

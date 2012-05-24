@@ -693,14 +693,10 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final ContractPO po 
 		= services.getSpecificationRepository()
 		          .getPOForProof(goal.proof());
-	Term mbyOk;	
+	final Term mbyOk;	
 	if(po != null && po.getMbyAtPre() != null && mby != null ) {
-	    mbyOk = TB.leq(TB.zero(services), mby, services);
-	    if(po.getContract().getTarget() == contract.getTarget()){ 
-	    	//Ensure decreasing of "measured by" only in case of recursion. 
-	    	//Comparing "measured by" declarations of two different methods would make no sense.
-	    	mbyOk = TB.and(mbyOk, TB.lt(mby, po.getMbyAtPre(), services));
-	    }
+    	mbyOk = TB.and(TB.leq(TB.zero(services), mby, services), 
+    			       TB.lt(mby, po.getMbyAtPre(), services));
 	} else {
 	    mbyOk = TB.tt();
 	}

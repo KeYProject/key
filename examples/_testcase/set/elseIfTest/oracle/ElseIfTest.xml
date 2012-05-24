@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;">
+   <methodCall name="self.elseIf(_x);">
+      <statement name="int a;">
+         <branchNode name="if (_x==0) {   a=1; }else if (_x==1||_x==2||_x==3) {if (_x==1||_x==2) {       a=-1;     }     a=_x*_x;   }else if (_x==4) {return 42;     }else  {       a=_x;     }">
+            <branchCondition name="x = 0 TRUE">
+               <statement name="a=1;">
+                  <statement name="return a;">
+                     <methodReturn name="&lt;return of self.elseIf(_x);&gt;" nameIncludingReturnValue="&lt;return &apos;1&apos; as result of self.elseIf(_x);&gt;">
+                        <termination name="&lt;end&gt;" exceptionalTermination="false">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </statement>
+            </branchCondition>
+            <branchCondition name="x = 0 FALSE">
+               <branchNode name="if (_x==1||_x==2||_x==3) {if (_x==1||_x==2) {     a=-1;   }   a=_x*_x; }else if (_x==4) {return 42;   }else  {     a=_x;   }">
+                  <branchCondition name="x = 1 TRUE">
+                     <branchNode name="if (_x==1||_x==2) {   a=-1; }">
+                        <statement name="a=-1;">
+                           <statement name="a=_x*_x;">
+                              <statement name="return a;">
+                                 <methodReturn name="&lt;return of self.elseIf(_x);&gt;" nameIncludingReturnValue="&lt;return &apos;1&apos; as result of self.elseIf(_x);&gt;">
+                                    <termination name="&lt;end&gt;" exceptionalTermination="false">
+                                    </termination>
+                                 </methodReturn>
+                              </statement>
+                           </statement>
+                        </statement>
+                     </branchNode>
+                  </branchCondition>
+                  <branchCondition name="x = 1 FALSE">
+                     <branchCondition name="x = 2 TRUE">
+                        <branchNode name="if (_x==1||_x==2) {   a=-1; }">
+                           <statement name="a=-1;">
+                              <statement name="a=_x*_x;">
+                                 <statement name="return a;">
+                                    <methodReturn name="&lt;return of self.elseIf(_x);&gt;" nameIncludingReturnValue="&lt;return &apos;4&apos; as result of self.elseIf(_x);&gt;">
+                                       <termination name="&lt;end&gt;" exceptionalTermination="false">
+                                       </termination>
+                                    </methodReturn>
+                                 </statement>
+                              </statement>
+                           </statement>
+                        </branchNode>
+                     </branchCondition>
+                     <branchCondition name="x = 2 FALSE">
+                        <branchCondition name="x = 3 TRUE">
+                           <branchNode name="if (_x==1||_x==2) {   a=-1; }">
+                              <statement name="a=_x*_x;">
+                                 <statement name="return a;">
+                                    <methodReturn name="&lt;return of self.elseIf(_x);&gt;" nameIncludingReturnValue="&lt;return &apos;9&apos; as result of self.elseIf(_x);&gt;">
+                                       <termination name="&lt;end&gt;" exceptionalTermination="false">
+                                       </termination>
+                                    </methodReturn>
+                                 </statement>
+                              </statement>
+                           </branchNode>
+                        </branchCondition>
+                        <branchCondition name="x = 3 FALSE">
+                           <branchNode name="if (_x==4) {return 42; }else  {   a=_x; }">
+                              <branchCondition name="x = 4 TRUE">
+                                 <statement name="return 42;">
+                                    <methodReturn name="&lt;return of self.elseIf(_x);&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.elseIf(_x);&gt;">
+                                       <termination name="&lt;end&gt;" exceptionalTermination="false">
+                                       </termination>
+                                    </methodReturn>
+                                 </statement>
+                              </branchCondition>
+                              <branchCondition name="x = 4 FALSE">
+                                 <statement name="a=_x;">
+                                    <statement name="return a;">
+                                       <methodReturn name="&lt;return of self.elseIf(_x);&gt;" nameIncludingReturnValue="&lt;return &apos;x&apos; as result of self.elseIf(_x);&gt;">
+                                          <termination name="&lt;end&gt;" exceptionalTermination="false">
+                                          </termination>
+                                       </methodReturn>
+                                    </statement>
+                                 </statement>
+                              </branchCondition>
+                           </branchNode>
+                        </branchCondition>
+                     </branchCondition>
+                  </branchCondition>
+               </branchNode>
+            </branchCondition>
+         </branchNode>
+      </statement>
+   </methodCall>
+</startNode>

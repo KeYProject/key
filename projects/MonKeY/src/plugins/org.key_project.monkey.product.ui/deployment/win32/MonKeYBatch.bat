@@ -1,0 +1,1 @@
+MonKeYC -batch -noSplash %*

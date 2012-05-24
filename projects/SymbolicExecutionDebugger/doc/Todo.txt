@@ -1,5 +1,4 @@
 TODOs for the execution tree
 ============================
 1. Handle switch case (Requires to simplify the proof tree)
-2. Handle exceptional termination (Requires to read variables)
-3. Handle local variable declaration in method which is wrong for instance if it is named result
+2. Handle local variable declaration in method which is wrong for instance if it is named result

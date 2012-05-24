@@ -23,7 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
-import de.uka.ilkd.key.rule.BuiltInRuleApp;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.speclang.Contract;
 
@@ -47,8 +47,8 @@ public class UseOperationContractRuleAnalyst implements IRuleAnalyst {
    public List<IDSProvableReference> getReferences(KeyConnection connection, Services services, Node node) {
       List<IDSProvableReference> result = new LinkedList<IDSProvableReference>();
       // See: ProofSaver#save() and SpecificationRepository#drawGraph(Proof)
-      if (node != null && node.getAppliedRuleApp() instanceof BuiltInRuleApp) {
-         BuiltInRuleApp app = (BuiltInRuleApp)node.getAppliedRuleApp();
+      if (node != null && node.getAppliedRuleApp() instanceof IBuiltInRuleApp) {
+         IBuiltInRuleApp app = (IBuiltInRuleApp)node.getAppliedRuleApp();
          if (app.rule() instanceof UseOperationContractRule) {
             RuleJustification ruleJusti = node.proof().env().getJustifInfo().getJustification(app, node.proof().getServices());
             if (ruleJusti instanceof RuleJustificationBySpec) {

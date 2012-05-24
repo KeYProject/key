@@ -439,9 +439,10 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	final Term invTerm2;
 	final StrategyProperties props = goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
-	if(props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_ON || 
+	final boolean queryTreatmenIsOn = props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_ON;
+	if(queryTreatmenIsOn || 
 	   props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_RESTRICTED){
-	   invTerm2 = QueryExpand.INSTANCE.evaluateQueries(services, invTerm, true); //chrisg
+	   invTerm2 = QueryExpand.INSTANCE.evaluateQueries(services, invTerm, true, queryTreatmenIsOn); //chrisg
 	}else{
 	   invTerm2 = invTerm;
 	}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;">
+   <methodCall name="self.main();">
+      <statement name="int result = 0;">
+         <loopNode name="do {result_1++;}while ( false );">
+            <statement name="result_1++;">
+               <loopCondition name="false">
+                  <statement name="return result_1;">
+                     <methodReturn name="&lt;return of self.main();&gt;" nameIncludingReturnValue="&lt;return &apos;1&apos; as result of self.main();&gt;">
+                        <termination name="&lt;end&gt;" exceptionalTermination="false">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </loopCondition>
+            </statement>
+         </loopNode>
+      </statement>
+   </methodCall>
+</startNode>

@@ -27,7 +27,7 @@ my $absolute_bin_path = &getcwd."/".$bin_path;
 #
 # Command line
 my %option = ();
-GetOptions(\%option, 'help|h', 'delete|d', 'reload|l', 'storefailed|s=s', 'file|f=s');
+GetOptions(\%option, 'help|h', 'delete|d', 'reload|l', 'stopfail|t', 'storefailed|s=s', 'file|f=s');
 
 if ($option{'help'}) {
   print "Runs all proofs listed in the file \'$automaticjavadl_txt\'.\n";
@@ -35,6 +35,7 @@ if ($option{'help'}) {
   print "Use '-h' or '--help' to get this text (very necessary this line).\n";
   print "Use '-l' or '--reload' to save proofs and reload them directly afterwards. (Test cases for proof loading.)\n";
   print "Use '-d' or '--delete' to delete all files created automatically by a run of this script.\n";
+  print "Use '-t' or '--stopfail' to stop immediately upon a failure.\n";
   print "Use '-s <filename>' or '--storefailed <filename>' to store the file names of failures in file <filename>.\n";
   print "Use '-f <filename>' or '--file <filename>' to load the problems from <filename>.\n";
 #  print "[DEFUNCT] Use '-m email\@address.com' to send the report as an email to the specified address.\n";
@@ -86,7 +87,8 @@ my %erroneous;
 #
 chdir $path_to_examples;
 foreach my $dotkey (@automatic_JAVADL) {
-
+if (! ($option{'stopfail'} && 
+		($failures + $errors + scalar(@reloadFailed) > 0))) {
    # ignore empty lines and comments
    next if $dotkey =~ /^\s*#/;
    next if $dotkey =~ /^\s*$/;
@@ -122,6 +124,7 @@ foreach my $dotkey (@automatic_JAVADL) {
        (($reloadTests and $provable) ? (scalar(@reloadFailed) . " failures") : "disabled") 
        . "\n\n";
 }
+}
 chdir "../";
 
 print "\n$correct/$counter prover runs according to spec.\n".
@@ -140,6 +143,9 @@ if($option{'storefailed'}) {
 }
 
 if($failures + $errors + scalar(@reloadFailed) > 0) {
+    if($option{'stopfail'}) {
+        print "Tests stopped after first failure.\n";
+    }
     exit -1;
 } else {
     exit 0;

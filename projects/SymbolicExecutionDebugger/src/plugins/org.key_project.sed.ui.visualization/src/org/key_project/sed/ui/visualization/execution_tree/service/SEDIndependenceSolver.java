@@ -10,7 +10,8 @@ import org.eclipse.graphiti.features.impl.IIndependenceSolver;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.util.SEDIterator;
+import org.key_project.sed.core.util.ISEDIterator;
+import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.util.java.ObjectUtil;
 
 /**
@@ -48,7 +49,7 @@ public class SEDIndependenceSolver implements IIndependenceSolver {
       Assert.isTrue(this.objectHashmap.isEmpty());
       if (targets != null) {
          for (ISEDDebugTarget target : targets) {
-            SEDIterator iter = new SEDIterator(target);
+            ISEDIterator iter = new SEDPreorderIterator(target);
             while (iter.hasNext()) {
                ISEDDebugElement next = iter.next();
                getKeyForBusinessObject(next);

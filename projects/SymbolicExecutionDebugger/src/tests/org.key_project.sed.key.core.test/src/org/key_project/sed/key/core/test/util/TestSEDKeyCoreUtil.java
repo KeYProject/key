@@ -10,6 +10,7 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
@@ -45,14 +46,19 @@ public final class TestSEDKeyCoreUtil {
     * Launches the {@link IMethod} in the symbolic execution debugger
     * based on KeY.
     * @param method The {@link IMethod} to debug.
+    * @param showMethodReturnValues Show method return values?
     * @throws Exception Occurred Exception.
     */
-   public static void launchKeY(final IMethod method) throws Exception {
+   public static void launchKeY(final IMethod method,
+                                final boolean showMethodReturnValues) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
             try {
                ILaunchConfiguration config = getKeYLaunchConfiguration(method);
+               ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
+               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
+               config = wc.doSave();
                DebugUITools.launch(config, KeySEDUtil.MODE);
             }
             catch (Exception e) {

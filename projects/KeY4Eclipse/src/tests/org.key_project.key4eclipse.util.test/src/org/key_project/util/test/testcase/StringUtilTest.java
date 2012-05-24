@@ -13,6 +13,35 @@ import org.key_project.util.java.StringUtil;
  */
 public class StringUtilTest extends TestCase {
    /**
+    * Tests {@link StringUtil#toSingleLinedString(String)}
+    */
+   @Test
+   public void testToSingleLinedString() {
+      String text = "First Line\nSecond Line\nLine\twith\tTabs\nLast Line";
+      assertNull(StringUtil.toSingleLinedString(null));
+      assertEquals("", StringUtil.toSingleLinedString(""));
+      assertEquals("First Line Second Line Line with Tabs Last Line", StringUtil.toSingleLinedString(text));
+   }
+   
+   /**
+    * Tests {@link StringUtil#replaceAll(String, char[], char)}
+    */
+   @Test
+   public void testReplaceAll() {
+      String text = "ABCDABCDABCDABCD";
+      assertNull(StringUtil.replaceAll(null, new char[] {}, 'X'));
+      assertEquals(text, StringUtil.replaceAll(text, null, 'X'));
+      assertEquals(text, StringUtil.replaceAll(text, new char[] {}, 'X'));
+      assertEquals("XBCDXBCDXBCDXBCD", StringUtil.replaceAll(text, new char[] {'A'}, 'X'));
+      assertEquals("AXCDAXCDAXCDAXCD", StringUtil.replaceAll(text, new char[] {'B'}, 'X'));
+      assertEquals("ABXDABXDABXDABXD", StringUtil.replaceAll(text, new char[] {'C'}, 'X'));
+      assertEquals("ABCXABCXABCXABCX", StringUtil.replaceAll(text, new char[] {'D'}, 'X'));
+      assertEquals("ABCDABCDABCDABCD", StringUtil.replaceAll(text, new char[] {'E'}, 'X'));
+      assertEquals("XBXDXBXDXBXDXBXD", StringUtil.replaceAll(text, new char[] {'A', 'C'}, 'X'));
+      assertEquals("XXXXXXXXXXXXXXXX", StringUtil.replaceAll(text, new char[] {'A', 'B', 'C', 'D'}, 'X'));
+   }
+   
+   /**
     * Tests {@link StringUtil#contains(String, CharSequence)}
     */
    @Test

@@ -16,6 +16,182 @@ import org.key_project.util.java.StringUtil;
  */
 public class ArrayUtilTest extends TestCase {
    /**
+    * Tests {@link ArrayUtil#getLast(Object[])}
+    */
+   @Test
+   public void testGetLast() {
+      // Test null
+      assertNull(ArrayUtil.getLast(null));
+      // Test empty collection
+      assertNull(ArrayUtil.getLast(new String[0]));
+      // Test one element
+      assertEquals("A", ArrayUtil.getLast(new String[] {"A"}));
+      // Test two elements
+      assertEquals("B", ArrayUtil.getLast(new String[] {"A", "B"}));
+      // Test three elements
+      assertEquals("C", ArrayUtil.getLast(new String[] {"A", "B", "C"}));
+   }
+   
+   /**
+    * Tests {@link ArrayUtil#getFirst(Object[])}
+    */
+   @Test
+   public void testGetFirst() {
+      // Test null
+      assertNull(ArrayUtil.getFirst(null));
+      // Test empty collection
+      assertNull(ArrayUtil.getFirst(new String[0]));
+      // Test one element
+      assertEquals("A", ArrayUtil.getFirst(new String[] {"A"}));
+      // Test two elements
+      assertEquals("A", ArrayUtil.getFirst(new String[] {"A", "B"}));
+      // Test three elements
+      assertEquals("A", ArrayUtil.getFirst(new String[] {"A", "B", "C"}));
+   }
+   
+   /**
+    * Tests {@link ArrayUtil#isLast(Object[], Object, Comparator)}
+    */
+   @Test
+   public void testIsLast_Comparator() {
+      Comparator<String> comparator = new Comparator<String>() {
+         @Override
+         public int compare(String o1, String o2) {
+            if ("B".equals(o1) && "B".equals(o2)) {
+                return Integer.MAX_VALUE; // B is false
+            }
+            else {
+                return ObjectUtil.equals(o1, o2) ? 0 : 1;
+            }
+         }
+      };      
+      // Test null values
+      String[] array = {"A"};
+      assertFalse(ArrayUtil.isLast(null, "A", comparator));
+      assertFalse(ArrayUtil.isLast(array, null, comparator));
+      assertFalse(ArrayUtil.isLast(null, null, comparator));
+      try {
+         ArrayUtil.isLast(array, "A", null);
+         fail("isLast should not be possible without a comparator");
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Comparator is null.", e.getMessage());
+      }
+      assertFalse(ArrayUtil.isLast(null, null, null));
+      // Test array with one element
+      assertTrue(ArrayUtil.isLast(array, "A", comparator));
+      assertFalse(ArrayUtil.isLast(array, "B", comparator));
+      // Test array with two elements
+      array = new String[] {"A", "B"};
+      assertFalse(ArrayUtil.isLast(array, "A", comparator));
+      assertFalse(ArrayUtil.isLast(array, "B", comparator));
+      assertFalse(ArrayUtil.isLast(array, "C", comparator));
+      // Test array with three elements
+      array = new String[] {"A", "B", "C"};
+      assertFalse(ArrayUtil.isLast(array, "A", comparator));
+      assertFalse(ArrayUtil.isLast(array, "B", comparator));
+      assertTrue(ArrayUtil.isLast(array, "C", comparator));
+      assertFalse(ArrayUtil.isLast(array, "D", comparator));
+   }
+   
+   /**
+    * Tests {@link ArrayUtil#isLast(Object[], Object)}
+    */
+   @Test
+   public void testIsLast() {
+      // Test null values
+      String[] array = {"A"};
+      assertFalse(ArrayUtil.isLast(null, "A"));
+      assertFalse(ArrayUtil.isLast(array, null));
+      assertFalse(ArrayUtil.isLast(null, null));
+      // Test array with one element
+      assertTrue(ArrayUtil.isLast(array, "A"));
+      assertFalse(ArrayUtil.isLast(array, "B"));
+      // Test array with two elements
+      array = new String[] {"A", "B"};
+      assertFalse(ArrayUtil.isLast(array, "A"));
+      assertTrue(ArrayUtil.isLast(array, "B"));
+      assertFalse(ArrayUtil.isLast(array, "C"));
+      // Test array with three elements
+      array = new String[] {"A", "B", "C"};
+      assertFalse(ArrayUtil.isLast(array, "A"));
+      assertFalse(ArrayUtil.isLast(array, "B"));
+      assertTrue(ArrayUtil.isLast(array, "C"));
+      assertFalse(ArrayUtil.isLast(array, "D"));
+   }
+   
+   /**
+    * Tests {@link ArrayUtil#getPrevious(Object[], Object, Comparator)}
+    */
+   @Test
+   public void testGetPrevious_Comparator() {
+      Comparator<String> comparator = new Comparator<String>() {
+         @Override
+         public int compare(String o1, String o2) {
+            if ("B".equals(o1) && "B".equals(o2)) {
+                return Integer.MAX_VALUE; // B is false
+            }
+            else {
+                return ObjectUtil.equals(o1, o2) ? 0 : 1;
+            }
+         }
+      };      
+      // Test null values
+      String[] array = {"A"};
+      assertNull(ArrayUtil.getPrevious(null, "A", comparator));
+      assertNull(ArrayUtil.getPrevious(array, null, comparator));
+      assertNull(ArrayUtil.getPrevious(null, null, comparator));
+      try {
+         ArrayUtil.getPrevious(array, "A", null);
+         fail("getPrevious should not be possible without a comparator");
+      }
+      catch (IllegalArgumentException e) {
+         assertEquals("Comparator is null.", e.getMessage());
+      }
+      assertNull(ArrayUtil.getPrevious(null, null, null));
+      // Test array with one element
+      assertNull(ArrayUtil.getPrevious(array, "A", comparator));
+      assertNull(ArrayUtil.getPrevious(array, "B", comparator));
+      // Test array with two elements
+      array = new String[] {"A", "B"};
+      assertNull(ArrayUtil.getPrevious(array, "A", comparator));
+      assertNull(ArrayUtil.getPrevious(array, "B", comparator));
+      assertNull(ArrayUtil.getPrevious(array, "C", comparator));
+      // Test array with three elements
+      array = new String[] {"A", "B", "C"};
+      assertNull(ArrayUtil.getPrevious(array, "A", comparator));
+      assertNull(ArrayUtil.getPrevious(array, "B", comparator));
+      assertEquals("B", ArrayUtil.getPrevious(array, "C", comparator));
+      assertNull(ArrayUtil.getPrevious(array, "D", comparator));
+   }
+   
+   /**
+    * Tests {@link ArrayUtil#getPrevious(Object[], Object)}
+    */
+   @Test
+   public void testGetPrevious() {
+      // Test null values
+      String[] array = {"A"};
+      assertNull(ArrayUtil.getPrevious(null, "A"));
+      assertNull(ArrayUtil.getPrevious(array, null));
+      assertNull(ArrayUtil.getPrevious(null, null));
+      // Test array with one element
+      assertNull(ArrayUtil.getPrevious(array, "A"));
+      assertNull(ArrayUtil.getPrevious(array, "B"));
+      // Test array with two elements
+      array = new String[] {"A", "B"};
+      assertNull(ArrayUtil.getPrevious(array, "A"));
+      assertEquals("A", ArrayUtil.getPrevious(array, "B"));
+      assertNull(ArrayUtil.getPrevious(array, "C"));
+      // Test array with three elements
+      array = new String[] {"A", "B", "C"};
+      assertNull(ArrayUtil.getPrevious(array, "A"));
+      assertEquals("A", ArrayUtil.getPrevious(array, "B"));
+      assertEquals("B", ArrayUtil.getPrevious(array, "C"));
+      assertNull(ArrayUtil.getPrevious(array, "D"));
+   }
+   
+   /**
     * Tests for {@link ArrayUtil#search(Object[], IFilter)}.
     */
    @Test

@@ -387,10 +387,12 @@ public final class StrategySelectionView extends JPanel {
         queryRestricted = new JRadioButtonHashMap("Restricted", 
                 StrategyProperties.QUERY_RESTRICTED, false, false);
         queryRestricted.setToolTipText ( "<html>Rewrite query to a method call (expanded) so that contracts or inlining can be used.<br>" +
-                                         "<ul><li> Queries occuring earlier on a branch get a higher chance to be expanded <br>" +
-        		                         " than queries introduced more recently. This results in a breath-first search<br>" +
+                                         "<ul><li> Priority of expanding queries that occuring earlier on a branch is higher than<br>" +
+        		                         " for queries introduced more recently. This approximates in a breath-first search<br>" +
                                          " with respect to query expansion.</li>" +
-        		                         "<li> Reexpansion of the same query is very limited (e.g. one time).</li>" +
+        		                         "<li> Reexpansion of identical query terms is suppressed.</li>" +
+        		                         "<li> A query is not expanded if one of its arguments contains a literal greater<br>" +
+        		                         " than "+QueryExpandCost.ConsideredAsBigLiteral+", or smaller than "+(-QueryExpandCost.ConsideredAsBigLiteral)+". This helps detecting loops in a proof.</li>" +
         		                         "<li> Queries are expanded after the loop body in the \"Preserves Invariant\"<br>" +
         		                         " branch of the loop invariant rule.</li>" +
         		                         "<li> Queries are expanded in the Base Case and the conclusio of the Step Case <br>" +

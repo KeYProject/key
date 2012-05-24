@@ -6,7 +6,7 @@ import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
 
 /**
  * A node in the symbolic execution tree which represents an exceptional termination of a branch,
- * e.g. {@code throws Exception}.
+ * e.g. {@code <uncaught java.lang.NullPointerException>}.
  * <p>
  * A symbolic exceptional termination is also a normal stack frame ({@link IStackFrame})
  * for compatibility reasons with the Eclipse debug API.

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;">
+   <methodCall name="self.main();">
+      <statement name="a();">
+         <methodCall name="self.a();">
+            <statement name="b();">
+               <methodCall name="self.b();">
+                  <statement name="c();">
+                     <methodCall name="self.c();">
+                        <statement name="throw new RuntimeException ();">
+                           <statement name="int ae = -1;">
+                              <statement name="int a1 = 1;">
+                                 <methodReturn name="&lt;return of self.a();&gt;" nameIncludingReturnValue="&lt;return of self.a();&gt;">
+                                    <methodReturn name="&lt;return of self.main();&gt;" nameIncludingReturnValue="&lt;return of self.main();&gt;">
+                                       <termination name="&lt;end&gt;" exceptionalTermination="false">
+                                       </termination>
+                                    </methodReturn>
+                                 </methodReturn>
+                              </statement>
+                           </statement>
+                        </statement>
+                     </methodCall>
+                  </statement>
+               </methodCall>
+            </statement>
+         </methodCall>
+      </statement>
+   </methodCall>
+</startNode>

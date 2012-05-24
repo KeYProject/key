@@ -11,10 +11,15 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -41,6 +46,65 @@ import org.key_project.util.test.util.ArrayObjectLabelProvider;
  */
 public class SWTUtilTest extends TestCase {
     /**
+     * Tests {@link SWTUtil#select(Viewer, org.eclipse.jface.viewers.ISelection, boolean)}
+     */
+    @Test
+    public void testSelect() {
+       Shell shell = new Shell();
+       try {
+          // Create viewer
+          String[] input = {"A", "B", "C"};
+          shell.setLayout(new FillLayout());
+          final ListViewer viewer = new ListViewer(shell);
+          viewer.setContentProvider(ArrayContentProvider.getInstance());
+          viewer.setInput(input);
+          viewer.setSelection(SWTUtil.createSelection("B"));
+          assertSelection(viewer.getSelection(), "B");
+          // Test null parameters
+          SWTUtil.select(null, SWTUtil.createSelection("C"), true);
+          assertSelection(viewer.getSelection(), "B");
+          SWTUtil.select(viewer, null, true);
+          assertSelection(viewer.getSelection());
+          SWTUtil.select(null, null, true);
+          assertSelection(viewer.getSelection());
+          // Change selection in displays thread
+          SWTUtil.select(viewer, SWTUtil.createSelection("C"), true);
+          assertSelection(viewer.getSelection(), "C");
+          // Change selection in different thread
+          Job changeJob = new Job("Change Selection") {
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+               SWTUtil.select(viewer, SWTUtil.createSelection("A", "B"), true);
+               return Status.OK_STATUS;
+            }
+          };
+          changeJob.schedule();
+          while (changeJob.getState() != Job.NONE) {
+             shell.getDisplay().readAndDispatch();
+          }
+          assertSelection(viewer.getSelection(), "A", "B");
+      }
+      finally {
+         shell.dispose();
+      }
+    }
+    
+    /**
+     * Makes sure that the given selection contains the given elements.
+     * @param currentSelection The current {@link ISelection}.
+     * @param expectedElements The expected contained elements.
+     */
+    protected void assertSelection(ISelection currentSelection, 
+                                   Object... expectedElements) {
+       assertTrue(currentSelection instanceof IStructuredSelection);
+       Object[] selection = SWTUtil.toArray(currentSelection);
+       assertEquals(expectedElements.length, selection.length);
+       for (int i = 0; i < expectedElements.length; i++) {
+          assertEquals(selection[i], expectedElements[i]);
+       }
+    }
+   
+    /**
      * Tests {@link SWTUtil#createSelection(List)}
      */
     @Test
@@ -50,17 +114,10 @@ public class SWTUtilTest extends TestCase {
         assertSame(StructuredSelection.EMPTY, SWTUtil.createSelection(Collections.EMPTY_LIST));
         // Test array with one element
         IStructuredSelection selection = SWTUtil.createSelection(Collections.singletonList("A"));
-        assertNotNull(selection);
-        Object[] content = selection.toArray();
-        assertEquals(1, content.length);
-        assertEquals("A", content[0]);
+        assertSelection(selection, "A");
         // Test array with two elements
         selection = SWTUtil.createSelection(CollectionUtil.toList("A", "B"));
-        assertNotNull(selection);
-        content = selection.toArray();
-        assertEquals(2, content.length);
-        assertEquals("A", content[0]);
-        assertEquals("B", content[1]);
+        assertSelection(selection, "A", "B");
     }
    
     /**
@@ -70,20 +127,17 @@ public class SWTUtilTest extends TestCase {
     public void testCreateSelection_Object_Array() {
         // Test null and empty
         assertSame(StructuredSelection.EMPTY, SWTUtil.createSelection((Object[])null));
-        assertSame(StructuredSelection.EMPTY, SWTUtil.createSelection(new String[0]));
+        assertSame(StructuredSelection.EMPTY, SWTUtil.createSelection(new Object[0]));
         // Test array with one element
-        IStructuredSelection selection = SWTUtil.createSelection(new String[] {"A"});
-        assertNotNull(selection);
-        Object[] content = selection.toArray();
-        assertEquals(1, content.length);
-        assertEquals("A", content[0]);
+        IStructuredSelection selection = SWTUtil.createSelection("A");
+        assertSelection(selection, "A");
+        selection = SWTUtil.createSelection(new Object[] {"A"});
+        assertSelection(selection, "A");
         // Test array with two elements
-        selection = SWTUtil.createSelection(new String[] {"A", "B"});
-        assertNotNull(selection);
-        content = selection.toArray();
-        assertEquals(2, content.length);
-        assertEquals("A", content[0]);
-        assertEquals("B", content[1]);
+        selection = SWTUtil.createSelection("A", "B");
+        assertSelection(selection, "A", "B");
+        selection = SWTUtil.createSelection(new Object[] {"A", "B"});
+        assertSelection(selection, "A", "B");
     }
    
     /**
@@ -93,10 +147,7 @@ public class SWTUtilTest extends TestCase {
     public void testCreateSelection_Object() {
         assertSame(StructuredSelection.EMPTY, SWTUtil.createSelection((Object)null));
         IStructuredSelection selection = SWTUtil.createSelection("A");
-        assertNotNull(selection);
-        Object[] content = selection.toArray();
-        assertEquals(1, content.length);
-        assertEquals("A", content[0]);
+        assertSelection(selection, "A");
     }
    
     /**
@@ -114,11 +165,33 @@ public class SWTUtilTest extends TestCase {
         assertNotNull(result);
         assertEquals(1, result.length);
         assertEquals("A", result[0]);
-        result = SWTUtil.toArray(SWTUtil.createSelection(new String[] {"A", "B"}));
+        result = SWTUtil.toArray(SWTUtil.createSelection("A", "B"));
         assertNotNull(result);
         assertEquals(2, result.length);
         assertEquals("A", result[0]);
         assertEquals("B", result[1]);
+    }
+   
+    /**
+     * Tests {@link SWTUtil#toList(org.eclipse.jface.viewers.ISelection)}
+     */
+    @Test
+    public void testToList_ISelection() {
+        List<?> result = SWTUtil.toList(null);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+        result = SWTUtil.toList(StructuredSelection.EMPTY);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+        result = SWTUtil.toList(SWTUtil.createSelection("A"));
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals("A", result.get(0));
+        result = SWTUtil.toList(SWTUtil.createSelection("A", "B"));
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("A", result.get(0));
+        assertEquals("B", result.get(1));
     }
    
     /**

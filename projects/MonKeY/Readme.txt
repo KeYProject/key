@@ -17,6 +17,7 @@ result as CSV file.
 The functionality to proof a whole project automatically was requested by:
 - Ina Schaefer (i.schaefer@tu-braunschweig.de)
 - Thomas Thüm (thomas.thuem@ovgu.de)
+- Sven Apel (apel@fim.uni-passau.de)
 
 
 (2) File Structure
@@ -33,17 +34,30 @@ It provides the following file structure:
 - org.key_project.monkey.feature
   // Provides the whole functionality
   - org.key_project.monkey.product.ui // The whole functionality.
-
+- <tests>
+  - org.key_project.monkey.all.test // Allows to execute all tests at once
+  - org.key_project.monkey.product.ui.test 
+    // Tests for org.key_project.monkey.product.ui
 
 (4) Setup development IDE
 -------------------------
-1. Download Eclipse 3.7 SR1 (Indigo) (e.g. in 32 bit version) as bundle 
+1. Download Eclipse 3.7 SR2 (Indigo) (e.g. in 32 bit version) as bundle 
    "Eclipse Modeling Tools" from
-   http://www.eclipse.org/downloads/packages/eclipse-modeling-tools/indigosr1
+   http://www.eclipse.org/downloads/packages/eclipse-modeling-tools/indigosr2
 2. Install find bugs
    => Help -> Eclipse Marketplace...
    => Type in Field "Find:" the value "findbugs" and press enter.
    => Install "FindBugs Eclipse Plugin" with all features.
+3. Install SWTBot
+   => Help -> Eclipse Marketplace...
+   => Type in Field "Find:" the value "swtbot" and press enter.
+   => Install "SWTBot" with all features.
+4. Install SWTBot IDE
+   => Help -> Install New Software...
+   => Select "--All Available Sites--" in field "Work with:"
+   => Select "SWTBot IDE Support (incubation)/SWTBot IDE Features (incubation)" 
+      (Version 2.0.4...)
+   => Install it by finishing the wizard
 
 
 (5) Development (Workspace configuration)
@@ -79,7 +93,7 @@ or Display#asyncExec(Runnable) and SwingUtil#invokeLater(Runnable). Keep
 always in mind that a synchronous call is not possible from SWT or Swing thread.
 In this case only an asynchronous method call is possible. If you don't
 respect this knowledge Mac OS will cause deadlocks!   
-   
+
    
 (7) Start the product from development IDE
 ------------------------------------------
@@ -87,12 +101,43 @@ respect this knowledge Mac OS will cause deadlocks!
 2. Click on "Launch an Eclipse application" in tab "Overview" of the
    opened "Product Configuration Editor"
 
+   
+(8) Start the product in batch mode from development IDE
+--------------------------------------------------------
+1. Create a duplicate of created launch configuration from section
+   (7) Start the product from development IDE.
+2. Add program argument -batch
+3. Launch configuration
 
-(8) Deploy the product
-----------------------
+   
+(9) Start the contained KeY from development IDE
+------------------------------------------------
+1. Create a duplicate of created launch configuration from section
+   (7) Start the product from development IDE.
+2. Add program argument -keyonly
+3. Launch configuration
+   
+
+(10) Start automated tests
+-------------------------
+- Start JUnit tests:
+  Run class org.key_project.monkey.all.test.suite.AllMonKeYTests as 
+  "JUnit Plug-in Test". 
+   
+- Start SWTBot tests:
+  Run class org.key_project.monkey.all.test.suite.swtbot.SWTBotAllMonKeYTests
+  as "SWTBot Test". Use the JVM settings defined in the JavaDoc comment of 
+  this class.
+
+
+(11) Deploy the product
+-----------------------
 1. Open file org.key_project.monkey.product.ui/MonKeY.product
 2. Click on "Eclipse Product export wizard" in tab "Overview" of the
    opened "Product Configuration Editor"
 3. Define "Root directory" e.g. "MonKeY" and "Destination Directory"
    e.g. "C:\Temp".
 4. Finish the wizard.
+5. Windows only: Copy content from 
+   org.key_project.monkey.product.ui/deployment/win32
+   into the created root directory. 
