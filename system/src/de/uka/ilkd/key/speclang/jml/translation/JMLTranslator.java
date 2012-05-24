@@ -87,7 +87,6 @@ final class JMLTranslator {
         INDEX_OF ("\\indexOf"),
         SEQ_GET ("\\seq_get"),
         SEQ_CONCAT ("\\seq_concat"),
-        CONTAINS ("\\contains"),
         REACH ("reach"),
         REACH_LOCS ("reachLocs"),
         COMMENTARY ("(* *)"),
@@ -412,6 +411,8 @@ final class JMLTranslator {
                 return TB.bsum(qv, lo, hi, body, services);
             }
         });
+        
+        
         translationMethods.put(JMLKeyWord.SEQ_DEF, new JMLTranslationMethod() {
 
             @Override
@@ -601,24 +602,6 @@ final class JMLTranslator {
                                         seqtype);
             }
         });
-        
-        translationMethods.put(JMLKeyWord.CONTAINS, new JMLTranslationMethod() {
-            // this is a quick hack; to be removed eventually; hopefully there will be support for set ADTs soon, so this will be obsolete
-
-            /** @deprecated */
-            @Override
-            public Object translate(SLTranslationExceptionManager excManager, Object... params)
-                    throws SLTranslationException {
-                checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
-                final Services services = (Services)params[0];
-                final Term seq = ((SLExpression)params[1]).getTerm();
-                final Term elem = ((SLExpression)params[2]).getTerm();
-                final LogicVariable i = new LogicVariable(new Name("i"), services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT).getSort());
-                final Term body = TB.and(TB.leq(TB.zero(services), TB.var(i), services),TB.lt(TB.var(i), TB.seqLen(services, seq), services), TB.equals(TB.seqGet(services, Sort.ANY, seq, TB.var(i)), elem));
-                return new SLExpression(TB.ex(i, body));
-            }
-        });
-        
         
         translationMethods.put(JMLKeyWord.REACH,
                                new JMLFieldAccessExpressionTranslationMethod() {

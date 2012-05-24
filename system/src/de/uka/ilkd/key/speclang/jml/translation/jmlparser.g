@@ -1691,7 +1691,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
             final Term put = TB.seqConcat(services, ante, TB.seqConcat(services, insert, post));
             result = new SLExpression(put);
         }
-    |   (tk1:SEQCONTAINS{tk=tk1;} | tk2: SEQCONCAT{tk=tk2;} | tk3: SEQGET{tk=tk3;} | tk4: INDEXOF{tk=tk4;})
+    |   (tk2: SEQCONCAT{tk=tk2;} | tk3: SEQGET{tk=tk3;} | tk4: INDEXOF{tk=tk4;})
         LPAREN e1=expression COMMA e2=expression RPAREN
         {
             result = translator.translate(tk.getText(), SLExpression.class, services, e1, e2);
