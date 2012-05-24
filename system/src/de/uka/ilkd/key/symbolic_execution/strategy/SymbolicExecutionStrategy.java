@@ -43,7 +43,7 @@ public class SymbolicExecutionStrategy extends VBTStrategy {
         res.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY,
               StrategyProperties.QUERYAXIOM_OFF);
         res.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
-              StrategyProperties.SPLITTING_NORMAL);
+              StrategyProperties.SPLITTING_DELAYED);
 //        res.put(VISUAL_DEBUGGER_WATCHPOINTS_KEY, watchpoints);
 //        res.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
 //                StrategyProperties.SPLITTING_NORMAL);
