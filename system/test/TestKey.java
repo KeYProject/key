@@ -128,7 +128,7 @@ public class TestKey extends TestCase {
 	suite.addTest(createSuite(javaTests, "Testing Java Datastructures"));
         suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
         suite.addTest(createSuite(smtTests, "Testing SMT backend"));
-        suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
+	//        suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
         
 	return suite;
     }
