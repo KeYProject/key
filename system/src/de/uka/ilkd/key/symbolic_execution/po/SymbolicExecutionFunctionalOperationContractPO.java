@@ -69,7 +69,7 @@ public class SymbolicExecutionFunctionalOperationContractPO extends FunctionalOp
                                     Term postTerm) {
         // Create parameters for predicate SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort) 
         ImmutableList<Term> arguments = TermBuilder.DF.var(paramVars); // Method parameters
-        arguments = arguments.prepend(TermBuilder.DF.heap(services)); // Heap (As first argument for the predicate)
+        arguments = arguments.prepend(TermBuilder.DF.heap(TermBuilder.BASE_HEAP_NAME,services)); // Heap (As first argument for the predicate)
         // Create non-rigid predicate with signature: SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
         ImmutableList<Sort> argumentSorts = MiscTools.getSorts(arguments);//.prepend(heapSort);
         Function f = new Function(new Name(TermBuilder.DF.newName(services, "SETAccumulate")), 
