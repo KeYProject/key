@@ -1635,4 +1635,20 @@ public final class TermBuilder {
                     new Term[]{a, b, t},
                     new ImmutableArray<QuantifiableVariable>(qv));
     }
+
+
+    /** Placeholder for the iteration variable in an enhanced for-loop.
+     * Index is always of type \\bigint.
+	 * See David Cok's proposal to extend JML for Java 5 */
+	public Term index(Services services) {
+		return func(services.getTypeConverter().getIntegerLDT().getIndex());
+	}
+
+
+	/** Placeholder for the sequence of values visited in an enhanced for-loop. 
+	 * Values is always of type \\seq.
+	 * See David Cok's proposal to extend JML for Java 5 */
+	public Term values(Services services) {
+		return func(services.getTypeConverter().getSeqLDT().getValues());
+	}
 }
