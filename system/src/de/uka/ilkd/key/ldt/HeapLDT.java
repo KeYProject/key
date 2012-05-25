@@ -281,10 +281,14 @@ public final class HeapLDT extends LDT {
 	return heap;
     }
 
-    public LocationVariable getSavedHeap() {
-	return savedHeap;
-    }
-    
+    public LocationVariable getHeap(String heapName) {
+       if(TermBuilder.BASE_HEAP_NAME.equals(heapName)) {
+         return heap;
+       }else{
+         assert TermBuilder.SAVED_HEAP_NAME.equals(heapName);
+         return savedHeap;
+       }
+    }    
     
     /**
      * Given a "program variable" representing a field or a model field, 

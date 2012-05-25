@@ -1200,15 +1200,7 @@ public final class TermBuilder {
     }
 
     public Term heap(String name, Services services) {
-        LocationVariable l = null;
-        if(name.equals(BASE_HEAP_NAME)) {
-          l = services.getTypeConverter().getHeapLDT().getHeap();
-        }else if(name.equals(SAVED_HEAP_NAME)) {
-          l = services.getTypeConverter().getHeapLDT().getSavedHeap();
-        }else{
-          throw new TermCreationException("Unknown global Heap variable: "+name);
-        }
-        return var(l);
+        return var(services.getTypeConverter().getHeapLDT().getHeap(name));
     }
 
     public Term wellFormed(Services services, Term h) {
@@ -1535,15 +1527,7 @@ public final class TermBuilder {
     
     
     public Term anonUpd(String name, Services services, Term mod, Term anonHeap) {
-        LocationVariable l = null;
-        if(name.equals(BASE_HEAP_NAME)) {
-          l = services.getTypeConverter().getHeapLDT().getHeap();
-        }else if(name.equals(SAVED_HEAP_NAME)) {
-          l = services.getTypeConverter().getHeapLDT().getSavedHeap();
-        }else{
-          throw new TermCreationException("Unknown global Heap variable: "+name);
-        }
-
+        final LocationVariable l = services.getTypeConverter().getHeapLDT().getHeap(name);
 	return elementary(services,
 		          l,
 		          anon(services, 

@@ -54,15 +54,11 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     final Term originalPre;
     final Term originalMby;    
     final Term originalPost;
-//    final Term originalMod;
-//    final Term originalModBackup;
     final Map<String,Term> originalMods; // indexed by heap name
     final ProgramVariable originalSelfVar;
     final ImmutableList<ProgramVariable> originalParamVars;
     final ProgramVariable originalResultVar;
     final ProgramVariable originalExcVar;
-//    final LocationVariable originalHeapAtPreVar;
-//    final LocationVariable originalSavedHeapAtPreVar;
     final Map<String,LocationVariable> originalAtPreVars; // indexed by heap name
     final int id;
     final boolean transaction;
