@@ -1596,7 +1596,7 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         { result = translator.translate(JMLTranslator.JMLKeyWord.UNION, t, javaInfo); }
         
     |   INTERSECT LPAREN t=storeRefIntersect RPAREN
-        { result = translator.translate(JMLTransltor.JMLKeyWord.INTERSECT, t, javaInfo); }
+        { result = translator.translate(JMLTranslator.JMLKeyWord.INTERSECT, t, javaInfo); }
 
     |   SETMINUS LPAREN t=storeref COMMA t2=storeref RPAREN
         {

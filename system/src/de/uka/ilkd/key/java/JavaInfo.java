@@ -26,6 +26,7 @@ import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -409,6 +410,8 @@ public final class JavaInfo {
                 sort = (Sort) sorts.lookup(LocSetLDT.NAME);
 	    } else if(type == PrimitiveType.JAVA_SEQ) {
                 sort = (Sort) sorts.lookup(SeqLDT.NAME);
+	    } else if(type == PrimitiveType.JAVA_SET) {
+            sort = (Sort) sorts.lookup(SetLDT.NAME);
 	    } else {
 		assert false : "unexpected primitive type: " + type;
 	    	sort = null;

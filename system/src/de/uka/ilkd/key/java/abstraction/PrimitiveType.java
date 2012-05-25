@@ -66,6 +66,7 @@ public class PrimitiveType
 	typeMap.put("boolean", JAVA_BOOLEAN);	
 	typeMap.put("\\locset", JAVA_LOCSET);
 	typeMap.put("\\seq", JAVA_SEQ);
+	typeMap.put("\\set", JAVA_SET);
     }
 
     public static PrimitiveType getPrimitiveType(String name) {

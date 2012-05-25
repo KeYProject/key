@@ -77,7 +77,9 @@ public abstract class LDT implements Named {
     protected final Function addFunction(Services services, String funcName) {
 	final Namespace funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name(funcName));
-        assert f != null : "LDT: Function " + funcName + " not found";
+        if (f == null)
+        	throw new RuntimeException("LDT: Function " + funcName + " not found.\n" +
+        			"It seems that there are definitions missing from the .key files.");
         return addFunction(f);
     }
     

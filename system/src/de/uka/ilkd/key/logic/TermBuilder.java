@@ -1192,6 +1192,7 @@ public final class TermBuilder {
     // untypted set operators    
     //-------------------------------------------------------------------------
     
+    /* NOT NEEDED AS LONG AS SETS ARE ACCESSED THROUGH THE \DL_ ESCAPE
     
     public Term empty2(Services services) {
 	return func(services.getTypeConverter().getSetLDT().getEmpty());
@@ -1339,7 +1340,7 @@ public final class TermBuilder {
 	    return func(ldt.getDisjoint(), s1, s2);
 	}
     }
-    
+    */
     
     
     
