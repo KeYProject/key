@@ -59,7 +59,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
         }
     }
 
-    @Override
+   @Override
     public void progressStarted(Object sender) {
         // TODO Implement ProblemInitializerListener.progressStarted
         if(verbose) {
@@ -202,4 +202,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             this);
       return pi;
    }
+
+   /**
+    * Returns the used {@link KeYMediator}.
+    * @return The used {@link KeYMediator}.
+    */
+   public KeYMediator getMediator() {
+     return mediator;
+  }
 }

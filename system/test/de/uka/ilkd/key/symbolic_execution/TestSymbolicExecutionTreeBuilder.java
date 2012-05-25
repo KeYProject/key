@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -562,7 +563,7 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
       assertTrue(oracleFile.exists());
       // Create user interface
       TestConsoleUserInterface ui = new TestConsoleUserInterface(false);
-      KeYMediator mediator = new KeYMediator(ui);
+      KeYMediator mediator = ui.getMediator();
       // Load java file
       ProblemLoader loader = new ProblemLoader(javaFile, mediator);
       EnvInput envInput = loader.createEnvInput(javaFile, null, null);
@@ -759,6 +760,15 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
        */
       @Override
       public void taskStarted(String message, int size) {
+         // Nothing to do
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate) {
+         // Nothing to do
       }
 
       /**
