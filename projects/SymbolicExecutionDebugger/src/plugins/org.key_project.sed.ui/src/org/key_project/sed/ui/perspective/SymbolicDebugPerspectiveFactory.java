@@ -22,9 +22,12 @@ public class SymbolicDebugPerspectiveFactory implements IPerspectiveFactory {
    public void createInitialLayout(IPageLayout layout) {
       // Get the editor area.
       String editorArea = layout.getEditorArea();
-      // Put the Resource Explorer on the left.
+      // Put the debug view on the left.
       IFolderLayout leftFolder = layout.createFolder("left", IPageLayout.LEFT, 0.5f, editorArea);
       leftFolder.addView(IDebugUIConstants.ID_DEBUG_VIEW);
+      // Put the variables view on top.
+      IFolderLayout topFolder = layout.createFolder("top", IPageLayout.TOP, 0.2f, editorArea);
+      topFolder.addView(IDebugUIConstants.ID_VARIABLE_VIEW);
       // Perspective Shortcuts
       layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaPerspective");
       layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaHierarchyPerspective");
@@ -32,5 +35,6 @@ public class SymbolicDebugPerspectiveFactory implements IPerspectiveFactory {
       layout.addPerspectiveShortcut("org.eclipse.debug.ui.DebugPerspective");
       // View Shortcuts
       layout.addShowViewShortcut(IDebugUIConstants.ID_DEBUG_VIEW);
+      layout.addShowViewShortcut(IDebugUIConstants.ID_VARIABLE_VIEW);
    }
 }
