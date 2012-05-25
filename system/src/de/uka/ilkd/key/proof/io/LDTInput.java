@@ -141,6 +141,7 @@ public class LDTInput implements EnvInput {
                         	.prepend(new LocSetLDT(services))
                         	.prepend(new HeapLDT(services))
                         	.prepend(new SeqLDT(services))
+                        	.prepend(new SetLDT(services))
                         	.prepend(new CharListLDT(services));
         initConfig.getServices().getTypeConverter().init(ldts);
     }

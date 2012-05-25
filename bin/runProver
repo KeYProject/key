@@ -1,21 +1,14 @@
 #!/bin/sh
 
-# new Field Separator which will be used to allow spaces in arguments
-# every character that is not allowed in arguments can be used
-# only one single character is allowed
-# default: newline
-IFS_NEW="
-"
-
 resolve_symlink  ()
 { 
-   TARGET=`ls -l "$1"| awk '/\ ->\ /{print $NF}'`
+   TARGET=`ls -l $1| awk '/\ ->\ /{print $NF}'`
 
    if [ -n "$TARGET" ] ; then
       RESULT="$TARGET"
       case "$RESULT" in
          /*) break ;;				# absolute symlink
-         *)  RESULT=`dirname "$0"`/"$RESULT" ;;	# relative symlink
+         *)  RESULT=`dirname $0`/"$RESULT" ;;	# relative symlink
       esac
    else
       RESULT=$1
@@ -45,14 +38,13 @@ else
 fi
 echo "Using JDK installation from:      $JAVA_HOME"
 
-# !!! JAVA_OPTIONS need to be separated by ${IFS_NEW} !!!
 
 # For debugging reasons disable JIT (otherwise strace doesn't work)
 JAVA_OPTIONS=
 #JAVA_OPTIONS=-classic
 
 # Uncomment the following definition for remote debugging on port 1234
-#JAVA_OPTIONS='-DKeyDebugFlag=on${IFS_NEW}-Xdebug${IFS_NEW}-Xnoagent${IFS_NEW}-Djava.compiler=NONE${IFS_NEW}-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1234'
+#JAVA_OPTIONS='-DKeyDebugFlag=on -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1234'
 
 #
 # Now $KEY_HOME  
@@ -60,9 +52,9 @@ JAVA_OPTIONS=
 
 if [ -z "$KEY_HOME" ] ; then
    KEY_HOME=`resolve_symlink "$0"`	# resolve symlink name
-   KEY_HOME=`dirname "$KEY_HOME"`		# strip executable filename
+   KEY_HOME=`dirname $KEY_HOME`		# strip executable filename
    KEY_HOME=`cd "$KEY_HOME";pwd`	# and now expand the path to full
-   KEY_HOME=`dirname "$KEY_HOME"`		# strip bin/ sirectory
+   KEY_HOME=`dirname $KEY_HOME`		# strip bin/ sirectory
 fi
 echo "Using KeY installation from:      $KEY_HOME"
 
@@ -84,7 +76,7 @@ keyclasspath="$KEY_HOME/system/binary/"
 
 for i in $key_ext_jars ; do
     current_jar="$KEY_LIB/$i"
-    if [ ! -f "$current_jar" ]
+    if [ ! -f $current_jar ]
     then
        echo Cannot find $current_jar. 
        echo Copy or link the file into the
@@ -95,7 +87,7 @@ for i in $key_ext_jars ; do
     fi
 done
 
-if [ "x$ASPECTJRTPATH" != x ]
+if [ x$ASPECTJRTPATH != x ]
 then
   echo "Using AspectJ runtime from:       $ASPECTJRTPATH"
   keyclasspath=$keyclasspath:$ASPECTJRTPATH
@@ -105,29 +97,26 @@ fi
 # KeY-specific command line options
 #
 
-# !!! keysysprops and keyarg need to be separated by ${IFS_NEW} !!!
 keysysprops=""
 while [ $# -ne 0 ]; do
     case $1 in
-        -keydebug) keysysprops="${keysysprops}-DKeyDebugFlag=on${IFS_NEW}"
+        -keydebug) keysysprops="${keysysprops}-DKeyDebugFlag=on "
             shift
             continue;;
 
-        -server) keysysprops="${keysysprops}-server${IFS_NEW}"
+        -server) keysysprops="${keysysprops}-server "
             shift
             continue;;
 
-        -debugclassloader) keysysprops="${keysysprops}-DKeyDebugClassLoader=on${IFS_NEW}"
+        -debugclassloader) keysysprops="${keysysprops}-DKeyDebugClassLoader=on "
             shift
             continue;;
 
-        -*)  keysysprops="${keysysprops}${1}${IFS_NEW}"
+        -*)  keysysprops="${keysysprops}${1} "
             shift
             continue;;
 
-        *)  keyarg="${keyarg}${1}${IFS_NEW}"
-            shift
-            continue;;
+        *)  break;;
     esac
 done	
 
@@ -142,9 +131,6 @@ fi
 PATH=${PATH}:$KEY_LIB
 export PATH
 
-# Set IFS to new fiels separator to allow spaces in arguments
-IFS_OLD=$IFS
-IFS=$IFS_NEW
 
 #
 # This command actually runs KeY
@@ -153,10 +139,10 @@ IFS=$IFS_NEW
 #-XX:CompileThreshold=1500 \
 
 
-"$JAVA" $JAVA_OPTIONS $keysysprops \
+$JAVA $JAVA_OPTIONS $keysysprops \
 -ea:de.uka.ilkd.key... -Xms64m -Xmx2048m \
--Dkey.home="$KEY_HOME" \
--Dkey.simplify.logdir="$KEY_SIMPLIFY_LOG_DIR" \
--Dkey.ics.logdir="$KEY_ICS_LOG_DIR" \
+-Dkey.home=$KEY_HOME \
+-Dkey.simplify.logdir=$KEY_SIMPLIFY_LOG_DIR \
+-Dkey.ics.logdir=$KEY_ICS_LOG_DIR \
 -Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
--classpath "$keyclasspath" de.uka.ilkd.key.gui.Main $keyarg
+-classpath $keyclasspath de.uka.ilkd.key.gui.Main "$@"

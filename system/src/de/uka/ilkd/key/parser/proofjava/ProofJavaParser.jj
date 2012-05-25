@@ -476,6 +476,7 @@ TOKEN :
 | < PUBLIC: "public" >
 | < RETURN: "return" >
 | < SEQ: "\\seq" >
+| < SET: "\\set" >
 | < SHORT: "short" >
 | < STATIC: "static" >
 | < SUPER: "super" >
@@ -1970,6 +1971,7 @@ TypeReference PrimitiveType() :
   | "double"
   | "\\locset"
   | "\\seq"
+  | "\\set"
   )
   {
     Identifier id = factory.createIdentifier(token.image);
