@@ -112,7 +112,10 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
    @Override
    public String getSourceName() {
       if (sourceName == null) {
-         sourceName = KeYModelUtil.getSourceName(executionNode.getActivePositionInfo()); // Do not use position info of expression because it is missing on boolean literals (true and false)
+         sourceName = KeYModelUtil.getSourceName(executionNode.getGuardExpressionPositionInfo());
+         if (sourceName == null) {
+            sourceName = KeYModelUtil.getSourceName(executionNode.getActivePositionInfo()); // Use position info of active statement as fallback because boolean literals (true and false) as expression have no source location.
+         }
       }
       return sourceName;
    }
