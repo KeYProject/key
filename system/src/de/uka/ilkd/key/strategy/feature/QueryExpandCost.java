@@ -189,12 +189,15 @@ public class QueryExpandCost implements Feature {
 	        	Iterator<RuleApp> appliedRuleAppIter=appliedRuleApps.iterator();
 	        	while(appliedRuleAppIter.hasNext()){
 	        		RuleApp appliedRuleApp = appliedRuleAppIter.next();
-	        		Term oldterm = appliedRuleApp.posInOccurrence().subTerm();
-	        		Term curterm = pos.subTerm();
-	        		if(appliedRuleApp.rule().equals(QueryExpand.INSTANCE) && 
-	        				oldterm.equals(curterm)){
-	        			count++;
-	        			if(count>maxRepetitionsOnSameTerm) break;
+	        		final PosInOccurrence pio = appliedRuleApp.posInOccurrence();
+	        		if(pio!=null){
+		        		Term oldterm = pio.subTerm();
+		        		Term curterm = pos.subTerm();
+		        		if(appliedRuleApp.rule().equals(QueryExpand.INSTANCE) && 
+		        				oldterm.equals(curterm)){
+		        			count++;
+		        			if(count>maxRepetitionsOnSameTerm) break;
+		        		}
 	        		}
 	        	}
 	        }
