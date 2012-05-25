@@ -43,9 +43,11 @@ public class PrimitiveType
     public static final PrimitiveType JAVA_BOOLEAN = 
 	new PrimitiveType("boolean", BooleanLiteral.FALSE);
     public static final PrimitiveType JAVA_LOCSET = 
-	new PrimitiveType("\\locset", EmptySetLiteral.INSTANCE);
+	new PrimitiveType("\\locset", EmptySetLiteral.LOCSET);
     public static final PrimitiveType JAVA_SEQ =
 	new PrimitiveType("\\seq", EmptySeqLiteral.INSTANCE);    
+    public static final PrimitiveType JAVA_SET =
+	new PrimitiveType("\\set", EmptySetLiteral.LOCSET);    
     public static final PrimitiveType PROGRAM_SV   = new PrimitiveType("SV", null);
 
     private ProgramElementName arrayElementName = null;

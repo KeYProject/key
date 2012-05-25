@@ -131,6 +131,7 @@ WORKINGSPACE : "\\working_space";
 XOR : "^";
 
 LOCSET : "\\locset";
+SET : "\\set";
 EMPTYSET : "\\empty";
 SINGLETON : "\\singleton";
 UNION : "\\set_union";

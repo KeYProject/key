@@ -14,6 +14,7 @@ import java.util.Map;
 
 import antlr.Token;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -57,19 +58,24 @@ final class JMLTranslator {
     private EnumMap<JMLKeyWord, JMLTranslationMethod> translationMethods;
     
     public static enum JMLKeyWord {
+    	// general features, not really keywords
         ARRAY_REF ("array reference"),
         INV ("\\inv"),
         INV_FOR ("\\invariant_for"),
-        ACCESSIBLE ("accessible"),
-        ASSIGNABLE ("assignable"),
         CAST ("cast"),
         CONDITIONAL ("conditional"),
+        
+        // clauses
+        ACCESSIBLE ("accessible"),
+        ASSIGNABLE ("assignable"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
         REPRESENTS ("represents"),
         REQUIRES ("requires"),
         SIGNALS ("signals"),
         SIGNALS_ONLY ("signals_only"),
+        
+        // quantifiers and "generalized quantifiers"
         FORALL ("\\forall"),
         EXISTS ("\\exists"),
         BSUM ("\\bsum"),
@@ -78,7 +84,22 @@ final class JMLTranslator {
         NUM_OF ("\\num_of"),
         PRODUCT ("\\product"),
         SUM ("\\sum"),
+        
+        // ADT stuff
         SEQ_DEF ("\\seq_def"),
+        STORE_REF_EXPR("store_ref_expr"),
+        CREATE_LOCSET("create locset"),
+        PAIRWISE_DISJOINT("\\disjoint"),
+        EMPTY ("\\empty"),
+        UNION ("\\set_union"),
+        INTERSECT ("\\intersect"),
+        SINGLETON ("\\singleton"),
+        SETMINUS ("\\set_minus"),
+        UNIONINF ("\\infinite_union"),
+        DISJOINT ("\\disjoint"),
+        SUBSET ("\\subset"),
+        
+        // logical operators
         EQUIVALENCE ("<==>"),
         ANTIVALENCE ("<=!=>"),
         EQ ("=="),
@@ -90,10 +111,9 @@ final class JMLTranslator {
         REACH ("reach"),
         REACH_LOCS ("reachLocs"),
         COMMENTARY ("(* *)"),
-        STORE_REF_EXPR("store_ref_expr"),
-        CREATE_LOCSET("create locset"),
-        PAIRWISE_DISJOINT("\\disjoint"),
         DL ("\\dl_"),
+        
+        // arithmetic
         ADD ("+"),
         SUBTRACT ("-"),
         SHIFT_LEFT ("<<"),
@@ -1054,6 +1074,38 @@ final class JMLTranslator {
                 
             }
         });
+        
+        
+        // sets
+        translationMethods.put(JMLKeyWord.EMPTY, new JMLTranslationMethod() {
+
+			@Override
+			public SLExpression translate(SLTranslationExceptionManager excManager,
+					Object... params) throws SLTranslationException {
+				checkParameters(params,Services.class,JavaInfo.class);
+				return new SLExpression(TB.empty((Services)params[0]),
+                        ((JavaInfo)params[1]).getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+			}});
+        
+        translationMethods.put(JMLKeyWord.UNION, new JMLTranslationMethod() {
+
+			@Override
+			public SLExpression translate(SLTranslationExceptionManager excManager,
+					Object... params) throws SLTranslationException {
+				checkParameters(params, Term.class, JavaInfo.class);
+				Term t = (Term)params[0];
+				return new SLExpression(t, ((JavaInfo)params[1]).getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+			}});
+        translationMethods.put(JMLKeyWord.INTERSECT, new JMLTranslationMethod() {
+
+			@Override
+			public SLExpression translate(SLTranslationExceptionManager excManager,
+					Object... params) throws SLTranslationException {
+				checkParameters(params, Term.class, JavaInfo.class);
+				Term t = (Term)params[0];
+				JavaInfo javaInfo = (JavaInfo)params[1];
+				return new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+			}});
 
         // others
         translationMethods.put(JMLKeyWord.ARRAY_REF,

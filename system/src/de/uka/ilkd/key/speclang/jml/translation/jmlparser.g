@@ -1586,18 +1586,17 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
 
     |   EMPTYSET
         {
-            result = new SLExpression(TB.empty(services),
-                                      javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+            result = translator.translate(JMLTranslator.JMLKeyWord.EMPTY, services, javaInfo);
         }
 
     |   t = createLocset
         { result = new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET)); }
         
     |   (UNION | UNION_2) LPAREN t=storeRefUnion RPAREN
-        { result = new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET)); }
+        { result = translator.translate(JMLTranslator.JMLKeyWord.UNION, t, javaInfo); }
         
     |   INTERSECT LPAREN t=storeRefIntersect RPAREN
-        { result = new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET)); }
+        { result = translator.translate(JMLTransltor.JMLKeyWord.INTERSECT, t, javaInfo); }
 
     |   SETMINUS LPAREN t=storeref COMMA t2=storeref RPAREN
         {
@@ -1943,6 +1942,7 @@ builtintype returns [KeYJavaType type = null] throws SLTranslationException
             {
                 type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_LOCSET);
             }
+        |   SET { type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SET); }
         |   SEQ
             {
                 type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SEQ);
