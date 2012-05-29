@@ -165,6 +165,9 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
       editorPart.setGridVisible(false);
       ZoomManager zoomManager = (ZoomManager)editorPart.getAdapter(ZoomManager.class);
       contributor.setZoomManager(zoomManager);
+      if (getDebugView() != null) {
+         updateDiagram(getDebugView().getViewer().getSelection());
+      }
    }
    
    /**
