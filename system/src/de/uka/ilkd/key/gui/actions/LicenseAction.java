@@ -42,13 +42,14 @@ public class LicenseAction extends MainWindowAction {
         try {
             FileInputStream inp=new FileInputStream(lic.getFile());
             while (inp.available()>0) sb.append((char)inp.read());	   
+            inp.close();
         } catch (IOException ioe) {
             System.out.println("License file cannot be loaded or is missing: \n"+
                     Main.COPYRIGHT+"\nKeY is protected by the "
                     +"GNU General Public License");
             sb=new StringBuffer(Main.COPYRIGHT+"\nKeY is protected by the "
                     +"GNU General Public License");
-        } 
+        }
         String s=sb.toString();
         JScrollPane scroll = new JScrollPane();
         JTextArea text = new JTextArea(s,20,40);

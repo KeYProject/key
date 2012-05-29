@@ -101,9 +101,9 @@ public class KeYFile implements EnvInput {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private KeYParser createDeclParser() throws FileNotFoundException {
+    private KeYParser createDeclParser(InputStream is) throws FileNotFoundException {
         return new KeYParser(ParserMode.DECLARATION,
-                             new KeYLexer(getNewStream(),
+                             new KeYLexer(is,
                                           initConfig.getServices().getExceptionHandler()),
                              file.toString(), 
                              initConfig.getServices(),
@@ -298,41 +298,47 @@ public class KeYFile implements EnvInput {
         //read .key file
 	try {
             Debug.out("Reading KeY file", file);
-	    CountingBufferedReader cinp = 
-		new CountingBufferedReader
-		    (getNewStream(),monitor,getNumberOfChars()/100);
                    
             final ParserConfig normalConfig 
                     = new ParserConfig(initConfig.getServices(), initConfig.namespaces());                       
             final ParserConfig schemaConfig 
                     = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
-            
-            KeYParser problemParser 
+
+            CountingBufferedReader cinp = 
+                    new CountingBufferedReader
+                        (getNewStream(),monitor,getNumberOfChars()/100);
+            try {
+                KeYParser problemParser 
                 = new KeYParser(ParserMode.PROBLEM, 
-                                new KeYLexer(cinp, 
-                                             initConfig.getServices()
-                                                       .getExceptionHandler()), 
-                                             file.toString(), 
-                                             schemaConfig, 
-                                             normalConfig, 
-                                             initConfig.getTaclet2Builder(), 
-                                             initConfig.getTaclets()); 
-            problemParser.problem(); 
-	    initConfig.addCategory2DefaultChoices(problemParser.
-						  getCategory2Default());
-	    ImmutableSet<Taclet> st = problemParser.getTaclets();
-	    initConfig.setTaclets(st);
-            
-	    SpecificationRepository specRepos 
-	        = initConfig.getServices().getSpecificationRepository();
-	    specRepos.addContracts(problemParser.getContracts());
-	    specRepos.addClassInvariants(problemParser.getInvariants());
-            chooseContract = problemParser.getChooseContract();
-            Debug.out("Read KeY file   ", file);
+                        new KeYLexer(cinp, 
+                                initConfig.getServices()
+                                .getExceptionHandler()), 
+                                file.toString(), 
+                                schemaConfig, 
+                                normalConfig, 
+                                initConfig.getTaclet2Builder(), 
+                                initConfig.getTaclets()); 
+                problemParser.problem(); 
+                initConfig.addCategory2DefaultChoices(problemParser.
+                        getCategory2Default());
+                ImmutableSet<Taclet> st = problemParser.getTaclets();
+                initConfig.setTaclets(st);
+
+                SpecificationRepository specRepos 
+                = initConfig.getServices().getSpecificationRepository();
+                specRepos.addContracts(problemParser.getContracts());
+                specRepos.addClassInvariants(problemParser.getInvariants());
+                chooseContract = problemParser.getChooseContract();
+                Debug.out("Read KeY file   ", file);
+            } finally {
+                cinp.close();
+            }
 	} catch (antlr.ANTLRException e) {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException fnfe) {
 	    throw new ProofInputException(fnfe);
+        } catch (IOException io) {
+            throw new ProofInputException(io);            
         }
     }
 
@@ -342,14 +348,21 @@ public class KeYFile implements EnvInput {
      * of the initial configuration 
      */
     public void readSorts() throws ProofInputException {
-	try {
-	    KeYParser p=createDeclParser();
-	    p.parseSorts();
-	    initConfig.addCategory2DefaultChoices(p.getCategory2Default());            
+        try {
+            InputStream is = getNewStream();
+            try { 
+                KeYParser p=createDeclParser(is);          
+                p.parseSorts();
+                initConfig.addCategory2DefaultChoices(p.getCategory2Default());
+            } finally {
+                is.close();
+            }
 	} catch (antlr.ANTLRException e) {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
+        } catch (IOException io) {
+            throw new ProofInputException(io);            
         }
     }
     
@@ -360,12 +373,19 @@ public class KeYFile implements EnvInput {
     public void readFuncAndPred() throws ProofInputException {	
 	if(file == null) return;
 	try {
-	    KeYParser p=createDeclParser();
-	    p.parseFuncAndPred();
+            InputStream is = getNewStream();
+            try { 
+                KeYParser p=createDeclParser(getNewStream());
+                p.parseFuncAndPred();
+            } finally {
+                is.close();
+            }
 	} catch (antlr.ANTLRException e) {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
+        } catch (IOException io) {
+            throw new ProofInputException(io);            
         }
     }
 
@@ -381,25 +401,31 @@ public class KeYFile implements EnvInput {
         final ParserConfig normalConfig = 
 	    new ParserConfig(initConfig.getServices(), initConfig.namespaces());
         
-	try {
-	    final CountingBufferedReader cinp = new CountingBufferedReader
-            (getNewStream(),monitor,getNumberOfChars()/100);
-            KeYParser problemParser 
+        try {
+            final CountingBufferedReader cinp = new CountingBufferedReader
+                    (getNewStream(), monitor, getNumberOfChars()/100);
+            try {
+                KeYParser problemParser 
                 = new KeYParser(ParserMode.PROBLEM,
-                                new KeYLexer(cinp, 
-                                             initConfig.getServices()
-                                                       .getExceptionHandler()), 
+                        new KeYLexer(cinp, 
+                                initConfig.getServices()
+                                .getExceptionHandler()), 
                                 file.toString(),
                                 schemaConfig,
                                 normalConfig,
                                 initConfig.getTaclet2Builder(),
-                                initConfig.getTaclets());                  
-            problemParser.parseTacletsAndProblem();
-	    initConfig.setTaclets(problemParser.getTaclets());
+                                initConfig.getTaclets());                             
+                problemParser.parseTacletsAndProblem();
+                initConfig.setTaclets(problemParser.getTaclets());
+            } finally {
+                cinp.close();
+            }
 	} catch (antlr.ANTLRException e) {
 	    throw new ProofInputException(e);
 	} catch (FileNotFoundException fnfe) {
             throw new ProofInputException(fnfe);
+        } catch (IOException io) {
+            throw new ProofInputException(io);            
         }
     }
 
