@@ -127,7 +127,6 @@ public final class IntegerLDT extends LDT {
     private final Function inInt;
     private final Function inLong;
     private final Function inChar;
-    private final Function index;
     private final Term one;
     private final Term zero;
 
@@ -229,9 +228,6 @@ public final class IntegerLDT extends LDT {
         inInt               = addFunction(services, "inInt");
         inLong              = addFunction(services, "inLong");
         inChar              = addFunction(services, "inChar");
-        max					= addFunction(services, "max");
-        min					= addFunction(services, "min");
-        index				= addFunction(services, "index");
 
         //cache often used constants       
         zero = translateLiteral(new IntLiteral(0), services);
@@ -969,9 +965,4 @@ public final class IntegerLDT extends LDT {
     public Term one() {	
 	return one;
     }
-
-
-	public Function getIndex() {
-		return index;
-	}
 } 

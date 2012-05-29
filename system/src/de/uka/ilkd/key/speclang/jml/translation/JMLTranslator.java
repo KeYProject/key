@@ -57,8 +57,6 @@ final class JMLTranslator {
     private EnumMap<JMLKeyWord, JMLTranslationMethod> translationMethods;
     
     public static enum JMLKeyWord {
-    	INDEX ("\\index"),
-    	VALUES ("\\values"),
         ARRAY_REF ("array reference"),
         INV ("\\inv"),
         INV_FOR ("\\invariant_for"),
@@ -1291,26 +1289,7 @@ final class JMLTranslator {
                 return new SLExpression(TB.and(disTerms));
             }
         });
-        
-        translationMethods.put(JMLKeyWord.INDEX,new JMLTranslationMethod(){
-
-			@Override
-			public SLExpression translate(SLTranslationExceptionManager excManager,
-					Object... params) throws SLTranslationException {
-				checkParameters(params, Services.class);
-				return new SLExpression(TB.index((Services)params[0]));
-			}});
-        
-        translationMethods.put(JMLKeyWord.VALUES,new JMLTranslationMethod(){
-
-			@Override
-			public Object translate(SLTranslationExceptionManager excManager,
-					Object... params) throws SLTranslationException {
-				checkParameters(params, Services.class);
-				return new SLExpression(TB.values((Services)params[0]));
-			}});
     }
-    
 
 
     /**

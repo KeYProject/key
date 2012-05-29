@@ -42,7 +42,6 @@ public final class SeqLDT extends LDT {
     private final Function seqSub;
     private final Function seqReverse;   
     private final Function seqDef;
-    private final Function values;
     
     
     public SeqLDT(Services services) {
@@ -56,7 +55,6 @@ public final class SeqLDT extends LDT {
         seqReverse    = addFunction(services, "seqReverse");
         seqIndexOf    = addFunction(services, "seqIndexOf");
         seqDef         = addFunction(services, "seqDef");
-        values		= addFunction(services, "values");
     }
     
     
@@ -190,10 +188,5 @@ public final class SeqLDT extends LDT {
 
     public Function getSeqIndexOf() {
 	return seqIndexOf;
-    }
-
-
-	public Function getValues() {
-		return values;
-	}    
+    }    
 }

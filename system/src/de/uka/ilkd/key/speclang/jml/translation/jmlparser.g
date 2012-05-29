@@ -1404,8 +1404,6 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
     |
 	(OLD | PRE) => result=oldexpression
 	
-	| INDEX {translator.translate(JMLTranslator.JMLKeyWord.INDEX,services);}
-	| VALUES {translator.translate(JMLTranslator.JMLKeyWord.VALUES,services);}
     |   result = transactionUpdated
     |
 	BACKUP LPAREN result=expression RPAREN
