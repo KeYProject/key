@@ -83,11 +83,16 @@ public interface LoopInvariant extends SpecificationElement {
      */
     Term getInternalInvariant();
 
+    Term getInternalTransactionInvariant();
+    
     /**
      * Returns the term internally used for the variant. 
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
     Term getInternalVariant();
+    
+    Term getInternalModifies();
+    Term getInternalModifiesBackup();
 
 
 

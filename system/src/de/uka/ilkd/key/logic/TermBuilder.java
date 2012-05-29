@@ -975,6 +975,10 @@ public final class TermBuilder {
                 new Name("inInt"));
         return func(f, var);
     }
+    
+    public Term index(Services services){
+    	return func(services.getTypeConverter().getIntegerLDT().getIndex());
+    }
 
     
     
@@ -1634,5 +1638,9 @@ public final class TermBuilder {
         return func(services.getTypeConverter().getSeqLDT().getSeqDef(),
                     new Term[]{a, b, t},
                     new ImmutableArray<QuantifiableVariable>(qv));
+    }
+    
+    public Term values(Services services){
+    	return func(services.getTypeConverter().getSeqLDT().getValues());
     }
 }

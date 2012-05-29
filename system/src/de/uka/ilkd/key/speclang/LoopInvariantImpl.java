@@ -219,6 +219,20 @@ public final class LoopInvariantImpl implements LoopInvariant {
         return originalVariant;
     }
 
+    @Override
+    public Term getInternalTransactionInvariant(){
+		return originalTransactionInvariant;
+    }
+    
+    @Override
+    public Term getInternalModifies(){
+    	return originalModifies;
+    }
+    
+    @Override
+    public Term getInternalModifiesBackup(){
+    	return originalModifiesBackup;
+    }
     
     @Override
     public Term getInternalSelfTerm() {
