@@ -209,5 +209,13 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     */
    public KeYMediator getMediator() {
      return mediator;
-  }
+   }
+
+   /**
+    * Checks if the verbose is active or not.
+    * @return {@code true} verbose is active, {@code false} verbose is deactivated.
+    */
+   public boolean isVerbose() {
+      return verbose;
+   }
 }

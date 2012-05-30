@@ -13,20 +13,14 @@ import junit.framework.TestCase;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -46,7 +40,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.ui.ConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * <p>
@@ -651,16 +645,12 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
          assertTrue("Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.", oracleFile.exists());
       }
       // Create user interface
-      TestConsoleUserInterface ui = new TestConsoleUserInterface(false);
-      KeYMediator mediator = ui.getMediator();
+      CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
       // Load java file
-      ProblemLoader loader = new ProblemLoader(javaFile, mediator);
-      EnvInput envInput = loader.createEnvInput(javaFile, null, null);
-      ProblemInitializer init = ui.createProblemInitializer();
-      InitConfig initConfig = init.prepare(envInput);
+      InitConfig initConfig = ui.load(javaFile, null, null);
+      // Search method to proof
       Services services = initConfig.getServices();
       JavaInfo javaInfo = services.getJavaInfo();
-      // Search method to proof
       KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
       assertNotNull(containerKJT);
       ImmutableList<ProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
@@ -675,22 +665,13 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
       FunctionalOperationContract contract = SymbolicExecutionUtil.createDefaultContract(services, pm);
       // Start proof
       ProofOblInput input = new SymbolicExecutionFunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract);
-      Proof proof = init.startProver(initConfig, input);
+      Proof proof = ui.createProof(initConfig, input);
       assertNotNull(proof);
       // Set strategy to use for auto mode
       StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, true);
       proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
       // Run proof
-      ui.setTaskActive(true); // Will be unset automatically when the auto mode has stopped.
-      mediator.setProof(proof);
-      mediator.startAutoMode();
-      while (ui.isTaskActive()) { // Wait until auto mode has stopped.
-         try {
-            Thread.sleep(10);
-         }
-         catch (InterruptedException e) {
-         }
-      }
+      ui.startAndWaitForProof(proof);
       // Create symbolic execution tree
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof);
       builder.analyse();
@@ -893,67 +874,6 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
       }
       else {
          assertNull(current);
-      }
-   }
-
-   /**
-    * User interface used for the batch mode.
-    * @author Martin Hentschel
-    */
-   private static class TestConsoleUserInterface extends ConsoleUserInterface {
-      /**
-       * Indicates that a task is active.
-       */
-      private boolean taskActive;
-
-      /**
-       * Constructor.
-       * @param verbose Verbose?
-       */
-      public TestConsoleUserInterface(boolean verbose) {
-         super(null, verbose);
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public void taskStarted(String message, int size) {
-         // Nothing to do
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public void proofCreated(ProblemInitializer sender, ProofAggregate proofAggregate) {
-         // Nothing to do
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public void taskFinished(TaskFinishedInfo info) {
-         taskActive = false;
-      }
-
-      /**
-       * Checks if a task is active.
-       * @return {@code true} task is active, {@code false} no task is active.
-       */
-      public boolean isTaskActive() {
-         return taskActive;
-      }
-
-      /**
-       * Defines if a task is active. 
-       * This should be done programmatically before the auto mode thread
-       * started to simplify the waiting process.
-       * @param taskActive {@code true} task is active, {@code false} no task is active.
-       */
-      public void setTaskActive(boolean taskActive) {
-         this.taskActive = taskActive;
       }
    }
 }
