@@ -140,7 +140,7 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
    /**
     * Tests example: examples/_testcase/set/variablesArrayTest
     */
-   public void testCariablesArrayTest() throws Exception {
+   public void testVariablesArrayTest() throws Exception {
       doTest(keyRepDirectory, 
              "examples/_testcase/set/variablesArrayTest/test/VariablesArrayTest.java", 
              "VariablesArrayTest", 
