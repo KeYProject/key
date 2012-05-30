@@ -224,8 +224,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             return;
         }
         Term selfTerm = inv.getInternalSelfTerm();
-//        Term heapAtPre = inv.getInternalHeapAtPre();
-//        Term savedHeapAtPre = inv.getInternalSavedHeapAtPre();
         Map<String,Term> atPres = inv.getInternalAtPres();
         
         // transaction invariant

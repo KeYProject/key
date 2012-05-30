@@ -77,8 +77,6 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
         TermProgramVariableCollector tpvc = 
             new TermProgramVariableCollector(services);
         Term selfTerm = x.getInternalSelfTerm();
-        //Term heapAtPre = x.getInternalHeapAtPre();
-        //Term savedHeapAtPre = x.getInternalSavedHeapAtPre();
         
         Map<String,Term> atPres = x.getInternalAtPres();
 
