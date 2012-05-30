@@ -121,8 +121,14 @@ class OperationContractSelectionPanel extends JPanel {
 		TitledBorder border = new TitledBorder(
 				BorderFactory.createEtchedBorder(),
                                 contract.getDisplayName());
-		border.setTitleFont(border.getTitleFont()
-					  .deriveFont(Font.BOLD));
+                Font borderFont = border.getTitleFont();
+                if (borderFont == null) { // MS Windows/JDK7 issues
+                    borderFont = result.getFont();
+                    if (borderFont == null) {
+                        borderFont = PLAINFONT;
+                    }
+                }
+                border.setTitleFont(borderFont.deriveFont(Font.BOLD));
 		result.setBorder(border);
 		
 		return result;
