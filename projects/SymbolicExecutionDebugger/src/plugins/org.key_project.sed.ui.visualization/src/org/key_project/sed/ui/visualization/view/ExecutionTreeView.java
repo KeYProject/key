@@ -202,6 +202,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     * When the selection on {@link #getEditorPart()} has changed.
     * @param event The event.
     */
+   // TODO: Selection is not synchronized with debug view if debug view is not visible, e.g. when execution tree view is maximized.
    protected void handleEditorSelectionChanged(final SelectionChangedEvent event) {
       // Check if the selection changed was caused programmatically during synchronization or by the user.
       if (internalSelectionUpdate) {
