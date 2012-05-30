@@ -32,14 +32,6 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
     * {@inheritDoc}
     */
    @Override
-   public IVariable[] getVariables() throws DebugException {
-      return new IVariable[0];
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
    public boolean hasVariables() throws DebugException {
       IVariable[] variables = getVariables();
       return variables != null && variables.length >= 1;

@@ -36,7 +36,7 @@ public abstract class AbstractExecutionNode extends AbstractExecutionElement imp
    public AbstractExecutionNode getParent() {
       return parent;
    }
-   
+
    /**
     * Sets the parent {@link AbstractExecutionNode}.
     * @param parent The parent {@link AbstractExecutionNode} to set.

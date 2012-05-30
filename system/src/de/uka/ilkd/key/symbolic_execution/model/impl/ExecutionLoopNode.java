@@ -35,4 +35,12 @@ public class ExecutionLoopNode extends AbstractExecutionStateNode<LoopStatement>
    protected IExecutionVariable[] lazyComputeVariables() {
       return SymbolicExecutionUtil.createExecutionVariables(this);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getElementType() {
+      return "Loop Node";
+   }
 }

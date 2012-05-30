@@ -6,7 +6,9 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDValue;
 import org.key_project.sed.core.model.impl.AbstractSEDValue;
 import org.key_project.sed.core.util.LogUtil;
+import org.key_project.util.java.StringUtil;
 
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
@@ -41,7 +43,14 @@ public class KeYValue extends AbstractSEDValue {
     */
    @Override
    public String getReferenceTypeName() throws DebugException {
-      return executionVariable.getTypeString();
+      try {
+         String typeName = executionVariable.getTypeString();
+         return typeName != null ? typeName : StringUtil.EMPTY_STRING;
+      }
+      catch (ProofInputException e) {
+         LogUtil.getLogger().logError(e);
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute reference type name.", e));
+      }
    }
 
    /**

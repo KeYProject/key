@@ -92,6 +92,66 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    }
    
    /**
+    * Tests the handling of variables.
+    */
+   @Test
+   public void testVariablesArrayTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testVariablesArrayTest",
+                     "data/variablesArrayTest/test",
+                     false,
+                     createMethodSelector("VariablesArrayTest", "main"),
+                     "data/variablesArrayTest/oracle/VariablesArrayTest.xml",
+                     false,
+                     8,
+                     true);
+   }
+   
+   /**
+    * Tests the handling of variables.
+    */
+   @Test
+   public void testVariablesInstanceVariableTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testVariablesInstanceVariableTest",
+                     "data/variablesInstanceVariableTest/test",
+                     false,
+                     createMethodSelector("VariablesInstanceVariableTest", "main", "QIntWrapper;"),
+                     "data/variablesInstanceVariableTest/oracle/VariablesInstanceVariableTest.xml",
+                     false,
+                     8,
+                     true);
+   }
+   
+   /**
+    * Tests the handling of variables.
+    */
+   @Test
+   public void testVariablesLocalTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testVariablesLocalTest",
+                     "data/variablesLocalTest/test",
+                     false,
+                     createMethodSelector("VariablesLocalTest", "main"),
+                     "data/variablesLocalTest/oracle/VariablesLocalTest.xml",
+                     false,
+                     8,
+                     true);
+   }
+   
+   /**
+    * Tests the handling of variables.
+    */
+   @Test
+   public void testVariablesStaticTest() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testVariablesStaticTest",
+                     "data/variablesStaticTest/test",
+                     false,
+                     createMethodSelector("VariablesStaticTest", "main"),
+                     "data/variablesStaticTest/oracle/VariablesStaticTest.xml",
+                     false,
+                     8,
+                     true);
+   }
+   
+   /**
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
@@ -537,7 +597,8 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                      createMethodSelector("RecursiveFibonacci", "fibonacci10"),
                      "data/recursiveFibonacci/oracle/RecursiveFibonacci.xml",
                      false,
-                     30);
+                     30,
+                     false);
    }
    
    /**
@@ -727,7 +788,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                                  IMethodSelector selector,
                                  String expectedModelPathInBundle,
                                  boolean showMethodReturnValues) throws Exception {
-      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 8);
+      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 8, false);
    }
    
    /**
@@ -747,6 +808,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDDebugTarget} model.
     * @param showMethodReturnValues Show method return values?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
+    * @param includeVariables Include variables?
     * @throws Exception Occurred Exception.
     */
    protected void assertSEDModel(String projectName,
@@ -755,7 +817,8 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                                  IMethodSelector selector,
                                  String expectedModelPathInBundle,
                                  boolean showMethodReturnValues,
-                                 int timeoutFactor) throws Exception {
+                                 int timeoutFactor,
+                                 boolean includeVariables) throws Exception {
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       // Get current settings to restore them in finally block
@@ -852,10 +915,10 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
             assertTrue(target.canResume());
             // Test the execution tree
             if (oracleDirectory != null) {
-               createOracleFile(target, expectedModelPathInBundle);
+               createOracleFile(target, expectedModelPathInBundle, includeVariables);
             }
             ISEDDebugTarget expectedDebugTarget = TestSEDKeyCoreUtil.createExpectedModel(expectedModelPathInBundle);
-            TestSedCoreUtil.compareDebugTarget(expectedDebugTarget, target, false);
+            TestSedCoreUtil.compareDebugTarget(expectedDebugTarget, target, false, includeVariables);
          }
       }
       finally {
@@ -876,17 +939,20 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * Creates a new oracle file for the given {@link ISEDDebugTarget}.
     * @param target The given {@link ISEDDebugTarget} which provides the oracle data.
     * @param expectedModelPathInBundle The path in the bundle under that the created oracle file will be later available. It is used to create sub directories in temp directory.
+    * @param saveVariables Save variables?
     * @throws IOException Occurred Exception.
     * @throws DebugException Occurred Exception.
     */
-   protected void createOracleFile(ISEDDebugTarget target, String expectedModelPathInBundle) throws IOException, DebugException {
+   protected void createOracleFile(ISEDDebugTarget target, 
+                                   String expectedModelPathInBundle, 
+                                   boolean saveVariables) throws IOException, DebugException {
       if (oracleDirectory != null && oracleDirectory.isDirectory()) {
          // Create sub folder structure
          File oracleFile = new File(oracleDirectory, expectedModelPathInBundle);
          oracleFile.getParentFile().mkdirs();
          // Create oracle file
          SEDXMLWriter writer = new SEDXMLWriter();
-         writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile));
+         writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile), saveVariables);
          // Print message to the user.
          printOracleDirectory();
       }

@@ -11,6 +11,22 @@ import junit.framework.TestCase;
  */
 public class TestJavaUtil extends TestCase {
    /**
+    * Tests {@link JavaUtil#equalIgnoreWhiteSpace(String, String)}.
+    */
+   public void testEqualIgnoreWhiteSpace() {
+      assertTrue(JavaUtil.equalIgnoreWhiteSpace(null, null));
+      assertFalse(JavaUtil.equalIgnoreWhiteSpace("A", null));
+      assertFalse(JavaUtil.equalIgnoreWhiteSpace("B", null));
+      assertTrue(JavaUtil.equalIgnoreWhiteSpace("A", "A"));
+      assertTrue(JavaUtil.equalIgnoreWhiteSpace("A B", "A B"));
+      assertTrue(JavaUtil.equalIgnoreWhiteSpace("A B C", "A B C"));
+      assertTrue(JavaUtil.equalIgnoreWhiteSpace("A    B    C", "A\nB\r\tC"));
+      assertFalse(JavaUtil.equalIgnoreWhiteSpace("A B C", "A B C D"));
+      assertFalse(JavaUtil.equalIgnoreWhiteSpace("A B C D", "A B C"));
+      assertTrue(JavaUtil.equalIgnoreWhiteSpace("  A B C", "A B C\t\n"));
+   }
+   
+   /**
     * Tests {@link JavaUtil#createLine(String, int)}
     */
    public void testCreateLine() {

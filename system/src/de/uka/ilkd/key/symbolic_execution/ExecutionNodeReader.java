@@ -34,6 +34,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
@@ -105,22 +106,46 @@ public class ExecutionNodeReader {
        * The parent hierarchy filled by {@link #startElement(String, String, String, Attributes)}
        * and emptied by {@link #endElement(String, String, String)}.
        */
-      private Deque<AbstractKeYlessExecutionNode> parentStack = new LinkedList<AbstractKeYlessExecutionNode>();
+      private Deque<AbstractKeYlessExecutionNode> parentNodeStack = new LinkedList<AbstractKeYlessExecutionNode>();
 
+      /**
+       * The parent hierarchy of {@link IExecutionVariable} filled by {@link #startElement(String, String, String, Attributes)}
+       * and emptied by {@link #endElement(String, String, String)}. 
+       */
+      private Deque<KeYlessVariable> parentVariableStack = new LinkedList<KeYlessVariable>();
+      
       /**
        * {@inheritDoc}
        */
       @Override
       public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-         AbstractKeYlessExecutionNode parent = parentStack.peekFirst();
-         AbstractKeYlessExecutionNode child = createElement(parent, uri, localName, qName, attributes);
-         if (root == null) {
-            root = child;
+         AbstractKeYlessExecutionNode parent = parentNodeStack.peekFirst();
+         if (isVariable(uri, localName, qName)) {
+            KeYlessVariable parentVariable = parentVariableStack.peekFirst();
+            KeYlessVariable variable = createVariable(parentVariable, uri, localName, qName, attributes);
+            if (parentVariable != null) {
+               parentVariable.addChildVariable(variable);
+            }
+            else {
+               if (parent instanceof AbstractKeYlessStateNode<?>) {
+                  ((AbstractKeYlessStateNode<?>)parent).addVariable(variable);
+               }
+               else {
+                  throw new SAXException("Can't add variable to parent executio node.");
+               }
+            }
+            parentVariableStack.addFirst(variable);
          }
-         if (parent != null) {
-            parent.addChild(child);
+         else {
+            AbstractKeYlessExecutionNode child = createExecutionNode(parent, uri, localName, qName, attributes);
+            if (root == null) {
+               root = child;
+            }
+            if (parent != null) {
+               parent.addChild(child);
+            }
+            parentNodeStack.addFirst(child);
          }
-         parentStack.addFirst(child);
       }
 
       /**
@@ -128,7 +153,12 @@ public class ExecutionNodeReader {
        */
       @Override
       public void endElement(String uri, String localName, String qName) throws SAXException {
-         parentStack.removeFirst();
+         if (isVariable(uri, localName, qName)) {
+            parentVariableStack.removeFirst();
+         }
+         else {
+            parentNodeStack.removeFirst();
+         }
       }
       
       /**
@@ -141,6 +171,39 @@ public class ExecutionNodeReader {
    }
    
    /**
+    * Checks if the currently parsed tag represents an {@link IExecutionVariable}.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @return {@code true} represents an {@link IExecutionVariable}, {@code false} is something else.
+    */
+   protected boolean isVariable(String uri, String localName, String qName) {
+      return ExecutionNodeWriter.TAG_VARIABLE.equals(qName);
+   }
+   
+   /**
+    * Creates a new {@link IExecutionVariable} with the given content.
+    * @param parentVariable The parent {@link IExecutionVariable}.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @param attributes The attributes.
+    * @return The created {@link IExecutionVariable}.
+    */
+   public KeYlessVariable createVariable(IExecutionVariable parentVariable,
+                                         String uri, 
+                                         String localName, 
+                                         String qName, 
+                                         Attributes attributes) {
+      return new KeYlessVariable(parentVariable, 
+                                 isArrayIndex(attributes), 
+                                 getArrayIndex(attributes), 
+                                 getTypeString(attributes), 
+                                 getValueString(attributes), 
+                                 getName(attributes));
+   }
+
+   /**
     * Creates a new {@link IExecutionNode} with the given content.
     * @param parent The parent {@link IExecutionNode}.
     * @param uri The URI.
@@ -150,7 +213,7 @@ public class ExecutionNodeReader {
     * @return The created {@link IExecutionNode}.
     * @throws SAXException Occurred Exception.
     */
-   protected AbstractKeYlessExecutionNode createElement(IExecutionNode parent, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+   protected AbstractKeYlessExecutionNode createExecutionNode(IExecutionNode parent, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       if (ExecutionNodeWriter.TAG_BRANCH_CONDITION.equals(qName)) {
          return new KeYlessBranchCondition(parent, getName(attributes));
       }
@@ -209,61 +272,60 @@ public class ExecutionNodeReader {
    protected boolean isExceptionalTermination(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_EXCEPTIONAL_TERMINATION));
    }
+
+   /**
+    * Returns the value string value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getValueString(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_VALUE_STRING);
+   }
+
+   /**
+    * Returns the type string value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getTypeString(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_TYPE_STRING);
+   }
+
+   /**
+    * Returns the array index value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected int getArrayIndex(Attributes attributes) {
+      return Integer.parseInt(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_ARRAY_INDEX));
+   }
+
+   /**
+    * Returns the is array index value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isArrayIndex(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_IS_ARRAY_INDEX));
+   }
    
    /**
-    * An abstract implementation of {@link IExecutionNode} which is independent
+    * An abstract implementation of {@link IExecutionElement} which is independent
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static abstract class AbstractKeYlessExecutionNode implements IExecutionNode {
-      /**
-       * The parent {@link IExecutionNode}.
-       */
-      private IExecutionNode parent;
-      
-      /**
-       * The children.
-       */
-      private List<IExecutionNode> children = new LinkedList<IExecutionNode>();
-
+   public static abstract class AbstractKeYlessExecutionElement implements IExecutionElement {
       /**
        * The name.
        */
       private String name;
-
-      /**
-       * Constructor.
-       * @param parent The parent {@link IExecutionNode}.
-       * @param name The name of this node.
-       */
-      public AbstractKeYlessExecutionNode(IExecutionNode parent, String name) {
-         super();
-         this.parent = parent;
-         this.name = name;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public IExecutionNode getParent() {
-         return parent;
-      }
       
       /**
-       * Adds the given child.
-       * @param child The child to add.
+       * Constructor.
+       * @param name The name of this node.
        */
-      public void addChild(IExecutionNode child) {
-         children.add(child);
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public IExecutionNode[] getChildren() {
-         return children.toArray(new IExecutionNode[children.size()]);
+      public AbstractKeYlessExecutionElement(String name) {
+         this.name = name;
       }
 
       /**
@@ -305,6 +367,65 @@ public class ExecutionNodeReader {
       public String getName() {
          return name;
       }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String toString() {
+         return getElementType() + " " + getName();
+      }
+   }
+   
+   /**
+    * An abstract implementation of {@link IExecutionNode} which is independent
+    * from KeY and provides such only children and default attributes.
+    * @author Martin Hentschel
+    */
+   public static abstract class AbstractKeYlessExecutionNode extends AbstractKeYlessExecutionElement implements IExecutionNode {
+      /**
+       * The parent {@link IExecutionNode}.
+       */
+      private IExecutionNode parent;
+      
+      /**
+       * The children.
+       */
+      private List<IExecutionNode> children = new LinkedList<IExecutionNode>();
+
+      /**
+       * Constructor.
+       * @param parent The parent {@link IExecutionNode}.
+       * @param name The name of this node.
+       */
+      public AbstractKeYlessExecutionNode(IExecutionNode parent, String name) {
+         super(name);
+         this.parent = parent;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionNode getParent() {
+         return parent;
+      }
+      
+      /**
+       * Adds the given child.
+       * @param child The child to add.
+       */
+      public void addChild(IExecutionNode child) {
+         children.add(child);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionNode[] getChildren() {
+         return children.toArray(new IExecutionNode[children.size()]);
+      }
    }
    
    /**
@@ -321,6 +442,14 @@ public class ExecutionNodeReader {
       public KeYlessBranchCondition(IExecutionNode parent, String name) {
          super(parent, name);
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Branch Condition";
+      }
    }
 
    /**
@@ -336,6 +465,14 @@ public class ExecutionNodeReader {
        */
       public KeYlessStartNode(String name) {
          super(null, name);
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Start Node";
       }
    }
    
@@ -384,6 +521,14 @@ public class ExecutionNodeReader {
       public boolean isExceptionalTermination() {
          return exceptionalTermination;
       }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return isExceptionalTermination() ? "Exceptional Termination" : "Termination";
+      }
    }
 
    /**
@@ -393,12 +538,25 @@ public class ExecutionNodeReader {
     */
    public static abstract class AbstractKeYlessStateNode<S extends SourceElement> extends AbstractKeYlessExecutionNode implements IExecutionStateNode<S> {
       /**
+       * The contained variables.
+       */
+      private List<IExecutionVariable> variables = new LinkedList<IExecutionVariable>();
+      
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        */
       public AbstractKeYlessStateNode(IExecutionNode parent, String name) {
          super(parent, name);
+      }
+      
+      /**
+       * Adds the given {@link IExecutionVariable}.
+       * @param variable The {@link IExecutionVariable} to add.
+       */
+      public void addVariable(IExecutionVariable variable) {
+         variables.add(variable);
       }
 
       /**
@@ -422,7 +580,7 @@ public class ExecutionNodeReader {
        */
       @Override
       public IExecutionVariable[] getVariables() {
-         return new IExecutionVariable[0];
+         return variables.toArray(new IExecutionVariable[variables.size()]);
       }
    }
    
@@ -439,6 +597,14 @@ public class ExecutionNodeReader {
        */
       public KeYlessBranchNode(IExecutionNode parent, String name) {
          super(parent, name);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Branch Node";
       }
    }
    
@@ -472,6 +638,14 @@ public class ExecutionNodeReader {
       public PositionInfo getGuardExpressionPositionInfo() {
          return null;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Loop Condition";
+      }
    }
 
    /**
@@ -480,8 +654,21 @@ public class ExecutionNodeReader {
     * @author Martin Hentschel
     */
    public static class KeYlessLoopNode extends AbstractKeYlessStateNode<LoopStatement> implements IExecutionLoopNode {
+      /**
+       * Constructor.
+       * @param parent The parent {@link IExecutionNode}.
+       * @param name The name of this node.
+       */
       public KeYlessLoopNode(IExecutionNode parent, String name) {
          super(parent, name);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Loop Node";
       }
    }
 
@@ -514,6 +701,14 @@ public class ExecutionNodeReader {
       @Override
       public ProgramMethod getProgramMethod() {
          return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Method Call";
       }
    }
 
@@ -570,6 +765,14 @@ public class ExecutionNodeReader {
       public String getFormatedReturnValue() throws ProofInputException {
          return null;
       }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Method Return";
+      }
    }
 
    /**
@@ -585,6 +788,154 @@ public class ExecutionNodeReader {
        */
       public KeYlessStatement(IExecutionNode parent, String name) {
          super(parent, name);
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Statement";
+      }
+   }
+   
+   /**
+    * An implementation of {@link IExecutionVariable} which is independent
+    * from KeY and provides such only children and default attributes.
+    * @author Martin Hentschel
+    */
+   public static class KeYlessVariable extends AbstractKeYlessExecutionElement implements IExecutionVariable {
+      /**
+       * The parent {@link IExecutionVariable} if available.
+       */
+      private IExecutionVariable parentVariable;
+      
+      /**
+       * The is array flag.
+       */
+      private boolean isArrayIndex;
+
+      /**
+       * The array index.
+       */
+      private int arrayIndex;
+      
+      /**
+       * The type string.
+       */
+      private String typeString;
+      
+      /**
+       * The value string.
+       */
+      private String valueString;
+      
+      /**
+       * The child variables.
+       */
+      private List<IExecutionVariable> childVariables = new LinkedList<IExecutionVariable>();
+      
+      /**
+       * Constructor.
+       * @param parentVariable The parent {@link IExecutionVariable} if available.
+       * @param isArrayIndex The is array flag.
+       * @param arrayIndex The array index.
+       * @param typeString The type string.
+       * @param valueString The value string.
+       * @param name The name.
+       */
+      public KeYlessVariable(IExecutionVariable parentVariable, 
+                             boolean isArrayIndex, 
+                             int arrayIndex, 
+                             String typeString, 
+                             String valueString, 
+                             String name) {
+         super(name);
+         this.parentVariable = parentVariable;
+         this.isArrayIndex = isArrayIndex;
+         this.arrayIndex = arrayIndex;
+         this.typeString = typeString;
+         this.valueString = valueString;
+      }
+      
+      /**
+       * Adds the given child {@link IExecutionVariable}.
+       * @param variable The child {@link IExecutionVariable} to add.
+       */
+      public void addChildVariable(IExecutionVariable variable) {
+         childVariables.add(variable);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getValueString() throws ProofInputException {
+         return valueString;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getTypeString() {
+         return typeString;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionVariable getParentVariable() {
+         return parentVariable;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionVariable[] getChildVariables() throws ProofInputException {
+         return childVariables.toArray(new IExecutionVariable[childVariables.size()]);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public int getArrayIndex() {
+         return arrayIndex;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isArrayIndex() {
+         return isArrayIndex;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IProgramVariable getProgramVariable() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getValue() throws ProofInputException {
+         return null;
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Variable";
       }
    }
 }

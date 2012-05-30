@@ -214,17 +214,14 @@ public final class SymbolicExecutionUtil {
     * extract the value of the given {@link IProgramVariable} from the
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
-    * @param context The {@link IExecutionContext} that defines the current object (this reference).
     * @param node The original {@link Node} which provides the sequent to extract from.
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
    public static SiteProofVariableValueInput createExtractVariableValueSequent(Services services,
-                                                                               IExecutionContext context,
                                                                                Node node,
                                                                                IProgramVariable variable) {
       // Make sure that correct parameters are given
-      assert context != null;
       assert node != null;
       assert variable instanceof ProgramVariable;
       // Create predicate which will be used in formulas to store the value interested in.
@@ -250,17 +247,14 @@ public final class SymbolicExecutionUtil {
     * extract the value of the given {@link IProgramVariable} from the
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
-    * @param context The {@link IExecutionContext} that defines the current object (this reference).
     * @param node The original {@link Node} which provides the sequent to extract from.
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
    public static SiteProofVariableValueInput createExtractTermSequent(Services services,
-                                                                      IExecutionContext context,
                                                                       Node node,
                                                                       Term term) {
       // Make sure that correct parameters are given
-      assert context != null;
       assert node != null;
       assert term != null;
       // Create predicate which will be used in formulas to store the value interested in.

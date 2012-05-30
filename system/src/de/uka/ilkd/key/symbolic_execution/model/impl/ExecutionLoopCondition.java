@@ -53,4 +53,12 @@ public class ExecutionLoopCondition extends AbstractExecutionStateNode<LoopState
    protected IExecutionVariable[] lazyComputeVariables() {
       return SymbolicExecutionUtil.createExecutionVariables(this);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getElementType() {
+      return "Loop Condition";
+   }
 }

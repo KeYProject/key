@@ -35,4 +35,12 @@ public class ExecutionStatement extends AbstractExecutionStateNode<SourceElement
    protected IExecutionVariable[] lazyComputeVariables() {
       return SymbolicExecutionUtil.createExecutionVariables(this);
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getElementType() {
+      return "Statement";
+   }
 }

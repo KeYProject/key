@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
@@ -19,6 +20,11 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
     * The contained child nodes.
     */
    private List<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
+   
+   /**
+    * The contained variables.
+    */
+   private List<IVariable> variables = new LinkedList<IVariable>();
    
    /**
     * The name of this debug node.
@@ -199,5 +205,21 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
    @Override
    public void setId(String id) {
       super.setId(id);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addVariable(IVariable variable) {
+      variables.add(variable);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IVariable[] getVariables() throws DebugException {
+      return variables.toArray(new IVariable[variables.size()]);
    }
 }

@@ -76,4 +76,12 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     * @return The human readable name of this {@link IExecutionNode}.
     */
    protected abstract String lazyComputeName();
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String toString() {
+      return getElementType() + " " + getName();
+   }
 }

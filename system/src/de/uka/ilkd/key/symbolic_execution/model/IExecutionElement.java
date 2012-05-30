@@ -5,6 +5,11 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 
+/**
+ * Defines the basic methods and properties each element in the 
+ * symbolic execution tree model has.
+ * @author Martin Hentschel
+ */
 public interface IExecutionElement {
    /**
     * Returns the {@link Services} used in {@link #getProof()}.
@@ -35,4 +40,10 @@ public interface IExecutionElement {
     * @return The human readable name which describes this element.
     */
    public String getName();
+   
+   /**
+    * Returns a human readable element type name.
+    * @return The human readable element type.
+    */
+   public String getElementType();
 }

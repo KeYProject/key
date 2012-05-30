@@ -130,4 +130,12 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
       }
       return result;
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getElementType() {
+      return isExceptionalTermination() ? "Exceptional Termination" : "Termination";
+   }
 }

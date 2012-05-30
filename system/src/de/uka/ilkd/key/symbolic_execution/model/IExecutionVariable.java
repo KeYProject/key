@@ -41,7 +41,7 @@ public interface IExecutionVariable extends IExecutionElement {
     * Returns the type of the variable as human readable string.
     * @return The type of the variable as human readable string.
     */
-   public String getTypeString();
+   public String getTypeString() throws ProofInputException;
    
    /**
     * Returns the parent {@link IExecutionVariable}.

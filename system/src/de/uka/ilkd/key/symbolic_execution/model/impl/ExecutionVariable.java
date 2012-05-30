@@ -15,8 +15,6 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.reference.IExecutionContext;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -32,7 +30,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput;
-import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * The default implementation of {@link IExecutionVariable}.
@@ -53,6 +50,11 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * The value as human readable string.
     */
    private String valueString;
+   
+   /**
+    * The type as human readable string.
+    */
+   private String typeString;
    
    /**
     * The parent {@link ExecutionVariable} or {@code null} if not available.
@@ -164,15 +166,13 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     */
    protected void lazyComputeValue() throws ProofInputException {
       // Start site proof to extract the value of the result variable.
-      JavaBlock jb = getProofNode().getAppliedRuleApp().posInOccurrence().subTerm().javaBlock();
-      IExecutionContext context = MiscTools.getInnermostExecutionContext(jb, getServices());
       SiteProofVariableValueInput sequentToProve;
       if (getParentVariable() != null || isStaticVariable()) {
          Term selectTerm = createSelectTerm();
-         sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), context, getProofNode(), selectTerm);
+         sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), getProofNode(), selectTerm);
       }
       else {
-         sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(getServices(), context, getProofNode(), getProgramVariable());
+         sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(getServices(), getProofNode(), getProgramVariable());
       }
       ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequentToProve.getSequentToProve());
       value = SymbolicExecutionUtil.extractOperatorValue(info, sequentToProve.getOperator());
@@ -180,6 +180,8 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       // Format return vale
       StringBuffer sb = ProofSaver.printTerm(value, getServices(), true);
       valueString = sb.toString();
+      // Determine type
+      typeString = value.sort().toString();
    }
    
    /**
@@ -242,8 +244,11 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * {@inheritDoc}
     */
    @Override
-   public String getTypeString() {
-      return programVariable.sort().toString();
+   public String getTypeString() throws ProofInputException {
+      if (value == null) {
+         lazyComputeValue();
+      }
+      return typeString;
    }
    
    /**
@@ -341,5 +346,13 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    @Override
    public boolean isArrayIndex() {
       return getArrayIndex() >= 0;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getElementType() {
+      return "Variable";
    }
 }

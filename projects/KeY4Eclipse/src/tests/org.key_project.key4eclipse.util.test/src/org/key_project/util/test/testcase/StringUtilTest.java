@@ -13,6 +13,23 @@ import org.key_project.util.java.StringUtil;
  */
 public class StringUtilTest extends TestCase {
    /**
+    * Tests {@link StringUtil#equalIgnoreWhiteSpace(String, String)}.
+    */
+   @Test
+   public void testEqualIgnoreWhiteSpace() {
+      assertTrue(StringUtil.equalIgnoreWhiteSpace(null, null));
+      assertFalse(StringUtil.equalIgnoreWhiteSpace("A", null));
+      assertFalse(StringUtil.equalIgnoreWhiteSpace("B", null));
+      assertTrue(StringUtil.equalIgnoreWhiteSpace("A", "A"));
+      assertTrue(StringUtil.equalIgnoreWhiteSpace("A B", "A B"));
+      assertTrue(StringUtil.equalIgnoreWhiteSpace("A B C", "A B C"));
+      assertTrue(StringUtil.equalIgnoreWhiteSpace("A    B    C", "A\nB\r\tC"));
+      assertFalse(StringUtil.equalIgnoreWhiteSpace("A B C", "A B C D"));
+      assertFalse(StringUtil.equalIgnoreWhiteSpace("A B C D", "A B C"));
+      assertTrue(StringUtil.equalIgnoreWhiteSpace("  A B C", "A B C\t\n"));
+   }
+   
+   /**
     * Tests {@link StringUtil#toSingleLinedString(String)}
     */
    @Test

@@ -2,6 +2,7 @@ package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 /**
  * Provides static utitlity methods for Java in general like
@@ -152,6 +153,33 @@ public final class JavaUtil {
          }
       }
       return result;
-   }   
+   }
    
+   /**
+    * Checks the equality of the given {@link String}s ignoring whitespace.
+    * @param first The first {@link String}.
+    * @param second The second {@link String}.
+    * @return {@code true} equal ignoring whitespace, {@code false} different.
+    */
+   public static boolean equalIgnoreWhiteSpace(String first, String second) {
+      if (first != null) {
+         if (second != null) {
+            StringTokenizer firstTokenizer = new StringTokenizer(first);
+            StringTokenizer secondTokenizer = new StringTokenizer(second);
+            boolean equal = true;
+            while (equal && firstTokenizer.hasMoreTokens() && secondTokenizer.hasMoreTokens()) {
+               String firstNext = firstTokenizer.nextToken();
+               String secondNext = secondTokenizer.nextToken();
+               equal = firstNext.equals(secondNext);
+            }
+            return equal && !firstTokenizer.hasMoreElements() && !secondTokenizer.hasMoreElements();
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return second == null;
+      }
+   }
 }

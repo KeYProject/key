@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;">
+   <methodCall name="self.main();">
+      <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+      </variable>
+      <statement name="int[][] multiArray = new int[2][];">
+         <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+         </variable>
+         <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+         </variable>
+         <statement name="multiArray[0]=new int[]{1,2 };">
+            <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+            </variable>
+            <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+            </variable>
+            <variable name="multiArray" typeString="int[][]" valueString="x_arr_arr_2" arrayIndex="-1" isArrayIndex="false">
+               <variable name="length" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
+               </variable>
+               <variable name="multiArray[0]" typeString="int[]" valueString="\if (\exists int _var0;
+       (_var0 = 0 &amp; _var0 &gt;= 0 &amp; _var0 &lt;= 2))
+    \then (null)
+    \else (x_arr_arr_2[0])" arrayIndex="0" isArrayIndex="true">
+                  <variable name="length" typeString="int" valueString="\if (\exists int _var0;
+       (_var0 = 0 &amp; _var0 &gt;= 0 &amp; _var0 &lt;= 2))
+    \then (null)
+    \else (x_arr_arr_2[0]).length" arrayIndex="-1" isArrayIndex="false">
+                  </variable>
+               </variable>
+               <variable name="multiArray[1]" typeString="int[]" valueString="\if (\exists int _var0;
+       (_var0 = 1 &amp; _var0 &gt;= 0 &amp; _var0 &lt;= 2))
+    \then (null)
+    \else (x_arr_arr_2[1])" arrayIndex="1" isArrayIndex="true">
+                  <variable name="length" typeString="int" valueString="\if (\exists int _var0;
+       (_var0 = 1 &amp; _var0 &gt;= 0 &amp; _var0 &lt;= 2))
+    \then (null)
+    \else (x_arr_arr_2[1]).length" arrayIndex="-1" isArrayIndex="false">
+                  </variable>
+               </variable>
+            </variable>
+            <statement name="multiArray[1]=new int[]{3,4,5 };">
+               <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+               </variable>
+               <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+               </variable>
+               <variable name="multiArray" typeString="int[][]" valueString="x_arr_arr_2" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="length" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
+                  </variable>
+                  <variable name="multiArray[0]" typeString="int[]" valueString="x_arr_4" arrayIndex="0" isArrayIndex="true">
+                     <variable name="length" typeString="int" valueString="x_arr_4.length" arrayIndex="-1" isArrayIndex="false">
+                     </variable>
+                  </variable>
+                  <variable name="multiArray[1]" typeString="int[]" valueString="\if (\exists int _var1;
+       (_var1 = 1 &amp; _var1 &gt;= 0 &amp; _var1 &lt;= 2))
+    \then (null)
+    \else (x_arr_arr_2[1])" arrayIndex="1" isArrayIndex="true">
+                     <variable name="length" typeString="int" valueString="\if (\exists int _var1;
+       (_var1 = 1 &amp; _var1 &gt;= 0 &amp; _var1 &lt;= 2))
+    \then (null)
+    \else (x_arr_arr_2[1]).length" arrayIndex="-1" isArrayIndex="false">
+                     </variable>
+                  </variable>
+               </variable>
+               <statement name="return multiArray[0][0]+multiArray[0][1]+multiArray[1][0]+multiArray[1][1]+multiArray[1][2];">
+                  <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+                  </variable>
+                  <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+                  </variable>
+                  <variable name="multiArray" typeString="int[][]" valueString="x_arr_arr_2" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="length" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
+                     </variable>
+                     <variable name="multiArray[0]" typeString="int[]" valueString="x_arr_4" arrayIndex="0" isArrayIndex="true">
+                        <variable name="length" typeString="int" valueString="x_arr_4.length" arrayIndex="-1" isArrayIndex="false">
+                        </variable>
+                     </variable>
+                     <variable name="multiArray[1]" typeString="int[]" valueString="x_arr_9" arrayIndex="1" isArrayIndex="true">
+                        <variable name="length" typeString="int" valueString="x_arr_9.length" arrayIndex="-1" isArrayIndex="false">
+                        </variable>
+                     </variable>
+                  </variable>
+                  <methodReturn name="&lt;return of self.main();&gt;" nameIncludingReturnValue="&lt;return &apos;  12
++ \if (x_arr_9 = x_arr_4)
+      \then (3)
+      \else (\if (x_arr_9 = x_arr_4)
+                 \then (0)
+                 \else (1))
++ \if (x_arr_9 = x_arr_4)
+      \then (4)
+      \else (\if (  x_arr_9 = x_arr_4
+                  &amp; x_arr_9.length &gt;= 1)
+                 \then (0)
+                 \else (2))&apos; as result of self.main();&gt;">
+                     <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+                     </variable>
+                     <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+                     </variable>
+                     <termination name="&lt;end&gt;" exceptionalTermination="false">
+                     </termination>
+                  </methodReturn>
+               </statement>
+            </statement>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>

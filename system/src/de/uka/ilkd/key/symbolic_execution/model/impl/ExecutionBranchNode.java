@@ -35,4 +35,12 @@ public class ExecutionBranchNode extends AbstractExecutionStateNode<BranchStatem
    protected IExecutionVariable[] lazyComputeVariables() {
       return SymbolicExecutionUtil.createExecutionVariables(this);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getElementType() {
+      return "Branch Node";
+   }
 }

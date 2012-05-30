@@ -24,4 +24,12 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
    protected String lazyComputeName() {
       return getProofNodeInfo().getBranchLabel();
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getElementType() {
+      return "Branch Condition";
+   }
 }

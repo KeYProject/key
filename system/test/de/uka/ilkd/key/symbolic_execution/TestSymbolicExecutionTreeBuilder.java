@@ -37,8 +37,10 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.po.SymbolicExecutionFunctionalOperationContractPO;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
@@ -136,6 +138,54 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
    }
    
    /**
+    * Tests example: examples/_testcase/set/variablesArrayTest
+    */
+   public void testCariablesArrayTest() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/variablesArrayTest/test/VariablesArrayTest.java", 
+             "VariablesArrayTest", 
+             "main", 
+             "examples/_testcase/set/variablesArrayTest/oracle/VariablesArrayTest.xml",
+             true);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/variablesInstanceVariableTest
+    */
+   public void testVariablesInstanceVariableTest() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/variablesInstanceVariableTest/test/VariablesInstanceVariableTest.java", 
+             "VariablesInstanceVariableTest", 
+             "main", 
+             "examples/_testcase/set/variablesInstanceVariableTest/oracle/VariablesInstanceVariableTest.xml",
+             true);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/variablesLocalTest
+    */
+   public void testVariablesLocalTest() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/variablesLocalTest/test/VariablesLocalTest.java", 
+             "VariablesLocalTest", 
+             "main", 
+             "examples/_testcase/set/variablesLocalTest/oracle/VariablesLocalTest.xml",
+             true);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/variablesStaticTest
+    */
+   public void testVariablesStaticTest() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/variablesStaticTest/test/VariablesStaticTest.java", 
+             "VariablesStaticTest", 
+             "main", 
+             "examples/_testcase/set/variablesStaticTest/oracle/VariablesStaticTest.xml",
+             true);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/complexFlatSteps
     */
    public void testComplexFlatSteps() throws Exception {
@@ -143,7 +193,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/complexFlatSteps/test/ComplexFlatSteps.java", 
              "ComplexFlatSteps", 
              "doSomething", 
-             "examples/_testcase/set/complexFlatSteps/oracle/ComplexFlatSteps.xml");
+             "examples/_testcase/set/complexFlatSteps/oracle/ComplexFlatSteps.xml",
+             false);
    }
    
    /**
@@ -154,7 +205,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/complexIf/test/ComplexIf.java", 
              "ComplexIf", 
              "min", 
-             "examples/_testcase/set/complexIf/oracle/ComplexIf.xml");
+             "examples/_testcase/set/complexIf/oracle/ComplexIf.xml",
+             false);
    }
    
    /**
@@ -165,7 +217,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/doWhileFalseTest/test/DoWhileFalseTest.java", 
              "DoWhileFalseTest", 
              "main", 
-             "examples/_testcase/set/doWhileFalseTest/oracle/DoWhileFalseTest.xml");
+             "examples/_testcase/set/doWhileFalseTest/oracle/DoWhileFalseTest.xml",
+             false);
    }
    
    /**
@@ -176,7 +229,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/doWhileTest/test/DoWhileTest.java", 
              "DoWhileTest", 
              "main", 
-             "examples/_testcase/set/doWhileTest/oracle/DoWhileTest.xml");
+             "examples/_testcase/set/doWhileTest/oracle/DoWhileTest.xml",
+             false);
    }
    
    /**
@@ -187,7 +241,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/elseIfDifferentVariables/test/ElseIfDifferentVariables.java", 
              "ElseIfDifferentVariables", 
              "main", 
-             "examples/_testcase/set/elseIfDifferentVariables/oracle/ElseIfDifferentVariables.xml");
+             "examples/_testcase/set/elseIfDifferentVariables/oracle/ElseIfDifferentVariables.xml",
+             false);
    }
    
    /**
@@ -198,7 +253,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/elseIfTest/test/ElseIfTest.java", 
              "ElseIfTest", 
              "elseIf", 
-             "examples/_testcase/set/elseIfTest/oracle/ElseIfTest.xml");
+             "examples/_testcase/set/elseIfTest/oracle/ElseIfTest.xml",
+             false);
    }
    
    /**
@@ -209,7 +265,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/fixedRecursiveMethodCallTest/test/FixedRecursiveMethodCallTest.java", 
              "FixedRecursiveMethodCallTest", 
              "decreaseValue", 
-             "examples/_testcase/set/fixedRecursiveMethodCallTest/oracle/FixedRecursiveMethodCallTest.xml");
+             "examples/_testcase/set/fixedRecursiveMethodCallTest/oracle/FixedRecursiveMethodCallTest.xml",
+             false);
    }
    
    /**
@@ -220,7 +277,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/forEachTest/test/ForEachTest.java", 
              "ForEachTest", 
              "main", 
-             "examples/_testcase/set/forEachTest/oracle/ForEachTest.xml");
+             "examples/_testcase/set/forEachTest/oracle/ForEachTest.xml",
+             false);
    }
    
    /**
@@ -231,7 +289,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/forFalseTest/test/ForFalseTest.java", 
              "ForFalseTest", 
              "main", 
-             "examples/_testcase/set/forFalseTest/oracle/ForFalseTest.xml");
+             "examples/_testcase/set/forFalseTest/oracle/ForFalseTest.xml",
+             false);
    }
    
    /**
@@ -242,7 +301,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/forTest/test/ForTest.java", 
              "ForTest", 
              "main", 
-             "examples/_testcase/set/forTest/oracle/ForTest.xml");
+             "examples/_testcase/set/forTest/oracle/ForTest.xml",
+             false);
    }
    
    /**
@@ -253,7 +313,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/functionalDoWhileTest/test/FunctionalDoWhileTest.java", 
              "FunctionalDoWhileTest", 
              "main", 
-             "examples/_testcase/set/functionalDoWhileTest/oracle/FunctionalDoWhileTest.xml");
+             "examples/_testcase/set/functionalDoWhileTest/oracle/FunctionalDoWhileTest.xml",
+             false);
    }
    
    /**
@@ -264,7 +325,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/functionalForTest/test/FunctionalForTest.java", 
              "FunctionalForTest", 
              "main", 
-             "examples/_testcase/set/functionalForTest/oracle/FunctionalForTest.xml");
+             "examples/_testcase/set/functionalForTest/oracle/FunctionalForTest.xml",
+             false);
    }
    
    /**
@@ -275,7 +337,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/functionalIf/test/FunctionalIf.java", 
              "FunctionalIf", 
              "min", 
-             "examples/_testcase/set/functionalIf/oracle/FunctionalIf.xml");
+             "examples/_testcase/set/functionalIf/oracle/FunctionalIf.xml",
+             false);
    }
    
    /**
@@ -286,7 +349,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/functionalWhileTest/test/FunctionalWhileTest.java", 
              "FunctionalWhileTest", 
              "main", 
-             "examples/_testcase/set/functionalWhileTest/oracle/FunctionalWhileTest.xml");
+             "examples/_testcase/set/functionalWhileTest/oracle/FunctionalWhileTest.xml",
+             false);
    }
    
    /**
@@ -297,7 +361,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/methodCallOnObject/test/MethodCallOnObject.java", 
              "MethodCallOnObject", 
              "main", 
-             "examples/_testcase/set/methodCallOnObject/oracle/MethodCallOnObject.xml");
+             "examples/_testcase/set/methodCallOnObject/oracle/MethodCallOnObject.xml",
+             false);
    }
    
    /**
@@ -308,7 +373,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/methodCallOnObjectWithException/test/MethodCallOnObjectWithException.java", 
              "MethodCallOnObjectWithException", 
              "main", 
-             "examples/_testcase/set/methodCallOnObjectWithException/oracle/MethodCallOnObjectWithException.xml");
+             "examples/_testcase/set/methodCallOnObjectWithException/oracle/MethodCallOnObjectWithException.xml",
+             false);
    }
    
    /**
@@ -319,7 +385,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/methodCallParallelTest/test/MethodCallParallelTest.java", 
              "MethodCallParallelTest", 
              "main", 
-             "examples/_testcase/set/methodCallParallelTest/oracle/MethodCallParallelTest.xml");
+             "examples/_testcase/set/methodCallParallelTest/oracle/MethodCallParallelTest.xml",
+             false);
    }
    
    /**
@@ -330,7 +397,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/methodFormatTest/test/MethodFormatTest.java", 
              "MethodFormatTest", 
              "main", 
-             "examples/_testcase/set/methodFormatTest/oracle/MethodFormatTest.xml");
+             "examples/_testcase/set/methodFormatTest/oracle/MethodFormatTest.xml",
+             false);
    }
    
    /**
@@ -341,7 +409,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/methodHierarchyCallTest/test/MethodHierarchyCallTest.java", 
              "MethodHierarchyCallTest", 
              "main", 
-             "examples/_testcase/set/methodHierarchyCallTest/oracle/MethodHierarchyCallTest.xml");
+             "examples/_testcase/set/methodHierarchyCallTest/oracle/MethodHierarchyCallTest.xml",
+             false);
    }
    
    /**
@@ -352,7 +421,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/methodHierarchyCallWithExceptionTest/test/MethodHierarchyCallWithExceptionTest.java", 
              "MethodHierarchyCallWithExceptionTest", 
              "main", 
-             "examples/_testcase/set/methodHierarchyCallWithExceptionTest/oracle/MethodHierarchyCallWithExceptionTest.xml");
+             "examples/_testcase/set/methodHierarchyCallWithExceptionTest/oracle/MethodHierarchyCallWithExceptionTest.xml",
+             false);
    }
    
    /**
@@ -363,7 +433,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/nestedDoWhileTest/test/NestedDoWhileTest.java", 
              "NestedDoWhileTest", 
              "main", 
-             "examples/_testcase/set/nestedDoWhileTest/oracle/NestedDoWhileTest.xml");
+             "examples/_testcase/set/nestedDoWhileTest/oracle/NestedDoWhileTest.xml",
+             false);
    }
    
    /**
@@ -374,7 +445,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/nestedForTest/test/NestedForTest.java", 
              "NestedForTest", 
              "main", 
-             "examples/_testcase/set/nestedForTest/oracle/NestedForTest.xml");
+             "examples/_testcase/set/nestedForTest/oracle/NestedForTest.xml",
+             false);
    }
    
    /**
@@ -385,7 +457,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/nestedWhileTest/test/NestedWhileTest.java", 
              "NestedWhileTest", 
              "mainNested", 
-             "examples/_testcase/set/nestedWhileTest/oracle/NestedWhileTest.xml");
+             "examples/_testcase/set/nestedWhileTest/oracle/NestedWhileTest.xml",
+             false);
    }
    
    /**
@@ -402,7 +475,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/recursiveFibonacci/test/RecursiveFibonacci.java", 
              "RecursiveFibonacci", 
              "fibonacci10", 
-             "examples/_testcase/set/recursiveFibonacci/oracle/RecursiveFibonacci.xml");
+             "examples/_testcase/set/recursiveFibonacci/oracle/RecursiveFibonacci.xml",
+             false);
    }
    
    /**
@@ -413,7 +487,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/simpleIf/test/SimpleIf.java", 
              "SimpleIf", 
              "min", 
-             "examples/_testcase/set/simpleIf/oracle/SimpleIf.xml");
+             "examples/_testcase/set/simpleIf/oracle/SimpleIf.xml",
+             false);
    }
    
    /**
@@ -424,7 +499,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/simpleNullPointerSplitTest/test/SimpleNullPointerSplitTest.java", 
              "SimpleNullPointerSplitTest", 
              "main", 
-             "examples/_testcase/set/simpleNullPointerSplitTest/oracle/SimpleNullPointerSplitTest.xml");
+             "examples/_testcase/set/simpleNullPointerSplitTest/oracle/SimpleNullPointerSplitTest.xml",
+             false);
    }
    
    /**
@@ -435,7 +511,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/statementKindTest/test/StatementKindTest.java", 
              "StatementKindTest", 
              "main", 
-             "examples/_testcase/set/statementKindTest/oracle/StatementKindTest.xml");
+             "examples/_testcase/set/statementKindTest/oracle/StatementKindTest.xml",
+             false);
    }
    
    /**
@@ -446,7 +523,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/statements/test/FlatSteps.java", 
              "FlatSteps", 
              "doSomething", 
-             "examples/_testcase/set/statements/oracle/FlatSteps.xml");
+             "examples/_testcase/set/statements/oracle/FlatSteps.xml",
+             false);
    }
    
    /**
@@ -457,7 +535,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/staticMethodCall/test/StaticMethodCall.java", 
              "StaticMethodCall", 
              "main", 
-             "examples/_testcase/set/staticMethodCall/oracle/StaticMethodCall.xml");
+             "examples/_testcase/set/staticMethodCall/oracle/StaticMethodCall.xml",
+             false);
    }
    
    /**
@@ -468,7 +547,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/switchCaseTest/test/SwitchCaseTest.java", 
              "SwitchCaseTest", 
              "switchCase", 
-             "examples/_testcase/set/switchCaseTest/oracle/SwitchCaseTest.xml");
+             "examples/_testcase/set/switchCaseTest/oracle/SwitchCaseTest.xml",
+             false);
    }
    
    /**
@@ -479,7 +559,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/throwTest/test/ThrowTest.java", 
              "ThrowTest", 
              "main", 
-             "examples/_testcase/set/throwTest/oracle/ThrowTest.xml");
+             "examples/_testcase/set/throwTest/oracle/ThrowTest.xml",
+             false);
    }
    
    /**
@@ -490,7 +571,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/throwVariableTest/test/ThrowVariableTest.java", 
              "ThrowVariableTest", 
              "main", 
-             "examples/_testcase/set/throwVariableTest/oracle/ThrowVariableTest.xml");
+             "examples/_testcase/set/throwVariableTest/oracle/ThrowVariableTest.xml",
+             false);
    }
    
    /**
@@ -501,7 +583,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/tryCatchFinally/test/TryCatchFinally.java", 
              "TryCatchFinally", 
              "tryCatchFinally", 
-             "examples/_testcase/set/tryCatchFinally/oracle/TryCatchFinally.xml");
+             "examples/_testcase/set/tryCatchFinally/oracle/TryCatchFinally.xml",
+             false);
    }
    
    /**
@@ -512,7 +595,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/whileFalseTest/test/WhileFalseTest.java", 
              "WhileFalseTest", 
              "main", 
-             "examples/_testcase/set/whileFalseTest/oracle/WhileFalseTest.xml");
+             "examples/_testcase/set/whileFalseTest/oracle/WhileFalseTest.xml",
+             false);
    }
    
    /**
@@ -523,7 +607,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "examples/_testcase/set/whileTest/test/WhileTest.java", 
              "WhileTest", 
              "main", 
-             "examples/_testcase/set/whileTest/oracle/WhileTest.xml");
+             "examples/_testcase/set/whileTest/oracle/WhileTest.xml",
+             false);
    }
    
    /**
@@ -542,6 +627,7 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
     * @param containerTypeName The java class to test.
     * @param methodFullName The method to test.
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
+    * @param includeVariables Include variables?
     * @throws ProofInputException Occurred Exception
     * @throws IOException Occurred Exception
     * @throws ParserConfigurationException Occurred Exception
@@ -551,7 +637,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
                          String javaPathInBaseDir,
                          String containerTypeName,
                          final String methodFullName,
-                         String oraclePathInBaseDirFile) throws ProofInputException, IOException, ParserConfigurationException, SAXException {
+                         String oraclePathInBaseDirFile,
+                         boolean includeVariables) throws ProofInputException, IOException, ParserConfigurationException, SAXException {
       // Make sure that parameter are valid.
       assertNotNull(javaPathInBaseDir);
       File javaFile = new File(baseDir, javaPathInBaseDir);
@@ -560,7 +647,9 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
       assertNotNull(methodFullName);
       assertNotNull(oraclePathInBaseDirFile);
       File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
-      assertTrue(oracleFile.exists());
+      if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
+         assertTrue("Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.", oracleFile.exists());
+      }
       // Create user interface
       TestConsoleUserInterface ui = new TestConsoleUserInterface(false);
       KeYMediator mediator = ui.getMediator();
@@ -607,30 +696,31 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
       builder.analyse();
       assertNotNull(builder.getStartNode());
       // Create new oracle file if required in a temporary directory
-      createOracleFile(builder.getStartNode(), oraclePathInBaseDirFile);
+      createOracleFile(builder.getStartNode(), oraclePathInBaseDirFile, includeVariables);
       // Read oracle file
       ExecutionNodeReader reader = new ExecutionNodeReader();
       IExecutionNode oracleRoot = reader.read(oracleFile);
       assertNotNull(oracleRoot);
       // Make sure that the created symbolic execution tree matches the expected one.
-      assertExecutionNodes(oracleRoot, builder.getStartNode());
+      assertExecutionNodes(oracleRoot, builder.getStartNode(), includeVariables);
    }
    
    /**
     * Creates a new oracle file.
     * @param node The node to save as oracle file.
     * @param oraclePathInBaseDirFile The path in example directory.
+    * @param saveVariables Save variables?
     * @throws IOException Occurred Exception
     * @throws ProofInputException Occurred Exception
     */
-   protected void createOracleFile(IExecutionNode node, String oraclePathInBaseDirFile) throws IOException, ProofInputException {
+   protected void createOracleFile(IExecutionNode node, String oraclePathInBaseDirFile, boolean saveVariables) throws IOException, ProofInputException {
       if (tempNewOracleDirectory != null && tempNewOracleDirectory.isDirectory()) {
          // Create sub folder structure
          File oracleFile = new File(tempNewOracleDirectory, oraclePathInBaseDirFile);
          oracleFile.getParentFile().mkdirs();
          // Create oracle file
          ExecutionNodeWriter writer = new ExecutionNodeWriter();
-         writer.write(node, ExecutionNodeWriter.DEFAULT_ENCODING, oracleFile);
+         writer.write(node, ExecutionNodeWriter.DEFAULT_ENCODING, oracleFile, saveVariables);
          // Print message to the user.
          printOracleDirectory();
       }
@@ -658,16 +748,18 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
     * Makes sure that the given nodes and their subtrees contains the same content.
     * @param expected The expected {@link IExecutionNode}.
     * @param current The current {@link IExecutionNode}.
+    * @param compareVariables Compare variables?
     * @throws ProofInputException Occurred Exception.
     */
    public static void assertExecutionNodes(IExecutionNode expected, 
-                                              IExecutionNode current) throws ProofInputException {
+                                           IExecutionNode current,
+                                           boolean compareVariables) throws ProofInputException {
       ExecutionNodePreorderIterator expectedIter = new ExecutionNodePreorderIterator(expected);
       ExecutionNodePreorderIterator currentIter = new ExecutionNodePreorderIterator(current);
       while (expectedIter.hasNext() && currentIter.hasNext()) {
          IExecutionNode expectedNext = expectedIter.next();
          IExecutionNode currentNext = currentIter.next();
-         assertExecutionNode(expectedNext, currentNext, true, true);
+         assertExecutionNode(expectedNext, currentNext, true, true, compareVariables);
       }
       assertFalse(expectedIter.hasNext());
       assertFalse(currentIter.hasNext());
@@ -680,12 +772,14 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
     * @param current The current {@link IExecutionNode}.
     * @param compareParent Compare also the parent node?
     * @param compareChildren Compare direct children?
+    * @param compareVariables Compare variables?
     * @throws ProofInputException Occurred Exception.
     */
    protected static void assertExecutionNode(IExecutionNode expected, 
                                              IExecutionNode current, 
                                              boolean compareParent, 
-                                             boolean compareChildren) throws ProofInputException {
+                                             boolean compareChildren,
+                                             boolean compareVariables) throws ProofInputException {
       // Compare nodes
       assertNotNull(expected);
       assertNotNull(current);
@@ -702,29 +796,35 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
       }
       else if (expected instanceof IExecutionBranchNode) {
          assertTrue("Expected IExecutionBranchNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchNode);
+         assertVariables((IExecutionBranchNode)expected, (IExecutionBranchNode)current, compareVariables);
       }
       else if (expected instanceof IExecutionLoopCondition) {
          assertTrue("Expected IExecutionLoopCondition but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionLoopCondition);
+         assertVariables((IExecutionLoopCondition)expected, (IExecutionLoopCondition)current, compareVariables);
       }
       else if (expected instanceof IExecutionLoopNode) {
          assertTrue("Expected IExecutionLoopNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionLoopNode);
+         assertVariables((IExecutionLoopNode)expected, (IExecutionLoopNode)current, compareVariables);
       }
       else if (expected instanceof IExecutionMethodCall) {
          assertTrue("Expected IExecutionMethodCall but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionMethodCall);
+         assertVariables((IExecutionMethodCall)expected, (IExecutionMethodCall)current, compareVariables);
       }
       else if (expected instanceof IExecutionMethodReturn) {
          assertTrue("Expected IExecutionMethodReturn but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionMethodReturn);
-         assertEquals(((IExecutionMethodReturn)expected).getNameIncludingReturnValue(), ((IExecutionMethodReturn)current).getNameIncludingReturnValue());
+         assertTrue(((IExecutionMethodReturn)expected).getNameIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getNameIncludingReturnValue(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getNameIncludingReturnValue(), ((IExecutionMethodReturn)current).getNameIncludingReturnValue()));
+         assertVariables((IExecutionMethodReturn)expected, (IExecutionMethodReturn)current, compareVariables);
       }
       else if (expected instanceof IExecutionStatement) {
          assertTrue("Expected IExecutionStatement but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStatement);
+         assertVariables((IExecutionStatement)expected, (IExecutionStatement)current, compareVariables);
       }
       else {
          fail("Unknown execution node \"" + expected + "\".");
       }
       // Optionally compare parent
       if (compareParent) {
-         assertExecutionNode(expected, current, false, false);
+         assertExecutionNode(expected, current, false, false, compareVariables);
       }
       // Optionally compare direct children
       if (compareChildren) {
@@ -732,8 +832,67 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
          IExecutionNode[] currentChildren = current.getChildren();
          assertEquals(expectedChildren.length, currentChildren.length);
          for (int i = 0; i < expectedChildren.length; i++) {
-            assertExecutionNode(expectedChildren[i], currentChildren[i], false, false);
+            assertExecutionNode(expectedChildren[i], currentChildren[i], false, false, compareVariables);
          }
+      }
+   }
+
+   /**
+    * Makes sure that the given nodes contains the same {@link IExecutionVariable}s.
+    * @param expected The expected node.
+    * @param current The current node.
+    * @param compareVariables Compare variables?
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertVariables(IExecutionStateNode<?> expected, IExecutionStateNode<?> current, boolean compareVariables) throws ProofInputException {
+      if (compareVariables) {
+         assertNotNull(expected);
+         assertNotNull(current);
+         IExecutionVariable[] expectedVariables = expected.getVariables();
+         IExecutionVariable[] currentVariables = current.getVariables();
+         assertEquals(expectedVariables.length, currentVariables.length);
+         for (int i = 0; i < expectedVariables.length; i++) {
+            assertVariable(expectedVariables[i], currentVariables[i], true, true);
+         }
+      }
+   }
+
+   /**
+    * Makes sure that the given variables are the same.
+    * @param expected The expected variable.
+    * @param current The current variable.
+    * @param compareParent Compare parent?
+    * @param compareChildren Compare children?
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertVariable(IExecutionVariable expected, 
+                                        IExecutionVariable current,
+                                        boolean compareParent, 
+                                        boolean compareChildren) throws ProofInputException {
+      if (expected != null) {
+         assertNotNull(current);
+         // Compare variable
+         assertEquals(expected.isArrayIndex(), current.isArrayIndex());
+         assertEquals(expected.getArrayIndex(), current.getArrayIndex());
+         assertEquals(expected.getName(), current.getName());
+         assertEquals(expected.getTypeString(), current.getTypeString());
+         assertTrue(expected.getValueString() + " does not match " + current.getValueString(), JavaUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
+         // Compare parent
+         if (compareParent) {
+            assertVariable(expected.getParentVariable(), current.getParentVariable(), false, false);
+         }
+         // Compare children
+         if (compareChildren) {
+            IExecutionVariable[] expectedChildVariables = expected.getChildVariables();
+            IExecutionVariable[] currentChildVariables = current.getChildVariables();
+            assertEquals(expectedChildVariables.length, currentChildVariables.length);
+            for (int i = 0; i < expectedChildVariables.length; i++) {
+               assertVariable(expectedChildVariables[i], currentChildVariables[i], compareParent, compareChildren);
+            }
+         }
+      }
+      else {
+         assertNull(current);
       }
    }
 
