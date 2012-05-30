@@ -130,7 +130,8 @@ public class ProofSaverLatex extends ProofSaver {
       sb.append("% "+proof.name()+"\n");
       try {
 	  FileInputStream inp=new FileInputStream(header.getFile());
-	  while (inp.available()>0) sb.append((char)inp.read());	   
+	  while (inp.available()>0) sb.append((char)inp.read());
+	  inp.close();
       } catch (IOException ioe) {
 	  sb=new StringBuffer("% Could not find proofheader.tex\n");
       }

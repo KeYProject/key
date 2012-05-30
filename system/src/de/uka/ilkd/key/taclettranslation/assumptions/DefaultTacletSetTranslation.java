@@ -166,14 +166,17 @@ public final class DefaultTacletSetTranslation implements TacletSetTranslation,
          */
         public void storeToFile(String dest) {
 
-                FileWriter fw;
-                try {
-                        fw = new FileWriter(dest);
-                        fw.write(toString());
-                        fw.close();
-                } catch (IOException e) {
-                        throw new RuntimeException(e);
+            FileWriter fw;
+            try {
+                fw = new FileWriter(dest);
+                try { 
+                    fw.write(toString());
+                } finally { 
+                    fw.close();
                 }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
         }
 

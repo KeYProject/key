@@ -177,8 +177,6 @@ public class KeYResourceManager {
 	// copying the resource to the target if targetfile 
 	// does not exist yet
 	boolean result = false;
-	ReadableByteChannel sourceStream = null;
-	FileChannel targetStream  = null;
 	try{
 	    File targetFile = new File(targetLocation);
 	    if (overwrite || !targetFile.exists()){
@@ -188,35 +186,27 @@ public class KeYResourceManager {
 		}
 		targetFile.createNewFile();	    
 		targetFile.deleteOnExit();
-		
-		sourceStream = Channels.newChannel(resourceURL.openStream());		
-		targetStream = new FileOutputStream (targetFile).getChannel();  
-		
-		long actualTransferredByte = targetStream.transferFrom(sourceStream, 0, Long.MAX_VALUE);
+				
+	        final ReadableByteChannel sourceStream = Channels.newChannel(resourceURL.openStream());
+                
+                long actualTransferredByte = 0;
+	        try { 
+	            final FileChannel targetStream  = new FileOutputStream (targetFile).getChannel();
+	            try { 
+	                actualTransferredByte = targetStream.transferFrom(sourceStream, 0, Long.MAX_VALUE);
+	            } finally {
+	                targetStream.close();
+	            }   
+	        } finally {
+	            sourceStream.close();
+	        }
 		if (actualTransferredByte < 0 || actualTransferredByte == Long.MAX_VALUE) {
 		    throw new RuntimeException("File " + resourcename + " too big.");
 		}
 	    }
 	} catch(Exception e) {
 	    System.err.println("KeYError: " + e);
-	    return false;
-	} finally {	    
-	    if (sourceStream != null) {
-		try {
-	            sourceStream.close();
-                } catch (IOException e) {
-        	    System.err.println("KeYError: " + e);
-        	    result = false;
-                }
-	    }
-	    if (targetStream != null) {
-		try {
-		    targetStream.close();
-                } catch (IOException e) {
-        	    System.err.println("KeYError: " + e);
-        	    result = false;
-                }
-	    }
+	    return false;	
 	}
 	
 	return result;

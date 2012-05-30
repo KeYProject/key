@@ -15,7 +15,13 @@ package de.uka.ilkd.key.util;
  * removes an old one, but should be useable in other projects.
  *
  */
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Vector;
 
 public class AddAHead {
@@ -74,7 +80,7 @@ public class AddAHead {
 	return false;
     }
 
-    public int containsHeader(File f, int type) {
+    public int containsHeader(File f, int type) throws IOException {
 	BufferedReader b=getBufferedReader(f);	
 	int i=0;
 	int hStart=-1;
@@ -124,9 +130,10 @@ public class AddAHead {
 		
 		i++;
 	    }
-	    b.close();	
 	} catch (IOException e) 
 	    {Debug.out("Exception thrown by class AddAhead at IO");	    
+	} finally {
+	       b.close();  
 	}
 	if (h) return 2;
 	if (oh) return 1;
@@ -134,13 +141,17 @@ public class AddAHead {
 
     }
 
-    public void addHeader(File f, int type) {
+    public void addHeader(File f, int type) throws IOException {
 	BufferedReader b=getBufferedReader(f);
 	try {
 	    PrintWriter w=new PrintWriter(new BufferedWriter
 		(new FileWriter(tmpFile)));
 	    String line=b.readLine();
-	    if (line==null) return;
+	    if (line==null) {
+	        w.close();
+	        b.close();
+	        return;
+	    }
 	    while (startsWithOne(line, notToRemove)) {	    
 		w.println(line);
 		line=b.readLine();
@@ -153,17 +164,19 @@ public class AddAHead {
 		line=b.readLine();
 	    }
 	    w.close();
-	    b.close();
 	} catch (IOException e) {
 	    Debug.out("Exception thrown by class AddAhead at IO");
+	} finally {
+	       b.close();
 	}
 	tmpFile.renameTo(f);
     }
 
-    public void removeOldHeader(File f, int type) {
+    public void removeOldHeader(File f, int type) throws IOException {
 	BufferedReader b=getBufferedReader(f);
+	PrintWriter w = null;
 	try {
-	    PrintWriter w=new PrintWriter(new BufferedWriter
+	    w=new PrintWriter(new BufferedWriter
 		(new FileWriter(tmpFile)));
 	    String line;
 	    int i=0;
@@ -190,15 +203,15 @@ public class AddAHead {
 		if (line!=null) w.println(line);
 		i++;
 	    }
-	    w.close();
-	    b.close();
 	} catch (IOException e) {
 	    Debug.out("Exception thrown by class AddAhead at IO");
+	} finally {
+	    try { w.close(); } finally { b.close(); }
 	}
 	tmpFile.renameTo(f);
     }
 
-    public void handleFile(File f) {
+    public void handleFile(File f) throws IOException {
 	for (int i=0; i<endings.length; i++) {
 	    if (ending(f.getName()).equals(endings[i])) {
 		if (endings[i].equals("")) {
@@ -223,7 +236,7 @@ public class AddAHead {
 	}
     }
 
-    public void visitFile(File currentFile) {
+    public void visitFile(File currentFile) throws IOException {
 
 	if (currentFile.isDirectory()) {
 	    String[] fileList=currentFile.list();
@@ -232,7 +245,9 @@ public class AddAHead {
                     + File.separator + aFileList));
         }
 	} else {
-	    if (currentFile.isFile()) handleFile(currentFile);
+	    if (currentFile.isFile()) { 
+	        handleFile(currentFile);
+	    }
 	}	
     }
     public String summary(String ending, int countFile, int countRemoveFile, 
@@ -330,7 +345,11 @@ public class AddAHead {
 	}
 	cm.readHeader(args[1]);
 	if (args.length>2) cm.readOldHeader(args[2]);
-	cm.visitFile(new File(args[0]));
+	try { 
+	    cm.visitFile(new File(args[0]));
+	} catch (IOException io) {
+	    System.out.println("Error trying to access "+args[0]);
+	}
 	System.out.println(cm.statistics());
     }
 }
