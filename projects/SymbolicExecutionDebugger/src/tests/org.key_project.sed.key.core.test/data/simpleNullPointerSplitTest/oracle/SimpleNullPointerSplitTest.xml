@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_4866f74f-0aaa-45a6-9b67-f1811b61eab1" name="SimpleNullPointerSplitTest[SimpleNullPointerSplitTest::main(SimpleNullPointerSplitTest)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_15ae443f-5cf1-47bd-b8dc-72cbab257cf0" name="KeY Default Thread">
+      <sedThread xml:id="_15ae443f-5cf1-47bd-b8dc-72cbab257cf0" name="&lt;start&gt;">
          <sedMethodCall xml:id="_9d4440ac-9a06-455e-bce9-8e53e49ad5c6" name="self.main(_instance);" lineNumber="-1" charStart="77" charEnd="81">
             <sedStatement xml:id="_cea67f45-2c1d-4ab0-9c1a-99487827b5c0" name="return _instance.x;" lineNumber="-1" charStart="124" charEnd="142">
                <sedBranchCondition xml:id="_5a321e9f-e094-4142-934a-db402a46256b" name="Normal Execution (_instance != null)">

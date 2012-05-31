@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_ddfec3e3-5622-421d-8c63-3efd6161fd91" name="ForTest[ForTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_e8681d76-0092-47a8-bddb-96a28373cf1a" name="KeY Default Thread">
+      <sedThread xml:id="_e8681d76-0092-47a8-bddb-96a28373cf1a" name="&lt;start&gt;">
          <sedMethodCall xml:id="_62bfd95a-916b-4e7a-9f4b-bc8262c20410" name="self.main();" lineNumber="-1" charStart="87" charEnd="91">
             <sedStatement xml:id="_6f24d533-163c-4e3d-81a9-c5dc1d9c31f9" name="int result = 0;" lineNumber="-1" charStart="99" charEnd="114">
                <sedLoopNode xml:id="_8941565d-b681-4e27-948b-286c9379d757" name="for ( int i = 0; i&lt;3; i++ ) {   result_1++; }" lineNumber="-1" charStart="118" charEnd="167">

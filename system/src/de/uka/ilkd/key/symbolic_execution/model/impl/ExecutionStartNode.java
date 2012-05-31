@@ -24,4 +24,12 @@ public class ExecutionStartNode extends AbstractExecutionNode implements IExecut
    protected String lazyComputeName() {
       return DEFAULT_START_NODE_NAME;
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getElementType() {
+      return "Start Node";
+   }
 }

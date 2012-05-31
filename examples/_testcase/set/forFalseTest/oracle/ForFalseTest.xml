@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;">
-   <methodCall name="self.main();">
-      <statement name="int result = 0;">
-         <loopNode name="for ( int i = 0; false; i++ ) {   result_1++; }">
-            <statement name="int i = 0;">
-               <loopCondition name="false">
-                  <statement name="return result_1;">
-                     <methodReturn name="&lt;return of self.main();&gt;" nameIncludingReturnValue="&lt;return &apos;0&apos; as result of self.main();&gt;">
-                        <termination name="&lt;end&gt;" exceptionalTermination="false">
+<startNode name="&lt;start&gt;" pathCondition="true">
+   <methodCall name="self.main();" pathCondition="true">
+      <statement name="int result = 0;" pathCondition="true">
+         <loopNode name="for ( int i = 0; false; i++ ) {   result_1++; }" pathCondition="true">
+            <statement name="int i = 0;" pathCondition="true">
+               <loopCondition name="false" pathCondition="true">
+                  <statement name="return result_1;" pathCondition="true">
+                     <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;0&apos; as result of self.main();&gt;">
+                        <termination name="&lt;end&gt;" pathCondition="true" exceptionalTermination="false">
                         </termination>
                      </methodReturn>
                   </statement>

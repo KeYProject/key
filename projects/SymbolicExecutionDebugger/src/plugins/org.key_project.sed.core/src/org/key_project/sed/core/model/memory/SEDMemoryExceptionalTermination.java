@@ -22,6 +22,11 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
    private List<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
    
    /**
+    * The name of this debug node.
+    */
+   private String name;
+   
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this exceptional termination is contained.
     * @param parent The parent in that this node is contained as child.
@@ -31,6 +36,14 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
                                           ISEDDebugNode parent,
                                           ISEDThread thread) {
       super(target, parent, thread);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getName() throws DebugException {
+      return name;
    }
 
    /**
@@ -85,16 +98,11 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
    }
    
    /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
+    * Sets the name of this node.
+    * @param name the name to set.
     */
-   @Override
    public void setName(String name) {
-      super.setName(name);
+      this.name = name;
    }
 
    /**

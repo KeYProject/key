@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;">
-   <methodCall name="self.tryCatchFinally(_input);">
-      <statement name="int result = 0;">
-         <statement name="result_1=1/_input;">
-            <branchCondition name="input = 0 TRUE">
-               <statement name="result_1=2;">
-                  <statement name="result_1=result_1*2;">
-                     <statement name="return result_1;">
-                        <methodReturn name="&lt;return of self.tryCatchFinally(_input);&gt;" nameIncludingReturnValue="&lt;return &apos;4&apos; as result of self.tryCatchFinally(_input);&gt;">
-                           <termination name="&lt;end&gt;" exceptionalTermination="false">
+<startNode name="&lt;start&gt;" pathCondition="true">
+   <methodCall name="self.tryCatchFinally(_input);" pathCondition="true">
+      <statement name="int result = 0;" pathCondition="true">
+         <statement name="result_1=1/_input;" pathCondition="true">
+            <branchCondition name="input = 0 TRUE" pathCondition="input = 0" branchCondition="input = 0">
+               <statement name="result_1=2;" pathCondition="input = 0">
+                  <statement name="result_1=result_1*2;" pathCondition="input = 0">
+                     <statement name="return result_1;" pathCondition="input = 0">
+                        <methodReturn name="&lt;return of self.tryCatchFinally(_input);&gt;" pathCondition="input = 0" nameIncludingReturnValue="&lt;return &apos;4&apos; as result of self.tryCatchFinally(_input);&gt;">
+                           <termination name="&lt;end&gt;" pathCondition="input = 0" exceptionalTermination="false">
                            </termination>
                         </methodReturn>
                      </statement>
                   </statement>
                </statement>
             </branchCondition>
-            <branchCondition name="input = 0 FALSE">
-               <statement name="result_1=result_1*2;">
-                  <statement name="return result_1;">
-                     <methodReturn name="&lt;return of self.tryCatchFinally(_input);&gt;" nameIncludingReturnValue="&lt;return &apos;quotient_0 * 2&apos; as result of self.tryCatchFinally(_input);&gt;">
-                        <termination name="&lt;end&gt;" exceptionalTermination="false">
+            <branchCondition name="input = 0 FALSE" pathCondition="!input = 0" branchCondition="!input = 0">
+               <statement name="result_1=result_1*2;" pathCondition="!input = 0">
+                  <statement name="return result_1;" pathCondition="!input = 0">
+                     <methodReturn name="&lt;return of self.tryCatchFinally(_input);&gt;" pathCondition="!input = 0" nameIncludingReturnValue="&lt;return &apos;quotient_0 * 2&apos; as result of self.tryCatchFinally(_input);&gt;">
+                        <termination name="&lt;end&gt;" pathCondition="!input = 0" exceptionalTermination="false">
                         </termination>
                      </methodReturn>
                   </statement>

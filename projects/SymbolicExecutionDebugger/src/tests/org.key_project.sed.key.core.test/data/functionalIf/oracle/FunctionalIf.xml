@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_351a9c99-e2c5-4d84-98e0-56a44323a114" name="FunctionalIf[FunctionalIf::min(int,int)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_04cb01b4-665e-45c9-8c02-00baf09c94a9" name="KeY Default Thread">
+      <sedThread xml:id="_04cb01b4-665e-45c9-8c02-00baf09c94a9" name="&lt;start&gt;">
          <sedMethodCall xml:id="_238413dd-48ec-4d08-bf30-3ead881875fd" name="self.min(_i,_j);" lineNumber="-1" charStart="661" charEnd="664">
             <sedStatement xml:id="_b4f56c10-2453-4224-b9e6-3209d9588d0b" name="int result;" lineNumber="-1" charStart="684" charEnd="695">
                <sedBranchNode xml:id="_2899b5ca-d9ea-4d01-bd09-474fc364310f" name="if (invert(_i)&lt;invert(_j)) {   result_1=_i; }else  {   result_1=_j; }" lineNumber="-1" charStart="699" charEnd="779">

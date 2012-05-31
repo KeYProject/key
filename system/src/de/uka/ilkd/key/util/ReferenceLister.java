@@ -87,7 +87,13 @@ public class ReferenceLister {
         System.err.println("Parsing: " + file);
 
         ProgramFactory factory = sc.getProgramFactory();
-        CompilationUnit cu = factory.parseCompilationUnit(new FileReader(file));
+        FileReader fileReader = new FileReader(file);
+        final CompilationUnit cu;
+        try { 
+           cu = factory.parseCompilationUnit(fileReader);
+        } finally {
+            fileReader.close();
+        }
         cu.makeAllParentRolesValid();
         sc.getChangeHistory().attached(cu);
     }

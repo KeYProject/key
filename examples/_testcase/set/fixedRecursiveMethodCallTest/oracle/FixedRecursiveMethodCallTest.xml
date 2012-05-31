@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;">
-   <methodCall name="FixedRecursiveMethodCallTest.decreaseValue();">
-      <statement name="return decrease(3);">
-         <methodCall name="FixedRecursiveMethodCallTest.decrease(n);">
-            <branchNode name="if (n&gt;=1) {return decrease(n-1); }">
-               <statement name="return decrease(n-1);">
-                  <methodCall name="FixedRecursiveMethodCallTest.decrease(n_1);">
-                     <branchNode name="if (n_1&gt;=1) {return decrease(n_1-1); }">
-                        <statement name="return decrease(n_1-1);">
-                           <methodCall name="FixedRecursiveMethodCallTest.decrease(n_2);">
-                              <branchNode name="if (n_2&gt;=1) {return decrease(n_2-1); }">
-                                 <statement name="return decrease(n_2-1);">
-                                    <methodCall name="FixedRecursiveMethodCallTest.decrease(n_3);">
-                                       <branchNode name="if (n_3&gt;=1) {return decrease(n_3-1); }">
-                                          <statement name="return n_3;">
-                                             <methodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n_3);&gt;" nameIncludingReturnValue="&lt;return &apos;0&apos; as result of FixedRecursiveMethodCallTest.decrease(n_3);&gt;">
-                                                <methodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n_2);&gt;" nameIncludingReturnValue="&lt;return &apos;0&apos; as result of FixedRecursiveMethodCallTest.decrease(n_2);&gt;">
-                                                   <methodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n_1);&gt;" nameIncludingReturnValue="&lt;return &apos;0&apos; as result of FixedRecursiveMethodCallTest.decrease(n_1);&gt;">
-                                                      <methodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n);&gt;" nameIncludingReturnValue="&lt;return &apos;0&apos; as result of FixedRecursiveMethodCallTest.decrease(n);&gt;">
-                                                         <methodReturn name="&lt;return of FixedRecursiveMethodCallTest.decreaseValue();&gt;" nameIncludingReturnValue="&lt;return &apos;0&apos; as result of FixedRecursiveMethodCallTest.decreaseValue();&gt;">
-                                                            <termination name="&lt;end&gt;" exceptionalTermination="false">
+<startNode name="&lt;start&gt;" pathCondition="true">
+   <methodCall name="FixedRecursiveMethodCallTest.decreaseValue();" pathCondition="true">
+      <statement name="return decrease(3);" pathCondition="true">
+         <methodCall name="FixedRecursiveMethodCallTest.decrease(n);" pathCondition="true">
+            <branchNode name="if (n&gt;=1) {return decrease(n-1); }" pathCondition="true">
+               <statement name="return decrease(n-1);" pathCondition="true">
+                  <methodCall name="FixedRecursiveMethodCallTest.decrease(n_1);" pathCondition="true">
+                     <branchNode name="if (n_1&gt;=1) {return decrease(n_1-1); }" pathCondition="true">
+                        <statement name="return decrease(n_1-1);" pathCondition="true">
+                           <methodCall name="FixedRecursiveMethodCallTest.decrease(n_2);" pathCondition="true">
+                              <branchNode name="if (n_2&gt;=1) {return decrease(n_2-1); }" pathCondition="true">
+                                 <statement name="return decrease(n_2-1);" pathCondition="true">
+                                    <methodCall name="FixedRecursiveMethodCallTest.decrease(n_3);" pathCondition="true">
+                                       <branchNode name="if (n_3&gt;=1) {return decrease(n_3-1); }" pathCondition="true">
+                                          <statement name="return n_3;" pathCondition="true">
+                                             <methodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n_3);&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;0&apos; as result of FixedRecursiveMethodCallTest.decrease(n_3);&gt;">
+                                                <methodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n_2);&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;0&apos; as result of FixedRecursiveMethodCallTest.decrease(n_2);&gt;">
+                                                   <methodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n_1);&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;0&apos; as result of FixedRecursiveMethodCallTest.decrease(n_1);&gt;">
+                                                      <methodReturn name="&lt;return of FixedRecursiveMethodCallTest.decrease(n);&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;0&apos; as result of FixedRecursiveMethodCallTest.decrease(n);&gt;">
+                                                         <methodReturn name="&lt;return of FixedRecursiveMethodCallTest.decreaseValue();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;0&apos; as result of FixedRecursiveMethodCallTest.decreaseValue();&gt;">
+                                                            <termination name="&lt;end&gt;" pathCondition="true" exceptionalTermination="false">
                                                             </termination>
                                                          </methodReturn>
                                                       </methodReturn>

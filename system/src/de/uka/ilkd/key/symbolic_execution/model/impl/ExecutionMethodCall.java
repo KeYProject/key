@@ -6,6 +6,8 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The default implementation of {@link IExecutionMethodCall}.
@@ -42,5 +44,21 @@ public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodySt
    @Override
    public ProgramMethod getProgramMethod() {
       return getActiveStatement().getProgramMethod(getServices());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected IExecutionVariable[] lazyComputeVariables() {
+      return SymbolicExecutionUtil.createExecutionVariables(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getElementType() {
+      return "Method Call";
    }
 }

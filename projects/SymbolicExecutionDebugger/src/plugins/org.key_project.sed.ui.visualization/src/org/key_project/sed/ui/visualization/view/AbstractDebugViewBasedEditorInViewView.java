@@ -68,7 +68,7 @@ public abstract class AbstractDebugViewBasedEditorInViewView<E extends IEditorPa
    @Override
    public void init(IViewSite site) throws PartInitException {
       super.init(site);
-      getViewSite().getPage().addPartListener(partListener);
+      getViewSite().getPage().addPartListener(partListener); // TODO: Fix bug that listener observes only the own events and not the events from other views.
       initDebugView(getViewSite());
    }
 

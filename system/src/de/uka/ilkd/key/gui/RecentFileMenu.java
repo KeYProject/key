@@ -204,13 +204,15 @@ public class RecentFileMenu {
 
     /** read the recent files from the given properties file */
     public void load(String filename) {
+        FileInputStream propStream = null;
         try {
+            propStream = new FileInputStream(filename);
             Properties p = new Properties();
-	    p.load(new FileInputStream(filename));
-              Enumeration e = p.propertyNames();
-              while (e.hasMoreElements()) {
-                  String s = (String) e.nextElement();
-                  if (s.indexOf("RecentFile") != -1)
+            p.load(propStream);
+            Enumeration e = p.propertyNames();
+            while (e.hasMoreElements()) {
+                String s = (String) e.nextElement();
+                if (s.indexOf("RecentFile") != -1)
                     addRecentFile(p.getProperty(s));
             }
 	} catch (FileNotFoundException ex) {
@@ -219,6 +221,15 @@ public class RecentFileMenu {
         } catch (IOException ioe) {
             Debug.out("Could not read RecentFileList. Some IO Error occured ",
 		      ioe);
+	} finally {
+	    try {
+	        if (propStream != null) { 
+	            propStream.close();
+	        }
+	    } catch (IOException e) {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+	    }
 	}
     }
 
@@ -233,13 +244,12 @@ public class RecentFileMenu {
      */
     public void store(String filename) {
 	File localRecentFiles = new File(filename);
-	FileInputStream fin;
-	FileOutputStream fout;
+	FileInputStream fin = null;
+	FileOutputStream fout = null;
 	Properties p = new Properties();	
 	try {
 	    // creates a new file if it does not exist yet
-	    localRecentFiles.createNewFile();
-            
+	    localRecentFiles.createNewFile();            
 	    fin = new FileInputStream(localRecentFiles);
 	    fout = new FileOutputStream(localRecentFiles);
 	    p.load(fin);
@@ -248,6 +258,17 @@ public class RecentFileMenu {
 	} catch (IOException ex) {            
             System.err.println("Cound not write recentFileList due to "+
 		      ex.toString()+"::"+localRecentFiles);
+        } finally {
+            try {
+                if (fin != null) fin.close();
+            } catch (IOException e) {
+                System.out.println("CLosing streams failed.");
+            }
+            try {
+                if (fout != null) fout.close();
+            } catch (IOException e) {
+                System.out.println("CLosing streams failed.");
+            }
         }
     }
 

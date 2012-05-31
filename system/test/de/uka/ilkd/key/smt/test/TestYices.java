@@ -14,6 +14,7 @@ import de.uka.ilkd.key.smt.SolverType;
 
 
 public class TestYices extends TestSMTSolver {
+    private static final String SYSTEM_PROPERTY_SOLVER_PATH = "yicesSolverPath";
 
     private static boolean isInstalled = false;
     private static boolean installChecked = false;
@@ -26,6 +27,7 @@ public class TestYices extends TestSMTSolver {
 	    installChecked = true;
 	    if(!isInstalled) {
 	    	System.out.println("Warning: " + getSolverType().getName() + " is not installed, tests skipped.");
+         System.out.println("Maybe use JVM system property \"" + SYSTEM_PROPERTY_SOLVER_PATH + "\" to define the path to the Yices command.");
 	    }	   
 		if(isInstalled &&!getSolverType().supportHasBeenChecked()){
 			if(!getSolverType().checkForSupport()){
@@ -40,7 +42,12 @@ public class TestYices extends TestSMTSolver {
 
     @Override
     public SolverType getSolverType() {
-	return SolverType.YICES_SOLVER;
+       SolverType type = SolverType.YICES_SOLVER;
+       String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
+       if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
+          type.setSolverCommand(solverPathProperty);
+       }
+       return type;
     }
 
 

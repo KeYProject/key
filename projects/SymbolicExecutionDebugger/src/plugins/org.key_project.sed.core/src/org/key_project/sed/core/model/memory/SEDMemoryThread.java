@@ -21,11 +21,24 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
    private List<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
    
    /**
+    * The name of this debug node.
+    */
+   private String name;
+   
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this thread is contained.
     */   
    public SEDMemoryThread(ISEDDebugTarget target) {
       super(target);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getName() throws DebugException {
+      return name;
    }
 
    /**
@@ -93,16 +106,11 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
    }
 
    /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
+    * Sets the name of this node.
+    * @param name the name to set.
     */
-   @Override
    public void setName(String name) {
-      super.setName(name);
+      this.name = name;
    }
 
    /**
