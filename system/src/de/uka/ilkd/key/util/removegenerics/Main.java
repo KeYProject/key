@@ -231,6 +231,7 @@ public class Main {
             if (!line.startsWith("#"))
                 files.add(line);
         }
+        br.close();
     }
 
     private static void processDirectory(File dir) throws ParserException {

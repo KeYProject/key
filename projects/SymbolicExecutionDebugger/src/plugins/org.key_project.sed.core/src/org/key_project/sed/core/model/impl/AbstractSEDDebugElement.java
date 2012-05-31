@@ -2,6 +2,7 @@ package org.key_project.sed.core.model.impl;
 
 import java.util.UUID;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.model.DebugElement;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugTarget;
@@ -23,7 +24,6 @@ public abstract class AbstractSEDDebugElement extends DebugElement implements IS
     */
    public AbstractSEDDebugElement(ISEDDebugTarget target) {
       super(target);
-      setId(computeNewId());
    }
 
    /**
@@ -56,6 +56,9 @@ public abstract class AbstractSEDDebugElement extends DebugElement implements IS
     */
    @Override
    public String getId() {
+      if (id == null) {
+         id = computeNewId();
+      }
       return id;
    }
 
@@ -64,6 +67,7 @@ public abstract class AbstractSEDDebugElement extends DebugElement implements IS
     * @param id The new unique ID to use.
     */
    protected void setId(String id) {
+      Assert.isTrue(this.id == null, "Can't change an already existing ID.");
       this.id = id;
    }
 }

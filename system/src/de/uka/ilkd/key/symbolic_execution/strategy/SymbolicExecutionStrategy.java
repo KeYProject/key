@@ -36,6 +36,14 @@ public class SymbolicExecutionStrategy extends VBTStrategy {
                 StrategyProperties.QUERY_OFF);
         res.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
                 StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+        res.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY,
+              StrategyProperties.AUTO_INDUCTION_OFF);
+        res.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
+              StrategyProperties.DEP_OFF);
+        res.setProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY,
+              StrategyProperties.QUERYAXIOM_OFF);
+        res.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
+              StrategyProperties.SPLITTING_DELAYED);
 //        res.put(VISUAL_DEBUGGER_WATCHPOINTS_KEY, watchpoints);
 //        res.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
 //                StrategyProperties.SPLITTING_NORMAL);
@@ -84,8 +92,6 @@ public class SymbolicExecutionStrategy extends VBTStrategy {
 //                inftyConst(), longConst(0)));
 //        bindRuleSet(d, "method_expand", ifZero(BreakpointFeature.create(),
 //                inftyConst(), longConst(0)));
-        bindRuleSet(d, "debugger", inftyConst());
-      //  bindRuleSet(d, "statement_sep", longConst(-200));
 //        if (!inInitPhase) {
 //            bindRuleSet(d, "simplify_autoname", ifZero(WatchPointFeature.create(watchpoints),
 //                    inftyConst(), longConst(0)));

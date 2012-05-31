@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_e6933ae1-deda-4618-a0fb-5e4243f406e9" name="ElseIfTest[ElseIfTest::elseIf(int)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_457b80b6-6676-4425-9308-b166003d8972" name="KeY Default Thread">
+      <sedThread xml:id="_457b80b6-6676-4425-9308-b166003d8972" name="&lt;start&gt;">
          <sedMethodCall xml:id="_b69d13da-9885-4527-83f0-13eaae5a4f6f" name="self.elseIf(_x);" lineNumber="-1" charStart="90" charEnd="96">
             <sedStatement xml:id="_ce5377de-7da8-41b0-abdc-b4cbf65d9f12" name="int a;" lineNumber="-1" charStart="109" charEnd="115">
                <sedBranchNode xml:id="_ceb22c96-331a-478a-9be4-f90b4fbc3790" name="if (_x==0) {   a=1; }else if (_x==1||_x==2||_x==3) {if (_x==1||_x==2) {       a=-1;     }     a=_x*_x;   }else if (_x==4) {return 42;     }else  {       a=_x;     }" lineNumber="-1" charStart="119" charEnd="325">

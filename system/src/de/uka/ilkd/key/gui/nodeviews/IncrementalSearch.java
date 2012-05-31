@@ -321,7 +321,7 @@ public class IncrementalSearch {
 
 
         @Override
-        public void addKeyListener(KeyListener l) {
+        public synchronized void addKeyListener(KeyListener l) {
             textField.addKeyListener(l);
         }
 

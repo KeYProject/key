@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_41e56eb8-0568-4c2a-a5e3-eecf2ebdf25a" name="ComplexFlatSteps[ComplexFlatSteps::doSomething()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_14ae5782-24f2-4b45-aff7-2c11c6d1f16d" name="KeY Default Thread">
+      <sedThread xml:id="_14ae5782-24f2-4b45-aff7-2c11c6d1f16d" name="&lt;start&gt;">
          <sedMethodCall xml:id="_67eb9c7c-51ce-45b7-bacc-7a1c91c5800d" name="self.doSomething();" lineNumber="-1" charStart="244" charEnd="255">
             <sedStatement xml:id="_aef516b0-422d-4c57-a4c1-7ec7092317e3" name="int x = 1+2;" lineNumber="-1" charStart="263" charEnd="277">
                <sedStatement xml:id="_77c404d2-908b-43b2-a28e-d0c5ed435b27" name="int y = 2*4*9;" lineNumber="-1" charStart="281" charEnd="299">

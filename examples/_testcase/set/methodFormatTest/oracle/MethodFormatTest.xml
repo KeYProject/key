@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;">
-   <methodCall name="MethodFormatTest.main();">
-      <statement name="return a();">
-         <methodCall name="MethodFormatTest.a();">
-            <statement name="return b();">
-               <methodCall name="MethodFormatTest.b();">
-                  <statement name="return c();">
-                     <methodCall name="MethodFormatTest.c();">
-                        <statement name="return d();">
-                           <methodCall name="MethodFormatTest.d();">
-                              <statement name="return e();">
-                                 <methodCall name="MethodFormatTest.e();">
-                                    <statement name="return f();">
-                                       <methodCall name="MethodFormatTest.f();">
-                                          <statement name="return g();">
-                                             <methodCall name="MethodFormatTest.g();">
-                                                <statement name="return 42;">
-                                                   <methodReturn name="&lt;return of MethodFormatTest.g();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.g();&gt;">
-                                                      <methodReturn name="&lt;return of MethodFormatTest.f();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.f();&gt;">
-                                                         <methodReturn name="&lt;return of MethodFormatTest.e();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.e();&gt;">
-                                                            <methodReturn name="&lt;return of MethodFormatTest.d();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.d();&gt;">
-                                                               <methodReturn name="&lt;return of MethodFormatTest.c();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.c();&gt;">
-                                                                  <methodReturn name="&lt;return of MethodFormatTest.b();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.b();&gt;">
-                                                                     <methodReturn name="&lt;return of MethodFormatTest.a();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.a();&gt;">
-                                                                        <methodReturn name="&lt;return of MethodFormatTest.main();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.main();&gt;">
-                                                                           <termination name="&lt;end&gt;" exceptionalTermination="false">
+<startNode name="&lt;start&gt;" pathCondition="true">
+   <methodCall name="MethodFormatTest.main();" pathCondition="true">
+      <statement name="return a();" pathCondition="true">
+         <methodCall name="MethodFormatTest.a();" pathCondition="true">
+            <statement name="return b();" pathCondition="true">
+               <methodCall name="MethodFormatTest.b();" pathCondition="true">
+                  <statement name="return c();" pathCondition="true">
+                     <methodCall name="MethodFormatTest.c();" pathCondition="true">
+                        <statement name="return d();" pathCondition="true">
+                           <methodCall name="MethodFormatTest.d();" pathCondition="true">
+                              <statement name="return e();" pathCondition="true">
+                                 <methodCall name="MethodFormatTest.e();" pathCondition="true">
+                                    <statement name="return f();" pathCondition="true">
+                                       <methodCall name="MethodFormatTest.f();" pathCondition="true">
+                                          <statement name="return g();" pathCondition="true">
+                                             <methodCall name="MethodFormatTest.g();" pathCondition="true">
+                                                <statement name="return 42;" pathCondition="true">
+                                                   <methodReturn name="&lt;return of MethodFormatTest.g();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.g();&gt;">
+                                                      <methodReturn name="&lt;return of MethodFormatTest.f();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.f();&gt;">
+                                                         <methodReturn name="&lt;return of MethodFormatTest.e();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.e();&gt;">
+                                                            <methodReturn name="&lt;return of MethodFormatTest.d();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.d();&gt;">
+                                                               <methodReturn name="&lt;return of MethodFormatTest.c();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.c();&gt;">
+                                                                  <methodReturn name="&lt;return of MethodFormatTest.b();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.b();&gt;">
+                                                                     <methodReturn name="&lt;return of MethodFormatTest.a();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.a();&gt;">
+                                                                        <methodReturn name="&lt;return of MethodFormatTest.main();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.main();&gt;">
+                                                                           <termination name="&lt;end&gt;" pathCondition="true" exceptionalTermination="false">
                                                                            </termination>
                                                                         </methodReturn>
                                                                      </methodReturn>

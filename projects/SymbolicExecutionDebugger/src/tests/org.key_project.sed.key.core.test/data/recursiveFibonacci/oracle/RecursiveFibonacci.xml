@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_d8df0045-7269-49af-9a22-81b00e5fcb4a" name="RecursiveFibonacci[RecursiveFibonacci::fibonacci10()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_5b493f09-d39f-4a50-b4c2-d4d7624c61a7" name="KeY Default Thread">
+      <sedThread xml:id="_5b493f09-d39f-4a50-b4c2-d4d7624c61a7" name="&lt;start&gt;">
          <sedMethodCall xml:id="_4b949a48-e08d-4bae-bbb2-ec4d866a6d01" name="self.fibonacci10();" lineNumber="-1" charStart="98" charEnd="109">
             <sedStatement xml:id="_9de2e2c8-f3fe-49dc-a3fe-320c8f40d139" name="return fibonacci(10);" lineNumber="-1" charStart="117" charEnd="138">
                <sedMethodCall xml:id="_fbbc6fd0-9056-49c9-95de-38e85b180b5c" name="self.fibonacci(n);" lineNumber="-1" charStart="208" charEnd="217">

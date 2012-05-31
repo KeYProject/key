@@ -27,6 +27,8 @@ import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
+import org.key_project.sed.core.model.memory.SEDMemoryValue;
+import org.key_project.sed.core.model.memory.SEDMemoryVariable;
 
 /**
  * <p>
@@ -147,6 +149,36 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        SEDMemoryMethodReturn returnPositive = new SEDMemoryMethodReturn(target, bpositive, thread);
        returnPositive.setName("return 1");
        bpositive.addChild(returnPositive);
+       
+       SEDMemoryVariable returnPositiveVar1 = new SEDMemoryVariable(target);
+       returnPositiveVar1.setName("returnPositiveVar1");
+       returnPositiveVar1.setReferenceTypeName("returnPositiveVar1type");
+       SEDMemoryValue returnPositiveVar1value = new SEDMemoryValue(target);
+       returnPositiveVar1value.setAllocated(true);
+       returnPositiveVar1value.setReferenceTypeName("returnPositiveVar1valueType");
+       returnPositiveVar1value.setValueString("returnPositiveVar1value");
+       returnPositiveVar1.setValue(returnPositiveVar1value);
+       returnPositive.addVariable(returnPositiveVar1);
+       
+       SEDMemoryVariable returnPositiveVar1_1 = new SEDMemoryVariable(target);
+       returnPositiveVar1_1.setName("returnPositiveVar1_1");
+       returnPositiveVar1_1.setReferenceTypeName("returnPositiveVar1_1type");
+       SEDMemoryValue returnPositiveVar1_1value = new SEDMemoryValue(target);
+       returnPositiveVar1_1value.setAllocated(true);
+       returnPositiveVar1_1value.setReferenceTypeName("returnPositiveVar1_1valueType");
+       returnPositiveVar1_1value.setValueString("returnPositiveVar1_1value");
+       returnPositiveVar1_1.setValue(returnPositiveVar1_1value);
+       returnPositive.addVariable(returnPositiveVar1_1);
+       
+       SEDMemoryVariable returnPositiveVar2 = new SEDMemoryVariable(target);
+       returnPositiveVar2.setName("returnPositiveVar2");
+       returnPositiveVar2.setReferenceTypeName("returnPositiveVar2type");
+       SEDMemoryValue returnPositiveVar2value = new SEDMemoryValue(target);
+       returnPositiveVar2value.setAllocated(true);
+       returnPositiveVar2value.setReferenceTypeName("returnPositiveVar2valueType");
+       returnPositiveVar2value.setValueString("returnPositiveVar2value");
+       returnPositiveVar2.setValue(returnPositiveVar2value);
+       returnPositive.addVariable(returnPositiveVar2);
        
        SEDMemoryTermination terminationPositive = new SEDMemoryTermination(target, returnPositive, thread);
        terminationPositive.setName("<end>");

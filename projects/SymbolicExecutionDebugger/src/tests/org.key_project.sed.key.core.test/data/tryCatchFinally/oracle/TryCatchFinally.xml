@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_e5c8e1b7-42b0-445c-a471-49ae35ef6839" name="TryCatchFinally[TryCatchFinally::tryCatchFinally(int)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_7322b745-53ea-4075-898f-9cfc548e4868" name="KeY Default Thread">
+      <sedThread xml:id="_7322b745-53ea-4075-898f-9cfc548e4868" name="&lt;start&gt;">
          <sedMethodCall xml:id="_a4187d06-c891-4623-b4b2-ecf430b49a11" name="self.tryCatchFinally(_input);" lineNumber="-1" charStart="97" charEnd="112">
             <sedStatement xml:id="_617e6905-bb55-454e-a5f1-676d30926e96" name="int result = 0;" lineNumber="-1" charStart="129" charEnd="144">
                <sedStatement xml:id="_11c67e1a-2d73-4908-a943-085058fee4e1" name="result_1=1/_input;" lineNumber="-1" charStart="158" charEnd="177">

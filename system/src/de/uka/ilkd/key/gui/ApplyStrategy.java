@@ -354,9 +354,7 @@ public class ApplyStrategy {
         }
 
         if (result != null) {
-            if (proof != null) { // Maybe the proof was removed from the proof list and #clear() has set the proof reference to null. It is possible because this statement is executed after MainWindow#frozen is set to false.
-                proof.addAutoModeTime(result.getTime());
-            }
+            proof.addAutoModeTime(result.getTime());
             
             fireTaskFinished (new DefaultTaskFinishedInfo(this, result, 
                     proof, result.getTime(), 

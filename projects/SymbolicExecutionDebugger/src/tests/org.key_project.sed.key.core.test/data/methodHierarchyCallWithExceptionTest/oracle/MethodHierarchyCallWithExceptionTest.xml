@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_821fc9ad-ee87-4636-85dd-f1da2b2d6134" name="MethodHierarchyCallWithExceptionTest[MethodHierarchyCallWithExceptionTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_dae25acf-6c24-4fc3-a804-363aea8ece12" name="KeY Default Thread">
+      <sedThread xml:id="_dae25acf-6c24-4fc3-a804-363aea8ece12" name="&lt;start&gt;">
          <sedMethodCall xml:id="_a6ec0961-44d8-4697-a5df-0119d0b27dfe" name="self.main();" lineNumber="-1" charStart="125" charEnd="129">
             <sedStatement xml:id="_07ad306e-d960-49c9-ba79-3fb8784f1eed" name="a();" lineNumber="-1" charStart="141" charEnd="145">
                <sedMethodCall xml:id="_840a0e8b-8459-4add-beac-c2a9cc569e37" name="self.a();" lineNumber="-1" charStart="173" charEnd="174">

@@ -2,6 +2,7 @@ package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 /**
  * Provides static utitlity methods for Java in general like
@@ -13,6 +14,37 @@ public final class JavaUtil {
     * Forbid instances.
     */
    private JavaUtil() {
+   }
+   
+   /**
+    * Returns the index of the element to search in the given iterator.
+    * @param iter The iterator to search in.
+    * @param toSearch The element to search.
+    * @return The index of the element or {@code -1} if it was not found.
+    */
+   public static <T> int indexOf(Iterator<T> iter, T toSearch) {
+      if (iter != null) {
+         int i = 0;
+         boolean found = false;
+         while (!found && iter.hasNext()) {
+            T next = iter.next();
+            if (next != null ? next.equals(toSearch) : toSearch == null) {
+               found = true;
+            }
+            else {
+               i++;
+            }
+         }
+         if (found) {
+            return i;
+         }
+         else {
+            return -1;
+         }
+      }
+      else {
+         return -1;
+      }
    }
    
    /**
@@ -152,6 +184,33 @@ public final class JavaUtil {
          }
       }
       return result;
-   }   
+   }
    
+   /**
+    * Checks the equality of the given {@link String}s ignoring whitespace.
+    * @param first The first {@link String}.
+    * @param second The second {@link String}.
+    * @return {@code true} equal ignoring whitespace, {@code false} different.
+    */
+   public static boolean equalIgnoreWhiteSpace(String first, String second) {
+      if (first != null) {
+         if (second != null) {
+            StringTokenizer firstTokenizer = new StringTokenizer(first);
+            StringTokenizer secondTokenizer = new StringTokenizer(second);
+            boolean equal = true;
+            while (equal && firstTokenizer.hasMoreTokens() && secondTokenizer.hasMoreTokens()) {
+               String firstNext = firstTokenizer.nextToken();
+               String secondNext = secondTokenizer.nextToken();
+               equal = firstNext.equals(secondNext);
+            }
+            return equal && !firstTokenizer.hasMoreElements() && !secondTokenizer.hasMoreElements();
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return second == null;
+      }
+   }
 }

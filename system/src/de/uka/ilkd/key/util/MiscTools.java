@@ -55,11 +55,18 @@ import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.RuleCollection;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.symbolic_execution.util.IFilter;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 
 /**
@@ -857,5 +864,23 @@ public final class MiscTools {
           }
        }
        return name;
+    }
+    
+    /**
+     * Searches the {@link OneStepSimplifier} which is used in the 
+     * {@link ProofEnvironment} of the current proof which is not in general
+     * {@link OneStepSimplifier#INSTANCE}. For instance uses the
+     * symbolic execution tree extraction its own instances of 
+     * {@link OneStepSimplifier} in site proofs for parallelization. 
+     * @return The found {@link OneStepSimplifier}.
+     */
+    public static OneStepSimplifier findOneStepSimplifier(Proof proof) {
+       RuleCollection rc = proof.env().getInitConfig().getProfile().getStandardRules();
+       return (OneStepSimplifier)JavaUtil.search(rc.getStandardBuiltInRules(), new IFilter<BuiltInRule>() {
+         @Override
+         public boolean select(BuiltInRule element) {
+            return element instanceof OneStepSimplifier;
+         }
+       });
     }
 }

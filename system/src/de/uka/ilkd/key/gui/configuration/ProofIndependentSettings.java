@@ -73,14 +73,16 @@ public class ProofIndependentSettings implements SettingsListener {
                             new File(PathConfig.getKeyConfigDir()+File.separator).mkdirs();
                             file.createNewFile();
                     }            
-                    FileOutputStream out = new FileOutputStream(file);
-                   
                     Properties result = new Properties();
                     for (Settings settings : settingsSet) {
                             settings.writeSettings(this,result);
                     }
-                    result.store(out, "Proof-Independent-Settings-File");
-                    
+                    FileOutputStream out = new FileOutputStream(file);                   
+                    try { 
+                        result.store(out, "Proof-Independent-Settings-File");
+                    } finally { 
+                        out.close();
+                    }
                 } catch (IOException e){
                     throw new RuntimeException(e);
                 }

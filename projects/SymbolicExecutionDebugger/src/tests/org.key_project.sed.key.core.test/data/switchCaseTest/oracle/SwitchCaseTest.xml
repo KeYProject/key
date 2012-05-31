@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
    <sedTarget xml:id="_990d9c76-00e5-422c-b3a3-f34181c9c032" name="SwitchCaseTest[SwitchCaseTest::switchCase(int)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_5bfef923-a34b-4131-bff0-a019633b9186" name="KeY Default Thread">
+      <sedThread xml:id="_5bfef923-a34b-4131-bff0-a019633b9186" name="&lt;start&gt;">
          <sedMethodCall xml:id="_5e573ca1-1ee8-4b3f-a85a-af83fde56661" name="self.switchCase(_x);" lineNumber="-1" charStart="45" charEnd="55">
             <sedStatement xml:id="_6518f4cb-cd93-4fb9-82fd-80898a7ef317" name="int a;" lineNumber="-1" charStart="68" charEnd="74">
                <sedBranchNode xml:id="_2e68461d-eea7-4a49-82b8-c295e434ca19" name="switch (_x) {case 0:a=1;break ;case 1:case 2:   a=-1;case 3:   a=_x*_x;break ;case 4:return 42;default:   a=_x; }" lineNumber="-1" charStart="78" charEnd="280">

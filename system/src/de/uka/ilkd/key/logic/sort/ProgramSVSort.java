@@ -904,7 +904,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	}
 
 	public TypeReferenceNotPrimitiveSort(String name) {
-	    super(new Name("NonPrimitiveType"));
+	    super(new Name("NonPrimitiveType"+ (name != null ? "[name="+name+"]" : "")));
             this.matchName = name;
 	}
 
@@ -942,7 +942,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 	}
 
         public MethodNameSort(ProgramElementName name) {
-	    super(new Name("MethodName"));
+	    super(new Name("MethodName" + (name != null ? "[name="+name+"]" : "")));
             this.methodName = name;
         }
         
@@ -959,7 +959,7 @@ public abstract class ProgramSVSort extends AbstractSort {
         }
 
         public String declarationString() {
-           return name().toString() + (methodName != null ? "[name="+methodName+"]" : "");
+           return name().toString();
         }
 
     }

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;">
-   <methodCall name="self.doSomething(_asdf,_a,_b);">
-      <statement name="int x = 1;">
-         <statement name="int y = 2;">
-            <statement name="int z = 3;">
-               <methodReturn name="&lt;return of self.doSomething(_asdf,_a,_b);&gt;" nameIncludingReturnValue="&lt;return of self.doSomething(_asdf,_a,_b);&gt;">
-                  <termination name="&lt;end&gt;" exceptionalTermination="false">
+<startNode name="&lt;start&gt;" pathCondition="true">
+   <methodCall name="self.doSomething(_asdf,_a,_b);" pathCondition="true">
+      <statement name="int x = 1;" pathCondition="true">
+         <statement name="int y = 2;" pathCondition="true">
+            <statement name="int z = 3;" pathCondition="true">
+               <methodReturn name="&lt;return of self.doSomething(_asdf,_a,_b);&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return of self.doSomething(_asdf,_a,_b);&gt;">
+                  <termination name="&lt;end&gt;" pathCondition="true" exceptionalTermination="false">
                   </termination>
                </methodReturn>
             </statement>

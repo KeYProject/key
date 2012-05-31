@@ -145,7 +145,7 @@ class ContractSelectionPanel extends JPanel {
     //public interface
     //-------------------------------------------------------------------------
     
-    public void addMouseListener(MouseListener ml) {
+    public synchronized void addMouseListener(MouseListener ml) {
         contractList.addMouseListener(ml);
     }
     

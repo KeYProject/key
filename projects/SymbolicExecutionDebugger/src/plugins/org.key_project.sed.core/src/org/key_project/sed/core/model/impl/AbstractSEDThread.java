@@ -18,11 +18,6 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
    private int priority = 0;
    
    /**
-    * The name of this thread.
-    */
-   private String name;
-   
-   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this thread is contained.
     */
@@ -52,22 +47,6 @@ public abstract class AbstractSEDThread extends AbstractSEDDebugNode implements 
     */
    protected void setPriority(int priority) {
       this.priority = priority;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getName() throws DebugException {
-      return name;
-   }
-
-   /**
-    * Sets the name of this thread.
-    * @param name The name to set.
-    */
-   protected void setName(String name) {
-      this.name = name;
    }
    
    /**

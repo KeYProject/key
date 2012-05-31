@@ -77,6 +77,7 @@ IMPLIESBACKWARD : "<==";
 IN_IMMORTAL_MEMORY : "\\inImmortalMemory"; //KeY extension, not official JML
 IN_OUTER_SCOPE : "\\inOuterScope"; //KeY extension, not official JML
 INCLUSIVEOR : "|";
+INDEX : "\\index";
 INTO : "\\into";
 INV : "\\inv";
 INVARIANT_FOR : "\\invariant_for";
@@ -127,6 +128,7 @@ TYPE : "\\TYPE";
 ST : "<:";
 SUCH_THAT : "\\such_that";
 UNSIGNEDSHIFTRIGHT : ">>>";
+VALUES : "\\values";
 WORKINGSPACE : "\\working_space";
 XOR : "^";
 
