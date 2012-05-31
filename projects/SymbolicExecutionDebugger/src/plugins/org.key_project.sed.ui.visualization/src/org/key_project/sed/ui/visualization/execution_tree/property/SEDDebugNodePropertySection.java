@@ -13,6 +13,8 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -97,7 +99,17 @@ public class SEDDebugNodePropertySection extends GFPropertySection {
     */
    @Override
    public IDiagramEditor getDiagramEditor() {
-      return super.getDiagramEditor();
+      IDiagramEditor editor = super.getDiagramEditor();
+      if (editor == null) {
+         IWorkbenchPart part = getPart();
+         if (part != null) {
+            IEditorPart editPart = (IEditorPart)part.getAdapter(IEditorPart.class);
+            if (editPart instanceof IDiagramEditor) {
+               editor = (IDiagramEditor)editPart;
+            }
+         }
+      }
+      return editor;
    }
 
    /**

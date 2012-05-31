@@ -228,6 +228,9 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
       if (result != null) {
          return result;
       }
+      if (IEditorPart.class.equals(adapter)) {
+         return getEditorPart();
+      }
       else {
          return super.getAdapter(adapter);
       }
