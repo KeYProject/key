@@ -33,7 +33,12 @@ public class SEDDebugNodePropertySection extends GFPropertySection {
     * Shows the value of {@link ISEDDebugNode#getName()}.
     */
    private Text nameText;
-
+   
+   /**
+    * Shows the value of {@link ISEDDebugNode#getPathCondition()}.
+    */
+   private Text pathText;
+   
    /**
     * {@inheritDoc}
     */
@@ -48,16 +53,31 @@ public class SEDDebugNodePropertySection extends GFPropertySection {
       nameText.setEditable(false);
       FormData data = new FormData();
       data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
-      data.right = new FormAttachment(100, 0);
+      data.right = new FormAttachment(80, 0);
       data.top = new FormAttachment(0, ITabbedPropertyConstants.VSPACE);
       nameText.setLayoutData(data);
 
-      CLabel valueLabel = factory.createCLabel(composite, "Name:");
+      CLabel nameLabel = factory.createCLabel(composite, "Name:");
       data = new FormData();
       data.left = new FormAttachment(0, 0);
       data.right = new FormAttachment(nameText, -ITabbedPropertyConstants.HSPACE);
       data.top = new FormAttachment(nameText, 0, SWT.CENTER);
-      valueLabel.setLayoutData(data);
+      nameLabel.setLayoutData(data);
+
+      pathText = factory.createText(composite, StringUtil.EMPTY_STRING);
+      pathText.setEditable(false);
+      data = new FormData();
+      data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
+      data.right = new FormAttachment(80, 0);
+      data.top = new FormAttachment(nameText, 0, ITabbedPropertyConstants.VSPACE);
+      pathText.setLayoutData(data);
+      
+      CLabel pathLabel = factory.createCLabel(composite, "Path:");
+      data = new FormData();
+      data.left = new FormAttachment(0, 0);
+      data.right = new FormAttachment(pathText, -ITabbedPropertyConstants.HSPACE);
+      data.top = new FormAttachment(pathText, 0, SWT.CENTER);
+      pathLabel.setLayoutData(data);
    }
 
    /**
@@ -66,6 +86,7 @@ public class SEDDebugNodePropertySection extends GFPropertySection {
    @Override
    public void refresh() {
       String name = null;
+      String path = null;
       try {
          PictogramElement pe = getSelectedPictogramElement();
          if (pe != null) {
@@ -76,17 +97,20 @@ public class SEDDebugNodePropertySection extends GFPropertySection {
                   Object bo = diagramProvider.getFeatureProvider().getBusinessObjectForPictogramElement(pe);
                   if (bo instanceof ISEDDebugNode) {
                      name = ((ISEDDebugNode)bo).getName();
+                     path = ((ISEDDebugNode)bo).getPathCondition();
                   }
                }
             }
          }
          SWTUtil.setText(nameText, name);
+         SWTUtil.setText(pathText, path);
       }
       catch (DebugException e) {
          name = e.getMessage();
          LogUtil.getLogger().logError(e);
+         SWTUtil.setText(nameText, name);
+         SWTUtil.setText(pathText, name);
       }
-      SWTUtil.setText(nameText, name);
    }
 
    /**

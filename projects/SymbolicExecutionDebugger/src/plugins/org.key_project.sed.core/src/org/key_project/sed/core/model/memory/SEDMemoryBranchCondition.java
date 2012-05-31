@@ -27,6 +27,11 @@ public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition impleme
    private String name;
    
    /**
+    * The human readable path condition to this node.
+    */
+   private String pathCondition;
+
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
@@ -116,5 +121,21 @@ public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition impleme
    @Override
    public void setId(String id) {
       super.setId(id);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getPathCondition() throws DebugException {
+      return pathCondition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setPathCondition(String pathCondition) {
+      this.pathCondition = pathCondition;
    }
 }

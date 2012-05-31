@@ -57,7 +57,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * has changed so that they are outdated.
     * </p>
     */
-   public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
+   public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = true;
    
    /**
     * The used temporary oracle directory.

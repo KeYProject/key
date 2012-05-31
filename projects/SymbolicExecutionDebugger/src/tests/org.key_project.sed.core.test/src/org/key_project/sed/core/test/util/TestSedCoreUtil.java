@@ -827,6 +827,7 @@ public final class TestSedCoreUtil {
          // Compare node
          TestCase.assertNotNull(current);
          TestCase.assertEquals(expected.getName(), current.getName());
+         TestCase.assertEquals(expected.getPathCondition(), current.getPathCondition());
          TestCase.assertEquals(expected.getNodeType(), current.getNodeType());
          compareDebugElement(expected, current, compareReferences, compareVariables);
          // Compare parent

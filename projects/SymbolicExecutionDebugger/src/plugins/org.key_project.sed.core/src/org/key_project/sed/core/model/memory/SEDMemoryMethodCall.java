@@ -33,6 +33,11 @@ public class SEDMemoryMethodCall extends AbstractSEDMethodCall implements ISEDMe
    private String name;
    
    /**
+    * The human readable path condition to this node.
+    */
+   private String pathCondition;
+   
+   /**
     * The source name.
     */
    private String sourceName;
@@ -222,5 +227,21 @@ public class SEDMemoryMethodCall extends AbstractSEDMethodCall implements ISEDMe
    @Override
    public IVariable[] getVariables() throws DebugException {
       return variables.toArray(new IVariable[variables.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getPathCondition() throws DebugException {
+      return pathCondition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setPathCondition(String pathCondition) {
+      this.pathCondition = pathCondition;
    }
 }

@@ -197,4 +197,17 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
       }
       return variables;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getPathCondition() throws DebugException {
+      try {
+         return executionNode.getFormatedPathCondition();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute path condition.", e));
+      }
+   }
 }

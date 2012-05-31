@@ -190,6 +190,11 @@ public class SEDXMLWriter {
     * Attribute name to store allocated flags.
     */
    public static final String ATTRIBUTE_ALLOCATED = "allocated";
+
+   /**
+    * Attribute name to store path conditions.
+    */
+   public static final String ATTRIBUTE_PATH_CONDITION = "pathCondition";
    
    /**
     * Writes the given {@link ISEDDebugTarget}s into the {@link OutputStream} with the defined encoding.
@@ -584,6 +589,7 @@ public class SEDXMLWriter {
          Map<String, String> attributeValues = new LinkedHashMap<String, String>();
          attributeValues.put(ATTRIBUTE_ID, node.getId());
          attributeValues.put(ATTRIBUTE_NAME, node.getName());
+         attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getPathCondition());
          if (node instanceof IStackFrame) {
             IStackFrame frame = (IStackFrame)node;
             attributeValues.put(ATTRIBUTE_LINE_NUMBER, frame.getLineNumber() + "");

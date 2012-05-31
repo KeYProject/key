@@ -7,8 +7,10 @@ import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDLoopCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
+import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.sed.key.core.util.KeYModelUtil.SourceLocation;
 
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
@@ -173,5 +175,18 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
          variables = KeYModelUtil.createVariables(this, executionNode);
       }
       return variables;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getPathCondition() throws DebugException {
+      try {
+         return executionNode.getFormatedPathCondition();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute path condition.", e));
+      }
    }
 }

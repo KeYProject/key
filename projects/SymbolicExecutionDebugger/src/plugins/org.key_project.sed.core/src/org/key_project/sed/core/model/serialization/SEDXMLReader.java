@@ -544,8 +544,9 @@ public class SEDXMLReader {
    protected void fillDebugNode(ISEDMemoryDebugNode node, Attributes attributes) {
       node.setId(getId(attributes));
       node.setName(getName(attributes));
+      node.setPathCondition(getPathCondition(attributes));
    }
-
+   
    /**
     * Fills the attributes of the given {@link ISEDMemoryStackFrameCompatibleDebugNode}.
     * @param node The {@link ISEDMemoryStackFrameCompatibleDebugNode} to fill.
@@ -574,6 +575,15 @@ public class SEDXMLReader {
     */
    protected String getName(Attributes attributes) {
       return attributes.getValue(SEDXMLWriter.ATTRIBUTE_NAME);
+   }
+
+   /**
+    * Returns the path condition value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getPathCondition(Attributes attributes) {
+      return attributes.getValue(SEDXMLWriter.ATTRIBUTE_PATH_CONDITION);
    }
    
    /**

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_6488b380-d665-4c16-a7ed-a5a0e49665e1" name="ThrowTest[ThrowTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_32967468-ba18-4872-81ff-69a43ac0b2f5" name="&lt;start&gt;">
-         <sedMethodCall xml:id="_433bd533-bbc1-4a52-85b7-e930bbc2421a" name="self.main();" lineNumber="-1" charStart="41" charEnd="45">
-            <sedStatement xml:id="_6a651f98-db38-4ce7-8039-3ea64d19ae3b" name="throw new RuntimeException ();" lineNumber="-1" charStart="53" charEnd="82">
-               <sedExceptionalTermination xml:id="_7aaa22de-d794-473b-84a9-8a38b2a82477" name="&lt;uncaught java.lang.RuntimeException&gt;">
+   <sedTarget xml:id="_a937a3e4-b65c-4a36-a359-87cc16802840" name="ThrowTest[ThrowTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_ef615f84-b8b2-407e-9e68-dd39b2efd58d" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_0ce67707-086d-4a61-88e3-315dc7bee6c0" name="self.main();" pathCondition="true" lineNumber="-1" charStart="41" charEnd="45">
+            <sedStatement xml:id="_44c1b8a0-ead4-4f98-811f-77a0d1692fda" name="throw new RuntimeException ();" pathCondition="true" lineNumber="-1" charStart="53" charEnd="82">
+               <sedExceptionalTermination xml:id="_f429bfbd-5553-4825-8cdf-f32c7001e989" name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true">
                </sedExceptionalTermination>
             </sedStatement>
          </sedMethodCall>
