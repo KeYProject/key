@@ -110,8 +110,8 @@
           point="org.eclipse.ui.views.properties.tabbed.propertySections">
           <propertySections contributorId="symbolicExecutionTreeDiagram.PropertyContributor">
               <propertySection tab="org.key_project.sed.ui.visualization.node.tab"           
-               class="org.key_project.sed.ui.visualization.execution_tree.property.SEDDebugNodePropertySection"
-               filter="org.key_project.sed.ui.visualization.execution_tree.property.SEDDebugNodeTreeFilter"
+               class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiDebugNodePropertySection"
+               filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiDebugNodeTreeFilter"
                id="org.key_project.sed.ui.visualization.node.tab.SEDDebugNodePropertySection">
               </propertySection>
           </propertySections>
@@ -148,7 +148,7 @@
               id="org.key_project.sed.ui.graphiti.view.ExecutionTreeView"
               minimized="false"
               relationship="right"
-              relative="org.eclipse.debug.ui.DebugView"
+              relative="left"
               visible="true">
         </view>
         <viewShortcut
@@ -157,9 +157,9 @@
         <view
               id="org.key_project.sed.ui.graphiti.view.ExecutionTreeThumbNailView"
               minimized="false"
-              ratio="0.80"
-              relationship="bottom"
-              relative="org.key_project.sed.ui.graphiti.view.ExecutionTreeView"
+              ratio="0.8"
+              relationship="right"
+              relative="org.eclipse.ui.views.PropertySheet"
               visible="true">
         </view>
         <viewShortcut

@@ -28,7 +28,7 @@ import org.key_project.util.java.StringUtil;
  * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
  * @author Martin Hentschel
  */
-public class SEDDebugNodePropertySection extends GFPropertySection {
+public class GraphitiDebugNodePropertySection extends GFPropertySection {
    /**
     * Shows the value of {@link ISEDDebugNode#getName()}.
     */
@@ -53,7 +53,7 @@ public class SEDDebugNodePropertySection extends GFPropertySection {
       nameText.setEditable(false);
       FormData data = new FormData();
       data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
-      data.right = new FormAttachment(80, 0);
+      data.right = new FormAttachment(100, 0);
       data.top = new FormAttachment(0, ITabbedPropertyConstants.VSPACE);
       nameText.setLayoutData(data);
 
@@ -68,7 +68,7 @@ public class SEDDebugNodePropertySection extends GFPropertySection {
       pathText.setEditable(false);
       data = new FormData();
       data.left = new FormAttachment(0, STANDARD_LABEL_WIDTH);
-      data.right = new FormAttachment(80, 0);
+      data.right = new FormAttachment(100, 0);
       data.top = new FormAttachment(nameText, 0, ITabbedPropertyConstants.VSPACE);
       pathText.setLayoutData(data);
       

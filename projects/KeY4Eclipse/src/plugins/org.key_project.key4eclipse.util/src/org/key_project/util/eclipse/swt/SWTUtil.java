@@ -343,6 +343,21 @@ public final class SWTUtil {
     }
 
     /**
+     * Returns the first element from the given {@link ISelection} if
+     * it is an {@link IStructuredSelection}.
+     * @param selection The {@link ISelection} to read from.
+     * @return The first selected element in the given {@link ISelection}.
+     */
+    public static Object getFirstElement(ISelection selection) {
+        if (selection instanceof IStructuredSelection) {
+            return ((IStructuredSelection)selection).getFirstElement();
+        }
+        else {
+            return null;
+        }
+    }
+
+    /**
      * Converts the given {@link ISelection} into an array if it is an
      * {@link IStructuredSelection}.
      * @param selection The {@link ISelection} to convert.
