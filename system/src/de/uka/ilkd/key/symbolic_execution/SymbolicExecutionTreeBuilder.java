@@ -321,7 +321,7 @@ public class SymbolicExecutionTreeBuilder {
        */
       @Override
       public void visit(Proof proof, Node visitedNode) {
-      // Find the parent node (IExecutionNode) to that the execution tree model representation of the given KeY's proof tree node should be added.
+         // Find the parent node (IExecutionNode) to that the execution tree model representation of the given KeY's proof tree node should be added.
          AbstractExecutionNode parentToAddTo = branchConditionAddToMapping.get(visitedNode);
          if (parentToAddTo == null) {
             Node parent = visitedNode.parent(); 

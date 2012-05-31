@@ -85,28 +85,28 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
     * @return The root of the example symbolic execution tree.
     */
    protected IExecutionNode createModel() {
-      KeYlessStartNode root = new KeYlessStartNode("start");
-      KeYlessBranchCondition bc = new KeYlessBranchCondition(root, "bc");
+      KeYlessStartNode root = new KeYlessStartNode("start", "pc1");
+      KeYlessBranchCondition bc = new KeYlessBranchCondition(root, "bc", "pc2", "condition of bc");
       root.addChild(bc);
-      KeYlessTermination ttrue = new KeYlessTermination(root, "t true", true);
+      KeYlessTermination ttrue = new KeYlessTermination(root, "t true", "pc3", true);
       root.addChild(ttrue);
-      KeYlessTermination tfalse = new KeYlessTermination(root, "t false", false);
+      KeYlessTermination tfalse = new KeYlessTermination(root, "t false", "pc4", false);
       root.addChild(tfalse);
-      KeYlessBranchNode bn = new KeYlessBranchNode(root, "bn");
+      KeYlessBranchNode bn = new KeYlessBranchNode(root, "bn", "pc5");
       root.addChild(bn);
       KeYlessVariable bnVar1 = new KeYlessVariable(null, true, 2, "myType", "myValue", "bnVar1");
       bn.addVariable(bnVar1);
       KeYlessVariable bnVar2 = new KeYlessVariable(null, false, -1, "myTypeAgain", "myValueAgain", "bnVar2");
       bn.addVariable(bnVar2);
-      KeYlessLoopNode ln = new KeYlessLoopNode(root, "ln");
+      KeYlessLoopNode ln = new KeYlessLoopNode(root, "ln", "pc6");
       root.addChild(ln);
-      KeYlessLoopCondition lc = new KeYlessLoopCondition(ln, "lc");
+      KeYlessLoopCondition lc = new KeYlessLoopCondition(ln, "lc", "pc7");
       ln.addChild(lc);
-      KeYlessMethodCall mc = new KeYlessMethodCall(ln, "mc");
+      KeYlessMethodCall mc = new KeYlessMethodCall(ln, "mc", "pc8");
       ln.addChild(mc);
-      KeYlessMethodReturn mr = new KeYlessMethodReturn(mc, "mr", "mc with return value");
+      KeYlessMethodReturn mr = new KeYlessMethodReturn(mc, "mr", "pc9", "mc with return value");
       mc.addChild(mr);
-      KeYlessStatement s = new KeYlessStatement(root, "s");
+      KeYlessStatement s = new KeYlessStatement(root, "s", "pc10");
       root.addChild(s);
       KeYlessVariable sVar1 = new KeYlessVariable(null, true, 2, "myType", "myValue", "sVar1");
       s.addVariable(sVar1);

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;">
-   <methodCall name="MethodCallOnObject.main();">
-      <statement name="MethodCallOnObject x = new MethodCallOnObject ();">
-         <statement name="return x.doSomething();">
-            <methodCall name="x.doSomething();">
-               <statement name="return 42;">
-                  <methodReturn name="&lt;return of x.doSomething();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of x.doSomething();&gt;">
-                     <methodReturn name="&lt;return of MethodCallOnObject.main();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodCallOnObject.main();&gt;">
-                        <termination name="&lt;end&gt;" exceptionalTermination="false">
+<startNode name="&lt;start&gt;" pathCondition="true">
+   <methodCall name="MethodCallOnObject.main();" pathCondition="true">
+      <statement name="MethodCallOnObject x = new MethodCallOnObject ();" pathCondition="true">
+         <statement name="return x.doSomething();" pathCondition="true">
+            <methodCall name="x.doSomething();" pathCondition="true">
+               <statement name="return 42;" pathCondition="true">
+                  <methodReturn name="&lt;return of x.doSomething();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of x.doSomething();&gt;">
+                     <methodReturn name="&lt;return of MethodCallOnObject.main();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodCallOnObject.main();&gt;">
+                        <termination name="&lt;end&gt;" pathCondition="true" exceptionalTermination="false">
                         </termination>
                      </methodReturn>
                   </methodReturn>

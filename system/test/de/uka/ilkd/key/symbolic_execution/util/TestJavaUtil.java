@@ -11,6 +11,23 @@ import junit.framework.TestCase;
  */
 public class TestJavaUtil extends TestCase {
    /**
+    * Tests {@link JavaUtil#indexOf(java.util.Iterator, Object)}
+    */
+   public void testIndexOf() {
+      List<String> list = new LinkedList<String>();
+      list.add("A");
+      list.add("B");
+      list.add("C");
+      assertEquals(-1, JavaUtil.indexOf(null, null));
+      assertEquals(-1, JavaUtil.indexOf(list.iterator(), null));
+      assertEquals(-1, JavaUtil.indexOf(null, "A"));
+      assertEquals(0, JavaUtil.indexOf(list.iterator(), "A"));
+      assertEquals(1, JavaUtil.indexOf(list.iterator(), "B"));
+      assertEquals(2, JavaUtil.indexOf(list.iterator(), "C"));
+      assertEquals(-1, JavaUtil.indexOf(list.iterator(), "D"));
+   }
+   
+   /**
     * Tests {@link JavaUtil#equalIgnoreWhiteSpace(String, String)}.
     */
    public void testEqualIgnoreWhiteSpace() {

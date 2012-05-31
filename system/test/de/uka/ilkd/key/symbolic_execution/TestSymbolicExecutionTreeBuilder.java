@@ -69,7 +69,7 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
     * has changed so that they are outdated.
     * </p>
     */
-   public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
+   public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = true;
    
    /**
     * The used temporary oracle directory.
@@ -765,8 +765,10 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
       assertNotNull(expected);
       assertNotNull(current);
       assertEquals(expected.getName(), current.getName());
+      assertEquals(expected.getFormatedPathCondition(), current.getFormatedPathCondition());
       if (expected instanceof IExecutionBranchCondition) {
          assertTrue("Expected IExecutionBranchCondition but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchCondition);
+         assertEquals(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition());
       }
       else if (expected instanceof IExecutionStartNode) {
          assertTrue("Expected IExecutionStartNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStartNode);

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;">
-   <methodCall name="self.main();">
-      <statement name="a();">
-         <methodCall name="self.a();">
-            <statement name="b();">
-               <methodCall name="self.b();">
-                  <statement name="c();">
-                     <methodCall name="self.c();">
-                        <statement name="throw new RuntimeException ();">
-                           <statement name="int ae = -1;">
-                              <statement name="int a1 = 1;">
-                                 <methodReturn name="&lt;return of self.a();&gt;" nameIncludingReturnValue="&lt;return of self.a();&gt;">
-                                    <methodReturn name="&lt;return of self.main();&gt;" nameIncludingReturnValue="&lt;return of self.main();&gt;">
-                                       <termination name="&lt;end&gt;" exceptionalTermination="false">
+<startNode name="&lt;start&gt;" pathCondition="true">
+   <methodCall name="self.main();" pathCondition="true">
+      <statement name="a();" pathCondition="true">
+         <methodCall name="self.a();" pathCondition="true">
+            <statement name="b();" pathCondition="true">
+               <methodCall name="self.b();" pathCondition="true">
+                  <statement name="c();" pathCondition="true">
+                     <methodCall name="self.c();" pathCondition="true">
+                        <statement name="throw new RuntimeException ();" pathCondition="true">
+                           <statement name="int ae = -1;" pathCondition="true">
+                              <statement name="int a1 = 1;" pathCondition="true">
+                                 <methodReturn name="&lt;return of self.a();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return of self.a();&gt;">
+                                    <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return of self.main();&gt;">
+                                       <termination name="&lt;end&gt;" pathCondition="true" exceptionalTermination="false">
                                        </termination>
                                     </methodReturn>
                                  </methodReturn>

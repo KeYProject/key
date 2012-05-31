@@ -3,7 +3,10 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
 /**
@@ -60,6 +63,32 @@ public abstract class AbstractExecutionNode extends AbstractExecutionElement imp
    public void addChild(AbstractExecutionNode child) {
       if (child != null) {
          children.add(child);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Term getPathCondition() throws ProofInputException {
+      if (getParent() != null) {
+         return getParent().getPathCondition(); // By default the path condition of the parent is used because only branch conditions change it.
+      }
+      else {
+         return TermBuilder.DF.tt();
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getFormatedPathCondition() throws ProofInputException {
+      if (getParent() != null) {
+         return getParent().getFormatedPathCondition(); // By default the path condition of the parent is used because only branch conditions change it.
+      }
+      else {
+         return TermBuilder.DF.tt().toString();
       }
    }
 }

@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 
 /**
@@ -50,4 +52,16 @@ public interface IExecutionNode extends IExecutionElement {
     * @return The available children.
     */
    public IExecutionNode[] getChildren();
+   
+   /**
+    * Returns the path condition to reach this node as {@link Term}.
+    * @return The path condition to reach this node as {@link Term}.
+    */
+   public Term getPathCondition() throws ProofInputException;
+   
+   /**
+    * Returns the human readable path condition to reach this node as string. 
+    * @return The human readable path condition as string.
+    */
+   public String getFormatedPathCondition() throws ProofInputException;
 }

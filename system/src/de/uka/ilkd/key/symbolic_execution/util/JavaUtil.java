@@ -17,6 +17,37 @@ public final class JavaUtil {
    }
    
    /**
+    * Returns the index of the element to search in the given iterator.
+    * @param iter The iterator to search in.
+    * @param toSearch The element to search.
+    * @return The index of the element or {@code -1} if it was not found.
+    */
+   public static <T> int indexOf(Iterator<T> iter, T toSearch) {
+      if (iter != null) {
+         int i = 0;
+         boolean found = false;
+         while (!found && iter.hasNext()) {
+            T next = iter.next();
+            if (next != null ? next.equals(toSearch) : toSearch == null) {
+               found = true;
+            }
+            else {
+               i++;
+            }
+         }
+         if (found) {
+            return i;
+         }
+         else {
+            return -1;
+         }
+      }
+      else {
+         return -1;
+      }
+   }
+   
+   /**
     * Creates a line which consists of the given text.
     * @param text The text to repeate.
     * @param repetitions The number of repetitions.

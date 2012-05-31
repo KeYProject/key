@@ -24,6 +24,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -35,6 +36,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -73,6 +75,63 @@ public final class SymbolicExecutionUtil {
    private SymbolicExecutionUtil() {
    }
    
+   /**
+    * Simplifies the given {@link Term} in a side proof. 
+    * @param parentProof The parent {@link Proof}.
+    * @param term The {@link Term} to simplify.
+    * @return The simplified {@link Term}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public static Term simplify(Proof parentProof,
+                               Term term) throws ProofInputException {
+      // Create sequent to proof
+      Sequent sequentToProve = Sequent.EMPTY_SEQUENT.addFormula(new SequentFormula(term), false, true).sequent();
+      // Return created sequent and the used predicate to identify the value interested in.
+      ApplyStrategyInfo info = startSideProof(parentProof, sequentToProve);
+      // The simplified formula is the conjunction of all open goals
+      ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
+      ImmutableList<Term> goalImplications = ImmutableSLList.nil(); 
+      for (Goal goal : openGoals) {
+         Term goalImplication = sequentToImplication(goal.sequent());
+         goalImplications = goalImplications.append(goalImplication);
+      }
+      return TermBuilder.DF.or(goalImplications);
+   }
+   
+   /**
+    * Converts the given {@link Sequent} into an implication.
+    * @param sequent The {@link Sequent} to convert.
+    * @return The created implication.
+    */
+   public static Term sequentToImplication(Sequent sequent) {
+      if (sequent != null) {
+         ImmutableList<Term> antecedents = listSemisequentTerms(sequent.antecedent());
+         ImmutableList<Term> succedents = listSemisequentTerms(sequent.succedent());
+         // Construct branch condition from created antecedent and succedent terms as new implication 
+         Term left = TermBuilder.DF.and(antecedents);
+         Term right = TermBuilder.DF.or(succedents);
+         return TermBuilder.DF.imp(left, right);
+      }
+      else {
+         return TermBuilder.DF.tt();
+      }
+   }
+   
+   /**
+    * Lists the {@link Term}s contained in the given {@link Semisequent}.
+    * @param semisequent The {@link Semisequent} to list terms of.
+    * @return The list with all contained {@link Term}s.
+    */
+   public static ImmutableList<Term> listSemisequentTerms(Semisequent semisequent) {
+      ImmutableList<Term> terms = ImmutableSLList.nil();
+      if (semisequent != null) {
+         for (SequentFormula sf : semisequent) {
+            terms = terms.append(sf.formula());
+         }
+      }
+      return terms;
+   }
+
    /**
     * Creates a new default contract for the given {@link ProgramMethod}
     * which only ensures that the own invariants ({@code this.<inv>}) hold.
