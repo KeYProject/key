@@ -1,13 +1,23 @@
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.expression.operator.LessThan;
+import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.Visitor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -28,10 +38,81 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             LoopInvariant inv) {
         super(rule, pio, ifInsts);
         assert pio != null;
-        this.inv = inv;
         this.loop = (While) MiscTools.getActiveStatement(programTerm()
                 .javaBlock());
         assert loop != null;
+        this.inv = instantiateIndex(inv);
+    }
+    
+    private LoopInvariant instantiateIndex(LoopInvariant rawInv){
+    	if (rawInv == null) return null;
+    	Term inv = rawInv.getInternalInvariant();
+    	Term var = rawInv.getInternalVariant();
+    	Term tnv = rawInv.getInternalTransactionInvariant();
+    	
+    	// try to retrieve a loop index variable
+    	de.uka.ilkd.key.java.statement.IGuard guard = loop.getGuard();
+    	// the guard is expected to be of the form "i < x" and we want to retrieve "i".
+    	assert guard.getChildCount() == 1 : "child count: "+guard.getChildCount();
+    	ProgramElement guardStatement = guard.getChildAt(0);
+    	if (!(guardStatement instanceof LessThan)) 
+    		return rawInv;
+    	Expression loopIndex = (Expression) ((LessThan)guard.getChildAt(0)).getChildAt(0);
+    	if (!( loopIndex instanceof ProgramVariable))
+    		return rawInv;
+    	final TermBuilder tb = TermBuilder.DF;
+		final Term loopIdxVar = tb.var((ProgramVariable)loopIndex);
+    	
+    	
+    	// set up replacement visitor
+    	final class IndexTermReplacementVisitor extends Visitor {
+    		
+    		private Term result;
+
+			@Override
+			public void visit(Term visited) {
+				result = replace(visited);
+			}
+			
+			public Term getResult(){
+				return result;
+			}
+			
+			private Term replace(Term visited){
+			    ImmutableArray<Term> subs = visited.subs();
+			    if (subs.isEmpty()) {
+			    	if (visited.op().name().toString().equals("index"))
+			    		return loopIdxVar;
+			    	else return visited;
+			    } else {
+			    	Term[] newSubs = new Term[subs.size()];
+			    	for (int i= 0; i < subs.size(); i++)
+			    		newSubs[i] = replace(subs.get(i));
+			    	return tb.tf().createTerm(visited.op(), new ImmutableArray<Term>(newSubs),
+			    			visited.boundVars(), visited.javaBlock());
+			    }
+			}
+		};
+		
+		// replace it!
+		IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
+		if (inv != null) {
+		    v.visit(inv);
+		    inv = v.getResult();
+		}
+		if (var != null) {
+		    v.visit(var);
+		    var = v.getResult();
+		}
+		if (tnv != null) {
+		    v.visit(tnv);
+		    tnv = v.getResult();
+		}
+		
+		return new LoopInvariantImpl(rawInv.getLoop(), inv, tnv, rawInv.getInternalModifies(),
+				rawInv.getInternalModifiesBackup(), var, rawInv.getInternalSelfTerm(),
+				rawInv.getInternalHeapAtPre(), rawInv.getInternalSavedHeapAtPre());
+    	
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
