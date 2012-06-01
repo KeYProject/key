@@ -43,6 +43,7 @@ public final class TypeConverter {
     private SetLDT setLDT;
     private HeapLDT heapLDT;
     private SeqLDT seqLDT;
+    private GenericLDT genLDT;
     @SuppressWarnings("unused")
     private FloatLDT floatLDT;
     @SuppressWarnings("unused")
@@ -73,6 +74,8 @@ public final class TypeConverter {
             this.seqLDT = (SeqLDT) ldt;
         } else if (ldt instanceof SetLDT) {
             this.setLDT = (SetLDT) ldt;
+        } else if (ldt instanceof GenericLDT){
+            this.genLDT = (GenericLDT) ldt;
         } else if (ldt instanceof FloatLDT ) {
             this.floatLDT = (FloatLDT) ldt;
         } else if (ldt instanceof DoubleLDT) {
@@ -136,6 +139,9 @@ public final class TypeConverter {
     	return setLDT;
     }
     
+    public GenericLDT getGenLDT(){
+        return genLDT;
+    }
     
     public CharListLDT getCharListLDT() {
 	return charListLDT;

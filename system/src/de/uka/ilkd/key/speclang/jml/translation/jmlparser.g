@@ -1948,6 +1948,7 @@ builtintype returns [KeYJavaType type = null] throws SLTranslationException
             {
                 type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SEQ);
             }            
+        | GEN { type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_GENERIC_ADT); }
 	)
 	
 ;

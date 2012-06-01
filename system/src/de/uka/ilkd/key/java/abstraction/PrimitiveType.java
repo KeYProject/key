@@ -47,7 +47,9 @@ public class PrimitiveType
     public static final PrimitiveType JAVA_SEQ =
 	new PrimitiveType("\\seq", EmptySeqLiteral.INSTANCE);    
     public static final PrimitiveType JAVA_SET =
-	new PrimitiveType("\\set", EmptySetLiteral.LOCSET);    
+	new PrimitiveType("\\set", EmptySetLiteral.LOCSET); 
+    public static final PrimitiveType JAVA_GENERIC_ADT =
+            new PrimitiveType("\\gen", null);
     public static final PrimitiveType PROGRAM_SV   = new PrimitiveType("SV", null);
 
     private ProgramElementName arrayElementName = null;
@@ -67,6 +69,7 @@ public class PrimitiveType
 	typeMap.put("\\locset", JAVA_LOCSET);
 	typeMap.put("\\seq", JAVA_SEQ);
 	typeMap.put("\\set", JAVA_SET);
+	typeMap.put("\\gen", JAVA_GENERIC_ADT);
     }
 
     public static PrimitiveType getPrimitiveType(String name) {

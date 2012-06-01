@@ -457,6 +457,7 @@ TOKEN :
 | < FINALLY: "finally" >
 | < FLOAT: "float" >
 | < FOR: "for" >
+| < GEN: "\\gen" >
 | < GOTO: "goto" >
 | < IF: "if" >
 | < IMPLEMENTS: "implements" >
@@ -1972,6 +1973,7 @@ TypeReference PrimitiveType() :
   | "\\locset"
   | "\\seq"
   | "\\set"
+  | "\\gen"
   )
   {
     Identifier id = factory.createIdentifier(token.image);

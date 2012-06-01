@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
+import de.uka.ilkd.key.ldt.GenericLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
@@ -412,6 +413,8 @@ public final class JavaInfo {
                 sort = (Sort) sorts.lookup(SeqLDT.NAME);
 	    } else if(type == PrimitiveType.JAVA_SET) {
             sort = (Sort) sorts.lookup(SetLDT.NAME);
+	    } else if (type == PrimitiveType.JAVA_GENERIC_ADT){
+	        sort = (Sort) sorts.lookup(GenericLDT.NAME);
 	    } else {
 		assert false : "unexpected primitive type: " + type;
 	    	sort = null;

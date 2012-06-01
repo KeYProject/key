@@ -2102,6 +2102,7 @@ TypeReference PrimitiveType() :
      | "\\set"
      | "\\seq"
      | "\\locset"
+     | "\\gen"
      | "\\bigint"
      )
 	{

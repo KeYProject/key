@@ -70,6 +70,7 @@ ELEMTYPE : "\\elemtype";
 EQUAL_SINGLE : "=";
 EVERYTHING : "\\everything";
 FRESH : "\\fresh"; 
+GEN : "\\gen";
 GEQ : ">=";
 GT : ">";
 IMPLIES : "==>";
