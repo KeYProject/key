@@ -75,6 +75,10 @@ public class DbcProofReferenceEditPart extends ConnectionNodeEditPart implements
     * @generated
     */
    public class DbcProofReferenceFigure extends PolylineConnectionEx {
+      /**
+       * @generated NOT
+       */
+      private boolean globalVisible = true; // Required for automaitc proof reference hiding
 
       /**
        * @generated
@@ -99,6 +103,27 @@ public class DbcProofReferenceEditPart extends ConnectionNodeEditPart implements
          return df;
       }
 
+      /**
+       * @generated NOT
+       */
+      @Override
+      public boolean isVisible() {
+         return isGlobalVisible() && super.isVisible();
+      }
+
+      /**
+       * @generated NOT
+       */
+      public boolean isGlobalVisible() {
+         return globalVisible;
+      }
+
+      /**
+       * @generated NOT
+       */
+      public void setGlobalVisible(boolean globalVisible) {
+         this.globalVisible = globalVisible;
+      }
    }
 
 }
