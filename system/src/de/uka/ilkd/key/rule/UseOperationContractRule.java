@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Map;
+import java.util.List;
 import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.collection.*;
@@ -34,6 +35,7 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -516,26 +518,36 @@ public final class UseOperationContractRule implements BuiltInRule {
         		(FunctionalOperationContract)((AbstractContractRuleApp) ruleApp)
                 .getInstantiation(); 
         assert contract.getTarget().equals(inst.pm);
-        final boolean transaction = contract.transactionContract();
-	//prepare heapBefore_method
-     	final LocationVariable heapAtPreVar 
-     		= TB.heapAtPreVar(services, 
-     				  TermBuilder.BASE_HEAP_NAME+"Before_" + inst.pm.getName(), 
-     				  true);
-        final LocationVariable savedHeapAtPreVar =
-           transaction ? TB.heapAtPreVar(services, 
-     				  TermBuilder.SAVED_HEAP_NAME+"Before_" + inst.pm.getName(), 
-     				  true) : null;
-     	goal.addProgramVariable(heapAtPreVar);
-        if(transaction) {
-     	  goal.addProgramVariable(savedHeapAtPreVar);
-        }
-        final Term heapAtPre = TB.var(heapAtPreVar);
-        final Term savedHeapAtPre = savedHeapAtPreVar != null ? TB.var(savedHeapAtPreVar) : null;
+//        final boolean transaction = contract.transactionContract();
 
-        Map<String,Term> atPres = new LinkedHashMap<String,Term>();
-        atPres.put(TermBuilder.BASE_HEAP_NAME, heapAtPre);
-        atPres.put(TermBuilder.SAVED_HEAP_NAME, savedHeapAtPre);
+        final HeapContext hc = contract.getHeapContext();
+
+	//prepare heapBefore_method
+//     	final LocationVariable heapAtPreVar 
+//     		= TB.heapAtPreVar(services, 
+//     				  TermBuilder.BASE_HEAP_NAME+"Before_" + inst.pm.getName(), 
+//     				  true);
+//        final LocationVariable savedHeapAtPreVar =
+//           transaction ? TB.heapAtPreVar(services, 
+//     				  TermBuilder.SAVED_HEAP_NAME+"Before_" + inst.pm.getName(), 
+//     				  true) : null;
+
+        Map<String,LocationVariable> atPreVars = hc.getBeforeAtPreVars(services, inst.pm.getName());
+        for(LocationVariable v : atPreVars.values()) {
+     	  goal.addProgramVariable(v);
+        }
+
+//     	goal.addProgramVariable(heapAtPreVar);
+//        if(transaction) {
+//     	  goal.addProgramVariable(savedHeapAtPreVar);
+//        }
+//        final Term heapAtPre = TB.var(heapAtPreVar);
+//        final Term savedHeapAtPre = savedHeapAtPreVar != null ? TB.var(savedHeapAtPreVar) : null;
+
+        Map<String,Term> atPres = hc.getAtPres();
+        // new LinkedHashMap<String,Term>();
+//        atPres.put(TermBuilder.BASE_HEAP_NAME, heapAtPre);
+//        atPres.put(TermBuilder.SAVED_HEAP_NAME, savedHeapAtPre);
 
         //create variables for result and exception
         final ProgramVariable resultVar 
@@ -554,13 +566,13 @@ public final class UseOperationContractRule implements BuiltInRule {
         //translate the contract
         final Term contractSelf 
         	= OpReplacer.replace(TB.heap(TermBuilder.BASE_HEAP_NAME, services), 
-        		             heapAtPre,
+        		             atPres.get(TermBuilder.BASE_HEAP_NAME),
         		             inst.pm.isConstructor() 
         		               ? TB.var(resultVar) 
         		               : inst.actualSelf);
         final ImmutableList<Term> contractParams
         	= OpReplacer.replace(TB.heap(TermBuilder.BASE_HEAP_NAME, services), 
-        			    heapAtPre, 
+        			    atPres.get(TermBuilder.BASE_HEAP_NAME), 
         			    inst.actualParams);
         final Term contractResult
         	= inst.pm.isConstructor() || resultVar == null 
@@ -578,15 +590,26 @@ public final class UseOperationContractRule implements BuiltInRule {
                                            TB.var(excVar), 
                                            atPres,
                                            services);
-        final Term mod = contract.getMod(TermBuilder.BASE_HEAP_NAME, TB.heap(TermBuilder.BASE_HEAP_NAME, services),
-        	                         contractSelf,
-        	                         contractParams, 
-        	                         services);
-        final Term modBackup = transaction ? 
-                contract.getMod(TermBuilder.SAVED_HEAP_NAME, TB.heap(TermBuilder.SAVED_HEAP_NAME, services),
-                contractSelf,
-                contractParams, 
-                services) : null;
+
+        final List<String> modHeapNames = hc.getModHeapNames();
+        final Map<String,Term> mods = new LinkedHashMap<String,Term>();
+
+        for(String heapName : modHeapNames) {
+           final Term m = contract.getMod(heapName, TB.heap(heapName, services),
+                contractSelf,contractParams, services);
+           mods.put(heapName, m);
+        }
+
+//        final Term mod = contract.getMod(TermBuilder.BASE_HEAP_NAME, TB.heap(TermBuilder.BASE_HEAP_NAME, services),
+//        	                         contractSelf,
+//        	                         contractParams, 
+//        	                         services);
+
+//        final Term modBackup = transaction ? 
+//                contract.getMod(TermBuilder.SAVED_HEAP_NAME, TB.heap(TermBuilder.SAVED_HEAP_NAME, services),
+//                contractSelf,
+//                contractParams, 
+//                services) : null;
                 
         final Term mby = contract.hasMby() 
                          ? contract.getMby(TB.heap(TermBuilder.BASE_HEAP_NAME, services), 
@@ -623,35 +646,80 @@ public final class UseOperationContractRule implements BuiltInRule {
         excPostGoal.setBranchLabel("Exceptional Post"+ " ("+contract.getTarget().getName()+")");
         
         //prepare common stuff for the three branches
-        final Triple<Term,Term,Term> anonAssumptionAndUpdateAndHeap;
-        if(contract.hasModifiesClause()) {
-            anonAssumptionAndUpdateAndHeap = createAnonUpdate(TermBuilder.BASE_HEAP_NAME, inst.pm, mod, services);
-        } else {
-            // a method w/o modification (i.e. strictly pure) does not modify the heap:
-            anonAssumptionAndUpdateAndHeap = 
-                    new Triple<Term,Term,Term>(TB.tt(), TB.skip(), TB.heap(TermBuilder.BASE_HEAP_NAME, services));
+        Term anonAssumption = null;
+        Term anonUpdate = null;
+        Term wellFormedAnon = null;
+        Term atPreUpdates = null;
+        Term reachableState = null;
+
+        for(String heapName : modHeapNames) {
+           final Triple<Term,Term,Term> tAnon;
+           // TODO probably the special case still needs fixing (later)
+           if(heapName.equals(TB.BASE_HEAP_NAME) && contract.hasModifiesClause()) {
+             tAnon = new Triple<Term,Term,Term>(TB.tt(), TB.skip(), TB.heap(heapName, services));
+           }else{
+             tAnon = createAnonUpdate(heapName, inst.pm, mods.get(heapName), services);
+           }
+           if(anonAssumption == null) {
+             anonAssumption = tAnon.first;
+           }else{
+             anonAssumption = TB.and(anonAssumption, tAnon.first);
+           }
+           if(anonUpdate == null) {
+             anonUpdate = tAnon.second;
+           }else{
+             anonUpdate = TB.parallel(anonUpdate, tAnon.second);
+           }
+           if(wellFormedAnon == null) {
+             wellFormedAnon = TB.wellFormed(services,tAnon.third);
+           }else{
+             wellFormedAnon = TB.and(wellFormedAnon, TB.wellFormed(services,tAnon.third));
+           }
+           final Term up = TB.elementary(services, atPreVars.get(heapName), TB.heap(heapName, services));
+           if(atPreUpdates == null) {
+             atPreUpdates = up;
+           }else{
+             atPreUpdates = TB.parallel(atPreUpdates, up);
+           }
+           if(reachableState == null) {
+             reachableState = TB.wellFormedHeap(heapName, services);
+           }else{
+             reachableState = TB.and(reachableState, TB.wellFormedHeap(heapName, services));
+           }
         }
+
+//        if(contract.hasModifiesClause()) {
+//            anonAssumptionAndUpdateAndHeap = createAnonUpdate(TermBuilder.BASE_HEAP_NAME, inst.pm, mod, services);
+//        } else {
+//            // a method w/o modification (i.e. strictly pure) does not modify the heap:
+//            anonAssumptionAndUpdateAndHeap = 
+//                    new Triple<Term,Term,Term>(TB.tt(), TB.skip(), TB.heap(TermBuilder.BASE_HEAP_NAME, services));
+//        }
         
-        final Triple<Term,Term,Term> anonAssumptionAndUpdateAndHeapSaved 
-            = transaction ?
-                 createAnonUpdate(TermBuilder.SAVED_HEAP_NAME, inst.pm, modBackup, services) : null;
+//        final Triple<Term,Term,Term> anonAssumptionAndUpdateAndHeapSaved 
+//            = transaction ?
+//                 createAnonUpdate(TermBuilder.SAVED_HEAP_NAME, inst.pm, modBackup, services) : null;
 
-        final Term anonAssumption = transaction ?
-              TB.and(anonAssumptionAndUpdateAndHeap.first, anonAssumptionAndUpdateAndHeapSaved.first)
-            : anonAssumptionAndUpdateAndHeap.first;
-        final Term anonUpdate     = transaction ? 
-              TB.parallel(anonAssumptionAndUpdateAndHeap.second, anonAssumptionAndUpdateAndHeapSaved.second)    
-            : anonAssumptionAndUpdateAndHeap.second;
-        final Term anonHeap       = anonAssumptionAndUpdateAndHeap.third;
-        final Term anonHeapSaved  = transaction ? anonAssumptionAndUpdateAndHeapSaved.third : null;
+
+//        final Term anonAssumption = transaction ?
+//              TB.and(anonAssumptionAndUpdateAndHeap.first, anonAssumptionAndUpdateAndHeapSaved.first)
+//            : anonAssumptionAndUpdateAndHeap.first;
+//        final Term anonUpdate     = transaction ? 
+//              TB.parallel(anonAssumptionAndUpdateAndHeap.second, anonAssumptionAndUpdateAndHeapSaved.second)    
+//            : anonAssumptionAndUpdateAndHeap.second;
+
+
+
+//        final Term anonHeap       = anonAssumptionAndUpdateAndHeap.third;
+//        final Term anonHeapSaved  = transaction ? anonAssumptionAndUpdateAndHeapSaved.third : null;
                  
-        final Term heapAtPreUpdate = TB.elementary(services, 
-        					   heapAtPreVar, 
-        					   TB.heap(TermBuilder.BASE_HEAP_NAME, services));
+//        final Term heapAtPreUpdate = TB.elementary(services, 
+//        					   heapAtPreVar, 
+//        					   TB.heap(TermBuilder.BASE_HEAP_NAME, services));
 
-        final Term savedHeapAtPreUpdate = transaction ? 
-            TB.elementary(services, savedHeapAtPreVar, TB.heap(TermBuilder.SAVED_HEAP_NAME, services))
-          : null;
+//        final Term savedHeapAtPreUpdate = transaction ? 
+//            TB.elementary(services, savedHeapAtPreVar, TB.heap(TermBuilder.SAVED_HEAP_NAME, services))
+//          : null;
 
         final Term excNull = TB.equals(TB.var(excVar), TB.NULL(services));
         final Term excCreated = TB.created(services, TB.var(excVar));
@@ -659,20 +727,20 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    		     		  inst.staticType,
 	    		     		  contractResult,
 	    		     		  contractSelf,
-	    		     		  heapAtPre,
+	    		     		  atPres.get(TermBuilder.BASE_HEAP_NAME),
 	    		     		  services);  
         final Term freeExcPost = inst.pm.isConstructor() 
                                  ? freePost 
                                  : TB.tt();        
         final Term postAssumption 
-        	= TB.applySequential(transaction ? new Term[]{inst.u, heapAtPreUpdate, savedHeapAtPreUpdate} : new Term[]{inst.u, heapAtPreUpdate}, 
+        	= TB.applySequential(new Term[]{inst.u, atPreUpdates}, 
         		   	     TB.and(anonAssumption,
         		   		    TB.apply(anonUpdate,
         		   	                     TB.and(new Term[]{excNull, 
                                 	     	                       freePost, 
                                 	     	                       post}))));
         final Term excPostAssumption 
-        	= TB.applySequential(transaction ? new Term[]{inst.u, heapAtPreUpdate, savedHeapAtPreUpdate} : new Term[]{inst.u, heapAtPreUpdate}, 
+        	= TB.applySequential(new Term[]{inst.u, atPreUpdates}, 
         		   TB.and(anonAssumption,
                                   TB.apply(anonUpdate,
                                            TB.and(new Term[]{TB.not(excNull),
@@ -681,7 +749,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                 	     	             post}))));
        
         //create "Pre" branch
-	Term reachableState = transaction ? TB.and(TB.wellFormedHeap(TermBuilder.BASE_HEAP_NAME, services),TB.wellFormed(services, TB.heap(TermBuilder.SAVED_HEAP_NAME,services))) : TB.wellFormedHeap(TermBuilder.BASE_HEAP_NAME, services);
+//	Term reachableState =  transaction ? TB.and(TB.wellFormedHeap(TermBuilder.BASE_HEAP_NAME, services),TB.wellFormed(services, TB.heap(TermBuilder.SAVED_HEAP_NAME,services))) : TB.wellFormedHeap(TermBuilder.BASE_HEAP_NAME, services);
 	int i = 0;
 	for(Term arg : contractParams) {
 	    KeYJavaType argKJT = contract.getTarget().getParameterType(i++);
@@ -699,7 +767,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	    mbyOk = TB.tt();
 	}
         preGoal.changeFormula(new SequentFormula(
-        			TB.applySequential(transaction ? new Term[]{inst.u, heapAtPreUpdate, savedHeapAtPreUpdate} : new Term[]{inst.u, heapAtPreUpdate}, 
+        			TB.applySequential(new Term[]{inst.u, atPreUpdates}, 
         	                                   TB.and(new Term[]{pre, 
         	                                	   	     reachableState, 
         	                                	   	     mbyOk}))),
@@ -721,10 +789,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                            TB.prog(inst.mod,
                                    JavaBlock.createJavaBlock(postSB),
                                    inst.progPost.sub(0)));
-        postGoal.addFormula(new SequentFormula(
-                                   transaction ? 
-                                      TB.and(TB.wellFormed(services, anonHeap),TB.wellFormed(services, anonHeapSaved))
-                                    : TB.wellFormed(services, anonHeap)), 
+        postGoal.addFormula(new SequentFormula(wellFormedAnon), 
         	            true, 
         	            false);
         postGoal.changeFormula(new SequentFormula(TB.apply(inst.u, 
@@ -742,10 +807,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                        TB.prog(inst.mod,
                                JavaBlock.createJavaBlock(excPostSB), 
                                inst.progPost.sub(0)));
-        excPostGoal.addFormula(new SequentFormula(
-                                      transaction ? 
-                                        TB.and(TB.wellFormed(services, anonHeap),TB.wellFormed(services, anonHeapSaved))
-                                      : TB.wellFormed(services, anonHeap)), 
+        excPostGoal.addFormula(new SequentFormula(wellFormedAnon), 
                 	       true, 
                 	       false);        
         excPostGoal.changeFormula(new SequentFormula(TB.apply(inst.u, 

@@ -337,6 +337,12 @@ public final class DependencyContractImpl implements DependencyContract {
         return false;
     }
 
+    // TODO ?
+    @Override
+    public HeapContext getHeapContext() {
+        return null;
+    }
+
     @Override
     public ProofOblInput createProofObl(InitConfig initConfig,
 	    Contract contract) {

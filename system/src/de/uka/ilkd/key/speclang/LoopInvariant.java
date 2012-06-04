@@ -31,7 +31,7 @@ public interface LoopInvariant extends SpecificationElement {
 
     
     /** Returns the invariant formula. */
-    public Term getInvariant(Term selfTerm, Map<String,Term> atPres, Services services);
+    public Term getInvariant(Term selfTerm, Map<String,Term> atPres, Services services, boolean transaction);
 
     /**
      * Returns the modifies clause.
@@ -82,7 +82,8 @@ public interface LoopInvariant extends SpecificationElement {
     public LoopInvariant setInvariant(Term invariant, 
             			      Term selfTerm,
             			      Map<String,Term> atPres,
-            			      Services services); 
+            			      Services services,
+                                      boolean transaction); 
     
     /** 
      * Loop invariants can be visited like source elements:
@@ -90,5 +91,7 @@ public interface LoopInvariant extends SpecificationElement {
      * perform some action/transformation on this element.
      */
     public void visit(Visitor v);
+
+    public HeapContext getHeapContext(boolean transaction);
 
 }

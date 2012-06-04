@@ -93,6 +93,8 @@ public interface Contract extends SpecificationElement {
     public boolean toBeSaved();
 
     public boolean transactionContract();
+
+    public HeapContext getHeapContext();
     
     /**
      * Returns a parseable String representation of the contract. 

@@ -80,33 +80,25 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
         
         Map<String,Term> atPres = x.getInternalAtPres();
 
+        //invariant
+        Term inv = x.getInvariant(selfTerm, atPres, services, false);
+        if(inv != null) {
+            inv.execPostOrder(tpvc);
+        }
+
         //transaction invariant
-        Term transInv = x.getInvariant(selfTerm, atPres, services);
+        Term transInv = x.getInvariant(selfTerm, atPres, services, true);
         if(transInv != null) {
             transInv.execPostOrder(tpvc);
         }
 
         //modifies
-        Term modBackup = x.getModifies(TermBuilder.SAVED_HEAP_NAME, selfTerm, atPres, services);
-        if(modBackup != null) {
-            modBackup.execPostOrder(tpvc);
+        for(String heapName : TermBuilder.VALID_HEAP_NAMES) {
+           Term mod = x.getModifies(heapName, selfTerm, atPres, services);
+           if(mod != null) {
+              mod.execPostOrder(tpvc);
+           }
         }
-        
-        atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
-
-        //invariant
-        Term inv = x.getInvariant(selfTerm, atPres, services);
-        if(inv != null) {
-            inv.execPostOrder(tpvc);
-        }
-
-                
-        //modifies
-        Term mod = x.getModifies(TermBuilder.BASE_HEAP_NAME,selfTerm, atPres, services);
-        if(mod != null) {
-            mod.execPostOrder(tpvc);
-        }
-
 
         //variant
         Term v = x.getVariant(selfTerm, atPres, services);

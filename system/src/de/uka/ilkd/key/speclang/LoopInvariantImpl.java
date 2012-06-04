@@ -154,11 +154,12 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override    
     public Term getInvariant(Term selfTerm,
             		     Map<String,Term> atPres,
-            		     Services services) {
+            		     Services services,
+                             boolean transaction) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace((atPres == null || atPres.get(TermBuilder.SAVED_HEAP_NAME) == null) ? originalInvariant : originalTransactionInvariant);
+        return or.replace(transaction ? originalTransactionInvariant : originalInvariant);
     }
     
     @Override
@@ -227,12 +228,12 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariant setInvariant(Term invariant, 
             			      Term selfTerm,
             			      Map<String,Term> atPres,
-            			      Services services) {
+            			      Services services,
+                                      boolean transaction) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> inverseReplaceMap 
             = getInverseReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(inverseReplaceMap);
-        final boolean transaction = atPres != null && atPres.get(TermBuilder.SAVED_HEAP_NAME) != null;
         return new LoopInvariantImpl(loop, 
                                      transaction ? originalInvariant : or.replace(invariant), 
                                      transaction ? or.replace(invariant) :  originalTransactionInvariant,  
@@ -248,6 +249,13 @@ public final class LoopInvariantImpl implements LoopInvariant {
         v.performActionOnLoopInvariant(this);
     }
     
+    public HeapContext getHeapContext(boolean transaction) {
+      if(transaction) {
+         return HeapContext.LOOP_TR_HC;
+      }else{
+         return HeapContext.LOOP_HC;
+      }
+    }
     
     @Override
     public String toString() {

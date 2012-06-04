@@ -11,7 +11,9 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -35,6 +37,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -216,32 +219,50 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
     final boolean transaction = ((Modality)inst.progPost.op()).transaction(); 
 
-//    final Term heapAtMethodPre = inst.inv.getInternalHeapAtPre();
-//    final Term savedHeapAtMethodPre = inst.inv.getInternalSavedHeapAtPre();
-
     final Map<String,Term> atPres = inst.inv.getInternalAtPres();
+    final HeapContext hc = inst.inv.getHeapContext(transaction);
+    final List<String> modHeapNames = hc.getModHeapNames();
 
-    final Term transactionInv = transaction ? inst.inv.getInvariant(inst.selfTerm, atPres, services) : null;
+//    final Term transactionInv = transaction ? inst.inv.getInvariant(inst.selfTerm, atPres, services) : null;
 
-    final Term s = atPres.get(TermBuilder.SAVED_HEAP_NAME);
+    final Term regularInv = inst.inv.getInvariant(inst.selfTerm, atPres, services, false);
 
-    final Term mod = inst.inv.getModifies(TermBuilder.BASE_HEAP_NAME, inst.selfTerm, 
-					      atPres, 
-					      services);
+    final Term invTerm;
+    if(transaction) {
+      final Term transactionInv = inst.inv.getInvariant(inst.selfTerm, atPres, services, true);
+      if(transactionInv != null) {
+        invTerm = TB.and(regularInv, transactionInv);
+      }else{
+        invTerm = regularInv;
+      }
+    }else{
+      invTerm = regularInv;
+    }
+
+//    final Term s = atPres.get(TermBuilder.SAVED_HEAP_NAME);
+    final Map<String,Term> mods = new LinkedHashMap<String,Term>();
+    for(String heapName : modHeapNames) {
+      final Term m = inst.inv.getModifies(heapName, inst.selfTerm, atPres, services);
+      mods.put(heapName, m);
+    }
+
+//    final Term mod = inst.inv.getModifies(TermBuilder.BASE_HEAP_NAME, inst.selfTerm, 
+//					      atPres, 
+//					      services);
 	// This on the other hand should never be null
-    final Term modBackup = inst.inv.getModifies(TermBuilder.SAVED_HEAP_NAME,inst.selfTerm, 
-            atPres, 
-            services);
+//    final Term modBackup = inst.inv.getModifies(TermBuilder.SAVED_HEAP_NAME,inst.selfTerm, 
+//            atPres, 
+//            services);
 
-    atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
-    final Term regularInv = inst.inv.getInvariant(inst.selfTerm, atPres, services);
-    // NOTE even when a transaction is on, the transactionInv can still be null (no loop_invariant_transaction given)
-	final Term invTerm  = transactionInv != null ?
-	     TB.and(regularInv, transactionInv) : regularInv;
+//  atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
+//  final Term regularInv = inst.inv.getInvariant(inst.selfTerm, atPres, services);
+   // NOTE even when a transaction is on, the transactionInv can still be null (no loop_invariant_transaction given)
+//	final Term invTerm  = transactionInv != null ?
+//	     TB.and(regularInv, transactionInv) : regularInv;
 	final Term variant = inst.inv.getVariant(inst.selfTerm, 
 						 atPres, 
 						 services);
-	atPres.put(TermBuilder.SAVED_HEAP_NAME, s);
+//	atPres.put(TermBuilder.SAVED_HEAP_NAME, s);
 	//collect input and output local variables, 
 	//prepare reachableIn and reachableOut
 	final ImmutableSet<ProgramVariable> localIns 
@@ -260,24 +281,27 @@ public final class WhileInvariantRule implements BuiltInRule {
 	}
 	
 	Term beforeLoopUpdate = null;
-        final Map<Term,Term> savedToBeforeLoop = new HashMap<Term,Term>();
-	final Map<Term,Term> normalToBeforeLoop = new HashMap<Term,Term>();
-        for(String h : atPres.keySet()) {
-          if(!transaction && h.equals(TermBuilder.SAVED_HEAP_NAME)) 
-            continue;
-          final LocationVariable lv = TB.heapAtPreVar(services, h+"BeforeLoop", true);
+//        final Map<Term,Term> savedToBeforeLoop = new HashMap<Term,Term>();
+//	final Map<Term,Term> normalToBeforeLoop = new HashMap<Term,Term>();
+
+        final Map<String,Map<Term,Term>> heapToBeforeLoop = new LinkedHashMap<String,Map<Term,Term>>();
+
+        for(String heapName : modHeapNames) {
+          heapToBeforeLoop.put(heapName, new HashMap<Term,Term>());
+          final LocationVariable lv = TB.heapAtPreVar(services, heapName+"BeforeLoop", true);
    	  services.getNamespaces().programVariables().addSafely(lv);
-          final Term u = TB.elementary(services, lv, TB.heap(h, services));
+          final Term u = TB.elementary(services, lv, TB.heap(heapName, services));
           if(beforeLoopUpdate == null) {
              beforeLoopUpdate = u;
           }else{
              beforeLoopUpdate = TB.parallel(beforeLoopUpdate, u);
           }
-          if(h.equals(TermBuilder.SAVED_HEAP_NAME)) {
-	    savedToBeforeLoop.put(TB.heap(h, services), TB.var(lv));
-          }else{
-	    normalToBeforeLoop.put(TB.heap(h, services), TB.var(lv));
-          }
+          heapToBeforeLoop.get(heapName).put(TB.heap(heapName, services), TB.var(lv));
+//          if(h.equals(TermBuilder.SAVED_HEAP_NAME)) {
+//	    savedToBeforeLoop.put(TB.heap(h, services), TB.var(lv));
+//          }else{
+//	    normalToBeforeLoop.put(TB.heap(h, services), TB.var(lv));
+//          }
         }
 
 	for(ProgramVariable pv : localOuts) {
@@ -291,39 +315,72 @@ public final class WhileInvariantRule implements BuiltInRule {
 		    			   TB.elementary(services, 
 		    				   	 pvBeforeLoop, 
 		    				   	 TB.var(pv)));
-	    normalToBeforeLoop.put(TB.var(pv), TB.var(pvBeforeLoop));
+	    heapToBeforeLoop.get(TB.BASE_HEAP_NAME).put(TB.var(pv), TB.var(pvBeforeLoop));
 	}
 	
-	//prepare anon update, frame condition
-	final Pair<Term,Term> anonUpdateAndHeap 
-		= createAnonUpdate(TermBuilder.BASE_HEAP_NAME, inst.loop, mod, localOuts, services);
-	final Term anonUpdate;
-	final Term anonHeapWellFormed;
-	if(transaction) {
-	    final Pair<Term,Term> anonUpdateAndHeapSaved  
-	      = createAnonUpdate(TermBuilder.SAVED_HEAP_NAME, inst.loop, modBackup, null, services);
-	  anonUpdate = TB.parallel(anonUpdateAndHeap.first, anonUpdateAndHeapSaved.first);
-	  anonHeapWellFormed   = TB.and(TB.wellFormed(services, anonUpdateAndHeap.second), TB.wellFormed(services, anonUpdateAndHeapSaved.second));
-	}else{
-	  anonUpdate = anonUpdateAndHeap.first;
-	  anonHeapWellFormed   = TB.wellFormed(services, anonUpdateAndHeap.second);	    
-	}
+	//prepare anon update, frame condition, etc.
+
+        Term anonUpdate = null;
+        Term wellFormedAnon = null;
+        Term frameCondition = null;
+        Term reachableState = reachableIn;
+        for(String heapName : modHeapNames) {
+	  final Pair<Term,Term> tAnon 
+	      = createAnonUpdate(heapName, inst.loop, mods.get(heapName), null, services);
+          if(anonUpdate == null) {
+            anonUpdate = tAnon.first;
+          }else{
+            anonUpdate = TB.parallel(anonUpdate, tAnon.first);
+          }
+          if(wellFormedAnon == null) {
+            wellFormedAnon = TB.wellFormed(services, tAnon.second);
+          }else{
+            wellFormedAnon = TB.and(wellFormedAnon, TB.wellFormed(services, tAnon.second));
+          }
+          final Term m = mods.get(heapName);
+          final Term fc;
+          if(TB.lessThanNothing().equals(m) && heapName.equals(TB.BASE_HEAP_NAME)) {
+            fc = TB.frameStrictlyEmpty(services, TB.heap(heapName, services), heapToBeforeLoop.get(heapName)); 
+          }else{
+            fc = TB.frame(services, TB.heap(heapName,services), heapToBeforeLoop.get(heapName), m);
+          }
+          if(frameCondition == null){
+            frameCondition = fc;
+          }else{
+            frameCondition = TB.and(frameCondition, fc);
+          }
+          reachableState = TB.and(reachableState, TB.wellFormedHeap(heapName, services));
+        }
+
+//	final Pair<Term,Term> anonUpdateAndHeap 
+//		= createAnonUpdate(TermBuilder.BASE_HEAP_NAME, inst.loop, mod, localOuts, services);
+//	final Term anonUpdate;
+//	final Term anonHeapWellFormed;
+//	if(transaction) {
+//	    final Pair<Term,Term> anonUpdateAndHeapSaved  
+//	      = createAnonUpdate(TermBuilder.SAVED_HEAP_NAME, inst.loop, modBackup, null, services);
+//	  anonUpdate = TB.parallel(anonUpdateAndHeap.first, anonUpdateAndHeapSaved.first);
+//	  anonHeapWellFormed   = TB.and(TB.wellFormed(services, anonUpdateAndHeap.second), TB.wellFormed(services, anonUpdateAndHeapSaved.second));
+//	}else{
+//	  anonUpdate = anonUpdateAndHeap.first;
+//	  anonHeapWellFormed   = TB.wellFormed(services, anonUpdateAndHeap.second);	    
+//	}
 
 	// special case frame condition for strictly pure loops
-	final Term normalFrameCondition;
-	if(TB.lessThanNothing().equals(mod)) {
-	    normalFrameCondition = TB.frameStrictlyEmpty(services, TB.heap(TermBuilder.BASE_HEAP_NAME, services), normalToBeforeLoop); 
-	} else {
-	    normalFrameCondition = TB.frame(services, TB.heap(TermBuilder.BASE_HEAP_NAME, services),
-               normalToBeforeLoop, 
-               mod);
-	}
-	final Term transactionFrameCondition = transaction ?
-	          TB.frame(services, TB.heap(TermBuilder.SAVED_HEAP_NAME,services), savedToBeforeLoop, modBackup)
-	        : null;
+//	final Term normalFrameCondition;
+//	if(TB.lessThanNothing().equals(mod)) {
+//	    normalFrameCondition = TB.frameStrictlyEmpty(services, TB.heap(TermBuilder.BASE_HEAP_NAME, services), normalToBeforeLoop); 
+//	} else {
+//	    normalFrameCondition = TB.frame(services, TB.heap(TermBuilder.BASE_HEAP_NAME, services),
+//               normalToBeforeLoop, 
+//               mod);
+//	}
+//	final Term transactionFrameCondition = transaction ?
+//	          TB.frame(services, TB.heap(TermBuilder.SAVED_HEAP_NAME,services), savedToBeforeLoop, modBackup)
+//	        : null;
         
-	final Term frameCondition = transactionFrameCondition != null ?
-	        TB.and(normalFrameCondition,transactionFrameCondition) : normalFrameCondition;
+//	final Term frameCondition = transactionFrameCondition != null ?
+//	        TB.and(normalFrameCondition,transactionFrameCondition) : normalFrameCondition;
 	
 	//prepare variant
 	final ProgramElementName variantName 
@@ -395,12 +452,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	//"Invariant Initially Valid":
 	// \replacewith (==> inv );
-	final Term reachableState = transaction ?
-           TB.and(TB.wellFormedHeap(TermBuilder.SAVED_HEAP_NAME, services),TB.and(TB.wellFormedHeap(TermBuilder.BASE_HEAP_NAME, services), 
-		                           reachableIn))
-           :
-           TB.and(TB.wellFormedHeap(TermBuilder.BASE_HEAP_NAME, services), 
-		                           reachableIn);
 	initGoal.changeFormula(new SequentFormula(
 		                 TB.apply(inst.u, 
 		                         TB.and(variantNonNeg, 
@@ -413,7 +464,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         //                         (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
         //                          #whileInvRule(\[{.. while (#e) #s ...}\]post, 
         //                               #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv)),anon1));
-	bodyGoal.addFormula(new SequentFormula(anonHeapWellFormed), 
+	bodyGoal.addFormula(new SequentFormula(wellFormedAnon), 
 		 	    true, 
 		 	    false);		
 
@@ -465,7 +516,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	// \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
 	// (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
 	// (#v1=FALSE -> \[{.. ...}\]post)),anon2))
-	useGoal.addFormula(new SequentFormula(anonHeapWellFormed), 
+	useGoal.addFormula(new SequentFormula(wellFormedAnon), 
 		 	   true, 
 		 	   false);		
 	useGoal.addFormula(new SequentFormula(uAnonInv), true, false);

@@ -1199,8 +1199,8 @@ public final class TermBuilder {
         return func(services.getTypeConverter().getHeapLDT().getNull());
     }
 
-    public Term heap(String name, Services services) {
-        return var(services.getTypeConverter().getHeapLDT().getHeap(name));
+    public Term heap(String heapName, Services services) {
+        return var(services.getTypeConverter().getHeapLDT().getHeap(heapName));
     }
 
     public Term wellFormed(Services services, Term h) {

@@ -226,34 +226,24 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         Term selfTerm = inv.getInternalSelfTerm();
         Map<String,Term> atPres = inv.getInternalAtPres();
         
-        // transaction invariant
-        Term newTransactionInvariant 
-            = replaceVariablesInTerm(inv.getInvariant(selfTerm, 
-                                                      atPres,
-                                                      services));
-
-        //backup modifies
-        Term newBackupModifies
-            = replaceVariablesInTerm(inv.getModifies(TermBuilder.SAVED_HEAP_NAME,selfTerm, 
-                                     atPres,
-                                     services));
-
-        final Term s = atPres.get(TermBuilder.SAVED_HEAP_NAME);
-        atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
-
         //invariant
         Term newInvariant 
             = replaceVariablesInTerm(inv.getInvariant(selfTerm, 
                                                       atPres,
-                                                      services));
+                                                      services, false));
+        // transaction invariant
+        Term newTransactionInvariant 
+            = replaceVariablesInTerm(inv.getInvariant(selfTerm, 
+                                                      atPres,
+                                                      services, true));
 
-
-        //modifies
-        Term newModifies
-            = replaceVariablesInTerm(inv.getModifies(TermBuilder.BASE_HEAP_NAME, selfTerm, 
+        Map<String,Term> newMods = new LinkedHashMap<String,Term>();
+        for(String heapName : TermBuilder.VALID_HEAP_NAMES) {
+           final Term m = replaceVariablesInTerm(inv.getModifies(heapName, selfTerm, 
                                      atPres,
                                      services));
-
+           newMods.put(heapName, m);
+        }
 
         //variant
         Term newVariant
@@ -263,21 +253,17 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         
         Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
 
-        atPres.put(TermBuilder.SAVED_HEAP_NAME, s);
         for(String h : atPres.keySet()) {
            final Term t = atPres.get(h);
            if(t == null) continue;
            atPres.put(h, replaceVariablesInTerm(t));
         }
 
-        Map<String,Term> mods = new LinkedHashMap<String,Term>();
-        mods.put(TermBuilder.BASE_HEAP_NAME, newModifies);
-        mods.put(TermBuilder.SAVED_HEAP_NAME, newBackupModifies);
         LoopInvariant newInv 
             = new LoopInvariantImpl(newLoop, 
                                     newInvariant,
                                     newTransactionInvariant,
-                                    mods,
+                                    newMods,
                                     newVariant, 
                                     newSelfTerm,
                                     atPres);

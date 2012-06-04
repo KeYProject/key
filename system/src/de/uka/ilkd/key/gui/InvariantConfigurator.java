@@ -243,7 +243,7 @@ public class InvariantConfigurator {
                 if(!isTransaction) {
                   atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
                 } 
-                final Term invariant = loopInv.getInvariant(loopInv.getInternalSelfTerm(), atPres, services);
+                final Term invariant = loopInv.getInvariant(loopInv.getInternalSelfTerm(), atPres, services, false);
                 if (invariant == null) {
                     loopInvStr[0] = "true";
                 } else {
