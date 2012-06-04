@@ -46,7 +46,7 @@ public class MethodContractHeapContext implements HeapContext {
        if(TermBuilder.SAVED_HEAP_NAME.equals(heapName) && !transaction) {
          continue;
        }
-       final LocationVariable atPreVar = TermBuilder.DF.heapAtPreVar(services, heapName+"Before_" + contextName, true);
+       final LocationVariable atPreVar = TermBuilder.DF.heapAtPreVar(services, heapName+contextName, true);
        lvCache.put(heapName, atPreVar);
     }
     return lvCache;

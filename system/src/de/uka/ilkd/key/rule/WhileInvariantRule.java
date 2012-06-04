@@ -532,7 +532,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 							uAnon,
 							guardFalseRestPsi)), 
                               ruleApp.posInOccurrence());
-
+        hc.reset();
 	return result;
     }
 

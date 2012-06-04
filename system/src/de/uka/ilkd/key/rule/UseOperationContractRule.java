@@ -532,7 +532,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 //     				  TermBuilder.SAVED_HEAP_NAME+"Before_" + inst.pm.getName(), 
 //     				  true) : null;
 
-        Map<String,LocationVariable> atPreVars = hc.getBeforeAtPreVars(services, inst.pm.getName());
+        Map<String,LocationVariable> atPreVars = hc.getBeforeAtPreVars(services, "Before_"+inst.pm.getName());
         for(LocationVariable v : atPreVars.values()) {
      	  goal.addProgramVariable(v);
         }
@@ -835,7 +835,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             	= (ComplexRuleJustificationBySpec)
             	    goal.proof().env().getJustifInfo().getJustification(this);
         cjust.add(ruleApp, just);
-        
+        hc.reset();
         return result;
     }
     

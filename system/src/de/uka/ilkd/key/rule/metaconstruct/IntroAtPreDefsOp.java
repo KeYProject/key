@@ -143,7 +143,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 services.getSpecificationRepository().setLoopInvariant(newInv);                
             }
         }
-        
+        hc.reset();
         return TB.apply(atPreUpdate, target);
     }
 }

@@ -927,13 +927,10 @@ public class JMLSpecFactory {
                 collectLocalVariables(pm.getBody(), loop);
         paramVars = paramVars.append(localVars);
 
-        Term heapAtPre = TB.var(TB.heapAtPreVar(services, TermBuilder.BASE_HEAP_NAME+"AtPre", false));
-        Term savedHeapAtPre = TB.var(TB.heapAtPreVar(services, TermBuilder.SAVED_HEAP_NAME+"AtPre",
-                                                     false));
-
         Map<String,Term> atPres = new LinkedHashMap<String,Term>();
-        atPres.put(TermBuilder.BASE_HEAP_NAME, heapAtPre);
-        atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
+        for(String heapName : TermBuilder.VALID_HEAP_NAMES) {
+          atPres.put(heapName, TB.var(TB.heapAtPreVar(services, heapName+"AtPre", false)));        
+        }
 
         //translateToTerm invariant
         Term invariant;
@@ -954,7 +951,6 @@ public class JMLSpecFactory {
         if (originalTransactionInvariant.isEmpty()) {
             transactionInvariant = null;
         } else {
-            atPres.put(TermBuilder.SAVED_HEAP_NAME, savedHeapAtPre);
             transactionInvariant = TB.tt();
             for (PositionedString expr : originalTransactionInvariant) {
                 Term translated =
@@ -992,14 +988,12 @@ public class JMLSpecFactory {
         if (originalVariant == null) {
             variant = null;
         } else {
-            atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
             Term translated =
                     JMLTranslator.translate(originalVariant,
                                             pm.getContainerType(), selfVar,
                                             paramVars, null, null, atPres, Term.class, services);
             variant = translated;
         }
-        atPres.put(TermBuilder.SAVED_HEAP_NAME, savedHeapAtPre);
         //create loop invariant annotation
         Term selfTerm = selfVar == null ? null : TB.var(selfVar);
         return new LoopInvariantImpl(loop,
