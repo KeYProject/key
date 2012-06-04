@@ -392,34 +392,10 @@ public final class JavaInfo {
 	}
 	
 	if(result == null) {
+	    Name ldtName = type.getCorrespondingLDTName();
 	    final Namespace sorts = services.getNamespaces().sorts();
 	    final Sort sort;
-	    if(type == PrimitiveType.JAVA_BOOLEAN) {
-		sort = (Sort) sorts.lookup(BooleanLDT.NAME);;
-	    } else if(type == PrimitiveType.JAVA_BYTE
-	              || type == PrimitiveType.JAVA_CHAR 
-	              || type == PrimitiveType.JAVA_INT 
-                      || type == PrimitiveType.JAVA_LONG 
-		      || type == PrimitiveType.JAVA_SHORT
-		      || type == PrimitiveType.JAVA_BIGINT) { 
-		 sort = (Sort) sorts.lookup(IntegerLDT.NAME);;
-	    } else if(type == PrimitiveType.JAVA_FLOAT) {
-		sort = (Sort) sorts.lookup(FloatLDT.NAME);
-	    } else if(type == PrimitiveType.JAVA_DOUBLE) {
-		sort = (Sort) sorts.lookup(DoubleLDT.NAME);
-	    } else if(type == PrimitiveType.JAVA_LOCSET) {
-                sort = (Sort) sorts.lookup(LocSetLDT.NAME);
-	    } else if(type == PrimitiveType.JAVA_SEQ) {
-                sort = (Sort) sorts.lookup(SeqLDT.NAME);
-	    } else if(type == PrimitiveType.JAVA_SET) {
-            sort = (Sort) sorts.lookup(SetLDT.NAME);
-	    } else if (type == PrimitiveType.JAVA_GENERIC_ADT){
-	        sort = (Sort) sorts.lookup(GenericLDT.NAME);
-	    } else {
-		assert false : "unexpected primitive type: " + type;
-	    	sort = null;
-	    }
-	    
+	    sort = (Sort) sorts.lookup(ldtName);
 	    assert sort != null : "could not find sort for type: " + type;
 	    result = new KeYJavaType(type, sort);
 	    if(type2KJTCache != null) {
@@ -493,7 +469,17 @@ public final class JavaInfo {
 	         }
 	     }
 	 }	
-	 return sort2KJTCache.get(sort);
+	 
+	 // lookup for primitive ldts
+	 KeYJavaType result = sort2KJTCache.get(sort);
+	 if(result == null) {
+	     Name n = sort.name();
+	     PrimitiveType pt = PrimitiveType.getPrimitiveTypeByLDT(n);
+	     if(pt != null) {
+	         return getPrimitiveKeYJavaType(pt);
+	     }
+	 }
+    return result;
      }
 
 

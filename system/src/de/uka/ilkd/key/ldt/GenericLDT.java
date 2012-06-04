@@ -21,9 +21,11 @@ import de.uka.ilkd.key.util.ExtList;
 public final class GenericLDT extends LDT {
 
     public static final Name NAME = new Name("Generic");
+    private Function atom;
 
     public GenericLDT(Services services) {
         super(NAME, services);
+        atom      = addFunction(services, "atom");
     }
 
     @Override
