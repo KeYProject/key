@@ -5,6 +5,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
+import de.uka.ilkd.key.java.expression.literal.GenericLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -63,13 +64,14 @@ public final class GenericLDT extends LDT {
 
     @Override
     public boolean hasLiteralFunction(Function f) {
-        // TODO Auto-generated method stub
-        assert false;
-        return false;
+        return "atom".equals(f.name().toString());
     }
 
     @Override
     public Expression translateTerm(Term t, ExtList children) {
+        if(t.op() instanceof Function && hasLiteralFunction((Function)t.op())) {
+            return GenericLiteral.INSTANCE;
+        }
         assert false;
         return null;
     }

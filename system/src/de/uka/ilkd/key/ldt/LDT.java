@@ -208,6 +208,7 @@ public abstract class LDT implements Named {
 
     public abstract boolean hasLiteralFunction(Function f);
 
+    /** Is called whenever <code>hasLiteralFunction()</code> returns true. */
     public abstract Expression translateTerm(Term t, ExtList children);
     
     public abstract Type getType(Term t);

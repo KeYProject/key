@@ -1044,7 +1044,7 @@ final class JMLTranslator {
 
                     try {
                         Term resultTerm = TB.func(function, args, null);
-                        SLExpression result = new SLExpression(resultTerm);
+                        SLExpression result = new SLExpression(resultTerm,services.getTypeConverter().getKeYJavaType(resultTerm));
                         return result;
                     } catch (TermCreationException ex) {
                         throw excManager.createException("Cannot create term " + function.name() + 
