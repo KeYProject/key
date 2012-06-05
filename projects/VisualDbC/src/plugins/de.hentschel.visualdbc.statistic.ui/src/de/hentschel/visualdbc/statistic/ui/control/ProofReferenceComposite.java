@@ -127,7 +127,7 @@ public class ProofReferenceComposite extends Composite {
       TreeViewerColumn mainColumn = new TreeViewerColumn(viewer, SWT.NONE);
       mainColumn.getColumn().setText("Selected Element");
       mainColumn.getColumn().setMoveable(true);
-      viewerLayout.setColumnData(mainColumn.getColumn(), new ColumnWeightData(30));
+      viewerLayout.setColumnData(mainColumn.getColumn(), new ColumnWeightData(40));
       // Add direction column
       TreeViewerColumn directionColumn = new TreeViewerColumn(viewer, SWT.NONE);
       directionColumn.getColumn().setText("Direction");
@@ -137,12 +137,12 @@ public class ProofReferenceComposite extends Composite {
       TreeViewerColumn kindColumn = new TreeViewerColumn(viewer, SWT.NONE);
       kindColumn.getColumn().setText("Kind");
       kindColumn.getColumn().setMoveable(true);
-      viewerLayout.setColumnData(kindColumn.getColumn(), new ColumnWeightData(30));
+      viewerLayout.setColumnData(kindColumn.getColumn(), new ColumnWeightData(20));
       // Add direction target column
       TreeViewerColumn directionTargetColumn = new TreeViewerColumn(viewer, SWT.NONE);
       directionTargetColumn.getColumn().setText("Direction Target");
       directionTargetColumn.getColumn().setMoveable(true);
-      viewerLayout.setColumnData(directionTargetColumn.getColumn(), new ColumnWeightData(30));
+      viewerLayout.setColumnData(directionTargetColumn.getColumn(), new ColumnWeightData(40));
       // Update content in viewer
       updateContent(editor.getEditorSite().getSelectionProvider().getSelection());
    }
