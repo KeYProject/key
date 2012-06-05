@@ -11,14 +11,24 @@
 
 package de.hentschel.visualdbc.statistic.ui.util;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.gef.EditPart;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ocl.util.ObjectUtil;
+import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.hentschel.visualdbc.dbcmodel.DbcProof;
 import de.hentschel.visualdbc.dbcmodel.DbcProofObligation;
 import de.hentschel.visualdbc.dbcmodel.DbcProofStatus;
 import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
+import de.hentschel.visualdbc.dbcmodel.diagram.custom.util.GMFUtil;
+import de.hentschel.visualdbc.dbcmodel.diagram.part.DbCDiagramEditor;
+import de.hentschel.visualdbc.dbcmodel.presentation.DbcmodelEditor;
 
 /**
  * Provides static utility methods for the statistics.
@@ -230,6 +240,63 @@ public final class StatisticUtil {
             }
          }
          return min;
+      }
+   }
+
+   /**
+    * Selects the given elements in the given {@link DbcmodelEditor}.
+    * @param editor The {@link DbcmodelEditor} to select elements in.
+    * @param toSelect The elements to select.
+    */
+   public static void select(DbcmodelEditor editor, List<?> toSelect) {
+      select(editor, SWTUtil.createSelection(toSelect));
+   }
+
+   /**
+    * Selects the given elements in the given {@link DbcmodelEditor}.
+    * @param editor The {@link DbcmodelEditor} to select elements in.
+    * @param selection The elements to select.
+    */
+   public static void select(DbcmodelEditor editor, ISelection selection) {
+      if (editor != null) {
+         Viewer viewer = editor.getViewer();
+         if (viewer != null) {
+            viewer.setSelection(selection);
+         }
+      }
+   }
+
+   /**
+    * Selects the given elements in the given {@link DbCDiagramEditor}.
+    * @param editor The {@link DbCDiagramEditor} to select elements in.
+    * @param selection The elements to select.
+    */
+   public static void select(DbCDiagramEditor editor, ISelection selection) {
+      select(editor, SWTUtil.toList(selection));
+   }
+
+   /**
+    * Selects the given elements in the given {@link DbCDiagramEditor}.
+    * @param editor The {@link DbCDiagramEditor} to select elements in.
+    * @param toSelect The elements to select.
+    */
+   public static void select(DbCDiagramEditor editor, List<?> toSelect) {
+      if (editor != null && toSelect != null) {
+         List<EditPart> partsToSelect = new LinkedList<EditPart>();
+         // Find EditParts for the contained EObjects
+         for (Object element : toSelect) {
+            if (element instanceof EObject) {
+               Collection<EditPart> parts = GMFUtil.findEditParts(editor.getDiagramEditPart(), (EObject)element);
+               if (parts != null) {
+                  for (EditPart part : parts) {
+                     editor.getDiagramGraphicalViewer().reveal(part); // Make EditPart visible
+                     partsToSelect.add(part);
+                  }
+               }
+            }
+         }
+         // Select EditParts
+         editor.getDiagramGraphicalViewer().setSelection(SWTUtil.createSelection(partsToSelect));
       }
    }
 }

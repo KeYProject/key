@@ -14,4 +14,10 @@ public interface IProofReferenceProvider {
     * @return The elements to show.
     */
    public List<?> extractElementsToShow(List<?> elements);
+
+   /**
+    * Selects the given elements in the provider.
+    * @param toSelect The elements to select.
+    */
+   public void select(List<?> toSelect);
 }

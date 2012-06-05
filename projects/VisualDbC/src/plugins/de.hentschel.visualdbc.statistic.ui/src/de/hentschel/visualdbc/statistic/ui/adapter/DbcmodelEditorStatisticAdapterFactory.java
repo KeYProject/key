@@ -18,11 +18,11 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.Viewer;
 
 import de.hentschel.visualdbc.dbcmodel.DbcModel;
 import de.hentschel.visualdbc.dbcmodel.presentation.DbcmodelEditor;
 import de.hentschel.visualdbc.statistic.ui.control.IStatisticProvider;
+import de.hentschel.visualdbc.statistic.ui.util.StatisticUtil;
 import de.hentschel.visualdbc.statistic.ui.view.DbcStatisticViewPart;
 import de.hentschel.visualdbc.statistic.ui.view.IStatisticViewPart;
 
@@ -52,13 +52,9 @@ public class DbcmodelEditorStatisticAdapterFactory extends AbstractStatisticAdap
 
          @Override
          public void select(ISelection selection) {
-            if (editor != null) {
-               Viewer viewer = editor.getViewer();
-               if (viewer != null) {
-                  viewer.setSelection(selection);
-               }
-            }
-         }};
+            StatisticUtil.select(editor, selection);
+         }
+      };
       return new DbcStatisticViewPart(provider);    
    }
 

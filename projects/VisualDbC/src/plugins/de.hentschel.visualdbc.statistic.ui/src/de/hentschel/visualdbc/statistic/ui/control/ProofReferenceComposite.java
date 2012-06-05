@@ -3,6 +3,7 @@ package de.hentschel.visualdbc.statistic.ui.control;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,8 @@ import org.eclipse.emf.edit.provider.resource.ResourceItemProviderAdapterFactory
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -113,6 +116,12 @@ public class ProofReferenceComposite extends Composite {
       viewer = new TreeViewer(this, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI | SWT.FULL_SELECTION);
       viewer.getTree().setHeaderVisible(true);
       viewer.getTree().setLinesVisible(true);
+      viewer.addDoubleClickListener(new IDoubleClickListener() {
+         @Override
+         public void doubleClick(DoubleClickEvent event) {
+            handleDoubleClick(event);
+         }
+      });
       // Add main column
       TreeViewerColumn mainColumn = new TreeViewerColumn(viewer, SWT.NONE);
       mainColumn.getColumn().setText("Selected Element");
@@ -152,6 +161,26 @@ public class ProofReferenceComposite extends Composite {
       super.dispose();
    }
 
+   /**
+    * Handles a double click in the viewer.
+    * @param event The event.
+    */
+   protected void handleDoubleClick(DoubleClickEvent event) {
+      if (proofReferenceProvider != null) {
+         List<?> selectedElements = SWTUtil.toList(event.getSelection());
+         List<Object> toSelect = new LinkedList<Object>();
+         for (Object selected : selectedElements) {
+            if (selected instanceof ProofReferenceEntry) {
+               toSelect.add(((ProofReferenceEntry)selected).getDirectionTarget());
+            }
+            else {
+               toSelect.add(selected);
+            }
+         }
+         proofReferenceProvider.select(toSelect);
+      }
+   }
+   
    /**
     * When the selection of {@link #editor} has changed.
     * @param event The event.
@@ -204,7 +233,7 @@ public class ProofReferenceComposite extends Composite {
       /**
        * The filtered elements of {@link #input} which are shown in {@link #viewer}.
        */
-      private List<EObject> filteredInput;
+      private Set<EObject> filteredInput;
       
       /**
        * Observed {@link EObject}s.
@@ -367,8 +396,8 @@ public class ProofReferenceComposite extends Composite {
        * @param input The input.
        * @return The elements which have something to do with proof references.
        */
-      protected List<EObject> filterInput(Object input) {
-         List<EObject> filteredInput = new LinkedList<EObject>();
+      protected Set<EObject> filterInput(Object input) {
+         Set<EObject> filteredInput = new LinkedHashSet<EObject>();
          if (input instanceof List<?>) {
             List<?> inputList = (List<?>)input;
             for (Object element : inputList) {

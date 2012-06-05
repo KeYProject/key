@@ -6,6 +6,7 @@ import org.eclipse.ui.IEditorPart;
 
 import de.hentschel.visualdbc.dbcmodel.presentation.DbcmodelEditor;
 import de.hentschel.visualdbc.statistic.ui.control.IProofReferenceProvider;
+import de.hentschel.visualdbc.statistic.ui.util.StatisticUtil;
 import de.hentschel.visualdbc.statistic.ui.view.DbcProofReferencesViewPart;
 import de.hentschel.visualdbc.statistic.ui.view.IProofReferencesViewPart;
 
@@ -21,10 +22,16 @@ public class DbcmodelEditorProofReferenceAdapterFactory extends AbstractProofRef
    @Override
    public Object getAdapter(Object adaptableObject, Class adapterType) {
       if (adaptableObject instanceof IEditorPart) {
+         final DbcmodelEditor editor = adaptableObject instanceof DbcmodelEditor ? (DbcmodelEditor)adaptableObject : null;
          IProofReferenceProvider provider = new IProofReferenceProvider() {
             @Override
             public List<?> extractElementsToShow(List<?> elements) {
                return elements;
+            }
+
+            @Override
+            public void select(List<?> toSelect) {
+               StatisticUtil.select(editor, toSelect);
             }
          };
          return new DbcProofReferencesViewPart((IEditorPart)adaptableObject, provider);

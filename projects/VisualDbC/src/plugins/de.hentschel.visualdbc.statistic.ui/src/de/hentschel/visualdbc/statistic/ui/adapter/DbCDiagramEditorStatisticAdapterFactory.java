@@ -11,18 +11,12 @@
 
 package de.hentschel.visualdbc.statistic.ui.adapter;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.gef.EditPart;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.hentschel.visualdbc.dbcmodel.DbcModel;
 import de.hentschel.visualdbc.dbcmodel.diagram.part.DbCDiagramEditor;
 import de.hentschel.visualdbc.statistic.ui.control.IStatisticProvider;
+import de.hentschel.visualdbc.statistic.ui.util.StatisticUtil;
 import de.hentschel.visualdbc.statistic.ui.view.DbcStatisticViewPart;
 import de.hentschel.visualdbc.statistic.ui.view.IStatisticViewPart;
 
@@ -52,25 +46,9 @@ public class DbCDiagramEditorStatisticAdapterFactory extends AbstractStatisticAd
 
          @Override
          public void select(ISelection selection) {
-            if (editor != null) {
-               if (selection instanceof IStructuredSelection) {
-                  Object[] elements = ((IStructuredSelection)selection).toArray();
-                  List<EditPart> parts = new LinkedList<EditPart>();
-                  // Find EditParts for the contained EObjects
-                  for (Object element : elements) {
-                     if (element instanceof EObject) {
-                        EditPart part = editor.getDiagramEditPart().findEditPart(editor.getDiagramEditPart(), (EObject)element);
-                        if (part != null) {
-                           editor.getDiagramGraphicalViewer().reveal(part); // Make EditPart visible
-                           parts.add(part);
-                        }
-                     }
-                  }
-                  // Select EditParts
-                  editor.getDiagramGraphicalViewer().setSelection(SWTUtil.createSelection(parts));
-               }
-            }
-         }};
-         return new DbcStatisticViewPart(provider);
+            StatisticUtil.select(editor, selection);
+         }
+      };
+      return new DbcStatisticViewPart(provider);
    }
 }
