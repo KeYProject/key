@@ -9,16 +9,13 @@
 //
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.logic.TermBuilder;
 
 /**
  * A JML specification case (i.e., more or less an operation contract) in 
@@ -53,8 +50,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         super(mods);
         assert behavior != null;
         this.behavior = behavior;
-        for(String hName : TermBuilder.VALID_HEAP_NAMES) {
-          assignables.put(hName, ImmutableSLList.<PositionedString>nil());
+        for(Name hName : HeapLDT.VALID_HEAP_NAMES) {
+          assignables.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
         }
     }
 
@@ -87,13 +84,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public void addAssignable(PositionedString ps) {
         String t = ps.text;
         if(!t.startsWith("<")) {
-           ImmutableList<PositionedString> l = assignables.get(TermBuilder.BASE_HEAP_NAME);
+           ImmutableList<PositionedString> l = assignables.get(HeapLDT.BASE_HEAP_NAME.toString());
            l = l.append(ps);
-           assignables.put(TermBuilder.BASE_HEAP_NAME, l);
+           assignables.put(HeapLDT.BASE_HEAP_NAME.toString(), l);
            return; 
         }
         List<String> hs = new ArrayList<String>();
-        for(String hName : TermBuilder.VALID_HEAP_NAMES) {
+        for(Name heapName : HeapLDT.VALID_HEAP_NAMES) {
+          final String hName = heapName.toString();
           String h = "<" + hName + ">";
           if(t.startsWith(h)) {
             hs.add(hName);
@@ -189,7 +187,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public ImmutableList<PositionedString> getAssignable() {
-        return assignables.get(TermBuilder.BASE_HEAP_NAME);
+        return assignables.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
 
     public ImmutableList<PositionedString> getAssignable(String hName) {
@@ -246,8 +244,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("requires: ").append(it.next()).append("\n");
         }
-        for(String h : TermBuilder.VALID_HEAP_NAMES) {
-          it = assignables.get(h).iterator();
+        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+          it = assignables.get(h.toString()).iterator();
           while(it.hasNext()) {
             sb.append("assignable<"+h+">: " + it.next() + "\n");
           }

@@ -81,14 +81,15 @@ public class FunctionalOperationContractPO
         final Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars);
 
         if(getContract().transactionContract()) {
-          return TB.and(new Term[]{TB.wellFormedHeap(TB.BASE_HEAP_NAME, services), TB.wellFormed(services, TB.heap(TB.SAVED_HEAP_NAME, services)),
+          return TB.and(new Term[]{TB.wellFormed(getBaseHeap(), services), 
+                                   TB.wellFormed(getSavedHeap(), services),
                                    selfNotNull,
                                    selfCreated,
                                    selfExactType,
                                    paramsOK,
                                    mbyAtPreDef});
         }else{
-          return TB.and(new Term[]{TB.wellFormedHeap(TB.BASE_HEAP_NAME, services), 
+          return TB.and(new Term[]{TB.wellFormed(getBaseHeap(), services), 
                                    selfNotNull,
                                    selfCreated,
                                    selfExactType,
@@ -165,7 +166,7 @@ public class FunctionalOperationContractPO
                                     ProgramVariable selfVar,
                                     ProgramVariable resultVar,
                                     ProgramVariable exceptionVar,
-                                    Map<String,LocationVariable> atPreVars,
+                                    Map<LocationVariable,LocationVariable> atPreVars,
                                     Term postTerm) {
         //create formal parameters
         ImmutableList<LocationVariable> formalParamVars =
@@ -191,8 +192,8 @@ public class FunctionalOperationContractPO
 
         //create update
         Term update = null;
-        for(String heapName : atPreVars.keySet()) {
-          final Term u = TB.elementary(services, atPreVars.get(heapName), TB.heap(TB.BASE_HEAP_NAME, services));
+        for(LocationVariable heap : atPreVars.keySet()) {
+          final Term u = TB.elementary(services, atPreVars.get(heap), TB.getBaseHeap(services));
           if(update == null) {
              update = u;
           }else{
@@ -209,6 +210,10 @@ public class FunctionalOperationContractPO
         }
 
         return TB.apply(update, programTerm);
+    }
+    
+    private LocationVariable getBaseHeap() {
+        return services.getTypeConverter().getHeapLDT().getHeap();
     }
 
 
@@ -229,7 +234,7 @@ public class FunctionalOperationContractPO
         final ProgramVariable resultVar = TB.resultVar(services, pm, true);
         final ProgramVariable exceptionVar = TB.excVar(services, pm, true);
        
-        final Map<String,LocationVariable> atPreVars = hc.getBeforeAtPreVars(services, "AtPre");
+        final Map<LocationVariable,LocationVariable> atPreVars = hc.getBeforeAtPreVars(services, "AtPre");
 
 //        final LocationVariable heapAtPreVar = TB.heapAtPreVar(services,
 //                                                              TB.BASE_HEAP_NAME+"AtPre", true);
@@ -241,15 +246,17 @@ public class FunctionalOperationContractPO
 //        atPreVars.put(TB.BASE_HEAP_NAME,  heapAtPreVar);
 //        atPreVars.put(TB.SAVED_HEAP_NAME,  savedHeapAtPreVar);
         
-        final List<String> modHeapNames = hc.getModHeapNames();
-        final Map<String,Map<Term,Term>> heapToAtPre = new LinkedHashMap<String,Map<Term,Term>>();
-        for(String heapName : modHeapNames) {
-           heapToAtPre.put(heapName, new HashMap<Term, Term>());
-           heapToAtPre.get(heapName).put(TB.heap(heapName,services),TB.var(atPreVars.get(heapName)));
+        final List<LocationVariable> modHeaps = hc.getModHeaps(services);
+        final Map<LocationVariable,Map<Term,Term>> heapToAtPre = new LinkedHashMap<LocationVariable,Map<Term,Term>>();
+        
+        for(LocationVariable heap : modHeaps) {
+           heapToAtPre.put(heap, new HashMap<Term, Term>());
+           heapToAtPre.get(heap).put(TB.var(heap), TB.var(atPreVars.get(heap)));
         }
+
         // FIXME check this again!?
-        if(modHeapNames.contains(TB.SAVED_HEAP_NAME)) {
-           heapToAtPre.get(TB.SAVED_HEAP_NAME).put(TB.heap(TB.BASE_HEAP_NAME, services), TB.var(atPreVars.get(TB.SAVED_HEAP_NAME)));
+        if(modHeaps.contains(getSavedHeap())) {
+           heapToAtPre.get(getSavedHeap()).put(TB.getBaseHeap(services), TB.var(atPreVars.get(getSavedHeap())));
         }
 
 //        final Map<Term, Term> normalToAtPre = new HashMap<Term, Term>();
@@ -284,14 +291,14 @@ public class FunctionalOperationContractPO
                                                     atPreVars,
                                                     services);
         Term frameTerm = null;
-        for(String heapName : modHeapNames) {
+        for(LocationVariable heap : modHeaps) {
            final Term ft;
-           if(!getContract().hasModifiesClause() && heapName.equals(TB.BASE_HEAP_NAME)) {
+           if(!getContract().hasModifiesClause() && heap == getBaseHeap()) {
              // strictly pure have a different contract.
-             ft = TB.frameStrictlyEmpty(services, TB.heap(heapName, services), heapToAtPre.get(heapName));
+             ft = TB.frameStrictlyEmpty(services, TB.var(heap), heapToAtPre.get(heap));
            }else{
-             ft = TB.frame(services, TB.heap(heapName, services),
-                    heapToAtPre.get(heapName), getContract().getMod(heapName, selfVar,
+             ft = TB.frame(services, TB.var(heap),
+                    heapToAtPre.get(heap), getContract().getMod(heap, selfVar,
                             paramVars, services));
            }
            if(frameTerm == null) {
@@ -333,6 +340,11 @@ public class FunctionalOperationContractPO
         //add axioms
         collectClassAxioms(contract.getKJT());
         hc.reset();
+    }
+
+
+    private LocationVariable getSavedHeap() {
+        return services.getTypeConverter().getHeapLDT().getSavedHeap();
     }
 
 

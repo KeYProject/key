@@ -1,41 +1,27 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -239,9 +225,9 @@ public class InvariantConfigurator {
 
                 String[] loopInvStr = new String[3];
                 
-                final Map<String,Term> atPres = loopInv.getInternalAtPres();
+                final Map<LocationVariable,Term> atPres = loopInv.getInternalAtPres();
                 if(!isTransaction) {
-                  atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
+                  atPres.put(services.getTypeConverter().getHeapLDT().getSavedHeap(), null);
                 } 
                 final Term invariant = loopInv.getInvariant(loopInv.getInternalSelfTerm(), atPres, services, false);
                 if (invariant == null) {
@@ -251,7 +237,8 @@ public class InvariantConfigurator {
                 }
 
                 // FIXME TODO !!! This should also deal with savedHeap and other heaps, if any
-                final Term modifies = loopInv.getModifies(TermBuilder.BASE_HEAP_NAME, loopInv.getInternalSelfTerm(), atPres, services);
+                final Term modifies = loopInv.getModifies(services.getTypeConverter().getHeapLDT().getHeap(), 
+                        loopInv.getInternalSelfTerm(), atPres, services);
                 
                 if (modifies == null) {
                     loopInvStr[1] = "allLocs";
@@ -576,8 +563,8 @@ public class InvariantConfigurator {
                 }
 
                 if (requirementsAreMet) {
-                    Map<String,Term> mods = new LinkedHashMap<String,Term>();
-                    mods.put(TermBuilder.BASE_HEAP_NAME, modifiesTerm);
+                    Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
+                    mods.put(services.getTypeConverter().getHeapLDT().getHeap(), modifiesTerm);
                     newInvariant = new LoopInvariantImpl(loopInv.getLoop(),
                             invariantTerm, mods, variantTerm, loopInv
                                     .getInternalSelfTerm(), loopInv

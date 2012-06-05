@@ -95,8 +95,8 @@ public final class DependencyContractPO extends AbstractPO
             mbyAtPreDef = TB.tt();
         }        
              
-        return TB.and(new Term[]{TB.wellFormedHeap(TB.BASE_HEAP_NAME, services), 
-        			 TB.wellFormed(services, anonHeap),
+        return TB.and(new Term[]{TB.wellFormed(TB.getBaseHeap(services), services), 
+        			 TB.wellFormed(anonHeap, services),
         	       		 selfNotNull,
         	       		 selfCreated,
         	       		 selfExactType,
@@ -150,7 +150,7 @@ public final class DependencyContractPO extends AbstractPO
 	//prepare update
 	final Term changedHeap 
 		= TB.anon(services, 
-			  TB.heap(TB.BASE_HEAP_NAME, services), 
+			  TB.getBaseHeap(services), 
 			  TB.setMinus(services, 
 				      TB.allLocs(services), 
 				      dep), 
@@ -162,7 +162,7 @@ public final class DependencyContractPO extends AbstractPO
 	//prepare target term
 	final Term[] subs
 		= new Term[paramVars.size() + (target.isStatic() ? 1 : 2)];
-	subs[0] = TB.heap(TB.BASE_HEAP_NAME, services);
+	subs[0] = TB.getBaseHeap(services);
 	int offset = 1;
 	if(!target.isStatic()) {
 	    subs[1] = TB.var(selfVar);

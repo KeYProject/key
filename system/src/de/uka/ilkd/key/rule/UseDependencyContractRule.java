@@ -462,8 +462,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
         
         //get precondition, dependency term, measured_by
         Term freePre 
-        	= TB.and(TB.wellFormed(services, subStep),
-        		 TB.wellFormed(services, focus.sub(0)));
+        	= TB.and(TB.wellFormed(subStep, services),
+        		 TB.wellFormed(focus.sub(0), services));
 	if(!target.isStatic()) {
 	    freePre = TB.and(freePre, TB.not(TB.equals(selfTerm, TB.NULL(services))));
 	    freePre = TB.and(freePre, TB.created(services,

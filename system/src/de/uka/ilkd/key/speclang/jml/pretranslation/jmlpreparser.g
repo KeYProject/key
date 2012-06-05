@@ -18,6 +18,8 @@ header {
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.speclang.*;
     import de.uka.ilkd.key.speclang.translation.*;
+    import de.uka.ilkd.key.ldt.HeapLDT;
+    import de.uka.ilkd.key.logic.Name;
     import de.uka.ilkd.key.logic.TermBuilder;
 }
 
@@ -608,15 +610,15 @@ assignable_clause
       String t = result.text;
       while(t.startsWith(" ")) t = t.substring(1);
       String p = "assignable ";
-      for(String hString : TermBuilder.VALID_HEAP_NAMES) {
-        String l = "<"+hString+">";
+      for(Name heapName : HeapLDT.VALID_HEAP_NAMES) {
+		String l = "<"+heapName+">";
         if(t.startsWith(l)) {
            p = l + p;
            t = t.substring(l.length());
         }
         result = new PositionedString(t, result.fileName, result.pos);
       }
-      result = result.prepend(p); 
+      result = result.prepend(p);
     }
 ;
 

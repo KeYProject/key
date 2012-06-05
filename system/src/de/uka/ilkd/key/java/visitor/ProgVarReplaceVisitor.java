@@ -10,8 +10,8 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -24,7 +24,6 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -224,7 +223,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             return;
         }
         Term selfTerm = inv.getInternalSelfTerm();
-        Map<String,Term> atPres = inv.getInternalAtPres();
+        Map<LocationVariable,Term> atPres = inv.getInternalAtPres();
         
         //invariant
         Term newInvariant 
@@ -237,12 +236,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                                       atPres,
                                                       services, true));
 
-        Map<String,Term> newMods = new LinkedHashMap<String,Term>();
-        for(String heapName : TermBuilder.VALID_HEAP_NAMES) {
-           final Term m = replaceVariablesInTerm(inv.getModifies(heapName, selfTerm, 
+        Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+           final Term m = replaceVariablesInTerm(inv.getModifies(heap, selfTerm, 
                                      atPres,
                                      services));
-           newMods.put(heapName, m);
+           newMods.put(heap, m);
         }
 
         //variant
@@ -253,7 +252,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         
         Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
 
-        for(String h : atPres.keySet()) {
+        for(LocationVariable h : atPres.keySet()) {
            final Term t = atPres.get(h);
            if(t == null) continue;
            atPres.put(h, replaceVariablesInTerm(t));

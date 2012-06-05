@@ -18,7 +18,9 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 
 /**
@@ -29,10 +31,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
     private final LoopStatement loop;
     private final Term originalInvariant;
     private final Term originalTransactionInvariant;
-    private final Map<String,Term> originalModifies;
+    private final Map<LocationVariable,Term> originalModifies;
     private final Term originalVariant;
     private final Term originalSelfTerm;
-    private final Map<String,Term> originalAtPres;
+    private final Map<LocationVariable,Term> originalAtPres;
     
     
     //-------------------------------------------------------------------------
@@ -51,10 +53,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariantImpl(LoopStatement loop,
                              Term invariant,
                              Term transactionInvariant,
-                             Map<String,Term> modifies,  
+                             Map<LocationVariable,Term> modifies,  
                              Term variant, 
                              Term selfTerm,
-                             Map<String,Term> atPres) {
+                             Map<LocationVariable,Term> atPres) {
         assert loop != null;
         //assert modifies != null;
         //assert heapAtPre != null;
@@ -69,10 +71,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     public LoopInvariantImpl(LoopStatement loop,
                              Term invariant,
-                             Map<String,Term> modifies,   
+                             Map<LocationVariable,Term> modifies,   
                              Term variant, 
                              Term selfTerm,
-                             Map<String,Term> atPres) {
+                             Map<LocationVariable,Term> atPres) {
         this(loop,invariant,null,modifies,variant,selfTerm,atPres);
     }
     
@@ -81,7 +83,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
      */
     public LoopInvariantImpl(LoopStatement loop, 
 	    		     Term selfTerm, 
-	    		     Map<String,Term> atPres) {
+	    		     Map<LocationVariable,Term> atPres) {
         this(loop, 
              null, 
              null, 
@@ -99,7 +101,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     
     private Map /*Operator, Operator, Term -> Term*/<Term, Term> getReplaceMap(
             Term selfTerm,
-            Map<String,Term> atPres,
+            Map<LocationVariable,Term> atPres,
             Services services) {
         final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
         
@@ -116,10 +118,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
         // date by the ProgVarReplaceVisitor
 
         if(atPres != null) {
-          for(String h : TermBuilder.VALID_HEAP_NAMES) {
+          for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
              if(atPres.get(h) != null) {
-	       assert originalAtPres.get(h).sort().equals(atPres.get(h).sort());
-	       result.put(originalAtPres.get(h), atPres.get(h));
+                 assert originalAtPres.get(h).sort().equals(atPres.get(h).sort());
+                 result.put(originalAtPres.get(h), atPres.get(h));
              }
           }
         }
@@ -130,7 +132,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     
     private Map<Term,Term> getInverseReplaceMap(
             Term selfTerm,
-            Map<String,Term> atPres,
+            Map<LocationVariable,Term> atPres,
             Services services) {
        final Map<Term,Term> result = new LinkedHashMap<Term,Term>();
        final Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
@@ -153,7 +155,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     @Override    
     public Term getInvariant(Term selfTerm,
-            		     Map<String,Term> atPres,
+            		     Map<LocationVariable,Term> atPres,
             		     Services services,
                              boolean transaction) {
         assert (selfTerm == null) == (originalSelfTerm == null);
@@ -163,20 +165,20 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     @Override
-    public Term getModifies(String heapName, Term selfTerm,
-            		    Map<String,Term> atPres,
+    public Term getModifies(LocationVariable heap, Term selfTerm,
+            		    Map<LocationVariable,Term> atPres,
             		    Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = 
             getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalModifies.get(heapName));
+        return or.replace(originalModifies.get(heap));
     }
     
 
     @Override
     public Term getVariant(Term selfTerm, 
-            		   Map<String,Term> atPres,
+            		   Map<LocationVariable,Term> atPres,
             		   Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
         Map<Term, Term> replaceMap = 
@@ -203,9 +205,9 @@ public final class LoopInvariantImpl implements LoopInvariant {
     
     
     @Override
-    public Map<String,Term> getInternalAtPres() {
-        Map<String,Term> result = new LinkedHashMap<String,Term>();
-        for(String h : originalAtPres.keySet()) {
+    public Map<LocationVariable,Term> getInternalAtPres() {
+        Map<LocationVariable,Term> result = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable h : originalAtPres.keySet()) {
           result.put(h, originalAtPres.get(h));
         }
         return result;
@@ -227,7 +229,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public LoopInvariant setInvariant(Term invariant, 
             			      Term selfTerm,
-            			      Map<String,Term> atPres,
+            			      Map<LocationVariable,Term> atPres,
             			      Services services,
                                       boolean transaction) {
         assert (selfTerm == null) == (originalSelfTerm == null);

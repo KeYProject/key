@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 
 
 /**
@@ -31,18 +32,18 @@ public interface LoopInvariant extends SpecificationElement {
 
     
     /** Returns the invariant formula. */
-    public Term getInvariant(Term selfTerm, Map<String,Term> atPres, Services services, boolean transaction);
+    public Term getInvariant(Term selfTerm, Map<LocationVariable,Term> atPres, Services services, boolean transaction);
 
     /**
      * Returns the modifies clause.
      */
-    public Term getModifies(String heapName, Term selfTerm, Map<String,Term> atPres, Services services);
+    public Term getModifies(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
     
     /**
      * Returns the variant term. 
      */
     public Term getVariant(Term selfTerm, 
-            		   Map<String,Term> atPres,
+            		   Map<LocationVariable,Term> atPres,
             		   Services services);
     
     /**
@@ -54,7 +55,7 @@ public interface LoopInvariant extends SpecificationElement {
     /**
      * Returns operators internally used for the pre-heap.
      */
-    public Map<String,Term> getInternalAtPres();
+    public Map<LocationVariable,Term> getInternalAtPres();
 
     /**
      * Returns the term internally used for the invariant. 
@@ -81,7 +82,7 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public LoopInvariant setInvariant(Term invariant, 
             			      Term selfTerm,
-            			      Map<String,Term> atPres,
+            			      Map<LocationVariable,Term> atPres,
             			      Services services,
                                       boolean transaction); 
     

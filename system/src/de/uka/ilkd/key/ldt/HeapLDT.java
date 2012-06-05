@@ -20,7 +20,6 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.ExtList;
@@ -37,6 +36,11 @@ public final class HeapLDT extends LDT {
         
     public static final Name SELECT_NAME = new Name("select");
     public static final Name STORE_NAME = new Name("store");
+    public static final Name BASE_HEAP_NAME = new Name("heap");
+    public static final Name SAVED_HEAP_NAME = new Name("savedHeap");
+    public static final Name[] VALID_HEAP_NAMES = {BASE_HEAP_NAME, SAVED_HEAP_NAME};
+
+
     
     //additional sorts
     private final Sort fieldSort;    
@@ -69,8 +73,7 @@ public final class HeapLDT extends LDT {
     private final Function reach;
     
     //heap pv
-    private final LocationVariable heap;
-    private final LocationVariable savedHeap;
+    private final ImmutableArray<LocationVariable> heaps;
     
     
     
@@ -102,8 +105,10 @@ public final class HeapLDT extends LDT {
         wellFormed        = addFunction(services, "wellFormed");
         acc               = addFunction(services, "acc");
         reach             = addFunction(services, "reach");
-        heap	          = (LocationVariable) progVars.lookup(new Name(TermBuilder.BASE_HEAP_NAME));    
-        savedHeap	  = (LocationVariable) progVars.lookup(new Name(TermBuilder.SAVED_HEAP_NAME));    
+        heaps = new ImmutableArray<LocationVariable>(new LocationVariable[]{
+                (LocationVariable) progVars.lookup(BASE_HEAP_NAME),
+                (LocationVariable) progVars.lookup(SAVED_HEAP_NAME)
+        });
     }
     
     
@@ -278,17 +283,36 @@ public final class HeapLDT extends LDT {
     
     
     public LocationVariable getHeap() {
-	return heap;
+	return heaps.get(0);
+    }
+    
+    public LocationVariable getSavedHeap() {
+        return heaps.get(1);
     }
 
-    public LocationVariable getHeap(String heapName) {
+    
+    public ImmutableArray<LocationVariable> getAllHeaps() {
+        return heaps;
+    }
+
+    public LocationVariable getHeapForName(Name name) {
+        for (LocationVariable h : getAllHeaps()) {
+            if (h.name().equals(name)) {
+                return h;
+            }
+        }
+        return null;
+    }
+
+   /* public LocationVariable getHeap(String heapName) {
+       
        if(TermBuilder.BASE_HEAP_NAME.equals(heapName)) {
          return heap;
        }else{
          assert TermBuilder.SAVED_HEAP_NAME.equals(heapName);
          return savedHeap;
        }
-    }    
+    }*/    
     
     /**
      * Given a "program variable" representing a field or a model field, 
@@ -414,4 +438,6 @@ public final class HeapLDT extends LDT {
 	assert false;
 	return null;
     }
+
+
 }

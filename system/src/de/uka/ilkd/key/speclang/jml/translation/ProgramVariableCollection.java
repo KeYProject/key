@@ -4,6 +4,7 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -14,13 +15,13 @@ public class ProgramVariableCollection {
     public ImmutableList<ProgramVariable> paramVars;
     public ProgramVariable resultVar;
     public ProgramVariable excVar;
-    public Map<String,LocationVariable> atPreVars ;
-    public Map<String,Term> atPres;
+    public Map<LocationVariable,LocationVariable> atPreVars ;
+    public Map<LocationVariable,Term> atPres;
     
     public ProgramVariableCollection(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar, ProgramVariable excVar,
-            Map<String,LocationVariable> atPreVars, Map<String,Term> atPres) {
+            Map<LocationVariable,LocationVariable> atPreVars, Map<LocationVariable,Term> atPres) {
         super();
         this.selfVar = selfVar;
         this.paramVars = paramVars;

@@ -517,7 +517,7 @@ public final class SpecificationRepository {
 	final Modality otherMatchModality = transactionModality ? ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA :
 	          Modality.BOX) : null;
 	for(FunctionalOperationContract contract : result) {
-	    if(!contract.getModality().equals(modality) && !(contract.isReadOnlyContract() && contract.getModality().equals(otherMatchModality))) {
+	    if(!contract.getModality().equals(modality) && !(contract.isReadOnlyContract(services) && contract.getModality().equals(otherMatchModality))) {
 		result = result.remove(contract);
 	    }
 	}

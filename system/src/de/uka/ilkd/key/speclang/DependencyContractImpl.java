@@ -19,7 +19,10 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -143,7 +146,7 @@ public final class DependencyContractImpl implements DependencyContract {
     @Override
     public Term getPre(ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
-                       Map<String, ? extends ProgramVariable> atPreVars,
+                       Map<LocationVariable, ? extends ProgramVariable> atPreVars,
 	    	       Services services) {
         assert (selfVar == null) == (originalSelfVar == null);
         assert paramVars != null;
@@ -166,7 +169,7 @@ public final class DependencyContractImpl implements DependencyContract {
     public Term getPre(Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
-                       Map<String,Term> atPres,
+                       Map<LocationVariable,Term> atPres,
 	    	       Services services) {
 	assert heapTerm != null;
 	assert (selfTerm == null) == (originalSelfVar == null);
@@ -174,7 +177,7 @@ public final class DependencyContractImpl implements DependencyContract {
 	assert paramTerms.size() == originalParamVars.size();
 	assert services != null;
 	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
-	map.put(TB.heap(TB.BASE_HEAP_NAME, services), heapTerm);
+	map.put(TB.getBaseHeap(services), heapTerm);
 	if (originalSelfVar != null) {
             map.put(TB.var(originalSelfVar), selfTerm);
         }
@@ -222,7 +225,7 @@ public final class DependencyContractImpl implements DependencyContract {
 	assert paramTerms.size() == originalParamVars.size();
 	assert services != null;
 	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
-	map.put(TB.heap(TB.BASE_HEAP_NAME, services), heapTerm);
+	map.put(TB.getBaseHeap(services), heapTerm);
 	if (originalSelfVar != null) {
 	    map.put(TB.var(originalSelfVar), selfTerm);
 	}
@@ -302,7 +305,7 @@ public final class DependencyContractImpl implements DependencyContract {
 	assert paramTerms.size() == originalParamVars.size();
 	assert services != null;
 	Map<SVSubstitute, SVSubstitute> map = new HashMap<SVSubstitute, SVSubstitute>();
-	map.put(TB.heap(TB.BASE_HEAP_NAME, services), heapTerm);
+	map.put(TB.getBaseHeap(services), heapTerm);
 	if (originalSelfVar != null) {
             map.put(TB.var(originalSelfVar), selfTerm);
         }

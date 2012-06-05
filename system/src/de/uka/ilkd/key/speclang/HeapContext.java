@@ -30,11 +30,11 @@ public interface HeapContext {
   public static final HeapContext LOOP_HC = new MethodContractHeapContext(false);
   public static final HeapContext LOOP_TR_HC = new MethodContractHeapContext(true);
 
-  Map<String,LocationVariable> getBeforeAtPreVars(Services services, String contextName);
+  Map<LocationVariable,LocationVariable> getBeforeAtPreVars(Services services, String contextName);
 
-  Map<String,Term> getAtPres();
+  Map<LocationVariable,Term> getAtPres(Services services);
 
-  List<String> getModHeapNames();
+  List<LocationVariable> getModHeaps(Services services);
 
   void reset();
 
