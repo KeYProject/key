@@ -34,6 +34,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ObjectUtil;
@@ -294,13 +295,20 @@ public class ProofReferenceComposite extends Composite {
        * Updates the children of the given parent element in {@link #viewer}.
        * @param parentElement The parent element to update its children.
        */
-      protected void updateChildren(Object parentElement) {
+      protected void updateChildren(final Object parentElement) {
          if (parentElement != null && viewer != null && !viewer.getControl().isDisposed()) {
-            Object[] children = childMapping.remove(parentElement);
-            if (children != null) {
-               viewer.remove(parentElement, children);
-            }
-            viewer.add(parentElement, getChildren(parentElement));
+            viewer.getControl().getDisplay().syncExec(new Runnable() {
+               @Override
+               public void run() {
+                  if (viewer.getControl().isDisposed()) {
+                     Object[] children = childMapping.remove(parentElement);
+                     if (children != null) {
+                        viewer.remove(parentElement, children);
+                     }
+                     viewer.add(parentElement, getChildren(parentElement));
+                  }
+               }
+            });
          }
       }
 
@@ -564,7 +572,7 @@ public class ProofReferenceComposite extends Composite {
        */
       protected void handleNotifyChanged(Notification msg) {
          if (DbcmodelPackage.Literals.DBC_PROOF_REFERENCE__KIND.equals(msg.getFeature())) {
-            fireLabelProviderChanged(new LabelProviderChangedEvent(this));
+            fireLabelProviderChangedThreadSave(new LabelProviderChangedEvent(this));
          }
       }
       
@@ -573,7 +581,20 @@ public class ProofReferenceComposite extends Composite {
        * @param event The event.
        */
       protected void handleChildLabelProviderChanged(LabelProviderChangedEvent event) {
-         fireLabelProviderChanged(new LabelProviderChangedEvent(this));
+         fireLabelProviderChangedThreadSave(new LabelProviderChangedEvent(this));
+      }
+      
+      /**
+       * Fires the event to all listeners thread save.
+       * @param event The event to fire.
+       */
+      protected void fireLabelProviderChangedThreadSave(final LabelProviderChangedEvent event) {
+         Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+               fireLabelProviderChanged(event);
+            }
+         });
       }
 
       /**
