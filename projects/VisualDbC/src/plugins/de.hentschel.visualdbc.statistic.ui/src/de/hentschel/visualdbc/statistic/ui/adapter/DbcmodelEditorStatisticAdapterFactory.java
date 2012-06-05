@@ -24,9 +24,10 @@ import de.hentschel.visualdbc.dbcmodel.DbcModel;
 import de.hentschel.visualdbc.dbcmodel.presentation.DbcmodelEditor;
 import de.hentschel.visualdbc.statistic.ui.control.IStatisticProvider;
 import de.hentschel.visualdbc.statistic.ui.view.DbcStatisticViewPart;
+import de.hentschel.visualdbc.statistic.ui.view.IStatisticViewPart;
 
 /**
- * Converts a given {@link DbcmodelEditor} into an {@link IStatisticProvider}.
+ * Converts a given {@link DbcmodelEditor} into an {@link IStatisticViewPart}.
  * @author Martin Hentschel
  */
 public class DbcmodelEditorStatisticAdapterFactory extends AbstractStatisticAdapterFactory {

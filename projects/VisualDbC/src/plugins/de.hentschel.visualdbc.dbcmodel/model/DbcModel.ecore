@@ -52,6 +52,8 @@
   <eClassifiers xsi:type="ecore:EClass" name="DbcProofReference">
     <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//IDbCProofReferencable"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="source" eType="#//DbcProof"
+        transient="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="DbcAttribute" eSuperTypes="#//IDbCProofReferencable">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -176,7 +178,10 @@
         eType="#//DbcProof" changeable="false" transient="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="IDbCProofReferencable" abstract="true"
-      interface="true"/>
+      interface="true">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="allReferences" upperBound="-1"
+        eType="#//DbcProofReference" changeable="false" transient="true"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="DbcProofObligation">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="obligation" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>

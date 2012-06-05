@@ -77,6 +77,7 @@ public class DbcProofReferenceItemProvider
 
          addTargetPropertyDescriptor(object);
          addKindPropertyDescriptor(object);
+         addSourcePropertyDescriptor(object);
       }
       return itemPropertyDescriptors;
    }
@@ -121,6 +122,28 @@ public class DbcProofReferenceItemProvider
              false,
              false,
              ItemPropertyDescriptor.GENERIC_VALUE_IMAGE,
+             null,
+             null));
+   }
+
+   /**
+    * This adds a property descriptor for the Source feature.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   protected void addSourcePropertyDescriptor(Object object) {
+      itemPropertyDescriptors.add
+         (createItemPropertyDescriptor
+            (((ComposeableAdapterFactory)adapterFactory).getRootAdapterFactory(),
+             getResourceLocator(),
+             getString("_UI_DbcProofReference_source_feature"),
+             getString("_UI_PropertyDescriptor_description", "_UI_DbcProofReference_source_feature", "_UI_DbcProofReference_type"),
+             DbcmodelPackage.Literals.DBC_PROOF_REFERENCE__SOURCE,
+             false,
+             false,
+             true,
+             null,
              null,
              null));
    }
