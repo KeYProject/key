@@ -183,6 +183,7 @@ public class ProofReferenceComposite extends Composite {
          elementsToShow = Collections.emptyList();
       }
       viewer.setInput(elementsToShow);
+      viewer.expandToLevel(2);
    }
 
    /**
@@ -361,7 +362,8 @@ public class ProofReferenceComposite extends Composite {
       
       /**
        * Filters out the element from the given {@link Object} which
-       * have nothing to do with proof references.
+       * have nothing to do with proof references or the elements
+       * which provides currently no proof references.
        * @param input The input.
        * @return The elements which have something to do with proof references.
        */
@@ -370,9 +372,19 @@ public class ProofReferenceComposite extends Composite {
          if (input instanceof List<?>) {
             List<?> inputList = (List<?>)input;
             for (Object element : inputList) {
-               if (element instanceof DbcProof ||
-                   element instanceof DbcProofReference ||
-                   element instanceof IDbCProofReferencable) {
+               if (element instanceof DbcProof) {
+                  DbcProof proof = (DbcProof)element;
+                  if (!proof.getProofReferences().isEmpty()) {
+                     filteredInput.add(proof);
+                  }
+               }
+               else if (element instanceof IDbCProofReferencable) {
+                  IDbCProofReferencable referencable = (IDbCProofReferencable)element;
+                  if (!referencable.getAllReferences().isEmpty()) {
+                     filteredInput.add(referencable);
+                  }
+               }
+               else if (element instanceof DbcProofReference) {
                   filteredInput.add((EObject)element);
                }
             }
