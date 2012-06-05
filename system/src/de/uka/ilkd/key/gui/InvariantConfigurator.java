@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -51,9 +52,15 @@ import de.uka.ilkd.key.speclang.LoopInvariantImpl;
  */
 public class InvariantConfigurator {
 
+    private static final int INV_IDX = 0;
+    private static final int MOD_IDX = 1;
+    private static final int VAR_IDX = 2;
+    private static final String DEFAULT = "Default";
+    private static final String TRANSACTION = "Transaction";
+
     private static InvariantConfigurator configurator = null;
-    private ArrayList<String[]> invariants = null;
-    private HashMap<LoopStatement, ArrayList<String[]>> mapLoopsToInvariants = null;
+    private List<Map<String,String>[]> invariants = null;
+    private HashMap<LoopStatement, List<Map<String,String>[]>> mapLoopsToInvariants = null;
     private int index = 0;
     private LoopInvariant newInvariant = null;
     private boolean userPressedCancel = false;
@@ -62,8 +69,8 @@ public class InvariantConfigurator {
      * Singleton
      */
     private InvariantConfigurator() {
-        invariants = new ArrayList<String[]>();
-        mapLoopsToInvariants = new HashMap<LoopStatement, ArrayList<String[]>>();
+        invariants = new ArrayList<Map<String,String>[]>();
+        mapLoopsToInvariants = new HashMap<LoopStatement, List<Map<String,String>[]>>();
     }
 
     /**
@@ -115,9 +122,9 @@ public class InvariantConfigurator {
             private Term variantTerm = null;
             private Term modifiesTerm = null;
 
-            private final String INVARIANTTITLE = "Invariant: ";
-            private final String VARIANTTITLE = "Variant: ";
-            private final String MODIFIESTITLE = "Modifies: ";
+            private final String INVARIANTTITLE = "Invariant%s: ";
+            private final String VARIANTTITLE = "Variant%s: ";
+            private final String MODIFIESTITLE = "Modifies%s: ";
 
 
             /**
@@ -237,53 +244,64 @@ public class InvariantConfigurator {
              */
             private void initInvariants() {
 
-                String[] loopInvStr = new String[3];
+                @SuppressWarnings({"unchecked"})
+                Map<String,String>[] loopInvTexts = new Map[VAR_IDX+1];
                 
                 final Map<String,Term> atPres = loopInv.getInternalAtPres();
-                if(!isTransaction) {
-                  atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
-                } 
+
+                loopInvTexts[INV_IDX] = new LinkedHashMap<String,String>();
                 final Term invariant = loopInv.getInvariant(loopInv.getInternalSelfTerm(), atPres, services, false);
                 if (invariant == null) {
-                    loopInvStr[0] = "true";
+                    loopInvTexts[INV_IDX].put(DEFAULT, "true");
                 } else {
-                    loopInvStr[0] = printTerm(invariant, true);
+                    loopInvTexts[INV_IDX].put(DEFAULT, printTerm(invariant, true));
                 }
 
-                // FIXME TODO !!! This should also deal with savedHeap and other heaps, if any
-                final Term modifies = loopInv.getModifies(TermBuilder.BASE_HEAP_NAME, loopInv.getInternalSelfTerm(), atPres, services);
+                final Term transInvariant = loopInv.getInvariant(loopInv.getInternalSelfTerm(), atPres, services, true);
+                if (transInvariant == null) {
+                    loopInvTexts[INV_IDX].put(TRANSACTION, "true");
+                } else {
+                    loopInvTexts[INV_IDX].put(TRANSACTION, printTerm(transInvariant, true));
+                }
+
+                loopInvTexts[MOD_IDX] = new LinkedHashMap<String,String>();
+                for(String heapName : TermBuilder.VALID_HEAP_NAMES) {
+                  final Term modifies = loopInv.getModifies(heapName, loopInv.getInternalSelfTerm(), atPres, services);
                 
-                if (modifies == null) {
-                    loopInvStr[1] = "allLocs";
-                } else {
-                    // pretty syntax cannot be parsed yet for modifies
-                    loopInvStr[1] = printTerm(modifies, false);
+                  if (modifies == null) {
+                    // FIXME check again and think what is the default for savedHeap
+                    loopInvTexts[MOD_IDX].put(heapName, "allLocs");
+                  } else {
+                      // pretty syntax cannot be parsed yet for modifies
+                    loopInvTexts[MOD_IDX].put(heapName, printTerm(modifies, false));
+                  }
                 }
 
+                loopInvTexts[VAR_IDX] = new LinkedHashMap<String,String>();
                 final Term variant = loopInv.getVariant(loopInv.getInternalSelfTerm(), atPres, services);
                 if (variant == null) {
-                    loopInvStr[2] = "";
+                    loopInvTexts[VAR_IDX].put(DEFAULT,"");
                 } else {                    
-                    loopInvStr[2] = printTerm(variant, true);
+                    loopInvTexts[VAR_IDX].put(DEFAULT,printTerm(variant, true));
                 }
 
                 if (!mapLoopsToInvariants.containsKey(loopInv.getLoop())) {
                     // add the given Invariant
-                    invariants = new ArrayList<String[]>();
-                    invariants.add(loopInvStr);
+                    invariants = new ArrayList<Map<String,String>[]>();
+                    invariants.add(loopInvTexts);
                     mapLoopsToInvariants.put(loopInv.getLoop(), invariants);
                     index = invariants.size() - 1;
                 } else {
                     invariants = mapLoopsToInvariants.get(loopInv.getLoop());
                     // Check if the given invariant is in
                     // the list
-                    if (!invariants.contains(loopInvStr)) {
-                        invariants.add(loopInvStr);
+                    if (!invariants.contains(loopInvTexts)) {
+                        invariants.add(loopInvTexts);
                         index = invariants.size() - 1;
                     } else {
                         // set the index to the
                         // currently used invariant
-                        index = invariants.indexOf(loopInvStr);
+                        index = invariants.indexOf(loopInvTexts);
                     }
                 }
             }
@@ -303,27 +321,33 @@ public class InvariantConfigurator {
                 JPanel panel = new JPanel();
                 panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
-                JTextArea invarea = createInputTextArea(INVARIANTTITLE,
-                        invariants.get(i)[0], i);
-                JTextArea modarea = createInputTextArea(MODIFIESTITLE,
-                        invariants.get(i)[1], i);
-                JTextArea vararea = createInputTextArea(VARIANTTITLE,
-                        invariants.get(i)[2], i);
-                JTabbedPane p = new JTabbedPane(JTabbedPane.BOTTOM);
-                p.add("Regular", invarea);
-                p.add("Transaction", new JPanel());
-                panel.add(p);
-                JTabbedPane p2 = new JTabbedPane(JTabbedPane.BOTTOM);
-                p2.add("heap", modarea);
-                p2.add("savedHeap", new JPanel());
-                p2.add("permissions", new JPanel());
-                panel.add(p2);
+		JTabbedPane invPane = new JTabbedPane(JTabbedPane.BOTTOM);
+                Map<String,String> invs = invariants.get(i)[INV_IDX];
+                for(String k : invs.keySet()) {
+                   String title = String.format(INVARIANTTITLE, k.equals(DEFAULT) ? "" : " "+k);
+                   JTextArea textArea = createInputTextArea(title, invs.get(k), i);
+                   invPane.add(k, textArea);
+                }
+
+		JTabbedPane modPane = new JTabbedPane(JTabbedPane.BOTTOM);
+                Map<String,String> mods = invariants.get(i)[MOD_IDX];
+                for(String k : mods.keySet()) {
+                   String title = String.format(MODIFIESTITLE, k.equals(TermBuilder.BASE_HEAP_NAME) ? "" : "["+k+"]");
+                   JTextArea textArea = createInputTextArea(title, mods.get(k), i);
+                   modPane.add(k, textArea);
+                }
+
+                JTextArea vararea = createInputTextArea(String.format(VARIANTTITLE,""),
+                        invariants.get(i)[VAR_IDX].get(DEFAULT), i);
+
+                panel.add(invPane);
+                panel.add(modPane);
                 panel.add(vararea);
 
                 JScrollPane rightPane = new JScrollPane(panel);;
                 
-                final int charXWidth = invarea.getFontMetrics(invarea.getFont()).charWidth('X');
-                final int fontHeight = invarea.getFontMetrics(invarea.getFont()).getHeight();
+                final int charXWidth = vararea.getFontMetrics(vararea.getFont()).charWidth('X');
+                final int fontHeight = vararea.getFontMetrics(vararea.getFont()).getHeight();
                 
                 rightPane.setMinimumSize(new Dimension(charXWidth * 72, fontHeight * 15));
                 rightPane.setPreferredSize(new Dimension(charXWidth * 80, fontHeight * 20));
@@ -343,11 +367,11 @@ public class InvariantConfigurator {
                                         Title));
                 inputTextArea.setEditable(true);
 
-                if (Title.equals(INVARIANTTITLE)) {
+                if (Title.startsWith(INVARIANTTITLE.substring(0,6))) {
                     return setInvariantListener(inputTextArea, i);
-                } else if (Title.equals(VARIANTTITLE)) {
+                } else if (Title.startsWith(VARIANTTITLE.substring(0,6))) {
                     return setVariantListener(inputTextArea, i);
-                } else if (Title.equals(MODIFIESTITLE)) {
+                } else if (Title.startsWith(MODIFIESTITLE.substring(0,6))) {
                     return setMoifiesListener(inputTextArea, i);
                 } else {
                     return inputTextArea;
@@ -490,7 +514,7 @@ public class InvariantConfigurator {
              */
             public void storeActionPerformed(ActionEvent aE) {
                 index = inputPane.getSelectedIndex();
-                String[] invs = invariants.get(index).clone();
+                Map<String,String>[] invs = invariants.get(index).clone();
                 invariants.add(invs);
                 index = invariants.size() - 1;
                 inputPane.addTab("Inv " + (invariants.size() - 1),
@@ -523,9 +547,10 @@ public class InvariantConfigurator {
                 Document doc = d.getDocument();
                 index = inputPane.getSelectedIndex();
 
-                String[] inv = invariants.get(index);
+                Map<String,String>[] inv = invariants.get(index);
                 try {
-                    inv[0] = doc.getText(0, doc.getLength());
+                    // FIXME
+                    inv[INV_IDX].put(DEFAULT, doc.getText(0, doc.getLength()));
                 } catch (Exception e) {
                 } finally {
                     parse();
@@ -536,9 +561,10 @@ public class InvariantConfigurator {
                 Document doc = d.getDocument();
                 index = inputPane.getSelectedIndex();
 
-                String[] inv = invariants.get(index);
+                Map<String,String>[] inv = invariants.get(index);
                 try {
-                    inv[1] = doc.getText(0, doc.getLength());
+                    // FIXME
+                    inv[MOD_IDX].put(TermBuilder.BASE_HEAP_NAME, doc.getText(0, doc.getLength()));
                 } catch (Exception e) {
                 } finally {
                     parse();
@@ -549,9 +575,9 @@ public class InvariantConfigurator {
                 Document doc = d.getDocument();
                 index = inputPane.getSelectedIndex();
 
-                String[] inv = invariants.get(index);
+                Map<String,String>[] inv = invariants.get(index);
                 try {
-                    inv[2] = doc.getText(0, doc.getLength());
+                    inv[VAR_IDX].put(DEFAULT,doc.getText(0, doc.getLength()));
                 } catch (Exception e) {
                 } finally {
                     parse();
@@ -594,7 +620,7 @@ public class InvariantConfigurator {
                 String invError = "OK";
                 Color invCol = Color.GREEN;
                 try {
-                    invariantTerm = parseInvariant();
+                    invariantTerm = parseInvariant(false);
                 } catch (Exception e) {
                     invError = e.getMessage();
                     invCol = Color.RED;
@@ -602,7 +628,7 @@ public class InvariantConfigurator {
                 String modError = "OK";
                 Color modCol = Color.GREEN;
                 try {
-                    modifiesTerm = parseModifies();
+                    modifiesTerm = parseModifies(TermBuilder.BASE_HEAP_NAME);
                 } catch (Exception e) {
                     modError = e.getMessage();
                     modCol = Color.RED;
@@ -612,7 +638,7 @@ public class InvariantConfigurator {
 
                 try {
                     int i = inputPane.getSelectedIndex();
-                    if (invariants.get(i)[2] == "") {
+                    if (invariants.get(i)[VAR_IDX].get(DEFAULT).equals("")) {
                         variantTerm = null;
                         if (requiresVariant) {
                             throw new Exception("Variant required!");
@@ -669,25 +695,25 @@ public class InvariantConfigurator {
              * @return invariant term
              * @throws Exception
              */
-            protected Term parseInvariant() throws Exception {
+            protected Term parseInvariant(boolean transaction) throws Exception {
                 Term result = null;
                 index = inputPane.getSelectedIndex();
                 // might throw parserException
+                String k = transaction ? TRANSACTION : DEFAULT;
                 
-                
-               result =  parser.parse(new StringReader(invariants.get(index)[0]), Sort.ANY, services, services.getNamespaces(),
+               result =  parser.parse(new StringReader(invariants.get(index)[INV_IDX].get(k)), Sort.ANY, services, services.getNamespaces(),
                 MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
 
                 return result;
             }
 
-            protected Term parseModifies() throws Exception {
+            protected Term parseModifies(String heapName) throws Exception {
                 Term result = null;
                 index = inputPane.getSelectedIndex();
                 // might throw parserException or some obscure
                 // antlr
                 result = parser.parse(
-                        new StringReader(invariants.get(index)[1]), Sort.ANY,
+                        new StringReader(invariants.get(index)[MOD_IDX].get(heapName)), Sort.ANY,
                         services, services.getNamespaces(), MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
                 return result;
             }
@@ -698,7 +724,7 @@ public class InvariantConfigurator {
                 // might throw parserException or some obscure
                 // antlr
                 result = parser.parse(
-                        new StringReader(invariants.get(index)[2]), Sort.ANY,
+                        new StringReader(invariants.get(index)[VAR_IDX].get(DEFAULT)), Sort.ANY,
                         services, services.getNamespaces(), MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
                 return result;
             }
