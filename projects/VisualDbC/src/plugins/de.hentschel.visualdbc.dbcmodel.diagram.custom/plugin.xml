@@ -32,19 +32,22 @@
             id="de.hentschel.visualdbc.dbcmodel.diagram.part.DbCDiagramEditorID.hideContribution"
             targetID="de.hentschel.visualdbc.dbcmodel.diagram.part.DbCDiagramEditorID">
          <menu
-               id="de.hentschel.visualdbc.dbcmodel.diagram.custom.proofReferenceHidingMenu"
-               label="Proof Reference Hiding"
+               id="de.hentschel.visualdbc.dbcmodel.diagram.custom.proofReferenceManagementMenu"
+               label="Proof Reference Management"
                path="diagramMenu">
             <separator
                   name="hide">
             </separator>
+            <separator
+                  name="highlight">
+            </separator>
          </menu>
          <action
                class="de.hentschel.visualdbc.dbcmodel.diagram.custom.action.AutomaticProofReferenceHidingEditorActionDelegate"
-               icon="icons/ProfReferenceHidingShowNone.gif"
+               icon="icons/ProofReferenceHidingShowNone.gif"
                id="de.hentschel.visualdbc.dbcmodel.diagram.custom.hideProofReferences"
                label="Hide all proof references"
-               menubarPath="de.hentschel.visualdbc.dbcmodel.diagram.custom.proofReferenceHidingMenu/hide"
+               menubarPath="de.hentschel.visualdbc.dbcmodel.diagram.custom.proofReferenceManagementMenu/hide"
                state="false"
                style="radio"
                toolbarPath="hide"
@@ -52,10 +55,10 @@
          </action>
          <action
                class="de.hentschel.visualdbc.dbcmodel.diagram.custom.action.AutomaticProofReferenceHidingEditorActionDelegate"
-               icon="icons/ProfReferenceHidingShowSelected.gif"
+               icon="icons/ProofReferenceHidingShowSelected.gif"
                id="de.hentschel.visualdbc.dbcmodel.diagram.custom.showSelectedProofReferences"
                label="Show only proof references of selected elements"
-               menubarPath="de.hentschel.visualdbc.dbcmodel.diagram.custom.proofReferenceHidingMenu/hide"
+               menubarPath="de.hentschel.visualdbc.dbcmodel.diagram.custom.proofReferenceManagementMenu/hide"
                state="false"
                style="radio"
                toolbarPath="hide"
@@ -63,14 +66,25 @@
          </action>
          <action
                class="de.hentschel.visualdbc.dbcmodel.diagram.custom.action.AutomaticProofReferenceHidingEditorActionDelegate"
-               icon="icons/ProfReferenceHidingShowAll.gif"
+               icon="icons/ProofReferenceHidingShowAll.gif"
                id="de.hentschel.visualdbc.dbcmodel.diagram.custom.showProofReferences"
                label="Show all proof references"
-               menubarPath="de.hentschel.visualdbc.dbcmodel.diagram.custom.proofReferenceHidingMenu/hide"
+               menubarPath="de.hentschel.visualdbc.dbcmodel.diagram.custom.proofReferenceManagementMenu/hide"
                state="true"
                style="radio"
                toolbarPath="hide"
                tooltip="Show all proof references.">
+         </action>
+         <action
+               class="de.hentschel.visualdbc.dbcmodel.diagram.custom.action.AutomaticProofReferenceHighlightEditorActionDelegate"
+               icon="icons/ProofReferenceHighlighting.gif"
+               id="de.hentschel.visualdbc.dbcmodel.diagram.custom.highlightProofReferences"
+               label="Highlight selected proof references"
+               menubarPath="de.hentschel.visualdbc.dbcmodel.diagram.custom.proofReferenceManagementMenu/highlight"
+               state="false"
+               style="toggle"
+               toolbarPath="highlight"
+               tooltip="Highlight selected proof references.">
          </action>
       </editorContribution>
    </extension>
