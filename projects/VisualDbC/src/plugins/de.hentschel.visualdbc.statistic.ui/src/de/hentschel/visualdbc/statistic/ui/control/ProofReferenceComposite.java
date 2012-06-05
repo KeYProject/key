@@ -54,6 +54,7 @@ import de.hentschel.visualdbc.dbcmodel.DbcProof;
 import de.hentschel.visualdbc.dbcmodel.DbcProofReference;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 import de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable;
+import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
 import de.hentschel.visualdbc.dbcmodel.provider.DbcmodelItemProviderAdapterFactory;
 
 /**
@@ -684,7 +685,11 @@ public class ProofReferenceComposite extends Composite {
       protected String getColumnText(Object element, int columnIndex, boolean rootElement) {
          if (element instanceof DbcProof) {
             if (columnIndex == 0 || columnIndex == 3 && !rootElement) {
-               return ((DbcProof) element).getObligation();
+               DbcProof proof = ((DbcProof)element);
+               IDbCProvable target = proof.getTarget();
+               return target != null ?
+                      proof.getObligation() + " of " + getColumnText(target, 0) :
+                      proof.getObligation();
             }
             else {
                return null;
