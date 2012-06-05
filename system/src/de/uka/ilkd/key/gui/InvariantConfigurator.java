@@ -309,8 +309,15 @@ public class InvariantConfigurator {
                         invariants.get(i)[1], i);
                 JTextArea vararea = createInputTextArea(VARIANTTITLE,
                         invariants.get(i)[2], i);
-                panel.add(invarea);
-                panel.add(modarea);
+                JTabbedPane p = new JTabbedPane(JTabbedPane.BOTTOM);
+                p.add("Regular", invarea);
+                p.add("Transaction", new JPanel());
+                panel.add(p);
+                JTabbedPane p2 = new JTabbedPane(JTabbedPane.BOTTOM);
+                p2.add("heap", modarea);
+                p2.add("savedHeap", new JPanel());
+                p2.add("permissions", new JPanel());
+                panel.add(p2);
                 panel.add(vararea);
 
                 JScrollPane rightPane = new JScrollPane(panel);;

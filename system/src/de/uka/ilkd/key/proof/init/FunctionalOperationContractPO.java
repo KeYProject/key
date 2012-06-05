@@ -248,7 +248,9 @@ public class FunctionalOperationContractPO
            heapToAtPre.get(heapName).put(TB.heap(heapName,services),TB.var(atPreVars.get(heapName)));
         }
         // FIXME check this again!?
-        heapToAtPre.get(TB.SAVED_HEAP_NAME).put(TB.heap(TB.BASE_HEAP_NAME, services), TB.var(atPreVars.get(TB.SAVED_HEAP_NAME)));
+        if(modHeapNames.contains(TB.SAVED_HEAP_NAME)) {
+           heapToAtPre.get(TB.SAVED_HEAP_NAME).put(TB.heap(TB.BASE_HEAP_NAME, services), TB.var(atPreVars.get(TB.SAVED_HEAP_NAME)));
+        }
 
 //        final Map<Term, Term> normalToAtPre = new HashMap<Term, Term>();
 
