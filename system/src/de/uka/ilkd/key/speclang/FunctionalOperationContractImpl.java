@@ -129,7 +129,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	this.originalExcVar         = excVar;
 	this.originalAtPreVars      = atPreVars;
 	this.id                     = id;
-        this.transaction            = transaction;//(mods.get(TermBuilder.SAVED_HEAP_NAME) != null);
+        this.transaction            = transaction;
         this.poModality             = (modality == Modality.DIA_TRANSACTION ? 
                                           Modality.DIA : 
                                           (modality == Modality.BOX_TRANSACTION ? Modality.BOX : modality));	
@@ -715,13 +715,6 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
        return getAnyMod(this.originalMods.get(heap), selfVar, paramVars, services);
     }
 
-//    @Override
-//    public Term getBackupMod(ProgramVariable selfVar, 
-//                       ImmutableList<ProgramVariable> paramVars,
-//                       Services services) {
-//       return getAnyMod(this.originalModBackup, selfVar, paramVars, services);
-//    }
-
     private Term getAnyMod(Term mod, Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
@@ -754,14 +747,6 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                        Services services) {
         return getAnyMod(this.originalMods.get(heap), heapTerm, selfTerm, paramTerms, services);
     }    
-
-//    @Override    
-//    public Term getBackupMod(Term heapTerm,
-//	               Term selfTerm, 
-//	    	       ImmutableList<Term> paramTerms,
-//                       Services services) {
-//        return getAnyMod(this.originalModBackup, heapTerm, selfTerm, paramTerms, services);
-//    }    
     
     @Override
     public String toString() {

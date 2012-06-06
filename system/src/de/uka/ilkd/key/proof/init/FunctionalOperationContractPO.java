@@ -236,16 +236,6 @@ public class FunctionalOperationContractPO
        
         final Map<LocationVariable,LocationVariable> atPreVars = hc.getBeforeAtPreVars(services, "AtPre");
 
-//        final LocationVariable heapAtPreVar = TB.heapAtPreVar(services,
-//                                                              TB.BASE_HEAP_NAME+"AtPre", true);
-
-
-//        final LocationVariable savedHeapAtPreVar = getContract().transactionContract() ? TB.heapAtPreVar(services,
-//                                                              TB.SAVED_HEAP_NAME+"AtPre", true) : null;
-//        Map<String,LocationVariable> atPreVars = new LinkedHashMap<String,LocationVariable>();
-//        atPreVars.put(TB.BASE_HEAP_NAME,  heapAtPreVar);
-//        atPreVars.put(TB.SAVED_HEAP_NAME,  savedHeapAtPreVar);
-        
         final List<LocationVariable> modHeaps = hc.getModHeaps(services);
         final Map<LocationVariable,Map<Term,Term>> heapToAtPre = new LinkedHashMap<LocationVariable,Map<Term,Term>>();
         
@@ -259,14 +249,6 @@ public class FunctionalOperationContractPO
            heapToAtPre.get(getSavedHeap()).put(TB.getBaseHeap(services), TB.var(atPreVars.get(getSavedHeap())));
         }
 
-//        final Map<Term, Term> normalToAtPre = new HashMap<Term, Term>();
-
-//        normalToAtPre.put(TB.heap(TB.BASE_HEAP_NAME, services), TB.var(heapAtPreVar));
-//        final Map<Term, Term> savedToAtPre = new HashMap<Term, Term>();
-//        if(savedHeapAtPreVar != null) {
-//            savedToAtPre.put(TB.heap(TB.SAVED_HEAP_NAME, services), TB.var(savedHeapAtPreVar));
-//            savedToAtPre.put(TB.heap(TB.BASE_HEAP_NAME, services), TB.var(savedHeapAtPreVar));
-//        }
         //register the variables so they are declared in proof header 
         //if the proof is saved to a file
         register(paramVars);
@@ -308,25 +290,8 @@ public class FunctionalOperationContractPO
            }
         }
         
-//        if(getContract().hasModifiesClause()) {
-//            frameTerm = TB.frame(services, TB.heap(TB.BASE_HEAP_NAME, services),
-//                    normalToAtPre, 
-//                    getContract().getMod(TB.BASE_HEAP_NAME, selfVar,
-//                            paramVars,
-//                            services));
-//        } else {
-//            frameTerm = TB.frameStrictlyEmpty(services, TB.heap(TB.BASE_HEAP_NAME, services), normalToAtPre);
-//        }
         
         final Term post = TB.and(postTerm, frameTerm);
-//           TB.and(getContract().transactionContract() ?
-//                new Term[] {postTerm, frameTerm, TB.frame(services, TB.heap(TB.BASE_HEAP_NAME, services),
-//                                          savedToAtPre,
-//                                          getContract().getMod(TB.SAVED_HEAP_NAME, selfVar,
-//                                                               paramVars,
-//                                                               services))}
-//             :
-//                new Term[] {postTerm, frameTerm} );
         final Term progPost = buildProgramTerm(paramVars,
                                                selfVar,
                                                resultVar,

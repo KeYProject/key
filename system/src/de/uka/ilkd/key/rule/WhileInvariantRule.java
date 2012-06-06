@@ -223,8 +223,6 @@ public final class WhileInvariantRule implements BuiltInRule {
     final HeapContext hc = inst.inv.getHeapContext(transaction);
     final List<LocationVariable> modHeaps = hc.getModHeaps(services);
 
-//    final Term transactionInv = transaction ? inst.inv.getInvariant(inst.selfTerm, atPres, services) : null;
-
     final Term regularInv = inst.inv.getInvariant(inst.selfTerm, atPres, services, false);
 
     final Term invTerm;
@@ -239,30 +237,15 @@ public final class WhileInvariantRule implements BuiltInRule {
       invTerm = regularInv;
     }
 
-//    final Term s = atPres.get(TermBuilder.SAVED_HEAP_NAME);
     final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
     for(LocationVariable heap : modHeaps) {
       final Term m = inst.inv.getModifies(heap, inst.selfTerm, atPres, services);
       mods.put(heap, m);
     }
 
-//    final Term mod = inst.inv.getModifies(TermBuilder.BASE_HEAP_NAME, inst.selfTerm, 
-//					      atPres, 
-//					      services);
-	// This on the other hand should never be null
-//    final Term modBackup = inst.inv.getModifies(TermBuilder.SAVED_HEAP_NAME,inst.selfTerm, 
-//            atPres, 
-//            services);
-
-//  atPres.put(TermBuilder.SAVED_HEAP_NAME, null);
-//  final Term regularInv = inst.inv.getInvariant(inst.selfTerm, atPres, services);
-   // NOTE even when a transaction is on, the transactionInv can still be null (no loop_invariant_transaction given)
-//	final Term invTerm  = transactionInv != null ?
-//	     TB.and(regularInv, transactionInv) : regularInv;
 	final Term variant = inst.inv.getVariant(inst.selfTerm, 
 						 atPres, 
 						 services);
-//	atPres.put(TermBuilder.SAVED_HEAP_NAME, s);
 	//collect input and output local variables, 
 	//prepare reachableIn and reachableOut
 	final ImmutableSet<ProgramVariable> localIns 
@@ -281,8 +264,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 	}
 	
 	Term beforeLoopUpdate = null;
-//        final Map<Term,Term> savedToBeforeLoop = new HashMap<Term,Term>();
-//	final Map<Term,Term> normalToBeforeLoop = new HashMap<Term,Term>();
 
         final Map<LocationVariable,Map<Term,Term>> heapToBeforeLoop = new LinkedHashMap<LocationVariable,Map<Term,Term>>();
 
@@ -297,11 +278,6 @@ public final class WhileInvariantRule implements BuiltInRule {
              beforeLoopUpdate = TB.parallel(beforeLoopUpdate, u);
           }
           heapToBeforeLoop.get(heap).put(TB.var(heap), TB.var(lv));
-//          if(h.equals(TermBuilder.SAVED_HEAP_NAME)) {
-//	    savedToBeforeLoop.put(TB.heap(h, services), TB.var(lv));
-//          }else{
-//	    normalToBeforeLoop.put(TB.heap(h, services), TB.var(lv));
-//          }
         }
 
 	for(ProgramVariable pv : localOuts) {
@@ -352,36 +328,6 @@ public final class WhileInvariantRule implements BuiltInRule {
           reachableState = TB.and(reachableState, TB.wellFormed(heap, services));
         }
 
-//	final Pair<Term,Term> anonUpdateAndHeap 
-//		= createAnonUpdate(TermBuilder.BASE_HEAP_NAME, inst.loop, mod, localOuts, services);
-//	final Term anonUpdate;
-//	final Term anonHeapWellFormed;
-//	if(transaction) {
-//	    final Pair<Term,Term> anonUpdateAndHeapSaved  
-//	      = createAnonUpdate(TermBuilder.SAVED_HEAP_NAME, inst.loop, modBackup, null, services);
-//	  anonUpdate = TB.parallel(anonUpdateAndHeap.first, anonUpdateAndHeapSaved.first);
-//	  anonHeapWellFormed   = TB.and(TB.wellFormed(services, anonUpdateAndHeap.second), TB.wellFormed(services, anonUpdateAndHeapSaved.second));
-//	}else{
-//	  anonUpdate = anonUpdateAndHeap.first;
-//	  anonHeapWellFormed   = TB.wellFormed(services, anonUpdateAndHeap.second);	    
-//	}
-
-	// special case frame condition for strictly pure loops
-//	final Term normalFrameCondition;
-//	if(TB.lessThanNothing().equals(mod)) {
-//	    normalFrameCondition = TB.frameStrictlyEmpty(services, TB.heap(TermBuilder.BASE_HEAP_NAME, services), normalToBeforeLoop); 
-//	} else {
-//	    normalFrameCondition = TB.frame(services, TB.heap(TermBuilder.BASE_HEAP_NAME, services),
-//               normalToBeforeLoop, 
-//               mod);
-//	}
-//	final Term transactionFrameCondition = transaction ?
-//	          TB.frame(services, TB.heap(TermBuilder.SAVED_HEAP_NAME,services), savedToBeforeLoop, modBackup)
-//	        : null;
-        
-//	final Term frameCondition = transactionFrameCondition != null ?
-//	        TB.and(normalFrameCondition,transactionFrameCondition) : normalFrameCondition;
-	
 	//prepare variant
 	final ProgramElementName variantName 
 		= new ProgramElementName(TB.newName(services, "variant"));
