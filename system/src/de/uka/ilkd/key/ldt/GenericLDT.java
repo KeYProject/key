@@ -83,5 +83,9 @@ public final class GenericLDT extends LDT {
         assert false;
         return null;
     }
+    
+    public Function getAtom(){
+        return atom;
+    }
 
 }
