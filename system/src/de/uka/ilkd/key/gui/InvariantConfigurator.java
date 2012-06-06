@@ -119,8 +119,9 @@ public class InvariantConfigurator {
             private JPanel errorPanel;
 
             private Term invariantTerm = null;
+            private Term transactionInvariantTerm = null;
             private Term variantTerm = null;
-            private Term modifiesTerm = null;
+            private Map<String,Term> modifiesTerm = new LinkedHashMap<String,Term>();
 
             private final String INVARIANTTITLE = "Invariant%s: ";
             private final String VARIANTTITLE = "Variant%s: ";
@@ -326,6 +327,7 @@ public class InvariantConfigurator {
                 for(String k : invs.keySet()) {
                    String title = String.format(INVARIANTTITLE, k.equals(DEFAULT) ? "" : " "+k);
                    JTextArea textArea = createInputTextArea(title, invs.get(k), i);
+                   setInvariantListener(textArea, k, i);
                    invPane.add(k, textArea);
                 }
 
@@ -334,11 +336,13 @@ public class InvariantConfigurator {
                 for(String k : mods.keySet()) {
                    String title = String.format(MODIFIESTITLE, k.equals(TermBuilder.BASE_HEAP_NAME) ? "" : "["+k+"]");
                    JTextArea textArea = createInputTextArea(title, mods.get(k), i);
+                   setModifiesListener(textArea, k, i);
                    modPane.add(k, textArea);
                 }
 
                 JTextArea vararea = createInputTextArea(String.format(VARIANTTITLE,""),
                         invariants.get(i)[VAR_IDX].get(DEFAULT), i);
+                setVariantListener(vararea, DEFAULT, i);
 
                 panel.add(invPane);
                 panel.add(modPane);
@@ -366,76 +370,61 @@ public class InvariantConfigurator {
                                         .createLineBorder(Color.DARK_GRAY),
                                         Title));
                 inputTextArea.setEditable(true);
-
-                if (Title.startsWith(INVARIANTTITLE.substring(0,6))) {
-                    return setInvariantListener(inputTextArea, i);
-                } else if (Title.startsWith(VARIANTTITLE.substring(0,6))) {
-                    return setVariantListener(inputTextArea, i);
-                } else if (Title.startsWith(MODIFIESTITLE.substring(0,6))) {
-                    return setMoifiesListener(inputTextArea, i);
-                } else {
-                    return inputTextArea;
-                }
-
+                return inputTextArea;
             }
 
-            private JTextArea setInvariantListener(JTextArea ta, int i) {
+            private void setInvariantListener(JTextArea ta, final String key, int i) {
                 index = i;
                 ta.getDocument().addDocumentListener(new DocumentListener() {
 
                     public void removeUpdate(DocumentEvent e) {
-                        invUdatePerformed(e);
+                        invUdatePerformed(e, key);
                     }
 
                     public void insertUpdate(DocumentEvent e) {
-                        invUdatePerformed(e);
+                        invUdatePerformed(e, key);
                     }
 
                     public void changedUpdate(DocumentEvent e) {
-                        invUdatePerformed(e);
+                        invUdatePerformed(e, key);
                     }
                 });
-                return ta;
-
             }
 
-            private JTextArea setVariantListener(JTextArea ta, int i) {
+            private void setVariantListener(JTextArea ta, final String key, int i) {
                 index = i;
                 ta.getDocument().addDocumentListener(new DocumentListener() {
 
                     public void removeUpdate(DocumentEvent e) {
-                        varUdatePerformed(e);
+                        varUdatePerformed(e, key);
                     }
 
                     public void insertUpdate(DocumentEvent e) {
-                        varUdatePerformed(e);
+                        varUdatePerformed(e, key);
                     }
 
                     public void changedUpdate(DocumentEvent e) {
-                        varUdatePerformed(e);
+                        varUdatePerformed(e, key);
                     }
                 });
-                return ta;
-
             }
 
-            private JTextArea setMoifiesListener(JTextArea ta, int i) {
+            private void setModifiesListener(JTextArea ta, final String key, int i) {
                 index = i;
                 ta.getDocument().addDocumentListener(new DocumentListener() {
 
                     public void removeUpdate(DocumentEvent e) {
-                        modUdatePerformed(e);
+                        modUdatePerformed(e, key);
                     }
 
                     public void insertUpdate(DocumentEvent e) {
-                        modUdatePerformed(e);
+                        modUdatePerformed(e, key);
                     }
 
                     public void changedUpdate(DocumentEvent e) {
-                        modUdatePerformed(e);
+                        modUdatePerformed(e, key);
                     }
                 });
-                return ta;
             }
 
             private JTextArea initLoopPresentation() {
@@ -466,24 +455,62 @@ public class InvariantConfigurator {
                 return loopRep;
             }
 
-            private JPanel createErrorPanel(String invMsg, Color invColor,
-                    String modMsg, Color modColor, String varMsg, Color varColor) {
+            private JPanel createErrorPanel(Map<String,String> invMsgs, Map<String,Color> invColors,
+                    Map<String,String> modMsgs, Map<String,Color> modColors, Map<String,String> varMsgs, Map<String,Color> varColors) {
                 JPanel panel = new JPanel();
                 panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-                panel.add(createErrorTextField("Invariant - Status: ", invMsg,
-                        invColor));
-                panel.add(createErrorTextField("Modifies - Status: ", modMsg,
-                        modColor));
-                panel.add(createErrorTextField("Variant - Status", varMsg,
-                        varColor));
+                JTabbedPane invPane = new JTabbedPane(JTabbedPane.BOTTOM);
+                for(String k : new String[]{ DEFAULT, TRANSACTION } ) {
+                   String title = String.format("%sInvariant - Status: ", k.equals(DEFAULT) ? "" : k+" ");
+                   JTextArea textArea = createErrorTextField(title, invMsgs.get(k),
+                        invColors.get(k));
+                   invPane.add(k, textArea);
+                }
+
+                JTabbedPane modPane = new JTabbedPane(JTabbedPane.BOTTOM);
+                for(String k : TermBuilder.VALID_HEAP_NAMES ) {
+                   String title = String.format("Modifies%s - Status: ", k.equals(TermBuilder.BASE_HEAP_NAME) ? "" : "["+k+"]");
+                   JTextArea textArea = createErrorTextField(title, modMsgs.get(k),
+                        modColors.get(k));
+                   modPane.add(k, textArea);
+                }
+
+                panel.add(invPane);
+                panel.add(modPane);
+                JTextArea varErrorArea = createErrorTextField("Variant - Status", varMsgs.get(DEFAULT),
+                        varColors.get(DEFAULT));
+                panel.add(varErrorArea);
+
+                final int charXWidth = varErrorArea.getFontMetrics(varErrorArea.getFont()).charWidth('X');
+                final int fontHeight = varErrorArea.getFontMetrics(varErrorArea.getFont()).getHeight();
+                
+                varErrorArea.setMinimumSize(new Dimension(charXWidth * 80, fontHeight * 5));
+                varErrorArea.setPreferredSize(new Dimension(charXWidth * 80, fontHeight * 10));
+                varErrorArea.setMaximumSize(new Dimension(charXWidth * 80, fontHeight * 15));
 
                 return panel;
 
             }
 
             private JPanel initErrorPanel() {
-                return createErrorPanel("OK", Color.GREEN, "OK", Color.GREEN,
-                        "OK", Color.GREEN);
+                Map<String,String> invMsgs = new LinkedHashMap<String,String>();
+                Map<String,Color> invColors = new LinkedHashMap<String,Color>();
+                Map<String,String> modMsgs = new LinkedHashMap<String,String>();
+                Map<String,Color> modColors = new LinkedHashMap<String,Color>();
+                Map<String,String> varMsgs = new LinkedHashMap<String,String>();
+                Map<String,Color> varColors = new LinkedHashMap<String,Color>();
+                for(String k : new String[]{ DEFAULT, TRANSACTION } ) {
+                   invMsgs.put(k, "OK");
+                   invColors.put(k, Color.GREEN);
+                }
+                for(String k : TermBuilder.VALID_HEAP_NAMES ) {
+                   modMsgs.put(k, "OK");
+                   modColors.put(k, Color.GREEN);
+                }
+                varMsgs.put(DEFAULT, "OK");
+                varColors.put(DEFAULT, Color.GREEN);
+                return createErrorPanel(invMsgs, invColors, modMsgs, modColors,
+                        varMsgs, varColors);
             }
 
             private JTextArea createErrorTextField(String Title,
@@ -543,41 +570,40 @@ public class InvariantConfigurator {
              * 
              * @param d
              */
-            private void invUdatePerformed(DocumentEvent d) {
+            private void invUdatePerformed(DocumentEvent d, String key) {
                 Document doc = d.getDocument();
                 index = inputPane.getSelectedIndex();
 
                 Map<String,String>[] inv = invariants.get(index);
                 try {
-                    // FIXME
-                    inv[INV_IDX].put(DEFAULT, doc.getText(0, doc.getLength()));
+                    inv[INV_IDX].put(key, doc.getText(0, doc.getLength()));
                 } catch (Exception e) {
                 } finally {
                     parse();
                 }
             }
 
-            public void modUdatePerformed(DocumentEvent d) {
+            public void modUdatePerformed(DocumentEvent d, String key) {
                 Document doc = d.getDocument();
                 index = inputPane.getSelectedIndex();
 
                 Map<String,String>[] inv = invariants.get(index);
                 try {
-                    // FIXME
-                    inv[MOD_IDX].put(TermBuilder.BASE_HEAP_NAME, doc.getText(0, doc.getLength()));
+                    inv[MOD_IDX].put(key, doc.getText(0, doc.getLength()));
                 } catch (Exception e) {
                 } finally {
                     parse();
                 }
             }
 
-            public void varUdatePerformed(DocumentEvent d) {
+            public void varUdatePerformed(DocumentEvent d, String key) {
+                assert key.equals(DEFAULT);
                 Document doc = d.getDocument();
                 index = inputPane.getSelectedIndex();
 
                 Map<String,String>[] inv = invariants.get(index);
                 try {
-                    inv[VAR_IDX].put(DEFAULT,doc.getText(0, doc.getLength()));
+                    inv[VAR_IDX].put(key, doc.getText(0, doc.getLength()));
                 } catch (Exception e) {
                 } finally {
                     parse();
@@ -590,22 +616,28 @@ public class InvariantConfigurator {
             private boolean buildInvariant() {
                 boolean requirementsAreMet = true;
                 if (requiresVariant && variantTerm == null) {
+                    Map<String,String> varErrors = new LinkedHashMap<String,String>();
+                    Map<String,Color> varColors = new LinkedHashMap<String,Color>();
+                    varErrors.put(DEFAULT, "Variant is required!");
+                    varColors.put(DEFAULT, Color.RED);
                     updateErrorPanel(null, null, null, null,
-                            "Variant is required!", Color.RED);
+                            varErrors, varColors);
                     requirementsAreMet = false;
                 }
 
                 if (invariantTerm == null) {
                     requirementsAreMet = false;
-                    updateErrorPanel("Invariant is required!", Color.RED, null,
+                    Map<String,String> invErrors = new LinkedHashMap<String,String>();
+                    Map<String,Color> invColors = new LinkedHashMap<String,Color>();
+                    invErrors.put(DEFAULT, "Invariant is required!");
+                    invColors.put(DEFAULT, Color.RED);
+                    updateErrorPanel(invErrors, invColors, null,
                             null, null, null);
                 }
 
                 if (requirementsAreMet) {
-                    Map<String,Term> mods = new LinkedHashMap<String,Term>();
-                    mods.put(TermBuilder.BASE_HEAP_NAME, modifiesTerm);
                     newInvariant = new LoopInvariantImpl(loopInv.getLoop(),
-                            invariantTerm, mods, variantTerm, loopInv
+                            invariantTerm, transactionInvariantTerm, modifiesTerm, variantTerm, loopInv
                                     .getInternalSelfTerm(), loopInv
                                     .getInternalAtPres());
                     return true;
@@ -617,24 +649,40 @@ public class InvariantConfigurator {
              * No Comment
              */
             private void parse() {
-                String invError = "OK";
-                Color invCol = Color.GREEN;
+                Map<String,String> invErrors = new LinkedHashMap<String,String>();
+                Map<String,Color>  invCols = new LinkedHashMap<String,Color>();
                 try {
                     invariantTerm = parseInvariant(false);
+                    invErrors.put(DEFAULT, "OK");
+                    invCols.put(DEFAULT,Color.GREEN);
                 } catch (Exception e) {
-                    invError = e.getMessage();
-                    invCol = Color.RED;
+                    invErrors.put(DEFAULT, e.getMessage());
+                    invCols.put(DEFAULT, Color.RED);
                 }
-                String modError = "OK";
-                Color modCol = Color.GREEN;
+
                 try {
-                    modifiesTerm = parseModifies(TermBuilder.BASE_HEAP_NAME);
+                    transactionInvariantTerm = parseInvariant(true);
+                    invErrors.put(TRANSACTION, "OK");
+                    invCols.put(TRANSACTION, Color.GREEN);
                 } catch (Exception e) {
-                    modError = e.getMessage();
-                    modCol = Color.RED;
+                    invErrors.put(TRANSACTION, e.getMessage());
+                    invCols.put(TRANSACTION, Color.RED);
                 }
-                String varError = "OK";
-                Color varCol = Color.GREEN;
+
+                Map<String,String> modErrors = new LinkedHashMap<String,String>();
+                Map<String,Color>  modCols = new LinkedHashMap<String,Color>();
+                for(String heapName : TermBuilder.VALID_HEAP_NAMES) {
+                  try {
+                    modifiesTerm.put(heapName, parseModifies(heapName));
+                    modErrors.put(heapName, "OK");
+                    modCols.put(heapName, Color.GREEN);
+                  } catch (Exception e) {
+                    modErrors.put(heapName, e.getMessage());
+                    modCols.put(heapName, Color.RED);
+                  }
+                }
+                Map<String,String> varErrors = new LinkedHashMap<String,String>();
+                Map<String,Color>  varCols = new LinkedHashMap<String,Color>();
 
                 try {
                     int i = inputPane.getSelectedIndex();
@@ -645,34 +693,51 @@ public class InvariantConfigurator {
                         }
                     } else {
                         variantTerm = parseVariant();
+                        varErrors.put(DEFAULT, "OK");
+                        varCols.put(DEFAULT, Color.GREEN);
+
                     }
                 } catch (Exception e) {
-                    varCol = Color.RED;
-                    varError = e.getMessage();
+                    varErrors.put(DEFAULT, e.getMessage());
+                    varCols.put(DEFAULT, Color.RED);
                 }
 
-                updateErrorPanel(invError, invCol, modError, modCol, varError,
-                        varCol);
+                updateErrorPanel(invErrors, invCols, modErrors, modCols, varErrors,
+                        varCols);
 
             }
 
-            private void updateErrorPanel(String invError, Color invCol,
-                    String modError, Color modCol, String varError, Color varCol) {
+            private void updateErrorPanel(Map<String,String> invErrors, Map<String,Color> invCols,
+                    Map<String,String> modErrors, Map<String,Color> modCols, Map<String,String> varErrors, Map<String,Color> varCols) {
                 boolean reeinit = true;
-
-                if (invError != null && invCol != null) {
-                    JTextArea jta = (JTextArea) errorPanel.getComponent(0);
+              
+                if (invErrors != null) {
+                  for(String k : invErrors.keySet()) {
+                    String invError = invErrors.get(k);
+                    Color invCol = invCols.get(k);
+                    JTabbedPane p = (JTabbedPane) errorPanel.getComponent(0);
+                    JTextArea jta = (JTextArea)p.getComponent(p.indexOfTab(k));
                     jta.setForeground(invCol);
                     jta.setText(invError);
-                    reeinit = false;
+                    // Set also the tab color
+                  }
+                  reeinit = false;
                 }
-                if (modError != null && modCol != null) {
-                    JTextArea jta = (JTextArea) errorPanel.getComponent(1);
+                if(modErrors != null) {
+                  for(String k : modErrors.keySet()) {
+                    String modError = modErrors.get(k);
+                    Color modCol = modCols.get(k);
+                    JTabbedPane p = (JTabbedPane) errorPanel.getComponent(1);
+                    JTextArea jta = (JTextArea)p.getComponent(p.indexOfTab(k));
                     jta.setForeground(modCol);
                     jta.setText(modError);
-                    reeinit = false;
+                    // Set also the tab color
+                  }
+                  reeinit = false;
                 }
-                if (varError != null && varCol == null) {
+                if (varErrors != null) {
+                    String varError = varErrors.get(DEFAULT);
+                    Color varCol = varCols.get(DEFAULT);
                     JTextArea jta = (JTextArea) errorPanel.getComponent(2);
                     jta.setForeground(varCol);
                     jta.setText(varError);
@@ -682,8 +747,8 @@ public class InvariantConfigurator {
                     Container con = errorPanel.getParent();
                     con.remove(errorPanel);
                     Dimension d = errorPanel.getPreferredSize();
-                    errorPanel = createErrorPanel(invError, invCol, modError,
-                            modCol, varError, varCol);
+                    errorPanel = createErrorPanel(invErrors, invCols, modErrors,
+                            modCols, varErrors, varCols);
                     errorPanel.setPreferredSize(d);
                     con.add(errorPanel, BorderLayout.SOUTH);
                 }
@@ -701,7 +766,7 @@ public class InvariantConfigurator {
                 // might throw parserException
                 String k = transaction ? TRANSACTION : DEFAULT;
                 
-               result =  parser.parse(new StringReader(invariants.get(index)[INV_IDX].get(k)), Sort.ANY, services, services.getNamespaces(),
+                result =  parser.parse(new StringReader(invariants.get(index)[INV_IDX].get(k)), Sort.ANY, services, services.getNamespaces(),
                 MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
 
                 return result;
