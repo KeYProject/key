@@ -365,7 +365,7 @@ public class TestJMLTranslator extends TestCase {
         assertTrue(
                 termContains(result,
                              services.getTypeConverter().getHeapLDT().getHeap()));
-        assertTrue(termContains(result, atPres.get("heap").op()));
+        assertTrue(termContains(result, atPres.get(services.getTypeConverter().getHeapLDT().getHeap()).op()));
     }
 
 
