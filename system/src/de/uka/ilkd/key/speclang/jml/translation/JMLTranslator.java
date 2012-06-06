@@ -9,23 +9,22 @@
 //
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import antlr.Token;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.ldt.BooleanLDT;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermCreationException;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
@@ -35,13 +34,10 @@ import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
-import de.uka.ilkd.key.util.*;
-import java.util.EnumMap;
-import java.util.Arrays;
-
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.util.LinkedHashMap;
+import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 
 
@@ -493,7 +489,7 @@ final class JMLTranslator {
                 final Services services = (Services)params[0];
                 Function inv = services.getJavaInfo().getInv();
                 Term obj = ((SLExpression) params[1]).getTerm();
-                return new SLExpression(TB.func(inv, TB.heap(TB.BASE_HEAP_NAME, services), obj));
+                return new SLExpression(TB.func(inv, TB.getBaseHeap(services), obj));
             }
         });
         
@@ -639,7 +635,7 @@ final class JMLTranslator {
                                               ? new LogicVariable(new Name("n"),
                                                                   services.getTypeConverter().getIntegerLDT().targetSort())
                         : null;
-                final Term h = TB.heap(TB.BASE_HEAP_NAME, services);
+                final Term h = TB.getBaseHeap(services);
                 final Term s = getFields(excManager, t, services);
                 final Term o = e1.getTerm();
                 final Term o2 = e2.getTerm();
@@ -672,7 +668,7 @@ final class JMLTranslator {
                                               ? new LogicVariable(new Name("n"),
                                                                   services.getTypeConverter().getIntegerLDT().targetSort())
                         : null;
-                final Term h = TB.heap(TB.BASE_HEAP_NAME, services);
+                final Term h = TB.getBaseHeap(services);
                 final Term s = getFields(excManager, t, services);
                 final Term o = e1.getTerm();
                 final Term o2 = TB.var(objLV);
@@ -1015,7 +1011,7 @@ final class JMLTranslator {
                         args = new Term[0];
                     } else {
 
-                        Term heap = TB.heap(TB.BASE_HEAP_NAME, services);
+                        Term heap = TB.getBaseHeap(services);
 
                         // special casing "implicit heap" arguments:
                         // omitting one argument means first argument is "heap"
@@ -1301,7 +1297,7 @@ final class JMLTranslator {
                                   ImmutableList<ProgramVariable> paramVars,
                                   ProgramVariable resultVar,
                                   ProgramVariable excVar,
-                                  Map<String,Term> atPres,
+                                  Map<LocationVariable,Term> atPres,
                                   Class<T> resultClass,
                                   Services services)
             throws SLTranslationException {
@@ -1641,7 +1637,7 @@ final class JMLTranslator {
         protected Term convertToOld(Services services, Term heapAtPre, Term term) {
             assert heapAtPre != null;
             Map<Term,Term> map = new LinkedHashMap<Term, Term>();
-            map.put(TB.heap(TB.BASE_HEAP_NAME, services), heapAtPre);
+            map.put(TB.getBaseHeap(services), heapAtPre);
             OpReplacer or = new OpReplacer(map);
             return or.replace(term);
         }

@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -78,7 +79,7 @@ public final class DLSpecFactory {
 	    if(!(eu.lhs() instanceof ProgramVariable)) {
 		throw new ProofInputException("Program variable expected, "
 				              + "but found: " + eu.lhs());
-	    } else if(!update.sub(0).equals(TB.heap(TB.BASE_HEAP_NAME, services))) {
+	    } else if(!update.sub(0).equals(TB.getBaseHeap(services))) {
 		throw new ProofInputException("heap expected, "
 					      + "but found: " + update.sub(0));
 	    } else {
@@ -265,14 +266,15 @@ public final class DLSpecFactory {
 	    }
 	}
 	
+	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	//heapAtPre variable may be omitted
 	if(heapAtPreVar == null) {
-	    heapAtPreVar = TB.heapAtPreVar(services, TermBuilder.BASE_HEAP_NAME+"AtPre", false);
+	    heapAtPreVar = TB.heapAtPreVar(services, heapLDT.getHeap() + "AtPre", false);
 	}
-        Map<String,LocationVariable> atPreVars = new LinkedHashMap<String,LocationVariable>();
-        atPreVars.put(TB.BASE_HEAP_NAME, heapAtPreVar);
-        Map<String,Term> mods = new LinkedHashMap<String,Term>();
-        mods.put(TB.BASE_HEAP_NAME, modifies);
+        Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
+        atPreVars.put(heapLDT.getHeap(), heapAtPreVar);
+        Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
+        mods.put(heapLDT.getHeap(), modifies);
 
 	//result variable may be omitted
 	if(resultVar == null && !pm.isVoid()) {

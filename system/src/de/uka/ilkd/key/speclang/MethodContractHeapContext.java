@@ -23,52 +23,52 @@ import java.util.LinkedHashMap;
 public class MethodContractHeapContext implements HeapContext {
  
   private boolean transaction;
-  private Map<String,LocationVariable> lvCache = new LinkedHashMap<String,LocationVariable>();
-  private List<String> heapModNames = new ArrayList<String>();
-
-  MethodContractHeapContext() {
-    this(false);
-  }
+  private Map<LocationVariable,LocationVariable> lvCache = 
+          new LinkedHashMap<LocationVariable,LocationVariable>();
+  private List<LocationVariable> heapMods;
 
   MethodContractHeapContext(boolean transaction) {
     this.transaction = transaction;
-    for(String heapName : TermBuilder.VALID_HEAP_NAMES) {
-       if(TermBuilder.SAVED_HEAP_NAME.equals(heapName) && !transaction) {
-         continue;
-       }
-       heapModNames.add(heapName);
-    }
   }
 
-  public Map<String,LocationVariable> getBeforeAtPreVars(Services services, String contextName) {
+  public Map<LocationVariable,LocationVariable> getBeforeAtPreVars(Services services, String contextName) {
     lvCache.clear();
-    for(String heapName : TermBuilder.VALID_HEAP_NAMES) {
-       if(TermBuilder.SAVED_HEAP_NAME.equals(heapName) && !transaction) {
+    final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
+    for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+       if(savedHeap == heap && !transaction) {
          continue;
        }
-       final LocationVariable atPreVar = TermBuilder.DF.heapAtPreVar(services, heapName+contextName, true);
-       lvCache.put(heapName, atPreVar);
+       final LocationVariable atPreVar = TermBuilder.DF.heapAtPreVar(services, heap.name()+contextName, true);
+       lvCache.put(heap, atPreVar);
     }
     return lvCache;
   }
 
-  public Map<String,Term> getAtPres() {
+  public Map<LocationVariable,Term> getAtPres(Services services) {
     assert !lvCache.isEmpty();
-    final Map<String,Term> result = new LinkedHashMap<String,Term>();
-    for(String heapName : TermBuilder.VALID_HEAP_NAMES) {
-       final LocationVariable lv = lvCache.get(heapName);
+    final Map<LocationVariable,Term> result = new LinkedHashMap<LocationVariable,Term>();
+    for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+       final LocationVariable lv = lvCache.get(heap);
        final Term t = lv == null ? null : TermBuilder.DF.var(lv);
-       result.put(heapName, t);
+       result.put(heap, t);
     }
     return result;
   }
 
-  public List<String> getModHeapNames() {
-    return heapModNames;
+  public List<LocationVariable> getModHeaps(Services services) {
+      heapMods = new ArrayList<LocationVariable>();      
+      final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
+      for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+          if(savedHeap == heap && !transaction) {
+              continue;
+          }
+          heapMods.add(heap);
+      }
+      return heapMods;
   }
 
   public void reset() {
-   lvCache.clear();
+      lvCache.clear();
   }
 
 

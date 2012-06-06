@@ -46,7 +46,7 @@ public class TestJMLTranslator extends TestCase {
     private static JavaInfo javaInfo;
     private static Services services;
     private static KeYJavaType testClassType;
-    private static Map<String,Term> atPres = new LinkedHashMap<String,Term>();
+    private static Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
 
 
     protected void setUp() {
@@ -57,7 +57,7 @@ public class TestJMLTranslator extends TestCase {
                 new File(testFile)).getFirstProof().getJavaInfo();
         services = javaInfo.getServices();
         testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
-        atPres.put("heap",TB.var(TB.heapAtPreVar(services, "heapAtPre", false)));
+        atPres.put(services.getTypeConverter().getHeapLDT().getHeap(), TB.var(TB.heapAtPreVar(services, "heapAtPre", false)));
     }
 
 

@@ -10,9 +10,9 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.Services;
@@ -29,9 +29,13 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
@@ -82,7 +86,7 @@ public class JMLSpecFactory {
         public Term measuredBy;
         // public Term assignable;
         // public Term assignable_backup;
-        public Map<String,Term> assignables = new LinkedHashMap<String,Term>();
+        public Map<LocationVariable,Term> assignables = new LinkedHashMap<LocationVariable,Term>();
         public Term accessible;
         public Term ensures;
         public Term signals;
@@ -201,9 +205,9 @@ public class JMLSpecFactory {
         progVar.resultVar = TB.resultVar(services, pm, false);
         progVar.excVar = TB.excVar(services, pm, false);
 
-        progVar.atPreVars = new LinkedHashMap<String,LocationVariable>();
-        progVar.atPres = new LinkedHashMap<String,Term>();
-        for(String h : TermBuilder.VALID_HEAP_NAMES) {
+        progVar.atPreVars = new LinkedHashMap<LocationVariable,LocationVariable>();
+        progVar.atPres = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
            LocationVariable lv = TB.heapAtPreVar(services, h+"AtPre", false);
            progVar.atPreVars.put(h, lv);
            progVar.atPres.put(h, TB.var(lv));
@@ -218,9 +222,10 @@ public class JMLSpecFactory {
                                                 Behavior originalBehavior)
             throws SLTranslationException {
         ContractClauses clauses = new ContractClauses();
-        Map<String,Term> atPres = new LinkedHashMap<String,Term>();
+        Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable, Term>();
+        final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
         if(textualSpecCase.getMods().contains("transaction")) {
-           atPres.put(TermBuilder.SAVED_HEAP_NAME, progVars.atPres.get(TermBuilder.SAVED_HEAP_NAME));
+           atPres.put(savedHeap, progVars.atPres.get(savedHeap));
         }
         clauses.requires =
                 translateAndClauses(pm, progVars.selfVar, progVars.paramVars,
@@ -234,21 +239,21 @@ public class JMLSpecFactory {
                 translateStrictlyPure(pm, progVars.selfVar,
                         progVars.paramVars,
                         textualSpecCase.getAssignable());
-        for(String h : TermBuilder.VALID_HEAP_NAMES) {
-           if(h.equals(TermBuilder.SAVED_HEAP_NAME) && !textualSpecCase.getMods().contains("transaction")) {
-             if(textualSpecCase.getAssignable(h).size() != 0) {
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+           if(heap == savedHeap && !textualSpecCase.getMods().contains("transaction")) {
+             if(textualSpecCase.getAssignable(heap.name().toString()).size() != 0) {
                  throw new SLTranslationException(
-                        "accessing "+TermBuilder.SAVED_HEAP_NAME+" not allowed in a non-transaction spec case.",
-                        textualSpecCase.getAssignable(h).head().fileName,
-                        textualSpecCase.getAssignable(h).head().pos);
+                        "accessing "+savedHeap.name()+" not allowed in a non-transaction spec case.",
+                        textualSpecCase.getAssignable(heap.name().toString()).head().fileName,
+                        textualSpecCase.getAssignable(heap.name().toString()).head().pos);
              }else{
-                clauses.assignables.put(h, null);
+                clauses.assignables.put(heap, null);
                 continue;
              }
            }
-           clauses.assignables.put(h, translateAssignable(pm, progVars.selfVar,
+           clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
                                     progVars.paramVars,
-                                    textualSpecCase.getAssignable(h)));
+                                    textualSpecCase.getAssignable(heap.name().toString())));
         }
         clauses.accessible =
                 translateAccessible(pm, progVars.selfVar,
@@ -310,7 +315,7 @@ public class JMLSpecFactory {
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar,
             ProgramVariable excVar,
-            Map<String,Term> atPres,
+            Map<LocationVariable, Term> atPres,
             ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
         //The array is used to invert the order in which the elements are read.
@@ -405,7 +410,7 @@ public class JMLSpecFactory {
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar,
             ProgramVariable excVar,
-            Map<String,Term> atPres,
+            Map<LocationVariable,Term> atPres,
             Behavior originalBehavior,
             ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
@@ -435,7 +440,7 @@ public class JMLSpecFactory {
                                   ImmutableList<ProgramVariable> paramVars,
                                   ProgramVariable resultVar,
                                   ProgramVariable excVar,
-                                  Map<String,Term> atPres,
+                                  Map<LocationVariable,Term> atPres,
                                   Behavior originalBehavior,
                                   ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
@@ -927,9 +932,9 @@ public class JMLSpecFactory {
                 collectLocalVariables(pm.getBody(), loop);
         paramVars = paramVars.append(localVars);
 
-        Map<String,Term> atPres = new LinkedHashMap<String,Term>();
-        for(String heapName : TermBuilder.VALID_HEAP_NAMES) {
-          atPres.put(heapName, TB.var(TB.heapAtPreVar(services, heapName+"AtPre", false)));        
+        Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+          atPres.put(heap, TB.var(TB.heapAtPreVar(services, heap+"AtPre", false)));        
         }
 
         //translateToTerm invariant
@@ -963,7 +968,7 @@ public class JMLSpecFactory {
         }
 
         //translateToTerm assignable
-        Map<String,Term> mods = new LinkedHashMap<String,Term>();
+        Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
         for(String h : originalAssignables.keySet()) {
            Term a = null;
            ImmutableList<PositionedString> as = originalAssignables.get(h);
@@ -980,7 +985,8 @@ public class JMLSpecFactory {
                 a = TB.union(services, a, translated);
              }
            }
-           mods.put(h, a);
+           
+           mods.put(services.getTypeConverter().getHeapLDT().getHeapForName(new Name(h)), a);
         }
 
         //translateToTerm variant

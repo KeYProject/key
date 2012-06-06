@@ -124,13 +124,13 @@ public final class WhileInvariantRule implements BuiltInRule {
     /**
      * @return (anon update, anon heap)
      */
-    private Pair<Term,Term> createAnonUpdate(String heapName,
+    private Pair<Term,Term> createAnonUpdate(LocationVariable heap,
 	    			While loop, 
 	    			Term mod,
 	    			ImmutableSet<ProgramVariable> localOuts,
 	    			Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final Name anonHeapName = new Name(TB.newName(services, "anon_"+heapName+"_loop"));
+	final Name anonHeapName = new Name(TB.newName(services, "anon_"+heap.name()+"_loop"));
 	final Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
@@ -141,7 +141,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	if(TB.lessThanNothing().equals(mod)) {
 	    anonUpdate = TB.skip();
 	} else {
-	    anonUpdate = TB.anonUpd(heapName, services, mod, anonHeapTerm);
+	    anonUpdate = TB.anonUpd(heap, services, mod, anonHeapTerm);
 	}
 	
 	//local output vars
@@ -219,9 +219,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
     final boolean transaction = ((Modality)inst.progPost.op()).transaction(); 
 
-    final Map<String,Term> atPres = inst.inv.getInternalAtPres();
+    final Map<LocationVariable,Term> atPres = inst.inv.getInternalAtPres();
     final HeapContext hc = inst.inv.getHeapContext(transaction);
-    final List<String> modHeapNames = hc.getModHeapNames();
+    final List<LocationVariable> modHeaps = hc.getModHeaps(services);
 
 //    final Term transactionInv = transaction ? inst.inv.getInvariant(inst.selfTerm, atPres, services) : null;
 
@@ -240,10 +240,10 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 //    final Term s = atPres.get(TermBuilder.SAVED_HEAP_NAME);
-    final Map<String,Term> mods = new LinkedHashMap<String,Term>();
-    for(String heapName : modHeapNames) {
-      final Term m = inst.inv.getModifies(heapName, inst.selfTerm, atPres, services);
-      mods.put(heapName, m);
+    final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
+    for(LocationVariable heap : modHeaps) {
+      final Term m = inst.inv.getModifies(heap, inst.selfTerm, atPres, services);
+      mods.put(heap, m);
     }
 
 //    final Term mod = inst.inv.getModifies(TermBuilder.BASE_HEAP_NAME, inst.selfTerm, 
@@ -284,19 +284,19 @@ public final class WhileInvariantRule implements BuiltInRule {
 //        final Map<Term,Term> savedToBeforeLoop = new HashMap<Term,Term>();
 //	final Map<Term,Term> normalToBeforeLoop = new HashMap<Term,Term>();
 
-        final Map<String,Map<Term,Term>> heapToBeforeLoop = new LinkedHashMap<String,Map<Term,Term>>();
+        final Map<LocationVariable,Map<Term,Term>> heapToBeforeLoop = new LinkedHashMap<LocationVariable,Map<Term,Term>>();
 
-        for(String heapName : modHeapNames) {
-          heapToBeforeLoop.put(heapName, new HashMap<Term,Term>());
-          final LocationVariable lv = TB.heapAtPreVar(services, heapName+"BeforeLoop", true);
+        for(LocationVariable heap : modHeaps) {
+          heapToBeforeLoop.put(heap, new HashMap<Term,Term>());
+          final LocationVariable lv = TB.heapAtPreVar(services, heap.name()+"BeforeLoop", true);
    	  services.getNamespaces().programVariables().addSafely(lv);
-          final Term u = TB.elementary(services, lv, TB.heap(heapName, services));
+          final Term u = TB.elementary(services, lv, TB.var(heap));
           if(beforeLoopUpdate == null) {
              beforeLoopUpdate = u;
           }else{
              beforeLoopUpdate = TB.parallel(beforeLoopUpdate, u);
           }
-          heapToBeforeLoop.get(heapName).put(TB.heap(heapName, services), TB.var(lv));
+          heapToBeforeLoop.get(heap).put(TB.var(heap), TB.var(lv));
 //          if(h.equals(TermBuilder.SAVED_HEAP_NAME)) {
 //	    savedToBeforeLoop.put(TB.heap(h, services), TB.var(lv));
 //          }else{
@@ -315,7 +315,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 		    			   TB.elementary(services, 
 		    				   	 pvBeforeLoop, 
 		    				   	 TB.var(pv)));
-	    heapToBeforeLoop.get(TB.BASE_HEAP_NAME).put(TB.var(pv), TB.var(pvBeforeLoop));
+	    heapToBeforeLoop.get(services.getTypeConverter().getHeapLDT().getHeap()).put(TB.var(pv), TB.var(pvBeforeLoop));
 	}
 	
 	//prepare anon update, frame condition, etc.
@@ -324,32 +324,32 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term wellFormedAnon = null;
         Term frameCondition = null;
         Term reachableState = reachableIn;
-        for(String heapName : modHeapNames) {
+        for(LocationVariable heap : modHeaps) {
 	  final Pair<Term,Term> tAnon 
-	      = createAnonUpdate(heapName, inst.loop, mods.get(heapName), null, services);
+	      = createAnonUpdate(heap, inst.loop, mods.get(heap), null, services);
           if(anonUpdate == null) {
             anonUpdate = tAnon.first;
           }else{
             anonUpdate = TB.parallel(anonUpdate, tAnon.first);
           }
           if(wellFormedAnon == null) {
-            wellFormedAnon = TB.wellFormed(services, tAnon.second);
+            wellFormedAnon = TB.wellFormed(tAnon.second, services);
           }else{
-            wellFormedAnon = TB.and(wellFormedAnon, TB.wellFormed(services, tAnon.second));
+            wellFormedAnon = TB.and(wellFormedAnon, TB.wellFormed(tAnon.second, services));
           }
-          final Term m = mods.get(heapName);
+          final Term m = mods.get(heap);
           final Term fc;
-          if(TB.lessThanNothing().equals(m) && heapName.equals(TB.BASE_HEAP_NAME)) {
-            fc = TB.frameStrictlyEmpty(services, TB.heap(heapName, services), heapToBeforeLoop.get(heapName)); 
+          if(TB.lessThanNothing().equals(m) && heap == services.getTypeConverter().getHeapLDT().getHeap()) {
+            fc = TB.frameStrictlyEmpty(services, TB.var(heap), heapToBeforeLoop.get(heap)); 
           }else{
-            fc = TB.frame(services, TB.heap(heapName,services), heapToBeforeLoop.get(heapName), m);
+            fc = TB.frame(services, TB.var(heap), heapToBeforeLoop.get(heap), m);
           }
           if(frameCondition == null){
             frameCondition = fc;
           }else{
             frameCondition = TB.and(frameCondition, fc);
           }
-          reachableState = TB.and(reachableState, TB.wellFormedHeap(heapName, services));
+          reachableState = TB.and(reachableState, TB.wellFormed(heap, services));
         }
 
 //	final Pair<Term,Term> anonUpdateAndHeap 

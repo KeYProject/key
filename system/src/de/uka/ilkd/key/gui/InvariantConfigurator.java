@@ -1,10 +1,6 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.StringReader;
@@ -12,31 +8,23 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -121,7 +109,7 @@ public class InvariantConfigurator {
             private Term invariantTerm = null;
             private Term transactionInvariantTerm = null;
             private Term variantTerm = null;
-            private Map<String,Term> modifiesTerm = new LinkedHashMap<String,Term>();
+            private Map<LocationVariable,Term> modifiesTerm = new LinkedHashMap<LocationVariable,Term>();
 
             private final String INVARIANTTITLE = "Invariant%s: ";
             private final String VARIANTTITLE = "Variant%s: ";
@@ -248,9 +236,8 @@ public class InvariantConfigurator {
                 @SuppressWarnings({"unchecked"})
                 Map<String,String>[] loopInvTexts = new Map[VAR_IDX+1];
                 
-                final Map<String,Term> atPres = loopInv.getInternalAtPres();
-
                 loopInvTexts[INV_IDX] = new LinkedHashMap<String,String>();
+                final Map<LocationVariable,Term> atPres = loopInv.getInternalAtPres();
                 final Term invariant = loopInv.getInvariant(loopInv.getInternalSelfTerm(), atPres, services, false);
                 if (invariant == null) {
                     loopInvTexts[INV_IDX].put(DEFAULT, "true");
@@ -266,15 +253,18 @@ public class InvariantConfigurator {
                 }
 
                 loopInvTexts[MOD_IDX] = new LinkedHashMap<String,String>();
-                for(String heapName : TermBuilder.VALID_HEAP_NAMES) {
-                  final Term modifies = loopInv.getModifies(heapName, loopInv.getInternalSelfTerm(), atPres, services);
+
+//services.getTypeConverter().getHeapLDT().getHeap()
+
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                  final Term modifies = loopInv.getModifies(heap, loopInv.getInternalSelfTerm(), atPres, services);
                 
                   if (modifies == null) {
                     // FIXME check again and think what is the default for savedHeap
-                    loopInvTexts[MOD_IDX].put(heapName, "allLocs");
+                    loopInvTexts[MOD_IDX].put(heap.toString(), "allLocs");
                   } else {
                       // pretty syntax cannot be parsed yet for modifies
-                    loopInvTexts[MOD_IDX].put(heapName, printTerm(modifies, false));
+                    loopInvTexts[MOD_IDX].put(heap.toString(), printTerm(modifies, false));
                   }
                 }
 
@@ -334,7 +324,7 @@ public class InvariantConfigurator {
 		JTabbedPane modPane = new JTabbedPane(JTabbedPane.BOTTOM);
                 Map<String,String> mods = invariants.get(i)[MOD_IDX];
                 for(String k : mods.keySet()) {
-                   String title = String.format(MODIFIESTITLE, k.equals(TermBuilder.BASE_HEAP_NAME) ? "" : "["+k+"]");
+                   String title = String.format(MODIFIESTITLE, k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
                    JTextArea textArea = createInputTextArea(title, mods.get(k), i);
                    setModifiesListener(textArea, k, i);
                    modPane.add(k, textArea);
@@ -468,8 +458,9 @@ public class InvariantConfigurator {
                 }
 
                 JTabbedPane modPane = new JTabbedPane(JTabbedPane.BOTTOM);
-                for(String k : TermBuilder.VALID_HEAP_NAMES ) {
-                   String title = String.format("Modifies%s - Status: ", k.equals(TermBuilder.BASE_HEAP_NAME) ? "" : "["+k+"]");
+                for(Name h : HeapLDT.VALID_HEAP_NAMES ) {
+                   String k = h.toString();
+                   String title = String.format("Modifies%s - Status: ", k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
                    JTextArea textArea = createErrorTextField(title, modMsgs.get(k),
                         modColors.get(k));
                    modPane.add(k, textArea);
@@ -503,7 +494,8 @@ public class InvariantConfigurator {
                    invMsgs.put(k, "OK");
                    invColors.put(k, Color.GREEN);
                 }
-                for(String k : TermBuilder.VALID_HEAP_NAMES ) {
+                for(Name h : HeapLDT.VALID_HEAP_NAMES ) {
+                   String k = h.toString();
                    modMsgs.put(k, "OK");
                    modColors.put(k, Color.GREEN);
                 }
@@ -671,14 +663,14 @@ public class InvariantConfigurator {
 
                 Map<String,String> modErrors = new LinkedHashMap<String,String>();
                 Map<String,Color>  modCols = new LinkedHashMap<String,Color>();
-                for(String heapName : TermBuilder.VALID_HEAP_NAMES) {
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                   try {
-                    modifiesTerm.put(heapName, parseModifies(heapName));
-                    modErrors.put(heapName, "OK");
-                    modCols.put(heapName, Color.GREEN);
+                    modifiesTerm.put(heap, parseModifies(heap));
+                    modErrors.put(heap.toString(), "OK");
+                    modCols.put(heap.toString(), Color.GREEN);
                   } catch (Exception e) {
-                    modErrors.put(heapName, e.getMessage());
-                    modCols.put(heapName, Color.RED);
+                    modErrors.put(heap.toString(), e.getMessage());
+                    modCols.put(heap.toString(), Color.RED);
                   }
                 }
                 Map<String,String> varErrors = new LinkedHashMap<String,String>();
@@ -772,13 +764,13 @@ public class InvariantConfigurator {
                 return result;
             }
 
-            protected Term parseModifies(String heapName) throws Exception {
+            protected Term parseModifies(LocationVariable heap) throws Exception {
                 Term result = null;
                 index = inputPane.getSelectedIndex();
                 // might throw parserException or some obscure
                 // antlr
                 result = parser.parse(
-                        new StringReader(invariants.get(index)[MOD_IDX].get(heapName)), Sort.ANY,
+                        new StringReader(invariants.get(index)[MOD_IDX].get(heap.toString())), Sort.ANY,
                         services, services.getNamespaces(), MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
                 return result;
             }

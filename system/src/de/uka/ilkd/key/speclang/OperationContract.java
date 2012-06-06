@@ -10,11 +10,10 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.util.Map;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -34,7 +33,7 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifies clause of the contract.
      */
-    public Term getMod(String heapName, ProgramVariable selfVar, 
+    public Term getMod(LocationVariable heapVar, ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Services services);
     
@@ -42,7 +41,7 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifies clause of the contract.
      */
-    public Term getMod(String heapName, Term heapTerm,
+    public Term getMod(LocationVariable heapVar, Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Services services);

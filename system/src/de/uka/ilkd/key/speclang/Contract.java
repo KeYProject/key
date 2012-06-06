@@ -16,6 +16,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -52,7 +53,7 @@ public interface Contract extends SpecificationElement {
      */
     public Term getPre(ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
-                       Map<String,? extends ProgramVariable> atPreVars,
+                       Map<LocationVariable,? extends ProgramVariable> atPreVars,
 	    	       Services services);
     
     /**
@@ -61,7 +62,7 @@ public interface Contract extends SpecificationElement {
     public Term getPre(Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
-                       Map<String,Term> atPres,
+                       Map<LocationVariable,Term> atPres,
 	    	       Services services);    
     
     

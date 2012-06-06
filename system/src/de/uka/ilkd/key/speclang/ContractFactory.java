@@ -58,7 +58,7 @@ public class ContractFactory {
      */
     public FunctionalOperationContract addPost(FunctionalOperationContract old, Term addedPost,
             ProgramVariable selfVar, ProgramVariable resultVar, ProgramVariable excVar,
-            ImmutableList<ProgramVariable> paramVars, Map<String,LocationVariable> atPreVars){
+            ImmutableList<ProgramVariable> paramVars, Map<LocationVariable, LocationVariable> atPreVars){
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
     FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
     addedPost = replaceVariables(addedPost, selfVar, resultVar, excVar, paramVars, atPreVars, 
@@ -81,7 +81,8 @@ public class ContractFactory {
             foci.originalExcVar,
             foci.originalAtPreVars,
             foci.id,
-            foci.toBeSaved);
+            foci.toBeSaved,
+            foci.originalMods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
     
     /** Add the specification contained in InitiallyClause as a postcondition. */
@@ -97,7 +98,7 @@ public class ContractFactory {
     public FunctionalOperationContract addPre(FunctionalOperationContract old,
                                               Term addedPre,
                                               ProgramVariable selfVar,
-                                              ImmutableList<ProgramVariable> paramVars, Map<String,LocationVariable> atPreVars) {
+                                              ImmutableList<ProgramVariable> paramVars, Map<LocationVariable,LocationVariable> atPreVars) {
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci =
                 (FunctionalOperationContractImpl) old;
@@ -123,7 +124,9 @@ public class ContractFactory {
                                                    foci.originalExcVar,
                                                    foci.originalAtPreVars,
                                                    foci.id,
-                                                   foci.toBeSaved);
+                                                   foci.toBeSaved,
+                                                   foci.originalMods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null
+                                                   );
     }
 
     public DependencyContract dep(KeYJavaType containerType,
@@ -193,36 +196,39 @@ public class ContractFactory {
             Term pre,
             Term mby,                           
             Term post,
-            Map<String,Term> mods,
+            Map<LocationVariable,Term> mods,
             boolean hasMod,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar,
             ProgramVariable excVar,
-            Map<String,LocationVariable> atPreVars,
+            Map<LocationVariable,LocationVariable> atPreVars,
             boolean toBeSaved) {
-        return new FunctionalOperationContractImpl(baseName, kjt,   pm, modality, pre, mby, post, mods, hasMod, selfVar, paramVars,resultVar,excVar,atPreVars, toBeSaved);
+        return new FunctionalOperationContractImpl(baseName, kjt,   pm, modality, 
+                pre, mby, post, mods, hasMod, selfVar, paramVars,resultVar,excVar,atPreVars, toBeSaved, 
+                mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
        
     
-    public FunctionalOperationContract func (String baseName, ProgramMethod pm, boolean terminates, Term pre, Term mby, Term post, Map<String,Term> mods, boolean hasMod, ProgramVariableCollection pv ){
-        Modality modality = null;
-        boolean transaction = (mods.get(TermBuilder.SAVED_HEAP_NAME) != null);
+    public FunctionalOperationContract func (String baseName, ProgramMethod pm, boolean terminates, Term pre, Term mby, Term post,
+            Map<LocationVariable,Term> mods, boolean hasMod, ProgramVariableCollection pv){
+        boolean transaction = mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null;
+        final Modality modality;
         if(!transaction) {
           modality = terminates ? Modality.DIA : Modality.BOX;
         } else {
           modality = terminates ? Modality.DIA_TRANSACTION : Modality.BOX_TRANSACTION;
         }
-        return func(baseName, pm, modality, pre, mby, post, mods, hasMod, pv, false);
+        return func(baseName, pm, modality, pre, mby, post, mods, hasMod, pv, false, transaction);
     }
   
     public FunctionalOperationContract func (String baseName, ProgramMethod pm,
-            Modality modality, Term pre, Term mby, Term post, Map<String,Term> mods, boolean hasMod,
-            ProgramVariableCollection progVars, boolean toBeSaved) {
+            Modality modality, Term pre, Term mby, Term post, Map<LocationVariable,Term> mods, boolean hasMod,
+            ProgramVariableCollection progVars, boolean toBeSaved, boolean transaction) {
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm, modality, pre, mby,
                 post, mods, hasMod, progVars.selfVar, progVars.paramVars,
                 progVars.resultVar, progVars.excVar, progVars.atPreVars,
-                Contract.INVALID_ID, toBeSaved);
+                Contract.INVALID_ID, toBeSaved, mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
         
     /**
@@ -257,7 +263,7 @@ public class ContractFactory {
         Term post = tb.imp(atPreify(t.originalPre, 
                         t.originalAtPreVars), 
                    t.originalPost);
-        Map<String,Term> mods = t.originalMods;
+        Map<LocationVariable,Term> mods = t.originalMods;
         boolean hasMod = t.hasModifiesClause();
         Modality moda = t.modality;
         for(FunctionalOperationContract other : others) {
@@ -299,7 +305,7 @@ public class ContractFactory {
                 // no need to update mod.
             } else {
                 hasMod = true;
-                for(String h : TermBuilder.VALID_HEAP_NAMES) {
+                for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                    Term m1 = mods.get(h);
                    Term m2 = other.getMod(h,t.originalSelfVar, 
                                          t.originalParamVars, 
@@ -336,7 +342,8 @@ public class ContractFactory {
                                          t.originalExcVar,
                                          t.originalAtPreVars,
                                          Contract.INVALID_ID,
-                                         t.toBeSaved);
+                                         t.toBeSaved,
+                                         mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
     
 
@@ -349,11 +356,11 @@ public class ContractFactory {
         }
     }
 
-    private Term atPreify(Term t, Map<String,? extends ProgramVariable> atPreVars) {
+    private Term atPreify(Term t, Map<LocationVariable,? extends ProgramVariable> atPreVars) {
         final Map<Term,Term> map = new HashMap<Term,Term>();
-        for(String h : atPreVars.keySet()) {
+        for(LocationVariable h : atPreVars.keySet()) {
           if(atPreVars.get(h) != null) {
-            map.put(tb.heap(h, services), tb.var(atPreVars.get(h)));
+            map.put(tb.var(h), tb.var(atPreVars.get(h)));
           }
         }
         return new OpReplacer(map).replace(t);
@@ -362,9 +369,9 @@ public class ContractFactory {
 
     /** replace in original the variables used for self and parameters */
     private Term replaceVariables(Term original, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Map<String,LocationVariable> atPreVars,
+            ImmutableList<ProgramVariable> paramVars, Map<LocationVariable,LocationVariable> atPreVars,
             ProgramVariable originalSelfVar, ImmutableList<ProgramVariable> originalParamVars, 
-            Map<String,LocationVariable> originalAtPreVars) {
+            Map<LocationVariable,LocationVariable> originalAtPreVars) {
         return replaceVariables(original,
                                 selfVar, null, null, paramVars, atPreVars,
                                 originalSelfVar, null, null, originalParamVars, originalAtPreVars);
@@ -372,14 +379,14 @@ public class ContractFactory {
     
     /** replace in original the variables used for self, result, exception, heap, and parameters */
     private Term replaceVariables(Term original, ProgramVariable selfVar, ProgramVariable resultVar, ProgramVariable excVar,
-            ImmutableList<ProgramVariable> paramVars, Map<String,LocationVariable> atPreVars,
+            ImmutableList<ProgramVariable> paramVars, Map<LocationVariable,LocationVariable> atPreVars,
             ProgramVariable originalSelfVar, ProgramVariable originalResultVar,ProgramVariable originalExcVar, ImmutableList<ProgramVariable> originalParamVars,
-            Map<String,LocationVariable> originalAtPreVars) {
+            Map<LocationVariable,LocationVariable> originalAtPreVars) {
         Map <Operator, Operator> map = new LinkedHashMap<Operator,Operator>();
         addToMap(selfVar, originalSelfVar, map);
         addToMap(resultVar, originalResultVar, map);
         addToMap(excVar, originalExcVar, map);
-        for(String h : originalAtPreVars.keySet()) {
+        for(LocationVariable h : originalAtPreVars.keySet()) {
            if(originalAtPreVars.get(h) != null ) {
              addToMap(atPreVars.get(h), originalAtPreVars.get(h), map);
            }

@@ -15,9 +15,9 @@ import java.util.Map;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
@@ -40,8 +40,9 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
                                     Services services) {
 	super(root, services);
         assert services != null;
-        for(String heapName : TermBuilder.VALID_HEAP_NAMES) {
-          result.add(services.getTypeConverter().getHeapLDT().getHeap(heapName));
+        HeapLDT ldt = services.getTypeConverter().getHeapLDT();
+        for(LocationVariable heap: ldt.getAllHeaps()) {
+          result.add(heap);
         }
     }
     
@@ -78,7 +79,7 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
             new TermProgramVariableCollector(services);
         Term selfTerm = x.getInternalSelfTerm();
         
-        Map<String,Term> atPres = x.getInternalAtPres();
+        Map<LocationVariable,Term> atPres = x.getInternalAtPres();
 
         //invariant
         Term inv = x.getInvariant(selfTerm, atPres, services, false);
@@ -93,8 +94,8 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
         }
 
         //modifies
-        for(String heapName : TermBuilder.VALID_HEAP_NAMES) {
-           Term mod = x.getModifies(heapName, selfTerm, atPres, services);
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+           Term mod = x.getModifies(heap, selfTerm, atPres, services);
            if(mod != null) {
               mod.execPostOrder(tpvc);
            }
