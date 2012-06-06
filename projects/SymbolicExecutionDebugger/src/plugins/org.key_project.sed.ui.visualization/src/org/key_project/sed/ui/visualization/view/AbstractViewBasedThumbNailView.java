@@ -31,6 +31,11 @@ import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
 @SuppressWarnings("restriction")
 public abstract class AbstractViewBasedThumbNailView extends AbstractViewBasedView {
    /**
+    * Contains {@link #_lws}.
+    */
+   private Canvas overview;
+   
+   /**
     * The used {@link FixedScrollableThumbnail}.
     */
    private FixedScrollableThumbnail _thumbnail;
@@ -50,7 +55,7 @@ public abstract class AbstractViewBasedThumbNailView extends AbstractViewBasedVi
     */
    @Override
    public void createPartControl(Composite parent) {
-      Canvas overview = new Canvas(parent, SWT.NONE);
+      overview = new Canvas(parent, SWT.NONE);
       _lws = new LightweightSystem(overview);
       refreshThumbnailViewer();
    }
@@ -118,5 +123,6 @@ public abstract class AbstractViewBasedThumbNailView extends AbstractViewBasedVi
     */
    @Override
    public void setFocus() {
+      overview.setFocus(); // Otherwise exception is thrown if focus changed from properties view to thumbnail view: WARNING: prevented recursive attempt to activate part org.eclipse.ui.views.PropertySheet while still in the middle of activating <my editor> 
    }
 }

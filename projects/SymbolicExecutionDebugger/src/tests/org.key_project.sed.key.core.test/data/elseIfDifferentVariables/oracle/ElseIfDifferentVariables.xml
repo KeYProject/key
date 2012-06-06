@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_83ef919e-a306-4174-a111-aca7d4640887" name="ElseIfDifferentVariables[ElseIfDifferentVariables::main(boolean,boolean)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_ef95e06f-436a-4b9c-933e-1715be91066c" name="KeY Default Thread">
-         <sedMethodCall xml:id="_0684e661-2e16-4072-b7f6-b48f59ba0207" name="self.main(_a,_b);" lineNumber="-1" charStart="55" charEnd="59">
-            <sedBranchNode xml:id="_71eb8f98-88aa-4a01-a556-e43037e116c0" name="if (_a) {return 1; }else if (_b) {return 2;   }else  {return 3;   }" lineNumber="-1" charStart="87" charEnd="179">
-               <sedBranchCondition xml:id="_ae8d79d0-267f-4fca-8696-bc98133901d3" name="if _a true">
-                  <sedStatement xml:id="_5e7535b0-b0a7-4faf-bf67-9cd36d98dfb6" name="return 1;" lineNumber="-1" charStart="100" charEnd="109">
-                     <sedMethodReturn xml:id="_6c038d25-61a8-486f-af65-572e7893cc4f" name="&lt;return &apos;1&apos; as result of self.main(_a,_b);&gt;" lineNumber="-1" charStart="55" charEnd="59">
-                        <sedTermination xml:id="_8c4f14f5-6446-4556-9740-a02995a609ae" name="&lt;end&gt;">
+   <sedTarget xml:id="_1a541a92-91f9-4f59-a7c7-90e1fae16b1b" name="ElseIfDifferentVariables[ElseIfDifferentVariables::main(boolean,boolean)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_883b7637-b72a-45dd-b4eb-5aa06c1bd9fa" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_0dcb2b8a-d975-49c3-9e80-82a007a9c887" name="self.main(_a,_b);" pathCondition="true" lineNumber="-1" charStart="55" charEnd="59">
+            <sedBranchNode xml:id="_3b897476-8e92-4418-bffb-73e8f3560372" name="if (_a) {return 1; }else if (_b) {return 2;   }else  {return 3;   }" pathCondition="true" lineNumber="-1" charStart="87" charEnd="179">
+               <sedBranchCondition xml:id="_99450f6d-59d6-41d7-a6a3-5dff2c4a6a17" name="if _a true" pathCondition="a = TRUE">
+                  <sedStatement xml:id="_2c6b18b6-80c4-4757-8382-dbde85a804d3" name="return 1;" pathCondition="a = TRUE" lineNumber="-1" charStart="100" charEnd="109">
+                     <sedMethodReturn xml:id="_6df66901-4bd9-42ba-939f-ebb6bbda7de9" name="&lt;return &apos;1&apos; as result of self.main(_a,_b);&gt;" pathCondition="a = TRUE" lineNumber="-1" charStart="55" charEnd="59">
+                        <sedTermination xml:id="_6c5b562b-b4ec-4cbc-83de-89388fa06ae2" name="&lt;end&gt;" pathCondition="a = TRUE">
                         </sedTermination>
                      </sedMethodReturn>
                   </sedStatement>
                </sedBranchCondition>
-               <sedBranchCondition xml:id="_6c255983-a604-4cc8-b7c9-c39209944ed8" name="if _a false">
-                  <sedBranchNode xml:id="_28961cb9-8b81-4aa8-bdbf-1ae7a4d28bcb" name="if (_b) {return 2; }else  {return 3; }" lineNumber="-1" charStart="87" charEnd="179">
-                     <sedBranchCondition xml:id="_dcc38494-5fd2-4497-95f5-9102db7a25e4" name="b = TRUE TRUE">
-                        <sedStatement xml:id="_cf6389ba-92f4-4929-bdc8-cb0c497cea44" name="return 2;" lineNumber="-1" charStart="136" charEnd="145">
-                           <sedMethodReturn xml:id="_eade76a4-7dcb-4cf9-a8c5-9da8d1cb11e0" name="&lt;return &apos;2&apos; as result of self.main(_a,_b);&gt;" lineNumber="-1" charStart="55" charEnd="59">
-                              <sedTermination xml:id="_a69167b9-2dab-4c79-bf7b-da9a45a1331f" name="&lt;end&gt;">
+               <sedBranchCondition xml:id="_bf5822b4-efc0-4849-a6e2-eefe3c86f7bf" name="if _a false" pathCondition="!a = TRUE">
+                  <sedBranchNode xml:id="_709482bf-8db7-4f8f-b0d5-fcec1a6f3454" name="if (_b) {return 2; }else  {return 3; }" pathCondition="!a = TRUE" lineNumber="-1" charStart="87" charEnd="179">
+                     <sedBranchCondition xml:id="_1bfc962b-1d50-4ee5-b88a-d7a394760030" name="b = TRUE TRUE" pathCondition="!a = TRUE &amp; b = TRUE">
+                        <sedStatement xml:id="_7c8154fe-df0b-4fec-8a4e-cf51667adcb2" name="return 2;" pathCondition="!a = TRUE &amp; b = TRUE" lineNumber="-1" charStart="136" charEnd="145">
+                           <sedMethodReturn xml:id="_3393a333-b703-4b33-8a4e-2ad90e3fe2a6" name="&lt;return &apos;2&apos; as result of self.main(_a,_b);&gt;" pathCondition="!a = TRUE &amp; b = TRUE" lineNumber="-1" charStart="55" charEnd="59">
+                              <sedTermination xml:id="_ccc86702-367e-4553-85ff-b012361605ad" name="&lt;end&gt;" pathCondition="!a = TRUE &amp; b = TRUE">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
                      </sedBranchCondition>
-                     <sedBranchCondition xml:id="_634caf48-b104-43bf-b7d3-58dce3524416" name="b = TRUE FALSE">
-                        <sedStatement xml:id="_d8bc3a60-a9ab-4ca6-b0f6-cff114d72037" name="return 3;" lineNumber="-1" charStart="165" charEnd="174">
-                           <sedMethodReturn xml:id="_0bf19902-c8c1-41b7-af25-0769e6f7ccdb" name="&lt;return &apos;3&apos; as result of self.main(_a,_b);&gt;" lineNumber="-1" charStart="55" charEnd="59">
-                              <sedTermination xml:id="_b559502e-b48c-4ab1-84c5-69b21f1c13e9" name="&lt;end&gt;">
+                     <sedBranchCondition xml:id="_01a79819-c8a7-4044-9753-8c8450964fcb" name="b = TRUE FALSE" pathCondition="!a = TRUE &amp; !b = TRUE">
+                        <sedStatement xml:id="_2f8111cc-f24a-4989-9639-8be9af3ac94f" name="return 3;" pathCondition="!a = TRUE &amp; !b = TRUE" lineNumber="-1" charStart="165" charEnd="174">
+                           <sedMethodReturn xml:id="_82ce188e-89fe-46ef-8e25-5fb4057bde6a" name="&lt;return &apos;3&apos; as result of self.main(_a,_b);&gt;" pathCondition="!a = TRUE &amp; !b = TRUE" lineNumber="-1" charStart="55" charEnd="59">
+                              <sedTermination xml:id="_313740ca-67e4-4709-a95e-ddde46494af6" name="&lt;end&gt;" pathCondition="!a = TRUE &amp; !b = TRUE">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>

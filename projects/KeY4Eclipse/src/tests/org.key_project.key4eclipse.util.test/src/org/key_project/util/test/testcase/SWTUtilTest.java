@@ -151,6 +151,17 @@ public class SWTUtilTest extends TestCase {
     }
    
     /**
+     * Tests {@link SWTUtil#getFirstElement(ISelection)}
+     */
+    @Test
+    public void testGetFirstElement() {
+       assertNull(SWTUtil.getFirstElement(null));
+       assertNull(SWTUtil.getFirstElement(StructuredSelection.EMPTY));
+       assertEquals("A", SWTUtil.getFirstElement(SWTUtil.createSelection("A")));
+       assertEquals("A", SWTUtil.getFirstElement(SWTUtil.createSelection("A", "B")));
+    }
+   
+    /**
      * Tests {@link SWTUtil#toArray(org.eclipse.jface.viewers.ISelection)}
      */
     @Test

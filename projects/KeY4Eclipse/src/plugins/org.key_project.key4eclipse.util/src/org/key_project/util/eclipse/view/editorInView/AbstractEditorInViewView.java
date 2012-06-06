@@ -215,7 +215,15 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
     */
    @Override
    public void setFocus() {
-      editorPart.setFocus();
+      if (isEditorShown()) {
+         editorPart.setFocus();
+      }
+      else if (isMessageShown()) {
+         messageLabel.setFocus();
+      }
+      else {
+         rootComposite.setFocus();
+      }
    }
 
    /**
@@ -227,6 +235,9 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
       Object result = editorPart.getAdapter(adapter);
       if (result != null) {
          return result;
+      }
+      if (IEditorPart.class.equals(adapter)) {
+         return getEditorPart();
       }
       else {
          return super.getAdapter(adapter);

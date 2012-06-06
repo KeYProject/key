@@ -2,3 +2,4 @@ TODOs for the execution tree
 ============================
 1. Handle switch case (Requires to simplify the proof tree)
 2. Handle local variable declaration in method which is wrong for instance if it is named result
+3. Implement view which shows the constraints (left site of ==>)

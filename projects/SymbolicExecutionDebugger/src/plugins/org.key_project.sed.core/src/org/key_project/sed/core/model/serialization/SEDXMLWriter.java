@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -12,6 +15,8 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.debug.core.model.IValue;
+import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDDebugNode;
@@ -24,6 +29,8 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDValue;
+import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.util.LogUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.XMLUtil;
@@ -120,6 +127,16 @@ public class SEDXMLWriter {
    public static final String TAG_THREAD = "sedThread";
 
    /**
+    * Tag name to store {@link IVariable}s.
+    */
+   public static final String TAG_VARIABLE = "sedVariable";
+
+   /**
+    * Tag name to store {@link IValue}s.
+    */
+   public static final String TAG_VALUE = "sedValue";
+
+   /**
     * Attribute name to store encodings.
     */
    private static final String ATTRIBUTE_ENCODING = "encoding";
@@ -158,20 +175,41 @@ public class SEDXMLWriter {
     * Attribute name to store char ends.
     */
    public static final String ATTRIBUTE_CHAR_END = "charEnd";
+
+   /**
+    * Attribute name to store reference type names.
+    */
+   public static final String ATTRIBUTE_REFERENCE_TYPE_NAME = "referenceTypeName";
+
+   /**
+    * Attribute name to store value strings.
+    */
+   public static final String ATTRIBUTE_VALUE_STRING = "valueString";
+
+   /**
+    * Attribute name to store allocated flags.
+    */
+   public static final String ATTRIBUTE_ALLOCATED = "allocated";
+
+   /**
+    * Attribute name to store path conditions.
+    */
+   public static final String ATTRIBUTE_PATH_CONDITION = "pathCondition";
    
    /**
     * Writes the given {@link ISEDDebugTarget}s into the {@link OutputStream} with the defined encoding.
     * @param targets The {@link ISEDDebugTarget}s to write.
     * @param encoding The encoding to use.
     * @param out The {@link OutputStream} to use.
+    * @param saveVariables Save variables?
     * @throws DebugException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
-   public void write(IDebugTarget[] targets, String encoding, OutputStream out) throws DebugException, IOException {
+   public void write(IDebugTarget[] targets, String encoding, OutputStream out, boolean saveVariables) throws DebugException, IOException {
       if (out != null) {
          try {
             Charset charset = encoding != null ? Charset.forName(encoding) : Charset.defaultCharset();
-            String xml = toXML(targets, charset.displayName());
+            String xml = toXML(targets, charset.displayName(), saveVariables);
             out.write(xml.getBytes(charset));
          }
          finally {
@@ -185,14 +223,15 @@ public class SEDXMLWriter {
     * @param launch The {@link ILaunch} to write.
     * @param encoding The encoding to use.
     * @param out The {@link OutputStream} to use.
+    * @param saveVariables Save variables?
     * @throws DebugException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
-   public void write(ILaunch launch, String encoding, OutputStream out) throws DebugException, IOException {
+   public void write(ILaunch launch, String encoding, OutputStream out, boolean saveVariables) throws DebugException, IOException {
       if (out != null) {
          try {
             Charset charset = encoding != null ? Charset.forName(encoding) : Charset.defaultCharset();
-            String xml = toXML(launch, charset.displayName());
+            String xml = toXML(launch, charset.displayName(), saveVariables);
             out.write(xml.getBytes(charset));
          }
          finally {
@@ -206,15 +245,16 @@ public class SEDXMLWriter {
     * @param launch The {@link ILaunch} to write.
     * @param encoding The encoding to use.
     * @param out The {@link OutputStream} to use.
+    * @param saveVariables Save variables?
     * @throws IOException Occurred Exception.
     * @throws CoreException Occurred Exception.
     */
-   public void write(ILaunch launch, String encoding, IFile file) throws IOException, CoreException {
+   public void write(ILaunch launch, String encoding, IFile file, boolean saveVariables) throws IOException, CoreException {
       if (file != null) {
          InputStream in = null;
          try {
             Charset charset = encoding != null ? Charset.forName(encoding) : Charset.defaultCharset();
-            String xml = toXML(launch, charset.displayName());
+            String xml = toXML(launch, charset.displayName(), saveVariables);
             in = new ByteArrayInputStream(xml.getBytes(charset));
             if (file.exists()) {
                file.setContents(in, true, true, null);
@@ -237,15 +277,16 @@ public class SEDXMLWriter {
     * @param targets The {@link IDebugTarget}s to write.
     * @param encoding The encoding to use.
     * @param out The {@link OutputStream} to use.
+    * @param saveVariables Save variables?
     * @throws IOException Occurred Exception.
     * @throws CoreException Occurred Exception.
     */
-   public void write(IDebugTarget[] targets, String encoding, IFile file) throws IOException, CoreException {
+   public void write(IDebugTarget[] targets, String encoding, IFile file, boolean saveVariables) throws IOException, CoreException {
       if (file != null) {
          InputStream in = null;
          try {
             Charset charset = encoding != null ? Charset.forName(encoding) : Charset.defaultCharset();
-            String xml = toXML(targets, charset.displayName());
+            String xml = toXML(targets, charset.displayName(), saveVariables);
             in = new ByteArrayInputStream(xml.getBytes(charset));
             if (file.exists()) {
                file.setContents(in, true, true, null);
@@ -272,13 +313,14 @@ public class SEDXMLWriter {
     * Serializes the given {@link ILaunch} into a {@link String} with the given encoding.
     * @param launch The {@link ILaunch} to serialize.
     * @param encoding The encoding to use.
+    * @param saveVariables Save variables?
     * @return The serialized {@link String}.
     * @throws DebugException Occurred Exception.
     */
-   public String toXML(ILaunch launch, String encoding) throws DebugException {
+   public String toXML(ILaunch launch, String encoding, boolean saveVariables) throws DebugException {
       StringBuffer sb = new StringBuffer();
       if (launch != null) {
-         sb.append(toXML(launch.getDebugTargets(), encoding));
+         sb.append(toXML(launch.getDebugTargets(), encoding, saveVariables));
       }
       return sb.toString();
    }
@@ -287,10 +329,11 @@ public class SEDXMLWriter {
     * Serializes the given {@link IDebugTarget}s into a {@link String} with the given encoding.
     * @param launch The {@link ILaunch} to serialize.
     * @param encoding The encoding to use.
+    * @param saveVariables Save variables?
     * @return The serialized {@link String}.
     * @throws DebugException Occurred Exception.
     */
-   public String toXML(IDebugTarget[] targets, String encoding) throws DebugException {
+   public String toXML(IDebugTarget[] targets, String encoding, boolean saveVariables) throws DebugException {
       StringBuffer sb = new StringBuffer();
       if (targets != null) {
          appendXmlHeader(encoding, sb);
@@ -301,7 +344,7 @@ public class SEDXMLWriter {
          appendNewLine(sb);
          for (IDebugTarget target : targets) {
             if (target instanceof ISEDDebugTarget) {
-               sb.append(toXML(1, (ISEDDebugTarget)target));
+               sb.append(toXML(1, (ISEDDebugTarget)target, saveVariables));
             }
             else {
                throw new DebugException(LogUtil.getLogger().createErrorStatus("Not supported debug target \"" + target + "\"."));
@@ -319,10 +362,11 @@ public class SEDXMLWriter {
     * Serializes the given {@link ISEDDebugTarget} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
     * @param target The {@link ISEDDebugTarget} to serialize.
+    * @param saveVariables Save variables?
     * @return The serialized {@link String}.
     * @throws DebugException Occurred Exception.
     */
-   protected String toXML(int level, ISEDDebugTarget target) throws DebugException {
+   protected String toXML(int level, ISEDDebugTarget target, boolean saveVariables) throws DebugException {
       StringBuffer sb = new StringBuffer();
       if (target != null) {
          appendWhiteSpace(level, sb);
@@ -335,7 +379,7 @@ public class SEDXMLWriter {
          appendNewLine(sb);
          ISEDThread[] threads = target.getSymbolicThreads();
          for (ISEDThread thread : threads) {
-            sb.append(toXML(level + 1, thread));
+            sb.append(toXML(level + 1, thread, saveVariables));
          }
          appendWhiteSpace(level, sb);
          sb.append("</");
@@ -350,39 +394,40 @@ public class SEDXMLWriter {
     * Serializes the given {@link ISEDDebugNode} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
     * @param target The {@link ISEDDebugNode} to serialize.
+    * @param saveVariables Save variables?
     * @return The serialized {@link String}.
     * @throws DebugException Occurred Exception.
     */
-   protected String toXML(int level, ISEDDebugNode node) throws DebugException {
+   protected String toXML(int level, ISEDDebugNode node, boolean saveVariables) throws DebugException {
       if (node instanceof ISEDBranchCondition) {
-         return toXML(level, (ISEDBranchCondition)node);
+         return toXML(level, (ISEDBranchCondition)node, saveVariables);
       }
       else if (node instanceof ISEDBranchNode) {
-         return toXML(level, (ISEDBranchNode)node);
+         return toXML(level, (ISEDBranchNode)node, saveVariables);
       }
       else if (node instanceof ISEDExceptionalTermination) {
-         return toXML(level, (ISEDExceptionalTermination)node);
+         return toXML(level, (ISEDExceptionalTermination)node, saveVariables);
       }
       else if (node instanceof ISEDLoopCondition) {
-         return toXML(level, (ISEDLoopCondition)node);
+         return toXML(level, (ISEDLoopCondition)node, saveVariables);
       }
       else if (node instanceof ISEDLoopNode) {
-         return toXML(level, (ISEDLoopNode)node);
+         return toXML(level, (ISEDLoopNode)node, saveVariables);
       }
       else if (node instanceof ISEDMethodCall) {
-         return toXML(level, (ISEDMethodCall)node);
+         return toXML(level, (ISEDMethodCall)node, saveVariables);
       }
       else if (node instanceof ISEDMethodReturn) {
-         return toXML(level, (ISEDMethodReturn)node);
+         return toXML(level, (ISEDMethodReturn)node, saveVariables);
       }
       else if (node instanceof ISEDStatement) {
-         return toXML(level, (ISEDStatement)node);
+         return toXML(level, (ISEDStatement)node, saveVariables);
       }
       else if (node instanceof ISEDTermination) {
-         return toXML(level, (ISEDTermination)node);
+         return toXML(level, (ISEDTermination)node, saveVariables);
       }
       else if (node instanceof ISEDThread) {
-         return toXML(level, (ISEDThread)node);
+         return toXML(level, (ISEDThread)node, saveVariables);
       }
       else {
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Unknown node type of node \"" + node + "\"."));
@@ -393,12 +438,13 @@ public class SEDXMLWriter {
     * Serializes the given {@link ISEDBranchCondition} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
     * @param target The {@link ISEDBranchCondition} to serialize.
+    * @param saveVariables Save variables?
     * @return The serialized {@link String}.
     * @throws DebugException Occurred Exception.
     */
-   protected String toXML(int level, ISEDBranchCondition branchCondition) throws DebugException {
+   protected String toXML(int level, ISEDBranchCondition branchCondition, boolean saveVariables) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_BRANCH_CONDITION, branchCondition, sb);
+      appendNode(level, TAG_BRANCH_CONDITION, branchCondition, saveVariables, sb);
       return sb.toString();
    }
    
@@ -406,12 +452,13 @@ public class SEDXMLWriter {
     * Serializes the given {@link ISEDBranchNode} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
     * @param target The {@link ISEDBranchNode} to serialize.
+    * @param saveVariables Save variables?
     * @return The serialized {@link String}.
     * @throws DebugException Occurred Exception.
     */
-   protected String toXML(int level, ISEDBranchNode branchNode) throws DebugException {
+   protected String toXML(int level, ISEDBranchNode branchNode, boolean saveVariables) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_BRANCH_NODE, branchNode, sb);
+      appendNode(level, TAG_BRANCH_NODE, branchNode, saveVariables, sb);
       return sb.toString();
    }
    
@@ -419,12 +466,13 @@ public class SEDXMLWriter {
     * Serializes the given {@link ISEDExceptionalTermination} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
     * @param target The {@link ISEDExceptionalTermination} to serialize.
+    * @param saveVariables Save variables?
     * @return The serialized {@link String}.
     * @throws DebugException Occurred Exception.
     */
-   protected String toXML(int level, ISEDExceptionalTermination exceptionalTermination) throws DebugException {
+   protected String toXML(int level, ISEDExceptionalTermination exceptionalTermination, boolean saveVariables) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_EXCEPTIONAL_TERMINATION, exceptionalTermination, sb);
+      appendNode(level, TAG_EXCEPTIONAL_TERMINATION, exceptionalTermination, saveVariables, sb);
       return sb.toString();
    }
    
@@ -432,12 +480,13 @@ public class SEDXMLWriter {
     * Serializes the given {@link ISEDLoopCondition} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
     * @param target The {@link ISEDLoopCondition} to serialize.
+    * @param saveVariables Save variables?
     * @return The serialized {@link String}.
     * @throws DebugException Occurred Exception.
     */
-   protected String toXML(int level, ISEDLoopCondition loopCondition) throws DebugException {
+   protected String toXML(int level, ISEDLoopCondition loopCondition, boolean saveVariables) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_LOOP_CONDITION, loopCondition, sb);
+      appendNode(level, TAG_LOOP_CONDITION, loopCondition, saveVariables, sb);
       return sb.toString();
    }
    
@@ -445,12 +494,13 @@ public class SEDXMLWriter {
     * Serializes the given {@link ISEDLoopNode} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
     * @param target The {@link ISEDLoopNode} to serialize.
+    * @param saveVariables Save variables?
     * @return The serialized {@link String}.
     * @throws DebugException Occurred Exception.
     */
-   protected String toXML(int level, ISEDLoopNode loopNode) throws DebugException {
+   protected String toXML(int level, ISEDLoopNode loopNode, boolean saveVariables) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_LOOP_NODE, loopNode, sb);
+      appendNode(level, TAG_LOOP_NODE, loopNode, saveVariables, sb);
       return sb.toString();
    }
    
@@ -458,12 +508,13 @@ public class SEDXMLWriter {
     * Serializes the given {@link ISEDMethodCall} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
     * @param target The {@link ISEDMethodCall} to serialize.
+    * @param saveVariables Save variables?
     * @return The serialized {@link String}.
     * @throws DebugException Occurred Exception.
     */
-   protected String toXML(int level, ISEDMethodCall methodCall) throws DebugException {
+   protected String toXML(int level, ISEDMethodCall methodCall, boolean saveVariables) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_METHOD_CALL, methodCall, sb);
+      appendNode(level, TAG_METHOD_CALL, methodCall, saveVariables, sb);
       return sb.toString();
    }
    
@@ -471,12 +522,13 @@ public class SEDXMLWriter {
     * Serializes the given {@link ISEDMethodReturn} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
     * @param target The {@link ISEDMethodReturn} to serialize.
+    * @param saveVariables Save variables?
     * @return The serialized {@link String}.
     * @throws DebugException Occurred Exception.
     */
-   protected String toXML(int level, ISEDMethodReturn methodReturn) throws DebugException {
+   protected String toXML(int level, ISEDMethodReturn methodReturn, boolean saveVariables) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_METHOD_RETURN, methodReturn, sb);
+      appendNode(level, TAG_METHOD_RETURN, methodReturn, saveVariables, sb);
       return sb.toString();
    }
    
@@ -484,12 +536,13 @@ public class SEDXMLWriter {
     * Serializes the given {@link ISEDStatement} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
     * @param target The {@link ISEDStatement} to serialize.
+    * @param saveVariables Save variables?
     * @return The serialized {@link String}.
     * @throws DebugException Occurred Exception.
     */
-   protected String toXML(int level, ISEDStatement statement) throws DebugException {
+   protected String toXML(int level, ISEDStatement statement, boolean saveVariables) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_STATEMENT, statement, sb);
+      appendNode(level, TAG_STATEMENT, statement, saveVariables, sb);
       return sb.toString();
    }
    
@@ -497,12 +550,13 @@ public class SEDXMLWriter {
     * Serializes the given {@link ISEDTermination} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
     * @param target The {@link ISEDTermination} to serialize.
+    * @param saveVariables Save variables?
     * @return The serialized {@link String}.
     * @throws DebugException Occurred Exception.
     */
-   protected String toXML(int level, ISEDTermination termination) throws DebugException {
+   protected String toXML(int level, ISEDTermination termination, boolean saveVariables) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_TERMINATION, termination, sb);
+      appendNode(level, TAG_TERMINATION, termination, saveVariables, sb);
       return sb.toString();
    }
    
@@ -510,12 +564,13 @@ public class SEDXMLWriter {
     * Serializes the given {@link ISEDThread} into a {@link String}.
     * @param level The level in the tree used for leading white space (formating).
     * @param target The {@link ISEDThread} to serialize.
+    * @param saveVariables Save variables?
     * @return The serialized {@link String}.
     * @throws DebugException Occurred Exception.
     */
-   protected String toXML(int level, ISEDThread thread) throws DebugException {
+   protected String toXML(int level, ISEDThread thread, boolean saveVariables) throws DebugException {
       StringBuffer sb = new StringBuffer();
-      appendNode(level, TAG_THREAD, thread, sb);
+      appendNode(level, TAG_THREAD, thread, saveVariables, sb);
       return sb.toString();
    }
    
@@ -524,36 +579,140 @@ public class SEDXMLWriter {
     * @param level The level in the tree used for leading white space (formating).
     * @param tagName The tag name to use.
     * @param node The {@link ISEDDebugNode} to serialize.
+    * @param saveVariables Save variables?
     * @param sb The {@link StringBuffer} to write to.
     * @throws DebugException Occurred Exception.
     */
-   protected void appendNode(int level, String tagName, ISEDDebugNode node, StringBuffer sb) throws DebugException {
+   protected void appendNode(int level, String tagName, ISEDDebugNode node, boolean saveVariables, StringBuffer sb) throws DebugException {
       if (node != null) {
-         appendWhiteSpace(level, sb);
-         sb.append("<");
-         sb.append(tagName);
-         appendAttribute(ATTRIBUTE_ID, node.getId(), sb);
-         appendAttribute(ATTRIBUTE_NAME, node.getName(), sb);
+         // Append start tag
+         Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+         attributeValues.put(ATTRIBUTE_ID, node.getId());
+         attributeValues.put(ATTRIBUTE_NAME, node.getName());
+         attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getPathCondition());
          if (node instanceof IStackFrame) {
             IStackFrame frame = (IStackFrame)node;
-            appendAttribute(ATTRIBUTE_LINE_NUMBER, frame.getLineNumber(), sb);
-            appendAttribute(ATTRIBUTE_CHAR_START, frame.getCharStart(), sb);
-            appendAttribute(ATTRIBUTE_CHAR_END, frame.getCharEnd(), sb);
+            attributeValues.put(ATTRIBUTE_LINE_NUMBER, frame.getLineNumber() + "");
+            attributeValues.put(ATTRIBUTE_CHAR_START, frame.getCharStart() + "");
+            attributeValues.put(ATTRIBUTE_CHAR_END, frame.getCharEnd() + "");
          }
-         sb.append(">");
-         appendNewLine(sb);
+         appendStartTag(level, tagName, attributeValues, sb);
+         // Append variables
+         if (node instanceof IStackFrame) {
+            appendVariables(level + 1, (IStackFrame)node, saveVariables, sb);
+         }
+         // Append children
          ISEDDebugNode[] children = node.getChildren();
          for (ISEDDebugNode child : children) {
-            sb.append(toXML(level + 1, child));
+            sb.append(toXML(level + 1, child, saveVariables));
          }
-         appendWhiteSpace(level, sb);
-         sb.append("</");
-         sb.append(tagName);
-         sb.append(">");
-         appendNewLine(sb);
+         // Append end tag
+         appendEndTag(level, tagName, sb);
       }
    }
    
+   /**
+    * Appends all contained variables to the {@link StringBuffer}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param stackFrame The {@link IStackFrame} which contains the variables.
+    * @param saveVariables Save variables?
+    * @param sb The {@link StringBuffer} to write to.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void appendVariables(int level, IStackFrame stackFrame, boolean saveVariables, StringBuffer sb) throws DebugException {
+      if (saveVariables && stackFrame.hasVariables()) {
+         IVariable[] variables = stackFrame.getVariables();
+         for (IVariable variable : variables) {
+            appendVariable(level, variable, sb);
+         }
+      }
+   }
+
+   /**
+    * Appends the given variable to the {@link StringBuffer}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param variable The variable to append.
+    * @param sb The {@link StringBuffer} to write to.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void appendVariable(int level, IVariable variable, StringBuffer sb) throws DebugException {
+      // Append start tag
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      if (variable instanceof ISEDVariable) {
+         attributeValues.put(ATTRIBUTE_ID, ((ISEDVariable)variable).getId());
+      }
+      attributeValues.put(ATTRIBUTE_NAME, variable.getName());
+      attributeValues.put(ATTRIBUTE_REFERENCE_TYPE_NAME, variable.getReferenceTypeName());
+      appendStartTag(level, TAG_VARIABLE, attributeValues, sb);
+      // Append children
+      if (variable.getValue() != null) {
+         appendValue(level + 1, variable.getValue(), sb);
+      }
+      // Append end tag
+      appendEndTag(level, TAG_VARIABLE, sb);
+   }
+
+   /**
+    * Appends the given value to the {@link StringBuffer}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param value The value to append.
+    * @param sb The {@link StringBuffer} to write to.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void appendValue(int level, IValue value, StringBuffer sb) throws DebugException {
+      // Append start tag
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      if (value instanceof ISEDValue) {
+         attributeValues.put(ATTRIBUTE_ID, ((ISEDValue)value).getId());
+      }
+      attributeValues.put(ATTRIBUTE_REFERENCE_TYPE_NAME, value.getReferenceTypeName());
+      attributeValues.put(ATTRIBUTE_VALUE_STRING, value.getValueString());
+      attributeValues.put(ATTRIBUTE_ALLOCATED, value.isAllocated() + "");
+      appendStartTag(level, TAG_VALUE, attributeValues, sb);
+      // Append children
+      if (value.hasVariables()) {
+         IVariable[] variables = value.getVariables();
+         for (IVariable variable : variables) {
+            appendVariable(level + 1, variable, sb);
+         }
+      }
+      // Append end tag
+      appendEndTag(level, TAG_VALUE, sb);
+   }
+
+   /**
+    * Appends a start tag to the given {@link StringBuffer}.
+    * @param level The level.
+    * @param tagName The tag name.
+    * @param attributeValues The attributes.
+    * @param sb The {@link StringBuffer} to append to.
+    */
+   protected void appendStartTag(int level, String tagName, Map<String, String> attributeValues, StringBuffer sb) {
+      appendWhiteSpace(level, sb);
+      sb.append("<");
+      sb.append(tagName);
+      for (Entry<String, String> entry : attributeValues.entrySet()) {
+         appendAttribute(entry.getKey(), entry.getValue(), sb);
+      }
+      sb.append(">");
+      appendNewLine(sb);
+
+   }
+
+   /**
+    * Appends an end tag to the given {@link StringBuffer}.
+    * @param level The level.
+    * @param tagName The tag name.
+    * @param sb The {@link StringBuffer} to append to.
+    */
+   protected void appendEndTag(int level, String tagName, StringBuffer sb) {
+      appendWhiteSpace(level, sb);
+      sb.append("</");
+      sb.append(tagName);
+      sb.append(">");
+      appendNewLine(sb);
+   }
+
    /**
     * Adds leading white space to the {@link StringBuffer}.
     * @param level The level in the tree used for leading white space (formating).
@@ -563,20 +722,6 @@ public class SEDXMLWriter {
       for (int i = 0; i < level; i++) {
          sb.append(LEADING_WHITE_SPACE_PER_LEVEL);
       }
-   }
-   
-   /**
-    * Adds an XML attribute to the given {@link StringBuffer}.
-    * @param attributeName The attribute name.
-    * @param value The attribute value.
-    * @param sb The {@link StringBuffer} to write to.
-    */
-   protected void appendAttribute(String attributeName, int value, StringBuffer sb) {
-      sb.append(" ");
-      sb.append(attributeName);
-      sb.append("=\"");
-      sb.append(value);
-      sb.append("\"");
    }
    
    /**

@@ -17,26 +17,6 @@ import org.key_project.sed.core.model.ISourceNameProvider;
  */
 public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractSEDTerminateCompatibleDebugNode implements IStackFrame, ISourceNameProvider {
    /**
-    * The source name.
-    */
-   private String sourceName;
-
-   /**
-    * The line number.
-    */
-   private int lineNumber = -1;
-
-   /**
-    * The index of the start character.
-    */
-   private int charStart = -1;
-   
-   /**
-    * The index of the end character.
-    */
-   private int charEnd = -1;
-   
-   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this node is contained.
     * @param parent The parent in that this node is contained as child.
@@ -46,14 +26,6 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
                                                    ISEDDebugNode parent, 
                                                    ISEDThread thread) {
       super(target, parent, thread);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public IVariable[] getVariables() throws DebugException {
-      return new IVariable[0];
    }
 
    /**
@@ -173,70 +145,6 @@ public abstract class AbstractSEDStackFrameCompatibleDebugNode extends AbstractS
     */
    @Override
    public void stepReturn() throws DebugException {
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public int getLineNumber() throws DebugException {
-      return lineNumber;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public int getCharStart() throws DebugException {
-      return charStart;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public int getCharEnd() throws DebugException {
-      return charEnd;
-   }
-
-   /**
-    * Sets the line number.
-    * @param lineNumber The line number or {@code -1} if it is unknown.
-    */
-   protected void setLineNumber(int lineNumber) {
-      this.lineNumber = lineNumber;
-   }
-
-   /**
-    * Sets the index of the start character.
-    * @param charStart The index or {@code -1} if it is unknown.
-    */
-   protected void setCharStart(int charStart) {
-      this.charStart = charStart;
-   }
-
-   /**
-    * Sets the index of the end character.
-    * @param charEnd The index or {@code -1} if it is unknown.
-    */
-   protected void setCharEnd(int charEnd) {
-      this.charEnd = charEnd;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getSourceName() {
-      return sourceName;
-   }
-
-   /**
-    * Sets the source name.
-    * @param sourceName The source name to set.
-    */
-   protected void setSourceName(String sourceName) {
-      this.sourceName = sourceName;
    }
 
    /**

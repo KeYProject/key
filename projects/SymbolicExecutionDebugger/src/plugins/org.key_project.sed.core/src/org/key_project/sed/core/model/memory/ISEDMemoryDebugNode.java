@@ -21,6 +21,12 @@ public interface ISEDMemoryDebugNode extends ISEDDebugNode {
    public void setName(String name);
    
    /**
+    * Sets the path condition.
+    * @param pathCondtion The path condition to set.
+    */
+   public void setPathCondition(String pathCondition);
+   
+   /**
     * Adds a new {@link ISEDDebugNode} child node.
     * @param child The {@link ISEDDebugNode} to add.
     */

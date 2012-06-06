@@ -27,6 +27,8 @@ import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
+import org.key_project.sed.core.model.memory.SEDMemoryValue;
+import org.key_project.sed.core.model.memory.SEDMemoryVariable;
 
 /**
  * <p>
@@ -82,74 +84,122 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        
        SEDMemoryThread thread = new SEDMemoryThread(target);
        thread.setName("Fixed Example Thread");
+       thread.setPathCondition("pc1");
        target.addSymbolicThread(thread);
        
        SEDMemoryStatement s1 = new SEDMemoryStatement(target, thread, thread);
        s1.setName("int x = 1;");
+       s1.setPathCondition("pc2");
        thread.addChild(s1);
        
        SEDMemoryLoopNode ln = new SEDMemoryLoopNode(target, s1, thread);
        ln.setName("while (x == 1)");
+       ln.setPathCondition("pc3");
        s1.addChild(ln);
        
        SEDMemoryLoopCondition lc = new SEDMemoryLoopCondition(target, ln, thread);
        lc.setName("x == 1");
+       lc.setPathCondition("pc4");
        ln.addChild(lc);
        
        SEDMemoryStatement ls = new SEDMemoryStatement(target, lc, thread);
        ls.setName("x++;");
+       ls.setPathCondition("pc5");
        lc.addChild(ls);
        
        SEDMemoryStatement s2 = new SEDMemoryStatement(target, ls, thread);
        s2.setName("int y = 2;");
+       s2.setPathCondition("pc6");
        ls.addChild(s2);
        
        SEDMemoryStatement s3 = new SEDMemoryStatement(target, s2, thread);
        s3.setName("int result = (x + y) / z;");
+       s3.setPathCondition("pc7");
        s2.addChild(s3);
        
        SEDMemoryBranchCondition bzero = new SEDMemoryBranchCondition(target, s3, thread);
        bzero.setName("z == 0");
+       bzero.setPathCondition("pc8");
        s3.addChild(bzero);
        
        SEDMemoryExceptionalTermination et = new SEDMemoryExceptionalTermination(target, bzero, thread);
        et.setName("throws DivisionByZeroException()");
+       et.setPathCondition("pc9");
        bzero.addChild(et);
        
        SEDMemoryBranchCondition bnotzero = new SEDMemoryBranchCondition(target, s3, thread);
        bnotzero.setName("z != 0");
+       bnotzero.setPathCondition("pc10");
        s3.addChild(bnotzero);
 
        SEDMemoryMethodCall call = new SEDMemoryMethodCall(target, bnotzero, thread);
        call.setName("foo(result)");
-       bnotzero.addChild(call);       
+       call.setPathCondition("pc11");
+       bnotzero.addChild(call);
 
        SEDMemoryBranchNode branch = new SEDMemoryBranchNode(target, call, thread);
        branch.setName("if (result >= 0)");
+       branch.setPathCondition("pc12");
        call.addChild(branch);
        
        SEDMemoryBranchCondition bnegative = new SEDMemoryBranchCondition(target, branch, thread);
        bnegative.setName("result < 0");
+       bnegative.setPathCondition("pc13");
        branch.addChild(bnegative);
        
        SEDMemoryMethodReturn returnNegative = new SEDMemoryMethodReturn(target, bnegative, thread);
        returnNegative.setName("return -1");
+       returnNegative.setPathCondition("pc14");
        bnegative.addChild(returnNegative);
        
        SEDMemoryTermination terminationNegative = new SEDMemoryTermination(target, returnNegative, thread);
        terminationNegative.setName("<end>");
+       terminationNegative.setPathCondition("pc15");
        returnNegative.addChild(terminationNegative);
        
        SEDMemoryBranchCondition bpositive = new SEDMemoryBranchCondition(target, branch, thread);
        bpositive.setName("result >= 0");
+       bpositive.setPathCondition("pc16");
        branch.addChild(bpositive);
        
        SEDMemoryMethodReturn returnPositive = new SEDMemoryMethodReturn(target, bpositive, thread);
        returnPositive.setName("return 1");
+       returnPositive.setPathCondition("pc17");
        bpositive.addChild(returnPositive);
+       
+       SEDMemoryVariable returnPositiveVar1 = new SEDMemoryVariable(target);
+       returnPositiveVar1.setName("returnPositiveVar1");
+       returnPositiveVar1.setReferenceTypeName("returnPositiveVar1type");
+       SEDMemoryValue returnPositiveVar1value = new SEDMemoryValue(target);
+       returnPositiveVar1value.setAllocated(true);
+       returnPositiveVar1value.setReferenceTypeName("returnPositiveVar1valueType");
+       returnPositiveVar1value.setValueString("returnPositiveVar1value");
+       returnPositiveVar1.setValue(returnPositiveVar1value);
+       returnPositive.addVariable(returnPositiveVar1);
+       
+       SEDMemoryVariable returnPositiveVar1_1 = new SEDMemoryVariable(target);
+       returnPositiveVar1_1.setName("returnPositiveVar1_1");
+       returnPositiveVar1_1.setReferenceTypeName("returnPositiveVar1_1type");
+       SEDMemoryValue returnPositiveVar1_1value = new SEDMemoryValue(target);
+       returnPositiveVar1_1value.setAllocated(true);
+       returnPositiveVar1_1value.setReferenceTypeName("returnPositiveVar1_1valueType");
+       returnPositiveVar1_1value.setValueString("returnPositiveVar1_1value");
+       returnPositiveVar1_1.setValue(returnPositiveVar1_1value);
+       returnPositive.addVariable(returnPositiveVar1_1);
+       
+       SEDMemoryVariable returnPositiveVar2 = new SEDMemoryVariable(target);
+       returnPositiveVar2.setName("returnPositiveVar2");
+       returnPositiveVar2.setReferenceTypeName("returnPositiveVar2type");
+       SEDMemoryValue returnPositiveVar2value = new SEDMemoryValue(target);
+       returnPositiveVar2value.setAllocated(true);
+       returnPositiveVar2value.setReferenceTypeName("returnPositiveVar2valueType");
+       returnPositiveVar2value.setValueString("returnPositiveVar2value");
+       returnPositiveVar2.setValue(returnPositiveVar2value);
+       returnPositive.addVariable(returnPositiveVar2);
        
        SEDMemoryTermination terminationPositive = new SEDMemoryTermination(target, returnPositive, thread);
        terminationPositive.setName("<end>");
+       terminationPositive.setPathCondition("pc18");
        returnPositive.addChild(terminationPositive);
     }
 }

@@ -10,11 +10,11 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
- * {@link IFilter} implementation used to define if a {@link SEDDebugNodePropertySection}
+ * {@link IFilter} implementation used to define if a {@link GraphitiDebugNodePropertySection}
  * is available or not.
  * @author Martin Hentschel
  */
-public class SEDDebugNodeTreeFilter extends AbstractPropertySectionFilter {
+public class GraphitiDebugNodeTreeFilter extends AbstractPropertySectionFilter {
    /**
     * {@inheritDoc}
     */
@@ -23,7 +23,7 @@ public class SEDDebugNodeTreeFilter extends AbstractPropertySectionFilter {
       IWorkbenchPart part = WorkbenchUtil.getActivePart();
       boolean accept = false;
       if (part != null) {
-         SEDDebugNodePropertySection section = new SEDDebugNodePropertySection();
+         GraphitiDebugNodePropertySection section = new GraphitiDebugNodePropertySection();
          section.setInput(WorkbenchUtil.getActivePart(), null);
          IDiagramTypeProvider diagramProvider = section.getDiagramTypeProvider();
          if (diagramProvider != null) {

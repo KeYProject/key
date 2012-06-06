@@ -165,6 +165,9 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
       editorPart.setGridVisible(false);
       ZoomManager zoomManager = (ZoomManager)editorPart.getAdapter(ZoomManager.class);
       contributor.setZoomManager(zoomManager);
+      if (getDebugView() != null) {
+         updateDiagram(getDebugView().getViewer().getSelection());
+      }
    }
    
    /**
@@ -199,6 +202,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     * When the selection on {@link #getEditorPart()} has changed.
     * @param event The event.
     */
+   // TODO: Selection is not synchronized with debug view if debug view is not visible, e.g. when execution tree view is maximized.
    protected void handleEditorSelectionChanged(final SelectionChangedEvent event) {
       // Check if the selection changed was caused programmatically during synchronization or by the user.
       if (internalSelectionUpdate) {
@@ -361,14 +365,15 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                   if (!treeViewer.getExpandedState(toExpand)) {
                      // Search item to expand
                      Widget item = treeViewer.testFindItem(toExpand);
-                     Assert.isTrue(item instanceof TreeItem);
-                     TreeItem treeItem = (TreeItem)item;
-                     // Make item visible and expand it. Invisible elements are not expanded.
-                     treeViewer.getTree().showItem(treeItem);
-                     treeViewer.setExpandedState(toExpand, true);
-                     // Make all children visible because otherwise lazy loading will not update them if the expanded element is exactly the last visible element.
-                     for (TreeItem child : treeItem.getItems()) {
-                        treeViewer.getTree().showItem(child);
+                     if (item instanceof TreeItem) {
+                        TreeItem treeItem = (TreeItem)item;
+                        // Make item visible and expand it. Invisible elements are not expanded.
+                        treeViewer.getTree().showItem(treeItem);
+                        treeViewer.setExpandedState(toExpand, true);
+                        // Make all children visible because otherwise lazy loading will not update them if the expanded element is exactly the last visible element.
+                        for (TreeItem child : treeItem.getItems()) {
+                           treeViewer.getTree().showItem(child);
+                        }
                      }
                   }
                }

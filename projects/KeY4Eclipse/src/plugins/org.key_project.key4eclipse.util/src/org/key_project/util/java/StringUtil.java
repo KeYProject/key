@@ -2,6 +2,7 @@ package org.key_project.util.java;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.StringTokenizer;
 
 /**
  * Provides static methods to work with strings.
@@ -146,6 +147,34 @@ public final class StringUtil {
       }
       else {
          return text;
+      }
+   }
+   
+   /**
+    * Checks the equality of the given {@link String}s ignoring whitespace.
+    * @param first The first {@link String}.
+    * @param second The second {@link String}.
+    * @return {@code true} equal ignoring whitespace, {@code false} different.
+    */
+   public static boolean equalIgnoreWhiteSpace(String first, String second) {
+      if (first != null) {
+         if (second != null) {
+            StringTokenizer firstTokenizer = new StringTokenizer(first);
+            StringTokenizer secondTokenizer = new StringTokenizer(second);
+            boolean equal = true;
+            while (equal && firstTokenizer.hasMoreTokens() && secondTokenizer.hasMoreTokens()) {
+               String firstNext = firstTokenizer.nextToken();
+               String secondNext = secondTokenizer.nextToken();
+               equal = firstNext.equals(secondNext);
+            }
+            return equal && !firstTokenizer.hasMoreElements() && !secondTokenizer.hasMoreElements();
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return second == null;
       }
    }
 }

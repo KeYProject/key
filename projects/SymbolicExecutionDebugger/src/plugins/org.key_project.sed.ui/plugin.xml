@@ -53,4 +53,41 @@
             </menu>
          </menuContribution>
       </extension>
+      <extension
+            point="org.eclipse.core.runtime.adapters">
+         <factory
+               adaptableType="org.eclipse.debug.internal.ui.views.launch.LaunchView"
+               class="org.key_project.sed.ui.adapter.AdapterFactory">
+            <adapter
+                  type="org.eclipse.ui.views.properties.IPropertySheetPage">
+            </adapter>
+         </factory>
+      </extension>
+      <extension
+          point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+          <propertyContributor contributorId="org.key_project.sed.launchViewPropertyContributor">
+              <propertyCategory category="Debug">
+              </propertyCategory>
+          </propertyContributor>
+      </extension>
+       
+      <extension
+          point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+          <propertyTabs contributorId="org.key_project.sed.launchViewPropertyContributor">
+              <propertyTab label="Node" category="Debug"
+                  id="org.key_project.sed.ui.node.tab">
+              </propertyTab>
+          </propertyTabs>
+      </extension>
+       
+      <extension
+          point="org.eclipse.ui.views.properties.tabbed.propertySections">
+          <propertySections contributorId="org.key_project.sed.launchViewPropertyContributor">
+              <propertySection tab="org.key_project.sed.ui.node.tab"           
+               class="org.key_project.sed.ui.property.SEDDebugNodePropertySection"
+               filter="org.key_project.sed.ui.property.SEDDebugNodeTreeFilter"
+               id="org.key_project.sed.ui.node.tab.SEDDebugNodePropertySection">
+              </propertySection>
+          </propertySections>
+      </extension>  
 </plugin>

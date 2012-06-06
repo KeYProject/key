@@ -14,6 +14,8 @@ import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
+import org.eclipse.debug.core.model.IValue;
+import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.debug.internal.ui.DelegatingModelPresentation;
 import org.eclipse.debug.internal.ui.InstructionPointerManager;
@@ -63,6 +65,7 @@ import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -76,7 +79,7 @@ public final class TestSedCoreUtil {
    /**
     * Waiting time of the user interface.
     */
-   public static final int USER_INTERFACE_DEBUG_TREE_WAIT_TIME = 1000;
+   public static final int USER_INTERFACE_DEBUG_TREE_WAIT_TIME = 2000;
    
    /**
     * The ID of the fixed example launch configuration type.
@@ -718,9 +721,10 @@ public final class TestSedCoreUtil {
     * @param expected The expected {@link ISEDDebugTarget}.
     * @param current The current {@link ISEDDebugTarget}.
     * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   public static void compareDebugTarget(ISEDDebugTarget expected, ISEDDebugTarget current, boolean compareId) throws DebugException {
+   public static void compareDebugTarget(ISEDDebugTarget expected, ISEDDebugTarget current, boolean compareId, boolean compareVariables) throws DebugException {
       ISEDIterator expectedIter = new SEDPreorderIterator(expected);
       ISEDIterator currentIter = new SEDPreorderIterator(current);
       while (expectedIter.hasNext()) {
@@ -730,43 +734,43 @@ public final class TestSedCoreUtil {
          if (expectedNext instanceof ISEDDebugTarget) {
             TestCase.assertTrue("Expected ISEDDebugTarget on " + ((ISEDDebugTarget)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDDebugTarget);
             compareDebugElement(expectedNext, currentNext, true, compareId);
-            compareDebugTarget((IDebugTarget)expectedNext, (IDebugTarget)currentNext, true);
+            compareDebugTarget((IDebugTarget)expectedNext, (IDebugTarget)currentNext, true, compareVariables);
          }
          else if (expectedNext instanceof ISEDBranchCondition) {
             TestCase.assertTrue("Expected ISEDBranchCondition on " + ((ISEDBranchCondition)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDBranchCondition);
-            compareBranchCondition((ISEDBranchCondition)expectedNext, (ISEDBranchCondition)currentNext, true, compareId);
+            compareBranchCondition((ISEDBranchCondition)expectedNext, (ISEDBranchCondition)currentNext, true, compareId, compareVariables);
          }
          else if (expectedNext instanceof ISEDBranchNode) {
             TestCase.assertTrue("Expected ISEDBranchNode on " + ((ISEDBranchNode)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDBranchNode);
-            compareBranchNode((ISEDBranchNode)expectedNext, (ISEDBranchNode)currentNext, true, compareId);
+            compareBranchNode((ISEDBranchNode)expectedNext, (ISEDBranchNode)currentNext, true, compareId, compareVariables);
          }
          else if (expectedNext instanceof ISEDExceptionalTermination) {
             TestCase.assertTrue("Expected ISEDExceptionalTermination on " + ((ISEDExceptionalTermination)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDExceptionalTermination);
-            compareExceptionalTermination((ISEDExceptionalTermination)expectedNext, (ISEDExceptionalTermination)currentNext, true, compareId);
+            compareExceptionalTermination((ISEDExceptionalTermination)expectedNext, (ISEDExceptionalTermination)currentNext, true, compareId, compareVariables);
          }
          else if (expectedNext instanceof ISEDLoopCondition) {
             TestCase.assertTrue("Expected ISEDLoopCondition on " + ((ISEDLoopCondition)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDLoopCondition);
-            compareLoopCondition((ISEDLoopCondition)expectedNext, (ISEDLoopCondition)currentNext, true, compareId);
+            compareLoopCondition((ISEDLoopCondition)expectedNext, (ISEDLoopCondition)currentNext, true, compareId, compareVariables);
          }
          else if (expectedNext instanceof ISEDLoopNode) {
             TestCase.assertTrue("Expected ISEDLoopNode on " + ((ISEDLoopNode)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDLoopNode);
-            compareLoopNode((ISEDLoopNode)expectedNext, (ISEDLoopNode)currentNext, true, compareId);
+            compareLoopNode((ISEDLoopNode)expectedNext, (ISEDLoopNode)currentNext, true, compareId, compareVariables);
          }
          else if (expectedNext instanceof ISEDMethodCall) {
             TestCase.assertTrue("Expected ISEDMethodCall on " + ((ISEDMethodCall)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDMethodCall);
-            compareMethodCall((ISEDMethodCall)expectedNext, (ISEDMethodCall)currentNext, true, compareId);
+            compareMethodCall((ISEDMethodCall)expectedNext, (ISEDMethodCall)currentNext, true, compareId, compareVariables);
          }
          else if (expectedNext instanceof ISEDMethodReturn) {
             TestCase.assertTrue("Expected ISEDMethodReturn on " + ((ISEDMethodReturn)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDMethodReturn);
-            compareMethodReturn((ISEDMethodReturn)expectedNext, (ISEDMethodReturn)currentNext, true, compareId);
+            compareMethodReturn((ISEDMethodReturn)expectedNext, (ISEDMethodReturn)currentNext, true, compareId, compareVariables);
          }
          else if (expectedNext instanceof ISEDStatement) {
             TestCase.assertTrue("Expected ISEDStatement on " + ((ISEDStatement)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDStatement);
-            compareStatement((ISEDStatement)expectedNext, (ISEDStatement)currentNext, true, compareId);
+            compareStatement((ISEDStatement)expectedNext, (ISEDStatement)currentNext, true, compareId, compareVariables);
          }
          else if (expectedNext instanceof ISEDTermination) {
             TestCase.assertTrue("Expected ISEDTermination on " + ((ISEDTermination)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDTermination);
-            compareTermination((ISEDTermination)expectedNext, (ISEDTermination)currentNext, true, compareId);
+            compareTermination((ISEDTermination)expectedNext, (ISEDTermination)currentNext, true, compareId, compareVariables);
          }
          else if (expectedNext instanceof ISEDThread) {
             TestCase.assertTrue("Expected ISEDThread on " + ((ISEDThread)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDThread);
@@ -785,14 +789,15 @@ public final class TestSedCoreUtil {
     * @param expected The expected {@link IDebugTarget}.
     * @param current The current {@link IDebugTarget}.
     * @param compareReferences Compare also the containment hierarchy?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareDebugTarget(IDebugTarget expected, IDebugTarget current, boolean compareReferences) throws DebugException {
+   protected static void compareDebugTarget(IDebugTarget expected, IDebugTarget current, boolean compareReferences, boolean compareVariables) throws DebugException {
       // Compare debug target
       TestCase.assertNotNull(expected);
       TestCase.assertNotNull(current);
       TestCase.assertEquals(expected.getName(), current.getName());
-      compareDebugElement(expected, current, false);
+      compareDebugElement(expected, current, false, compareVariables);
       // Compare debug target which should be itself
       TestCase.assertSame(expected, expected.getDebugTarget());
       TestCase.assertSame(current, current.getDebugTarget());
@@ -803,7 +808,7 @@ public final class TestSedCoreUtil {
          IThread[] currentThreads = current.getThreads();
          TestCase.assertEquals(expectedThreads.length, currentThreads.length);
          for (int i = 0; i < expectedThreads.length; i++) {
-            compareThread(expectedThreads[i], currentThreads[i], false);
+            compareThread(expectedThreads[i], currentThreads[i], false, compareVariables);
          }
       }
    }
@@ -814,18 +819,20 @@ public final class TestSedCoreUtil {
     * @param current The current {@link ISEDDebugNode}.
     * @param compareReferences Compare also the containment hierarchy?
     * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareNode(ISEDDebugNode expected, ISEDDebugNode current, boolean compareReferences, boolean compareId) throws DebugException {
+   protected static void compareNode(ISEDDebugNode expected, ISEDDebugNode current, boolean compareReferences, boolean compareId, boolean compareVariables) throws DebugException {
       if (expected != null) {
          // Compare node
          TestCase.assertNotNull(current);
          TestCase.assertEquals(expected.getName(), current.getName());
+         TestCase.assertEquals(expected.getPathCondition(), current.getPathCondition());
          TestCase.assertEquals(expected.getNodeType(), current.getNodeType());
-         compareDebugElement(expected, current, compareReferences);
+         compareDebugElement(expected, current, compareReferences, compareVariables);
          // Compare parent
          if (compareReferences) {
-            compareNode(expected.getParent(), current.getParent(), false, compareId);
+            compareNode(expected.getParent(), current.getParent(), false, compareId, compareVariables);
             // Compare children
             ISEDDebugNode[] expectedChildren = expected.getChildren();
             ISEDDebugNode[] currentChildren = current.getChildren();
@@ -833,51 +840,51 @@ public final class TestSedCoreUtil {
             for (int i = 0; i < expectedChildren.length; i++) {
                if (expectedChildren[i] instanceof ISEDBranchCondition) {
                   TestCase.assertTrue("Expected ISEDBranchCondition on " + ((ISEDBranchCondition)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDBranchCondition);
-                  compareBranchCondition((ISEDBranchCondition)expectedChildren[i], (ISEDBranchCondition)currentChildren[i], false, compareId);
+                  compareBranchCondition((ISEDBranchCondition)expectedChildren[i], (ISEDBranchCondition)currentChildren[i], false, compareId, compareVariables);
                }
                else if (expectedChildren[i] instanceof ISEDBranchNode) {
                   TestCase.assertTrue("Expected ISEDBranchNode on " + ((ISEDBranchNode)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDBranchNode);
-                  compareBranchNode((ISEDBranchNode)expectedChildren[i], (ISEDBranchNode)currentChildren[i], false, compareId);
+                  compareBranchNode((ISEDBranchNode)expectedChildren[i], (ISEDBranchNode)currentChildren[i], false, compareId, compareVariables);
                }
                else if (expectedChildren[i] instanceof ISEDExceptionalTermination) {
                   TestCase.assertTrue("Expected ISEDExceptionalTermination on " + ((ISEDExceptionalTermination)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDExceptionalTermination);
-                  compareExceptionalTermination((ISEDExceptionalTermination)expectedChildren[i], (ISEDExceptionalTermination)currentChildren[i], false, compareId);
+                  compareExceptionalTermination((ISEDExceptionalTermination)expectedChildren[i], (ISEDExceptionalTermination)currentChildren[i], false, compareId, compareVariables);
                }
                else if (expectedChildren[i] instanceof ISEDLoopCondition) {
                   TestCase.assertTrue("Expected ISEDLoopCondition on " + ((ISEDLoopCondition)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopCondition);
-                  compareLoopCondition((ISEDLoopCondition)expectedChildren[i], (ISEDLoopCondition)currentChildren[i], false, compareId);
+                  compareLoopCondition((ISEDLoopCondition)expectedChildren[i], (ISEDLoopCondition)currentChildren[i], false, compareId, compareVariables);
                }
                else if (expectedChildren[i] instanceof ISEDLoopNode) {
                   TestCase.assertTrue("Expected ISEDLoopNode on " + ((ISEDLoopNode)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopNode);
-                  compareLoopNode((ISEDLoopNode)expectedChildren[i], (ISEDLoopNode)currentChildren[i], false, compareId);
+                  compareLoopNode((ISEDLoopNode)expectedChildren[i], (ISEDLoopNode)currentChildren[i], false, compareId, compareVariables);
                }
                else if (expectedChildren[i] instanceof ISEDLoopCondition) {
                   TestCase.assertTrue("Expected ISEDLoopCondition on " + ((ISEDLoopCondition)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopCondition);
-                  compareLoopCondition((ISEDLoopCondition)expectedChildren[i], (ISEDLoopCondition)currentChildren[i], false, compareId);
+                  compareLoopCondition((ISEDLoopCondition)expectedChildren[i], (ISEDLoopCondition)currentChildren[i], false, compareId, compareVariables);
                }
                else if (expectedChildren[i] instanceof ISEDLoopNode) {
                   TestCase.assertTrue("Expected ISEDLoopNode on " + ((ISEDLoopNode)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopNode);
-                  compareLoopNode((ISEDLoopNode)expectedChildren[i], (ISEDLoopNode)currentChildren[i], false, compareId);
+                  compareLoopNode((ISEDLoopNode)expectedChildren[i], (ISEDLoopNode)currentChildren[i], false, compareId, compareVariables);
                }
                else if (expectedChildren[i] instanceof ISEDMethodCall) {
                   TestCase.assertTrue("Expected ISEDMethodCall on " + ((ISEDMethodCall)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDMethodCall);
-                  compareMethodCall((ISEDMethodCall)expectedChildren[i], (ISEDMethodCall)currentChildren[i], false, compareId);
+                  compareMethodCall((ISEDMethodCall)expectedChildren[i], (ISEDMethodCall)currentChildren[i], false, compareId, compareVariables);
                }
                else if (expectedChildren[i] instanceof ISEDMethodReturn) {
                   TestCase.assertTrue("Expected ISEDMethodReturn on " + ((ISEDMethodReturn)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDMethodReturn);
-                  compareMethodReturn((ISEDMethodReturn)expectedChildren[i], (ISEDMethodReturn)currentChildren[i], false, compareId);
+                  compareMethodReturn((ISEDMethodReturn)expectedChildren[i], (ISEDMethodReturn)currentChildren[i], false, compareId, compareVariables);
                }
                else if (expectedChildren[i] instanceof ISEDStatement) {
                   TestCase.assertTrue("Expected ISEDStatement on " + ((ISEDStatement)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDStatement);
-                  compareStatement((ISEDStatement)expectedChildren[i], (ISEDStatement)currentChildren[i], false, compareId);
+                  compareStatement((ISEDStatement)expectedChildren[i], (ISEDStatement)currentChildren[i], false, compareId, compareVariables);
                }
                else if (expectedChildren[i] instanceof ISEDTermination) {
                   TestCase.assertTrue("Expected ISEDTermination on " + ((ISEDTermination)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDTermination);
-                  compareTermination((ISEDTermination)expectedChildren[i], (ISEDTermination)currentChildren[i], false, compareId);
+                  compareTermination((ISEDTermination)expectedChildren[i], (ISEDTermination)currentChildren[i], false, compareId, compareVariables);
                }
                else if (expectedChildren[i] instanceof ISEDThread) {
                   TestCase.assertTrue("Expected ISEDThread on " + ((ISEDThread)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDThread);
-                  compareThread((ISEDThread)expectedChildren[i], (ISEDThread)currentChildren[i], true);
+                  compareThread((ISEDThread)expectedChildren[i], (ISEDThread)currentChildren[i], true, compareVariables);
                }
                else {
                   TestCase.fail("Unknown node type \"" + (expectedChildren[i] != null ? expectedChildren[i].getClass() : null) + "\".");
@@ -895,19 +902,20 @@ public final class TestSedCoreUtil {
     * @param expected The expected {@link IDebugElement}.
     * @param current The current {@link IDebugElement}.
     * @param compareReferences Compare also the containment hierarchy?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareDebugElement(IDebugElement expected, IDebugElement current, boolean compareReferences) throws DebugException {
+   protected static void compareDebugElement(IDebugElement expected, IDebugElement current, boolean compareReferences, boolean compareVariables) throws DebugException {
       TestCase.assertNotNull(expected);
       TestCase.assertNotNull(current);
       TestCase.assertEquals(expected.getModelIdentifier(), current.getModelIdentifier());
       if (compareReferences) {
          if (expected.getDebugTarget() instanceof ISEDDebugTarget) {
             TestCase.assertTrue(current.getDebugTarget() instanceof ISEDDebugTarget);
-            compareDebugTarget((IDebugTarget)expected.getDebugTarget(), (IDebugTarget)current.getDebugTarget(), false);
+            compareDebugTarget((IDebugTarget)expected.getDebugTarget(), (IDebugTarget)current.getDebugTarget(), false, compareVariables);
          }
          else {
-            compareDebugTarget(expected.getDebugTarget(), current.getDebugTarget(), false);
+            compareDebugTarget(expected.getDebugTarget(), current.getDebugTarget(), false, compareVariables);
          }
       }
    }
@@ -918,37 +926,52 @@ public final class TestSedCoreUtil {
     * @param current The current {@link IDebugElement}.
     * @param compareReferences Compare also the containment hierarchy?
     * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareDebugElement(ISEDDebugElement expected, ISEDDebugElement current, boolean compareReferences, boolean compareId) throws DebugException {
+   protected static void compareDebugElement(ISEDDebugElement expected, ISEDDebugElement current, boolean compareReferences, boolean compareId, boolean compareVariables) throws DebugException {
       TestCase.assertNotNull(expected);
       TestCase.assertNotNull(current);
       if (compareId) {
          TestCase.assertEquals(expected.getId(), current.getId());
       }
-      compareDebugElement((IDebugElement)expected, (IDebugElement)current, compareReferences);
+      compareDebugElement((IDebugElement)expected, (IDebugElement)current, compareReferences, compareVariables);
    }
    
    /**
     * Compares the given {@link IStackFrame}s with each other.
     * @param expected The expected {@link IStackFrame}.
     * @param current The current {@link IStackFrame}.
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareStackFrame(IStackFrame expected, IStackFrame current) throws DebugException {
+   protected static void compareStackFrame(IStackFrame expected, IStackFrame current, boolean compareVariables) throws DebugException {
       if (expected != null) {
          TestCase.assertNotNull(current);
+         // Compare stack frame
          TestCase.assertEquals(expected.getName(), current.getName());
          TestCase.assertEquals(expected.getName(), expected.getCharStart(), current.getCharStart());
          TestCase.assertEquals(expected.getName(), expected.getCharEnd(), current.getCharEnd());
          TestCase.assertEquals(expected.getName(), expected.getLineNumber(), current.getLineNumber());
-         compareDebugElement(expected, current, true);
+         compareDebugElement(expected, current, true, compareVariables);
          if (expected.getThread() instanceof ISEDThread) {
             TestCase.assertTrue(current.getThread() instanceof ISEDThread);
-            compareThread((ISEDThread)expected.getThread(), (ISEDThread)current.getThread(), false);
+            compareThread((ISEDThread)expected.getThread(), (ISEDThread)current.getThread(), false, compareVariables);
          }
          else {
-            compareThread(expected.getThread(), current.getThread(), false);
+            compareThread(expected.getThread(), current.getThread(), false, compareVariables);
+         }
+         // Compare variables
+         if (compareVariables) {
+            TestCase.assertEquals(expected.getName(), expected.hasVariables(), current.hasVariables());
+            if (expected.hasVariables()) {
+               IVariable[] expectedVariables = expected.getVariables();
+               IVariable[] currentVariables = current.getVariables();
+               TestCase.assertEquals(expected.getName(), expectedVariables.length, currentVariables.length);
+               for (int i = 0; i < expectedVariables.length; i++) {
+                  compareVariable(expectedVariables[i], currentVariables[i], compareVariables);
+               }
+            }
          }
       }
       else {
@@ -957,19 +980,73 @@ public final class TestSedCoreUtil {
    }
    
    /**
+    * Compares the given {@link IVariable}s with each other.
+    * @param expected The expected {@link IVariable}.
+    * @param current The current {@link IVariable}.
+    * @param compareVariables Compare variables?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareVariable(IVariable expected, IVariable current, boolean compareVariables) throws DebugException {
+      if (expected != null) {
+         TestCase.assertNotNull(current);
+         // Compare variable
+         TestCase.assertEquals(expected.getName(), current.getName());
+         TestCase.assertEquals(expected.getName(), expected.getReferenceTypeName(), current.getReferenceTypeName());
+         compareDebugElement(expected, current, true, compareVariables);
+         // Compare value
+         compareValue(expected.getValue(), current.getValue(), compareVariables);
+      }
+      else {
+         TestCase.assertNull(current);
+      }
+   }
+
+   /**
+    * Compares the given {@link IValue}s with each other.
+    * @param expected The expected {@link IValue}.
+    * @param current The current {@link IValue}.
+    * @param compareVariables Compare variables?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareValue(IValue expected, IValue current, boolean compareVariables) throws DebugException {
+      if (expected != null) {
+         TestCase.assertNotNull(current);
+         // Compare value
+         TestCase.assertEquals(expected.isAllocated(), current.isAllocated());
+         TestCase.assertEquals(expected.getReferenceTypeName(), current.getReferenceTypeName());
+         TestCase.assertTrue(expected.getValueString() + " does not match " + current.getValueString(), StringUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
+         compareDebugElement(expected, current, true, compareVariables);
+         // Compare variables
+         TestCase.assertEquals(expected.hasVariables(), current.hasVariables());
+         if (expected.hasVariables()) {
+            IVariable[] expectedVariables = expected.getVariables();
+            IVariable[] currentVariables = current.getVariables();
+            TestCase.assertEquals(expectedVariables.length, currentVariables.length);
+            for (int i = 0; i < expectedVariables.length; i++) {
+               compareVariable(expectedVariables[i], currentVariables[i], compareVariables);
+            }
+         }
+      }
+      else {
+         TestCase.assertNull(current);
+      }
+   }
+
+   /**
     * Compares the given {@link IThread}s with each other.
     * @param expected The expected {@link IThread}.
     * @param current The current {@link IThread}.
     * @param compareReferences Compare also the containment hierarchy?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareThread(IThread expected, IThread current, boolean compareReferences) throws DebugException {
+   protected static void compareThread(IThread expected, IThread current, boolean compareReferences, boolean compareVariables) throws DebugException {
       // Compare thread
       TestCase.assertNotNull(expected);
       TestCase.assertNotNull(current);
       TestCase.assertEquals(expected.getName(), current.getName());
       TestCase.assertEquals(expected.getPriority(), current.getPriority());
-      compareDebugElement(expected, current, compareReferences);
+      compareDebugElement(expected, current, compareReferences, compareVariables);
       if (compareReferences) {
          // Compare contained stack frames
          TestCase.assertEquals(expected.hasStackFrames(), current.hasStackFrames());
@@ -977,9 +1054,9 @@ public final class TestSedCoreUtil {
          IStackFrame[] currentStackFrames = current.getStackFrames();
          TestCase.assertEquals(expectedStackFrames.length, currentStackFrames.length);
          for (int i = 0; i < expectedStackFrames.length; i++) {
-            compareStackFrame(expectedStackFrames[i], currentStackFrames[i]);
+            compareStackFrame(expectedStackFrames[i], currentStackFrames[i], compareVariables);
          }
-         compareStackFrame(expected.getTopStackFrame(), current.getTopStackFrame());
+         compareStackFrame(expected.getTopStackFrame(), current.getTopStackFrame(), compareVariables);
       }
    }
    
@@ -989,11 +1066,12 @@ public final class TestSedCoreUtil {
     * @param current The current {@link ISEDThread}.
     * @param compareReferences Compare also the containment hierarchy?
     * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareThread(ISEDThread expected, ISEDThread current, boolean compareReferences, boolean compareId) throws DebugException {
-      compareThread((IThread)expected, (IThread)current, compareReferences);
-      compareNode(expected, current, compareReferences, compareId);
+   protected static void compareThread(ISEDThread expected, ISEDThread current, boolean compareReferences, boolean compareId, boolean compareVariables) throws DebugException {
+      compareThread((IThread)expected, (IThread)current, compareReferences, compareVariables);
+      compareNode(expected, current, compareReferences, compareId, compareVariables);
    }
 
    /**
@@ -1002,10 +1080,11 @@ public final class TestSedCoreUtil {
     * @param current The current {@link ISEDBranchCondition}.
     * @param compareReferences Compare also the containment hierarchy?
     * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareBranchCondition(ISEDBranchCondition expected, ISEDBranchCondition current, boolean compareReferences, boolean compareId) throws DebugException {
-      compareNode(expected, current, compareReferences, compareId);
+   protected static void compareBranchCondition(ISEDBranchCondition expected, ISEDBranchCondition current, boolean compareReferences, boolean compareId, boolean compareVariables) throws DebugException {
+      compareNode(expected, current, compareReferences, compareId, compareVariables);
    }
 
    /**
@@ -1014,11 +1093,12 @@ public final class TestSedCoreUtil {
     * @param current The current {@link ISEDBranchNode}.
     * @param compareReferences Compare also the containment hierarchy?
     * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareBranchNode(ISEDBranchNode expected, ISEDBranchNode current, boolean compareReferences, boolean compareId) throws DebugException {
-      compareStackFrame(expected, current);
-      compareNode(expected, current, compareReferences, compareId);
+   protected static void compareBranchNode(ISEDBranchNode expected, ISEDBranchNode current, boolean compareReferences, boolean compareId, boolean compareVariables) throws DebugException {
+      compareStackFrame(expected, current, compareVariables);
+      compareNode(expected, current, compareReferences, compareId, compareVariables);
    }
 
    /**
@@ -1027,11 +1107,12 @@ public final class TestSedCoreUtil {
     * @param current The current {@link ISEDMethodCall}.
     * @param compareReferences Compare also the containment hierarchy?
     * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareMethodCall(ISEDMethodCall expected, ISEDMethodCall current, boolean compareReferences, boolean compareId) throws DebugException {
-      compareStackFrame(expected, current);
-      compareNode(expected, current, compareReferences, compareId);
+   protected static void compareMethodCall(ISEDMethodCall expected, ISEDMethodCall current, boolean compareReferences, boolean compareId, boolean compareVariables) throws DebugException {
+      compareStackFrame(expected, current, compareVariables);
+      compareNode(expected, current, compareReferences, compareId, compareVariables);
    }
 
    /**
@@ -1040,10 +1121,11 @@ public final class TestSedCoreUtil {
     * @param current The current {@link ISEDExceptionalTermination}.
     * @param compareReferences Compare also the containment hierarchy?
     * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareExceptionalTermination(ISEDExceptionalTermination expected, ISEDExceptionalTermination current, boolean compareReferences, boolean compareId) throws DebugException {
-      compareTermination(expected, current, compareReferences, compareId);
+   protected static void compareExceptionalTermination(ISEDExceptionalTermination expected, ISEDExceptionalTermination current, boolean compareReferences, boolean compareId, boolean compareVariables) throws DebugException {
+      compareTermination(expected, current, compareReferences, compareId, compareVariables);
    }
 
    /**
@@ -1052,11 +1134,12 @@ public final class TestSedCoreUtil {
     * @param current The current {@link ISEDLoopCondition}.
     * @param compareReferences Compare also the containment hierarchy?
     * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareLoopCondition(ISEDLoopCondition expected, ISEDLoopCondition current, boolean compareReferences, boolean compareId) throws DebugException {
-      compareStackFrame(expected, current);
-      compareNode(expected, current, compareReferences, compareId);
+   protected static void compareLoopCondition(ISEDLoopCondition expected, ISEDLoopCondition current, boolean compareReferences, boolean compareId, boolean compareVariables) throws DebugException {
+      compareStackFrame(expected, current, compareVariables);
+      compareNode(expected, current, compareReferences, compareId, compareVariables);
    }
 
    /**
@@ -1065,11 +1148,12 @@ public final class TestSedCoreUtil {
     * @param current The current {@link ISEDLoopNode}.
     * @param compareReferences Compare also the containment hierarchy?
     * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareLoopNode(ISEDLoopNode expected, ISEDLoopNode current, boolean compareReferences, boolean compareId) throws DebugException {
-      compareStackFrame(expected, current);
-      compareNode(expected, current, compareReferences, compareId);
+   protected static void compareLoopNode(ISEDLoopNode expected, ISEDLoopNode current, boolean compareReferences, boolean compareId, boolean compareVariables) throws DebugException {
+      compareStackFrame(expected, current, compareVariables);
+      compareNode(expected, current, compareReferences, compareId, compareVariables);
    }
 
    /**
@@ -1078,11 +1162,12 @@ public final class TestSedCoreUtil {
     * @param current The current {@link ISEDMethodReturn}.
     * @param compareReferences Compare also the containment hierarchy?
     * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareMethodReturn(ISEDMethodReturn expected, ISEDMethodReturn current, boolean compareReferences, boolean compareId) throws DebugException {
-      compareStackFrame(expected, current);
-      compareNode(expected, current, compareReferences, compareId);
+   protected static void compareMethodReturn(ISEDMethodReturn expected, ISEDMethodReturn current, boolean compareReferences, boolean compareId, boolean compareVariables) throws DebugException {
+      compareStackFrame(expected, current, compareVariables);
+      compareNode(expected, current, compareReferences, compareId, compareVariables);
    }
 
    /**
@@ -1091,11 +1176,12 @@ public final class TestSedCoreUtil {
     * @param current The current {@link ISEDStatement}.
     * @param compareReferences Compare also the containment hierarchy?
     * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareStatement(ISEDStatement expected, ISEDStatement current, boolean compareReferences, boolean compareId) throws DebugException {
-      compareStackFrame(expected, current);
-      compareNode(expected, current, compareReferences, compareId);
+   protected static void compareStatement(ISEDStatement expected, ISEDStatement current, boolean compareReferences, boolean compareId, boolean compareVariables) throws DebugException {
+      compareStackFrame(expected, current, compareVariables);
+      compareNode(expected, current, compareReferences, compareId, compareVariables);
    }
 
    /**
@@ -1104,9 +1190,10 @@ public final class TestSedCoreUtil {
     * @param current The current {@link ISEDTermination}.
     * @param compareReferences Compare also the containment hierarchy?
     * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
     * @throws DebugException Occurred Exception.
     */
-   protected static void compareTermination(ISEDTermination expected, ISEDTermination current, boolean compareReferences, boolean compareId) throws DebugException {
-      compareNode(expected, current, compareReferences, compareId);
+   protected static void compareTermination(ISEDTermination expected, ISEDTermination current, boolean compareReferences, boolean compareId, boolean compareVariables) throws DebugException {
+      compareNode(expected, current, compareReferences, compareId, compareVariables);
    }
 }

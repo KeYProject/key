@@ -80,6 +80,8 @@ final class JMLTranslator {
         EQ ("=="),
         NEQ ("!="),
         NOT_MOD ("\\not_modified"),
+        VALUES ("\\values"),
+        INDEX ("\\index"),
         INDEX_OF ("\\indexOf"),
         SEQ_GET ("\\seq_get"),
         SEQ_CONCAT ("\\seq_concat"),
@@ -1285,6 +1287,32 @@ final class JMLTranslator {
                 return new SLExpression(TB.and(disTerms));
             }
         });
+        
+        
+        // keywords in loop specifications of enhanced for loops
+        
+        translationMethods.put(JMLKeyWord.INDEX, new JMLTranslationMethod(){
+
+			@Override
+			public SLExpression translate(SLTranslationExceptionManager excManager,
+					Object... params) throws SLTranslationException {
+				checkParameters(params, Services.class);
+				final KeYJavaType t = ((Services)params[0]).getJavaInfo()
+			               .getKeYJavaType(PrimitiveType.JAVA_INT);
+				return new SLExpression(TB.index((Services)params[0]),t);
+			}});
+        
+        translationMethods.put(JMLKeyWord.VALUES, new JMLTranslationMethod(){
+
+			@Override
+			public SLExpression translate(SLTranslationExceptionManager excManager,
+					Object... params) throws SLTranslationException {
+				checkParameters(params, Services.class);
+				throw new SLTranslationException("JML keyword \\values not yet supported.");
+//				final KeYJavaType t = ((Services)params[0]).getJavaInfo()
+//			               .getKeYJavaType(PrimitiveType.JAVA_SEQ);
+//				return new SLExpression(TB.values((Services)params[0]),t);
+			}});
     }
 
 

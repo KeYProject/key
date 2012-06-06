@@ -2,6 +2,7 @@ package org.key_project.sed.core.provider;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.internal.ui.model.elements.ElementContentProvider;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IElementContentProvider;
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationContext;
@@ -51,28 +52,47 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
    /**
     * Returns the available children.
     * @param parent The parent element for that the children are needed.
+    * @param context The {@link IPresentationContext} of the request.
     * @return The children. 
     * @throws CoreException Occurred Exception.
     */
-   protected Object[] getChildren(Object parent) throws CoreException {
-      if (parent instanceof ISEDDebugNode) {
-         if (SEDPreferenceUtil.isShowCompactExecutionTree()) {
-            ISEDDebugNode node = (ISEDDebugNode)parent;
-            if (!isCompactNod(node)) {
-               Object[] children = getCompactChildren(node);
-               return children != null ? children : new Object[0];
-            }
-            else {
-               return new Object[0];
-            }
+   protected Object[] getAllChildren(Object parent, IPresentationContext context) throws CoreException {
+      if (IDebugUIConstants.ID_VARIABLE_VIEW.equals(context.getId())) {
+         if (parent instanceof IStackFrame) {
+            return ((IStackFrame)parent).getVariables();
          }
          else {
-            Object[] children = ((ISEDDebugNode)parent).getChildren();
-            return children != null ? children : new Object[0];
+            return EMPTY;
+         }
+      }
+      else if (IDebugUIConstants.ID_REGISTER_VIEW.equals(context.getId())) {
+         if (parent instanceof IStackFrame) {
+            return ((IStackFrame)parent).getRegisterGroups();
+         }
+         else {
+            return EMPTY;
          }
       }
       else {
-         return new Object[0];
+         if (parent instanceof ISEDDebugNode) {
+            if (SEDPreferenceUtil.isShowCompactExecutionTree()) {
+               ISEDDebugNode node = (ISEDDebugNode)parent;
+               if (!isCompactNod(node)) {
+                  Object[] children = getCompactChildren(node);
+                  return children != null ? children : EMPTY;
+               }
+               else {
+                  return EMPTY;
+               }
+            }
+            else {
+               Object[] children = ((ISEDDebugNode)parent).getChildren();
+               return children != null ? children : EMPTY;
+            }
+         }
+         else {
+            return EMPTY;
+         }
       }
    }
    
@@ -140,7 +160,7 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
     */
    @Override
    protected Object[] getChildren(Object parent, int index, int length, IPresentationContext context, IViewerUpdate monitor) throws CoreException {
-      return getElements(getChildren(parent), index, length);
+      return getElements(getAllChildren(parent, context), index, length);
    }
 
    /**
@@ -148,7 +168,7 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
     */
    @Override
    protected int getChildCount(Object element, IPresentationContext context, IViewerUpdate monitor) throws CoreException {
-      return getChildren(element).length;
+      return getAllChildren(element, context).length;
    }
 
    /**
@@ -156,6 +176,34 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
     */
    @Override
    protected boolean supportsContextId(String id) {
-      return IDebugUIConstants.ID_DEBUG_VIEW.equals(id);
+      return IDebugUIConstants.ID_DEBUG_VIEW.equals(id) ||
+             IDebugUIConstants.ID_VARIABLE_VIEW.equals(id) ||
+             IDebugUIConstants.ID_REGISTER_VIEW.equals(id);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected boolean hasChildren(Object element, IPresentationContext context, IViewerUpdate monitor) throws CoreException {
+      if (IDebugUIConstants.ID_VARIABLE_VIEW.equals(context.getId())) {
+         if (element instanceof IStackFrame) {
+            return ((IStackFrame)element).hasVariables();
+         }
+         else {
+            return false;
+         }
+      }
+      else if (IDebugUIConstants.ID_REGISTER_VIEW.equals(context.getId())) {
+         if (element instanceof IStackFrame) {
+            return ((IStackFrame)element).hasRegisterGroups();
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return super.hasChildren(element, context, monitor);
+      }
    }
 }

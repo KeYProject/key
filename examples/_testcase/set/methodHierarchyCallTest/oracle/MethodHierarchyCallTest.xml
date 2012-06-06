@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;">
-   <methodCall name="self.main();">
-      <statement name="return a();">
-         <methodCall name="self.a();">
-            <statement name="return b();">
-               <methodCall name="self.b();">
-                  <statement name="return c();">
-                     <methodCall name="self.c();">
-                        <statement name="return 42;">
-                           <methodReturn name="&lt;return of self.c();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.c();&gt;">
-                              <methodReturn name="&lt;return of self.b();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.b();&gt;">
-                                 <methodReturn name="&lt;return of self.a();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.a();&gt;">
-                                    <methodReturn name="&lt;return of self.main();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.main();&gt;">
-                                       <termination name="&lt;end&gt;" exceptionalTermination="false">
+<startNode name="&lt;start&gt;" pathCondition="true">
+   <methodCall name="self.main();" pathCondition="true">
+      <statement name="return a();" pathCondition="true">
+         <methodCall name="self.a();" pathCondition="true">
+            <statement name="return b();" pathCondition="true">
+               <methodCall name="self.b();" pathCondition="true">
+                  <statement name="return c();" pathCondition="true">
+                     <methodCall name="self.c();" pathCondition="true">
+                        <statement name="return 42;" pathCondition="true">
+                           <methodReturn name="&lt;return of self.c();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.c();&gt;">
+                              <methodReturn name="&lt;return of self.b();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.b();&gt;">
+                                 <methodReturn name="&lt;return of self.a();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.a();&gt;">
+                                    <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.main();&gt;">
+                                       <termination name="&lt;end&gt;" pathCondition="true" exceptionalTermination="false">
                                        </termination>
                                     </methodReturn>
                                  </methodReturn>

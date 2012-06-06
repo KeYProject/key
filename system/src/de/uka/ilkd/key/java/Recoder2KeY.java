@@ -619,14 +619,15 @@ public class Recoder2KeY implements JavaReader {
         	try {
                     currentDataLocation = walker.getCurrentDataLocation();
                     is = new BufferedInputStream(walker.openCurrent());
-                    ClassFile cf = parser.parseClassFile(is);
+                    ClassFile cf;
+                    try {
+                        cf = parser.parseClassFile(is);
+                    } finally {
+                        is.close();
+                    }
                     manager.addClassFile(cf, currentDataLocation);
                 } catch(Exception ex) {
                     throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(), ex);
-                } finally {
-                    if (is != null) {
-                	is.close();
-                    }
                 }
             }
         }
