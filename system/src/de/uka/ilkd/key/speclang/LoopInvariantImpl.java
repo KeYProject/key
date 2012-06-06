@@ -188,8 +188,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     @Override
-    public Term getInternalInvariant() {
-        return originalInvariant;
+    public Term getInternalInvariant(boolean transaction) {
+        return transaction ? originalTransactionInvariant : originalInvariant;
     }
 
     @Override
@@ -198,18 +198,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public Term getInternalTransactionInvariant(){
-		return originalTransactionInvariant;
-    }
-    
-    @Override
-    public Term getInternalModifies(){
+    public Map<LocationVariable,Term> getInternalModifies(){
     	return originalModifies;
-    }
-    
-    @Override
-    public Term getInternalModifiesBackup(){
-    	return originalModifiesBackup;
     }
     
     @Override

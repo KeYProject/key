@@ -61,18 +61,15 @@ public interface LoopInvariant extends SpecificationElement {
      * Returns the term internally used for the invariant. 
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
-    Term getInternalInvariant();
+    Term getInternalInvariant(boolean transaction);
 
-    Term getInternalTransactionInvariant();
-    
     /**
      * Returns the term internally used for the variant. 
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
     Term getInternalVariant();
     
-    Term getInternalModifies();
-    Term getInternalModifiesBackup();
+    Map<LocationVariable,Term> getInternalModifies();
 
     /**
      * Returns a new loop invariant where the loop reference has been
