@@ -626,7 +626,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         for(LocationVariable heap : modHeaps) {
            final Triple<Term,Term,Term> tAnon;
            // TODO probably the special case still needs fixing (later)
-           if(heap == baseHeap && contract.hasModifiesClause()) {
+           if(heap == baseHeap && !contract.hasModifiesClause()) {
              tAnon = new Triple<Term,Term,Term>(TB.tt(), TB.skip(), TB.var(heap));
            }else{
              tAnon = createAnonUpdate(heap, inst.pm, mods.get(heap), services);
