@@ -120,6 +120,24 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
+
+    private Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts, Services services) {
+      Term anonUpdate = null;
+      for(ProgramVariable pv : localOuts) {
+        final String anonFuncName 
+    	    = TB.newName(services, pv.name().toString());
+        final Function anonFunc 
+    	    = new Function(new Name(anonFuncName), pv.sort());
+        services.getNamespaces().functions().addSafely(anonFunc);
+        final Term elemUpd = TB.elementary(services, (LocationVariable)pv, TB.func(anonFunc));
+        if(anonUpdate == null) {
+          anonUpdate = elemUpd;
+        }else{
+          anonUpdate = TB.parallel(anonUpdate, elemUpd);
+        }
+      }
+      return anonUpdate;
+    }
     
     /**
      * @return (anon update, anon heap)
@@ -127,7 +145,6 @@ public final class WhileInvariantRule implements BuiltInRule {
     private Pair<Term,Term> createAnonUpdate(LocationVariable heap,
 	    			While loop, 
 	    			Term mod,
-	    			ImmutableSet<ProgramVariable> localOuts,
 	    			Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name anonHeapName = new Name(TB.newName(services, "anon_"+heap.name()+"_loop"));
@@ -137,27 +154,13 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final Term anonHeapTerm = TB.func(anonHeapFunc);
 	
 	// check for strictly pure loops
-	Term anonUpdate;
+	final Term anonUpdate;
 	if(TB.lessThanNothing().equals(mod)) {
 	    anonUpdate = TB.skip();
 	} else {
 	    anonUpdate = TB.anonUpd(heap, services, mod, anonHeapTerm);
 	}
 	
-	//local output vars
-	if(localOuts != null) {
-	    for(ProgramVariable pv : localOuts) {
-	        final String anonFuncName 
-	    	    = TB.newName(services, pv.name().toString());
-	        final Function anonFunc 
-	    	    = new Function(new Name(anonFuncName), pv.sort());
-	        services.getNamespaces().functions().addSafely(anonFunc);
-	        final Term elemUpd = TB.elementary(services, 
-	                (LocationVariable)pv, 
-	                TB.func(anonFunc));
-	        anonUpdate = TB.parallel(anonUpdate, elemUpd);
-	    }
-	}
 	return new Pair<Term,Term>(anonUpdate, anonHeapTerm);
     }
     
@@ -296,13 +299,13 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	//prepare anon update, frame condition, etc.
 
-        Term anonUpdate = null;
+        Term anonUpdate = createLocalAnonUpdate(localOuts, services); // can still be null
         Term wellFormedAnon = null;
         Term frameCondition = null;
         Term reachableState = reachableIn;
         for(LocationVariable heap : modHeaps) {
 	  final Pair<Term,Term> tAnon 
-	      = createAnonUpdate(heap, inst.loop, mods.get(heap), null, services);
+	      = createAnonUpdate(heap, inst.loop, mods.get(heap), services);
           if(anonUpdate == null) {
             anonUpdate = tAnon.first;
           }else{
@@ -327,7 +330,6 @@ public final class WhileInvariantRule implements BuiltInRule {
           }
           reachableState = TB.and(reachableState, TB.wellFormed(heap, services));
         }
-
 	//prepare variant
 	final ProgramElementName variantName 
 		= new ProgramElementName(TB.newName(services, "variant"));
