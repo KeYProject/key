@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 
 /**
@@ -93,6 +94,8 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       addSymbolicThread(thread);
       // Observe frozen state of KeY Main Frame
       MainWindow.getInstance().getMediator().addAutoModeListener(autoModeListener);
+      // Set stop condition to use
+      builder.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(new ExecutedSymbolicExecutionTreeNodesStopCondition(10000));
    }
 
    /**

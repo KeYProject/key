@@ -855,12 +855,28 @@ public final class MiscTools {
     public static String getRuleDisplayName(Node node) {
        String name = null;
        if (node != null) {
-          RuleApp ruleApp = node.getAppliedRuleApp();
-          if (ruleApp != null) {
-             Rule rule = ruleApp.rule();
-             if (rule != null) {
-                name = rule.displayName();
-             }
+          name = getRuleDisplayName(node.getAppliedRuleApp());
+       }
+       return name;
+    }
+    
+    /**
+     * <p>
+     * Returns the name of the {@link RuleApp}.
+     * </p>
+     * <p>
+     * This method is required for the symbolic execution tree extraction,
+     * e.g. used in the Symbolic Execution Tree Debugger.
+     * </p>
+     * @param ruleApp The given {@link RuleApp}.
+     * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
+     */
+    public static String getRuleDisplayName(RuleApp ruleApp) {
+       String name = null;
+       if (ruleApp != null) {
+          Rule rule = ruleApp.rule();
+          if (rule != null) {
+             name = rule.displayName();
           }
        }
        return name;

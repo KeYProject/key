@@ -11,7 +11,10 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -19,6 +22,10 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.BranchStatement;
+import de.uka.ilkd.key.java.statement.EnhancedFor;
+import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -38,6 +45,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -48,6 +56,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -595,6 +604,157 @@ public final class SymbolicExecutionUtil {
       }
       else {
          return null;
+      }
+   }
+   
+//   /**
+//    * Checks if the given {@link Node} contains an applied rule.
+//    * @param node The {@link Node} to check.
+//    * @return {@code true} node has applied rule, {@code false} node has no rule or node is {@code null}.
+//    */
+//   public static boolean hasAppliedRule(Node node) {
+//      return node != null && node.getAppliedRuleApp() != null;
+//   }
+   
+   /**
+    * Checks if the given node should be represented as method call.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The statement ({@link SourceElement}).
+    * @return {@code true} represent node as method call, {@code false} represent node as something else. 
+    */
+   public static boolean isMethodCallNode(Node node, RuleApp ruleApp, SourceElement statement) {
+      return isMethodCallNode(node, ruleApp, statement, false);
+   }
+   
+   /**
+    * Checks if the given node should be represented as method call.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The statement ({@link SourceElement}).
+    * @param allowImpliciteMethods {@code true} implicit methods are included, {@code false} implicit methods are outfiltered.
+    * @return {@code true} represent node as method call, {@code false} represent node as something else. 
+    */
+   public static boolean isMethodCallNode(Node node, RuleApp ruleApp, SourceElement statement, boolean allowImpliciteMethods) {
+      if (ruleApp != null) { // Do not handle open goal nodes without applied rule
+         if (statement instanceof MethodBodyStatement) {
+            if (allowImpliciteMethods) {
+               return true;
+            }
+            else {
+               MethodBodyStatement mbs = (MethodBodyStatement)statement;
+               ProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
+               return !pm.isImplicit(); // Do not include implicit methods
+            }
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Checks if the given node should be represented as branch node.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The statement ({@link SourceElement}).
+    * @param posInfo The {@link PositionInfo}.
+    * @return {@code true} represent node as branch node, {@code false} represent node as something else. 
+    */
+   public static boolean isBranchNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+      return isStatementNode(node, ruleApp, statement, posInfo) &&
+             (statement instanceof BranchStatement); 
+   }
+   
+   /**
+    * Checks if the given node should be represented as loop node.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The statement ({@link SourceElement}).
+    * @param posInfo The {@link PositionInfo}.
+    * @return {@code true} represent node as loop node, {@code false} represent node as something else. 
+    */
+   public static boolean isLoopNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+      return isStatementNode(node, ruleApp, statement, posInfo) &&
+             (statement instanceof LoopStatement); 
+   }
+
+   /**
+    * Checks if the given node should be represented as statement.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The statement ({@link SourceElement}).
+    * @param posInfo The {@link PositionInfo}.
+    * @return {@code true} represent node as statement, {@code false} represent node as something else. 
+    */
+   public static boolean isStatementNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+      return ruleApp != null && // Do not handle the open goal node which has no applied rule
+             posInfo != null && 
+             posInfo.getEndPosition() != Position.UNDEFINED &&
+             posInfo.getEndPosition().getLine() >= 0;  // Filter out statements where source code is missing.
+   }
+   
+   /**
+    * Checks if the given node should be represented as termination.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The statement ({@link SourceElement}).
+    * @param posInfo The {@link PositionInfo}.
+    * @return {@code true} represent node as termination, {@code false} represent node as something else. 
+    */
+   public static boolean isTerminationNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+      return "emptyModality".equals(MiscTools.getRuleDisplayName(ruleApp));
+   }
+   
+   /**
+    * Checks if the given node should be represented as method return.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The statement ({@link SourceElement}).
+    * @param posInfo The {@link PositionInfo}.
+    * @return {@code true} represent node as method return, {@code false} represent node as something else. 
+    */
+   public static boolean isMethodReturnNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+      return "methodCallEmpty".equals(MiscTools.getRuleDisplayName(ruleApp));
+   }
+
+   /**
+    * Checks if the given {@link Node} has a loop condition.
+    * @param node The {@link Node} to check.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The actual statement ({@link SourceElement}).
+    * @return {@code true} has loop condition, {@code false} has no loop condition.
+    */
+   public static boolean hasLoopCondition(Node node, RuleApp ruleApp, SourceElement statement) {
+      return ruleApp != null && // Do not handle open goal nodes without applied rule
+             statement instanceof LoopStatement && 
+             !(statement instanceof EnhancedFor); // For each loops have no loop condition
+   }
+   
+   /**
+    * Checks if the given {@link Node} in KeY's proof tree represents
+    * also a {@link Node} in a symbolic execution tree.
+    * @param node The {@link Node} of KeY's proof tree to check.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @return {@code true} is also symbolic execution tree node, {@code false} is no node in a symbolic execution tree.
+    */
+   public static boolean isSymbolicExecutionTreeNode(Node node, RuleApp ruleApp) {
+      if (node != null) {
+         SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
+         PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
+         return isBranchNode(node, ruleApp, statement, posInfo) ||
+                isLoopNode(node, ruleApp, statement, posInfo) ||
+                isMethodCallNode(node, ruleApp, statement) ||
+                isMethodReturnNode(node, ruleApp, statement, posInfo) ||
+                isStatementNode(node, ruleApp, statement, posInfo) ||
+                isTerminationNode(node, ruleApp, statement, posInfo) ||
+                hasLoopCondition(node, ruleApp, statement);
+      }
+      else {
+         return false;
       }
    }
 }

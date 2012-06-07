@@ -10,19 +10,15 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.Assignment;
-import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.Do;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -31,7 +27,6 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -57,7 +52,7 @@ import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
 import de.uka.ilkd.key.symbolic_execution.util.EqualsHashCodeResetter;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
-import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.NodePreorderIterator;
 
 /**
@@ -403,12 +398,12 @@ public class SymbolicExecutionTreeBuilder {
          NodeInfo info = node.getNodeInfo();
          SourceElement statement = info.getActiveStatement();
          // Update call stack
-         updateCallStack(node, info, statement);
+         updateCallStack(node, statement);
          // Check if the node is already contained in the symbolic execution tree
          AbstractExecutionNode executionNode = keyNodeMapping.get(node);
          if (executionNode == null) {
             // Try to create a new node
-            executionNode = createExecutionTreeModelRepresentation(parentToAddTo, node, info, statement);
+            executionNode = createExecutionTreeModelRepresentation(parentToAddTo, node, statement);
             // Check if a new node was created
             if (executionNode != null) {
                // Add new node to symbolic execution tree
@@ -421,7 +416,7 @@ public class SymbolicExecutionTreeBuilder {
             parentToAddTo = executionNode;
          }
          // Check if loop condition is available
-         if (hasLoopCondition(node, statement)) {
+         if (SymbolicExecutionUtil.hasLoopCondition(node, node.getAppliedRuleApp(), statement)) {
             // Get the original loop statement
             LoopStatement loop = (LoopStatement)statement;
             Expression expression = loop.getGuardExpression();
@@ -453,11 +448,10 @@ public class SymbolicExecutionTreeBuilder {
     * Updates the call stack ({@link #methodCallStack}) if the given {@link Node}
     * in KeY's proof tree is a method call.
     * @param node The current {@link Node} in the proof tree of KeY.
-    * @param info The {@link NodeInfo}.
     * @param statement The statement ({@link SourceElement}).
     */
-   protected void updateCallStack(Node node, NodeInfo info, SourceElement statement) {
-      if (isMethodCallNode(node, info, statement, true)) {
+   protected void updateCallStack(Node node, SourceElement statement) {
+      if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement, true)) {
          // Remove outdated methods from call stack
          int currentLevel = computeStackSize(node);
          while (methodCallStack.size() > currentLevel) {
@@ -473,24 +467,22 @@ public class SymbolicExecutionTreeBuilder {
     * if possible for the given {@link Node} in KeY's proof tree.
     * @param parent The parent {@link IExecutionNode}.
     * @param node The {@link Node} in the proof tree of KeY.
-    * @param info The {@link NodeInfo}.
     * @param statement The actual statement ({@link SourceElement}).
     * @return The created {@link IExecutionNode} or {@code null} if the {@link Node} should be ignored in the symbolic execution tree.
     */
    protected AbstractExecutionNode createExecutionTreeModelRepresentation(AbstractExecutionNode parent,
-                                                          Node node, 
-                                                          NodeInfo info, 
-                                                          SourceElement statement) {
+                                                                          Node node, 
+                                                                          SourceElement statement) {
       AbstractExecutionNode result = null;
       // Make sure that a statement (SourceElement) is available.
       if (statement != null) {
          // Get position information
          PositionInfo posInfo = statement.getPositionInfo();
          // Determine the node representation and create it if one is available
-         if (isMethodCallNode(node, info, statement)) {
+         if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
             result = new ExecutionMethodCall(node);
          }
-         else if (isMethodReturnNode(node, info, statement, posInfo)) {
+         else if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
             // Find the Node in the proof tree of KeY for that this Node is the return
             Node callNode = findMethodCallNode(node);
             if (callNode != null) {
@@ -502,16 +494,16 @@ public class SymbolicExecutionTreeBuilder {
                }
             }
          }
-         else if (isTerminationNode(node, info, statement, posInfo)) {
+         else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
             result = new ExecutionTermination(node, exceptionVariable);
          }
-         else if (isBranchNode(node, info, statement, posInfo)) {
+         else if (SymbolicExecutionUtil.isBranchNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
             result = new ExecutionBranchNode(node);
          }
-         else if (isLoopNode(node, info, statement, posInfo)) {
+         else if (SymbolicExecutionUtil.isLoopNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
             result = new ExecutionLoopNode(node);
          }
-         else if (isStatementNode(node, info, statement, posInfo)) {
+         else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
             result = new ExecutionStatement(node);
          }
       }
@@ -528,7 +520,7 @@ public class SymbolicExecutionTreeBuilder {
       if (callNode != null) {
          NodeInfo callInfo = callNode.getNodeInfo();
          SourceElement callStatement = callInfo.getActiveStatement();
-         return !isMethodCallNode(callNode, callInfo, callStatement);
+         return !SymbolicExecutionUtil.isMethodCallNode(callNode, callNode.getAppliedRuleApp(), callStatement);
       }
       else {
          return false;
@@ -574,17 +566,6 @@ public class SymbolicExecutionTreeBuilder {
       }
       return node;
    }
-
-   /**
-    * Checks if the given {@link Node} has a loop condition.
-    * @param node The {@link Node} to check.
-    * @param statement The actual statement ({@link SourceElement}).
-    * @return {@code true} has loop condition, {@code false} has no loop condition.
-    */
-   protected boolean hasLoopCondition(Node node, SourceElement statement) {
-      return statement instanceof LoopStatement && 
-             !(statement instanceof EnhancedFor); // For each loops have no loop condition
-   }
    
    /**
     * Checks if the given {@link SourceElement} is a do while loop.
@@ -604,30 +585,6 @@ public class SymbolicExecutionTreeBuilder {
     */
    protected boolean isForLoopCondition(Node node, SourceElement statement) {
       return statement instanceof For;
-   }
-   
-   /**
-    * Checks if the given node should be represented as termination.
-    * @param node The current {@link Node} in the proof tree of KeY.
-    * @param info The {@link NodeInfo}.
-    * @param statement The statement ({@link SourceElement}).
-    * @param posInfo The {@link PositionInfo}.
-    * @return {@code true} represent node as termination, {@code false} represent node as something else. 
-    */
-   protected boolean isTerminationNode(Node node, NodeInfo info, SourceElement statement, PositionInfo posInfo) {
-      return "emptyModality".equals(MiscTools.getRuleDisplayName(node));
-   }
-   
-   /**
-    * Checks if the given node should be represented as method return.
-    * @param node The current {@link Node} in the proof tree of KeY.
-    * @param info The {@link NodeInfo}.
-    * @param statement The statement ({@link SourceElement}).
-    * @param posInfo The {@link PositionInfo}.
-    * @return {@code true} represent node as method return, {@code false} represent node as something else. 
-    */
-   protected boolean isMethodReturnNode(Node node, NodeInfo info, SourceElement statement, PositionInfo posInfo) {
-      return "methodCallEmpty".equals(MiscTools.getRuleDisplayName(node));
    }
    
    /**
@@ -681,81 +638,6 @@ public class SymbolicExecutionTreeBuilder {
          }
       }
       return result;
-   }
-   
-   /**
-    * Checks if the given node should be represented as method call.
-    * @param node The current {@link Node} in the proof tree of KeY.
-    * @param info The {@link NodeInfo}.
-    * @param statement The statement ({@link SourceElement}).
-    * @return {@code true} represent node as method call, {@code false} represent node as something else. 
-    */
-   protected boolean isMethodCallNode(Node node, NodeInfo info, SourceElement statement) {
-      return isMethodCallNode(node, info, statement, false);
-   }
-   
-   /**
-    * Checks if the given node should be represented as method call.
-    * @param node The current {@link Node} in the proof tree of KeY.
-    * @param info The {@link NodeInfo}.
-    * @param statement The statement ({@link SourceElement}).
-    * @param allowImpliciteMethods {@code true} implicit methods are included, {@code false} implicit methods are outfiltered.
-    * @return {@code true} represent node as method call, {@code false} represent node as something else. 
-    */
-   protected boolean isMethodCallNode(Node node, NodeInfo info, SourceElement statement, boolean allowImpliciteMethods) {
-      if (statement instanceof MethodBodyStatement) {
-         if (allowImpliciteMethods) {
-            return true;
-         }
-         else {
-            MethodBodyStatement mbs = (MethodBodyStatement)statement;
-            ProgramMethod pm = mbs.getProgramMethod(proof.getServices());
-            return !pm.isImplicit(); // Do not include implicit methods
-         }
-      }
-      else {
-         return false;
-      }
-   }
-   
-   /**
-    * Checks if the given node should be represented as branch node.
-    * @param node The current {@link Node} in the proof tree of KeY.
-    * @param info The {@link NodeInfo}.
-    * @param statement The statement ({@link SourceElement}).
-    * @param posInfo The {@link PositionInfo}.
-    * @return {@code true} represent node as branch node, {@code false} represent node as something else. 
-    */
-   protected boolean isBranchNode(Node node, NodeInfo info, SourceElement statement, PositionInfo posInfo) {
-      return isStatementNode(node, info, statement, posInfo) &&
-             (statement instanceof BranchStatement); 
-   }
-   
-   /**
-    * Checks if the given node should be represented as loop node.
-    * @param node The current {@link Node} in the proof tree of KeY.
-    * @param info The {@link NodeInfo}.
-    * @param statement The statement ({@link SourceElement}).
-    * @param posInfo The {@link PositionInfo}.
-    * @return {@code true} represent node as loop node, {@code false} represent node as something else. 
-    */
-   protected boolean isLoopNode(Node node, NodeInfo info, SourceElement statement, PositionInfo posInfo) {
-      return isStatementNode(node, info, statement, posInfo) &&
-             (statement instanceof LoopStatement); 
-   }
-   
-   /**
-    * Checks if the given node should be represented as statement.
-    * @param node The current {@link Node} in the proof tree of KeY.
-    * @param info The {@link NodeInfo}.
-    * @param statement The statement ({@link SourceElement}).
-    * @param posInfo The {@link PositionInfo}.
-    * @return {@code true} represent node as statement, {@code false} represent node as something else. 
-    */
-   protected boolean isStatementNode(Node node, NodeInfo info, SourceElement statement, PositionInfo posInfo) {
-      return posInfo != null && 
-             posInfo.getEndPosition() != Position.UNDEFINED &&
-             posInfo.getEndPosition().getLine() >= 0;  // Filter out statements where source code is missing.
    }
    
    /**

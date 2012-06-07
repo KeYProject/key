@@ -58,13 +58,13 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       // Read from XML string
       ExecutionNodeReader reader = new ExecutionNodeReader();
       IExecutionNode currentNode = reader.read(new ByteArrayInputStream(xml.getBytes(Charset.forName(ExecutionNodeWriter.DEFAULT_ENCODING))));
-      TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes);
+      TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, true);
       // Serialize model to output stream
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, out, saveVariabes);
       // Read from input stream
       currentNode = reader.read(new ByteArrayInputStream(out.toByteArray()));
-      TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes);
+      TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, true);
       // Serialize model to temporary file
       File tempFile = File.createTempFile("TestExecutionNodeWriterAndReader", "testWritingAndReading");
       try {
@@ -73,7 +73,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
          assertTrue(tempFile.isFile());
          // Read from tempoary file
          currentNode = reader.read(tempFile);
-         TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes);
+         TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, true);
       }
       finally {
          tempFile.delete();
