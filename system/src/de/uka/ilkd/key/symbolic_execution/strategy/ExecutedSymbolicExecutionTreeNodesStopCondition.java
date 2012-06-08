@@ -3,6 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -30,7 +31,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
    /**
     * The maximal number of allowed symbolic execution tree nodes.
     * The auto mode will stop exactly in the open goal proof node which
-    * becomes the next symbolic exection tree node.
+    * becomes the next symbolic execution tree node.
     */
    private int maximalNumberOfSetNodesToExecute;
    
@@ -64,8 +65,62 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
                              long timeout, 
                              Proof proof, 
                              IGoalChooser goalChooser) {
-      executedNumberOfSetNodes = -1; // Reset number of already detected symbolic execution tree nodes. It is initialized based on the current proof tree in shouldStop when the first node is provided.
+      executedNumberOfSetNodes = 0; // Reset number of already detected symbolic execution tree nodes.
       return 0; // Return unknown because there is no relation between applied rules and executed symbolic execution tree nodes.
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isGoalAllowed(ApplyStrategy strategy, 
+                                int maxApplications, 
+                                long timeout, 
+                                Proof proof, 
+                                IGoalChooser goalChooser, 
+                                long startTime, 
+                                int countApplied, 
+                                Goal goal) {
+      if (goal != null) {
+         Node node = goal.node();
+         // Check if goal is allowed
+         RuleApp ruleApp = goal.getRuleAppManager().peekNext();
+         if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {    
+            if (executedNumberOfSetNodes + 1> maximalNumberOfSetNodesToExecute) {
+               return false;
+            }
+            else {
+               executedNumberOfSetNodes ++;
+               return true;
+            }
+         }
+         else {
+            return true;
+         }
+      }
+      else {
+         return true; // Allowed, because ApplyStrategy will handle the null case
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getGoalNotAllowedMessage(ApplyStrategy strategy, 
+                                          int maxApplications, 
+                                          long timeout, 
+                                          Proof proof, 
+                                          IGoalChooser goalChooser, 
+                                          long startTime, 
+                                          int countApplied, 
+                                          Goal goal) {
+      if (maximalNumberOfSetNodesToExecute > 1) {
+         return "Maximal limit of " + maximalNumberOfSetNodesToExecute + " symbolic execution tree nodes reached.";
+      }
+      else {
+         return "Maximal limit of one symbolic execution tree node reached.";
+      }
    }
 
    /**
@@ -80,37 +135,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
                              long startTime, 
                              int countApplied, 
                              SingleRuleApplicationInfo singleRuleApplicationInfo) {
-      if (singleRuleApplicationInfo != null) {
-         // Get open goal node on branch
-         Node node = singleRuleApplicationInfo.getGoal().node();
-         // Check if auto mode was started and must be initialized
-         if (executedNumberOfSetNodes < 0) {
-            Node parent = node.parent();
-            if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(parent, parent.getAppliedRuleApp())) {
-               executedNumberOfSetNodes = 1; // Last open goal was a symbolic execution tree node. 
-            }
-            else {
-               executedNumberOfSetNodes = 0; // Last stop was somewhere in between symbolic execution tree nodes
-            }
-         }
-         // Get rule app which will be applied on it in the future
-         RuleApp ruleApp = singleRuleApplicationInfo.getGoal().getRuleAppManager().peekNext();
-         if(SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
-            executedNumberOfSetNodes ++;
-            if (executedNumberOfSetNodes > maximalNumberOfSetNodesToExecute) {
-               return true; // TODO: Continue on all other branches before stop, maybe use own IGoalChooser
-            }
-            else {
-               return false; // Still more symbolic execution tree nodes allowed.
-            }
-         }
-         else {
-            return false; // Internal node, continue
-         }
-      }
-      else {
-         return false; // Initial check, should continue because nothing done yet.
-      }
+      return false;
    }
 
    /**
@@ -125,12 +150,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
                                 long startTime, 
                                 int countApplied, 
                                 SingleRuleApplicationInfo singleRuleApplicationInfo) {
-      if (maximalNumberOfSetNodesToExecute > 1) {
-         return "Maximal limit of " + maximalNumberOfSetNodesToExecute + " symbolic execution tree nodes reached.";
-      }
-      else {
-         return "Maximal limit of one symbolic execution tree node reached.";
-      }
+      return null;
    }
 
    /**
