@@ -164,7 +164,10 @@ public final class KeYUtil {
         SwingUtil.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                Main.main(new String[] {});
+                if (!MainWindow.hasInstance()) {
+                   MainWindow.createInstance(Main.getMainWindowTitle());
+                }
+                MainWindow.getInstance().setVisible(true);
             }
         });
     }
