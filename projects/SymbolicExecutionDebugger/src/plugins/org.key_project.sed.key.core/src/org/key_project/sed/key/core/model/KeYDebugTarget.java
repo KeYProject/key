@@ -21,6 +21,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 
 /**
@@ -103,6 +104,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Set stop condition to use
       stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(10000);
       builder.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
+      builder.getProof().getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
    }
 
    /**

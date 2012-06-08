@@ -41,6 +41,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.po.SymbolicExecutionFunctionalOperationContractPO;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -782,13 +783,16 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
       // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
       ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
+      proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
       // Execute auto mode until no more symbolic execution tree nodes are found
       do {
          // Run proof
          ui.startAndWaitForProof(proof);
+         // Update symbolic execution tree 
+         builder.analyse();
+         // Make sure that not to many set nodes are executed
+         assertTrue(stopCondition.getExecutedNumberOfSetNodes() + " is not less equal to " + maximalNumberOfExecutedSetNodes,stopCondition.getExecutedNumberOfSetNodes() <= maximalNumberOfExecutedSetNodes);
       } while(stopCondition.getExecutedNumberOfSetNodes() > 0);
-      // Update symbolic execution tree 
-      builder.analyse(); // TODO: Move back in do loop when each branch is continued in stop condition
       // Create new oracle file if required in a temporary directory
       createOracleFile(builder.getStartNode(), oraclePathInBaseDirFile, includeVariables);
       // Read oracle file
