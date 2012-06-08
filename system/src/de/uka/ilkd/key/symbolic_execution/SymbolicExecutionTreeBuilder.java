@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -143,6 +144,12 @@ public class SymbolicExecutionTreeBuilder {
    private Map<Node, ExecutionLoopCondition> keyNodeLoopConditionMapping = new HashMap<Node, ExecutionLoopCondition>();
    
    /**
+    * Maps a branch condition of a {@link Node} of KeY's proof tree to his 
+    * execution tree model representation ({@link IExecutionBranchCondition}) if it is available.
+    */
+   private Map<Node, ExecutionBranchCondition> keyNodeBranchConditionMapping = new HashMap<Node, ExecutionBranchCondition>();
+   
+   /**
     * <p>
     * Maps the loop expression to the initial loop statement which contains
     * the source code location. The repeated loop statements in KeY's proof
@@ -233,6 +240,10 @@ public class SymbolicExecutionTreeBuilder {
          keyNodeLoopConditionMapping.clear();
          keyNodeLoopConditionMapping = null;
       }
+      if (keyNodeBranchConditionMapping != null) {
+         keyNodeBranchConditionMapping.clear();
+         keyNodeBranchConditionMapping = null;
+      }
       if (loopExpressionToLoopStatementMapping != null) {
          loopExpressionToLoopStatementMapping.clear();
          loopExpressionToLoopStatementMapping = null;
@@ -286,11 +297,6 @@ public class SymbolicExecutionTreeBuilder {
        * Maps the {@link Node} in KeY's proof tree to the {@link IExecutionNode} of the symbolic execution tree where the {@link Node}s children should be added to.
        */
       private Map<Node, AbstractExecutionNode> addToMapping = new HashMap<Node, AbstractExecutionNode>();
-
-      /**
-       * Maps the {@link Node} with branch conditions in KeY's proof tree to the {@link IExecutionNode} of the symbolic execution tree where the {@link Node}s children should be added to.
-       */
-      private Map<Node, AbstractExecutionNode> branchConditionAddToMapping = new HashMap<Node, AbstractExecutionNode>();
       
       /**
        * Branch conditions ({@link ExecutionBranchCondition}) are only applied to the 
@@ -317,7 +323,7 @@ public class SymbolicExecutionTreeBuilder {
       @Override
       public void visit(Proof proof, Node visitedNode) {
          // Find the parent node (IExecutionNode) to that the execution tree model representation of the given KeY's proof tree node should be added.
-         AbstractExecutionNode parentToAddTo = branchConditionAddToMapping.get(visitedNode);
+         AbstractExecutionNode parentToAddTo = keyNodeBranchConditionMapping.get(visitedNode);
          if (parentToAddTo == null) {
             Node parent = visitedNode.parent(); 
             if (parent != null) {
@@ -336,18 +342,20 @@ public class SymbolicExecutionTreeBuilder {
             NodeIterator iter = visitedNode.childrenIterator();
             while (iter.hasNext()) {
                Node childNode = iter.next();
-               if (!visitedNode.isClosed()) { // Filter out branches that are closed
-                  // Create branch condition
-                  ExecutionBranchCondition condition = new ExecutionBranchCondition(childNode);
-                  // Add branch condition to the branch condition attributes for later adding to the proof tree. This is required for instance to filter out branches after the symbolic execution has finished.
-                  List<ExecutionBranchCondition> list = parentToBranchConditionMapping.get(parentToAddTo);
-                  if (list == null) {
-                     list = new LinkedList<ExecutionBranchCondition>();
-                     branchConditionsStack.addFirst(new DefaultEntry<AbstractExecutionNode, List<ExecutionBranchCondition>>(parentToAddTo, list));
-                     parentToBranchConditionMapping.put(parentToAddTo, list);
+               if (!keyNodeBranchConditionMapping.containsKey(childNode)) {
+                  if (!visitedNode.isClosed()) { // Filter out branches that are closed
+                     // Create branch condition
+                     ExecutionBranchCondition condition = new ExecutionBranchCondition(childNode);
+                     // Add branch condition to the branch condition attributes for later adding to the proof tree. This is required for instance to filter out branches after the symbolic execution has finished.
+                     List<ExecutionBranchCondition> list = parentToBranchConditionMapping.get(parentToAddTo);
+                     if (list == null) {
+                        list = new LinkedList<ExecutionBranchCondition>();
+                        branchConditionsStack.addFirst(new DefaultEntry<AbstractExecutionNode, List<ExecutionBranchCondition>>(parentToAddTo, list));
+                        parentToBranchConditionMapping.put(parentToAddTo, list);
+                     }
+                     list.add(condition);
+                     keyNodeBranchConditionMapping.put(childNode, condition);
                   }
-                  list.add(condition);
-                  branchConditionAddToMapping.put(childNode, condition);
                }
             }
          }
@@ -368,6 +376,9 @@ public class SymbolicExecutionTreeBuilder {
              for (ExecutionBranchCondition condition : entry.getValue()) {
                 if (!JavaUtil.isEmpty(condition.getChildren())) {
                    addChild(entry.getKey(), condition);
+                }
+                else {
+                   keyNodeBranchConditionMapping.remove(condition.getProofNode());
                 }
              }
          }
