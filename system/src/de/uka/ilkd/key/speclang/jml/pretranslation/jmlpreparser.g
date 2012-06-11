@@ -103,6 +103,23 @@ options {
     public ImmutableSet<PositionedString> getWarnings() {
     	return warnings;
     }
+
+    private PositionedString flipHeaps(String declString, PositionedString result) {
+      String t = result.text;
+      String p = declString+" ";
+      for(Name heapName : HeapLDT.VALID_HEAP_NAMES) {
+        t = t.trim();
+	String l = "<"+heapName+">";
+        if(t.startsWith(l)) {
+           p = l + p;
+           t = t.substring(l.length());
+        }
+        result = new PositionedString(t, result.fileName, result.pos);
+      }
+      result = result.prepend(p);
+      return result;
+    }
+
 }
 
 
@@ -606,20 +623,7 @@ assignable_clause
 	returns [PositionedString result = null] 
 	throws SLTranslationException
 :
-    assignable_keyword result=expression { 
-      String t = result.text;
-      t = t.trim();
-      String p = "assignable ";
-      for(Name heapName : HeapLDT.VALID_HEAP_NAMES) {
-		String l = "<"+heapName+">";
-        if(t.startsWith(l)) {
-           p = l + p;
-           t = t.substring(l.length());
-        }
-        result = new PositionedString(t, result.fileName, result.pos);
-      }
-      result = result.prepend(p);
-    }
+    assignable_keyword result=expression { result = flipHeaps("assignable", result); } 
 ;
 
 
@@ -1089,7 +1093,6 @@ loop_specification[ImmutableList<String> mods]
     	options { greedy = true; }
     	:
     	    ps=loop_invariant       { ls.addInvariant(ps); }
-        |   ps=loop_invariant_tra   { ls.addTransactionInvariant(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); } 
     )+
@@ -1098,14 +1101,8 @@ loop_specification[ImmutableList<String> mods]
 
 loop_invariant returns [PositionedString result = null]
 :
-    maintaining_keyword result=expression
+    maintaining_keyword result=expression { result = flipHeaps("loop_invariant", result); }
 ;
-
-loop_invariant_tra returns [PositionedString result = null]
-:
-    LOOP_INVARIANT_TRA result=expression
-;
-
 
 maintaining_keyword 
 :

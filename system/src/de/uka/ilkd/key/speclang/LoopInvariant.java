@@ -32,7 +32,7 @@ public interface LoopInvariant extends SpecificationElement {
 
     
     /** Returns the invariant formula. */
-    public Term getInvariant(Term selfTerm, Map<LocationVariable,Term> atPres, Services services, boolean transaction);
+    public Term getInvariant(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
 
     /**
      * Returns the modifies clause.
@@ -61,15 +61,15 @@ public interface LoopInvariant extends SpecificationElement {
      * Returns the term internally used for the invariant. 
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
-    Term getInternalInvariant(boolean transaction);
+    public Map<LocationVariable,Term> getInternalInvariants();
 
     /**
      * Returns the term internally used for the variant. 
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
-    Term getInternalVariant();
+    public Term getInternalVariant();
     
-    Map<LocationVariable,Term> getInternalModifies();
+    public Map<LocationVariable,Term> getInternalModifies();
 
     /**
      * Returns a new loop invariant where the loop reference has been
@@ -82,11 +82,10 @@ public interface LoopInvariant extends SpecificationElement {
      * replaced with the passed one. Take care: the variables used for
      * the receiver, parameters, and local variables must stay the same!
      */
-    public LoopInvariant setInvariant(Term invariant, 
+    public LoopInvariant setInvariant(Map<LocationVariable,Term> invariants, 
             			      Term selfTerm,
             			      Map<LocationVariable,Term> atPres,
-            			      Services services,
-                                      boolean transaction); 
+            			      Services services); 
     
     /** 
      * Loop invariants can be visited like source elements:

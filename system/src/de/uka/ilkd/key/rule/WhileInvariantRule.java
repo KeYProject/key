@@ -226,18 +226,15 @@ public final class WhileInvariantRule implements BuiltInRule {
     final HeapContext hc = inst.inv.getHeapContext(transaction);
     final List<LocationVariable> modHeaps = hc.getModHeaps(services);
 
-    final Term regularInv = inst.inv.getInvariant(inst.selfTerm, atPres, services, false);
 
-    final Term invTerm;
-    if(transaction) {
-      final Term transactionInv = inst.inv.getInvariant(inst.selfTerm, atPres, services, true);
-      if(transactionInv != null) {
-        invTerm = TB.and(regularInv, transactionInv);
+    Term invTerm = null;
+    for(LocationVariable heap : modHeaps) {
+      final Term i = inst.inv.getInvariant(heap, inst.selfTerm, atPres, services);
+      if(invTerm == null) {
+        invTerm = i;
       }else{
-        invTerm = regularInv;
+        invTerm = TB.and(invTerm, i);
       }
-    }else{
-      invTerm = regularInv;
     }
 
     final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();

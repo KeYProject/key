@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Expression;
@@ -46,9 +49,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     
     private LoopInvariant instantiateIndex(LoopInvariant rawInv){
     	if (rawInv == null) return null;
-    	Term inv = rawInv.getInternalInvariant(false);
+    	Map<LocationVariable,Term> invs = rawInv.getInternalInvariants();
     	Term var = rawInv.getInternalVariant();
-    	Term tnv = rawInv.getInternalInvariant(true);
     	
     	// try to retrieve a loop index variable
     	de.uka.ilkd.key.java.statement.IGuard guard = loop.getGuard();
@@ -96,20 +98,20 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 		
 		// replace it!
 		IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
-		if (inv != null) {
-		    v.visit(inv);
-		    inv = v.getResult();
-		}
+                Map<LocationVariable,Term> newInvs = new LinkedHashMap<LocationVariable,Term>();
+                for(LocationVariable heap : invs.keySet()) {
+                   Term inv = invs.get(heap);
+		   if (inv != null) {
+		     v.visit(inv);
+		     inv = v.getResult();
+                     newInvs.put(heap, inv);
+  		   }                   
+                }
 		if (var != null) {
 		    v.visit(var);
 		    var = v.getResult();
 		}
-		if (tnv != null) {
-		    v.visit(tnv);
-		    tnv = v.getResult();
-		}
-		
-		return new LoopInvariantImpl(rawInv.getLoop(), inv, tnv, rawInv.getInternalModifies(),
+		return new LoopInvariantImpl(rawInv.getLoop(), newInvs, rawInv.getInternalModifies(),
 				var, rawInv.getInternalSelfTerm(),
 				rawInv.getInternalAtPres());
     	
@@ -121,8 +123,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     }
 
-    public boolean complete() {
-        return inv != null && loop != null && invariantAvailable()
+    public boolean complete(Services services, boolean isTransaction) {
+        return inv != null && loop != null && invariantAvailable(services, isTransaction)
                 && (!variantRequired() || variantAvailable());
     }
 
@@ -134,8 +136,17 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         return loop;
     }
 
-    public boolean invariantAvailable() {
-        return inv != null && inv.getInternalInvariant(false) != null;
+    public boolean invariantAvailable(Services services, boolean isTransaction) {
+        boolean result = inv != null && inv.getInternalInvariants() != null;
+        if(result && isTransaction) {
+          result = result && (
+            inv.getInternalInvariants().get(services.getTypeConverter().getHeapLDT().getHeap()) != null ||
+            inv.getInternalInvariants().get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
+        }else{
+          result = result && 
+            inv.getInternalInvariants().get(services.getTypeConverter().getHeapLDT().getHeap()) != null;
+        }
+        return result;
     }
 
     public boolean isSufficientlyComplete() {

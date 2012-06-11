@@ -38,7 +38,7 @@ public final class HeapLDT extends LDT {
     public static final Name STORE_NAME = new Name("store");
     public static final Name BASE_HEAP_NAME = new Name("heap");
     public static final Name SAVED_HEAP_NAME = new Name("savedHeap");
-    public static final Name[] VALID_HEAP_NAMES = {BASE_HEAP_NAME, SAVED_HEAP_NAME};
+    public static final Name[] VALID_HEAP_NAMES = { BASE_HEAP_NAME, SAVED_HEAP_NAME };
 
 
     

@@ -44,7 +44,7 @@ public class InvariantConfigurator {
     private static final int MOD_IDX = 1;
     private static final int VAR_IDX = 2;
     private static final String DEFAULT = "Default";
-    private static final String TRANSACTION = "Transaction";
+//    private static final String TRANSACTION = "Transaction";
 
     private static InvariantConfigurator configurator = null;
     private List<Map<String,String>[]> invariants = null;
@@ -106,10 +106,9 @@ public class InvariantConfigurator {
             private JTabbedPane inputPane;
             private JPanel errorPanel;
 
-            private Term invariantTerm = null;
-            private Term transactionInvariantTerm = null;
             private Term variantTerm = null;
             private Map<LocationVariable,Term> modifiesTerm = new LinkedHashMap<LocationVariable,Term>();
+            private Map<LocationVariable,Term> invariantTerm = new LinkedHashMap<LocationVariable,Term>();
 
             private final String INVARIANTTITLE = "Invariant%s: ";
             private final String VARIANTTITLE = "Variant%s: ";
@@ -238,18 +237,16 @@ public class InvariantConfigurator {
                 
                 loopInvTexts[INV_IDX] = new LinkedHashMap<String,String>();
                 final Map<LocationVariable,Term> atPres = loopInv.getInternalAtPres();
-                final Term invariant = loopInv.getInvariant(loopInv.getInternalSelfTerm(), atPres, services, false);
-                if (invariant == null) {
-                    loopInvTexts[INV_IDX].put(DEFAULT, "true");
-                } else {
-                    loopInvTexts[INV_IDX].put(DEFAULT, printTerm(invariant, true));
-                }
 
-                final Term transInvariant = loopInv.getInvariant(loopInv.getInternalSelfTerm(), atPres, services, true);
-                if (transInvariant == null) {
-                    loopInvTexts[INV_IDX].put(TRANSACTION, "true");
-                } else {
-                    loopInvTexts[INV_IDX].put(TRANSACTION, printTerm(transInvariant, true));
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                  final Term i = loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
+                
+                  if (i == null) {
+                    // FIXME check again and think what is the default for savedHeap
+                    loopInvTexts[INV_IDX].put(heap.toString(), "true");
+                  } else {
+                    loopInvTexts[INV_IDX].put(heap.toString(), printTerm(i, true));
+                  }
                 }
 
                 loopInvTexts[MOD_IDX] = new LinkedHashMap<String,String>();
@@ -449,19 +446,17 @@ public class InvariantConfigurator {
                     Map<String,String> modMsgs, Map<String,Color> modColors, Map<String,String> varMsgs, Map<String,Color> varColors) {
                 JPanel panel = new JPanel();
                 panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-                JTabbedPane invPane = new JTabbedPane(JTabbedPane.BOTTOM);
-                for(String k : new String[]{ DEFAULT, TRANSACTION } ) {
-                   String title = String.format("%sInvariant - Status: ", k.equals(DEFAULT) ? "" : k+" ");
-                   JTextArea textArea = createErrorTextField(title, invMsgs.get(k),
-                        invColors.get(k));
-                   invPane.add(k, textArea);
-                }
 
+                JTabbedPane invPane = new JTabbedPane(JTabbedPane.BOTTOM);
                 JTabbedPane modPane = new JTabbedPane(JTabbedPane.BOTTOM);
                 for(Name h : HeapLDT.VALID_HEAP_NAMES ) {
                    String k = h.toString();
-                   String title = String.format("Modifies%s - Status: ", k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
-                   JTextArea textArea = createErrorTextField(title, modMsgs.get(k),
+                   String title = String.format("%sInvariant - Status: ", k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : k+" ");
+                   JTextArea textArea = createErrorTextField(title, invMsgs.get(k),
+                        invColors.get(k));
+                   invPane.add(k, textArea);
+                   title = String.format("Modifies%s - Status: ", k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
+                   textArea = createErrorTextField(title, modMsgs.get(k),
                         modColors.get(k));
                    modPane.add(k, textArea);
                 }
@@ -490,12 +485,10 @@ public class InvariantConfigurator {
                 Map<String,Color> modColors = new LinkedHashMap<String,Color>();
                 Map<String,String> varMsgs = new LinkedHashMap<String,String>();
                 Map<String,Color> varColors = new LinkedHashMap<String,Color>();
-                for(String k : new String[]{ DEFAULT, TRANSACTION } ) {
-                   invMsgs.put(k, "OK");
-                   invColors.put(k, Color.GREEN);
-                }
                 for(Name h : HeapLDT.VALID_HEAP_NAMES ) {
                    String k = h.toString();
+                   invMsgs.put(k, "OK");
+                   invColors.put(k, Color.GREEN);
                    modMsgs.put(k, "OK");
                    modColors.put(k, Color.GREEN);
                 }
@@ -629,7 +622,7 @@ public class InvariantConfigurator {
 
                 if (requirementsAreMet) {
                     newInvariant = new LoopInvariantImpl(loopInv.getLoop(),
-                            invariantTerm, transactionInvariantTerm, modifiesTerm, variantTerm, loopInv
+                            invariantTerm, modifiesTerm, variantTerm, loopInv
                                     .getInternalSelfTerm(), loopInv
                                     .getInternalAtPres());
                     return true;
@@ -643,27 +636,17 @@ public class InvariantConfigurator {
             private void parse() {
                 Map<String,String> invErrors = new LinkedHashMap<String,String>();
                 Map<String,Color>  invCols = new LinkedHashMap<String,Color>();
-                try {
-                    invariantTerm = parseInvariant(false);
-                    invErrors.put(DEFAULT, "OK");
-                    invCols.put(DEFAULT,Color.GREEN);
-                } catch (Exception e) {
-                    invErrors.put(DEFAULT, e.getMessage());
-                    invCols.put(DEFAULT, Color.RED);
-                }
-
-                try {
-                    transactionInvariantTerm = parseInvariant(true);
-                    invErrors.put(TRANSACTION, "OK");
-                    invCols.put(TRANSACTION, Color.GREEN);
-                } catch (Exception e) {
-                    invErrors.put(TRANSACTION, e.getMessage());
-                    invCols.put(TRANSACTION, Color.RED);
-                }
-
                 Map<String,String> modErrors = new LinkedHashMap<String,String>();
                 Map<String,Color>  modCols = new LinkedHashMap<String,Color>();
                 for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                  try {
+                    invariantTerm.put(heap, parseInvariant(heap));
+                    invErrors.put(heap.toString(), "OK");
+                    invCols.put(heap.toString(), Color.GREEN);
+                  } catch (Exception e) {
+                    invErrors.put(heap.toString(), e.getMessage());
+                    invCols.put(heap.toString(), Color.RED);
+                  }
                   try {
                     modifiesTerm.put(heap, parseModifies(heap));
                     modErrors.put(heap.toString(), "OK");
@@ -752,13 +735,12 @@ public class InvariantConfigurator {
              * @return invariant term
              * @throws Exception
              */
-            protected Term parseInvariant(boolean transaction) throws Exception {
+            protected Term parseInvariant(LocationVariable heap) throws Exception {
                 Term result = null;
                 index = inputPane.getSelectedIndex();
                 // might throw parserException
-                String k = transaction ? TRANSACTION : DEFAULT;
                 
-                result =  parser.parse(new StringReader(invariants.get(index)[INV_IDX].get(k)), Sort.ANY, services, services.getNamespaces(),
+                result =  parser.parse(new StringReader(invariants.get(index)[INV_IDX].get(heap.toString())), Sort.ANY, services, services.getNamespaces(),
                 MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
 
                 return result;

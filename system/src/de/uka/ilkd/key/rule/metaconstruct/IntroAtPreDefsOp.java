@@ -115,25 +115,22 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     //we're calling a static method from an instance context
                     selfTerm = null;
                 }
-                final Term newTransactionInvariant =
-                  transaction ?
-                     inv.getInvariant(selfTerm, atPres, services, true)
-                   : null;
 
-                final Term newInvariant 
-                    = inv.getInvariant(selfTerm, atPres, services, false);
                 final Term newVariant
                     = inv.getVariant(selfTerm, atPres, services);
 
                 Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
-                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
+                // FIXME or services.getTypeConverter().getHeapLDT().getAllHeaps() ?
+                for(LocationVariable heap : hc.getModHeaps(services)) {
                   final Term m = inv.getModifies(heap, selfTerm, atPres, services);
+                  final Term i = inv.getInvariant(heap, selfTerm, atPres, services);
                   newMods.put(heap, m);
+                  newInvariants.put(heap, i);
                 }
                 final LoopInvariant newInv 
              	       = new LoopInvariantImpl(loop, 
-                                            newInvariant,
-                                            newTransactionInvariant,
+                                            newInvariants,
                                             newMods, 
                                             newVariant, 
                                             selfTerm,

@@ -84,8 +84,6 @@ public class JMLSpecFactory {
 
         public Term requires;
         public Term measuredBy;
-        // public Term assignable;
-        // public Term assignable_backup;
         public Map<LocationVariable,Term> assignables = new LinkedHashMap<LocationVariable,Term>();
         public Term accessible;
         public Term ensures;
@@ -903,14 +901,13 @@ public class JMLSpecFactory {
     public LoopInvariant createJMLLoopInvariant(
             ProgramMethod pm,
             LoopStatement loop,
-            ImmutableList<PositionedString> originalInvariant,
-            ImmutableList<PositionedString> originalTransactionInvariant,
+            Map<String,ImmutableList<PositionedString>> originalInvariants,
             Map<String,ImmutableList<PositionedString>> originalAssignables,
             PositionedString originalVariant)
             throws SLTranslationException {
         assert pm != null;
         assert loop != null;
-        assert originalInvariant != null;
+        assert originalInvariants != null;
         assert originalAssignables != null;
 
         //create variables for self, parameters, other relevant local variables 
@@ -938,10 +935,13 @@ public class JMLSpecFactory {
         }
 
         //translateToTerm invariant
-        Term invariant;
-        if (originalInvariant.isEmpty()) {
+        Map<LocationVariable,Term> invariants = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+          Term invariant;
+          ImmutableList<PositionedString> originalInvariant = originalInvariants.get(heap.name().toString());
+          if (originalInvariant.isEmpty()) {
             invariant = null;
-        } else {
+          } else {
             invariant = TB.tt();
             for (PositionedString expr : originalInvariant) {
                 Term translated =
@@ -951,20 +951,8 @@ public class JMLSpecFactory {
                                                 Term.class, services);
                 invariant = TB.and(invariant, TB.convertToFormula(translated,services));
             }
-        }
-        Term transactionInvariant;
-        if (originalTransactionInvariant.isEmpty()) {
-            transactionInvariant = null;
-        } else {
-            transactionInvariant = TB.tt();
-            for (PositionedString expr : originalTransactionInvariant) {
-                Term translated =
-                        JMLTranslator.translate(expr, pm.getContainerType(),
-                                                selfVar, paramVars, null,
-                                                null, atPres, Term.class,
-                                                services);
-                transactionInvariant = TB.and(transactionInvariant, TB.convertToFormula(translated,services));
-            }
+          }          
+          invariants.put(heap, invariant);
         }
 
         //translateToTerm assignable
@@ -1003,8 +991,7 @@ public class JMLSpecFactory {
         //create loop invariant annotation
         Term selfTerm = selfVar == null ? null : TB.var(selfVar);
         return new LoopInvariantImpl(loop,
-                                     invariant,
-                                     transactionInvariant,
+                                     invariants,
                                      mods,
                                      variant,
                                      selfTerm,
@@ -1019,8 +1006,7 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         return createJMLLoopInvariant(pm,
                                       loop,
-                                      textualLoopSpec.getInvariant(),
-                                      textualLoopSpec.getTransactionInvariant(),
+                                      textualLoopSpec.getInvariants(),
                                       textualLoopSpec.getAssignables(),
                                       textualLoopSpec.getVariant());
     }

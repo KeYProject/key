@@ -60,7 +60,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         this.name = n.text;
     }
 
-
     public void addRequires(PositionedString ps) {
         requires = requires.append(ps);
     }
@@ -82,39 +81,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public void addAssignable(PositionedString ps) {
-        String t = ps.text;
-        if(!t.startsWith("<")) {
-           ImmutableList<PositionedString> l = assignables.get(HeapLDT.BASE_HEAP_NAME.toString());
-           l = l.append(ps);
-           assignables.put(HeapLDT.BASE_HEAP_NAME.toString(), l);
-           return; 
-        }
-        List<String> hs = new ArrayList<String>();
-        for(Name heapName : HeapLDT.VALID_HEAP_NAMES) {
-          final String hName = heapName.toString();
-          String h = "<" + hName + ">";
-          if(t.startsWith(h)) {
-            hs.add(hName);
-            t = t.substring(h.length());
-          }
-        }
-        ps = new PositionedString(t, ps.fileName, ps.pos);
-        for(String h : hs) {
-           ImmutableList<PositionedString> l = assignables.get(h);
-           l = l.append(ps);
-           assignables.put(h, l); 
-        }
+        addGeneric(assignables, ps);
     }
-
-//    public void addAssignableBackup(PositionedString ps) {
-        //assignable_backup = assignable_backup.append(ps);
-//    }
-
-
-//    public void addAssignableBackup(ImmutableList<PositionedString> l) {
-        //assignable_backup = assignable_backup.append(l);
-//    }
-
 
     public void addAccessible(PositionedString ps) {
         accessible = accessible.append(ps);
