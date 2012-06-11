@@ -1,11 +1,15 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.gui.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -13,8 +17,8 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 /**
  * <p>
  * This {@link IStopCondition} stops the auto mode ({@link ApplyStrategy}) if
- * a given number ({@link #getMaximalNumberOfSetNodesToExecute()}) of maximal
- * executed symbolic execution tree nodes is reached. 
+ * a given number ({@link #getMaximalNumberOfSetNodesToExecutePerGoal()}) of maximal
+ * executed symbolic execution tree nodes is reached in a goal. 
  * </p>
  * <p>
  * If a {@link Node} in
@@ -27,19 +31,28 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * </p>
  * @author Martin Hentschel
  */
-public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCondition {   
+public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCondition {
    /**
-    * The maximal number of allowed symbolic execution tree nodes.
+    * The default maximal number of steps to simulate a complete program execution.
+    */
+   public static final int MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN = 1000;
+
+   /**
+    * The default maximal number of steps to do exactly one step in each goal.
+    */
+   public static final int MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP = 1;
+
+   /**
+    * The maximal number of allowed symbolic execution tree nodes per goal.
     * The auto mode will stop exactly in the open goal proof node which
     * becomes the next symbolic execution tree node.
     */
-   private int maximalNumberOfSetNodesToExecute;
+   private int maximalNumberOfSetNodesToExecutePerGoal;
    
    /**
-    * The number of detected symbolic execution tree nodes in the currently
-    * running auto mode. It is {@code -1} if this {@link IStopCondition} was never used.
+    * Maps a {@link Goal} to the number of executed symbolic execution tree nodes.
     */
-   private int executedNumberOfSetNodes = -1;
+   private Map<Goal, Integer> executedNumberOfSetNodesPerGoal = new HashMap<Goal, Integer>();
    
    /**
     * Constructor to stop after one executed symbolic execution tree node.
@@ -50,10 +63,10 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
 
    /**
     * Constructor to stop after the given number of symbolic execution tree nodes.
-    * @param maximalNumberOfSetNodesToExecute The maximal number of allowed symbolic execution tree nodes.
+    * @param maximalNumberOfSetNodesToExecutePerGoal The maximal number of allowed symbolic execution tree nodes per goal.
     */
-   public ExecutedSymbolicExecutionTreeNodesStopCondition(int maximalNumberOfSetNodesToExecute) {
-      this.maximalNumberOfSetNodesToExecute = maximalNumberOfSetNodesToExecute;
+   public ExecutedSymbolicExecutionTreeNodesStopCondition(int maximalNumberOfSetNodesToExecutePerGoal) {
+      this.maximalNumberOfSetNodesToExecutePerGoal = maximalNumberOfSetNodesToExecutePerGoal;
    }
 
    /**
@@ -65,7 +78,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
                              long timeout, 
                              Proof proof, 
                              IGoalChooser goalChooser) {
-      executedNumberOfSetNodes = 0; // Reset number of already detected symbolic execution tree nodes.
+      executedNumberOfSetNodesPerGoal.clear(); // Reset number of already detected symbolic execution tree nodes for all goals.
       return 0; // Return unknown because there is no relation between applied rules and executed symbolic execution tree nodes.
    }
 
@@ -85,12 +98,20 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
          Node node = goal.node();
          // Check if goal is allowed
          RuleApp ruleApp = goal.getRuleAppManager().peekNext();
-         if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {    
-            if (executedNumberOfSetNodes + 1> maximalNumberOfSetNodesToExecute) {
-               return false;
+         if (SymbolicExecutionUtil.isSymbolicExecutionTreeNode(node, ruleApp)) {
+            // Get the number of executed set nodes on the current goal
+            Integer executedNumberOfSetNodes = executedNumberOfSetNodesPerGoal.get(goal);
+            if (executedNumberOfSetNodes == null) {
+               executedNumberOfSetNodes = Integer.valueOf(0);
+            }
+            // Check if limit of set nodes of the current goal is exceeded
+            if (executedNumberOfSetNodes.intValue() + 1 > maximalNumberOfSetNodesToExecutePerGoal) {
+               return false; // Limit of set nodes of this goal exceeded
             }
             else {
-               executedNumberOfSetNodes ++;
+               // Increase number of set nodes on this goal and allow rule application
+               executedNumberOfSetNodes = Integer.valueOf(executedNumberOfSetNodes.intValue() + 1);
+               executedNumberOfSetNodesPerGoal.put(goal, executedNumberOfSetNodes);
                return true;
             }
          }
@@ -115,8 +136,8 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
                                           long startTime, 
                                           int countApplied, 
                                           Goal goal) {
-      if (maximalNumberOfSetNodesToExecute > 1) {
-         return "Maximal limit of " + maximalNumberOfSetNodesToExecute + " symbolic execution tree nodes reached.";
+      if (maximalNumberOfSetNodesToExecutePerGoal > 1) {
+         return "Maximal limit of " + maximalNumberOfSetNodesToExecutePerGoal + " symbolic execution tree nodes reached.";
       }
       else {
          return "Maximal limit of one symbolic execution tree node reached.";
@@ -135,6 +156,32 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
                              long startTime, 
                              int countApplied, 
                              SingleRuleApplicationInfo singleRuleApplicationInfo) {
+      // Check if a rule was applied
+      if (singleRuleApplicationInfo != null) {
+         // Get the node on which a rule was applied.
+         Goal goal = singleRuleApplicationInfo.getGoal();
+         Node goalNode = goal.node();
+         assert goalNode.childrenCount() == 0; // Make sure that this is the current goal node
+         Node updatedNode = goalNode.parent();
+         // Check if multiple branches where created.
+         if (updatedNode.childrenCount() >= 2) {
+            // If a number of executed set nodes is available for the goal it must be used for all other new created goals.
+            Integer executedValue = executedNumberOfSetNodesPerGoal.get(goal);
+            if (executedValue != null) {
+               // Reuse number of set nodes for new created goals
+               NodeIterator childIter = updatedNode.childrenIterator();
+               while (childIter.hasNext()) {
+                  Node next = childIter.next();
+                  Goal nextGoal = next.proof().getGoal(next);
+                  // Check if the current goal is a new one
+                  if (nextGoal != goal) {
+                     // New goal found, use the number of set nodes for it.
+                     executedNumberOfSetNodesPerGoal.put(nextGoal, executedValue);
+                  }
+               }
+            }
+         }
+      }
       return false;
    }
 
@@ -154,26 +201,34 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
    }
 
    /**
-    * Returns the maximal number of executed symbolic execution tree nodes per auto mode run.
-    * @return The maximal number of executed symbolic execution tree nodes per auto mode run.
+    * Returns the maximal number of executed symbolic execution tree nodes per goal per auto mode run.
+    * @return The maximal number of executed symbolic execution tree nodes per goal per auto mode run.
     */
-   public int getMaximalNumberOfSetNodesToExecute() {
-      return maximalNumberOfSetNodesToExecute;
+   public int getMaximalNumberOfSetNodesToExecutePerGoal() {
+      return maximalNumberOfSetNodesToExecutePerGoal;
    }
    
    /**
-    * Sets the maximal number of executed symbolic execution tree nodes per auto mode run.
-    * @param maximalNumberOfSetNodesToExecute The maximal number of executed symbolic execution tree nodes per auto mode run.
+    * Sets the maximal number of executed symbolic execution tree nodes per goal per auto mode run.
+    * @param maximalNumberOfSetNodesToExecute The maximal number of executed symbolic execution tree nodes per per goal auto mode run.
     */
-   public void setMaximalNumberOfSetNodesToExecute(int maximalNumberOfSetNodesToExecute) {
-      this.maximalNumberOfSetNodesToExecute = maximalNumberOfSetNodesToExecute;
+   public void setMaximalNumberOfSetNodesToExecutePerGoal(int maximalNumberOfSetNodesToExecute) {
+      this.maximalNumberOfSetNodesToExecutePerGoal = maximalNumberOfSetNodesToExecute;
    }
-
+   
    /**
-    * Returns the number of executed symbolic execution tree nodes in the previous run.
-    * @return The number of executed symbolic execution tree nodes in the previous run or {@code -1} if the {@link IStopCondition} was never used..
+    * Checks if at least one symbolic execution tree node was executed.
+    * @return {@code true} at least one symbolic execution tree node was executed, {@code false} no symbolic execution tree node was executed.
     */
-   public int getExecutedNumberOfSetNodes() {
-      return executedNumberOfSetNodes;
+   public boolean wasSetNodeExecuted() {
+      return !executedNumberOfSetNodesPerGoal.isEmpty();
+   }
+   
+   /**
+    * Returns the number of executed symbolic execution tree nodes per {@link Goal}.
+    * @return The number of executed symbolic execution tree nodes per {@link Goal}.
+    */
+   public Map<Goal, Integer> getExectuedSetNodesPerGoal() {
+      return executedNumberOfSetNodesPerGoal;
    }
 }

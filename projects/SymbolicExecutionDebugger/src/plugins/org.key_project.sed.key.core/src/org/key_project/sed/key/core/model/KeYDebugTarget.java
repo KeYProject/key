@@ -12,9 +12,11 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.key.core.util.LogUtil;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -23,6 +25,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Implementation if {@link ISEDDebugTarget} which uses KeY to symbolically
@@ -102,7 +105,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Observe frozen state of KeY Main Frame
       MainWindow.getInstance().getMediator().addAutoModeListener(autoModeListener);
       // Set stop condition to use
-      stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(10000);
+      stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
       builder.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       builder.getProof().getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
    }
@@ -126,22 +129,24 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
          // Inform UI that the process is resumed
          super.resume();
          // Run auto mode
-         runAutoMode(10000);
+         runAutoMode(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, 
+                     builder.getProof().openEnabledGoals());
       }
    }
    
    /**
     * Runs the auto mode in KeY until the maximal number of set nodes are executed.
-    * @param maximalNumberOfSetNodesToExecute The maxinmal number of set nodes to execute.
+    * @param maximalNumberOfSetNodesToExecute The maximal number of set nodes to execute.
+    * @param gaols The {@link Goal}s to work with.
     */
-   protected void runAutoMode(int maximalNumberOfSetNodesToExecute) {
+   protected void runAutoMode(int maximalNumberOfSetNodesToExecute, ImmutableList<Goal> goals) {
       // Set strategy to use
       StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, true);
       builder.getProof().setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(builder.getProof(), strategyProperties));
       // Update stop condition
-      stopCondition.setMaximalNumberOfSetNodesToExecute(maximalNumberOfSetNodesToExecute);
+      stopCondition.setMaximalNumberOfSetNodesToExecutePerGoal(maximalNumberOfSetNodesToExecute);
       // Run proof
-      KeYUtil.runProofInAutomaticModeWithoutResultDialog(builder.getProof());
+      KeYUtil.runProofInAutomaticModeWithoutResultDialog(builder.getProof(), goals);
    }
 
    /**
@@ -292,6 +297,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param keyNode The {@link IKeYSEDDebugNode} which requests the step into.
     */
    public void stepInto(IKeYSEDDebugNode<?> keyNode) {
-      runAutoMode(1);
+      runAutoMode(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP, 
+                  SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()));
    }
 }

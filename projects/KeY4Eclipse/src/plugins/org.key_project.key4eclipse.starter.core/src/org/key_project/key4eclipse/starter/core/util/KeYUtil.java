@@ -46,6 +46,7 @@ import de.uka.ilkd.key.gui.notification.NotificationTask;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
@@ -596,6 +597,18 @@ public final class KeYUtil {
      * @param proof The {@link Proof} to close.
      */
     public static void runProofInAutomaticModeWithoutResultDialog(Proof proof) {
+       runProofInAutomaticModeWithoutResultDialog(proof, proof.openEnabledGoals());
+    }
+
+    /**
+     * Tries to close the given {@link Proof} in KeY with the automatic mode.
+     * The current {@link Thread} is blocked until the automatic mode has finished.
+     * The result dialog with the statistics is not shown to the user.
+     * @param proof The {@link Proof} to close.
+     * @param goals The {@link Goal}s to work with.
+     */
+    public static void runProofInAutomaticModeWithoutResultDialog(Proof proof,
+                                                                  ImmutableList<Goal> goals) {
        // Make sure that main window is available.
        Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
        MainWindow main = MainWindow.getInstance();
@@ -610,7 +623,7 @@ public final class KeYUtil {
           }
           // Start interactive proof automatically
           main.getMediator().setProof(proof);
-          main.getMediator().startAutoMode(proof.openEnabledGoals());
+          main.getMediator().startAutoMode(goals);
           // Wait for interactive prover
           KeYUtil.waitWhileMainWindowIsFrozen(main);
        }

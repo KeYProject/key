@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -50,8 +52,9 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * <p>
- * Tests for {@link SymbolicExecutionTreeBuilder} and
- * {@link ExecutedSymbolicExecutionTreeNodesStopCondition}.
+ * Tests for {@link SymbolicExecutionTreeBuilder},
+ * {@link ExecutedSymbolicExecutionTreeNodesStopCondition} and
+ * {@link SymbolicExecutionGoalChooser}.
  * </p>
  * <p>
  * This test needs access to the checkout of the KeY repository defined
@@ -81,12 +84,12 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
    /**
     * Number of executed SET nodes to execute all in one.
     */
-   private static final int ALL_IN_ONE_RUN = 10000;
+   private static final int ALL_IN_ONE_RUN = ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN;
 
    /**
     * Number of executed SET nodes for only one SET node per auto mode run.
     */
-   private static final int SINGLE_SET_NODE_RUN = 1;
+   private static final int SINGLE_SET_NODE_RUN = ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP;
 
    /**
     * Default stop conditions of executed SET nodes.
@@ -791,8 +794,12 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
          // Update symbolic execution tree 
          builder.analyse();
          // Make sure that not to many set nodes are executed
-         assertTrue(stopCondition.getExecutedNumberOfSetNodes() + " is not less equal to " + maximalNumberOfExecutedSetNodes,stopCondition.getExecutedNumberOfSetNodes() <= maximalNumberOfExecutedSetNodes);
-      } while(stopCondition.getExecutedNumberOfSetNodes() > 0);
+         Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
+         for (Integer value : executedSetNodesPerGoal.values()) {
+            assertNotNull(value);
+            assertTrue(value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes, value.intValue() <= maximalNumberOfExecutedSetNodes);
+         }
+      } while(stopCondition.wasSetNodeExecuted());
       // Create new oracle file if required in a temporary directory
       createOracleFile(builder.getStartNode(), oraclePathInBaseDirFile, includeVariables);
       // Read oracle file

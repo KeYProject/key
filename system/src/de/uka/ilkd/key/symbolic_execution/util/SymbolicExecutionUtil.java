@@ -45,6 +45,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -66,6 +67,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
@@ -756,5 +758,40 @@ public final class SymbolicExecutionUtil {
       else {
          return false;
       }
+   }
+
+   /**
+    * Collects all {@link Goal}s in the subtree of the given {@link IExecutionElement}.
+    * @param executionElement The {@link IExecutionElement} to collect {@link Goal}s in.
+    * @return The found {@link Goal}s.
+    */
+   public static ImmutableList<Goal> collectGoalsInSubtree(IExecutionElement executionElement) {
+      if (executionElement != null) {
+         return collectGoalsInSubtree(executionElement.getProofNode());
+      }
+      else {
+         return ImmutableSLList.nil();
+      }
+   }
+
+   /**
+    * Collects all {@link Goal}s in the subtree of the given {@link Node}.
+    * @param node The {@link Node} to collect {@link Goal}s in.
+    * @return The found {@link Goal}s.
+    */
+   public static ImmutableList<Goal> collectGoalsInSubtree(Node node) {
+      ImmutableList<Goal> result = ImmutableSLList.nil();
+      if (node != null) {
+         Proof proof = node.proof();
+         NodeIterator iter = node.leavesIterator();
+         while (iter.hasNext()) {
+            Node next = iter.next();
+            Goal nextGoal = proof.getGoal(next);
+            if (nextGoal != null) {
+               result = result.append(nextGoal);
+            }
+         }
+      }
+      return result;
    }
 }
