@@ -1101,7 +1101,7 @@ loop_specification[ImmutableList<String> mods]
 
 loop_invariant returns [PositionedString result = null]
 :
-    maintaining_keyword result=expression { result = flipHeaps("loop_invariant", result); }
+    maintaining_keyword result=expression { result = flipHeaps("", result); }
 ;
 
 maintaining_keyword 
