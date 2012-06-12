@@ -6,7 +6,7 @@
             <sedStatement xml:id="_1acc6605-1662-4485-a4ba-46c38c87e3e6" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="104" charEnd="119">
                <sedLoopNode xml:id="_83d1751c-edc3-49c9-8aae-15ec1c1d72d3" name="for ( int i = 0; false; i++ ) {   result_1++; }" pathCondition="true" lineNumber="-1" charStart="123" charEnd="172">
                   <sedStatement xml:id="_6f6bda38-aa86-4317-8295-227294d4f05c" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="128" charEnd="137">
-                     <sedLoopCondition xml:id="_4200af10-73dd-4af6-9004-c4c8a8d45701" name="false" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                     <sedLoopCondition xml:id="_4200af10-73dd-4af6-9004-c4c8a8d45701" name="false" pathCondition="true" lineNumber="-1" charStart="139" charEnd="144">
                         <sedStatement xml:id="_177e3ef1-74db-4b5d-a034-87c2957266b7" name="return result_1;" pathCondition="true" lineNumber="-1" charStart="176" charEnd="190">
                            <sedMethodReturn xml:id="_58d9b91e-2b82-44ef-ad21-b5dad7bde58e" name="&lt;return &apos;0&apos; as result of self.main();&gt;" pathCondition="true" lineNumber="-1" charStart="92" charEnd="96">
                               <sedTermination xml:id="_c21189d9-cbc2-4443-b6d5-3d9bca9a879e" name="&lt;end&gt;" pathCondition="true">
