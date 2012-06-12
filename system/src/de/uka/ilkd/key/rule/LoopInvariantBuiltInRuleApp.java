@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.MiscTools;
@@ -31,6 +32,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private final While loop;
 
     private final LoopInvariant inv;
+
+    private final HeapContext heapContext;
 
     public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pos) {
         this(rule, pos, null, null);
@@ -45,6 +48,12 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
                 .javaBlock());
         assert loop != null;
         this.inv = instantiateIndex(inv);
+        Modality m = (Modality)programTerm().op();
+        if(m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION) {
+          heapContext = HeapContext.LOOP_TR_HC;
+        }else{
+          heapContext = HeapContext.LOOP_HC;
+        }
     }
     
     private LoopInvariant instantiateIndex(LoopInvariant rawInv){
