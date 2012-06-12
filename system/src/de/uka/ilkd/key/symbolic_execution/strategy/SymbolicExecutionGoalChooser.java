@@ -121,8 +121,6 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
     */
    @Override
    public void updateGoalList(Node node, ImmutableList<Goal> newGoals) {
-      // Temporary store old goals
-      ImmutableList<Goal> oldGoals = selectedList;
       // Update available goals in super class
       super.updateGoalList(node, newGoals);
       // Remove no longer relevant goals from preferred set
@@ -131,12 +129,6 @@ public class SymbolicExecutionGoalChooser extends DepthFirstGoalChooser {
          Goal next = preferredIter.next();
          if (!proof.openGoals().contains(next)) {
             preferredIter.remove();
-         }
-      }
-      // Add new goals to preferred set
-      for (Goal goal : newGoals) {
-         if (!oldGoals.contains(goal)) {
-            goalsToPrefer.add(goal);
          }
       }
    }
