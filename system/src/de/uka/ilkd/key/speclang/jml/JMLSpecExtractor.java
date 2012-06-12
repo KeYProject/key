@@ -481,7 +481,6 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 warnings = warnings.add(e.getWarning());
             }
         }
-
         return result;
     }
 

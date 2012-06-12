@@ -92,7 +92,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	// try to get invariant from JML specification
 	LoopInvariant inv = app.getInvariant(); 
-        
+
 	//collect self, execution context
 	final MethodFrame innermostMethodFrame 
 		= MiscTools.getInnermostMethodFrame(progPost.javaBlock(), 

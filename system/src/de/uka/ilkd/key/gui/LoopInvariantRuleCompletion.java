@@ -55,7 +55,7 @@ public class LoopInvariantRuleCompletion implements
             boolean requiresVariant = loopApp.variantRequired()
                     && !loopApp.variantAvailable();
             // Check if a variant is required
-            if (!forced || !loopApp.invariantAvailable(services, isTransaction) || requiresVariant) {
+            if (!forced || !loopApp.invariantAvailable() || requiresVariant) {
                 // get invariant or variant interactively
                 try {
                     inv = InvariantConfigurator.getInstance().getLoopInvariant(

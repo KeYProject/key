@@ -123,8 +123,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     }
 
-    public boolean complete(Services services, boolean isTransaction) {
-        return inv != null && loop != null && invariantAvailable(services, isTransaction)
+    public boolean complete() {
+        return inv != null && loop != null && invariantAvailable()
                 && (!variantRequired() || variantAvailable());
     }
 
@@ -136,15 +136,17 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         return loop;
     }
 
-    public boolean invariantAvailable(Services services, boolean isTransaction) {
+    public boolean invariantAvailable() {
         boolean result = inv != null && inv.getInternalInvariants() != null;
-        if(result && isTransaction) {
-          result = result && (
-            inv.getInternalInvariants().get(services.getTypeConverter().getHeapLDT().getHeap()) != null ||
-            inv.getInternalInvariants().get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
-        }else{
-          result = result && 
-            inv.getInternalInvariants().get(services.getTypeConverter().getHeapLDT().getHeap()) != null;
+        if(result) {
+          Map<LocationVariable,Term> invs = inv.getInternalInvariants();
+          result = false;
+          for(LocationVariable heap : invs.keySet()) {
+            if(invs.get(heap) != null) {
+              result = true;
+              break;
+            }
+          }
         }
         return result;
     }
@@ -190,7 +192,6 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             return this;
         }
         final LoopInvariant inv = retrieveLoopInvariantFromSpecification(goal.proof().getServices());
-
         if (inv == null) {
             return this;
         }

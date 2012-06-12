@@ -312,7 +312,7 @@ public class InvariantConfigurator {
 		JTabbedPane invPane = new JTabbedPane(JTabbedPane.BOTTOM);
                 Map<String,String> invs = invariants.get(i)[INV_IDX];
                 for(String k : invs.keySet()) {
-                   String title = String.format(INVARIANTTITLE, k.equals(DEFAULT) ? "" : " "+k);
+                   String title = String.format(INVARIANTTITLE, k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
                    JTextArea textArea = createInputTextArea(title, invs.get(k), i);
                    setInvariantListener(textArea, k, i);
                    invPane.add(k, textArea);
@@ -451,7 +451,7 @@ public class InvariantConfigurator {
                 JTabbedPane modPane = new JTabbedPane(JTabbedPane.BOTTOM);
                 for(Name h : HeapLDT.VALID_HEAP_NAMES ) {
                    String k = h.toString();
-                   String title = String.format("%sInvariant - Status: ", k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : k+" ");
+                   String title = String.format("Invariant%s - Status: ", k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
                    JTextArea textArea = createErrorTextField(title, invMsgs.get(k),
                         invColors.get(k));
                    invPane.add(k, textArea);
