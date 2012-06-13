@@ -215,31 +215,31 @@ public class ExecutionNodeReader {
     */
    protected AbstractKeYlessExecutionNode createExecutionNode(IExecutionNode parent, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       if (ExecutionNodeWriter.TAG_BRANCH_CONDITION.equals(qName)) {
-         return new KeYlessBranchCondition(parent, getName(attributes), getPathCondition(attributes), getBranchCondition(attributes));
+         return new KeYlessBranchCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getBranchCondition(attributes));
       }
       else if (ExecutionNodeWriter.TAG_BRANCH_NODE.equals(qName)) {
-         return new KeYlessBranchNode(parent, getName(attributes), getPathCondition(attributes));
+         return new KeYlessBranchNode(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_LOOP_CONDITION.equals(qName)) {
-         return new KeYlessLoopCondition(parent, getName(attributes), getPathCondition(attributes));
+         return new KeYlessLoopCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_LOOP_NODE.equals(qName)) {
-         return new KeYlessLoopNode(parent, getName(attributes), getPathCondition(attributes));
+         return new KeYlessLoopNode(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_METHOD_CALL.equals(qName)) {
-         return new KeYlessMethodCall(parent, getName(attributes), getPathCondition(attributes));
+         return new KeYlessMethodCall(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_METHOD_RETURN.equals(qName)) {
-         return new KeYlessMethodReturn(parent, getName(attributes), getPathCondition(attributes), getNameIncludingReturnValue(attributes));
+         return new KeYlessMethodReturn(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getNameIncludingReturnValue(attributes));
       }
       else if (ExecutionNodeWriter.TAG_START_NODE.equals(qName)) {
-         return new KeYlessStartNode(getName(attributes), getPathCondition(attributes));
+         return new KeYlessStartNode(getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_STATEMENT.equals(qName)) {
-         return new KeYlessStatement(parent, getName(attributes), getPathCondition(attributes));
+         return new KeYlessStatement(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_TERMINATION.equals(qName)) {
-         return new KeYlessTermination(parent, getName(attributes), getPathCondition(attributes), isExceptionalTermination(attributes));
+         return new KeYlessTermination(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isExceptionalTermination(attributes));
       }
       else {
          throw new SAXException("Unknown tag \"" + qName + "\".");
@@ -325,6 +325,15 @@ public class ExecutionNodeReader {
     */
    protected String getPathCondition(Attributes attributes) {
       return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_PATH_CONDITION);
+   }
+
+   /**
+    * Returns the path condition changed value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isPathConditionChanged(Attributes attributes) {
+      return Boolean.valueOf(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_PATH_CONDITION_CHANGED));
    }
    
    /**
@@ -417,15 +426,25 @@ public class ExecutionNodeReader {
       private String formatedPathCondition;
       
       /**
+       * Is the path condition changed compared to parent?
+       */
+      private boolean pathConditionChanged;
+      
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
        */
-      public AbstractKeYlessExecutionNode(IExecutionNode parent, String name, String formatedPathCondition) {
+      public AbstractKeYlessExecutionNode(IExecutionNode parent, 
+                                          String name, 
+                                          String formatedPathCondition, 
+                                          boolean pathConditionChanged) {
          super(name);
          this.parent = parent;
          this.formatedPathCondition = formatedPathCondition;
+         this.pathConditionChanged = pathConditionChanged;
       }
 
       /**
@@ -467,6 +486,14 @@ public class ExecutionNodeReader {
       public String getFormatedPathCondition() throws ProofInputException {
          return formatedPathCondition;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isPathConditionChanged() {
+         return pathConditionChanged;
+      }
    }
    
    /**
@@ -485,10 +512,15 @@ public class ExecutionNodeReader {
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param formatedBranchCondition The formated branch condition.
        */
-      public KeYlessBranchCondition(IExecutionNode parent, String name, String formatedPathCondition, String formatedBranchCondition) {
-         super(parent, name, formatedPathCondition);
+      public KeYlessBranchCondition(IExecutionNode parent, 
+                                    String name, 
+                                    String formatedPathCondition, 
+                                    boolean pathConditionChanged,
+                                    String formatedBranchCondition) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
          this.formatedBranchCondition = formatedBranchCondition;
       }
 
@@ -527,9 +559,12 @@ public class ExecutionNodeReader {
        * Constructor.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
        */
-      public KeYlessStartNode(String name, String formatedPathCondition) {
-         super(null, name, formatedPathCondition);
+      public KeYlessStartNode(String name, 
+                              String formatedPathCondition, 
+                              boolean pathConditionChanged) {
+         super(null, name, formatedPathCondition, pathConditionChanged);
       }
       
       /**
@@ -557,10 +592,15 @@ public class ExecutionNodeReader {
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param exceptionalTermination Exceptional termination?
        */
-      public KeYlessTermination(IExecutionNode parent, String name, String formatedPathCondition, boolean exceptionalTermination) {
-         super(parent, name, formatedPathCondition);
+      public KeYlessTermination(IExecutionNode parent, 
+                                String name, 
+                                String formatedPathCondition, 
+                                boolean pathConditionChanged, 
+                                boolean exceptionalTermination) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
          this.exceptionalTermination = exceptionalTermination;
       }
 
@@ -613,9 +653,13 @@ public class ExecutionNodeReader {
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
        */
-      public AbstractKeYlessStateNode(IExecutionNode parent, String name, String formatedPathCondition) {
-         super(parent, name, formatedPathCondition);
+      public AbstractKeYlessStateNode(IExecutionNode parent, 
+                                      String name, 
+                                      String formatedPathCondition,
+                                      boolean pathConditionChanged) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
       }
       
       /**
@@ -662,9 +706,13 @@ public class ExecutionNodeReader {
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
        */
-      public KeYlessBranchNode(IExecutionNode parent, String name, String formatedPathCondition) {
-         super(parent, name, formatedPathCondition);
+      public KeYlessBranchNode(IExecutionNode parent, 
+                               String name, 
+                               String formatedPathCondition,
+                               boolean pathConditionChanged) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
       }
 
       /**
@@ -687,9 +735,13 @@ public class ExecutionNodeReader {
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
        */
-      public KeYlessLoopCondition(IExecutionNode parent, String name, String formatedPathCondition) {
-         super(parent, name, formatedPathCondition);
+      public KeYlessLoopCondition(IExecutionNode parent, 
+                                  String name, 
+                                  String formatedPathCondition,
+                                  boolean pathConditionChanged) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
       }
 
       /**
@@ -728,9 +780,13 @@ public class ExecutionNodeReader {
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
        */
-      public KeYlessLoopNode(IExecutionNode parent, String name, String formatedPathCondition) {
-         super(parent, name, formatedPathCondition);
+      public KeYlessLoopNode(IExecutionNode parent, 
+                             String name, 
+                             String formatedPathCondition, 
+                             boolean pathConditionChanged) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
       }
 
       /**
@@ -753,9 +809,13 @@ public class ExecutionNodeReader {
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
        */
-      public KeYlessMethodCall(IExecutionNode parent, String name, String formatedPathCondition) {
-         super(parent, name, formatedPathCondition);
+      public KeYlessMethodCall(IExecutionNode parent, 
+                               String name, 
+                               String formatedPathCondition,
+                               boolean pathConditionChanged) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
       }
 
       /**
@@ -799,10 +859,15 @@ public class ExecutionNodeReader {
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param nameIncludingReturnValue The name including the return value.
        */
-      public KeYlessMethodReturn(IExecutionNode parent, String name, String formatedPathCondition, String nameIncludingReturnValue) {
-         super(parent, name, formatedPathCondition);
+      public KeYlessMethodReturn(IExecutionNode parent, 
+                                 String name, 
+                                 String formatedPathCondition, 
+                                 boolean pathConditionChanged,
+                                 String nameIncludingReturnValue) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
          this.nameIncludingReturnValue = nameIncludingReturnValue;
       }
 
@@ -857,10 +922,14 @@ public class ExecutionNodeReader {
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param formatedPathCondition The formated path condition.
        */
-      public KeYlessStatement(IExecutionNode parent, String name, String formatedPathCondition) {
-         super(parent, name, formatedPathCondition);
+      public KeYlessStatement(IExecutionNode parent, 
+                              String name, 
+                              String formatedPathCondition,
+                              boolean pathConditionChanged) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
       }
       
       /**

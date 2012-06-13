@@ -971,6 +971,7 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
       assertNotNull(expected);
       assertNotNull(current);
       assertEquals(expected.getName(), current.getName());
+      assertEquals(expected.isPathConditionChanged(), current.isPathConditionChanged());
       assertEquals(expected.getFormatedPathCondition(), current.getFormatedPathCondition());
       if (expected instanceof IExecutionBranchCondition) {
          assertTrue("Expected IExecutionBranchCondition but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchCondition);

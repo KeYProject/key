@@ -91,6 +91,11 @@ public class ExecutionNodeWriter {
     * Attribute name to store {@link IExecutionNode#getPathCondition()}.
     */
    public static final String ATTRIBUTE_PATH_CONDITION = "pathCondition";
+
+   /**
+    * Attribute name to store {@link IExecutionNode#isPathConditionChanged()}.
+    */
+   public static final String ATTRIBUTE_PATH_CONDITION_CHANGED = "pathConditionChanged";
    
    /**
     * The default enconding.
@@ -250,6 +255,7 @@ public class ExecutionNodeWriter {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       attributeValues.put(ATTRIBUTE_BRANCH_CONDITION, node.getFormatedBranchCondition());
       appendStartTag(level, TAG_BRANCH_CONDITION, attributeValues, sb);
       appendChildren(level + 1, node, saveVariables, sb);
@@ -268,6 +274,7 @@ public class ExecutionNodeWriter {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_START_NODE, attributeValues, sb);
       appendChildren(level + 1, node, saveVariables, sb);
       appendEndTag(level, TAG_START_NODE, sb);
@@ -285,6 +292,7 @@ public class ExecutionNodeWriter {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_BRANCH_NODE, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
       appendChildren(level + 1, node, saveVariables, sb);
@@ -303,6 +311,7 @@ public class ExecutionNodeWriter {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_LOOP_CONDITION, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
       appendChildren(level + 1, node, saveVariables, sb);
@@ -321,6 +330,7 @@ public class ExecutionNodeWriter {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_LOOP_NODE, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
       appendChildren(level + 1, node, saveVariables, sb);
@@ -339,6 +349,7 @@ public class ExecutionNodeWriter {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_METHOD_CALL, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
       appendChildren(level + 1, node, saveVariables, sb);
@@ -357,6 +368,7 @@ public class ExecutionNodeWriter {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       attributeValues.put(ATTRIBUTE_NAME_INCLUDING_RETURN_VALUE, node.getNameIncludingReturnValue());
       appendStartTag(level, TAG_METHOD_RETURN, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
@@ -376,6 +388,7 @@ public class ExecutionNodeWriter {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_STATEMENT, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
       appendChildren(level + 1, node, saveVariables, sb);
@@ -394,6 +407,7 @@ public class ExecutionNodeWriter {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       attributeValues.put(ATTRIBUTE_EXCEPTIONAL_TERMINATION, Boolean.valueOf(node.isExceptionalTermination()).toString());
       appendStartTag(level, TAG_TERMINATION, attributeValues, sb);
       appendChildren(level + 1, node, saveVariables, sb);

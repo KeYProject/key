@@ -70,13 +70,28 @@ public abstract class AbstractExecutionNode extends AbstractExecutionElement imp
     * {@inheritDoc}
     */
    @Override
+   public boolean isPathConditionChanged() {
+      return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public Term getPathCondition() throws ProofInputException {
-      if (getParent() != null) {
-         return getParent().getPathCondition(); // By default the path condition of the parent is used because only branch conditions change it.
+      // Search path condition of the parent which is used by default.
+      Term result = null;
+      AbstractExecutionNode parent = getParent();
+      while (result == null && parent != null) {
+         if (parent.isPathConditionChanged()) {
+            result = parent.getPathCondition();
+         }
+         else {
+            parent = parent.getParent();
+         }
       }
-      else {
-         return TermBuilder.DF.tt();
-      }
+      // Check if a path condition was found.
+      return result != null ? result :  TermBuilder.DF.tt();
    }
 
    /**
@@ -84,11 +99,18 @@ public abstract class AbstractExecutionNode extends AbstractExecutionElement imp
     */
    @Override
    public String getFormatedPathCondition() throws ProofInputException {
-      if (getParent() != null) {
-         return getParent().getFormatedPathCondition(); // By default the path condition of the parent is used because only branch conditions change it.
+      // Search path condition of the parent which is used by default.
+      String result = null;
+      AbstractExecutionNode parent = getParent();
+      while (result == null && parent != null) {
+         if (parent.isPathConditionChanged()) {
+            result = parent.getFormatedPathCondition();
+         }
+         else {
+            parent = parent.getParent();
+         }
       }
-      else {
-         return TermBuilder.DF.tt().toString();
-      }
+      // Check if a path condition was found.
+      return result != null ? result :  TermBuilder.DF.tt().toString();
    }
 }

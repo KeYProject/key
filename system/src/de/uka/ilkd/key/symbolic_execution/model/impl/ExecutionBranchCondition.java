@@ -150,6 +150,14 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     * {@inheritDoc}
     */
    @Override
+   public boolean isPathConditionChanged() {
+      return true;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public Term getPathCondition() throws ProofInputException {
       if (pathCondition == null) {
          lazyComputePathCondition();
