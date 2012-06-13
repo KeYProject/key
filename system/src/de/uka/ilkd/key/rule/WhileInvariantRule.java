@@ -17,6 +17,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
@@ -95,7 +96,7 @@ public final class WhileInvariantRule implements BuiltInRule {
          
 	//collect self, execution context
 	final MethodFrame innermostMethodFrame 
-		= MiscTools.getInnermostMethodFrame(progPost.javaBlock(), 
+		= JavaTools.getInnermostMethodFrame(progPost.javaBlock(), 
 						    services);
 	final Term selfTerm = innermostMethodFrame == null
 	                      ? null
@@ -192,7 +193,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         // active statement must be while loop
-        SourceElement activeStatement = MiscTools
+        SourceElement activeStatement = JavaTools
         .getActiveStatement(progPost.javaBlock());
         if (!(activeStatement instanceof While)) {
             return false;
@@ -470,7 +471,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
 
 	Term restPsi = TB.prog((Modality)inst.progPost.op(),
-			       MiscTools.removeActiveStatement(
+			       JavaTools.removeActiveStatement(
 				       	inst.progPost.javaBlock(), 
 					services), 
                                inst.progPost.sub(0));

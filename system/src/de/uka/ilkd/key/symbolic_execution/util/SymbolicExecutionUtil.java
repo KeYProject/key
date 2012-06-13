@@ -11,6 +11,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -257,7 +258,7 @@ public final class SymbolicExecutionUtil {
       Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = MiscTools.goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
       Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, modalityTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
@@ -290,7 +291,7 @@ public final class SymbolicExecutionUtil {
       // Combine method frame with value formula in a modality.
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = MiscTools.goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
       Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, newTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
@@ -322,7 +323,7 @@ public final class SymbolicExecutionUtil {
       Term newTerm = TermBuilder.DF.func(newPredicate, term);
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = MiscTools.goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
       Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, newTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
@@ -588,7 +589,7 @@ public final class SymbolicExecutionUtil {
    public static IProgramVariable findSelfTerm(Node node) {
       JavaBlock jb = node.getAppliedRuleApp().posInOccurrence().subTerm().javaBlock();
       Services services = node.proof().getServices();
-      IExecutionContext context = MiscTools.getInnermostExecutionContext(jb, services);
+      IExecutionContext context = JavaTools.getInnermostExecutionContext(jb, services);
       if (context instanceof ExecutionContext) {
          ReferencePrefix prefix = ((ExecutionContext)context).getRuntimeInstance();
          return prefix instanceof IProgramVariable ? (IProgramVariable)prefix : null;

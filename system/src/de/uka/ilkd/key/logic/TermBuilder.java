@@ -11,9 +11,11 @@
 package de.uka.ilkd.key.logic;
 
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -30,6 +32,8 @@ import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.util.Pair;
+
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -438,6 +442,18 @@ public final class TermBuilder {
 	return all(t.freeVars(), t);
     }
 
+    /**
+     * Removes universal quantifiers from a formula.
+     */
+    public Term open(Term formula) {
+    assert formula.sort() == Sort.FORMULA;
+    if(formula.op() == Quantifier.ALL) {
+        return open(formula.sub(0)); 
+    } else {
+        return formula;
+    }
+    }
+    
 
     public Term ex(QuantifiableVariable qv, Term t) {
 	return tf.createTerm(Quantifier.EX, 
@@ -1619,6 +1635,57 @@ public final class TermBuilder {
     public Term seqReverse(Services services, Term s) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
     }
+
+    //-------------------------------------------------------------------------
+    // misc    (moved from key.util.MiscTools)
+    //-------------------------------------------------------------------------
+    
+
+    
+    public ImmutableSet<Term> unionToSet(Term s, Services services) {
+    final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+    assert s.sort().equals(setLDT.targetSort());
+    final Function union = setLDT.getUnion();
+    ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
+        ImmutableList<Term> workingList = ImmutableSLList.<Term>nil().prepend(s);
+        while(!workingList.isEmpty()) {
+            Term f = workingList.head();
+            workingList = workingList.tail();
+            if(f.op() == union) {
+                workingList = workingList.prepend(f.sub(1)).prepend(f.sub(0));
+            } else {
+                result = result.add(f);
+            }
+        }
+        return result;
+    }
+
+
+    
+    /**
+     * Removes leading updates from the passed term.
+     */
+    public Term goBelowUpdates(Term term) {
+        while(term.op() instanceof UpdateApplication) {
+            term = UpdateApplication.getTarget(term);
+        }        
+        return term;
+    }
+    
+
+    
+    /**
+     * Removes leading updates from the passed term.
+     */
+    public Pair<ImmutableList<Term>,Term> goBelowUpdates2(Term term) {
+    ImmutableList<Term> updates = ImmutableSLList.<Term>nil();
+        while(term.op() instanceof UpdateApplication) {
+            updates = updates.append(UpdateApplication.getUpdate(term));
+            term = UpdateApplication.getTarget(term);
+        }        
+        return new Pair<ImmutableList<Term>,Term>(updates, term);
+    }    
+    
     
     
     public Term seqDef(QuantifiableVariable qv,
