@@ -36,7 +36,6 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -75,7 +74,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Expression actualResult;
         final MethodOrConstructorReference mr;
         
-        final SourceElement activeStatement = MiscTools.getActiveStatement(jb);
+        final SourceElement activeStatement = JavaTools.getActiveStatement(jb);
         //active statement must be method reference or assignment with
         //method reference
         if(activeStatement instanceof MethodReference) {
@@ -433,7 +432,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     assert mr != null;
 	//arguments of method call must be simple expressions
 	final ExecutionContext ec 
-	= MiscTools.getInnermostExecutionContext(progPost.javaBlock(), 
+	= JavaTools.getInnermostExecutionContext(progPost.javaBlock(), 
 	        services); 	        
 	for(Expression arg : mr.getArguments()) {
 	    if(!ProgramSVSort.SIMPLEEXPRESSION
