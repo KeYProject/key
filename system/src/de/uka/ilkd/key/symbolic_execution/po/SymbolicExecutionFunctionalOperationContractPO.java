@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.po;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -64,12 +66,11 @@ public class SymbolicExecutionFunctionalOperationContractPO extends FunctionalOp
                                     ProgramVariable selfVar,
                                     ProgramVariable resultVar,
                                     ProgramVariable exceptionVar,
-                                    LocationVariable heapAtPreVar,
-                                    LocationVariable savedHeapAtPreVar,
+                                    Map<LocationVariable,LocationVariable> atPreVars,
                                     Term postTerm) {
         // Create parameters for predicate SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort) 
         ImmutableList<Term> arguments = TermBuilder.DF.var(paramVars); // Method parameters
-        arguments = arguments.prepend(TermBuilder.DF.heap(services)); // Heap (As first argument for the predicate)
+        arguments = arguments.prepend(TermBuilder.DF.getBaseHeap(services)); // Heap (As first argument for the predicate)
         // Create non-rigid predicate with signature: SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
         ImmutableList<Sort> argumentSorts = MiscTools.getSorts(arguments);//.prepend(heapSort);
         Function f = new Function(new Name(TermBuilder.DF.newName(services, "SETAccumulate")), 
@@ -80,6 +81,6 @@ public class SymbolicExecutionFunctionalOperationContractPO extends FunctionalOp
         Term postSubstitute = TermBuilder.DF.func(f, arguments.toArray(new Term[arguments.size()]));
         // Enrich post condition with the new predicate
         Term extendedPostTerm = TermBuilder.DF.and(postTerm, postSubstitute);
-        return super.buildProgramTerm(paramVars, selfVar, resultVar, exceptionVar, heapAtPreVar, savedHeapAtPreVar, extendedPostTerm);
+        return super.buildProgramTerm(paramVars, selfVar, resultVar, exceptionVar, atPreVars, extendedPostTerm);
     }
 }

@@ -10,10 +10,13 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -50,7 +53,7 @@ public interface Contract extends SpecificationElement {
      */
     public Term getPre(ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
-                       ProgramVariable savedHeapAtPreVar,
+                       Map<LocationVariable,? extends ProgramVariable> atPreVars,
 	    	       Services services);
     
     /**
@@ -59,7 +62,7 @@ public interface Contract extends SpecificationElement {
     public Term getPre(Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
-                       Term savedHeapAtPre,
+                       Map<LocationVariable,Term> atPres,
 	    	       Services services);    
     
     
@@ -91,6 +94,8 @@ public interface Contract extends SpecificationElement {
     public boolean toBeSaved();
 
     public boolean transactionContract();
+
+    public HeapContext getHeapContext();
     
     /**
      * Returns a parseable String representation of the contract. 

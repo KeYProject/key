@@ -91,12 +91,12 @@ public final class SLMethodResolver extends SLExpressionResolver {
                         " on Type " + receiver.getType());
             }
             subs = new Term[parameters.getParameters().size() + 2];
-            subs[0] = TB.heap(services);
+            subs[0] = TB.getBaseHeap(services);
             subs[1] = recTerm;
             i = 2;
         } else {
             subs = new Term[parameters.getParameters().size() + 1];
-            subs[0] = TB.heap(services);
+            subs[0] = TB.getBaseHeap(services);
             i = 1;
         }
 

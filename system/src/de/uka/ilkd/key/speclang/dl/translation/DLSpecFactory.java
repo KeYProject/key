@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.speclang.dl.translation;
 
+import java.util.Map;
+import java.util.LinkedHashMap;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
@@ -18,6 +21,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -75,7 +79,7 @@ public final class DLSpecFactory {
 	    if(!(eu.lhs() instanceof ProgramVariable)) {
 		throw new ProofInputException("Program variable expected, "
 				              + "but found: " + eu.lhs());
-	    } else if(!update.sub(0).equals(TB.heap(services))) {
+	    } else if(!update.sub(0).equals(TB.getBaseHeap(services))) {
 		throw new ProofInputException("heap expected, "
 					      + "but found: " + update.sub(0));
 	    } else {
@@ -262,10 +266,15 @@ public final class DLSpecFactory {
 	    }
 	}
 	
+	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	//heapAtPre variable may be omitted
 	if(heapAtPreVar == null) {
-	    heapAtPreVar = TB.heapAtPreVar(services, "heapAtPre", false);
+	    heapAtPreVar = TB.heapAtPreVar(services, heapLDT.getHeap() + "AtPre", false);
 	}
+        Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
+        atPreVars.put(heapLDT.getHeap(), heapAtPreVar);
+        Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
+        mods.put(heapLDT.getHeap(), modifies);
 
 	//result variable may be omitted
 	if(resultVar == null && !pm.isVoid()) {
@@ -297,13 +306,13 @@ public final class DLSpecFactory {
 					 pre,
 					 null,// TODO measured_by in DL contracts not supported yet
 					 post, 
-					 modifies, 
+					 mods, 
 					 true, // TODO strictly pure in DL contracts not supported yet
 					 selfVar, 
 					 paramVars, 
 					 resultVar, 
 					 excVar,
-					 heapAtPreVar,
+					 atPreVars,
 					 !isLibraryClass);
     }
 }

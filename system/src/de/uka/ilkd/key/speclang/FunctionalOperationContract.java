@@ -10,11 +10,14 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 
 /**
@@ -31,7 +34,7 @@ public interface FunctionalOperationContract extends OperationContract {
 
     public Modality getPOModality();
    
-    public boolean isReadOnlyContract();
+    public boolean isReadOnlyContract(Services services);
     /**
      * Returns the postcondition of the contract.
      */
@@ -39,8 +42,7 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        ImmutableList<ProgramVariable> paramVars, 
 	    	        ProgramVariable resultVar, 
 	    	        ProgramVariable excVar,
-	    	        ProgramVariable heapAtPreVar,
-	    	        ProgramVariable savedHeapAtPreVar,
+	    	        Map<LocationVariable,? extends ProgramVariable> atPreVars,
 	    	        Services services);
     
     /**
@@ -51,8 +53,7 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        ImmutableList<Term> paramTerms, 
 	    	        Term resultTerm, 
 	    	        Term excTerm,
-	    	        Term heapAtPre,
-                        Term savedHeapAtPre,
+	    	        Map<LocationVariable,Term> atPres,
 	    	        Services services);
 
 

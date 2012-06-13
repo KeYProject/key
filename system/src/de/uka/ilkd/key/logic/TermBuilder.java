@@ -52,7 +52,6 @@ public final class TermBuilder {
     private static final Term tt = TermFactory.DEFAULT.createTerm(Junctor.TRUE); 
     private static final Term ff = TermFactory.DEFAULT.createTerm(Junctor.FALSE); 
 
-    
     private TermBuilder() {
     }
     
@@ -684,7 +683,7 @@ public final class TermBuilder {
 
 
     public Term elementary(Services services, Term heapTerm) {
-        return elementary(services, heap(services), heapTerm);
+        return elementary(services, getBaseHeap(services), heapTerm);
     }
 
 
@@ -1187,7 +1186,7 @@ public final class TermBuilder {
     public Term createdLocs(Services services) {
         return setMinus(services, 
         	        allLocs(services), 
-                        freshLocs(services, heap(services))); 
+                        freshLocs(services, getBaseHeap(services))); 
     }    
     
     
@@ -1200,24 +1199,14 @@ public final class TermBuilder {
         return func(services.getTypeConverter().getHeapLDT().getNull());
     }
 
-    
-    public Term heap(Services services) {
-        return var(services.getTypeConverter().getHeapLDT().getHeap());
-    }
-
-    public Term savedHeap(Services services) {
-        return var(services.getTypeConverter().getHeapLDT().getSavedHeap());
-    }
-    
-    
-    public Term wellFormed(Services services, Term h) {
+    public Term wellFormed(Term heap, Services services) {
         return func(services.getTypeConverter().getHeapLDT().getWellFormed(), 
-        	    h);
+        	    heap);
     }
     
 
-    public Term wellFormedHeap(Services services) {
-        return wellFormed(services, heap(services));
+    public Term wellFormed(LocationVariable heap, Services services) {
+        return wellFormed(var(heap), services);
     }
     
     
@@ -1229,7 +1218,7 @@ public final class TermBuilder {
     
     
     public Term inv(Services services, Term o) {
-	return inv(services, heap(services),  o);
+	return inv(services, getBaseHeap(services),  o);
     }
     
     public Term staticInv(Services services, Term h, KeYJavaType t){
@@ -1237,7 +1226,7 @@ public final class TermBuilder {
     }
     
     public Term staticInv(Services services, KeYJavaType t){
-        return func(services.getJavaInfo().getStaticInv(t), heap(services));
+        return func(services.getJavaInfo().getStaticInv(t), getBaseHeap(services));
     }
 
     
@@ -1250,16 +1239,19 @@ public final class TermBuilder {
 
     
     public Term dot(Services services, Sort asSort, Term o, Term f) {
-        return select(services, asSort, heap(services), o, f);
+        return select(services, asSort, getBaseHeap(services), o, f);
     }
 
+    public Term getBaseHeap(Services services) {
+        return var(services.getTypeConverter().getHeapLDT().getHeap());
+    }
     
     public Term dot(Services services, Sort asSort, Term o, Function f) {
 	final Sort fieldSort 
 		= services.getTypeConverter().getHeapLDT().getFieldSort();
         return f.sort() == fieldSort
                ? dot(services, asSort, o, func(f))
-               : func(f, heap(services), o);
+               : func(f, getBaseHeap(services), o);
     }
     
 
@@ -1273,7 +1265,7 @@ public final class TermBuilder {
 		= services.getTypeConverter().getHeapLDT().getFieldSort();
 	return f.sort() == fieldSort
 	       ? staticDot(services, asSort, func(f))
-	       : func(f, heap(services));
+	       : func(f, getBaseHeap(services));
     }
     
 
@@ -1301,7 +1293,7 @@ public final class TermBuilder {
         
         return select(services, 
         	      elementSort, 
-        	      heap(services), 
+        	      getBaseHeap(services), 
         	      ref, 
         	      arr(services, idx));
     }    
@@ -1325,7 +1317,7 @@ public final class TermBuilder {
 
 
     public Term created(Services services, Term o) {
-	return created(services, heap(services), o);
+	return created(services, getBaseHeap(services), o);
     }
 
     
@@ -1399,7 +1391,7 @@ public final class TermBuilder {
     
                
     public Term fieldStore(Services services, Term o, Function f, Term v) {
-        return store(services, heap(services), o, func(f), v);
+        return store(services, getBaseHeap(services), o, func(f), v);
     }
     
     
@@ -1410,7 +1402,7 @@ public final class TermBuilder {
     
     public Term arrayStore(Services services, Term o, Term i, Term v) {
         return store(services, 
-        	     heap(services), 
+                getBaseHeap(services), 
         	     o, 
         	     func(services.getTypeConverter().getHeapLDT().getArr(), i),
         	     v);
@@ -1439,7 +1431,7 @@ public final class TermBuilder {
 
 
     public Term reachableValue(Services services, Term t, KeYJavaType kjt) {
-	return reachableValue(services, heap(services), t, kjt);
+	return reachableValue(services, getBaseHeap(services), t, kjt);
     }
     
     
@@ -1467,7 +1459,7 @@ public final class TermBuilder {
 	
 	final OpReplacer or = new OpReplacer(normalToAtPre);
 	final Term modAtPre = or.replace(mod);
-	final Term createdAtPre = or.replace(created(services, objVarTerm));
+	final Term createdAtPre = or.replace(created(services, heapTerm, objVarTerm));
 
         ImmutableList<QuantifiableVariable> quantVars =
                 ImmutableSLList.<QuantifiableVariable>nil();
@@ -1533,12 +1525,11 @@ public final class TermBuilder {
     }
     
     
-    public Term anonUpd(Services services, Term mod, Term anonHeap, boolean savedHeap) {
+    public Term anonUpd(LocationVariable heap, Services services, Term mod, Term anonHeap) {
 	return elementary(services,
-		          savedHeap ? services.getTypeConverter().getHeapLDT().getSavedHeap()
-		                    : services.getTypeConverter().getHeapLDT().getHeap(),
+		          heap,
 		          anon(services, 
-		               savedHeap ? savedHeap(services) : heap(services), 
+		               var(heap), 
 		               mod, 
 		               anonHeap));
     }

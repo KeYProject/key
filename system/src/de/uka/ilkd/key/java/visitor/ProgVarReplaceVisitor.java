@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
@@ -222,58 +223,49 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             return;
         }
         Term selfTerm = inv.getInternalSelfTerm();
-        Term heapAtPre = inv.getInternalHeapAtPre();
-        Term savedHeapAtPre = inv.getInternalSavedHeapAtPre();
+        Map<LocationVariable,Term> atPres = inv.getInternalAtPres();
         
         //invariant
         Term newInvariant 
             = replaceVariablesInTerm(inv.getInvariant(selfTerm, 
-                                                      heapAtPre,
-                                                      null,
-                                                      services));
-
+                                                      atPres,
+                                                      services, false));
         // transaction invariant
         Term newTransactionInvariant 
             = replaceVariablesInTerm(inv.getInvariant(selfTerm, 
-                                                      heapAtPre,
-                                                      savedHeapAtPre,
-                                                      services));
+                                                      atPres,
+                                                      services, true));
 
-        //modifies
-        Term newModifies
-            = replaceVariablesInTerm(inv.getModifies(selfTerm, 
-                                     heapAtPre,
-                                     null,
+        Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+           final Term m = replaceVariablesInTerm(inv.getModifies(heap, selfTerm, 
+                                     atPres,
                                      services));
-
-        //backup modifies
-        Term newBackupModifies
-            = replaceVariablesInTerm(inv.getModifies(selfTerm, 
-                                     heapAtPre,
-                                     savedHeapAtPre,
-                                     services));
+           newMods.put(heap, m);
+        }
 
         //variant
         Term newVariant
             = replaceVariablesInTerm(inv.getVariant(selfTerm, 
-                                                    heapAtPre, 
+                                                    atPres, 
                                                     services));
         
-        
         Term newSelfTerm = replaceVariablesInTerm(selfTerm); 
-        Term newHeapAtPre = replaceVariablesInTerm(heapAtPre);
-        Term newSavedHeapAtPre = replaceVariablesInTerm(savedHeapAtPre);
+
+        for(LocationVariable h : atPres.keySet()) {
+           final Term t = atPres.get(h);
+           if(t == null) continue;
+           atPres.put(h, replaceVariablesInTerm(t));
+        }
 
         LoopInvariant newInv 
             = new LoopInvariantImpl(newLoop, 
                                     newInvariant,
                                     newTransactionInvariant,
-                                    newModifies, 
-                                    newBackupModifies,
+                                    newMods,
                                     newVariant, 
                                     newSelfTerm,
-                                    newHeapAtPre,
-                                    newSavedHeapAtPre);
+                                    atPres);
         services.getSpecificationRepository().setLoopInvariant(newInv);
     }
 }

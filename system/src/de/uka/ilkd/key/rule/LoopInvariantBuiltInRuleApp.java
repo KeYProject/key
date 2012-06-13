@@ -46,9 +46,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     
     private LoopInvariant instantiateIndex(LoopInvariant rawInv){
     	if (rawInv == null) return null;
-    	Term inv = rawInv.getInternalInvariant();
+    	Term inv = rawInv.getInternalInvariant(false);
     	Term var = rawInv.getInternalVariant();
-    	Term tnv = rawInv.getInternalTransactionInvariant();
+    	Term tnv = rawInv.getInternalInvariant(true);
     	
     	// try to retrieve a loop index variable
     	de.uka.ilkd.key.java.statement.IGuard guard = loop.getGuard();
@@ -110,8 +110,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 		}
 		
 		return new LoopInvariantImpl(rawInv.getLoop(), inv, tnv, rawInv.getInternalModifies(),
-				rawInv.getInternalModifiesBackup(), var, rawInv.getInternalSelfTerm(),
-				rawInv.getInternalHeapAtPre(), rawInv.getInternalSavedHeapAtPre());
+				var, rawInv.getInternalSelfTerm(),
+				rawInv.getInternalAtPres());
     	
     }
 
@@ -135,7 +135,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public boolean invariantAvailable() {
-        return inv != null && inv.getInternalInvariant() != null;
+        return inv != null && inv.getInternalInvariant(false) != null;
     }
 
     public boolean isSufficientlyComplete() {

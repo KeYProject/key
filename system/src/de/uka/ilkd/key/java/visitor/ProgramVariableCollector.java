@@ -10,12 +10,14 @@
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashSet;
+import java.util.Map;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
@@ -38,8 +40,10 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
                                     Services services) {
 	super(root, services);
         assert services != null;
-        result.add(services.getTypeConverter().getHeapLDT().getHeap());
-        result.add(services.getTypeConverter().getHeapLDT().getSavedHeap());
+        HeapLDT ldt = services.getTypeConverter().getHeapLDT();
+        for(LocationVariable heap: ldt.getAllHeaps()) {
+          result.add(heap);
+        }
     }
     
     
@@ -74,35 +78,31 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
         TermProgramVariableCollector tpvc = 
             new TermProgramVariableCollector(services);
         Term selfTerm = x.getInternalSelfTerm();
-        Term heapAtPre = x.getInternalHeapAtPre();
-        Term savedHeapAtPre = x.getInternalSavedHeapAtPre();
         
+        Map<LocationVariable,Term> atPres = x.getInternalAtPres();
+
         //invariant
-        Term inv = x.getInvariant(selfTerm, heapAtPre, null, services);
+        Term inv = x.getInvariant(selfTerm, atPres, services, false);
         if(inv != null) {
             inv.execPostOrder(tpvc);
         }
 
         //transaction invariant
-        Term transInv = x.getInvariant(selfTerm, heapAtPre, savedHeapAtPre, services);
+        Term transInv = x.getInvariant(selfTerm, atPres, services, true);
         if(transInv != null) {
             transInv.execPostOrder(tpvc);
         }
-                
-        //modifies
-        Term mod = x.getModifies(selfTerm, heapAtPre, null, services);
-        if(mod != null) {
-            mod.execPostOrder(tpvc);
-        }
 
         //modifies
-        Term modBackup = x.getModifies(selfTerm, heapAtPre, savedHeapAtPre, services);
-        if(modBackup != null) {
-            modBackup.execPostOrder(tpvc);
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+           Term mod = x.getModifies(heap, selfTerm, atPres, services);
+           if(mod != null) {
+              mod.execPostOrder(tpvc);
+           }
         }
 
         //variant
-        Term v = x.getVariant(selfTerm, heapAtPre, services);
+        Term v = x.getVariant(selfTerm, atPres, services);
         if(v != null) {
             v.execPostOrder(tpvc);
         }
