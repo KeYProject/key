@@ -454,7 +454,9 @@ public class SymbolicExecutionTreeBuilder {
             result = new ExecutionBranchNode(node);
          }
          else if (SymbolicExecutionUtil.isLoopNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
-            result = new ExecutionLoopNode(node);
+            if (SymbolicExecutionUtil.isFirstLoopIteration(node, node.getAppliedRuleApp(), statement)) {
+               result = new ExecutionLoopNode(node);
+            }
          }
          else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
             result = new ExecutionStatement(node);

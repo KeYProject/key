@@ -96,6 +96,42 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    }
    
    /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testLoopIteration_LoopWithMethod() throws Exception {
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopWithMethod",
+                                   "data/loopIterationTest/test",
+                                   false,
+                                   createMethodSelector("LoopIterationTest", "loopMultipleTimes"),
+                                   "data/loopIterationTest/oracle/LoopIterationTest_loopMultipleTimes.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testLoopIteration_LoopStatementCopied() throws Exception {
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied",
+                                   "data/loopIterationTest/test",
+                                   false,
+                                   createMethodSelector("LoopIterationTest", "mainWorks"),
+                                   "data/loopIterationTest/oracle/LoopIterationTest_mainWorks.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testLoopIteration_LoopStatementReused() throws Exception {
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementReused",
+                                   "data/loopIterationTest/test",
+                                   false,
+                                   createMethodSelector("LoopIterationTest", "main"),
+                                   "data/loopIterationTest/oracle/LoopIterationTest_main.xml");
+   }
+   
+   /**
     * Tests the handling of variables.
     */
    @Test

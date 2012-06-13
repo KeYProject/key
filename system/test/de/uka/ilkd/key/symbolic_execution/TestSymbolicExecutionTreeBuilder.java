@@ -157,6 +157,45 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
    }
    
    /**
+    * Tests example: examples/_testcase/set/loopIterationTest
+    */
+   public void testLoopIteration_LoopWithMethod() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/loopIterationTest/test/LoopIterationTest.java", 
+             "LoopIterationTest", 
+             "loopMultipleTimes", 
+             "examples/_testcase/set/loopIterationTest/oracle/LoopIterationTest_loopMultipleTimes.xml",
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/loopIterationTest
+    */
+   public void testLoopIteration_LoopStatementCopied() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/loopIterationTest/test/LoopIterationTest.java", 
+             "LoopIterationTest", 
+             "mainWorks", 
+             "examples/_testcase/set/loopIterationTest/oracle/LoopIterationTest_mainWorks.xml",
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/loopIterationTest
+    */
+   public void testLoopIteration_LoopStatementReused() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/loopIterationTest/test/LoopIterationTest.java", 
+             "LoopIterationTest", 
+             "main", 
+             "examples/_testcase/set/loopIterationTest/oracle/LoopIterationTest_main.xml",
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/variablesArrayTest
     */
    public void testVariablesArrayTest() throws Exception {

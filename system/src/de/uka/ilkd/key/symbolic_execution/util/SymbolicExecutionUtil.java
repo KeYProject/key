@@ -687,7 +687,53 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isLoopNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
       return isStatementNode(node, ruleApp, statement, posInfo) &&
-             (statement instanceof LoopStatement); 
+             (statement instanceof LoopStatement);
+   }
+
+   /**
+    * <p>
+    * Checks if the given {@link SourceElement} which represents a {@link LoopStatement} is executed
+    * the first time in proof node or if it is a higher loop iteration.
+    * </p>
+    * <p>
+    * The reason why such checks are required is that KeY's tacklet sometimes create
+    * a copy in further loop iteration without a source code position and sometimes
+    * is the original loop reused. The expected behavior of KeY should be to
+    * reuse the original loop all the time to save memory. But the symbolic
+    * execution tree should contain the loop statement only when it is executed
+    * the first time and in further iterations only the checked loop condition.
+    * For this reason is this check required.
+    * </p>
+    * <p>
+    * <b>Attention:</b> This check requires to iterate over parent {@link Node}s
+    * and can not be decided locally in the current {@link Node}.
+    * This is a performance deficit.
+    * </p>
+    * @param node The current {@link Node} of the proof tree.
+    * @param ruleApp The applied rule in {@link Node}.
+    * @param statement The active {@link LoopStatement} of {@link Node} to check.
+    * @return {@code true} it is the first loop iteration, {@code false} it is a second or higher loop iteration.
+    */
+   public static boolean isFirstLoopIteration(Node node, RuleApp ruleApp, SourceElement statement) {
+      // Compute stack size of current node
+      int stackSize = computeStackSize(node, ruleApp);
+      // Iterate over all parents until another loop iteration is found or the current method was called
+      boolean firstLoop = true;
+      Node parent = node.parent();
+      while (firstLoop && parent != null) {
+         // Check if the current parent node treats the same loop
+         SourceElement activeStatement = parent.getNodeInfo().getActiveStatement();
+         firstLoop = activeStatement != statement;
+         // Define parent for next iteration
+         parent = parent.parent();
+         // Check if the next parent is the method call of the current method, in this case iteration can stop
+         if (isMethodCallNode(parent, parent.getAppliedRuleApp(), parent.getNodeInfo().getActiveStatement(), true) &&
+             computeStackSize(parent, parent.getAppliedRuleApp()) < stackSize) {
+            // Stop iteration because further parents are before the current method is called
+            parent = null;
+         }
+      }
+      return firstLoop;
    }
 
    /**
@@ -758,8 +804,10 @@ public final class SymbolicExecutionUtil {
             Node callNode = temporaryFindMethodCallNode(stack, node, ruleApp);
             return callNode != null && isMethodCallNode(callNode, callNode.getAppliedRuleApp(), callNode.getNodeInfo().getActiveStatement());
          }
+         else if (isLoopNode(node, ruleApp, statement, posInfo)) { 
+            return isFirstLoopIteration(node, ruleApp, statement);
+         }
          else if (isBranchNode(node, ruleApp, statement, posInfo) ||
-                  isLoopNode(node, ruleApp, statement, posInfo) ||
                   isMethodCallNode(node, ruleApp, statement) ||
                   isStatementNode(node, ruleApp, statement, posInfo) ||
                   isTerminationNode(node, ruleApp, statement, posInfo)) {
