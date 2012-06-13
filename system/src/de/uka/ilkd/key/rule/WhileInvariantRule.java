@@ -220,11 +220,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//get instantiation
 	Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);	
 	
-    final boolean transaction = ((Modality)inst.progPost.op()).transaction(); 
-
     final Map<LocationVariable,Term> atPres = inst.inv.getInternalAtPres();
     final List<LocationVariable> heapContext = ((IBuiltInRuleApp)ruleApp).getHeapContext();
-
 
     Term invTerm = null;
     for(LocationVariable heap : heapContext) {

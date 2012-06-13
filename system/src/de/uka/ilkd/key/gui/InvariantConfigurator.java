@@ -44,7 +44,6 @@ public class InvariantConfigurator {
     private static final int MOD_IDX = 1;
     private static final int VAR_IDX = 2;
     private static final String DEFAULT = "Default";
-//    private static final String TRANSACTION = "Transaction";
 
     private static InvariantConfigurator configurator = null;
     private List<Map<String,String>[]> invariants = null;
@@ -78,12 +77,11 @@ public class InvariantConfigurator {
      * 
      * @param loopInv
      * @param services
-     * @param isTransaction 
      * @return LoopInvariant
      */
     public LoopInvariant getLoopInvariant (final LoopInvariant loopInv,
-            final Services services, final boolean requiresVariant,
-            final boolean isTransaction) throws RuleAbortException {
+            final Services services, final boolean requiresVariant, final List<LocationVariable> heapContext)
+          throws RuleAbortException {
         // Check if there is a LoopInvariant
         if (loopInv == null) {
             return null;
@@ -105,6 +103,7 @@ public class InvariantConfigurator {
                             .getServices());*/
             private JTabbedPane inputPane;
             private JPanel errorPanel;
+            private List<JTabbedPane> heapPanes = new ArrayList<JTabbedPane>();
 
             private Term variantTerm = null;
             private Map<LocationVariable,Term> modifiesTerm = new LinkedHashMap<LocationVariable,Term>();
@@ -135,10 +134,9 @@ public class InvariantConfigurator {
 
                 inputPane = new JTabbedPane();
                 initInputPane();
-                
-                
+                updateActiveTabs(heapContext);
 
-                                
+                
                 JTextArea loopRep = initLoopPresentation();
                 JPanel leftPanel = new JPanel();
                 leftPanel.setLayout(new BorderLayout());
@@ -334,6 +332,8 @@ public class InvariantConfigurator {
                 panel.add(invPane);
                 panel.add(modPane);
                 panel.add(vararea);
+                heapPanes.add(invPane);
+                heapPanes.add(modPane);
 
                 JScrollPane rightPane = new JScrollPane(panel);;
                 
@@ -460,9 +460,10 @@ public class InvariantConfigurator {
                         modColors.get(k));
                    modPane.add(k, textArea);
                 }
-
                 panel.add(invPane);
                 panel.add(modPane);
+		heapPanes.add(invPane);
+		heapPanes.add(modPane);
                 JTextArea varErrorArea = createErrorTextField("Variant - Status", varMsgs.get(DEFAULT),
                         varColors.get(DEFAULT));
                 panel.add(varErrorArea);
@@ -682,6 +683,18 @@ public class InvariantConfigurator {
 
             }
 
+            private void updateActiveTabs(List<LocationVariable> heapContext) {
+               for(JTabbedPane p : heapPanes) {
+                    for(int j = 0; j<p.getTabCount(); j++) {
+                      p.setEnabledAt(j, false);
+                    }
+                    for(LocationVariable lv : heapContext) {
+                      p.setEnabledAt(p.indexOfTab(lv.name().toString()), true);
+                    }
+                    
+               }
+            }
+
             private void updateErrorPanel(Map<String,String> invErrors, Map<String,Color> invCols,
                     Map<String,String> modErrors, Map<String,Color> modCols, Map<String,String> varErrors, Map<String,Color> varCols) {
                 boolean reeinit = true;
@@ -724,6 +737,7 @@ public class InvariantConfigurator {
                     Dimension d = errorPanel.getPreferredSize();
                     errorPanel = createErrorPanel(invErrors, invCols, modErrors,
                             modCols, varErrors, varCols);
+                    updateActiveTabs(heapContext);
                     errorPanel.setPreferredSize(d);
                     con.add(errorPanel, BorderLayout.SOUTH);
                 }

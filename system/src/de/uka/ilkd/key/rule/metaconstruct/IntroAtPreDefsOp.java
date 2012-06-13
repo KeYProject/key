@@ -121,7 +121,6 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
                 Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
                 Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
-                // FIXME or services.getTypeConverter().getHeapLDT().getAllHeaps() ?
                 for(LocationVariable heap : hc.getModHeaps(services)) {
                   final Term m = inv.getModifies(heap, selfTerm, atPres, services);
                   final Term i = inv.getInvariant(heap, selfTerm, atPres, services);

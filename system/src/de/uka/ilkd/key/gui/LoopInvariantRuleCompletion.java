@@ -36,7 +36,7 @@ public class LoopInvariantRuleCompletion implements
         final While loop = loopApp.getLoopStatement();
 
         LoopInvariant inv = loopApp.getInvariant();
-        final boolean isTransaction = ((Modality)loopApp.programTerm().op()).transaction();
+        // final boolean isTransaction = ((Modality)loopApp.programTerm().op()).transaction();
         if (inv == null) { // no invariant present, get it interactively
             inv = new LoopInvariantImpl(loop,
                     MiscTools.getInnermostMethodFrame(progPost.javaBlock(),
@@ -46,7 +46,7 @@ public class LoopInvariantRuleCompletion implements
                                             services), null);
             try {
                 inv = InvariantConfigurator.getInstance().getLoopInvariant(inv,
-                        services, false, isTransaction);
+                        services, false, loopApp.getHeapContext());
             } catch (RuleAbortException e) {
                 return null;
             }
@@ -59,7 +59,7 @@ public class LoopInvariantRuleCompletion implements
                 // get invariant or variant interactively
                 try {
                     inv = InvariantConfigurator.getInstance().getLoopInvariant(
-                            inv, services, requiresVariant, isTransaction);
+                            inv, services, requiresVariant, loopApp.getHeapContext());
                 } catch (RuleAbortException e) {
                     return null;
                 }

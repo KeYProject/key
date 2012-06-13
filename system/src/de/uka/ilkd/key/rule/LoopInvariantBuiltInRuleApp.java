@@ -146,7 +146,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         if(result) {
           Map<LocationVariable,Term> invs = inv.getInternalInvariants();
           result = false;
-          for(LocationVariable heap : invs.keySet()) {
+          for(LocationVariable heap : heapContext) {
             if(invs.get(heap) != null) {
               result = true;
               break;

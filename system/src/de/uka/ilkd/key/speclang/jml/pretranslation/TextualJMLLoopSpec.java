@@ -26,10 +26,6 @@ import de.uka.ilkd.key.speclang.PositionedString;
  */
 public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
-//    private ImmutableList<PositionedString> invariant          
-//            = ImmutableSLList.<PositionedString>nil();
-//    private ImmutableList<PositionedString> transaction_invariant          
-//            = ImmutableSLList.<PositionedString>nil();
     private PositionedString variant                  
             = null;
 
@@ -53,11 +49,6 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         addGeneric(invariants, ps);
     }
 
-//    public void addTransactionInvariant(PositionedString ps) {
-//        addGeneric(invariants, ps);
-//    }
-    
-    
     public void addAssignable(PositionedString ps) {
         addGeneric(assignables, ps);
     }
@@ -75,10 +66,6 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     public ImmutableList<PositionedString> getInvariant() {
         return invariants.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
-    
-//    public ImmutableList<PositionedString> getTransactionInvariant() {
-//        return invariants.get(HeapLDT.SAVED_HEAP_NAME.toString());
-//    }
     
     public ImmutableList<PositionedString> getAssignable() {
         return assignables.get(HeapLDT.BASE_HEAP_NAME.toString());
@@ -106,13 +93,11 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         StringBuffer sb = new StringBuffer();
         Iterator<PositionedString> it;
         
-        it = invariants.get(HeapLDT.BASE_HEAP_NAME.toString()).iterator();
-        while(it.hasNext()) {
-            sb.append("invariant: " + it.next() + "\n");
-        }
-        it = invariants.get(HeapLDT.SAVED_HEAP_NAME.toString()).iterator();
-        while(it.hasNext()) {
-            sb.append("invariant<savedHeap>: " + it.next() + "\n");
+        for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
+          it = invariants.get(heap.toString()).iterator();
+          while(it.hasNext()) {
+            sb.append("invariant<"+heap+">: " + it.next() + "\n");
+          }
         }
         for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
           it = assignables.get(heap.toString()).iterator();
