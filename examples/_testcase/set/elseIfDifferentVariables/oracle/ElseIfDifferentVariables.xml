@@ -12,7 +12,7 @@
          </branchCondition>
          <branchCondition name="if _a false" pathCondition="!a = TRUE" branchCondition="!a = TRUE">
             <branchNode name="if (_b) {return 2; }else  {return 3; }" pathCondition="!a = TRUE">
-               <branchCondition name="b = TRUE TRUE" pathCondition="!a = TRUE &amp; b = TRUE" branchCondition="b = TRUE">
+               <branchCondition name="if _b true" pathCondition="!a = TRUE &amp; b = TRUE" branchCondition="b = TRUE">
                   <statement name="return 2;" pathCondition="!a = TRUE &amp; b = TRUE">
                      <methodReturn name="&lt;return of self.main(_a,_b);&gt;" pathCondition="!a = TRUE &amp; b = TRUE" nameIncludingReturnValue="&lt;return &apos;2&apos; as result of self.main(_a,_b);&gt;">
                         <termination name="&lt;end&gt;" pathCondition="!a = TRUE &amp; b = TRUE" exceptionalTermination="false">
@@ -20,7 +20,7 @@
                      </methodReturn>
                   </statement>
                </branchCondition>
-               <branchCondition name="b = TRUE FALSE" pathCondition="!a = TRUE &amp; !b = TRUE" branchCondition="!b = TRUE">
+               <branchCondition name="if _b false" pathCondition="!a = TRUE &amp; !b = TRUE" branchCondition="!b = TRUE">
                   <statement name="return 3;" pathCondition="!a = TRUE &amp; !b = TRUE">
                      <methodReturn name="&lt;return of self.main(_a,_b);&gt;" pathCondition="!a = TRUE &amp; !b = TRUE" nameIncludingReturnValue="&lt;return &apos;3&apos; as result of self.main(_a,_b);&gt;">
                         <termination name="&lt;end&gt;" pathCondition="!a = TRUE &amp; !b = TRUE" exceptionalTermination="false">

@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.tree.TreeModel;
@@ -273,6 +274,44 @@ public class TestUtilsUtil {
       }
       treeBot.select(lastItem);
       return lastItem;
+   }
+
+   /**
+    * <p>
+    * Collects all leaf nodes in the subtree starting at the given {@link SWTBotTreeItem}.
+    * </p>
+    * </p>
+    * <b>Attention:</b> Lazy provider are also supported. For this reason
+    * is the selection changed and each node in the subtree expanded.
+    * <p>
+    * @param item The {@link SWTBotTreeItem} to start collecting.
+    * @return The found leaf {@link SWTBotTreeItem}s.
+    */
+   public static List<SWTBotTreeItem> collectLeafs(SWTBotTreeItem item) {
+      List<SWTBotTreeItem> result = new LinkedList<SWTBotTreeItem>();
+      internalCollectLeafs(result, item);
+      return result;
+   }
+
+   /**
+    * Internal methods to collect leaf items recursive of {@link #collectLeafs(SWTBotTreeItem)}.
+    * @param leafItems The result {@link List} to fill.
+    * @param item The current item.
+    */
+   private static void internalCollectLeafs(List<SWTBotTreeItem> leafItems, SWTBotTreeItem item) {
+      if (item != null) {
+         item.select();
+         item.expand();
+         SWTBotTreeItem[] children = item.getItems();
+         if (ArrayUtil.isEmpty(children)) {
+            leafItems.add(item);
+         }
+         else {
+            for (SWTBotTreeItem child : children) {
+               internalCollectLeafs(leafItems, child);
+            }
+         }
+      }
    }
 
    /**

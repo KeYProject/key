@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
+import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +12,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
@@ -23,7 +25,9 @@ import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.BranchStatement;
+import de.uka.ilkd.key.java.statement.Do;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
+import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -31,6 +35,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -747,17 +752,146 @@ public final class SymbolicExecutionUtil {
       if (node != null) {
          SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
          PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
-         return isBranchNode(node, ruleApp, statement, posInfo) ||
-                isLoopNode(node, ruleApp, statement, posInfo) ||
-                isMethodCallNode(node, ruleApp, statement) ||
-                isMethodReturnNode(node, ruleApp, statement, posInfo) ||
-                isStatementNode(node, ruleApp, statement, posInfo) ||
-                isTerminationNode(node, ruleApp, statement, posInfo) ||
-                hasLoopCondition(node, ruleApp, statement);
+         if (isMethodReturnNode(node, ruleApp, statement, posInfo)) {
+            LinkedList<Node> stack = temporaryCreateMethodCallStack(node);
+            Node callNode = temporaryFindMethodCallNode(stack, node, ruleApp);
+            return callNode != null && isMethodCallNode(callNode, callNode.getAppliedRuleApp(), callNode.getNodeInfo().getActiveStatement());
+         }
+         else if (isBranchNode(node, ruleApp, statement, posInfo) ||
+                  isLoopNode(node, ruleApp, statement, posInfo) ||
+                  isMethodCallNode(node, ruleApp, statement) ||
+                  isStatementNode(node, ruleApp, statement, posInfo) ||
+                  isTerminationNode(node, ruleApp, statement, posInfo)) {
+            return true;
+         }
+         else if (hasLoopCondition(node, ruleApp, statement)) {
+            return ((LoopStatement)statement).getGuardExpression().getPositionInfo() != PositionInfo.UNDEFINED &&
+                   !isDoWhileLoopCondition(node, statement) && 
+                   !isForLoopCondition(node, statement);
+         }
+         else {
+            return false;
+         }
       }
       else {
          return false;
       }
+   }
+
+   // TODO: Remove temporary methods when the current method is part of an ExecutionContext.
+
+   /**
+    * Finds the {@link Node} in the proof tree of KeY which has called the
+    * method that is now executed or returned in the {@link Node}.
+    * @param methodCallStack The method call stack to search in.
+    * @param currentNode The {@link Node} for that the method call {@link Node} is needed.
+    * @return The found call {@link Node} or {@code null} if no one was found.
+    */
+   public static Node temporaryFindMethodCallNode(LinkedList<Node> methodCallStack, Node currentNode, RuleApp ruleApp) {
+      // Compute the stack frame size before the method is called
+      final int returnStackSize = SymbolicExecutionUtil.computeStackSize(currentNode, ruleApp) - 1;
+      // Return the method from the call stack
+      if (returnStackSize >= 0) {
+         return methodCallStack.get(returnStackSize);
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Creates the call stack for the given {@link Node}.
+    * @param node The {@link Node} to create call stack for.
+    * @return The created call stack.
+    */
+   public static LinkedList<Node> temporaryCreateMethodCallStack(Node node) {
+      // List parents
+      Deque<Node> parents = new LinkedList<Node>();
+      while (node != null) {
+         parents.addFirst(node);
+         node = node.parent();
+      }
+      // Create method call stack
+      LinkedList<Node> methodCallStack = new LinkedList<Node>();
+      for (Node parent : parents) {
+         temporaryUpdateCallStack(methodCallStack, parent, parent.getNodeInfo().getActiveStatement());
+      }
+      return methodCallStack;
+   }
+   
+   /**
+    * Updates the call stack ({@link #methodCallStack}) if the given {@link Node}
+    * in KeY's proof tree is a method call.
+    * @param methodCallStack The method call stack to update.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param statement The statement ({@link SourceElement}).
+    */
+   public static void temporaryUpdateCallStack(LinkedList<Node> methodCallStack, Node node, SourceElement statement) {
+      if (isMethodCallNode(node, node.getAppliedRuleApp(), statement, true)) {
+         // Remove outdated methods from call stack
+         int currentLevel = computeStackSize(node, node.getAppliedRuleApp());
+         while (methodCallStack.size() > currentLevel) {
+            methodCallStack.removeLast();
+         }
+         // Add new node to call stack.
+         methodCallStack.addLast(node);
+      }
+   }
+   
+   /**
+    * Compute the stack size of the given {@link Node} in the proof tree of KeY.
+    * @param node The {@link Node} to compute stack size for.
+    * @param ruleApp The {@link RuleApp} which is or should be applied in the {@link Node}.
+    * @return The stack size.
+    */
+   public static int computeStackSize(Node node, RuleApp ruleApp) {
+      int result = 0;
+      if (node != null && ruleApp != null) {
+         PosInOccurrence posInOc = ruleApp.posInOccurrence();
+         if (posInOc != null && posInOc.constrainedFormula() != null) {
+            Term term = posInOc.constrainedFormula().formula();
+            if (term != null && term.subs().size() == 2) {
+               Term sub = term.sub(1);
+               if (sub != null) {
+                  JavaBlock block = sub.javaBlock();
+                  if (block != null) {
+                     JavaProgramElement element = block.program();
+                     if (element instanceof StatementBlock) {
+                        StatementBlock b = (StatementBlock)block.program();
+                        ImmutableArray<ProgramPrefix> prefix = b.getPrefixElements();
+                        result = JavaUtil.count(prefix, new IFilter<ProgramPrefix>() {
+                           @Override
+                           public boolean select(ProgramPrefix element) {
+                              return element instanceof MethodFrame;
+                           }
+                        });
+                     }
+                  }
+               }
+            }
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Checks if the given {@link SourceElement} is a do while loop.
+    * @param node The {@link Node} to check.
+    * @param statement The actual statement ({@link SourceElement}).
+    * @return {@code true} is do while loop, {@code false} is something else.
+    */
+   public static boolean isDoWhileLoopCondition(Node node, SourceElement statement) {
+      return statement instanceof Do;
+   }
+   
+   /**
+    * Checks if the given {@link SourceElement} is a for loop.
+    * @param node The {@link Node} to check.
+    * @param statement The actual statement ({@link SourceElement}).
+    * @return {@code true} is for loop, {@code false} is something else.
+    */
+   public static boolean isForLoopCondition(Node node, SourceElement statement) {
+      return statement instanceof For;
    }
 
    /**

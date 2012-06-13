@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
@@ -16,14 +15,8 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.statement.Catch;
-import de.uka.ilkd.key.java.statement.Do;
-import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -50,8 +43,6 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.po.SymbolicExecutionFunctionalOperationContractPO;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
-import de.uka.ilkd.key.symbolic_execution.util.EqualsHashCodeResetter;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.NodePreorderIterator;
@@ -150,22 +141,6 @@ public class SymbolicExecutionTreeBuilder {
    private Map<Node, ExecutionBranchCondition> keyNodeBranchConditionMapping = new HashMap<Node, ExecutionBranchCondition>();
    
    /**
-    * <p>
-    * Maps the loop expression to the initial loop statement which contains
-    * the source code location. The repeated loop statements in KeY's proof
-    * tree have no source locations.
-    * </p>
-    * <p>
-    * The trick is that the repeated loop have exactly the same object
-    * as loop expression. This means reference equality. But {@link Object#equals(Object)}
-    * and {@link Object#hashCode()} is overwritten in {@link Expression}s. Which
-    * leads to wrongly found loops if the expression is equal. For this reason
-    * is an {@link EqualsHashCodeResetter} used.
-    * </p>
-    */
-   private Map<EqualsHashCodeResetter<Expression>, LoopStatement> loopExpressionToLoopStatementMapping = new HashMap<EqualsHashCodeResetter<Expression>, LoopStatement>();
-   
-   /**
     * Represents the method call stack of the current branch in KeY's proof tree.
     */
    private LinkedList<Node> methodCallStack = new LinkedList<Node>();
@@ -243,10 +218,6 @@ public class SymbolicExecutionTreeBuilder {
       if (keyNodeBranchConditionMapping != null) {
          keyNodeBranchConditionMapping.clear();
          keyNodeBranchConditionMapping = null;
-      }
-      if (loopExpressionToLoopStatementMapping != null) {
-         loopExpressionToLoopStatementMapping.clear();
-         loopExpressionToLoopStatementMapping = null;
       }
       if (methodCallStack!= null) {
          methodCallStack.clear();
@@ -409,7 +380,7 @@ public class SymbolicExecutionTreeBuilder {
          NodeInfo info = node.getNodeInfo();
          SourceElement statement = info.getActiveStatement();
          // Update call stack
-         updateCallStack(node, statement);
+         SymbolicExecutionUtil.temporaryUpdateCallStack(methodCallStack, node, statement);
          // Check if the node is already contained in the symbolic execution tree
          AbstractExecutionNode executionNode = keyNodeMapping.get(node);
          if (executionNode == null) {
@@ -428,20 +399,9 @@ public class SymbolicExecutionTreeBuilder {
          }
          // Check if loop condition is available
          if (SymbolicExecutionUtil.hasLoopCondition(node, node.getAppliedRuleApp(), statement)) {
-            // Get the original loop statement
-            LoopStatement loop = (LoopStatement)statement;
-            Expression expression = loop.getGuardExpression();
-            EqualsHashCodeResetter<Expression> resetter = new EqualsHashCodeResetter<Expression>(expression);
-            LoopStatement originalStatement = loopExpressionToLoopStatementMapping.get(resetter);
-            if (originalStatement == null) {
-               loopExpressionToLoopStatementMapping.put(resetter, loop);
-            }
-            else {
-               loop = originalStatement;
-            }
-            if (loop.getPositionInfo() != PositionInfo.UNDEFINED &&
-                !isDoWhileLoopCondition(node, statement) && 
-                !isForLoopCondition(node, statement)) { // do while and for loops exists only in the first iteration where the loop condition is not evaluated. They are transfered into while loops in later proof nodes. 
+            if (((LoopStatement)statement).getGuardExpression().getPositionInfo() != PositionInfo.UNDEFINED &
+                !SymbolicExecutionUtil.isDoWhileLoopCondition(node, statement) && 
+                !SymbolicExecutionUtil.isForLoopCondition(node, statement)) { // do while and for loops exists only in the first iteration where the loop condition is not evaluated. They are transfered into while loops in later proof nodes. 
                ExecutionLoopCondition condition = keyNodeLoopConditionMapping.get(node);
                if (condition == null) {
                   condition = new ExecutionLoopCondition(node);
@@ -453,24 +413,6 @@ public class SymbolicExecutionTreeBuilder {
          }
       }
       return parentToAddTo;
-   }
-   
-   /**
-    * Updates the call stack ({@link #methodCallStack}) if the given {@link Node}
-    * in KeY's proof tree is a method call.
-    * @param node The current {@link Node} in the proof tree of KeY.
-    * @param statement The statement ({@link SourceElement}).
-    */
-   protected void updateCallStack(Node node, SourceElement statement) {
-      if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement, true)) {
-         // Remove outdated methods from call stack
-         int currentLevel = computeStackSize(node);
-         while (methodCallStack.size() > currentLevel) {
-            methodCallStack.removeLast();
-         }
-         // Add new node to call stack.
-         methodCallStack.addLast(node);
-      }
    }
 
    /**
@@ -495,7 +437,7 @@ public class SymbolicExecutionTreeBuilder {
          }
          else if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
             // Find the Node in the proof tree of KeY for that this Node is the return
-            Node callNode = findMethodCallNode(node);
+            Node callNode = SymbolicExecutionUtil.temporaryFindMethodCallNode(methodCallStack, node, node.getAppliedRuleApp());
             if (callNode != null) {
                // Find the call Node representation in SED, if not available ignore it.
                IExecutionNode callSEDNode = keyNodeMapping.get(callNode);
@@ -527,7 +469,7 @@ public class SymbolicExecutionTreeBuilder {
     * @return {@code true} is in implicit method, {@code false} is not in implicit method.
     */
    protected boolean isInImplicitMethod(Node node) {
-      Node callNode = findMethodCallNode(node);
+      Node callNode = SymbolicExecutionUtil.temporaryFindMethodCallNode(methodCallStack, node, node.getAppliedRuleApp());
       if (callNode != null) {
          NodeInfo callInfo = callNode.getNodeInfo();
          SourceElement callStatement = callInfo.getActiveStatement();
@@ -576,79 +518,6 @@ public class SymbolicExecutionTreeBuilder {
          node = node.parent();
       }
       return node;
-   }
-   
-   /**
-    * Checks if the given {@link SourceElement} is a do while loop.
-    * @param node The {@link Node} to check.
-    * @param statement The actual statement ({@link SourceElement}).
-    * @return {@code true} is do while loop, {@code false} is something else.
-    */
-   protected boolean isDoWhileLoopCondition(Node node, SourceElement statement) {
-      return statement instanceof Do;
-   }
-   
-   /**
-    * Checks if the given {@link SourceElement} is a for loop.
-    * @param node The {@link Node} to check.
-    * @param statement The actual statement ({@link SourceElement}).
-    * @return {@code true} is for loop, {@code false} is something else.
-    */
-   protected boolean isForLoopCondition(Node node, SourceElement statement) {
-      return statement instanceof For;
-   }
-   
-   /**
-    * Finds the {@link Node} in the proof tree of KeY which has called the
-    * method that is now executed or returned in the {@link Node}.
-    * @param currentNode The {@link Node} for that the method call {@link Node} is needed.
-    * @return The found call {@link Node} or {@code null} if no one was found.
-    */
-   protected Node findMethodCallNode(Node currentNode) {
-      // Compute the stack frame size before the method is called
-      final int returnStackSize = computeStackSize(currentNode) - 1;
-      // Return the method from the call stack
-      if (returnStackSize >= 0) {
-         return methodCallStack.get(returnStackSize);
-      }
-      else {
-         return null;
-      }
-   }
-
-   /**
-    * Compute the stack size of the given {@link Node} in the proof tree of KeY.
-    * @param node The {@link Node} to compute stack size for.
-    * @return The stack size.
-    */
-   protected int computeStackSize(Node node) {
-      int result = 0;
-      if (node != null && node.getAppliedRuleApp() != null) {
-         PosInOccurrence posInOc = node.getAppliedRuleApp().posInOccurrence();
-         if (posInOc != null && posInOc.constrainedFormula() != null) {
-            Term term = posInOc.constrainedFormula().formula();
-            if (term != null && term.subs().size() == 2) {
-               Term sub = term.sub(1);
-               if (sub != null) {
-                  JavaBlock block = sub.javaBlock();
-                  if (block != null) {
-                     JavaProgramElement element = block.program();
-                     if (element instanceof StatementBlock) {
-                        StatementBlock b = (StatementBlock)block.program();
-                        ImmutableArray<ProgramPrefix> prefix = b.getPrefixElements();
-                        result = JavaUtil.count(prefix, new IFilter<ProgramPrefix>() {
-                           @Override
-                           public boolean select(ProgramPrefix element) {
-                              return element instanceof MethodFrame;
-                           }
-                        });
-                     }
-                  }
-               }
-            }
-         }
-      }
-      return result;
    }
    
    /**
