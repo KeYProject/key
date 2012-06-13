@@ -10,10 +10,12 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
@@ -77,6 +79,12 @@ public class ContractRuleApp extends AbstractContractRuleApp {
         super.setMutable(ifInsts);
         return this;
         //return new ContractRuleApp(builtInRule, pio, ifInsts, instantiation);
+    }
+
+    @Override
+    public List<LocationVariable> getHeapContext() {
+      // TODO
+      return null;
     }
 
 }

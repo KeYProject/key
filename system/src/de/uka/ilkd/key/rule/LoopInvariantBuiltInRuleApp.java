@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
@@ -33,27 +34,22 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private final LoopInvariant inv;
 
-    private final HeapContext heapContext;
+    private final List<LocationVariable> heapContext;
 
     public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pos) {
-        this(rule, pos, null, null);
+        this(rule, pos, null, null, null);
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
-            LoopInvariant inv) {
+            LoopInvariant inv, List<LocationVariable> heapContext) {
         super(rule, pio, ifInsts);
         assert pio != null;
         this.loop = (While) MiscTools.getActiveStatement(programTerm()
                 .javaBlock());
         assert loop != null;
         this.inv = instantiateIndex(inv);
-        Modality m = (Modality)programTerm().op();
-        if(m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION) {
-          heapContext = HeapContext.LOOP_TR_HC;
-        }else{
-          heapContext = HeapContext.LOOP_HC;
-        }
+        this.heapContext = heapContext;
     }
     
     private LoopInvariant instantiateIndex(LoopInvariant rawInv){
@@ -128,7 +124,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio, LoopInvariant inv) {
-        this(rule, pio, null, inv);
+        this(rule, pio, null, inv, null);
 
     }
 
@@ -173,7 +169,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public LoopInvariantBuiltInRuleApp replacePos(PosInOccurrence newPos) {
-        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv);
+        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv, heapContext);
     }
 
     public LoopInvariant retrieveLoopInvariantFromSpecification(
@@ -192,7 +188,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopInvariant inv) {
-        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv);
+        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext);
     }
 
     @Override
@@ -204,8 +200,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         if (inv == null) {
             return this;
         }
-
-        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv);
+        Modality m = (Modality)programTerm().op();
+        HeapContext hc = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION) ? HeapContext.LOOP_TR_HC : HeapContext.LOOP_HC; 
+        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, hc.getModHeaps(goal.proof().getServices()));
     }
 
     public boolean variantAvailable() {
@@ -215,5 +212,10 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     public boolean variantRequired() {
         return ((Modality) programTerm().op()).terminationSensitive();
     }
+
+    @Override
+    public List<LocationVariable> getHeapContext() {
+      return heapContext;
+    }   
 
 }

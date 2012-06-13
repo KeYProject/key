@@ -94,6 +94,4 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public void visit(Visitor v);
 
-    public HeapContext getHeapContext(boolean transaction);
-
 }

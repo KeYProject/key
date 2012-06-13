@@ -9,6 +9,7 @@
 //
 package de.uka.ilkd.key.proof.init;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Iterator;
@@ -61,7 +62,7 @@ public class FunctionalOperationContractPO
      */
     private Term buildFreePre(ProgramVariable selfVar,
                               KeYJavaType selfKJT,
-                              ImmutableList<ProgramVariable> paramVars)
+                              ImmutableList<ProgramVariable> paramVars, List<LocationVariable> heaps)
             throws ProofInputException {
         //"self != null"
         final Term selfNotNull = generateSelfNotNull(selfVar);
@@ -79,23 +80,22 @@ public class FunctionalOperationContractPO
 
         //initial value of measured_by clause
         final Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars);
-
-        if(getContract().transactionContract()) {
-          return TB.and(new Term[]{TB.wellFormed(getBaseHeap(), services), 
-                                   TB.wellFormed(getSavedHeap(), services),
-                                   selfNotNull,
-                                   selfCreated,
-                                   selfExactType,
-                                   paramsOK,
-                                   mbyAtPreDef});
-        }else{
-          return TB.and(new Term[]{TB.wellFormed(getBaseHeap(), services), 
-                                   selfNotNull,
-                                   selfCreated,
-                                   selfExactType,
-                                   paramsOK,
-                                   mbyAtPreDef});
+        Term wellFormed = null;
+        for(LocationVariable heap : heaps) {
+           final Term wf = TB.wellFormed(heap, services);
+           if(wellFormed == null){
+             wellFormed = wf;
+           }else{
+             wellFormed = TB.and(wellFormed, wf);
+           }
         }
+
+        return TB.and(new Term[]{wellFormed, 
+                                 selfNotNull,
+                                 selfCreated,
+                                 selfExactType,
+                                 paramsOK,
+                                 mbyAtPreDef});
     }
 
 
@@ -103,7 +103,8 @@ public class FunctionalOperationContractPO
             ImmutableList<LocationVariable> formalParVars,
             ProgramVariable selfVar,
             ProgramVariable resultVar,
-            ProgramVariable exceptionVar) {
+            ProgramVariable exceptionVar,
+            boolean transaction) {
         //create method call
         final ImmutableArray<Expression> formalArray = new ImmutableArray<Expression>(formalParVars.toArray(
                 new ProgramVariable[formalParVars.size()]));
@@ -147,7 +148,7 @@ public class FunctionalOperationContractPO
                                           new StatementBlock(assignStat));
         final Try tryStat = new Try(sb, new Branch[]{catchStat});
         final StatementBlock sb2 = new StatementBlock(
-           getContract().transactionContract() ? 
+           transaction ? 
                 new Statement[]{
                         new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.BEGIN),
                         nullStat, tryStat,
@@ -184,7 +185,7 @@ public class FunctionalOperationContractPO
         final JavaBlock jb = buildJavaBlock(formalParamVars,
                                             selfVar,
                                             resultVar,
-                                            exceptionVar);
+                                            exceptionVar, atPreVars.keySet().contains(getSavedHeap()));
 
         //create program term
         final Term programTerm = TB.prog(getContract().getPOModality(), jb,
@@ -216,7 +217,6 @@ public class FunctionalOperationContractPO
         return services.getTypeConverter().getHeapLDT().getHeap();
     }
 
-
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------        
@@ -224,87 +224,100 @@ public class FunctionalOperationContractPO
     public void readProblem()
             throws ProofInputException {
         final ProgramMethod pm = getContract().getTarget();
-        final HeapContext hc = getContract().getHeapContext();
 
-        //prepare variables, program method, heapAtPre
-        final ImmutableList<ProgramVariable> paramVars = TB.paramVars(services,
-                                                                      pm, true);
-        final ProgramVariable selfVar = TB.selfVar(services, pm,
-                                                   contract.getKJT(), true);
-        final ProgramVariable resultVar = TB.resultVar(services, pm, true);
-        final ProgramVariable exceptionVar = TB.excVar(services, pm, true);
-       
-        final Map<LocationVariable,LocationVariable> atPreVars = hc.getBeforeAtPreVars(services, "AtPre");
+        // true means two po-s have to be generated
+        final boolean transaction = getContract().transactionContract();
 
-        final List<LocationVariable> modHeaps = hc.getModHeaps(services);
-        final Map<LocationVariable,Map<Term,Term>> heapToAtPre = new LinkedHashMap<LocationVariable,Map<Term,Term>>();
+        final HeapContext[] heapContexts;
+        if(transaction) {
+          heapContexts = new HeapContext[]{ HeapContext.METHOD_CONTRACT_HC, HeapContext.METHOD_CONTRACT_TR_HC};
+        }else{
+          heapContexts = new HeapContext[]{ HeapContext.METHOD_CONTRACT_HC};
+        }
+        final List<Term> termPOs = new ArrayList<Term>();
         
-        for(LocationVariable heap : modHeaps) {
-           heapToAtPre.put(heap, new HashMap<Term, Term>());
-           heapToAtPre.get(heap).put(TB.var(heap), TB.var(atPreVars.get(heap)));
-        }
+        for(HeapContext hc : heapContexts) {
 
-        // FIXME check this again!?
-        if(modHeaps.contains(getSavedHeap())) {
-           heapToAtPre.get(getSavedHeap()).put(TB.getBaseHeap(services), TB.var(atPreVars.get(getSavedHeap())));
-        }
+          //prepare variables, program method, heapAtPre
+          final ImmutableList<ProgramVariable> paramVars = TB.paramVars(services,
+                                                                      pm, true);
+          final ProgramVariable selfVar = TB.selfVar(services, pm,
+                                                     contract.getKJT(), true);
+          final ProgramVariable resultVar = TB.resultVar(services, pm, true);
+          final ProgramVariable exceptionVar = TB.excVar(services, pm, true);
+       
+          final Map<LocationVariable,LocationVariable> atPreVars = hc.getBeforeAtPreVars(services, "AtPre");
 
-        //register the variables so they are declared in proof header 
-        //if the proof is saved to a file
-        register(paramVars);
-        register(selfVar);
-        register(resultVar);
-        register(exceptionVar);
-        for(LocationVariable lv : atPreVars.values()) {
-          register(lv);
-        }
+          final List<LocationVariable> modHeaps = hc.getModHeaps(services);
+          final Map<LocationVariable,Map<Term,Term>> heapToAtPre = new LinkedHashMap<LocationVariable,Map<Term,Term>>();
+        
+          for(LocationVariable heap : modHeaps) {
+             heapToAtPre.put(heap, new HashMap<Term, Term>());
+             heapToAtPre.get(heap).put(TB.var(heap), TB.var(atPreVars.get(heap)));
+          }
 
-        //build precondition
-        final Term pre = TB.and(buildFreePre(selfVar,
-                                             contract.getKJT(),
-                                             paramVars),
-                                contract.getPre(selfVar, paramVars, atPreVars, services));
+          // FIXME check this again!?
+          if(modHeaps.contains(getSavedHeap())) {
+             heapToAtPre.get(getSavedHeap()).put(TB.getBaseHeap(services), TB.var(atPreVars.get(getSavedHeap())));
+          }
 
-        //build program term
-        final Term postTerm = getContract().getPost(selfVar,
-                                                    paramVars,
-                                                    resultVar,
-                                                    exceptionVar,
-                                                    atPreVars,
-                                                    services);
-        Term frameTerm = null;
-        for(LocationVariable heap : modHeaps) {
-           final Term ft;
-           if(!getContract().hasModifiesClause() && heap == getBaseHeap()) {
-             // strictly pure have a different contract.
-             ft = TB.frameStrictlyEmpty(services, TB.var(heap), heapToAtPre.get(heap));
-           }else{
-             ft = TB.frame(services, TB.var(heap),
+          //register the variables so they are declared in proof header 
+          //if the proof is saved to a file
+          register(paramVars);
+          register(selfVar);
+          register(resultVar);
+          register(exceptionVar);
+          for(LocationVariable lv : atPreVars.values()) {
+            register(lv);
+          }
+
+          //build precondition
+          final Term pre = TB.and(buildFreePre(selfVar,
+                                               contract.getKJT(),
+                                               paramVars, modHeaps),
+                                  contract.getPre(selfVar, paramVars, atPreVars, services));
+
+          //build program term
+          final Term postTerm = getContract().getPost(selfVar,
+                                                      paramVars,
+                                                      resultVar,
+                                                      exceptionVar,
+                                                      atPreVars,
+                                                      services);
+          Term frameTerm = null;
+          for(LocationVariable heap : modHeaps) {
+             final Term ft;
+             if(!getContract().hasModifiesClause() && heap == getBaseHeap()) {
+               // strictly pure have a different contract.
+               ft = TB.frameStrictlyEmpty(services, TB.var(heap), heapToAtPre.get(heap));
+             }else{
+               ft = TB.frame(services, TB.var(heap),
                     heapToAtPre.get(heap), getContract().getMod(heap, selfVar,
                             paramVars, services));
-           }
-           if(frameTerm == null) {
-             frameTerm = ft;
-           }else{
-             frameTerm = TB.and(frameTerm, ft);
-           }
+             }
+             if(frameTerm == null) {
+               frameTerm = ft;
+             }else{
+               frameTerm = TB.and(frameTerm, ft);
+             }
+          }
+        
+        
+          final Term post = TB.and(postTerm, frameTerm);
+          final Term progPost = buildProgramTerm(paramVars,
+                                                 selfVar,
+                                                 resultVar,
+                                                 exceptionVar,
+                                                 atPreVars,
+                                                 post);
+          termPOs.add(TB.imp(pre, progPost));
+          hc.reset();
         }
-        
-        
-        final Term post = TB.and(postTerm, frameTerm);
-        final Term progPost = buildProgramTerm(paramVars,
-                                               selfVar,
-                                               resultVar,
-                                               exceptionVar,
-                                               atPreVars,
-                                               post);
-
         //save in field
-        assignPOTerms(TB.imp(pre, progPost));
+        assignPOTerms(termPOs.toArray(new Term[0]));
 
         //add axioms
         collectClassAxioms(contract.getKJT());
-        hc.reset();
     }
 
 

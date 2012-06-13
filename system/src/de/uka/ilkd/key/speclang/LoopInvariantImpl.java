@@ -253,14 +253,6 @@ public final class LoopInvariantImpl implements LoopInvariant {
         v.performActionOnLoopInvariant(this);
     }
     
-    public HeapContext getHeapContext(boolean transaction) {
-      if(transaction) {
-         return HeapContext.LOOP_TR_HC;
-      }else{
-         return HeapContext.LOOP_HC;
-      }
-    }
-    
     @Override
     public String toString() {
         return "invariants: " 
