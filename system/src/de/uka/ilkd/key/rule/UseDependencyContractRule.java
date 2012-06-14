@@ -477,7 +477,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
 					       		paramTerm, 
 					       		target.getParamType(i++)));
 	}
-        final Term pre = contract.getPre(subStep,
+        final Term pre = contract.getPre(services.getTypeConverter().getHeapLDT().getHeap(),
+                                         subStep,
         	                         selfTerm, 
         	                         paramTerms,
                                          null, 

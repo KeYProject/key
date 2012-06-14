@@ -562,12 +562,14 @@ public final class UseOperationContractRule implements BuiltInRule {
         	= inst.pm.isConstructor() || resultVar == null 
         	  ? null 
                   : TB.var(resultVar);
-        final Term pre  = contract.getPre(TB.getBaseHeap(services), 
+        final Term pre  = contract.getPre(heapContext,
+                                          TB.getBaseHeap(services), 
         				  contractSelf, 
         				  contractParams,
                                           atPres,
         				  services);
-        final Term post = contract.getPost(TB.getBaseHeap(services),
+        final Term post = contract.getPost(heapContext,
+                                           TB.getBaseHeap(services),
         	                               contractSelf, 
         				                   contractParams, 
                                            contractResult, 

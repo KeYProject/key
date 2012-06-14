@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -144,7 +145,8 @@ public final class DependencyContractImpl implements DependencyContract {
     
     
     @Override
-    public Term getPre(ProgramVariable selfVar, 
+    public Term getPre(LocationVariable heap,
+                       ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable, ? extends ProgramVariable> atPreVars,
 	    	       Services services) {
@@ -163,10 +165,28 @@ public final class DependencyContractImpl implements DependencyContract {
 	OpReplacer or = new OpReplacer(map);
 	return or.replace(originalPre);
     }
+
+    public Term getPre(List<LocationVariable> heapContext,
+                       ProgramVariable selfVar, 
+	    	       ImmutableList<ProgramVariable> paramVars,
+                       Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+	    	       Services services) {
+       Term result = null;
+       for(LocationVariable heap : heapContext) {
+          final Term p = getPre(heap, selfVar, paramVars, atPreVars, services);
+          if(result == null) {
+            result = p;
+          }else{
+            result = TB.and(result, p);
+          }
+       }
+       return result;
+    }
     
     
     @Override
-    public Term getPre(Term heapTerm,
+    public Term getPre(LocationVariable heap,
+                       Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
@@ -189,7 +209,24 @@ public final class DependencyContractImpl implements DependencyContract {
 	return or.replace(originalPre);
     }
     
-    
+
+    public Term getPre(List<LocationVariable> heapContext,
+                       Term heapTerm,
+	               Term selfTerm, 
+	    	       ImmutableList<Term> paramTerms,
+                       Map<LocationVariable,Term> atPres,
+	    	       Services services) {
+       Term result = null;
+       for(LocationVariable heap : heapContext) {
+          final Term p = getPre(heap, heapTerm, selfTerm, paramTerms, atPres, services);
+          if(result == null) {
+            result = p;
+          }else{
+            result = TB.and(result, p);
+          }
+       }
+       return result;
+    }
 
     @Override
     public Term getMby(ProgramVariable selfVar,

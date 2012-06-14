@@ -273,10 +273,11 @@ public class FunctionalOperationContractPO
           final Term pre = TB.and(buildFreePre(selfVar,
                                                contract.getKJT(),
                                                paramVars, modHeaps),
-                                  contract.getPre(selfVar, paramVars, atPreVars, services));
+                                  contract.getPre(modHeaps, selfVar, paramVars, atPreVars, services));
 
           //build program term
-          final Term postTerm = getContract().getPost(selfVar,
+          final Term postTerm = getContract().getPost(modHeaps,
+                                                      selfVar,
                                                       paramVars,
                                                       resultVar,
                                                       exceptionVar,

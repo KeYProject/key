@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -51,7 +52,14 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns the precondition of the contract.
      */
-    public Term getPre(ProgramVariable selfVar, 
+    public Term getPre(LocationVariable heap,
+                       ProgramVariable selfVar, 
+	    	       ImmutableList<ProgramVariable> paramVars,
+                       Map<LocationVariable,? extends ProgramVariable> atPreVars,
+	    	       Services services);
+
+    public Term getPre(List<LocationVariable> heapContext,
+                       ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable,? extends ProgramVariable> atPreVars,
 	    	       Services services);
@@ -59,7 +67,15 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns the precondition of the contract.
      */
-    public Term getPre(Term heapTerm,
+    public Term getPre(LocationVariable heap,
+                       Term heapTerm,
+	               Term selfTerm, 
+	    	       ImmutableList<Term> paramTerms,
+                       Map<LocationVariable,Term> atPres,
+	    	       Services services);    
+
+    public Term getPre(List<LocationVariable> heapContext,
+                       Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
