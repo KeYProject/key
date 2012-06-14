@@ -59,11 +59,11 @@ public final class LoopInvariantImpl implements LoopInvariant {
         //assert modifies != null;
         //assert heapAtPre != null;
         this.loop                       = loop;
-        this.originalInvariants         = invariants;
+        this.originalInvariants         = invariants == null ? new LinkedHashMap<LocationVariable,Term>() : invariants;
         this.originalVariant            = variant;
-        this.originalModifies           = modifies;
+        this.originalModifies           = modifies == null ? new LinkedHashMap<LocationVariable,Term>() : modifies;
         this.originalSelfTerm           = selfTerm;   
-        this.originalAtPres             = atPres;
+        this.originalAtPres             = atPres == null ? new LinkedHashMap<LocationVariable,Term>() : atPres;
     }
 
 /*
