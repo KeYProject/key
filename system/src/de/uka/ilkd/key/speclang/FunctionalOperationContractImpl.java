@@ -789,14 +789,6 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         return transaction;
     }
 
-    public HeapContext getHeapContext() {
-      if(transaction) {
-        return HeapContext.METHOD_CONTRACT_TR_HC;
-      }else{
-        return HeapContext.METHOD_CONTRACT_HC;
-      }
-    }
-
     @Override
     public FunctionalOperationContract setID(int newId) {
         return new FunctionalOperationContractImpl(baseName,

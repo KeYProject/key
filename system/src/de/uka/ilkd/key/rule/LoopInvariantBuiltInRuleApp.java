@@ -196,8 +196,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         }
         final LoopInvariant inv = retrieveLoopInvariantFromSpecification(goal.proof().getServices());
         Modality m = (Modality)programTerm().op();
-        HeapContext hc = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION) ? HeapContext.LOOP_TR_HC : HeapContext.LOOP_HC; 
-        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, hc.getModHeaps(goal.proof().getServices()));
+        boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION); 
+        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, HeapContext.getModHeaps(goal.proof().getServices(), transaction));
     }
 
     public boolean variantAvailable() {

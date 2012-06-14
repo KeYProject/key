@@ -225,18 +225,16 @@ public class FunctionalOperationContractPO
             throws ProofInputException {
         final ProgramMethod pm = getContract().getTarget();
 
-        // true means two po-s have to be generated
-        final boolean transaction = getContract().transactionContract();
+        final boolean[] transactionFlags;
 
-        final HeapContext[] heapContexts;
-        if(transaction) {
-          heapContexts = new HeapContext[]{ HeapContext.METHOD_CONTRACT_HC, HeapContext.METHOD_CONTRACT_TR_HC};
+        if(getContract().transactionContract()) {
+          transactionFlags = new boolean[]{ false, true };
         }else{
-          heapContexts = new HeapContext[]{ HeapContext.METHOD_CONTRACT_HC};
+          transactionFlags = new boolean[]{ false };
         }
         final List<Term> termPOs = new ArrayList<Term>();
         
-        for(HeapContext hc : heapContexts) {
+        for(boolean transactionFlag : transactionFlags) {
 
           //prepare variables, program method, heapAtPre
           final ImmutableList<ProgramVariable> paramVars = TB.paramVars(services,
@@ -246,9 +244,9 @@ public class FunctionalOperationContractPO
           final ProgramVariable resultVar = TB.resultVar(services, pm, true);
           final ProgramVariable exceptionVar = TB.excVar(services, pm, true);
        
-          final Map<LocationVariable,LocationVariable> atPreVars = hc.getBeforeAtPreVars(services, "AtPre");
+          final List<LocationVariable> modHeaps = HeapContext.getModHeaps(services, transactionFlag);        
+          final Map<LocationVariable,LocationVariable> atPreVars = HeapContext.getBeforeAtPreVars(modHeaps, services, "AtPre");
 
-          final List<LocationVariable> modHeaps = hc.getModHeaps(services);
           final Map<LocationVariable,Map<Term,Term>> heapToAtPre = new LinkedHashMap<LocationVariable,Map<Term,Term>>();
         
           for(LocationVariable heap : modHeaps) {
@@ -311,7 +309,6 @@ public class FunctionalOperationContractPO
                                                  atPreVars,
                                                  post);
           termPOs.add(TB.imp(pre, progPost));
-          hc.reset();
         }
         //save in field
         assignPOTerms(termPOs.toArray(new Term[0]));

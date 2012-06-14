@@ -518,17 +518,19 @@ public final class UseOperationContractRule implements BuiltInRule {
                 .getInstantiation(); 
         assert contract.getTarget().equals(inst.pm);
 
-        final HeapContext hc = contract.getHeapContext();
+        Modality md = (Modality)MiscTools.goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
+        boolean transaction = (md == Modality.DIA_TRANSACTION || md == Modality.BOX_TRANSACTION); 
+        final List<LocationVariable> heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
 
 	//prepare heapBefore_method
 
-        Map<LocationVariable,LocationVariable> atPreVars = hc.getBeforeAtPreVars(services, "Before_"+inst.pm.getName());
+        Map<LocationVariable,LocationVariable> atPreVars = HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
         for(LocationVariable v : atPreVars.values()) {
      	  goal.addProgramVariable(v);
         }
 
 
-        Map<LocationVariable,Term> atPres = hc.getAtPres(services);
+        Map<LocationVariable,Term> atPres = HeapContext.getAtPres(atPreVars, services);
 
         //create variables for result and exception
         final ProgramVariable resultVar 
@@ -573,10 +575,9 @@ public final class UseOperationContractRule implements BuiltInRule {
                                            atPres,
                                            services);
 
-        final List<LocationVariable> modHeaps = hc.getModHeaps(services);
         final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
 
-        for(LocationVariable heap : modHeaps) {
+        for(LocationVariable heap : heapContext) {
            final Term m = contract.getMod(heap, TB.var(heap),
                 contractSelf,contractParams, services);
            mods.put(heap, m);
@@ -623,7 +624,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         Term atPreUpdates = null;
         Term reachableState = null;
 
-        for(LocationVariable heap : modHeaps) {
+        for(LocationVariable heap : heapContext) {
            final Triple<Term,Term,Term> tAnon;
            // TODO probably the special case still needs fixing (later)
            if(heap == baseHeap && !contract.hasModifiesClause()) {
@@ -772,7 +773,6 @@ public final class UseOperationContractRule implements BuiltInRule {
             	= (ComplexRuleJustificationBySpec)
             	    goal.proof().env().getJustifInfo().getJustification(this);
         cjust.add(ruleApp, just);
-        hc.reset();
         return result;
     }
     
