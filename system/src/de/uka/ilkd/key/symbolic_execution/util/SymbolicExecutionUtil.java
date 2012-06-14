@@ -977,4 +977,30 @@ public final class SymbolicExecutionUtil {
       }
       return result;
    }
+
+   /**
+    * Searches for the given {@link Node} the parent node
+    * which also represents a symbolic execution tree node
+    * (checked via {@link #isSymbolicExecutionTreeNode(Node, RuleApp)}).
+    * @param node The {@link Node} to start search in.
+    * @return The parent {@link Node} of the given {@link Node} which is also a set node or {@code null} if no parent node was found.
+    */
+   public static Node findParentSetNode(Node node) {
+      if (node != null) {
+         Node parent = node.parent();
+         Node result = null;
+         while (parent != null && result == null) {
+            if (isSymbolicExecutionTreeNode(parent, parent.getAppliedRuleApp())) {
+               result = parent;
+            }
+            else {
+               parent = parent.parent();
+            }
+         }
+         return result;
+      }
+      else {
+         return null;
+      }
+   }
 }
