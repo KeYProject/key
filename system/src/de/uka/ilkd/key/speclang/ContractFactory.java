@@ -317,16 +317,16 @@ public class ContractFactory {
                   mby = tb.ife(otherPre, otherMby, mby);
                 }
               }
-
-              pres.put(h,tb.or(pres.get(h), otherPre));
-              posts.put(h,tb.and(posts.get(h), tb.imp(atPreify(otherPre, 
-                                  t.originalAtPreVars), 
-                                  otherPost)));
+              if(otherPre != null) {
+                pres.put(h,pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
+              }
+              if(otherPost != null) {
+                final Term oPost = tb.imp(atPreify(otherPre, t.originalAtPreVars), otherPost);
+                posts.put(h, posts.get(h) == null ? oPost : tb.and(posts.get(h), oPost));
+              }
             }
 
             boolean otherHasMod = other.hasModifiesClause();
-            
-            
             
             if(!hasMod && !otherHasMod) {
                 // both contracts are strictly pure
