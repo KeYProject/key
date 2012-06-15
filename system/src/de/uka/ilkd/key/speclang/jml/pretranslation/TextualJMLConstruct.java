@@ -49,7 +49,7 @@ public abstract class TextualJMLConstruct {
 
     protected void addGeneric(Map<String, ImmutableList<PositionedString>> item, PositionedString ps) {
         String t = ps.text;
-        if(!t.startsWith("<")) {
+        if(!t.startsWith("<") || t.startsWith("<inv>")) {
            ImmutableList<PositionedString> l = item.get(HeapLDT.BASE_HEAP_NAME.toString());
            l = l.append(ps);
            item.put(HeapLDT.BASE_HEAP_NAME.toString(), l);
