@@ -37,7 +37,6 @@ public class LoopInvariantRuleCompletion implements
         final While loop = loopApp.getLoopStatement();
 
         LoopInvariant inv = loopApp.getInvariant();
-        // final boolean isTransaction = ((Modality)loopApp.programTerm().op()).transaction();
         if (inv == null) { // no invariant present, get it interactively
             inv = new LoopInvariantImpl(loop,
                     JavaTools.getInnermostMethodFrame(progPost.javaBlock(),

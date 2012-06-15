@@ -517,7 +517,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                 .getInstantiation(); 
         assert contract.getTarget().equals(inst.pm);
 
-        Modality md = (Modality)MiscTools.goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
+        Modality md = (Modality)TermBuilder.DF.goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
         boolean transaction = (md == Modality.DIA_TRANSACTION || md == Modality.BOX_TRANSACTION); 
         final List<LocationVariable> heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
 

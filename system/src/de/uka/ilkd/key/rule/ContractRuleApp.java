@@ -18,12 +18,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.util.MiscTools;
 
 
 /**
@@ -97,7 +97,7 @@ public class ContractRuleApp extends AbstractContractRuleApp {
 
     public Term programTerm() {
         if (posInOccurrence() != null) {
-            return MiscTools.goBelowUpdates(posInOccurrence().subTerm());
+            return TermBuilder.DF.goBelowUpdates(posInOccurrence().subTerm());
         }
         return null;
     }
