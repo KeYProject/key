@@ -229,11 +229,12 @@ public class FunctionalOperationContractPO
 
         if(getContract().transactionContract()) {
           transactionFlags = new boolean[]{ false, true };
+          poNames = new String[2];
         }else{
           transactionFlags = new boolean[]{ false };
         }
         final List<Term> termPOs = new ArrayList<Term>();
-        
+        int nameIndex = 0;
         for(boolean transactionFlag : transactionFlags) {
 
           //prepare variables, program method, heapAtPre
@@ -310,6 +311,10 @@ public class FunctionalOperationContractPO
                                                  atPreVars,
                                                  post);
           termPOs.add(TB.imp(pre, progPost));
+          if(poNames != null) {
+            poNames[nameIndex++] = getContract().getName()+"."+
+              (transactionFlag ? "transaction_active" : "transaction_inactive");
+          }
         }
         //save in field
         assignPOTerms(termPOs.toArray(new Term[0]));
