@@ -268,7 +268,7 @@ options {
     private Term convertToBackup(Term term) {
 	assert atPres != null && atPres.get(getSavedHeap()) != null;
 	Map map = new LinkedHashMap();
-	map.put(TB.var(getSavedHeap()), TB.var(getSavedHeap()));
+	map.put(TB.var(getBaseHeap()), TB.var(getSavedHeap()));
         if(atPres.get(getBaseHeap()) != null) {
 	  map.put(atPres.get(getBaseHeap()), atPres.get(getSavedHeap()));
         }

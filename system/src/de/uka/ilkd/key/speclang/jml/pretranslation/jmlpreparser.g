@@ -517,7 +517,7 @@ requires_clause
 	returns [PositionedString result = null] 
 	throws SLTranslationException
 :
-    requires_keyword result=expression { result = result.prepend("requires "); }
+    requires_keyword result=expression { result = flipHeaps("requires", result); }
 ;
 
 
@@ -672,7 +672,7 @@ ensures_clause
 	returns [PositionedString result = null] 
 	throws SLTranslationException
 :
-    ensures_keyword result=expression { result = result.prepend("ensures "); }
+    ensures_keyword result=expression { result = flipHeaps("ensures", result); }
 ;
 
 
