@@ -276,6 +276,12 @@ public final class DLSpecFactory {
         Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
         mods.put(heapLDT.getHeap(), modifies);
 
+        Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable,Term>();
+        pres.put(heapLDT.getHeap(), pre);
+
+        Map<LocationVariable,Term> posts = new LinkedHashMap<LocationVariable,Term>();
+        posts.put(heapLDT.getHeap(), post);
+      
 	//result variable may be omitted
 	if(resultVar == null && !pm.isVoid()) {
 	    resultVar = TB.resultVar(services, pm, false);
@@ -303,9 +309,9 @@ public final class DLSpecFactory {
 					 pm.getContainerType(),		
 					 pm, 
 					 modality, 
-					 pre,
+					 pres,
 					 null,// TODO measured_by in DL contracts not supported yet
-					 post, 
+					 posts, 
 					 mods, 
 					 true, // TODO strictly pure in DL contracts not supported yet
 					 selfVar, 

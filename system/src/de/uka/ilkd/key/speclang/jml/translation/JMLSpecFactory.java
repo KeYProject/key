@@ -82,11 +82,11 @@ public class JMLSpecFactory {
     //-------------------------------------------------------------------------
     private class ContractClauses {
 
-        public Term requires;
+        public Map<LocationVariable,Term> requires = new LinkedHashMap<LocationVariable,Term>();
         public Term measuredBy;
         public Map<LocationVariable,Term> assignables = new LinkedHashMap<LocationVariable,Term>();
         public Term accessible;
-        public Term ensures;
+        public Map<LocationVariable,Term> ensures = new LinkedHashMap<LocationVariable,Term>();
         public Term signals;
         public Term signalsOnly;
         public Term diverges;
@@ -225,10 +225,6 @@ public class JMLSpecFactory {
         if(textualSpecCase.getMods().contains("transaction")) {
            atPres.put(savedHeap, progVars.atPres.get(savedHeap));
         }
-        clauses.requires =
-                translateAndClauses(pm, progVars.selfVar, progVars.paramVars,
-                                    null, null, atPres,
-                                    textualSpecCase.getRequires());
         clauses.measuredBy =
                 translateMeasuredBy(pm, progVars.selfVar,
                                     progVars.paramVars,
@@ -239,30 +235,46 @@ public class JMLSpecFactory {
                         textualSpecCase.getAssignable());
         for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
            if(heap == savedHeap && !textualSpecCase.getMods().contains("transaction")) {
-             if(textualSpecCase.getAssignable(heap.name().toString()).size() != 0) {
+             if(textualSpecCase.getAssignable(heap.name().toString()).size() != 0 ) {
                  throw new SLTranslationException(
                         "accessing "+savedHeap.name()+" not allowed in a non-transaction spec case.",
                         textualSpecCase.getAssignable(heap.name().toString()).head().fileName,
                         textualSpecCase.getAssignable(heap.name().toString()).head().pos);
-             }else{
+             } else if (textualSpecCase.getRequires(heap.name().toString()).size() != 0 ) {
+                 throw new SLTranslationException(
+                        "accessing "+savedHeap.name()+" not allowed in a non-transaction spec case.",
+                        textualSpecCase.getRequires(heap.name().toString()).head().fileName,
+                        textualSpecCase.getRequires(heap.name().toString()).head().pos);
+             } else if (textualSpecCase.getEnsures(heap.name().toString()).size() != 0 ) {
+                 throw new SLTranslationException(
+                        "accessing "+savedHeap.name()+" not allowed in a non-transaction spec case.",
+                        textualSpecCase.getEnsures(heap.name().toString()).head().fileName,
+                        textualSpecCase.getEnsures(heap.name().toString()).head().pos);
+             } else {
                 clauses.assignables.put(heap, null);
+                clauses.requires.put(heap, null);
+                clauses.ensures.put(heap, null);
                 continue;
              }
            }
            clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
                                     progVars.paramVars,
                                     textualSpecCase.getAssignable(heap.name().toString())));
+           clauses.requires.put(heap, translateAndClauses(pm, progVars.selfVar, progVars.paramVars,
+                                    null, null, atPres,
+                                    textualSpecCase.getRequires(heap.name().toString())));
+
+           clauses.ensures.put(heap, translateEnsures(pm, progVars.selfVar,
+                                           progVars.paramVars,
+                                           progVars.resultVar, progVars.excVar,
+                                           progVars.atPres,
+                                           originalBehavior,
+                                           textualSpecCase.getEnsures(heap.name().toString())));
         }
         clauses.accessible =
                 translateAccessible(pm, progVars.selfVar,
                                     progVars.paramVars,
                                     textualSpecCase.getAccessible());
-        clauses.ensures = translateEnsures(pm, progVars.selfVar,
-                                           progVars.paramVars,
-                                           progVars.resultVar, progVars.excVar,
-                                           progVars.atPres,
-                                           originalBehavior,
-                                           textualSpecCase.getEnsures());
         clauses.signals = translateSignals(pm, progVars.selfVar,
                                            progVars.paramVars,
                                            progVars.resultVar, progVars.excVar,
@@ -543,18 +555,21 @@ public class JMLSpecFactory {
     }
 
 
-    private Term generatePostCondition(ProgramVariableCollection progVars,
+    private Map<LocationVariable,Term> generatePostCondition(ProgramVariableCollection progVars,
                                        ContractClauses clauses,
                                        Behavior originalBehavior) {
-        Term excNull = TB.equals(TB.var(progVars.excVar), TB.NULL(services));
-        Term post1 = (originalBehavior == Behavior.NORMAL_BEHAVIOR
-                      ? TB.convertToFormula(clauses.ensures,services)
-                      : TB.imp(excNull, TB.convertToFormula(clauses.ensures,services)));
-        Term post2 = (originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR
+        Map<LocationVariable,Term> result = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+          Term excNull = TB.equals(TB.var(progVars.excVar), TB.NULL(services));
+          Term post1 = (originalBehavior == Behavior.NORMAL_BEHAVIOR
+                      ? TB.convertToFormula(clauses.ensures.get(heap),services)
+                      : TB.imp(excNull, TB.convertToFormula(clauses.ensures.get(heap),services)));
+          Term post2 = (originalBehavior == Behavior.EXCEPTIONAL_BEHAVIOR
                       ? TB.and(TB.convertToFormula(clauses.signals,services), TB.convertToFormula(clauses.signalsOnly,services)) 
                       : TB.imp(TB.not(excNull),TB.and(TB.convertToFormula(clauses.signals,services), TB.convertToFormula(clauses.signalsOnly,services))));
-        Term post = TB.and(post1, post2);
-        return post;
+          result.put(heap, TB.and(post1, post2));
+        }
+        return result;
     }
 
 
@@ -576,32 +591,37 @@ public class JMLSpecFactory {
             ProgramMethod pm,
             ProgramVariableCollection progVars,
             ContractClauses clauses,
-            Term post) {
+            Map<LocationVariable,Term> posts) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+        Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+           final Term pre = TB.convertToFormula(clauses.requires.get(heap), services);
+           pres.put(heap, pre);
+        }
         if (clauses.diverges.equals(TB.ff())) {
             FunctionalOperationContract contract = cf.func(
-                    name, pm, true, TB.convertToFormula(clauses.requires,services),
-                    clauses.measuredBy, post, clauses.assignables, 
+                    name, pm, true, pres,
+                    clauses.measuredBy, posts, clauses.assignables, 
                     !clauses.strictlyPure, progVars);
             result = result.add(contract);
         } else if (clauses.diverges.equals(TB.tt())) {
             FunctionalOperationContract contract = cf.func(
-                    name, pm, false, TB.convertToFormula(clauses.requires,services),
-                    clauses.measuredBy, post, clauses.assignables, !clauses.strictlyPure, progVars);
+                    name, pm, false, pres,
+                    clauses.measuredBy, posts, clauses.assignables, !clauses.strictlyPure, progVars);
             result = result.add(contract);
         } else {
+            for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+              final Term pre = TB.convertToFormula(clauses.requires.get(heap), services);
+              pres.put(heap, TB.and(pres.get(heap), TB.not(TB.convertToFormula(clauses.diverges,services))));
+            }
             FunctionalOperationContract contract1 = cf.func(
                     name, pm, true,
-                    TB.and(TB.convertToFormula(clauses.requires,services), TB.not(TB.convertToFormula(clauses.diverges,services))),
-                    clauses.measuredBy, post, clauses.assignables,
+                    pres,
+                    clauses.measuredBy, posts, clauses.assignables,
                     !clauses.strictlyPure, progVars);
             FunctionalOperationContract contract2 =
-                    cf.func(name, pm, false,
-                                                        clauses.requires,
-                                                        clauses.measuredBy, post,
-                                                        clauses.assignables,
-                                                        !clauses.strictlyPure,
-                                                        progVars);
+                    cf.func(name, pm, false, clauses.requires, clauses.measuredBy, posts,
+                        clauses.assignables, !clauses.strictlyPure, progVars);
             result = result.add(contract1).add(contract2);
         }
         return result;
@@ -627,7 +647,7 @@ public class JMLSpecFactory {
             assert (progVars.selfVar == null) == pm.isStatic();
             final Contract depContract = cf.dep(
                     pm.getContainerType(), pm,
-                    TB.convertToFormula(clauses.requires,services), clauses.measuredBy,
+                    TB.convertToFormula(clauses.requires.get(services.getTypeConverter().getHeapLDT().getHeap()),services), clauses.measuredBy,
                     clauses.accessible, progVars.selfVar,
                     progVars.paramVars);
             result = result.add(depContract);
@@ -884,13 +904,13 @@ public class JMLSpecFactory {
         ContractClauses clauses =
                 translateJMLClauses(pm, textualSpecCase,
                                     progVars, originalBehavior);
-        Term post = generatePostCondition(progVars, clauses, originalBehavior);
+        Map<LocationVariable,Term> posts = generatePostCondition(progVars, clauses, originalBehavior);
 
         // create contracts
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
         result = result.union(createFunctionalOperationContracts(name, pm,
                                                                  progVars,
-                                                                 clauses, post));
+                                                                 clauses, posts));
         result = result.union(createDependencyOperationContract(pm, progVars,
                                                                 clauses));
 
