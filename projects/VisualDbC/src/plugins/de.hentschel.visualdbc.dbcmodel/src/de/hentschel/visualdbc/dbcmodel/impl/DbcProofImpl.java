@@ -203,11 +203,33 @@ public class DbcProofImpl extends EObjectImpl implements DbcProof {
    /**
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
-    * @generated
+    * @generated NOT
     */
    public EList<DbcProofReference> getProofReferences() {
       if (proofReferences == null) {
-         proofReferences = new EObjectContainmentEList<DbcProofReference>(DbcProofReference.class, this, DbcmodelPackage.DBC_PROOF__PROOF_REFERENCES);
+         proofReferences = new EObjectContainmentEList<DbcProofReference>(DbcProofReference.class, this, DbcmodelPackage.DBC_PROOF__PROOF_REFERENCES) {
+            /**
+             * Generated UID.
+             */
+            private static final long serialVersionUID = 4638908045894728557L;
+
+            @Override
+            protected void didAdd(int index, DbcProofReference newObject) {
+               super.didAdd(index, newObject);
+               if (newObject != null) {
+                  newObject.setSource(DbcProofImpl.this);
+               }
+            }
+
+            @Override
+            protected void didRemove(int index, DbcProofReference oldObject) {
+               super.didRemove(index, oldObject);
+               if (oldObject != null && oldObject.getSource() == DbcProofImpl.this) {
+                  oldObject.setSource(null);
+               }
+            }
+            
+         };
       }
       return proofReferences;
    }

@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true">
-   <methodCall name="self.main();" pathCondition="true">
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
       </variable>
-      <statement name="z=2;" pathCondition="true">
+      <statement name="z=2;" pathCondition="true" pathConditionChanged="false">
          <variable name="self" typeString="VariablesStaticTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
          </variable>
          <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
          </variable>
-         <statement name="StaticFields.a=4;" pathCondition="true">
+         <statement name="StaticFields.a=4;" pathCondition="true" pathConditionChanged="false">
             <variable name="self" typeString="VariablesStaticTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
             </variable>
             <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
             </variable>
             <variable name="VariablesStaticTest::z" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
             </variable>
-            <statement name="StaticFields.b=8;" pathCondition="true">
+            <statement name="StaticFields.b=8;" pathCondition="true" pathConditionChanged="false">
                <variable name="self" typeString="VariablesStaticTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
                </variable>
                <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
@@ -24,7 +24,7 @@
                </variable>
                <variable name="VariablesStaticTest::z" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
                </variable>
-               <statement name="return z+StaticFields.a+StaticFields.b;" pathCondition="true">
+               <statement name="return z+StaticFields.a+StaticFields.b;" pathCondition="true" pathConditionChanged="false">
                   <variable name="self" typeString="VariablesStaticTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
                   </variable>
                   <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
@@ -35,7 +35,7 @@
                   </variable>
                   <variable name="VariablesStaticTest::z" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
                   </variable>
-                  <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;14&apos; as result of self.main();&gt;">
+                  <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;14&apos; as result of self.main();&gt;">
                      <variable name="self" typeString="VariablesStaticTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
                      </variable>
                      <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
@@ -46,7 +46,7 @@
                      </variable>
                      <variable name="VariablesStaticTest::z" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
                      </variable>
-                     <termination name="&lt;end&gt;" pathCondition="true" exceptionalTermination="false">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
                      </termination>
                   </methodReturn>
                </statement>

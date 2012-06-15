@@ -4,7 +4,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -17,6 +22,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -36,6 +42,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.po.SymbolicExecutionFunctionalOperationContractPO;
+import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -44,7 +52,9 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * <p>
- * Tests for {@link SymbolicExecutionTreeBuilder}.
+ * Tests for {@link SymbolicExecutionTreeBuilder},
+ * {@link ExecutedSymbolicExecutionTreeNodesStopCondition} and
+ * {@link SymbolicExecutionGoalChooser}.
  * </p>
  * <p>
  * This test needs access to the checkout of the KeY repository defined
@@ -70,6 +80,21 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
     * </p>
     */
    public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
+   
+   /**
+    * Number of executed SET nodes to execute all in one.
+    */
+   private static final int ALL_IN_ONE_RUN = ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN;
+
+   /**
+    * Number of executed SET nodes for only one SET node per auto mode run.
+    */
+   private static final int SINGLE_SET_NODE_RUN = ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP;
+
+   /**
+    * Default stop conditions of executed SET nodes.
+    */
+   private static final int[] DEFAULT_MAXIMAL_SET_NODES_PER_RUN = {ALL_IN_ONE_RUN, SINGLE_SET_NODE_RUN};
    
    /**
     * The used temporary oracle directory.
@@ -132,6 +157,45 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
    }
    
    /**
+    * Tests example: examples/_testcase/set/loopIterationTest
+    */
+   public void testLoopIteration_LoopWithMethod() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/loopIterationTest/test/LoopIterationTest.java", 
+             "LoopIterationTest", 
+             "loopMultipleTimes", 
+             "examples/_testcase/set/loopIterationTest/oracle/LoopIterationTest_loopMultipleTimes.xml",
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/loopIterationTest
+    */
+   public void testLoopIteration_LoopStatementCopied() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/loopIterationTest/test/LoopIterationTest.java", 
+             "LoopIterationTest", 
+             "mainWorks", 
+             "examples/_testcase/set/loopIterationTest/oracle/LoopIterationTest_mainWorks.xml",
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/loopIterationTest
+    */
+   public void testLoopIteration_LoopStatementReused() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/loopIterationTest/test/LoopIterationTest.java", 
+             "LoopIterationTest", 
+             "main", 
+             "examples/_testcase/set/loopIterationTest/oracle/LoopIterationTest_main.xml",
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/variablesArrayTest
     */
    public void testVariablesArrayTest() throws Exception {
@@ -140,7 +204,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "VariablesArrayTest", 
              "main", 
              "examples/_testcase/set/variablesArrayTest/oracle/VariablesArrayTest.xml",
-             true);
+             true,
+             ALL_IN_ONE_RUN);
    }
    
    /**
@@ -152,7 +217,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "VariablesInstanceVariableTest", 
              "main", 
              "examples/_testcase/set/variablesInstanceVariableTest/oracle/VariablesInstanceVariableTest.xml",
-             true);
+             true,
+             ALL_IN_ONE_RUN);
    }
    
    /**
@@ -164,7 +230,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "VariablesLocalTest", 
              "main", 
              "examples/_testcase/set/variablesLocalTest/oracle/VariablesLocalTest.xml",
-             true);
+             true,
+             ALL_IN_ONE_RUN);
    }
    
    /**
@@ -176,7 +243,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "VariablesStaticTest", 
              "main", 
              "examples/_testcase/set/variablesStaticTest/oracle/VariablesStaticTest.xml",
-             true);
+             true,
+             ALL_IN_ONE_RUN);
    }
    
    /**
@@ -188,7 +256,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "ComplexFlatSteps", 
              "doSomething", 
              "examples/_testcase/set/complexFlatSteps/oracle/ComplexFlatSteps.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -200,7 +269,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "ComplexIf", 
              "min", 
              "examples/_testcase/set/complexIf/oracle/ComplexIf.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -212,7 +282,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "DoWhileFalseTest", 
              "main", 
              "examples/_testcase/set/doWhileFalseTest/oracle/DoWhileFalseTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -224,7 +295,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "DoWhileTest", 
              "main", 
              "examples/_testcase/set/doWhileTest/oracle/DoWhileTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -236,7 +308,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "ElseIfDifferentVariables", 
              "main", 
              "examples/_testcase/set/elseIfDifferentVariables/oracle/ElseIfDifferentVariables.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -248,7 +321,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "ElseIfTest", 
              "elseIf", 
              "examples/_testcase/set/elseIfTest/oracle/ElseIfTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -260,7 +334,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "FixedRecursiveMethodCallTest", 
              "decreaseValue", 
              "examples/_testcase/set/fixedRecursiveMethodCallTest/oracle/FixedRecursiveMethodCallTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -272,7 +347,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "ForEachTest", 
              "main", 
              "examples/_testcase/set/forEachTest/oracle/ForEachTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -284,7 +360,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "ForFalseTest", 
              "main", 
              "examples/_testcase/set/forFalseTest/oracle/ForFalseTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -296,7 +373,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "ForTest", 
              "main", 
              "examples/_testcase/set/forTest/oracle/ForTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -308,7 +386,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "FunctionalDoWhileTest", 
              "main", 
              "examples/_testcase/set/functionalDoWhileTest/oracle/FunctionalDoWhileTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -320,7 +399,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "FunctionalForTest", 
              "main", 
              "examples/_testcase/set/functionalForTest/oracle/FunctionalForTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -332,7 +412,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "FunctionalIf", 
              "min", 
              "examples/_testcase/set/functionalIf/oracle/FunctionalIf.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -344,7 +425,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "FunctionalWhileTest", 
              "main", 
              "examples/_testcase/set/functionalWhileTest/oracle/FunctionalWhileTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -356,7 +438,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "MethodCallOnObject", 
              "main", 
              "examples/_testcase/set/methodCallOnObject/oracle/MethodCallOnObject.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -368,7 +451,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "MethodCallOnObjectWithException", 
              "main", 
              "examples/_testcase/set/methodCallOnObjectWithException/oracle/MethodCallOnObjectWithException.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -380,7 +464,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "MethodCallParallelTest", 
              "main", 
              "examples/_testcase/set/methodCallParallelTest/oracle/MethodCallParallelTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -392,7 +477,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "MethodFormatTest", 
              "main", 
              "examples/_testcase/set/methodFormatTest/oracle/MethodFormatTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -404,7 +490,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "MethodHierarchyCallTest", 
              "main", 
              "examples/_testcase/set/methodHierarchyCallTest/oracle/MethodHierarchyCallTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -416,7 +503,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "MethodHierarchyCallWithExceptionTest", 
              "main", 
              "examples/_testcase/set/methodHierarchyCallWithExceptionTest/oracle/MethodHierarchyCallWithExceptionTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -428,7 +516,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "NestedDoWhileTest", 
              "main", 
              "examples/_testcase/set/nestedDoWhileTest/oracle/NestedDoWhileTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -440,7 +529,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "NestedForTest", 
              "main", 
              "examples/_testcase/set/nestedForTest/oracle/NestedForTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -452,7 +542,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "NestedWhileTest", 
              "mainNested", 
              "examples/_testcase/set/nestedWhileTest/oracle/NestedWhileTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -470,7 +561,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "RecursiveFibonacci", 
              "fibonacci10", 
              "examples/_testcase/set/recursiveFibonacci/oracle/RecursiveFibonacci.xml",
-             false);
+             false,
+             ALL_IN_ONE_RUN);
    }
    
    /**
@@ -482,7 +574,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "SimpleIf", 
              "min", 
              "examples/_testcase/set/simpleIf/oracle/SimpleIf.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -494,7 +587,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "SimpleNullPointerSplitTest", 
              "main", 
              "examples/_testcase/set/simpleNullPointerSplitTest/oracle/SimpleNullPointerSplitTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -506,7 +600,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "StatementKindTest", 
              "main", 
              "examples/_testcase/set/statementKindTest/oracle/StatementKindTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -518,7 +613,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "FlatSteps", 
              "doSomething", 
              "examples/_testcase/set/statements/oracle/FlatSteps.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -530,7 +626,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "StaticMethodCall", 
              "main", 
              "examples/_testcase/set/staticMethodCall/oracle/StaticMethodCall.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -542,7 +639,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "SwitchCaseTest", 
              "switchCase", 
              "examples/_testcase/set/switchCaseTest/oracle/SwitchCaseTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -554,7 +652,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "ThrowTest", 
              "main", 
              "examples/_testcase/set/throwTest/oracle/ThrowTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -566,7 +665,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "ThrowVariableTest", 
              "main", 
              "examples/_testcase/set/throwVariableTest/oracle/ThrowVariableTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -578,7 +678,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "TryCatchFinally", 
              "tryCatchFinally", 
              "examples/_testcase/set/tryCatchFinally/oracle/TryCatchFinally.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -590,7 +691,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "WhileFalseTest", 
              "main", 
              "examples/_testcase/set/whileFalseTest/oracle/WhileFalseTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -602,7 +704,8 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
              "WhileTest", 
              "main", 
              "examples/_testcase/set/whileTest/oracle/WhileTest.xml",
-             false);
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
    /**
@@ -622,6 +725,7 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
     * @param methodFullName The method to test.
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
     * @param includeVariables Include variables?
+    * @param maximalNumberOfExecutedSetNodesPerRun The number of executed set nodes per auto mode run. The whole test is executed for each defined value.
     * @throws ProofInputException Occurred Exception
     * @throws IOException Occurred Exception
     * @throws ParserConfigurationException Occurred Exception
@@ -632,7 +736,50 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
                          String containerTypeName,
                          final String methodFullName,
                          String oraclePathInBaseDirFile,
-                         boolean includeVariables) throws ProofInputException, IOException, ParserConfigurationException, SAXException {
+                         boolean includeVariables,
+                         int[] maximalNumberOfExecutedSetNodesPerRun) throws ProofInputException, IOException, ParserConfigurationException, SAXException {
+      assertNotNull(maximalNumberOfExecutedSetNodesPerRun);
+      for (int i = 0; i < maximalNumberOfExecutedSetNodesPerRun.length; i++) {
+         doTest(baseDir, 
+                javaPathInBaseDir, 
+                containerTypeName, 
+                methodFullName, 
+                oraclePathInBaseDirFile, 
+                includeVariables, 
+                maximalNumberOfExecutedSetNodesPerRun[i]);
+      }
+   }
+   
+   /**
+    * Executes a test with the following steps:
+    * <ol>
+    *    <li>Load java file</li>
+    *    <li>Instantiate proof for method in container type</li>
+    *    <li>Try to close proof in auto mode</li>
+    *    <li>Create symbolic execution tree</li>
+    *    <li>Create new oracle file in temporary directory {@link #tempNewOracleDirectory} if it is defined</li>
+    *    <li>Load oracle file</li>
+    *    <li>Compare created symbolic execution tree with oracle model</li>
+    * </ol>
+    * @param baseDir The base directory which contains test and oracle file.
+    * @param javaPathInBaseDir The path to the java file inside the base directory.
+    * @param containerTypeName The java class to test.
+    * @param methodFullName The method to test.
+    * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
+    * @param includeVariables Include variables?
+    * @param maximalNumberOfExecutedSetNodes The number of executed set nodes per auto mode run.
+    * @throws ProofInputException Occurred Exception
+    * @throws IOException Occurred Exception
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    */
+   protected void doTest(File baseDir,
+                         String javaPathInBaseDir,
+                         String containerTypeName,
+                         final String methodFullName,
+                         String oraclePathInBaseDirFile,
+                         boolean includeVariables,
+                         int maximalNumberOfExecutedSetNodes) throws ProofInputException, IOException, ParserConfigurationException, SAXException {
       // Make sure that parameter are valid.
       assertNotNull(javaPathInBaseDir);
       File javaFile = new File(baseDir, javaPathInBaseDir);
@@ -644,6 +791,7 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
       if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
          assertTrue("Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.", oracleFile.exists());
       }
+      assertTrue(maximalNumberOfExecutedSetNodes >= 1);
       // Create user interface
       CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
       // Load java file
@@ -667,15 +815,30 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
       ProofOblInput input = new SymbolicExecutionFunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract);
       Proof proof = ui.createProof(initConfig, input);
       assertNotNull(proof);
-      // Set strategy to use for auto mode
-      StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, true);
-      proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
-      // Run proof
-      ui.startAndWaitForProof(proof);
-      // Create symbolic execution tree
+      // Create symbolic execution tree which contains only the start node at beginning
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof);
       builder.analyse();
       assertNotNull(builder.getStartNode());
+      // Set strategy to use for auto mode
+      StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, true);
+      proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
+      // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
+      ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
+      proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
+      proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
+      // Execute auto mode until no more symbolic execution tree nodes are found
+      do {
+         // Run proof
+         ui.startAndWaitForProof(proof);
+         // Update symbolic execution tree 
+         builder.analyse();
+         // Make sure that not to many set nodes are executed
+         Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
+         for (Integer value : executedSetNodesPerGoal.values()) {
+            assertNotNull(value);
+            assertTrue(value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes, value.intValue() <= maximalNumberOfExecutedSetNodes);
+         }
+      } while(stopCondition.wasSetNodeExecuted());
       // Create new oracle file if required in a temporary directory
       createOracleFile(builder.getStartNode(), oraclePathInBaseDirFile, includeVariables);
       // Read oracle file
@@ -683,7 +846,7 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
       IExecutionNode oracleRoot = reader.read(oracleFile);
       assertNotNull(oracleRoot);
       // Make sure that the created symbolic execution tree matches the expected one.
-      assertExecutionNodes(oracleRoot, builder.getStartNode(), includeVariables);
+      assertExecutionNodes(oracleRoot, builder.getStartNode(), includeVariables, false);
    }
    
    /**
@@ -730,22 +893,105 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
     * @param expected The expected {@link IExecutionNode}.
     * @param current The current {@link IExecutionNode}.
     * @param compareVariables Compare variables?
+    * @param compareChildOrder Is the order of children relevant?
     * @throws ProofInputException Occurred Exception.
     */
    public static void assertExecutionNodes(IExecutionNode expected, 
                                            IExecutionNode current,
-                                           boolean compareVariables) throws ProofInputException {
-      ExecutionNodePreorderIterator expectedIter = new ExecutionNodePreorderIterator(expected);
-      ExecutionNodePreorderIterator currentIter = new ExecutionNodePreorderIterator(current);
-      while (expectedIter.hasNext() && currentIter.hasNext()) {
-         IExecutionNode expectedNext = expectedIter.next();
-         IExecutionNode currentNext = currentIter.next();
-         assertExecutionNode(expectedNext, currentNext, true, true, compareVariables);
+                                           boolean compareVariables,
+                                           boolean compareChildOrder) throws ProofInputException {
+      if (compareChildOrder) {
+         // Order of children must be the same.
+         ExecutionNodePreorderIterator expectedIter = new ExecutionNodePreorderIterator(expected);
+         ExecutionNodePreorderIterator currentIter = new ExecutionNodePreorderIterator(current);
+         while (expectedIter.hasNext() && currentIter.hasNext()) {
+            IExecutionNode expectedNext = expectedIter.next();
+            IExecutionNode currentNext = currentIter.next();
+            assertExecutionNode(expectedNext, currentNext, true, compareVariables);
+         }
+         assertFalse(expectedIter.hasNext());
+         assertFalse(currentIter.hasNext());
       }
-      assertFalse(expectedIter.hasNext());
-      assertFalse(currentIter.hasNext());
+      else {
+         // Order of children is not relevant.
+         ExecutionNodePreorderIterator expectedIter = new ExecutionNodePreorderIterator(expected);
+         Set<IExecutionNode> currentVisitedNodes = new HashSet<IExecutionNode>();
+         while (expectedIter.hasNext()) {
+            IExecutionNode expectedNext = expectedIter.next();
+            IExecutionNode currentNext = searchExecutionNode(current, expectedNext);
+            if (!currentVisitedNodes.add(currentNext)) {
+               fail("Node " + currentNext + " visited twice.");
+            }
+            assertExecutionNode(expectedNext, currentNext, true, compareVariables);
+         }
+         // Make sure that each current node was visited
+         ExecutionNodePreorderIterator currentIter = new ExecutionNodePreorderIterator(current);
+         while (currentIter.hasNext()) {
+            IExecutionNode currentNext = currentIter.next();
+            if (!currentVisitedNodes.remove(currentNext)) {
+               fail("Node " + currentNext + " is not in expected model.");
+            }
+         }
+         assertTrue(currentVisitedNodes.isEmpty());
+      }
    }
    
+   /**
+    * Searches the direct or indirect child in subtree of the node to search in.
+    * @param toSearchIn The node to search in.
+    * @param childToSearch The node to search.
+    * @return The found node.
+    */
+   protected static IExecutionNode searchExecutionNode(IExecutionNode toSearchIn, IExecutionNode childToSearch) {
+      // Make sure that parameters are valid
+      assertNotNull(toSearchIn);
+      assertNotNull(childToSearch);
+      // Collect parents
+      Deque<IExecutionNode> parents = new LinkedList<IExecutionNode>();
+      IExecutionNode parent = childToSearch;
+      while (parent != null) {
+         parents.addFirst(parent);
+         parent = parent.getParent();
+      }
+      // Search children in parent order
+      boolean afterFirst = false;
+      for (IExecutionNode currentParent : parents) {
+         if (afterFirst) {
+            toSearchIn = searchDirectChildNode(toSearchIn, currentParent);
+         }
+         else {
+            afterFirst = true;
+         }
+      }
+      assertNotNull("Direct or indirect Child " + childToSearch + " is not contained in " + toSearchIn + ".", toSearchIn);
+      return toSearchIn;
+   }
+   
+   /**
+    * Searches the direct child. Nodes are equal if the name and the element type is equal.
+    * @param parentToSearchIn The parent to search in its children.
+    * @param directChildToSearch The child to search.
+    * @return The found child.
+    */
+   protected static IExecutionNode searchDirectChildNode(IExecutionNode parentToSearchIn, IExecutionNode directChildToSearch) {
+      // Make sure that parameters are valid
+      assertNotNull(parentToSearchIn);
+      assertNotNull(directChildToSearch);
+      // Search child
+      IExecutionNode result = null;
+      int i = 0;
+      IExecutionNode[] children = parentToSearchIn.getChildren();
+      while (result == null && i < children.length) {
+         if (children[i].getName().equals(directChildToSearch.getName()) &&
+             children[i].getElementType().equals(directChildToSearch.getElementType())) {
+            result = children[i];
+         }
+         i++;
+      }
+      assertNotNull("Child " + directChildToSearch + " is not contained in " + parentToSearchIn + ".", result);
+      return result;
+   }
+
    /**
     * Makes sure that the given nodes contains the same content.
     * Children are not compared.
@@ -758,13 +1004,13 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
     */
    protected static void assertExecutionNode(IExecutionNode expected, 
                                              IExecutionNode current, 
-                                             boolean compareParent, 
-                                             boolean compareChildren,
+                                             boolean compareParent,
                                              boolean compareVariables) throws ProofInputException {
       // Compare nodes
       assertNotNull(expected);
       assertNotNull(current);
       assertEquals(expected.getName(), current.getName());
+      assertEquals(expected.isPathConditionChanged(), current.isPathConditionChanged());
       assertEquals(expected.getFormatedPathCondition(), current.getFormatedPathCondition());
       if (expected instanceof IExecutionBranchCondition) {
          assertTrue("Expected IExecutionBranchCondition but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchCondition);
@@ -807,16 +1053,7 @@ public class TestSymbolicExecutionTreeBuilder extends TestCase {
       }
       // Optionally compare parent
       if (compareParent) {
-         assertExecutionNode(expected, current, false, false, compareVariables);
-      }
-      // Optionally compare direct children
-      if (compareChildren) {
-         IExecutionNode[] expectedChildren = expected.getChildren();
-         IExecutionNode[] currentChildren = current.getChildren();
-         assertEquals(expectedChildren.length, currentChildren.length);
-         for (int i = 0; i < expectedChildren.length; i++) {
-            assertExecutionNode(expectedChildren[i], currentChildren[i], false, false, compareVariables);
-         }
+         assertExecutionNode(expected, current, false, compareVariables);
       }
    }
 

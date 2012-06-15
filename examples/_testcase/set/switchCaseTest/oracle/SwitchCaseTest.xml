@@ -1,69 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true">
-   <methodCall name="self.switchCase(_x);" pathCondition="true">
-      <statement name="int a;" pathCondition="true">
-         <branchNode name="switch (_x) {case 0:a=1;break ;case 1:case 2:   a=-1;case 3:   a=_x*_x;break ;case 4:return 42;default:   a=_x; }" pathCondition="true">
-            <branchCondition name="x = 0 TRUE" pathCondition="x = 0" branchCondition="x = 0">
-               <statement name="a=1;" pathCondition="x = 0">
-                  <statement name="return a;" pathCondition="x = 0">
-                     <methodReturn name="&lt;return of self.switchCase(_x);&gt;" pathCondition="x = 0" nameIncludingReturnValue="&lt;return &apos;1&apos; as result of self.switchCase(_x);&gt;">
-                        <termination name="&lt;end&gt;" pathCondition="x = 0" exceptionalTermination="false">
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.switchCase(_x);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int a;" pathCondition="true" pathConditionChanged="false">
+         <branchNode name="switch (_x) {case 0:a=1;break ;case 1:case 2:   a=-1;case 3:   a=_x*_x;break ;case 4:return 42;default:   a=_x; }" pathCondition="true" pathConditionChanged="false">
+            <branchCondition name="x = 0 TRUE" pathCondition="x = 0" pathConditionChanged="true" branchCondition="x = 0">
+               <statement name="a=1;" pathCondition="x = 0" pathConditionChanged="false">
+                  <statement name="return a;" pathCondition="x = 0" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of self.switchCase(_x);&gt;" pathCondition="x = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;1&apos; as result of self.switchCase(_x);&gt;">
+                        <termination name="&lt;end&gt;" pathCondition="x = 0" pathConditionChanged="false" exceptionalTermination="false">
                         </termination>
                      </methodReturn>
                   </statement>
                </statement>
             </branchCondition>
-            <branchCondition name="x = 0 FALSE" pathCondition="!x = 0" branchCondition="!x = 0">
-               <branchCondition name="x = 1 TRUE" pathCondition="!x = 0 &amp; x = 1" branchCondition="x = 1">
-                  <statement name="a=-1;" pathCondition="!x = 0 &amp; x = 1">
-                     <statement name="a=_x*_x;" pathCondition="!x = 0 &amp; x = 1">
-                        <statement name="return a;" pathCondition="!x = 0 &amp; x = 1">
-                           <methodReturn name="&lt;return of self.switchCase(_x);&gt;" pathCondition="!x = 0 &amp; x = 1" nameIncludingReturnValue="&lt;return &apos;1&apos; as result of self.switchCase(_x);&gt;">
-                              <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; x = 1" exceptionalTermination="false">
+            <branchCondition name="x = 0 FALSE" pathCondition="!x = 0" pathConditionChanged="true" branchCondition="!x = 0">
+               <branchCondition name="x = 1 TRUE" pathCondition="!x = 0 &amp; x = 1" pathConditionChanged="true" branchCondition="x = 1">
+                  <statement name="a=-1;" pathCondition="!x = 0 &amp; x = 1" pathConditionChanged="false">
+                     <statement name="a=_x*_x;" pathCondition="!x = 0 &amp; x = 1" pathConditionChanged="false">
+                        <statement name="return a;" pathCondition="!x = 0 &amp; x = 1" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of self.switchCase(_x);&gt;" pathCondition="!x = 0 &amp; x = 1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;1&apos; as result of self.switchCase(_x);&gt;">
+                              <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; x = 1" pathConditionChanged="false" exceptionalTermination="false">
                               </termination>
                            </methodReturn>
                         </statement>
                      </statement>
                   </statement>
                </branchCondition>
-               <branchCondition name="x = 1 FALSE" pathCondition="!x = 0 &amp; !x = 1" branchCondition="!x = 1">
-                  <branchCondition name="x = 2 TRUE" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" branchCondition="x = 2">
-                     <statement name="a=-1;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2">
-                        <statement name="a=_x*_x;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2">
-                           <statement name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2">
-                              <methodReturn name="&lt;return of self.switchCase(_x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" nameIncludingReturnValue="&lt;return &apos;4&apos; as result of self.switchCase(_x);&gt;">
-                                 <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" exceptionalTermination="false">
+               <branchCondition name="x = 1 FALSE" pathCondition="!x = 0 &amp; !x = 1" pathConditionChanged="true" branchCondition="!x = 1">
+                  <branchCondition name="x = 2 TRUE" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" pathConditionChanged="true" branchCondition="x = 2">
+                     <statement name="a=-1;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" pathConditionChanged="false">
+                        <statement name="a=_x*_x;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" pathConditionChanged="false">
+                           <statement name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" pathConditionChanged="false">
+                              <methodReturn name="&lt;return of self.switchCase(_x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;4&apos; as result of self.switchCase(_x);&gt;">
+                                 <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" pathConditionChanged="false" exceptionalTermination="false">
                                  </termination>
                               </methodReturn>
                            </statement>
                         </statement>
                      </statement>
                   </branchCondition>
-                  <branchCondition name="x = 2 FALSE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2" branchCondition="!x = 2">
-                     <branchCondition name="x = 3 TRUE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" branchCondition="x = 3">
-                        <statement name="a=_x*_x;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3">
-                           <statement name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3">
-                              <methodReturn name="&lt;return of self.switchCase(_x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" nameIncludingReturnValue="&lt;return &apos;9&apos; as result of self.switchCase(_x);&gt;">
-                                 <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" exceptionalTermination="false">
+                  <branchCondition name="x = 2 FALSE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2" pathConditionChanged="true" branchCondition="!x = 2">
+                     <branchCondition name="x = 3 TRUE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" pathConditionChanged="true" branchCondition="x = 3">
+                        <statement name="a=_x*_x;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" pathConditionChanged="false">
+                           <statement name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" pathConditionChanged="false">
+                              <methodReturn name="&lt;return of self.switchCase(_x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;9&apos; as result of self.switchCase(_x);&gt;">
+                                 <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" pathConditionChanged="false" exceptionalTermination="false">
                                  </termination>
                               </methodReturn>
                            </statement>
                         </statement>
                      </branchCondition>
-                     <branchCondition name="x = 3 FALSE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3" branchCondition="!x = 3">
-                        <branchCondition name="x = 4 TRUE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4" branchCondition="x = 4">
-                           <statement name="return 42;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4">
-                              <methodReturn name="&lt;return of self.switchCase(_x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.switchCase(_x);&gt;">
-                                 <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4" exceptionalTermination="false">
+                     <branchCondition name="x = 3 FALSE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3" pathConditionChanged="true" branchCondition="!x = 3">
+                        <branchCondition name="x = 4 TRUE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4" pathConditionChanged="true" branchCondition="x = 4">
+                           <statement name="return 42;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4" pathConditionChanged="false">
+                              <methodReturn name="&lt;return of self.switchCase(_x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.switchCase(_x);&gt;">
+                                 <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4" pathConditionChanged="false" exceptionalTermination="false">
                                  </termination>
                               </methodReturn>
                            </statement>
                         </branchCondition>
-                        <branchCondition name="x = 4 FALSE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" branchCondition="!x = 4">
-                           <statement name="a=_x;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4">
-                              <statement name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4">
-                                 <methodReturn name="&lt;return of self.switchCase(_x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" nameIncludingReturnValue="&lt;return &apos;x&apos; as result of self.switchCase(_x);&gt;">
-                                    <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" exceptionalTermination="false">
+                        <branchCondition name="x = 4 FALSE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathConditionChanged="true" branchCondition="!x = 4">
+                           <statement name="a=_x;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathConditionChanged="false">
+                              <statement name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathConditionChanged="false">
+                                 <methodReturn name="&lt;return of self.switchCase(_x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;x&apos; as result of self.switchCase(_x);&gt;">
+                                    <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" pathConditionChanged="false" exceptionalTermination="false">
                                     </termination>
                                  </methodReturn>
                               </statement>

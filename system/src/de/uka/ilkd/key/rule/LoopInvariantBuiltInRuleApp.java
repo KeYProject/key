@@ -8,22 +8,20 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
-import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.Visitor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
-import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * The built in rule app for the loop invariant rule.
@@ -45,7 +43,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             LoopInvariant inv, List<LocationVariable> heapContext) {
         super(rule, pio, ifInsts);
         assert pio != null;
-        this.loop = (While) MiscTools.getActiveStatement(programTerm()
+        this.loop = (While) JavaTools.getActiveStatement(programTerm()
                 .javaBlock());
         assert loop != null;
         this.inv = instantiateIndex(inv);
@@ -162,7 +160,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     public Term programTerm() {
         if (posInOccurrence() != null) {
-            return MiscTools.goBelowUpdates(posInOccurrence().subTerm());
+            return TermBuilder.DF.goBelowUpdates(posInOccurrence().subTerm());
         }
         return null;
     }

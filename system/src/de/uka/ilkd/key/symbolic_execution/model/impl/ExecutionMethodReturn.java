@@ -1,10 +1,13 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.reference.IExecutionContext;
+import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -128,7 +131,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
          Node methodReturnNode = findMethodReturnNode(getProofNode());
          if (methodReturnNode != null) {
             // Start site proof to extract the value of the result variable.
-            SiteProofVariableValueInput sequentToProve = SymbolicExecutionUtil.createExtractReturnVariableValueSequent(getServices(),
+            de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput sequentToProve = SymbolicExecutionUtil.createExtractReturnVariableValueSequent(getServices(),
                                                                                                                        mbs.getBodySourceAsTypeReference(),  
                                                                                                                        mbs.getDesignatedContext(), 
                                                                                                                        methodReturnNode, 
@@ -174,6 +177,94 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
    }
 
    /**
+    * Creates a {@link Sequent} which can be used in site proofs to
+    * extract the value of the given {@link IProgramVariable} from the
+    * sequent of the given {@link Node}.
+    * @param context The {@link IExecutionContext} that defines the current object (this reference).
+    * @param node The original {@link Node} which provides the sequent to extract from.
+    * @param variable The {@link IProgramVariable} of the value which is interested.
+    * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
+    */
+   protected SiteProofVariableValueInput createExtractVariableValueSequent(IExecutionContext context,
+                                                                           Node node,
+                                                                           IProgramVariable variable) {
+      // Make sure that correct parameters are given
+      assert context != null;
+      assert node != null;
+      assert variable instanceof ProgramVariable;
+      // Create method frame which will be executed in site proof
+      Statement originalReturnStatement = (Statement)node.getNodeInfo().getActiveStatement();
+      MethodFrame newMethodFrame = new MethodFrame(variable, context, new StatementBlock(originalReturnStatement));
+      JavaBlock newJavaBlock = JavaBlock.createJavaBlock(new StatementBlock(newMethodFrame));
+      // Create predicate which will be used in formulas to store the value interested in.
+      Function newPredicate = new Function(new Name(TermBuilder.DF.newName(getServices(), "ResultPredicate")), Sort.FORMULA, variable.sort());
+      // Create formula which contains the value interested in.
+      Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
+      // Combine method frame with value formula in a modality.
+      Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
+      // Get the updates from the return node which includes the value interested in.
+      Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
+      // Combine method frame, formula with value predicate and the updates which provides the values
+      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, modalityTerm);
+      // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
+      PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
+      Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
+      Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
+      // Return created sequent and the used predicate to identify the value interested in.
+      return new SiteProofVariableValueInput(sequentToProve, newPredicate);
+   }
+   
+   /**
+    * Helper class which represents the return value of
+    * {@link ExecutionMethodReturn#createExtractVariableValueSequent(TypeReference, ReferencePrefix, Node, IProgramVariable)} and
+    * {@link ExecutionMethodReturn#createExtractVariableValueSequent(IExecutionContext, Node, IProgramVariable)}.
+    * @author Martin Hentschel
+    */
+   protected static class SiteProofVariableValueInput {
+      /**
+       * The sequent to prove.
+       */
+      private Sequent sequentToProve;
+      
+      /**
+       * The {@link Operator} which is the predicate that contains the value interested in.
+       */
+      private Operator operator;
+      
+      /**
+       * Constructor.
+       * @param sequentToProve he sequent to prove.
+       * @param operator The {@link Operator} which is the predicate that contains the value interested in.
+       */
+      public SiteProofVariableValueInput(Sequent sequentToProve, Operator operator) {
+         super();
+         this.sequentToProve = sequentToProve;
+         this.operator = operator;
+      }
+      
+      /**
+       * Returns the sequent to prove.
+       * @return The sequent to prove.
+       */
+      public Sequent getSequentToProve() {
+         return sequentToProve;
+      }
+      
+      /**
+       * Returns the {@link Operator} which is the predicate that contains the value interested in.
+       * @return The {@link Operator} which is the predicate that contains the value interested in.
+       */
+      public Operator getOperator() {
+         return operator;
+      }
+   }
+   
+   /**
+    * Starts a site proof for the given {@link Sequent}.
+    * @param sequentToProve The {@link Sequent} to prove.
+    * @return The proof result represented as {@link ApplyStrategyInfo} instance.
+    * @throws ProofInputException Occurred Exception
     * {@inheritDoc}
     */
    @Override

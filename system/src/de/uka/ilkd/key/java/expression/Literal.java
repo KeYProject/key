@@ -42,7 +42,24 @@ public abstract class Literal extends JavaProgramElement implements Expression, 
 	
     }
 
-    /** retrieves the literal's type (as it is independant of the
+    /**
+     * Literal with specific source code position.
+     * @param children the children of this AST element as KeY classes. May contain: Comments
+     * @param pos The specific source code position.
+     */
+    public Literal(ExtList children, PositionInfo pos) {
+        super(children, pos);
+    }
+
+    /**
+     * Literal with specific source code position.
+     * @param pos The specific source code position.
+     */
+    public Literal(PositionInfo pos) {
+        super(pos);
+    }
+
+   /** retrieves the literal's type (as it is independant of the
      * execution context, it is same as using {@link #getKeYJavaType(Services)})
      * @param javaServ the Services offering access to the Java model 
      * @param ec the ExecutionContext in which the expression is evaluated 

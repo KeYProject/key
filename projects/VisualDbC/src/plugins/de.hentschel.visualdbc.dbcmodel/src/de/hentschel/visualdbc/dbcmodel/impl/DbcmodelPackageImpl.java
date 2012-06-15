@@ -603,6 +603,15 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
     * <!-- end-user-doc -->
     * @generated
     */
+   public EReference getDbcProofReference_Source() {
+      return (EReference)dbcProofReferenceEClass.getEStructuralFeatures().get(2);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    public EClass getDbcAttribute() {
       return dbcAttributeEClass;
    }
@@ -1035,6 +1044,15 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
     * <!-- end-user-doc -->
     * @generated
     */
+   public EReference getIDbCProofReferencable_AllReferences() {
+      return (EReference)iDbCProofReferencableEClass.getEStructuralFeatures().get(0);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    public EClass getDbcProofObligation() {
       return dbcProofObligationEClass;
    }
@@ -1193,6 +1211,7 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
       dbcProofReferenceEClass = createEClass(DBC_PROOF_REFERENCE);
       createEReference(dbcProofReferenceEClass, DBC_PROOF_REFERENCE__TARGET);
       createEAttribute(dbcProofReferenceEClass, DBC_PROOF_REFERENCE__KIND);
+      createEReference(dbcProofReferenceEClass, DBC_PROOF_REFERENCE__SOURCE);
 
       dbcAttributeEClass = createEClass(DBC_ATTRIBUTE);
       createEAttribute(dbcAttributeEClass, DBC_ATTRIBUTE__NAME);
@@ -1257,6 +1276,7 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
       createEReference(iDbCProvableEClass, IDB_CPROVABLE__ALL_PROOFS);
 
       iDbCProofReferencableEClass = createEClass(IDB_CPROOF_REFERENCABLE);
+      createEReference(iDbCProofReferencableEClass, IDB_CPROOF_REFERENCABLE__ALL_REFERENCES);
 
       dbcProofObligationEClass = createEClass(DBC_PROOF_OBLIGATION);
       createEAttribute(dbcProofObligationEClass, DBC_PROOF_OBLIGATION__OBLIGATION);
@@ -1379,6 +1399,7 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
       initEClass(dbcProofReferenceEClass, DbcProofReference.class, "DbcProofReference", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEReference(getDbcProofReference_Target(), this.getIDbCProofReferencable(), null, "target", null, 0, 1, DbcProofReference.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
       initEAttribute(getDbcProofReference_Kind(), ecorePackage.getEString(), "kind", null, 0, 1, DbcProofReference.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+      initEReference(getDbcProofReference_Source(), this.getDbcProof(), null, "source", null, 0, 1, DbcProofReference.class, IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
       initEClass(dbcAttributeEClass, DbcAttribute.class, "DbcAttribute", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEAttribute(getDbcAttribute_Name(), ecorePackage.getEString(), "name", null, 0, 1, DbcAttribute.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -1471,6 +1492,7 @@ public class DbcmodelPackageImpl extends EPackageImpl implements DbcmodelPackage
       initEReference(getIDbCProvable_AllProofs(), this.getDbcProof(), null, "allProofs", null, 0, -1, IDbCProvable.class, IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
       initEClass(iDbCProofReferencableEClass, IDbCProofReferencable.class, "IDbCProofReferencable", IS_ABSTRACT, IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+      initEReference(getIDbCProofReferencable_AllReferences(), this.getDbcProofReference(), null, "allReferences", null, 0, -1, IDbCProofReferencable.class, IS_TRANSIENT, !IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
       initEClass(dbcProofObligationEClass, DbcProofObligation.class, "DbcProofObligation", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEAttribute(getDbcProofObligation_Obligation(), ecorePackage.getEString(), "obligation", null, 0, 1, DbcProofObligation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

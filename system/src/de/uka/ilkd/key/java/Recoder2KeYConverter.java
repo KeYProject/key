@@ -789,12 +789,10 @@ public class Recoder2KeYConverter {
     public BooleanLiteral convert(
             recoder.java.expression.literal.BooleanLiteral booleanLit) {
 
-        // if there are comments to take into consideration
-        // change parameter to ExtList
-        // TODO make comments available
-
-        return (booleanLit.getValue() ? BooleanLiteral.TRUE
-                : BooleanLiteral.FALSE);
+        // The source code position is very important because a single boolean literal is maybe a complete loop condition and the symbolic execution debugger needs source code position to separate code steps from internal proof steps. For this reason is the usage of the singleton constants not possible.
+        return booleanLit.getValue() ? 
+               new BooleanLiteral(collectComments(booleanLit), positionInfo(booleanLit), true) : 
+               new BooleanLiteral(collectComments(booleanLit), positionInfo(booleanLit), false);
     }
     
     

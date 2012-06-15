@@ -315,6 +315,15 @@ public class DbcConstructorEditPart extends ShapeNodeEditPart {
     * @generated
     */
    public class DbcConstructorFigure extends RectangleFigure {
+      /**
+       * @generated NOT
+       */
+      private Color originalForegroundColor;
+
+      /**
+       * @generated NOT
+       */
+      private int originalLineWidth;
 
       /**
        * @generated
@@ -385,6 +394,65 @@ public class DbcConstructorEditPart extends ShapeNodeEditPart {
        */
       public RectangleFigure getFigureDbcConstructorCompartmentRectangle() {
          return fFigureDbcConstructorCompartmentRectangle;
+      }
+
+      /**
+       * @generated NOT
+       */
+      public void highlight(Color highlightForegroundColor, int lineWidth) {
+         if (originalForegroundColor == null) {
+            this.originalForegroundColor = getForegroundColor();
+            this.originalLineWidth = getLineWidth();
+         }
+         super.setForegroundColor(highlightForegroundColor);
+         super.setLineWidth(lineWidth);
+         for (Object child :getChildren()) {
+            if (child instanceof Shape) {
+               ((Shape)child).setLineWidth(lineWidth);
+            }
+         }
+      }
+      
+      /**
+       * @generated NOT
+       */
+      public void disableHighlighting() {
+         if (originalForegroundColor != null) {
+            super.setForegroundColor(originalForegroundColor);
+            super.setLineWidth(originalLineWidth);
+            for (Object child :getChildren()) {
+               if (child instanceof Shape) {
+                  ((Shape)child).setLineWidth(originalLineWidth);
+               }
+            }
+            originalForegroundColor = null;
+         }
+      }
+
+      /**
+       * @generated NOT
+       */
+      @Override
+      public void setForegroundColor(Color fg) {
+         if (originalForegroundColor == null) {
+            super.setForegroundColor(fg);
+         }
+         else {
+            originalForegroundColor = fg;
+         }
+      }
+
+      /**
+       * @generated NOT
+       */
+      @Override
+      public void setLineWidth(int w) {
+         if (originalForegroundColor == null) {
+            super.setLineWidth(w);
+         }
+         else {
+            originalLineWidth = w;
+         }
       }
 
    }

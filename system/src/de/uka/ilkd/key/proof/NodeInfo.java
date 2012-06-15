@@ -20,9 +20,9 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.util.MiscTools;
 
 
 /**
@@ -78,24 +78,78 @@ public class NodeInfo {
         if (determinedFstAndActiveStatement)
             return;
         final RuleApp ruleApp = node.getAppliedRuleApp();
-        // TODO: unify with MiscTools getActiveStatement
         if (ruleApp instanceof PosTacletApp) {
-            PosTacletApp pta = (PosTacletApp) ruleApp;
-            if (!isSymbolicExecution(pta.taclet())) return;
-            Term t = MiscTools.goBelowUpdates(pta.posInOccurrence().subTerm());
-            final ProgramElement pe = t.javaBlock().program();
-            if (pe != null) {
-                firstStatement = pe.getFirstElement();
-                firstStatementString = null;
-
-                activeStatement = firstStatement;
-                while ((activeStatement instanceof ProgramPrefix)
-                        && !(activeStatement instanceof StatementBlock)) {
-                    activeStatement = activeStatement.getFirstElement();
-                }
-            }
-            determinedFstAndActiveStatement = true;
+           firstStatement = computeFirstStatement(ruleApp);
+           firstStatementString = null;
+           activeStatement = computeActiveStatement(ruleApp);
+           determinedFstAndActiveStatement = true;
         }
+    }
+
+    /**
+     * <p>
+     * Computes the active statement in the given {@link RuleApp}.
+     * </p>
+     * <p>
+     * This functionality is independent from concrete {@link NodeInfo}s
+     * and used for instance by the symbolic execution tree extraction.
+     * </p>
+     * @param ruleApp The given {@link RuleApp}.
+     * @return The active statement or {@code null} if no one is provided.
+     */
+    public static SourceElement computeActiveStatement(RuleApp ruleApp) {
+       SourceElement firstStatement = computeFirstStatement(ruleApp);
+       return computeActiveStatement(firstStatement);
+    }
+
+    /**
+     * <p>
+     * Computes the first statement in the given {@link RuleApp}.
+     * </p>
+     * <p>
+     * This functionality is independent from concrete {@link NodeInfo}s
+     * and used for instance by the symbolic execution tree extraction.
+     * </p>
+     * @param ruleApp The given {@link RuleApp}.
+     * @return The first statement or {@code null} if no one is provided.
+     */
+    public static SourceElement computeFirstStatement(RuleApp ruleApp) {
+       SourceElement firstStatement = null;
+       // TODO: unify with MiscTools getActiveStatement
+       if (ruleApp instanceof PosTacletApp) {
+           PosTacletApp pta = (PosTacletApp) ruleApp;
+           if (!isSymbolicExecution(pta.taclet())) return null;
+           Term t = TermBuilder.DF.goBelowUpdates(pta.posInOccurrence().subTerm());
+           final ProgramElement pe = t.javaBlock().program();
+           if (pe != null) {
+               firstStatement = pe.getFirstElement();
+           }
+       }
+       return firstStatement;
+    }
+
+    /**
+     * <p>
+     * Computes the active statement in the given {@link SourceElement}.
+     * </p>
+     * <p>
+     * This functionality is independent from concrete {@link NodeInfo}s
+     * and used for instance by the symbolic execution tree extraction.
+     * </p>
+     * @param firstStatement The given {@link SourceElement}.
+     * @return The active statement or {@code null} if no one is provided.
+     */
+    public static SourceElement computeActiveStatement(SourceElement firstStatement) {
+       SourceElement activeStatement = null;
+       // TODO: unify with MiscTools getActiveStatement
+       if (firstStatement != null) {
+          activeStatement = firstStatement;
+          while ((activeStatement instanceof ProgramPrefix)
+                  && !(activeStatement instanceof StatementBlock)) {
+              activeStatement = activeStatement.getFirstElement();
+          }
+       }
+       return activeStatement;
     }
     
     void updateNoteInfo(){
@@ -107,7 +161,7 @@ public class NodeInfo {
     }
   
     
-    private boolean isSymbolicExecution(Taclet t) {
+    private static boolean isSymbolicExecution(Taclet t) {
         ImmutableList<RuleSet> list = t.getRuleSets();
 	RuleSet       rs;
 	while (!list.isEmpty()) {

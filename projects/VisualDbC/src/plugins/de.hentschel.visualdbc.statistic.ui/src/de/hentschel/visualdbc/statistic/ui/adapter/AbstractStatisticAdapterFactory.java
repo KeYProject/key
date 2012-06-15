@@ -13,17 +13,17 @@ package de.hentschel.visualdbc.statistic.ui.adapter;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 
-import de.hentschel.visualdbc.statistic.ui.control.IStatisticProvider;
+import de.hentschel.visualdbc.statistic.ui.view.IStatisticViewPart;
 
 /**
  * Provides a basic implementation for {@link IAdapterFactory}s that
- * allows to convert to {@link IStatisticProvider}.
+ * allows to convert to {@link IStatisticViewPart}.
  * @author Martin Hentschel
  */
 public abstract class AbstractStatisticAdapterFactory implements IAdapterFactory {
    @SuppressWarnings("rawtypes")
    @Override
    public Class[] getAdapterList() {
-      return new Class[] {IStatisticProvider.class};
+      return new Class[] {IStatisticViewPart.class};
    }
 }

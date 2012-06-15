@@ -13,13 +13,10 @@ package de.hentschel.visualdbc.interactive.proving.ui.util;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.ecore.EObject;
@@ -29,7 +26,6 @@ import org.eclipse.emf.edit.command.RemoveCommand;
 import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.gef.EditPart;
-import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
 import org.eclipse.gef.commands.CompoundCommand;
@@ -38,7 +34,6 @@ import org.eclipse.gef.requests.GroupRequest;
 import org.eclipse.gmf.runtime.common.core.command.ICommand;
 import org.eclipse.gmf.runtime.diagram.ui.commands.DeferredCreateConnectionViewAndElementCommand;
 import org.eclipse.gmf.runtime.diagram.ui.commands.ICommandProxy;
-import org.eclipse.gmf.runtime.diagram.ui.editparts.ConnectionEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ShapeNodeEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.requests.CreateConnectionViewAndElementRequest;
 import org.eclipse.gmf.runtime.diagram.ui.requests.EditCommandRequestWrapper;
@@ -46,7 +41,6 @@ import org.eclipse.gmf.runtime.emf.core.util.EObjectAdapter;
 import org.eclipse.gmf.runtime.emf.type.core.IHintedType;
 import org.eclipse.gmf.runtime.emf.type.core.requests.SetRequest;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.hentschel.visualdbc.datasource.model.IDSConnection;
@@ -64,6 +58,7 @@ import de.hentschel.visualdbc.dbcmodel.DbcProofStatus;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelFactory;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 import de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable;
+import de.hentschel.visualdbc.dbcmodel.diagram.custom.util.GMFUtil;
 import de.hentschel.visualdbc.dbcmodel.diagram.providers.DbCElementTypes;
 import de.hentschel.visualdbc.interactive.proving.ui.finder.IDSFinder;
 import de.hentschel.visualdbc.interactive.proving.ui.finder.IDbcFinder;
@@ -223,7 +218,7 @@ public final class ProofUtil {
             // Compute the edit parts to delete
             List<Object> editPartsToDelete = new LinkedList<Object>();
             for (DbcProofReference refToDel : proof.getProofReferences()) {
-               Collection<EditPart> targetEditPart = findEditParts(proofEditPart, refToDel);
+               Collection<EditPart> targetEditPart = GMFUtil.findEditParts(proofEditPart, refToDel);
                editPartsToDelete.addAll(targetEditPart);
             }
             // Create delete reference commands
@@ -369,7 +364,7 @@ public final class ProofUtil {
          // Compute the edit parts to delete
          List<Object> editPartsToDelete = new LinkedList<Object>();
          for (DbcProofReference refToDel : referencesToDelete) {
-            Collection<EditPart> targetEditPart = findEditParts(proofEditPart, refToDel);
+            Collection<EditPart> targetEditPart = GMFUtil.findEditParts(proofEditPart, refToDel);
             editPartsToDelete.addAll(targetEditPart);
          }
          // Create delete reference commands
@@ -387,40 +382,6 @@ public final class ProofUtil {
          // Execute delete command
          proofEditPart.getDiagramEditDomain().getDiagramCommandStack().execute(compoundCmd);
       }
-   }
-
-   /**
-    * Returns all {@link EditPart}s although if they are not contained in the 
-    * containment hierarchy, like {@link ConnectionEditPart}s.
-    * @param parent The parent that has a reference to the viewer.
-    * @param toSearch The {@link EObject} for that the {@link EditPart} is needed.
-    * @return The found {@link EditPart}s or {@code null} if no one were found.
-    */
-   public static Collection<EditPart> findEditParts(EditPart parent, EObject toSearch) {
-      return findEditParts(parent.getViewer(), toSearch);
-   }
-
-   /**
-    * Returns all {@link EditPart}s although if they are not contained in the 
-    * containment hierarchy, like {@link ConnectionEditPart}s.
-    * @param viewer The viewer to use.
-    * @param toSearch The {@link EObject} for that the {@link EditPart} is needed.
-    * @return The found {@link EditPart}s or {@code null} if no one were found.
-    */
-   public static Collection<EditPart> findEditParts(EditPartViewer viewer, EObject toSearch) {
-      Map<?, ?> map = viewer.getEditPartRegistry();
-      Collection<?> entries = map.values();
-      Iterator<?> entryIter = entries.iterator();
-      Collection<EditPart> result = new HashSet<EditPart>();
-      while (entryIter.hasNext()) {
-         Object entry = entryIter.next();
-         Assert.isTrue(entry instanceof EditPart);
-         EditPart editPart = (EditPart)entry;
-         if (ObjectUtil.equals(editPart.getAdapter(EObject.class), toSearch)) {
-            result.add(editPart);
-         }
-      }
-      return result;
    }
 
    /**

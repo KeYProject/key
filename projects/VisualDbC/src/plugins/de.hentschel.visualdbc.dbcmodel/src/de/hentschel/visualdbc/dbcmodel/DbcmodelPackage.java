@@ -370,13 +370,22 @@ public interface DbcmodelPackage extends EPackage {
    int ABSTRACT_DBC_TYPE__TYPES = ABSTRACT_DBC_TYPE_CONTAINER__TYPES;
 
    /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int ABSTRACT_DBC_TYPE__ALL_REFERENCES = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 0;
+
+   /**
     * The feature id for the '<em><b>Proof Obligations</b></em>' reference list.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_TYPE__PROOF_OBLIGATIONS = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 0;
+   int ABSTRACT_DBC_TYPE__PROOF_OBLIGATIONS = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 1;
 
    /**
     * The feature id for the '<em><b>All Proofs</b></em>' reference list.
@@ -385,7 +394,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_TYPE__ALL_PROOFS = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 1;
+   int ABSTRACT_DBC_TYPE__ALL_PROOFS = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 2;
 
    /**
     * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -394,7 +403,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_TYPE__NAME = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 2;
+   int ABSTRACT_DBC_TYPE__NAME = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 3;
 
    /**
     * The feature id for the '<em><b>Visibility</b></em>' attribute.
@@ -403,7 +412,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_TYPE__VISIBILITY = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 3;
+   int ABSTRACT_DBC_TYPE__VISIBILITY = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 4;
 
    /**
     * The feature id for the '<em><b>Static</b></em>' attribute.
@@ -412,7 +421,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_TYPE__STATIC = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 4;
+   int ABSTRACT_DBC_TYPE__STATIC = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 5;
 
    /**
     * The feature id for the '<em><b>Invariants</b></em>' containment reference list.
@@ -421,7 +430,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_TYPE__INVARIANTS = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 5;
+   int ABSTRACT_DBC_TYPE__INVARIANTS = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 6;
 
    /**
     * The feature id for the '<em><b>Axioms</b></em>' containment reference list.
@@ -430,7 +439,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-    int ABSTRACT_DBC_TYPE__AXIOMS = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 6;
+    int ABSTRACT_DBC_TYPE__AXIOMS = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 7;
 
 /**
     * The number of structural features of the '<em>Abstract Dbc Type</em>' class.
@@ -439,7 +448,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_TYPE_FEATURE_COUNT = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 7;
+   int ABSTRACT_DBC_TYPE_FEATURE_COUNT = ABSTRACT_DBC_TYPE_CONTAINER_FEATURE_COUNT + 8;
 
    /**
     * The feature id for the '<em><b>Proofs</b></em>' containment reference list.
@@ -458,6 +467,15 @@ public interface DbcmodelPackage extends EPackage {
     * @ordered
     */
    int ABSTRACT_DBC_INTERFACE__TYPES = ABSTRACT_DBC_TYPE__TYPES;
+
+   /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int ABSTRACT_DBC_INTERFACE__ALL_REFERENCES = ABSTRACT_DBC_TYPE__ALL_REFERENCES;
 
    /**
     * The feature id for the '<em><b>Proof Obligations</b></em>' reference list.
@@ -566,6 +584,15 @@ public interface DbcmodelPackage extends EPackage {
     * @ordered
     */
    int ABSTRACT_DBC_CLASS__TYPES = ABSTRACT_DBC_INTERFACE__TYPES;
+
+   /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int ABSTRACT_DBC_CLASS__ALL_REFERENCES = ABSTRACT_DBC_INTERFACE__ALL_REFERENCES;
 
    /**
     * The feature id for the '<em><b>Proof Obligations</b></em>' reference list.
@@ -692,6 +719,15 @@ public interface DbcmodelPackage extends EPackage {
     * @ordered
     */
    int DBC_CLASS__TYPES = ABSTRACT_DBC_CLASS__TYPES;
+
+   /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_CLASS__ALL_REFERENCES = ABSTRACT_DBC_CLASS__ALL_REFERENCES;
 
    /**
     * The feature id for the '<em><b>Proof Obligations</b></em>' reference list.
@@ -987,13 +1023,22 @@ public interface DbcmodelPackage extends EPackage {
    int ABSTRACT_DBC_OPERATION__PROOFS = ABSTRACT_DBC_PROOF_CONTAINER__PROOFS;
 
    /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int ABSTRACT_DBC_OPERATION__ALL_REFERENCES = ABSTRACT_DBC_PROOF_CONTAINER_FEATURE_COUNT + 0;
+
+   /**
     * The feature id for the '<em><b>Proof Obligations</b></em>' reference list.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_OPERATION__PROOF_OBLIGATIONS = ABSTRACT_DBC_PROOF_CONTAINER_FEATURE_COUNT + 0;
+   int ABSTRACT_DBC_OPERATION__PROOF_OBLIGATIONS = ABSTRACT_DBC_PROOF_CONTAINER_FEATURE_COUNT + 1;
 
    /**
     * The feature id for the '<em><b>All Proofs</b></em>' reference list.
@@ -1002,7 +1047,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_OPERATION__ALL_PROOFS = ABSTRACT_DBC_PROOF_CONTAINER_FEATURE_COUNT + 1;
+   int ABSTRACT_DBC_OPERATION__ALL_PROOFS = ABSTRACT_DBC_PROOF_CONTAINER_FEATURE_COUNT + 2;
 
    /**
     * The feature id for the '<em><b>Operation Contracts</b></em>' containment reference list.
@@ -1011,7 +1056,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_OPERATION__OPERATION_CONTRACTS = ABSTRACT_DBC_PROOF_CONTAINER_FEATURE_COUNT + 2;
+   int ABSTRACT_DBC_OPERATION__OPERATION_CONTRACTS = ABSTRACT_DBC_PROOF_CONTAINER_FEATURE_COUNT + 3;
 
    /**
     * The feature id for the '<em><b>Signature</b></em>' attribute.
@@ -1020,7 +1065,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_OPERATION__SIGNATURE = ABSTRACT_DBC_PROOF_CONTAINER_FEATURE_COUNT + 3;
+   int ABSTRACT_DBC_OPERATION__SIGNATURE = ABSTRACT_DBC_PROOF_CONTAINER_FEATURE_COUNT + 4;
 
    /**
     * The feature id for the '<em><b>Visibility</b></em>' attribute.
@@ -1029,7 +1074,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_OPERATION__VISIBILITY = ABSTRACT_DBC_PROOF_CONTAINER_FEATURE_COUNT + 4;
+   int ABSTRACT_DBC_OPERATION__VISIBILITY = ABSTRACT_DBC_PROOF_CONTAINER_FEATURE_COUNT + 5;
 
    /**
     * The feature id for the '<em><b>Static</b></em>' attribute.
@@ -1038,7 +1083,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_OPERATION__STATIC = ABSTRACT_DBC_PROOF_CONTAINER_FEATURE_COUNT + 5;
+   int ABSTRACT_DBC_OPERATION__STATIC = ABSTRACT_DBC_PROOF_CONTAINER_FEATURE_COUNT + 6;
 
    /**
     * The number of structural features of the '<em>Abstract Dbc Operation</em>' class.
@@ -1047,7 +1092,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int ABSTRACT_DBC_OPERATION_FEATURE_COUNT = ABSTRACT_DBC_PROOF_CONTAINER_FEATURE_COUNT + 6;
+   int ABSTRACT_DBC_OPERATION_FEATURE_COUNT = ABSTRACT_DBC_PROOF_CONTAINER_FEATURE_COUNT + 7;
 
    /**
     * The feature id for the '<em><b>Proofs</b></em>' containment reference list.
@@ -1057,6 +1102,15 @@ public interface DbcmodelPackage extends EPackage {
     * @ordered
     */
    int DBC_METHOD__PROOFS = ABSTRACT_DBC_OPERATION__PROOFS;
+
+   /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_METHOD__ALL_REFERENCES = ABSTRACT_DBC_OPERATION__ALL_REFERENCES;
 
    /**
     * The feature id for the '<em><b>Proof Obligations</b></em>' reference list.
@@ -1176,13 +1230,22 @@ public interface DbcmodelPackage extends EPackage {
    int DBC_INVARIANT__NAME = ABSTRACT_DBC_SPECIFICATION__NAME;
 
    /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_INVARIANT__ALL_REFERENCES = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 0;
+
+   /**
     * The feature id for the '<em><b>Condition</b></em>' attribute.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int DBC_INVARIANT__CONDITION = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 0;
+   int DBC_INVARIANT__CONDITION = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 1;
 
    /**
     * The number of structural features of the '<em>Dbc Invariant</em>' class.
@@ -1191,7 +1254,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_INVARIANT_FEATURE_COUNT = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 1;
+   int DBC_INVARIANT_FEATURE_COUNT = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 2;
 
    /**
     * The feature id for the '<em><b>Target</b></em>' reference.
@@ -1246,6 +1309,15 @@ public interface DbcmodelPackage extends EPackage {
     * @ordered
     */
    int DBC_CONSTRUCTOR__PROOFS = ABSTRACT_DBC_OPERATION__PROOFS;
+
+   /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_CONSTRUCTOR__ALL_REFERENCES = ABSTRACT_DBC_OPERATION__ALL_REFERENCES;
 
    /**
     * The feature id for the '<em><b>Proof Obligations</b></em>' reference list.
@@ -1329,13 +1401,22 @@ public interface DbcmodelPackage extends EPackage {
    int DBC_PROOF_REFERENCE__KIND = 1;
 
    /**
+    * The feature id for the '<em><b>Source</b></em>' reference.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_PROOF_REFERENCE__SOURCE = 2;
+
+   /**
     * The number of structural features of the '<em>Dbc Proof Reference</em>' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int DBC_PROOF_REFERENCE_FEATURE_COUNT = 2;
+   int DBC_PROOF_REFERENCE_FEATURE_COUNT = 3;
 
    /**
     * The meta object id for the '{@link de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable <em>IDb CProof Referencable</em>}' class.
@@ -1348,13 +1429,31 @@ public interface DbcmodelPackage extends EPackage {
    int IDB_CPROOF_REFERENCABLE = 24;
 
    /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int IDB_CPROOF_REFERENCABLE__ALL_REFERENCES = 0;
+
+   /**
     * The number of structural features of the '<em>IDb CProof Referencable</em>' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int IDB_CPROOF_REFERENCABLE_FEATURE_COUNT = 0;
+   int IDB_CPROOF_REFERENCABLE_FEATURE_COUNT = 1;
+
+   /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_ATTRIBUTE__ALL_REFERENCES = IDB_CPROOF_REFERENCABLE__ALL_REFERENCES;
 
    /**
     * The feature id for the '<em><b>Name</b></em>' attribute.
@@ -1427,6 +1526,15 @@ public interface DbcmodelPackage extends EPackage {
     * @ordered
     */
    int DBC_INTERFACE__TYPES = ABSTRACT_DBC_INTERFACE__TYPES;
+
+   /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_INTERFACE__ALL_REFERENCES = ABSTRACT_DBC_INTERFACE__ALL_REFERENCES;
 
    /**
     * The feature id for the '<em><b>Proof Obligations</b></em>' reference list.
@@ -1544,6 +1652,15 @@ public interface DbcmodelPackage extends EPackage {
     * @ordered
     */
    int ABSTRACT_DBC_ENUM__TYPES = ABSTRACT_DBC_CLASS__TYPES;
+
+   /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int ABSTRACT_DBC_ENUM__ALL_REFERENCES = ABSTRACT_DBC_CLASS__ALL_REFERENCES;
 
    /**
     * The feature id for the '<em><b>Proof Obligations</b></em>' reference list.
@@ -1681,6 +1798,15 @@ public interface DbcmodelPackage extends EPackage {
    int DBC_ENUM__TYPES = ABSTRACT_DBC_ENUM__TYPES;
 
    /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_ENUM__ALL_REFERENCES = ABSTRACT_DBC_ENUM__ALL_REFERENCES;
+
+   /**
     * The feature id for the '<em><b>Proof Obligations</b></em>' reference list.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -1798,6 +1924,15 @@ public interface DbcmodelPackage extends EPackage {
    int DBC_ENUM_FEATURE_COUNT = ABSTRACT_DBC_ENUM_FEATURE_COUNT + 0;
 
    /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_ENUM_LITERAL__ALL_REFERENCES = IDB_CPROOF_REFERENCABLE__ALL_REFERENCES;
+
+   /**
     * The feature id for the '<em><b>Name</b></em>' attribute.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -1825,13 +1960,22 @@ public interface DbcmodelPackage extends EPackage {
    int DBC_OPERATION_CONTRACT__NAME = ABSTRACT_DBC_SPECIFICATION__NAME;
 
    /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_OPERATION_CONTRACT__ALL_REFERENCES = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 0;
+
+   /**
     * The feature id for the '<em><b>Proof Obligations</b></em>' reference list.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int DBC_OPERATION_CONTRACT__PROOF_OBLIGATIONS = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 0;
+   int DBC_OPERATION_CONTRACT__PROOF_OBLIGATIONS = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 1;
 
    /**
     * The feature id for the '<em><b>All Proofs</b></em>' reference list.
@@ -1840,7 +1984,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_OPERATION_CONTRACT__ALL_PROOFS = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 1;
+   int DBC_OPERATION_CONTRACT__ALL_PROOFS = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 2;
 
    /**
     * The feature id for the '<em><b>Pre</b></em>' attribute.
@@ -1849,7 +1993,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_OPERATION_CONTRACT__PRE = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 2;
+   int DBC_OPERATION_CONTRACT__PRE = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 3;
 
    /**
     * The feature id for the '<em><b>Post</b></em>' attribute.
@@ -1858,7 +2002,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_OPERATION_CONTRACT__POST = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 3;
+   int DBC_OPERATION_CONTRACT__POST = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 4;
 
    /**
     * The feature id for the '<em><b>Modifies</b></em>' attribute.
@@ -1867,7 +2011,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_OPERATION_CONTRACT__MODIFIES = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 4;
+   int DBC_OPERATION_CONTRACT__MODIFIES = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 5;
 
    /**
     * The feature id for the '<em><b>Termination</b></em>' attribute.
@@ -1876,7 +2020,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_OPERATION_CONTRACT__TERMINATION = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 5;
+   int DBC_OPERATION_CONTRACT__TERMINATION = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 6;
 
    /**
     * The number of structural features of the '<em>Dbc Operation Contract</em>' class.
@@ -1885,7 +2029,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DBC_OPERATION_CONTRACT_FEATURE_COUNT = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 6;
+   int DBC_OPERATION_CONTRACT_FEATURE_COUNT = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 7;
 
    /**
     * The feature id for the '<em><b>Key</b></em>' attribute.
@@ -1923,6 +2067,15 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     */
    int IDB_CPROVABLE = 23;
+
+   /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int IDB_CPROVABLE__ALL_REFERENCES = IDB_CPROOF_REFERENCABLE__ALL_REFERENCES;
 
    /**
     * The feature id for the '<em><b>Proof Obligations</b></em>' reference list.
@@ -1990,6 +2143,15 @@ public interface DbcmodelPackage extends EPackage {
     int DBC_AXIOM = 26;
 
 /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DBC_AXIOM__ALL_REFERENCES = IDB_CPROOF_REFERENCABLE__ALL_REFERENCES;
+
+/**
     * The feature id for the '<em><b>Name</b></em>' attribute.
     * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -2045,13 +2207,22 @@ public interface DbcmodelPackage extends EPackage {
    int DB_CAXIOM_CONTRACT__NAME = ABSTRACT_DBC_SPECIFICATION__NAME;
 
 /**
+    * The feature id for the '<em><b>All References</b></em>' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int DB_CAXIOM_CONTRACT__ALL_REFERENCES = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 0;
+
+/**
     * The feature id for the '<em><b>Proof Obligations</b></em>' reference list.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int DB_CAXIOM_CONTRACT__PROOF_OBLIGATIONS = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 0;
+   int DB_CAXIOM_CONTRACT__PROOF_OBLIGATIONS = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 1;
 
 /**
     * The feature id for the '<em><b>All Proofs</b></em>' reference list.
@@ -2060,7 +2231,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DB_CAXIOM_CONTRACT__ALL_PROOFS = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 1;
+   int DB_CAXIOM_CONTRACT__ALL_PROOFS = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 2;
 
 /**
     * The feature id for the '<em><b>Pre</b></em>' attribute.
@@ -2069,7 +2240,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DB_CAXIOM_CONTRACT__PRE = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 2;
+   int DB_CAXIOM_CONTRACT__PRE = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 3;
 
 /**
     * The feature id for the '<em><b>Dep</b></em>' attribute.
@@ -2078,7 +2249,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DB_CAXIOM_CONTRACT__DEP = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 3;
+   int DB_CAXIOM_CONTRACT__DEP = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 4;
 
 /**
     * The number of structural features of the '<em>Db CAxiom Contract</em>' class.
@@ -2087,7 +2258,7 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int DB_CAXIOM_CONTRACT_FEATURE_COUNT = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 4;
+   int DB_CAXIOM_CONTRACT_FEATURE_COUNT = ABSTRACT_DBC_SPECIFICATION_FEATURE_COUNT + 5;
 
 /**
     * The meta object id for the '{@link de.hentschel.visualdbc.dbcmodel.DbcVisibility <em>Dbc Visibility</em>}' enum.
@@ -2419,6 +2590,17 @@ public interface DbcmodelPackage extends EPackage {
     * @generated
     */
    EAttribute getDbcProofReference_Kind();
+
+   /**
+    * Returns the meta object for the reference '{@link de.hentschel.visualdbc.dbcmodel.DbcProofReference#getSource <em>Source</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the reference '<em>Source</em>'.
+    * @see de.hentschel.visualdbc.dbcmodel.DbcProofReference#getSource()
+    * @see #getDbcProofReference()
+    * @generated
+    */
+   EReference getDbcProofReference_Source();
 
    /**
     * Returns the meta object for class '{@link de.hentschel.visualdbc.dbcmodel.DbcAttribute <em>Dbc Attribute</em>}'.
@@ -2933,6 +3115,17 @@ public interface DbcmodelPackage extends EPackage {
    EClass getIDbCProofReferencable();
 
    /**
+    * Returns the meta object for the reference list '{@link de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable#getAllReferences <em>All References</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the reference list '<em>All References</em>'.
+    * @see de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable#getAllReferences()
+    * @see #getIDbCProofReferencable()
+    * @generated
+    */
+   EReference getIDbCProofReferencable_AllReferences();
+
+   /**
     * Returns the meta object for class '{@link de.hentschel.visualdbc.dbcmodel.DbcProofObligation <em>Dbc Proof Obligation</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -3311,6 +3504,14 @@ public interface DbcmodelPackage extends EPackage {
        * @generated
        */
       EAttribute DBC_PROOF_REFERENCE__KIND = eINSTANCE.getDbcProofReference_Kind();
+
+      /**
+       * The meta object literal for the '<em><b>Source</b></em>' reference feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EReference DBC_PROOF_REFERENCE__SOURCE = eINSTANCE.getDbcProofReference_Source();
 
       /**
        * The meta object literal for the '{@link de.hentschel.visualdbc.dbcmodel.impl.DbcAttributeImpl <em>Dbc Attribute</em>}' class.
@@ -3727,6 +3928,14 @@ public interface DbcmodelPackage extends EPackage {
        * @generated
        */
       EClass IDB_CPROOF_REFERENCABLE = eINSTANCE.getIDbCProofReferencable();
+
+      /**
+       * The meta object literal for the '<em><b>All References</b></em>' reference list feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EReference IDB_CPROOF_REFERENCABLE__ALL_REFERENCES = eINSTANCE.getIDbCProofReferencable_AllReferences();
 
       /**
        * The meta object literal for the '{@link de.hentschel.visualdbc.dbcmodel.impl.DbcProofObligationImpl <em>Dbc Proof Obligation</em>}' class.

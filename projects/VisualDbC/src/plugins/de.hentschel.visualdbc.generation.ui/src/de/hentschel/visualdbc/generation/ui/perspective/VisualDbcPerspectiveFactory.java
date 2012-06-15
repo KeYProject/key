@@ -37,7 +37,6 @@ public class VisualDbcPerspectiveFactory implements IPerspectiveFactory {
       // Put the log view on the bottom
       IFolderLayout bottomFolder = layout.createFolder("bottom", IPageLayout.BOTTOM, 0.75f, editorArea);
       bottomFolder.addView(IPageLayout.ID_PROP_SHEET);
-      bottomFolder.addView("de.hentschel.visualdbc.statistic.ui.view.StatisticViewPart");
 //      bottomFolder.addView("org.eclipse.pde.runtime.LogView");
       bottomFolder.addPlaceholder(IPageLayout.ID_PROBLEM_VIEW);
       bottomFolder.addPlaceholder(IPageLayout.ID_BOOKMARKS);
@@ -55,7 +54,6 @@ public class VisualDbcPerspectiveFactory implements IPerspectiveFactory {
       layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
 //      layout.addShowViewShortcut("org.eclipse.pde.runtime.LogView");
       layout.addShowViewShortcut(ProjectExplorer.VIEW_ID);
-      layout.addShowViewShortcut("de.hentschel.visualdbc.statistic.ui.view.StatisticViewPart");
       // Perspective Shortcuts
       layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaPerspective");
       layout.addPerspectiveShortcut("org.eclipse.ui.resourcePerspective");

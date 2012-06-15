@@ -186,4 +186,20 @@ public class KeYLoopNode extends AbstractSEDLoopNode implements IKeYSEDDebugNode
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute path condition.", e));
       }
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canStepInto() {
+      return getDebugTarget().canStepInto(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void stepInto() throws DebugException {
+      getDebugTarget().stepInto(this);
+   }
 }

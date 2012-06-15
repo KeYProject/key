@@ -35,7 +35,6 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -513,7 +512,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         //bail out if obviously not helpful
         if(!changedLocs.first.op().equals(locSetLDT.getEmpty())) {
             final ImmutableSet<Term> changed 
-            	= addEqualDefs(MiscTools.unionToSet(
+            	= addEqualDefs(TB.unionToSet(
             				      changedLocs.first, 
             				      services), 
             				      goal);

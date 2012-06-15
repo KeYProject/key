@@ -829,7 +829,7 @@
       <layoutConstraint xmi:type="notation:Location" xmi:id="_gIzf1HVZEeCHv5FBek0a1w" x="-120" y="9"/>
     </children>
     <children xmi:type="notation:DecorationNode" xmi:id="_gIzf1XVZEeCHv5FBek0a1w" type="6003">
-      <layoutConstraint xmi:type="notation:Location" xmi:id="_gIzf1nVZEeCHv5FBek0a1w" x="24" y="-11"/>
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_gIzf1nVZEeCHv5FBek0a1w" x="24" y="9"/>
     </children>
     <styles xmi:type="notation:FontStyle" xmi:id="_gIzf0XVZEeCHv5FBek0a1w" fontName="Segoe UI"/>
     <element xmi:type="ecore:EReference" href="DbcModel.ecore#//DbcProofReference/target"/>
@@ -1197,5 +1197,31 @@
     <element xsi:nil="true"/>
     <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_Rdi04mYSEeGJEZGYYsGG7g" points="[-73, 0, -61, -721]$[-368, 0, -356, -721]$[-368, 721, -356, 0]$[-138, 721, -126, 0]"/>
     <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_T_QjsGYSEeGJEZGYYsGG7g" id="(0.8811188811188811,0.6153846153846154)"/>
+  </edges>
+  <edges xmi:type="notation:Connector" xmi:id="_wYVp0a7nEeGTdsC1Q_WX6w" type="4002" source="_d6Io0XVZEeCHv5FBek0a1w" target="_INf6UHS2EeCYX-eRvGq0-w">
+    <children xmi:type="notation:DecorationNode" xmi:id="_wYbwcK7nEeGTdsC1Q_WX6w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_wYbwca7nEeGTdsC1Q_WX6w" x="18" y="23"/>
+    </children>
+    <children xmi:type="notation:DecorationNode" xmi:id="_wYbwcq7nEeGTdsC1Q_WX6w" type="6003">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_wYbwc67nEeGTdsC1Q_WX6w" x="17" y="-9"/>
+    </children>
+    <styles xmi:type="notation:FontStyle" xmi:id="_wYVp0q7nEeGTdsC1Q_WX6w" fontName="Segoe UI"/>
+    <element xmi:type="ecore:EReference" href="DbcModel.ecore#//DbcProofReference/source"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_wYVp067nEeGTdsC1Q_WX6w" points="[9, -15, 98, 167]$[9, -182, 98, 0]$[-84, -182, 5, 0]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_wYh3EK7nEeGTdsC1Q_WX6w" id="(0.9098360655737705,0.2542372881355932)"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_wYh3Ea7nEeGTdsC1Q_WX6w" id="(0.9671052631578947,0.8292682926829268)"/>
+  </edges>
+  <edges xmi:type="notation:Connector" xmi:id="_22xQYK7oEeGTdsC1Q_WX6w" type="4002" source="_s96sMKJrEeCH6ZBHrrS7gw" target="_d6Io0XVZEeCHv5FBek0a1w">
+    <children xmi:type="notation:DecorationNode" xmi:id="_22xQY67oEeGTdsC1Q_WX6w" type="6001">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_22xQZK7oEeGTdsC1Q_WX6w" x="-97" y="10"/>
+    </children>
+    <children xmi:type="notation:DecorationNode" xmi:id="_22xQZa7oEeGTdsC1Q_WX6w" type="6003">
+      <layoutConstraint xmi:type="notation:Location" xmi:id="_22xQZq7oEeGTdsC1Q_WX6w" x="24" y="10"/>
+    </children>
+    <styles xmi:type="notation:FontStyle" xmi:id="_22xQYa7oEeGTdsC1Q_WX6w" fontName="Segoe UI"/>
+    <element xmi:type="ecore:EReference" href="DbcModel.ecore#//IDbCProofReferencable/allReferences"/>
+    <bendpoints xmi:type="notation:RelativeBendpoints" xmi:id="_22xQYq7oEeGTdsC1Q_WX6w" points="[39, -4, -368, 0]$[413, 8, 6, 12]"/>
+    <sourceAnchor xmi:type="notation:IdentityAnchor" xmi:id="_223XAK7oEeGTdsC1Q_WX6w" id="(0.7272727272727273,0.8846153846153846)"/>
+    <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_229doK7oEeGTdsC1Q_WX6w" id="(0.5819672131147541,0.7966101694915254)"/>
   </edges>
 </notation:Diagram>

@@ -54,6 +54,12 @@ public interface IExecutionNode extends IExecutionElement {
    public IExecutionNode[] getChildren();
    
    /**
+    * Checks if this node has changed the path condition of the parent.
+    * @return {@code true} has different path condition compared to its parent, {@code false} has same path condition as parent.
+    */
+   public boolean isPathConditionChanged();
+   
+   /**
     * Returns the path condition to reach this node as {@link Term}.
     * @return The path condition to reach this node as {@link Term}.
     */

@@ -3,6 +3,9 @@ package org.key_project.sed.key.core.test.testcase.swtbot;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
@@ -10,6 +13,7 @@ import junit.framework.TestCase;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
+import org.eclipse.debug.core.model.IStep;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -92,6 +96,42 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    }
    
    /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testLoopIteration_LoopWithMethod() throws Exception {
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopWithMethod",
+                                   "data/loopIterationTest/test",
+                                   false,
+                                   createMethodSelector("LoopIterationTest", "loopMultipleTimes"),
+                                   "data/loopIterationTest/oracle/LoopIterationTest_loopMultipleTimes.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testLoopIteration_LoopStatementCopied() throws Exception {
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementCopied",
+                                   "data/loopIterationTest/test",
+                                   false,
+                                   createMethodSelector("LoopIterationTest", "mainWorks"),
+                                   "data/loopIterationTest/oracle/LoopIterationTest_mainWorks.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testLoopIteration_LoopStatementReused() throws Exception {
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopStatementReused",
+                                   "data/loopIterationTest/test",
+                                   false,
+                                   createMethodSelector("LoopIterationTest", "main"),
+                                   "data/loopIterationTest/oracle/LoopIterationTest_main.xml");
+   }
+   
+   /**
     * Tests the handling of variables.
     */
    @Test
@@ -103,7 +143,8 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                      "data/variablesArrayTest/oracle/VariablesArrayTest.xml",
                      false,
                      8,
-                     true);
+                     true,
+                     false);
    }
    
    /**
@@ -118,7 +159,8 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                      "data/variablesInstanceVariableTest/oracle/VariablesInstanceVariableTest.xml",
                      false,
                      8,
-                     true);
+                     true,
+                     false);
    }
    
    /**
@@ -133,7 +175,8 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                      "data/variablesLocalTest/oracle/VariablesLocalTest.xml",
                      false,
                      8,
-                     true);
+                     true,
+                     false);
    }
    
    /**
@@ -148,7 +191,8 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                      "data/variablesStaticTest/oracle/VariablesStaticTest.xml",
                      false,
                      8,
-                     true);
+                     true,
+                     false);
    }
    
    /**
@@ -161,6 +205,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                      false,
                      createMethodSelector("SimpleIf", "min", "I", "I"),
                      "data/simpleIf/oracle_noMethodReturnValues/SimpleIf.xml",
+                     false,
                      false);
    }
    
@@ -169,11 +214,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testThrowVariableTest() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testThrowVariableTest",
-                     "data/throwVariableTest/test",
-                     false,
-                     createMethodSelector("ThrowVariableTest", "main"),
-                     "data/throwVariableTest/oracle/ThrowVariableTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testThrowVariableTest",
+                                   "data/throwVariableTest/test",
+                                   false,
+                                   createMethodSelector("ThrowVariableTest", "main"),
+                                   "data/throwVariableTest/oracle/ThrowVariableTest.xml");
    }
    
    /**
@@ -181,11 +226,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testThrowTest() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest",
-                     "data/throwTest/test",
-                     false,
-                     createMethodSelector("ThrowTest", "main"),
-                     "data/throwTest/oracle/ThrowTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testThrowTest",
+                                   "data/throwTest/test",
+                                   false,
+                                   createMethodSelector("ThrowTest", "main"),
+                                   "data/throwTest/oracle/ThrowTest.xml");
    }
    
    /**
@@ -193,11 +238,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testSimpleNullPointerSplitTest() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest",
-                     "data/simpleNullPointerSplitTest/test",
-                     false,
-                     createMethodSelector("SimpleNullPointerSplitTest", "main", "QSimpleNullPointerSplitTest;"),
-                     "data/simpleNullPointerSplitTest/oracle/SimpleNullPointerSplitTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testSimpleNullPointerSplitTest",
+                                   "data/simpleNullPointerSplitTest/test",
+                                   false,
+                                   createMethodSelector("SimpleNullPointerSplitTest", "main", "QSimpleNullPointerSplitTest;"),
+                                   "data/simpleNullPointerSplitTest/oracle/SimpleNullPointerSplitTest.xml");
    }
    
    /**
@@ -205,11 +250,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testForEach() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testForEach",
-                     "data/forEachTest/test",
-                     false,
-                     createMethodSelector("ForEachTest", "main"),
-                     "data/forEachTest/oracle/ForEachTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testForEach",
+                                   "data/forEachTest/test",
+                                   false,
+                                   createMethodSelector("ForEachTest", "main"),
+                                   "data/forEachTest/oracle/ForEachTest.xml");
    }
    
    /**
@@ -217,11 +262,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testForFalse() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testForFalse",
-                     "data/forFalseTest/test",
-                     false,
-                     createMethodSelector("ForFalseTest", "main"),
-                     "data/forFalseTest/oracle/ForFalseTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testForFalse",
+                                   "data/forFalseTest/test",
+                                   false,
+                                   createMethodSelector("ForFalseTest", "main"),
+                                   "data/forFalseTest/oracle/ForFalseTest.xml");
    }
    
    /**
@@ -229,11 +274,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testFunctionalFor() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalFor",
-                     "data/functionalForTest/test",
-                     false,
-                     createMethodSelector("FunctionalForTest", "main"),
-                     "data/functionalForTest/oracle/FunctionalForTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalFor",
+                                   "data/functionalForTest/test",
+                                   false,
+                                   createMethodSelector("FunctionalForTest", "main"),
+                                   "data/functionalForTest/oracle/FunctionalForTest.xml");
    }
    
    /**
@@ -241,11 +286,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testNestedFor() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testNestedFor",
-                     "data/nestedForTest/test",
-                     false,
-                     createMethodSelector("NestedForTest", "main"),
-                     "data/nestedForTest/oracle/NestedForTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testNestedFor",
+                                   "data/nestedForTest/test",
+                                   false,
+                                   createMethodSelector("NestedForTest", "main"),
+                                   "data/nestedForTest/oracle/NestedForTest.xml");
    }
    
    /**
@@ -253,11 +298,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testFor() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFor",
-                     "data/forTest/test",
-                     false,
-                     createMethodSelector("ForTest", "main"),
-                     "data/forTest/oracle/ForTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testFor",
+                                   "data/forTest/test",
+                                   false,
+                                   createMethodSelector("ForTest", "main"),
+                                   "data/forTest/oracle/ForTest.xml");
    }
    
    /**
@@ -265,12 +310,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testDoWhileFalse() throws Exception {
-      // TODO: Remove constants in BooleanLiteral and instantiate always a new true, false instance to have source code locations.
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse",
-                     "data/doWhileFalseTest/test",
-                     false,
-                     createMethodSelector("DoWhileFalseTest", "main"),
-                     "data/doWhileFalseTest/oracle/DoWhileFalseTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testDoWhileFalse",
+                                   "data/doWhileFalseTest/test",
+                                   false,
+                                   createMethodSelector("DoWhileFalseTest", "main"),
+                                   "data/doWhileFalseTest/oracle/DoWhileFalseTest.xml");
    }
    
    /**
@@ -278,11 +322,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testFunctionalDoWhile() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalDoWhile",
-                     "data/functionalDoWhileTest/test",
-                     false,
-                     createMethodSelector("FunctionalDoWhileTest", "main"),
-                     "data/functionalDoWhileTest/oracle/FunctionalDoWhileTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalDoWhile",
+                                   "data/functionalDoWhileTest/test",
+                                   false,
+                                   createMethodSelector("FunctionalDoWhileTest", "main"),
+                                   "data/functionalDoWhileTest/oracle/FunctionalDoWhileTest.xml");
    }
    
    /**
@@ -290,11 +334,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testNestedDoWhile() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testNestedDoWhile",
-                     "data/nestedDoWhileTest/test",
-                     false,
-                     createMethodSelector("NestedDoWhileTest", "main"),
-                     "data/nestedDoWhileTest/oracle/NestedDoWhileTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testNestedDoWhile",
+                                   "data/nestedDoWhileTest/test",
+                                   false,
+                                   createMethodSelector("NestedDoWhileTest", "main"),
+                                   "data/nestedDoWhileTest/oracle/NestedDoWhileTest.xml");
    }
    
    /**
@@ -302,11 +346,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testDoWhile() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testDoWhile",
-                     "data/doWhileTest/test",
-                     false,
-                     createMethodSelector("DoWhileTest", "main"),
-                     "data/doWhileTest/oracle/DoWhileTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testDoWhile",
+                                   "data/doWhileTest/test",
+                                   false,
+                                   createMethodSelector("DoWhileTest", "main"),
+                                   "data/doWhileTest/oracle/DoWhileTest.xml");
    }
    
    /**
@@ -314,11 +358,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testWhileFalse() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testWhileFalse",
-                     "data/whileFalseTest/test",
-                     false,
-                     createMethodSelector("WhileFalseTest", "main"),
-                     "data/whileFalseTest/oracle/WhileFalseTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testWhileFalse",
+                                   "data/whileFalseTest/test",
+                                   false,
+                                   createMethodSelector("WhileFalseTest", "main"),
+                                   "data/whileFalseTest/oracle/WhileFalseTest.xml");
    }
    
    /**
@@ -326,11 +370,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testFunctionalWhile() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalWhile",
-                     "data/functionalWhileTest/test",
-                     false,
-                     createMethodSelector("FunctionalWhileTest", "main"),
-                     "data/functionalWhileTest/oracle/FunctionalWhileTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalWhile",
+                                   "data/functionalWhileTest/test",
+                                   false,
+                                   createMethodSelector("FunctionalWhileTest", "main"),
+                                   "data/functionalWhileTest/oracle/FunctionalWhileTest.xml");
    }
    
    /**
@@ -338,11 +382,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testNestedWhile() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testNestedWhile",
-                     "data/nestedWhileTest/test",
-                     false,
-                     createMethodSelector("NestedWhileTest", "mainNested"),
-                     "data/nestedWhileTest/oracle/NestedWhileTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testNestedWhile",
+                                   "data/nestedWhileTest/test",
+                                   false,
+                                   createMethodSelector("NestedWhileTest", "mainNested"),
+                                   "data/nestedWhileTest/oracle/NestedWhileTest.xml");
    }
    
    /**
@@ -350,11 +394,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testWhile() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testWhile",
-                     "data/whileTest/test",
-                     false,
-                     createMethodSelector("WhileTest", "main"),
-                     "data/whileTest/oracle/WhileTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testWhile",
+                                   "data/whileTest/test",
+                                   false,
+                                   createMethodSelector("WhileTest", "main"),
+                                   "data/whileTest/oracle/WhileTest.xml");
    }
    
    /**
@@ -362,11 +406,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testStatementKinds() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testStatementKinds",
-                     "data/statementKindTest/test",
-                     false,
-                     createMethodSelector("StatementKindTest", "main"),
-                     "data/statementKindTest/oracle/StatementKindTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testStatementKinds",
+                                   "data/statementKindTest/test",
+                                   false,
+                                   createMethodSelector("StatementKindTest", "main"),
+                                   "data/statementKindTest/oracle/StatementKindTest.xml");
    }
    
    /**
@@ -374,11 +418,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testSwitchCase() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testSwitchCase",
-                     "data/switchCaseTest/test",
-                     false,
-                     createMethodSelector("SwitchCaseTest", "switchCase", "I"),
-                     "data/switchCaseTest/oracle/SwitchCaseTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testSwitchCase",
+                                   "data/switchCaseTest/test",
+                                   false,
+                                   createMethodSelector("SwitchCaseTest", "switchCase", "I"),
+                                   "data/switchCaseTest/oracle/SwitchCaseTest.xml");
    }
    
    /**
@@ -386,11 +430,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testElseIf() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testElseIf",
-                     "data/elseIfTest/test",
-                     false,
-                     createMethodSelector("ElseIfTest", "elseIf", "I"),
-                     "data/elseIfTest/oracle/ElseIfTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testElseIf",
+                                   "data/elseIfTest/test",
+                                   false,
+                                   createMethodSelector("ElseIfTest", "elseIf", "I"),
+                                   "data/elseIfTest/oracle/ElseIfTest.xml");
    }
    
    /**
@@ -398,11 +442,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testMethodCallFormatTest() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallFormatTest",
-                     "data/methodFormatTest/test",
-                     false,
-                     createMethodSelector("MethodFormatTest", "main"),
-                     "data/methodFormatTest/oracle/MethodFormatTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallFormatTest",
+                                   "data/methodFormatTest/test",
+                                   false,
+                                   createMethodSelector("MethodFormatTest", "main"),
+                                   "data/methodFormatTest/oracle/MethodFormatTest.xml");
    }
    
    /**
@@ -410,11 +454,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testFixedRecursiveMethodCall() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall",
-                     "data/fixedRecursiveMethodCallTest/test",
-                     false,
-                     createMethodSelector("FixedRecursiveMethodCallTest", "decreaseValue"),
-                     "data/fixedRecursiveMethodCallTest/oracle/FixedRecursiveMethodCallTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testFixedRecursiveMethodCall",
+                                   "data/fixedRecursiveMethodCallTest/test",
+                                   false,
+                                   createMethodSelector("FixedRecursiveMethodCallTest", "decreaseValue"),
+                                   "data/fixedRecursiveMethodCallTest/oracle/FixedRecursiveMethodCallTest.xml");
    }
    
    /**
@@ -422,11 +466,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testElseIfDifferentVariables() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables",
-                     "data/elseIfDifferentVariables/test",
-                     false,
-                     createMethodSelector("ElseIfDifferentVariables", "main", "Z", "Z"),
-                     "data/elseIfDifferentVariables/oracle/ElseIfDifferentVariables.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testElseIfDifferentVariables",
+                                   "data/elseIfDifferentVariables/test",
+                                   false,
+                                   createMethodSelector("ElseIfDifferentVariables", "main", "Z", "Z"),
+                                   "data/elseIfDifferentVariables/oracle/ElseIfDifferentVariables.xml");
    }
    
    /**
@@ -434,11 +478,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testTryCatchFinally() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally",
-                     "data/tryCatchFinally/test",
-                     false,
-                     createMethodSelector("TryCatchFinally", "tryCatchFinally", "I"),
-                     "data/tryCatchFinally/oracle/TryCatchFinally.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testTryCatchFinally",
+                                   "data/tryCatchFinally/test",
+                                   false,
+                                   createMethodSelector("TryCatchFinally", "tryCatchFinally", "I"),
+                                   "data/tryCatchFinally/oracle/TryCatchFinally.xml");
    }
    
    /**
@@ -446,11 +490,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testStaticMethodCall() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testStaticMethodCall",
-                     "data/staticMethodCall/test",
-                     false,
-                     createMethodSelector("StaticMethodCall", "main"),
-                     "data/staticMethodCall/oracle/StaticMethodCall.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testStaticMethodCall",
+                                   "data/staticMethodCall/test",
+                                   false,
+                                   createMethodSelector("StaticMethodCall", "main"),
+                                   "data/staticMethodCall/oracle/StaticMethodCall.xml");
    }
    
    /**
@@ -458,11 +502,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testComplexIfSteps() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps",
-                     "data/complexIf/test",
-                     false,
-                     createMethodSelector("ComplexIf", "min", "I", "I"),
-                     "data/complexIf/oracle/ComplexIf.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testComplexIfSteps",
+                                  "data/complexIf/test",
+                                  false,
+                                  createMethodSelector("ComplexIf", "min", "I", "I"),
+                                  "data/complexIf/oracle/ComplexIf.xml");
    }
    
    /**
@@ -470,11 +514,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testComplexFlatSteps() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testComplexFlatSteps",
-                     "data/complexFlatSteps/test",
-                     false,
-                     createMethodSelector("ComplexFlatSteps", "doSomething"),
-                     "data/complexFlatSteps/oracle/ComplexFlatSteps.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testComplexFlatSteps",
+                                   "data/complexFlatSteps/test",
+                                   false,
+                                   createMethodSelector("ComplexFlatSteps", "doSomething"),
+                                   "data/complexFlatSteps/oracle/ComplexFlatSteps.xml");
    }
    
    /**
@@ -482,11 +526,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testFunctionalIf() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf",
-                     "data/functionalIf/test",
-                     false,
-                     createMethodSelector("FunctionalIf", "min", "I", "I"),
-                     "data/functionalIf/oracle/FunctionalIf.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testFunctionalIf",
+                                   "data/functionalIf/test",
+                                   false,
+                                   createMethodSelector("FunctionalIf", "min", "I", "I"),
+                                   "data/functionalIf/oracle/FunctionalIf.xml");
    }
    
    /**
@@ -494,11 +538,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testSimpleIf() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf",
-                     "data/simpleIf/test",
-                     false,
-                     createMethodSelector("SimpleIf", "min", "I", "I"),
-                     "data/simpleIf/oracle/SimpleIf.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testSimpleIf",
+                                   "data/simpleIf/test",
+                                   false,
+                                   createMethodSelector("SimpleIf", "min", "I", "I"),
+                                   "data/simpleIf/oracle/SimpleIf.xml");
    }
    
    /**
@@ -506,11 +550,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testMethodCallOnObjectWithException() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObjectWithException",
-                     "data/methodCallOnObjectWithException/test",
-                     false,
-                     createMethodSelector("MethodCallOnObjectWithException", "main"),
-                     "data/methodCallOnObjectWithException/oracle/MethodCallOnObjectWithException.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObjectWithException",
+                                   "data/methodCallOnObjectWithException/test",
+                                   false,
+                                   createMethodSelector("MethodCallOnObjectWithException", "main"),
+                                   "data/methodCallOnObjectWithException/oracle/MethodCallOnObjectWithException.xml");
    }
    
    /**
@@ -518,11 +562,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testMethodCallOnObject() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObject",
-                     "data/methodCallOnObject/test",
-                     false,
-                     createMethodSelector("MethodCallOnObject", "main"),
-                     "data/methodCallOnObject/oracle/MethodCallOnObject.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallOnObject",
+                                   "data/methodCallOnObject/test",
+                                   false,
+                                   createMethodSelector("MethodCallOnObject", "main"),
+                                   "data/methodCallOnObject/oracle/MethodCallOnObject.xml");
    }
    
    /**
@@ -530,11 +574,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testMethodCallParallel() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallParallel",
-                     "data/methodCallParallelTest/test",
-                     false,
-                     createMethodSelector("MethodCallParallelTest", "main"),
-                     "data/methodCallParallelTest/oracle/MethodCallParallelTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallParallel",
+                                   "data/methodCallParallelTest/test",
+                                   false,
+                                   createMethodSelector("MethodCallParallelTest", "main"),
+                                   "data/methodCallParallelTest/oracle/MethodCallParallelTest.xml");
    }
    
    /**
@@ -542,11 +586,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testMethodCallHierarchyWithException() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException",
-                     "data/methodHierarchyCallWithExceptionTest/test",
-                     false,
-                     createMethodSelector("MethodHierarchyCallWithExceptionTest", "main"),
-                     "data/methodHierarchyCallWithExceptionTest/oracle/MethodHierarchyCallWithExceptionTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchyWithException",
+                                   "data/methodHierarchyCallWithExceptionTest/test",
+                                   false,
+                                   createMethodSelector("MethodHierarchyCallWithExceptionTest", "main"),
+                                   "data/methodHierarchyCallWithExceptionTest/oracle/MethodHierarchyCallWithExceptionTest.xml");
    }
    
    /**
@@ -554,11 +598,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testMethodCallHierarchy() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchy",
-                     "data/methodHierarchyCallTest/test",
-                     false,
-                     createMethodSelector("MethodHierarchyCallTest", "main"),
-                     "data/methodHierarchyCallTest/oracle/MethodHierarchyCallTest.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testMethodCallHierarchy",
+                                   "data/methodHierarchyCallTest/test",
+                                   false,
+                                   createMethodSelector("MethodHierarchyCallTest", "main"),
+                                   "data/methodHierarchyCallTest/oracle/MethodHierarchyCallTest.xml");
    }
    
    /**
@@ -566,11 +610,11 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testFlatStatements() throws Exception {
-      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements",
-                     "data/statements/test",
-                     false,
-                     createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"),
-                     "data/statements/oracle/FlatSteps.xml");
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testFlatStatements",
+                                   "data/statements/test",
+                                   false,
+                                   createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"),
+                                   "data/statements/oracle/FlatSteps.xml");
    }
    
    /**
@@ -583,7 +627,8 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                      "data/statements/test",
                      true,
                      createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"),
-                     "data/statements/oracle/FlatSteps.xml");
+                     "data/statements/oracle/FlatSteps.xml",
+                     false);
    }
    
    /**
@@ -598,6 +643,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                      "data/recursiveFibonacci/oracle/RecursiveFibonacci.xml",
                      false,
                      30,
+                     false,
                      false);
    }
    
@@ -740,6 +786,25 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
    }
    
    /**
+    * Executes {@link #assertSEDModel(String, String, boolean, IMethodSelector, String, boolean)}
+    * first with run and second with step into functionality.
+    * @param projectName The project name in the workspace.
+    * @param pathInBundle The path to the source code in the bundle to extract to the workspace project.
+    * @param clearProofListInKeYBeforeResume Clear proof list in KeY before resume?
+    * @param selector {@link IMethodSelector} to select an {@link IMethod} to launch.
+    * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDDebugTarget} model.
+    * @throws Exception Occurred Exception.
+    */
+   protected void assertSEDModelRunAndStepInto(String projectName,
+                                               String pathInBundle,
+                                               boolean clearProofListInKeYBeforeResume,
+                                               IMethodSelector selector,
+                                               String expectedModelPathInBundle) throws Exception {
+      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false);
+      assertSEDModel(projectName + "stepInto", pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, true);
+   }
+   
+   /**
     * Executes the following test steps:
     * <ol>
     *    <li>Extract code from bundle to a Java project with the defined name in the workspace.</li>
@@ -754,14 +819,16 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * @param clearProofListInKeYBeforeResume Clear proof list in KeY before resume?
     * @param selector {@link IMethodSelector} to select an {@link IMethod} to launch.
     * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDDebugTarget} model.
+    * @param stepIntoInsteadOfRun Use step into functionality instead of the run functionality to create the tree?
     * @throws Exception Occurred Exception.
     */
    protected void assertSEDModel(String projectName,
                                  String pathInBundle,
                                  boolean clearProofListInKeYBeforeResume,
                                  IMethodSelector selector,
-                                 String expectedModelPathInBundle) throws Exception {
-      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, true);
+                                 String expectedModelPathInBundle,
+                                 boolean stepIntoInsteadOfRun) throws Exception {
+      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, true, stepIntoInsteadOfRun);
    }
    
    /**
@@ -780,6 +847,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * @param selector {@link IMethodSelector} to select an {@link IMethod} to launch.
     * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDDebugTarget} model.
     * @param showMethodReturnValues Show method return values?
+    * @param stepIntoInsteadOfRun Use step into functionality instead of the run functionality to create the tree?
     * @throws Exception Occurred Exception.
     */
    protected void assertSEDModel(String projectName,
@@ -787,8 +855,9 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                                  boolean clearProofListInKeYBeforeResume,
                                  IMethodSelector selector,
                                  String expectedModelPathInBundle,
-                                 boolean showMethodReturnValues) throws Exception {
-      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 8, false);
+                                 boolean showMethodReturnValues,
+                                 boolean stepIntoInsteadOfRun) throws Exception {
+      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 8, false, stepIntoInsteadOfRun);
    }
    
    /**
@@ -809,6 +878,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * @param showMethodReturnValues Show method return values?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param includeVariables Include variables?
+    * @param stepIntoInsteadOfRun Use step into functionality instead of the run functionality to create the tree?
     * @throws Exception Occurred Exception.
     */
    protected void assertSEDModel(String projectName,
@@ -818,7 +888,8 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                                  String expectedModelPathInBundle,
                                  boolean showMethodReturnValues,
                                  int timeoutFactor,
-                                 boolean includeVariables) throws Exception {
+                                 boolean includeVariables,
+                                 boolean stepIntoInsteadOfRun) throws Exception {
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       // Get current settings to restore them in finally block
@@ -870,15 +941,46 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
          TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
          // Get debug target TreeItem
          SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
-         SWTBotMenu menuItem = item.contextMenu("Resume"); 
-         // Remove proof in KeY if required
-         if (clearProofListInKeYBeforeResume) {
-            assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-            KeYUtil.clearProofList(MainWindow.getInstance());
-            assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+         // Create tree
+         if (stepIntoInsteadOfRun) {
+            // Step into on each SET node
+            Set<Object> stepDone = new HashSet<Object>();
+            boolean newStepDone = true;
+            do {
+               newStepDone = false;
+               List<SWTBotTreeItem> leafItems = TestUtilsUtil.collectLeafs(item);
+               for (SWTBotTreeItem leafItem : leafItems) {
+                  Object leafData = TestUtilsUtil.getTreeItemData(leafItem);
+                  if (stepDone.add(leafData)) {
+                     newStepDone = true;
+                     if (leafData instanceof IStep) {
+                        IStep leafStep = (IStep)leafData;
+                        assertTrue(leafStep.canStepInto());
+                        leafItem.select();
+                        SWTBotMenu menuItem = leafItem.contextMenu("Step Into"); 
+                        menuItem.click();
+                        TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
+                        assertFalse(leafStep.canStepInto());
+                        TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
+                        assertTrue(leafStep.canStepInto());
+                     }
+                  }
+               }
+            } while (newStepDone);
          }
-         // Resume launch
-         menuItem.click();
+         else {
+            // Find resume menu item; must be done before proof is removed.
+            SWTBotMenu menuItem = item.contextMenu("Resume");
+            // Remove proof in KeY if required
+            if (clearProofListInKeYBeforeResume) {
+               assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+               KeYUtil.clearProofList(MainWindow.getInstance());
+               assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+            }
+            // Resume
+            menuItem.click();
+         }
+         // Evaluate created tree
          if (clearProofListInKeYBeforeResume) {
             assertTrue(launch.canTerminate());
             assertFalse(launch.isTerminated());
@@ -893,17 +995,19 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
             TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
          }
          else {
-            TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
-            assertTrue(launch.canTerminate());
-            assertFalse(launch.isTerminated());
-            assertTrue(target.canDisconnect());
-            assertFalse(target.canResume());
-            assertTrue(target.canSuspend());
-            assertTrue(target.canTerminate());
-            assertFalse(target.isDisconnected());
-            assertFalse(target.isSuspended());
-            assertFalse(target.isTerminated());
-            TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
+            if (!stepIntoInsteadOfRun) {
+               TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
+               assertTrue(launch.canTerminate());
+               assertFalse(launch.isTerminated());
+               assertTrue(target.canDisconnect());
+               assertFalse(target.canResume());
+               assertTrue(target.canSuspend());
+               assertTrue(target.canTerminate());
+               assertFalse(target.isDisconnected());
+               assertFalse(target.isSuspended());
+               assertFalse(target.isTerminated());
+               TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
+            }
             assertTrue(launch.canTerminate());
             assertFalse(launch.isTerminated());
             assertTrue(target.canDisconnect());

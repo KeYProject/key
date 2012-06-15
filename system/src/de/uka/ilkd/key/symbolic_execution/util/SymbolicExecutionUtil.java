@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
+import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,7 +12,12 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -19,11 +25,18 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.BranchStatement;
+import de.uka.ilkd.key.java.statement.Do;
+import de.uka.ilkd.key.java.statement.EnhancedFor;
+import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -38,6 +51,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Node.NodeIterator;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -48,6 +63,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -57,6 +73,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
@@ -257,7 +274,7 @@ public final class SymbolicExecutionUtil {
       Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = MiscTools.goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
       Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, modalityTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
@@ -290,7 +307,7 @@ public final class SymbolicExecutionUtil {
       // Combine method frame with value formula in a modality.
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = MiscTools.goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
       Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, newTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
@@ -322,7 +339,7 @@ public final class SymbolicExecutionUtil {
       Term newTerm = TermBuilder.DF.func(newPredicate, term);
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = MiscTools.goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
       Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, newTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
@@ -588,7 +605,7 @@ public final class SymbolicExecutionUtil {
    public static IProgramVariable findSelfTerm(Node node) {
       JavaBlock jb = node.getAppliedRuleApp().posInOccurrence().subTerm().javaBlock();
       Services services = node.proof().getServices();
-      IExecutionContext context = MiscTools.getInnermostExecutionContext(jb, services);
+      IExecutionContext context = JavaTools.getInnermostExecutionContext(jb, services);
       if (context instanceof ExecutionContext) {
          ReferencePrefix prefix = ((ExecutionContext)context).getRuntimeInstance();
          return prefix instanceof IProgramVariable ? (IProgramVariable)prefix : null;
@@ -596,5 +613,368 @@ public final class SymbolicExecutionUtil {
       else {
          return null;
       }
+   }
+   
+//   /**
+//    * Checks if the given {@link Node} contains an applied rule.
+//    * @param node The {@link Node} to check.
+//    * @return {@code true} node has applied rule, {@code false} node has no rule or node is {@code null}.
+//    */
+//   public static boolean hasAppliedRule(Node node) {
+//      return node != null && node.getAppliedRuleApp() != null;
+//   }
+   
+   /**
+    * Checks if the given node should be represented as method call.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The statement ({@link SourceElement}).
+    * @return {@code true} represent node as method call, {@code false} represent node as something else. 
+    */
+   public static boolean isMethodCallNode(Node node, RuleApp ruleApp, SourceElement statement) {
+      return isMethodCallNode(node, ruleApp, statement, false);
+   }
+   
+   /**
+    * Checks if the given node should be represented as method call.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The statement ({@link SourceElement}).
+    * @param allowImpliciteMethods {@code true} implicit methods are included, {@code false} implicit methods are outfiltered.
+    * @return {@code true} represent node as method call, {@code false} represent node as something else. 
+    */
+   public static boolean isMethodCallNode(Node node, RuleApp ruleApp, SourceElement statement, boolean allowImpliciteMethods) {
+      if (ruleApp != null) { // Do not handle open goal nodes without applied rule
+         if (statement instanceof MethodBodyStatement) {
+            if (allowImpliciteMethods) {
+               return true;
+            }
+            else {
+               MethodBodyStatement mbs = (MethodBodyStatement)statement;
+               ProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
+               return !pm.isImplicit(); // Do not include implicit methods
+            }
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Checks if the given node should be represented as branch node.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The statement ({@link SourceElement}).
+    * @param posInfo The {@link PositionInfo}.
+    * @return {@code true} represent node as branch node, {@code false} represent node as something else. 
+    */
+   public static boolean isBranchNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+      return isStatementNode(node, ruleApp, statement, posInfo) &&
+             (statement instanceof BranchStatement); 
+   }
+   
+   /**
+    * Checks if the given node should be represented as loop node.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The statement ({@link SourceElement}).
+    * @param posInfo The {@link PositionInfo}.
+    * @return {@code true} represent node as loop node, {@code false} represent node as something else. 
+    */
+   public static boolean isLoopNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+      return isStatementNode(node, ruleApp, statement, posInfo) &&
+             (statement instanceof LoopStatement);
+   }
+
+   /**
+    * <p>
+    * Checks if the given {@link SourceElement} which represents a {@link LoopStatement} is executed
+    * the first time in proof node or if it is a higher loop iteration.
+    * </p>
+    * <p>
+    * The reason why such checks are required is that KeY's tacklet sometimes create
+    * a copy in further loop iteration without a source code position and sometimes
+    * is the original loop reused. The expected behavior of KeY should be to
+    * reuse the original loop all the time to save memory. But the symbolic
+    * execution tree should contain the loop statement only when it is executed
+    * the first time and in further iterations only the checked loop condition.
+    * For this reason is this check required.
+    * </p>
+    * <p>
+    * <b>Attention:</b> This check requires to iterate over parent {@link Node}s
+    * and can not be decided locally in the current {@link Node}.
+    * This is a performance deficit.
+    * </p>
+    * @param node The current {@link Node} of the proof tree.
+    * @param ruleApp The applied rule in {@link Node}.
+    * @param statement The active {@link LoopStatement} of {@link Node} to check.
+    * @return {@code true} it is the first loop iteration, {@code false} it is a second or higher loop iteration.
+    */
+   public static boolean isFirstLoopIteration(Node node, RuleApp ruleApp, SourceElement statement) {
+      // Compute stack size of current node
+      int stackSize = computeStackSize(node, ruleApp);
+      // Iterate over all parents until another loop iteration is found or the current method was called
+      boolean firstLoop = true;
+      Node parent = node.parent();
+      while (firstLoop && parent != null) {
+         // Check if the current parent node treats the same loop
+         SourceElement activeStatement = parent.getNodeInfo().getActiveStatement();
+         firstLoop = activeStatement != statement;
+         // Define parent for next iteration
+         parent = parent.parent();
+         // Check if the next parent is the method call of the current method, in this case iteration can stop
+         if (isMethodCallNode(parent, parent.getAppliedRuleApp(), parent.getNodeInfo().getActiveStatement(), true) &&
+             computeStackSize(parent, parent.getAppliedRuleApp()) < stackSize) {
+            // Stop iteration because further parents are before the current method is called
+            parent = null;
+         }
+      }
+      return firstLoop;
+   }
+
+   /**
+    * Checks if the given node should be represented as statement.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The statement ({@link SourceElement}).
+    * @param posInfo The {@link PositionInfo}.
+    * @return {@code true} represent node as statement, {@code false} represent node as something else. 
+    */
+   public static boolean isStatementNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+      return ruleApp != null && // Do not handle the open goal node which has no applied rule
+             posInfo != null && 
+             posInfo.getEndPosition() != Position.UNDEFINED &&
+             posInfo.getEndPosition().getLine() >= 0;  // Filter out statements where source code is missing.
+   }
+   
+   /**
+    * Checks if the given node should be represented as termination.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The statement ({@link SourceElement}).
+    * @param posInfo The {@link PositionInfo}.
+    * @return {@code true} represent node as termination, {@code false} represent node as something else. 
+    */
+   public static boolean isTerminationNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+      return "emptyModality".equals(MiscTools.getRuleDisplayName(ruleApp));
+   }
+   
+   /**
+    * Checks if the given node should be represented as method return.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The statement ({@link SourceElement}).
+    * @param posInfo The {@link PositionInfo}.
+    * @return {@code true} represent node as method return, {@code false} represent node as something else. 
+    */
+   public static boolean isMethodReturnNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+      return "methodCallEmpty".equals(MiscTools.getRuleDisplayName(ruleApp));
+   }
+
+   /**
+    * Checks if the given {@link Node} has a loop condition.
+    * @param node The {@link Node} to check.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @param statement The actual statement ({@link SourceElement}).
+    * @return {@code true} has loop condition, {@code false} has no loop condition.
+    */
+   public static boolean hasLoopCondition(Node node, RuleApp ruleApp, SourceElement statement) {
+      return ruleApp != null && // Do not handle open goal nodes without applied rule
+             statement instanceof LoopStatement && 
+             !(statement instanceof EnhancedFor); // For each loops have no loop condition
+   }
+   
+   /**
+    * Checks if the given {@link Node} in KeY's proof tree represents
+    * also a {@link Node} in a symbolic execution tree.
+    * @param node The {@link Node} of KeY's proof tree to check.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @return {@code true} is also symbolic execution tree node, {@code false} is no node in a symbolic execution tree.
+    */
+   public static boolean isSymbolicExecutionTreeNode(Node node, RuleApp ruleApp) {
+      if (node != null) {
+         SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
+         PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
+         if (isMethodReturnNode(node, ruleApp, statement, posInfo)) {
+            LinkedList<Node> stack = temporaryCreateMethodCallStack(node);
+            Node callNode = temporaryFindMethodCallNode(stack, node, ruleApp);
+            return callNode != null && isMethodCallNode(callNode, callNode.getAppliedRuleApp(), callNode.getNodeInfo().getActiveStatement());
+         }
+         else if (isLoopNode(node, ruleApp, statement, posInfo)) { 
+            return isFirstLoopIteration(node, ruleApp, statement);
+         }
+         else if (isBranchNode(node, ruleApp, statement, posInfo) ||
+                  isMethodCallNode(node, ruleApp, statement) ||
+                  isStatementNode(node, ruleApp, statement, posInfo) ||
+                  isTerminationNode(node, ruleApp, statement, posInfo)) {
+            return true;
+         }
+         else if (hasLoopCondition(node, ruleApp, statement)) {
+            return ((LoopStatement)statement).getGuardExpression().getPositionInfo() != PositionInfo.UNDEFINED &&
+                   !isDoWhileLoopCondition(node, statement) && 
+                   !isForLoopCondition(node, statement);
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return false;
+      }
+   }
+
+   // TODO: Remove temporary methods when the current method is part of an ExecutionContext.
+
+   /**
+    * Finds the {@link Node} in the proof tree of KeY which has called the
+    * method that is now executed or returned in the {@link Node}.
+    * @param methodCallStack The method call stack to search in.
+    * @param currentNode The {@link Node} for that the method call {@link Node} is needed.
+    * @return The found call {@link Node} or {@code null} if no one was found.
+    */
+   public static Node temporaryFindMethodCallNode(LinkedList<Node> methodCallStack, Node currentNode, RuleApp ruleApp) {
+      // Compute the stack frame size before the method is called
+      final int returnStackSize = SymbolicExecutionUtil.computeStackSize(currentNode, ruleApp) - 1;
+      // Return the method from the call stack
+      if (returnStackSize >= 0) {
+         return methodCallStack.get(returnStackSize);
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Creates the call stack for the given {@link Node}.
+    * @param node The {@link Node} to create call stack for.
+    * @return The created call stack.
+    */
+   public static LinkedList<Node> temporaryCreateMethodCallStack(Node node) {
+      // List parents
+      Deque<Node> parents = new LinkedList<Node>();
+      while (node != null) {
+         parents.addFirst(node);
+         node = node.parent();
+      }
+      // Create method call stack
+      LinkedList<Node> methodCallStack = new LinkedList<Node>();
+      for (Node parent : parents) {
+         temporaryUpdateCallStack(methodCallStack, parent, parent.getNodeInfo().getActiveStatement());
+      }
+      return methodCallStack;
+   }
+   
+   /**
+    * Updates the call stack ({@link #methodCallStack}) if the given {@link Node}
+    * in KeY's proof tree is a method call.
+    * @param methodCallStack The method call stack to update.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param statement The statement ({@link SourceElement}).
+    */
+   public static void temporaryUpdateCallStack(LinkedList<Node> methodCallStack, Node node, SourceElement statement) {
+      if (isMethodCallNode(node, node.getAppliedRuleApp(), statement, true)) {
+         // Remove outdated methods from call stack
+         int currentLevel = computeStackSize(node, node.getAppliedRuleApp());
+         while (methodCallStack.size() > currentLevel) {
+            methodCallStack.removeLast();
+         }
+         // Add new node to call stack.
+         methodCallStack.addLast(node);
+      }
+   }
+   
+   /**
+    * Compute the stack size of the given {@link Node} in the proof tree of KeY.
+    * @param node The {@link Node} to compute stack size for.
+    * @param ruleApp The {@link RuleApp} which is or should be applied in the {@link Node}.
+    * @return The stack size.
+    */
+   public static int computeStackSize(Node node, RuleApp ruleApp) {
+      int result = 0;
+      if (node != null && ruleApp != null) {
+         PosInOccurrence posInOc = ruleApp.posInOccurrence();
+         if (posInOc != null && posInOc.constrainedFormula() != null) {
+            Term term = posInOc.constrainedFormula().formula();
+            if (term != null && term.subs().size() == 2) {
+               Term sub = term.sub(1);
+               if (sub != null) {
+                  JavaBlock block = sub.javaBlock();
+                  if (block != null) {
+                     JavaProgramElement element = block.program();
+                     if (element instanceof StatementBlock) {
+                        StatementBlock b = (StatementBlock)block.program();
+                        ImmutableArray<ProgramPrefix> prefix = b.getPrefixElements();
+                        result = JavaUtil.count(prefix, new IFilter<ProgramPrefix>() {
+                           @Override
+                           public boolean select(ProgramPrefix element) {
+                              return element instanceof MethodFrame;
+                           }
+                        });
+                     }
+                  }
+               }
+            }
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Checks if the given {@link SourceElement} is a do while loop.
+    * @param node The {@link Node} to check.
+    * @param statement The actual statement ({@link SourceElement}).
+    * @return {@code true} is do while loop, {@code false} is something else.
+    */
+   public static boolean isDoWhileLoopCondition(Node node, SourceElement statement) {
+      return statement instanceof Do;
+   }
+   
+   /**
+    * Checks if the given {@link SourceElement} is a for loop.
+    * @param node The {@link Node} to check.
+    * @param statement The actual statement ({@link SourceElement}).
+    * @return {@code true} is for loop, {@code false} is something else.
+    */
+   public static boolean isForLoopCondition(Node node, SourceElement statement) {
+      return statement instanceof For;
+   }
+
+   /**
+    * Collects all {@link Goal}s in the subtree of the given {@link IExecutionElement}.
+    * @param executionElement The {@link IExecutionElement} to collect {@link Goal}s in.
+    * @return The found {@link Goal}s.
+    */
+   public static ImmutableList<Goal> collectGoalsInSubtree(IExecutionElement executionElement) {
+      if (executionElement != null) {
+         return collectGoalsInSubtree(executionElement.getProofNode());
+      }
+      else {
+         return ImmutableSLList.nil();
+      }
+   }
+
+   /**
+    * Collects all {@link Goal}s in the subtree of the given {@link Node}.
+    * @param node The {@link Node} to collect {@link Goal}s in.
+    * @return The found {@link Goal}s.
+    */
+   public static ImmutableList<Goal> collectGoalsInSubtree(Node node) {
+      ImmutableList<Goal> result = ImmutableSLList.nil();
+      if (node != null) {
+         Proof proof = node.proof();
+         NodeIterator iter = node.leavesIterator();
+         while (iter.hasNext()) {
+            Node next = iter.next();
+            Goal nextGoal = proof.getGoal(next);
+            if (nextGoal != null) {
+               result = result.append(nextGoal);
+            }
+         }
+      }
+      return result;
    }
 }

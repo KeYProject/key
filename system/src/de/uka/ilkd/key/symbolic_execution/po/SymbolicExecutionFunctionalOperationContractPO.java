@@ -3,6 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.po;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -72,7 +73,7 @@ public class SymbolicExecutionFunctionalOperationContractPO extends FunctionalOp
         ImmutableList<Term> arguments = TermBuilder.DF.var(paramVars); // Method parameters
         arguments = arguments.prepend(TermBuilder.DF.getBaseHeap(services)); // Heap (As first argument for the predicate)
         // Create non-rigid predicate with signature: SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
-        ImmutableList<Sort> argumentSorts = MiscTools.getSorts(arguments);//.prepend(heapSort);
+        ImmutableList<Sort> argumentSorts = getSorts(arguments);//.prepend(heapSort);
         Function f = new Function(new Name(TermBuilder.DF.newName(services, "SETAccumulate")), 
                                   Sort.FORMULA, 
                                   argumentSorts.toArray(new Sort[argumentSorts.size()]));
@@ -83,4 +84,24 @@ public class SymbolicExecutionFunctionalOperationContractPO extends FunctionalOp
         Term extendedPostTerm = TermBuilder.DF.and(postTerm, postSubstitute);
         return super.buildProgramTerm(paramVars, selfVar, resultVar, exceptionVar, atPreVars, extendedPostTerm);
     }
+
+    
+    /**
+     * <p>
+     * Returns the {@link Sort}s of the given {@link Term}s.
+     * </p>
+     * <p>
+     * This method is used for instance by the Symbolic Execution Debugger.
+     * </p>
+     * @param terms The given {@link Term}s.
+     * @return The {@link Term} {@link Sort}s.
+     */
+    private static ImmutableList<Sort> getSorts(Iterable<Term> terms) {
+        ImmutableList<Sort> result = ImmutableSLList.<Sort>nil();
+        for (Term t : terms) {
+            result = result.append(t.sort());
+        }
+        return result;
+    }
+    
 }
