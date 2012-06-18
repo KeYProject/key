@@ -28,6 +28,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -70,7 +71,9 @@ import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithException;
+import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
@@ -529,26 +532,25 @@ public final class TestSedCoreUtil {
        */
       @Override
       public boolean test() throws Exception {
-         SWTBotTreeItem[] rootItems = debugTree.getAllItems();
-         if (rootItems != null && rootItems.length >= 1) {
-            SWTBotTreeItem[] level1Items = rootItems[0].getItems();
-            if (level1Items != null && level1Items.length >= 1) {
-               Object data = TestUtilsUtil.getTreeItemData(level1Items[0]);
-               if (data instanceof ISEDDebugTarget) {
-                  target = (ISEDDebugTarget)data;
-                  return true;
-               }
-               else {
-                  return false;
+         IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+            @Override
+            public void run() {
+               setResult(Boolean.FALSE);
+               TreeItem[] rootItems = debugTree.widget.getItems();
+               if (rootItems != null && rootItems.length >= 1) {
+                  TreeItem[] level1Items = rootItems[0].getItems();
+                  if (level1Items != null && level1Items.length >= 1) {
+                     Object data = level1Items[0].getData();
+                     if (data instanceof ISEDDebugTarget) {
+                        target = (ISEDDebugTarget)data;
+                        setResult(Boolean.TRUE);
+                     }
+                  }
                }
             }
-            else {
-               return false;
-            }
-         }
-         else {
-            return false;
-         }
+         };
+         debugTree.display.syncExec(run);
+         return run.getResult() != null && run.getResult().booleanValue();
       }
       
       /**
