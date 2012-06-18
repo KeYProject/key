@@ -10,6 +10,7 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -116,18 +117,37 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
              !MainWindow.getInstance().frozen && // Only one proof completion per time is possible
              KeYUtil.isProofInUI(builder.getProof()); // Otherwise Auto Mode is not available.
    }
+   
+   /**
+    * Checks if resuming on the given {@link IKeYSEDDebugNode} is possible.
+    * @param keyNode The {@link IKeYSEDDebugNode} to check.
+    * @return {@code true} possible, {@code false} not possible.
+    */
+   public boolean canResume(IKeYSEDDebugNode<?> keyNode) {
+      return canResume();
+   }
 
    /**
     * {@inheritDoc}
     */
    @Override
    public void resume() throws DebugException {
+      Object element = KeySEDUtil.getSelectedDebugElement(); // To ask the UI for the selected element is a little bit ugly, but the only way because the Eclipse API does not provide the selected element.
+      resume(element instanceof IKeYSEDDebugNode<?> ? (IKeYSEDDebugNode<?>)element : null);
+   }
+   
+   /**
+    * Resumes the given {@link IKeYSEDDebugNode}.
+    * @param keyNode The {@link IKeYSEDDebugNode} to resume.
+    * @throws DebugException Occurred Exception.
+    */
+   public void resume(IKeYSEDDebugNode<?> keyNode) throws DebugException {
       if (canResume()) {
          // Inform UI that the process is resumed
          super.resume();
          // Run auto mode
          runAutoMode(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, 
-                     builder.getProof().openEnabledGoals(),
+                     keyNode != null ? SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()) : builder.getProof().openEnabledGoals(),
                      false,
                      false);
       }
@@ -170,6 +190,15 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
              MainWindow.getInstance().frozen && // Only if the auto mode is in progress
              MainWindow.getInstance().getMediator().getProof() == builder.getProof(); // And the auto mode handles this proof
    }
+   
+   /**
+    * Checks if suspending on the given {@link IKeYSEDDebugNode} is possible.
+    * @param keyNode The {@link IKeYSEDDebugNode} to check.
+    * @return {@code true} possible, {@code false} not possible.
+    */
+   public boolean canSuspend(IKeYSEDDebugNode<?> keyNode) {
+      return canSuspend();
+   }
 
    /**
     * {@inheritDoc}
@@ -179,6 +208,15 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       if (canSuspend()) {
          MainWindow.getInstance().getMediator().stopAutoMode();
       }
+   }
+   
+   /**
+    * Suspends the given {@link IKeYSEDDebugNode}.
+    * @param keyNode The {@link IKeYSEDDebugNode} to suspend.
+    * @throws DebugException Occurred Exception.
+    */
+   public void suspend(IKeYSEDDebugNode<?> keyNode) throws DebugException {
+      suspend();
    }
 
    /**
@@ -301,7 +339,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @return {@code true} can step into, {@code false} can not step into.
     */
    public boolean canStepInto(IKeYSEDDebugNode<?> keyNode) {
-      return canResume();
+      return canResume(keyNode);
    }
 
    /**
@@ -321,7 +359,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @return {@code true} can step over, {@code false} can not step over.
     */
    public boolean canStepOver(IKeYSEDDebugNode<?> keyNode) {
-      return canResume();
+      return canResume(keyNode);
    }
 
    /**
@@ -341,7 +379,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @return {@code true} can step return, {@code false} can not step return.
     */
    public boolean canStepReturn(IKeYSEDDebugNode<?> keyNode) {
-      return canResume();
+      return canResume(keyNode);
    }
 
    /**

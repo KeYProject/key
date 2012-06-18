@@ -11,18 +11,27 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IViewPart;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.LaunchUtil;
+import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -332,5 +341,24 @@ public final class KeySEDUtil {
       else {
          System.out.println("Node is null");
       }
+   }
+   
+   /**
+    * Returns the selected element of view "Debug".
+    * @return The selected element of view "Debug" or {@code null} if no one is selected or if the view is not available.
+    */
+   public static Object getSelectedDebugElement() {
+      IRunnableWithResult<Object> run = new AbstractRunnableWithResult<Object>() {
+         @Override
+         public void run() {
+            IViewPart view = WorkbenchUtil.findView(IDebugUIConstants.ID_DEBUG_VIEW);
+            if (view instanceof IDebugView) {
+               ISelection selection = ((IDebugView)view).getViewer().getSelection();
+               setResult(SWTUtil.getFirstElement(selection));
+            }
+         }
+      };
+      Display.getDefault().syncExec(run);
+      return run.getResult();
    }
 }

@@ -234,4 +234,36 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
    public void stepReturn() throws DebugException {
       getDebugTarget().stepReturn(this);
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canResume() {
+      return getDebugTarget().canResume(this);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void resume() throws DebugException {
+      getDebugTarget().resume(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canSuspend() {
+      return getDebugTarget().canSuspend(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void suspend() throws DebugException {
+      getDebugTarget().suspend(this);
+   }
 }
