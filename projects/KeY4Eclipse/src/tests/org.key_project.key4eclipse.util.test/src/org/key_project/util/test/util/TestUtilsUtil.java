@@ -300,8 +300,12 @@ public class TestUtilsUtil {
     */
    private static void internalCollectLeafs(List<SWTBotTreeItem> leafItems, SWTBotTreeItem item) {
       if (item != null) {
-         item.select();
-         item.expand();
+         if (getTreeItemData(item) == null) {
+            item.select();
+         }
+         if (!item.isExpanded()) {
+            item.expand();
+         }
          SWTBotTreeItem[] children = item.getItems();
          if (ArrayUtil.isEmpty(children)) {
             leafItems.add(item);
