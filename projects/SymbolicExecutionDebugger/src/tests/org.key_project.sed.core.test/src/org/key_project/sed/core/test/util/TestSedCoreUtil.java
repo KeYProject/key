@@ -40,9 +40,12 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.sed.core.model.ISEDBranchCondition;
@@ -175,13 +178,33 @@ public final class TestSedCoreUtil {
          @Override
          public void run() {
             try {
-               String perspectiveId = SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID;
-               IPerspectiveDescriptor perspective = PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
-               TestCase.assertNotNull(perspective);
+               // Make sure that the view is not already opened
                IWorkbenchPage activePage = WorkbenchUtil.getActivePage();
                TestCase.assertNotNull(activePage);
-               activePage.setPerspective(perspective);
-               TestCase.assertEquals(perspective, activePage.getPerspective());
+               if (activePage.getPerspective() == null || !ObjectUtil.equals(activePage.getPerspective().getId(), SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID)) {
+                  // Make sure that the project explorer is not active to avoid NullPointerException in constructor of org.eclipse.ui.internal.navigator.resources.workbench.TabbedPropertySheetTitleProvider
+                  IWorkbenchPart part = activePage.findView(ProjectExplorer.VIEW_ID);
+                  if (WorkbenchUtil.isActive(part)) {
+                     // Project explorer is active, so select another view if possible
+                     IViewReference[] viewRefs = activePage.getViewReferences();
+                     boolean done = false;
+                     int i = 0;
+                     while (!done && i < viewRefs.length) {
+                        if (!ObjectUtil.equals(viewRefs[i].getId(), ProjectExplorer.VIEW_ID)) {
+                           WorkbenchUtil.activate(viewRefs[i].getView(true));
+                           done = true;
+                        }
+                        i++;
+                     }
+                  }
+                  // Change perspective
+                  String perspectiveId = SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID;
+                  IPerspectiveDescriptor perspective = PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
+                  TestCase.assertNotNull(perspective);
+                  activePage.setPerspective(perspective);
+                  // Make sure that correct perspective is open
+                  TestCase.assertEquals(perspective, activePage.getPerspective());
+               }
             }
             catch (Exception e) {
                setException(e);
