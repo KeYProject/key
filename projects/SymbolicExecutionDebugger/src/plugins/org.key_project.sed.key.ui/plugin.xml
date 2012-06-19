@@ -112,4 +112,13 @@
                id="org.key_project.sed.key.core">
          </debugModelPresentation>
       </extension>
+      <extension
+            point="org.eclipse.ui.preferencePages">
+         <page
+               category="org.key_project.sed.ui.preference.page.symbolic_debug"
+               class="org.key_project.sed.key.ui.preference.page.KeYSymbolicDebugPreferencePage"
+               id="org.key_project.sed.key.ui.preference.page.key_symbolic_debug"
+               name="KeY">
+         </page>
+      </extension>
 </plugin>

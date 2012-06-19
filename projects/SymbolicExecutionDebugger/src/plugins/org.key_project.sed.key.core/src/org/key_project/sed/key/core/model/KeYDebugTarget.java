@@ -10,6 +10,7 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 
@@ -105,7 +106,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Set goal chooser to use
       builder.getProof().getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
       // Set initial stop condition to use
-      builder.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
+      builder.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(new ExecutedSymbolicExecutionTreeNodesStopCondition(KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun()));
    }
 
    /**
@@ -146,7 +147,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
          // Inform UI that the process is resumed
          super.resume();
          // Run auto mode
-         runAutoMode(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, 
+         runAutoMode(KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
                      keyNode != null ? SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()) : builder.getProof().openEnabledGoals(),
                      false,
                      false);
@@ -367,7 +368,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param keyNode The {@link IKeYSEDDebugNode} which requests the step over.
     */
    public void stepOver(IKeYSEDDebugNode<?> keyNode) {
-      runAutoMode(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, 
+      runAutoMode(KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
                   SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
                   true,
                   false);
@@ -387,7 +388,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param keyNode The {@link IKeYSEDDebugNode} which requests the step return.
     */
    public void stepReturn(IKeYSEDDebugNode<?> keyNode) {
-      runAutoMode(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, 
+      runAutoMode(KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
                   SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
                   false,
                   true);
