@@ -89,5 +89,11 @@
                id="org.key_project.sed.ui.node.tab.SEDDebugNodePropertySection">
               </propertySection>
           </propertySections>
+      </extension>
+      <extension
+            point="org.eclipse.debug.ui.contextViewBindings">
+         <perspective
+               perspectiveId="org.key_project.sed.ui.perspective">
+         </perspective>
       </extension>  
 </plugin>
