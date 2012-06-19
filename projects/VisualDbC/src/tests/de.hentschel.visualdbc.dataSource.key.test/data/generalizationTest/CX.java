@@ -10,6 +10,6 @@
  *******************************************************************************/
 
 
-public class C extends B implements InterfaceC, InterfaceX {
+public class CX extends B implements InterfaceC, InterfaceX {
 
 }
