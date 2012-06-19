@@ -3,6 +3,7 @@ package org.key_project.sed.key.core.test.testcase.swtbot;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -15,6 +16,7 @@ import org.eclipse.debug.core.model.ISuspendResume;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
@@ -30,6 +32,8 @@ import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.test.util.TestSEDKeyCoreUtil;
+import org.key_project.sed.ui.visualization.view.ExecutionTreeThumbNailView;
+import org.key_project.sed.ui.visualization.view.ExecutionTreeView;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
@@ -416,6 +420,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     * the environment an the real test is done in the given {@link IKeYDebugTargetTestExecutor}.
     * @param projectName The project name.
     * @param pathInBundle The path to the test files in bundle.
+    * @param closeExecutionTreeViews Close the views which visualizes the symbolic execution tree? Will increase the test perforamnce.
     * @param selector The {@link IMethodSelector} to select the {@link IMethod} to debug.
     * @param showMethodReturnValues Show method return values?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
@@ -424,6 +429,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     */
    protected void doKeYDebugTargetTest(String projectName,
                                        String pathInBundle,
+                                       boolean closeExecutionTreeViews,
                                        IMethodSelector selector,
                                        Boolean showMethodReturnValues,
                                        int timeoutFactor,
@@ -435,9 +441,16 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
       SWTBotTree debugTree = null;
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       String originalRuntimeExceptions = null;
+      boolean restoreExecutionTreeView = false;
+      boolean restoreThumbinalExecutionTreeView = false;
+      List<? extends SWTBotEditor> oldEditors = bot.editors();
       try {
          // Open symbolic debug perspective
          TestSedCoreUtil.openSymbolicDebugPerspective();
+         if (closeExecutionTreeViews) {
+            restoreExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeView.VIEW_ID);
+            restoreThumbinalExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeThumbNailView.VIEW_ID);
+         }
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
          BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathInBundle, project.getProject().getFolder("src"));
@@ -476,6 +489,22 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          }
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
+         // Make sure that all jobs are done because otherwise older jobs may influence the next test execution
+         TestUtilsUtil.waitForJobs();
+         // Close all opened editors which where not opened before test execution
+         List<? extends SWTBotEditor> currentEditors = bot.editors();
+         for (SWTBotEditor editor : currentEditors) {
+            if (!oldEditors.contains(editor)) {
+               editor.close();
+            }
+         }
+         // Restore closed views if required
+         if (restoreExecutionTreeView) {
+            TestUtilsUtil.openView(ExecutionTreeView.VIEW_ID);
+         }
+         if (restoreThumbinalExecutionTreeView) {
+            TestUtilsUtil.openView(ExecutionTreeThumbNailView.VIEW_ID);
+         }
          // Restore perspective
          defaultPerspective.activate();
       }

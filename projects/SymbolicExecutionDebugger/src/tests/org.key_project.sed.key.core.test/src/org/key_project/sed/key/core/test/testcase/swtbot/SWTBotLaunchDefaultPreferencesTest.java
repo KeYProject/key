@@ -10,6 +10,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.key.core.test.util.TestSEDKeyCoreUtil;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -61,7 +62,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
             @Override
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                // Get debug target TreeItem
-               SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0, 0); // Select thread
+               SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
                // Do resume and test created tree
                String expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? "data/simpleIf/oracle/SimpleIf.xml" : "data/simpleIf/oracle_noMethodReturnValues/SimpleIf.xml";
                resume(bot, item, target);
@@ -70,6 +71,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          };
          doKeYDebugTargetTest(projectName,
                               "data/simpleIf/test",
+                              false,
                               createMethodSelector("SimpleIf", "min", "I", "I"),
                               null,
                               8,

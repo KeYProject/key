@@ -11,7 +11,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.util.test.util.TestUtilsUtil;
+import org.key_project.sed.key.core.test.util.TestSEDKeyCoreUtil;
 
 /**
  * Tests the step return functionality of an {@link IDebugTarget} and
@@ -28,7 +28,7 @@ public class SWTBotStepReturnTest extends AbstractKeYDebugTargetTestCase {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Get debug target TreeItem
-            SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0, 0); // Select first thread
+            SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select first thread
             // Test initial debug target
             String expectedModelPathInBundle = "data/stepReturnTest/oracle/StepReturnTest";
             String expectedModelFileExtension = ".xml";
@@ -52,6 +52,7 @@ public class SWTBotStepReturnTest extends AbstractKeYDebugTargetTestCase {
       };
       doKeYDebugTargetTest("SWTBotStepReturnTest_testStepReturn", 
                            "data/stepReturnTest/test", 
+                           true,
                            createMethodSelector("StepReturnTest", "main", "I"), 
                            false, 
                            4, 

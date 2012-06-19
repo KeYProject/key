@@ -10,6 +10,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.key.core.test.util.TestSEDKeyCoreUtil;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -29,7 +30,7 @@ public class SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest extends AbstractKeY
             int originalMaximalNumberOfSetNodesPerBranchOnRun = KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun();
             try {
                // Get debug target TreeItem
-               SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0, 0); // Select thread
+               SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
                // Test initial debug target
                String expectedModelPathInBundle = "data/manyStatements/oracle/ManyStatements";
                String expectedModelFileExtension = ".xml";
@@ -57,6 +58,7 @@ public class SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest extends AbstractKeY
       };
       doKeYDebugTargetTest("SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest_testDifferentValues",
                            "data/manyStatements/test",
+                           false,
                            createMethodSelector("ManyStatements", "main"),
                            false,
                            8,

@@ -608,7 +608,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             // Make sure that the debug target is in the initial state.
             TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.computeTargetName(method));
             // Resume launch
-            SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
+            SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, 0, 0); // Select first debug target
             item.contextMenu("Resume").click();
             TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
             assertTrue(launch.canTerminate());
@@ -660,7 +660,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
          }
       };
       doKeYDebugTargetTest("SWTBotKeYDebugTargetSuspendResumeTest_testSuspendResumeDebugTarget_Resume_Suspend_Resume", 
-                           "data/statements/test", 
+                           "data/statements/test",
+                           true,
                            createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"), 
                            true, 
                            6, 
@@ -789,7 +790,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
             // Make sure that the debug target is in the initial state.
             TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
             // Get debug target TreeItem
-            SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
+            SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, 0, 0); // Select first debug target
             // Create tree
             if (stepIntoInsteadOfRun) {
                // Step into on each SET node
@@ -863,6 +864,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
       };
       doKeYDebugTargetTest(projectName, 
                            pathInBundle, 
+                           true,
                            selector, 
                            showMethodReturnValues, 
                            timeoutFactor, 
@@ -949,7 +951,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
             }
             // Disconnect
-            SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, pathToElementInDebugTreeWhichProvidesDisconnectMenuItem); // Select first debug target
+            SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, pathToElementInDebugTreeWhichProvidesDisconnectMenuItem); // Select first debug target
             item.contextMenu("Disconnect").click();
             assertTrue(launch.canTerminate());
             assertTrue(launch.isTerminated()); // Also disconnected debug targets are seen as terminated by the Eclipse Debug API.
@@ -972,6 +974,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
       };
       doKeYDebugTargetTest(projectName, 
                            "data/statements/test", 
+                           true,
                            createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"), 
                            true, 
                            8, 
@@ -1044,7 +1047,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
             }
             // Terminate launch
-            SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, pathToElementInDebugTreeWhichProvidesTerminateMenuItem); // Select first launch
+            SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, pathToElementInDebugTreeWhichProvidesTerminateMenuItem); // Select first launch
             item.contextMenu("Terminate").click();
             TestSedCoreUtil.waitUntilLaunchIsTerminated(bot, launch);
             assertFalse(launch.canTerminate());
@@ -1063,6 +1066,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
       };
       doKeYDebugTargetTest(projectName, 
                            "data/statements/test", 
+                           true,
                            createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"), 
                            true, 
                            8, 

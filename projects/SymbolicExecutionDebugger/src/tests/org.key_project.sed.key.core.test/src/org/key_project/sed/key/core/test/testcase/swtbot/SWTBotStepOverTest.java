@@ -12,7 +12,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.key.core.test.util.TestSEDKeyCoreUtil;
-import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
  * Tests the step over functionality of an {@link IDebugTarget} and
@@ -29,7 +28,7 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Get debug target TreeItem
-            SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0, 0); // Select thread
+            SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
             // Test initial debug target
             String expectedModelPathInBundle = "data/stepOverOnTwoBranches/oracleOnBranchOnly/StepOverOnTwoBranches";
             String expectedModelFileExtension = ".xml";
@@ -57,6 +56,7 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
       };
       doKeYDebugTargetTest("SWTBotStepOverTest_testStepOverOnOneBranchOnly", 
                            "data/stepOverOnTwoBranches/test", 
+                           true,
                            createMethodSelector("StepOverOnTwoBranches", "main", "I"), 
                            false, 
                            14, 
@@ -72,7 +72,7 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Get debug target TreeItem
-            SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0, 0); // Select first thread
+            SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select first thread
             // Test initial debug target
             String expectedModelPathInBundle = "data/stepOverOnTwoBranches/oracleTwoBranches/StepOverOnTwoBranches";
             String expectedModelFileExtension = ".xml";
@@ -94,6 +94,7 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
       };
       doKeYDebugTargetTest("SWTBotStepOverTest_testStepOverOnTwoBranches", 
                            "data/stepOverOnTwoBranches/test", 
+                           true,
                            createMethodSelector("StepOverOnTwoBranches", "main", "I"), 
                            false, 
                            4, 

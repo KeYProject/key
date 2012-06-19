@@ -72,6 +72,11 @@ import org.key_project.util.java.thread.IRunnableWithResult;
  */
 public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<ExecutionTreeDiagramEditor, ReadonlyDiagramEditorActionBarContributor> {
    /**
+    * The ID of this view.
+    */
+   public static final String VIEW_ID = "org.key_project.sed.ui.graphiti.view.ExecutionTreeView";
+   
+   /**
     * The message which is shown to the user if the debug view is not opened.
     */
    public static final String MESSAGE_DEBUG_VIEW_NOT_OPENED = "View \"Debug\" is not opened.";
