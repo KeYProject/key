@@ -218,8 +218,8 @@ tokens {
    private String modalityBegin = null;
    private String modalityEnd = null;
 
-   private static HashMap modNames = new HashMap(20);
-   private static HashMap modPairs = new HashMap(20);
+   private static HashMap<String,String> modNames = new HashMap<String,String>(20);
+   private static HashMap<String,String> modPairs = new HashMap<String,String>(20);
    
    static {
       modNames.put("\\<","diamond");
