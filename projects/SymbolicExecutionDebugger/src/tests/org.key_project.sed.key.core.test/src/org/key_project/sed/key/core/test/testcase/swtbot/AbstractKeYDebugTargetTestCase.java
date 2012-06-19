@@ -11,6 +11,7 @@ import junit.framework.TestCase;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IStep;
+import org.eclipse.debug.core.model.ISuspendResume;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -358,6 +359,55 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          assertFalse(leafStep.canStepReturn());
          TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
          assertTrue(leafStep.canStepReturn());
+      }
+   }
+   
+   /**
+    * Makes sure that a resume was done correctly.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @param launchTreeItem The {@link SWTBotTreeItem} to perform resume on.
+    * @param target The {@link ISEDDebugTarget} to use.
+    * @param expectedModelPathInBundle The path and file name of oracle file.
+    * @param modelIndex The index of the oracle file.
+    * @param expectedModelFileExtension The oracle file extension.
+    * @throws DebugException Occurred Exception
+    * @throws IOException Occurred Exception
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    */
+   protected void assertResume(SWTWorkbenchBot bot, 
+                               SWTBotTreeItem launchTreeItem, 
+                               ISEDDebugTarget target,
+                               String expectedModelPathInBundle,
+                               int modelIndex,
+                               String expectedModelFileExtension) throws DebugException, IOException, ParserConfigurationException, SAXException {
+      resume(bot, launchTreeItem, target);
+      assertStep(target, expectedModelPathInBundle, modelIndex, expectedModelFileExtension);
+   }
+   
+   /**
+    * Performs a resume on the given {@link SWTBotTreeItem}.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @param launchTreeItem The {@link SWTBotTreeItem} to perform resume on.
+    * @param target The {@link ISEDDebugTarget} to use.
+    */
+   protected static void resume(SWTWorkbenchBot bot, 
+                                SWTBotTreeItem launchTreeItem, 
+                                ISEDDebugTarget target) {
+      assertNotNull(bot);
+      assertNotNull(launchTreeItem);
+      assertNotNull(target);
+      Object leafData = TestUtilsUtil.getTreeItemData(launchTreeItem);
+      if (leafData instanceof ISuspendResume) {
+         ISuspendResume leafStep = (ISuspendResume)leafData;
+         assertTrue(leafStep.canResume());
+         launchTreeItem.select();
+         SWTBotMenu menuItem = launchTreeItem.contextMenu("Resume"); 
+         menuItem.click();
+         TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
+         assertFalse(leafStep.canResume());
+         TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
+         assertTrue(leafStep.canResume());
       }
    }
    
