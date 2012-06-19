@@ -19,7 +19,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest extends AbstractKeYDebugTargetTestCase {
    /**
-    * Tests the step over functionality on each branch separately.
+    * Tests the resume functionality with different maximal values.
     */
    @Test
    public void testDifferentValues() throws Exception {

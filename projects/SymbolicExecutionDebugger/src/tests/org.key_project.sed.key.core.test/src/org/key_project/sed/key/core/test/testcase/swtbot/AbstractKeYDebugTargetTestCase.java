@@ -425,7 +425,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
    protected void doKeYDebugTargetTest(String projectName,
                                        String pathInBundle,
                                        IMethodSelector selector,
-                                       boolean showMethodReturnValues,
+                                       Boolean showMethodReturnValues,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create bot

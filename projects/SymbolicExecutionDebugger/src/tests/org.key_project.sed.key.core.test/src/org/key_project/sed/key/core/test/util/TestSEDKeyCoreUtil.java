@@ -52,18 +52,20 @@ public final class TestSEDKeyCoreUtil {
     * Launches the {@link IMethod} in the symbolic execution debugger
     * based on KeY.
     * @param method The {@link IMethod} to debug.
-    * @param showMethodReturnValues Show method return values?
+    * @param showMethodReturnValues Show method return values? Use {@code null} to use default value.
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IMethod method,
-                                final boolean showMethodReturnValues) throws Exception {
+                                final Boolean showMethodReturnValues) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
             try {
                ILaunchConfiguration config = getKeYLaunchConfiguration(method);
                ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
-               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
+               if (showMethodReturnValues != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
+               }
                config = wc.doSave();
                DebugUITools.launch(config, KeySEDUtil.MODE);
             }
