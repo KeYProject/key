@@ -31,7 +31,7 @@ public class KeYSymbolicDebugPreferencePage extends FieldEditorPreferencePage im
     */
    @Override
    protected void createFieldEditors() {
-      IntegerFieldEditor runSetNodes = new IntegerFieldEditor(KeYSEDPreferences.MAXIMAL_NUMBER_OF_SET_NODES_PER_BRANCH_ON_RUN, "Maximal number of symbolic execution tree nodes per branch on run", getFieldEditorParent());
+      IntegerFieldEditor runSetNodes = new IntegerFieldEditor(KeYSEDPreferences.MAXIMAL_NUMBER_OF_SET_NODES_PER_BRANCH_ON_RUN, "&Maximal number of symbolic execution tree nodes per branch on run", getFieldEditorParent());
       runSetNodes.setValidRange(1, Integer.MAX_VALUE);
       addField(runSetNodes);
    }

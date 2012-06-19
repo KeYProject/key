@@ -120,5 +120,11 @@
                id="org.key_project.sed.key.ui.preference.page.key_symbolic_debug"
                name="KeY">
          </page>
+         <page
+               category="org.key_project.sed.ui.preference.page.symbolic_debug"
+               class="org.key_project.sed.key.ui.preference.page.KeYLaunchSymbolicDebugPreferencePage"
+               id="org.key_project.sed.key.ui.preference.page.key_launch_defaults"
+               name="KeY Launch Defaults">
+         </page>
       </extension>
 </plugin>

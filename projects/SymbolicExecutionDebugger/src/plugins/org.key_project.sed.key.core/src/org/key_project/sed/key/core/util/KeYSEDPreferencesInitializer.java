@@ -18,5 +18,6 @@ public class KeYSEDPreferencesInitializer extends AbstractPreferenceInitializer 
    @Override
    public void initializeDefaultPreferences() {
       KeYSEDPreferences.setDefaultMaximalNumberOfSetNodesPerBranchOnRun(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
+      KeYSEDPreferences.setDefaultShowMethodReturnValuesInDebugNode(true);
    }
 }
