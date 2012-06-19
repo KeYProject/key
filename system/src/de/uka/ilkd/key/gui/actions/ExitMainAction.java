@@ -38,17 +38,12 @@ public class ExitMainAction extends MainWindowAction {
     };
 
     protected void exitMain() {
-        boolean quit = false;       
         final int option = JOptionPane.showConfirmDialog
         (mainWindow, "Really Quit?", "Exit", 
-                JOptionPane.YES_NO_OPTION);		   	    
+                JOptionPane.YES_NO_OPTION);
         if (option == JOptionPane.YES_OPTION) {
-            quit = true;
-        } 
-
-        if (quit) {
             exitMainWithoutInteraction();
-        }
+        } 
     }
     
     /**

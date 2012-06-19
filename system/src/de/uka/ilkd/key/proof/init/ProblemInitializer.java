@@ -302,23 +302,23 @@ public final class ProblemInitializer {
      * depending symbols for a generic sort out of the namespaces.
      * Helper for readEnvInput().
      * 
-     * See bug report #1185
+     * See bug report #1185, #1189
      */
     private void cleanupNamespaces(InitConfig initConfig) {
 	Namespace newVarNS = new Namespace();	    
 	Namespace newSortNS = new Namespace();
 	Namespace newFuncNS = new Namespace();	    
 	for(Named n : initConfig.sortNS().allElements()) {
-//	    if(!(n instanceof GenericSort)) {
+	    if(!(n instanceof GenericSort)) {
 		newSortNS.addSafely(n);
-//	    }	
+	    }	
 	}
 	for(Named n : initConfig.funcNS().allElements()) {
-//	    if(!(n instanceof SortDependingFunction 
-//		    && ((SortDependingFunction)n).getSortDependingOn() 
-//		    instanceof GenericSort)) {
+	    if(!(n instanceof SortDependingFunction 
+		    && ((SortDependingFunction)n).getSortDependingOn() 
+		    instanceof GenericSort)) {
 		newFuncNS.addSafely(n);
-//	    }
+	    }
 	}
 	//System.out.println(initConfig.funcNS().hashCode() + " ---> " + newFuncNS.hashCode());
 	initConfig.getServices().getNamespaces().setVariables(newVarNS);
@@ -339,7 +339,7 @@ public final class ProblemInitializer {
 	    //sanity check
 	    assert initConfig.varNS().allElements().size() == 0;
 	    for(Named n : initConfig.sortNS().allElements()) {
-		assert n instanceof Sort; //&& !(n instanceof GenericSort);
+		assert n instanceof Sort && !(n instanceof GenericSort);
 	    }	    
 	    
 	    //read envInput itself
