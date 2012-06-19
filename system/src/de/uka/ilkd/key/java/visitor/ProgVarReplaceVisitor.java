@@ -225,23 +225,18 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         Term selfTerm = inv.getInternalSelfTerm();
         Map<LocationVariable,Term> atPres = inv.getInternalAtPres();
         
-        //invariant
-        Term newInvariant 
-            = replaceVariablesInTerm(inv.getInvariant(selfTerm, 
-                                                      atPres,
-                                                      services, false));
-        // transaction invariant
-        Term newTransactionInvariant 
-            = replaceVariablesInTerm(inv.getInvariant(selfTerm, 
-                                                      atPres,
-                                                      services, true));
-
+        Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
         Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
+
         for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
            final Term m = replaceVariablesInTerm(inv.getModifies(heap, selfTerm, 
                                      atPres,
                                      services));
            newMods.put(heap, m);
+           final Term i = replaceVariablesInTerm(inv.getInvariant(heap, selfTerm, 
+                                     atPres,
+                                     services));
+           newInvariants.put(heap, i);
         }
 
         //variant
@@ -260,8 +255,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         LoopInvariant newInv 
             = new LoopInvariantImpl(newLoop, 
-                                    newInvariant,
-                                    newTransactionInvariant,
+                                    newInvariants,
                                     newMods,
                                     newVariant, 
                                     newSelfTerm,

@@ -93,7 +93,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	// try to get invariant from JML specification
 	LoopInvariant inv = app.getInvariant(); 
-         
+
 	//collect self, execution context
 	final MethodFrame innermostMethodFrame 
 		= JavaTools.getInnermostMethodFrame(progPost.javaBlock(), 
@@ -221,28 +221,21 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//get instantiation
 	Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);	
 	
-    final boolean transaction = ((Modality)inst.progPost.op()).transaction(); 
-
     final Map<LocationVariable,Term> atPres = inst.inv.getInternalAtPres();
-    final HeapContext hc = inst.inv.getHeapContext(transaction);
-    final List<LocationVariable> modHeaps = hc.getModHeaps(services);
+    final List<LocationVariable> heapContext = ((IBuiltInRuleApp)ruleApp).getHeapContext();
 
-    final Term regularInv = inst.inv.getInvariant(inst.selfTerm, atPres, services, false);
-
-    final Term invTerm;
-    if(transaction) {
-      final Term transactionInv = inst.inv.getInvariant(inst.selfTerm, atPres, services, true);
-      if(transactionInv != null) {
-        invTerm = TB.and(regularInv, transactionInv);
+    Term invTerm = null;
+    for(LocationVariable heap : heapContext) {
+      final Term i = inst.inv.getInvariant(heap, inst.selfTerm, atPres, services);
+      if(invTerm == null) {
+        invTerm = i;
       }else{
-        invTerm = regularInv;
+        invTerm = TB.and(invTerm, i);
       }
-    }else{
-      invTerm = regularInv;
     }
 
     final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
-    for(LocationVariable heap : modHeaps) {
+    for(LocationVariable heap : heapContext) {
       final Term m = inst.inv.getModifies(heap, inst.selfTerm, atPres, services);
       mods.put(heap, m);
     }
@@ -271,7 +264,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         final Map<LocationVariable,Map<Term,Term>> heapToBeforeLoop = new LinkedHashMap<LocationVariable,Map<Term,Term>>();
 
-        for(LocationVariable heap : modHeaps) {
+        for(LocationVariable heap : heapContext) {
           heapToBeforeLoop.put(heap, new HashMap<Term,Term>());
           final LocationVariable lv = TB.heapAtPreVar(services, heap.name()+"BeforeLoop", true);
    	  services.getNamespaces().programVariables().addSafely(lv);
@@ -304,7 +297,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term wellFormedAnon = null;
         Term frameCondition = null;
         Term reachableState = reachableIn;
-        for(LocationVariable heap : modHeaps) {
+        for(LocationVariable heap : heapContext) {
 	  final Pair<Term,Term> tAnon 
 	      = createAnonUpdate(heap, inst.loop, mods.get(heap), services);
           if(anonUpdate == null) {
@@ -481,7 +474,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 							uAnon,
 							guardFalseRestPsi)), 
                               ruleApp.posInOccurrence());
-        hc.reset();
 	return result;
     }
 

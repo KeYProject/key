@@ -1484,6 +1484,9 @@ choice_option[String cat]{
         }
     ;
 
+/* TODO: Why is the result of one_sort_decl stored in the local variables?
+ * It does not seem to be employed at all ?! (MU)
+ */
 sort_decls 
 {
   ImmutableList<Sort> lsorts = ImmutableSLList.<Sort>nil();
