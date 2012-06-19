@@ -575,7 +575,6 @@ public final class UseOperationContractRule implements BuiltInRule {
                                            TB.var(excVar), 
                                            atPres,
                                            services);
-
         final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
 
         for(LocationVariable heap : heapContext) {

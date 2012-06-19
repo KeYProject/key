@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -263,7 +263,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    					       Sequent seq) {
 	assert focus.op() instanceof ObserverFunction;
 	final Map<Term, PosInOccurrence> result 
-		= new HashMap<Term, PosInOccurrence>();
+		= new LinkedHashMap<Term, PosInOccurrence>();
 	for(SequentFormula cf : seq.antecedent()) {
 	    final PosInOccurrence pos 
 	    	= new PosInOccurrence(cf, PosInTerm.TOP_LEVEL, true);

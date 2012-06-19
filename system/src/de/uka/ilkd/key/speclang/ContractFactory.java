@@ -274,7 +274,10 @@ public class ContractFactory {
         }
         
         //collect information
-        Map<LocationVariable,Term> pres = t.originalPres;
+        Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable h : t.originalPres.keySet()) {
+           pres.put(h, t.originalPres.get(h));
+        }
         Term mby = t.originalMby;        
         Map<LocationVariable,Term> posts = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
