@@ -1,14 +1,17 @@
 package org.key_project.sed.ui.visualization.view;
 
 import org.eclipse.debug.ui.IDebugView;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.ui.IEditorActionBarContributor;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
 import org.key_project.util.java.ArrayUtil;
@@ -30,30 +33,57 @@ public abstract class AbstractDebugViewBasedEditorInViewView<E extends IEditorPa
    /**
     * Listens for changes on the {@link IWorkbenchPage} of this {@link IViewSite}.
     */
-   private IPartListener partListener = new IPartListener() {
+   private IPartListener2 partListener = new IPartListener2() {
       @Override
-      public void partOpened(IWorkbenchPart part) {
-         handlePartOpened(part);
+      public void partActivated(IWorkbenchPartReference partRef) {
+         handlePartActivated(partRef);
       }
-      
+
       @Override
-      public void partDeactivated(IWorkbenchPart part) {
-         handlePartDeactivated(part);
+      public void partBroughtToTop(IWorkbenchPartReference partRef) {
+         handlePartBroughtToTop(partRef);
       }
-      
+
       @Override
-      public void partClosed(IWorkbenchPart part) {
-         handlePartClosed(part);
+      public void partClosed(IWorkbenchPartReference partRef) {
+         handlePartClosed(partRef);
       }
-      
+
       @Override
-      public void partBroughtToTop(IWorkbenchPart part) {
-         handlePartBroughtToTop(part);
+      public void partDeactivated(IWorkbenchPartReference partRef) {
+         handlePartDeactivated(partRef);
       }
-      
+
       @Override
-      public void partActivated(IWorkbenchPart part) {
-         handlePartActivated(part);
+      public void partOpened(IWorkbenchPartReference partRef) {
+         handlePartOpened(partRef);
+      }
+
+      @Override
+      public void partHidden(IWorkbenchPartReference partRef) {
+         handlePartHidden(partRef);
+      }
+
+      @Override
+      public void partVisible(IWorkbenchPartReference partRef) {
+         handlePartVisible(partRef);
+      }
+
+      @Override
+      public void partInputChanged(IWorkbenchPartReference partRef) {
+         handlePartInputChanged(partRef);
+      }
+   };
+   
+   /**
+    * This listener is added to {@link #debugView} because the
+    * Eclipse API provides no event to detect when a view is closed
+    * and not only hidden.
+    */
+   private DisposeListener disposeListener = new DisposeListener() {
+      @Override
+      public void widgetDisposed(DisposeEvent e) {
+         handleDebugViewDisposed(e);
       }
    };
    
@@ -68,7 +98,7 @@ public abstract class AbstractDebugViewBasedEditorInViewView<E extends IEditorPa
    @Override
    public void init(IViewSite site) throws PartInitException {
       super.init(site);
-      getViewSite().getPage().addPartListener(partListener); // TODO: Fix bug that listener observes only the own events and not the events from other views.
+      site.getPage().addPartListener(partListener);
       initDebugView(getViewSite());
    }
 
@@ -80,7 +110,8 @@ public abstract class AbstractDebugViewBasedEditorInViewView<E extends IEditorPa
       IViewReference view = ArrayUtil.search(site.getPage().getViewReferences(), new IFilter<IViewReference>() {
          @Override
          public boolean select(IViewReference view) {
-            if (!ObjectUtil.equals(view.getId(), site.getId())) { // Avoid warning: Warning: Detected recursive attempt by part org.key_project.sed.ui.graphiti.view.ExecutionTreeView to create itself (this is probably, but not necessarily, a bug) 
+            if (!ObjectUtil.equals(view.getId(), site.getId()) &&
+                !ObjectUtil.equals(view.getId(), ExecutionTreeThumbNailView.VIEW_ID)) { // Avoid warning: Warning: Detected recursive attempt by part org.key_project.sed.ui.graphiti.view.ExecutionTreeView to create itself (this is probably, but not necessarily, a bug) 
                IViewPart part = view.getView(true);
                return part instanceof IDebugView && shouldHandleDebugView((IDebugView)part);
             }
@@ -101,20 +132,53 @@ public abstract class AbstractDebugViewBasedEditorInViewView<E extends IEditorPa
    protected abstract boolean shouldHandleDebugView(IDebugView debugView);
 
    /**
-    * Handles the event {@link IPartListener#partClosed(IWorkbenchPart)}.
-    * @param part The closed {@link IWorkbenchPart}.
+    * Handles the event {@link IPartListener2#partActivated(IWorkbenchPartReference)}.
+    * @param partRef The source of the event.
     */
-   protected void handlePartClosed(IWorkbenchPart part) {
-      if (part instanceof IDebugView && shouldHandleDebugView((IDebugView)part)) {
-         setDebugView(null);
-      }
+   protected void handlePartActivated(IWorkbenchPartReference partRef) {
    }
 
    /**
-    * Handles the event {@link IPartListener#partOpened(IWorkbenchPart)}.
-    * @param part The opened {@link IWorkbenchPart}.
+    * Handles the event {@link IPartListener2#partBroughtToTop(IWorkbenchPartReference)}.
+    * @param partRef The source of the event.
     */
-   protected void handlePartOpened(IWorkbenchPart part) {
+   protected void handlePartBroughtToTop(IWorkbenchPartReference partRef) {
+   }
+
+   /**
+    * Handles the event {@link IPartListener2#partClosed(IWorkbenchPartReference)}.
+    * @param partRef The source of the event.
+    */
+   protected void handlePartClosed(IWorkbenchPartReference partRef) {
+   }
+
+   /**
+    * Handles the event {@link IPartListener2#partDeactivated(IWorkbenchPartReference)}.
+    * @param partRef The source of the event.
+    */
+   protected void handlePartDeactivated(IWorkbenchPartReference partRef) {
+   }
+
+   /**
+    * Handles the event {@link IPartListener2#partOpened(IWorkbenchPartReference)}.
+    * @param partRef The source of the event.
+    */
+   protected void handlePartOpened(IWorkbenchPartReference partRef) {
+   }
+
+   /**
+    * Handles the event {@link IPartListener2#partHidden(IWorkbenchPartReference)}.
+    * @param partRef The source of the event.
+    */
+   protected void handlePartHidden(IWorkbenchPartReference partRef) {
+   }
+
+   /**
+    * Handles the event {@link IPartListener2#partVisible(IWorkbenchPartReference)}.
+    * @param partRef The source of the event.
+    */
+   protected void handlePartVisible(IWorkbenchPartReference partRef) {
+      IWorkbenchPart part = partRef.getPart(true);
       if (part instanceof IDebugView) {
          IDebugView debugView = (IDebugView)part;
          if (shouldHandleDebugView(debugView)) {
@@ -124,24 +188,18 @@ public abstract class AbstractDebugViewBasedEditorInViewView<E extends IEditorPa
    }
 
    /**
-    * Handles the event {@link IPartListener#partActivated(IWorkbenchPart)}.
-    * @param part The activated {@link IWorkbenchPart}.
+    * Handles the event {@link IPartListener2#partInputChanged(IWorkbenchPartReference)}.
+    * @param partRef The source of the event.
     */
-   protected void handlePartActivated(IWorkbenchPart part) {
+   protected void handlePartInputChanged(IWorkbenchPartReference partRef) {
    }
 
    /**
-    * Handles the event {@link IPartListener#partBroughtToTop(IWorkbenchPart)}.
-    * @param part The {@link IWorkbenchPart} brought to top.
+    * When the debug view was disposed.
+    * @param e The event.
     */
-   protected void handlePartBroughtToTop(IWorkbenchPart part) {
-   }
-
-   /**
-    * Handles the event {@link IPartListener#partDeactivated(IWorkbenchPart)}.
-    * @param part The deactivated {@link IWorkbenchPart}.
-    */
-   protected void handlePartDeactivated(IWorkbenchPart part) {
+   protected void handleDebugViewDisposed(DisposeEvent e) {
+      setDebugView(null); // Attention: The debug view is only disposed when the workbench window is closed. For this reason it is not possible to detect closings at runtime.
    }
 
    /**
@@ -149,7 +207,10 @@ public abstract class AbstractDebugViewBasedEditorInViewView<E extends IEditorPa
     */
    @Override
    public void dispose() {
-      getViewSite().getPage().removePartListener(partListener);
+      getSite().getPage().removePartListener(partListener);
+      if (this.debugView != null) {
+         this.debugView.getViewer().getControl().removeDisposeListener(disposeListener);
+      }
       super.dispose();
    }
 
@@ -167,7 +228,13 @@ public abstract class AbstractDebugViewBasedEditorInViewView<E extends IEditorPa
     */
    protected void setDebugView(IDebugView debugView) {
       IDebugView oldDebugView = this.debugView;
+      if (oldDebugView != null) {
+         oldDebugView.getViewer().getControl().removeDisposeListener(disposeListener);
+      }
       this.debugView = debugView;
+      if (this.debugView != null) {
+         this.debugView.getViewer().getControl().addDisposeListener(disposeListener);
+      }
       if (!ObjectUtil.equals(oldDebugView, this.debugView)) {
          handleDebugViewChanged(oldDebugView, this.debugView);
       }
