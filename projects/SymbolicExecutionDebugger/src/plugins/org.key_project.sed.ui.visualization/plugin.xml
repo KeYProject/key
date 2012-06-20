@@ -148,7 +148,7 @@
               id="org.key_project.sed.ui.graphiti.view.ExecutionTreeView"
               minimized="false"
               relationship="right"
-              relative="left"
+              relative="org.eclipse.debug.ui.DebugView"
               visible="true">
         </view>
         <viewShortcut

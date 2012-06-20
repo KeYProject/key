@@ -226,4 +226,68 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    public void stepInto() throws DebugException {
       getDebugTarget().stepInto(this);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canStepOver() {
+      return getDebugTarget().canStepOver(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void stepOver() throws DebugException {
+      getDebugTarget().stepOver(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canStepReturn() {
+      return getDebugTarget().canStepReturn(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void stepReturn() throws DebugException {
+      getDebugTarget().stepReturn(this);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canResume() {
+      return getDebugTarget().canResume(this);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void resume() throws DebugException {
+      getDebugTarget().resume(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canSuspend() {
+      return getDebugTarget().canSuspend(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void suspend() throws DebugException {
+      getDebugTarget().suspend(this);
+   }
 }

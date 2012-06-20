@@ -89,5 +89,20 @@
                id="org.key_project.sed.ui.node.tab.SEDDebugNodePropertySection">
               </propertySection>
           </propertySections>
+      </extension>
+      <extension
+            point="org.eclipse.debug.ui.contextViewBindings">
+         <perspective
+               perspectiveId="org.key_project.sed.ui.perspective">
+         </perspective>
+      </extension>
+      <extension
+            point="org.eclipse.ui.preferencePages">
+         <page
+               category="org.eclipse.debug.ui.DebugPreferencePage"
+               class="org.key_project.sed.ui.preference.page.SymbolicDebugPreferencePage"
+               id="org.key_project.sed.ui.preference.page.symbolic_debug"
+               name="Symbolic Debug">
+         </page>
       </extension>  
 </plugin>

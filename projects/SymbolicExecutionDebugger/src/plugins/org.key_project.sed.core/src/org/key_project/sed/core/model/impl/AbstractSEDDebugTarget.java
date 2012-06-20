@@ -195,7 +195,7 @@ public abstract class AbstractSEDDebugTarget extends AbstractSEDDebugElement imp
    @Override
    public void resume() throws DebugException {
       suspended = false;
-      fireSuspendEvent(DebugEvent.RESUME);
+      fireResumeEvent(DebugEvent.RESUME);
    }
 
    /**

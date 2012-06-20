@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_aae88938-113c-41d7-9640-fba61e15bafc" name="StepReturnTest[StepReturnTest::main(int)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_c833ce69-370b-4de5-b4ec-d9cacca4dc59" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_dd3f40a1-aabe-443f-91b9-48dfa0e54c0e" name="self.main(_a);" pathCondition="true" lineNumber="-1" charStart="46" charEnd="50">
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

@@ -1,41 +1,27 @@
 package org.key_project.sed.key.core.test.testcase.swtbot;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
 
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
-import org.eclipse.debug.core.model.IStep;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.junit.Before;
 import org.junit.Test;
-import org.key_project.key4eclipse.starter.core.test.util.TestStarterCoreUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
-import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.test.util.TestSEDKeyCoreUtil;
-import org.key_project.util.eclipse.BundleUtil;
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -45,56 +31,7 @@ import de.uka.ilkd.key.proof.Proof;
  * Tests for the functionality of a {@link KeYDebugTarget}.
  * @author Martin Hentschel
  */
-public class SWTBotKeYDebugTargetTest extends TestCase {
-   /**
-    * <p>
-    * If this constant is {@code true} a temporary directory is created with
-    * new oracle files. The developer has than to copy the new required files
-    * into the plug-in so that they are used during next test execution.
-    * </p>
-    * <p>
-    * <b>Attention: </b> It is strongly required that new test scenarios
-    * are verified with the SED application. If everything is fine a new test
-    * method can be added to this class and the first test execution can be
-    * used to generate the required oracle file. Existing oracle files should
-    * only be replaced if the functionality of the Symbolic Execution Debugger
-    * has changed so that they are outdated.
-    * </p>
-    */
-   public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
-   
-   /**
-    * The used temporary oracle directory.
-    */
-   private static final File oracleDirectory;
-
-   /**
-    * Creates the temporary oracle directory if required.
-    */
-   static {
-      File directory = null;
-      try {
-         if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
-            directory = IOUtil.createTempDirectory("ORACLE_DIRECTORY", StringUtil.EMPTY_STRING);
-         }
-      }
-      catch (IOException e) {
-      }
-      oracleDirectory = directory;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Before
-   @Override
-   public void setUp() throws Exception {
-      super.setUp();
-      // Close welcome view
-      SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      TestUtilsUtil.closeWelcomeView(bot);
-   }
-   
+public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
    /**
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
@@ -654,135 +591,81 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    @Test
    public void testSuspendResumeDebugTarget_Resume_Suspend_Resume() throws Exception {
-      // Create bot
-      SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      // Get current settings to restore them in finally block
-      SWTBotPerspective defaultPerspective = bot.activePerspective();
-      SWTBotTree debugTree = null;
-      long originalTimeout = SWTBotPreferences.TIMEOUT;
-      try {
-         // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
-         // Create test project
-         IJavaProject project = TestUtilsUtil.createJavaProject("SWTBotKeYDebugTargetSuspendResumeTest_testSuspendResumeDebugTarget_Resume_Suspend_Resume");
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements/test", project.getProject().getFolder("src"));
-         // Get method
-         IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
-         // Increase timeout
-         SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 6;
-         // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, true);
-         // Find the launched ILaunch in the debug view
-         SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
-         debugTree = debugView.bot().tree();
-         ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
-         ILaunch launch = target.getLaunch();
-         // Test launch commands after loading completed
-         assertTrue(launch.canTerminate());
-         assertFalse(launch.isTerminated());
-         assertTrue(target instanceof ISEDDebugTarget);
-         assertTrue(target.canDisconnect());
-         assertTrue(target.canResume());
-         assertFalse(target.canSuspend());
-         assertTrue(target.canTerminate());
-         assertFalse(target.isDisconnected());
-         assertTrue(target.isSuspended());
-         assertFalse(target.isTerminated());
-         // Make sure that the debug target is in the initial state.
-         TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.computeTargetName(method));
-         // Resume launch
-         SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
-         item.contextMenu("Resume").click();
-         TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
-         assertTrue(launch.canTerminate());
-         assertFalse(launch.isTerminated());
-         assertTrue(target.canDisconnect());
-         assertFalse(target.canResume());
-         assertTrue(target.canSuspend());
-         assertTrue(target.canTerminate());
-         assertFalse(target.isDisconnected());
-         assertFalse(target.isSuspended());
-         assertFalse(target.isTerminated());
-         // Suspend launch
-         TestSedCoreUtil.suspend(bot, target);
-         // Make sure that the execution tree is not completed
-         AssertionFailedError caughtError = null;
-         try {
+      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         @Override
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+            // Test launch commands after loading completed
+            assertTrue(launch.canTerminate());
+            assertFalse(launch.isTerminated());
+            assertTrue(target instanceof ISEDDebugTarget);
+            assertTrue(target.canDisconnect());
+            assertTrue(target.canResume());
+            assertFalse(target.canSuspend());
+            assertTrue(target.canTerminate());
+            assertFalse(target.isDisconnected());
+            assertTrue(target.isSuspended());
+            assertFalse(target.isTerminated());
+            // Make sure that the debug target is in the initial state.
+            TestSEDKeyCoreUtil.assertInitialTarget(target, TestSEDKeyCoreUtil.computeTargetName(method));
+            // Resume launch
+            SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, 0, 0); // Select first debug target
+            item.contextMenu("Resume").click();
+            TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
+            assertTrue(launch.canTerminate());
+            assertFalse(launch.isTerminated());
+            assertTrue(target.canDisconnect());
+            assertFalse(target.canResume());
+            assertTrue(target.canSuspend());
+            assertTrue(target.canTerminate());
+            assertFalse(target.isDisconnected());
+            assertFalse(target.isSuspended());
+            assertFalse(target.isTerminated());
+            // Suspend launch
+            TestSedCoreUtil.suspend(bot, target);
+            // Make sure that the execution tree is not completed
+            AssertionFailedError caughtError = null;
+            try {
+               TestSEDKeyCoreUtil.assertFlatStepsExample(target);
+            }
+            catch (AssertionFailedError e) {
+               caughtError = e;
+            }
+            if (caughtError == null) {
+               fail("Execution Tree is completed, suspend has not worked.");
+            }
+            // Resume launch
+            item.contextMenu("Resume").click();
+            TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
+            assertTrue(launch.canTerminate());
+            assertFalse(launch.isTerminated());
+            assertTrue(target.canDisconnect());
+            assertFalse(target.canResume());
+            assertTrue(target.canSuspend());
+            assertTrue(target.canTerminate());
+            assertFalse(target.isDisconnected());
+            assertFalse(target.isSuspended());
+            assertFalse(target.isTerminated());
+            TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
+            assertTrue(launch.canTerminate());
+            assertFalse(launch.isTerminated());
+            assertTrue(target.canDisconnect());
+            assertTrue(target.canResume());
+            assertFalse(target.canSuspend());
+            assertTrue(target.canTerminate());
+            assertFalse(target.isDisconnected());
+            assertTrue(target.isSuspended());
+            assertFalse(target.isTerminated());
+            // Test the execution tree
             TestSEDKeyCoreUtil.assertFlatStepsExample(target);
          }
-         catch (AssertionFailedError e) {
-            caughtError = e;
-         }
-         if (caughtError == null) {
-            fail("Execution Tree is completed, suspend has not worked.");
-         }
-         // Resume launch
-         item.contextMenu("Resume").click();
-         TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
-         assertTrue(launch.canTerminate());
-         assertFalse(launch.isTerminated());
-         assertTrue(target.canDisconnect());
-         assertFalse(target.canResume());
-         assertTrue(target.canSuspend());
-         assertTrue(target.canTerminate());
-         assertFalse(target.isDisconnected());
-         assertFalse(target.isSuspended());
-         assertFalse(target.isTerminated());
-         TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
-         assertTrue(launch.canTerminate());
-         assertFalse(launch.isTerminated());
-         assertTrue(target.canDisconnect());
-         assertTrue(target.canResume());
-         assertFalse(target.canSuspend());
-         assertTrue(target.canTerminate());
-         assertFalse(target.isDisconnected());
-         assertTrue(target.isSuspended());
-         assertFalse(target.isTerminated());
-         // Test the execution tree
-         TestSEDKeyCoreUtil.assertFlatStepsExample(target);
-      }
-      finally {
-         // Restore timeout
-         SWTBotPreferences.TIMEOUT = originalTimeout;
-         // Restore perspective
-         defaultPerspective.activate();
-         // Terminate and remove all launches
-         TestSedCoreUtil.terminateAndRemoveAll(debugTree);
-      }
-   }
-   
-   /**
-    * Utility class to select an {@link IMethod} in a given {@link IJavaProject}.
-    * @author Martin Hentschel
-    */
-   public static interface IMethodSelector {
-      /**
-       * Selects an {@link IMethod} in the given {@link IJavaProject}.
-       * @param project The {@link IJavaProject}.
-       * @return The selected {@link IMethod}.
-       * @throws Exception Occurred Exceptions.
-       */
-      public IMethod getMethod(IJavaProject project) throws Exception;
-   }
-   
-   /**
-    * Creates a default {@link IMethodSelector} which uses
-    * {@link TestUtilsUtil#getJdtMethod(IJavaProject, String, String, String...)}
-    * to select an {@link IMethod}.
-    * @param typeName The type name.
-    * @param methodName The method name.
-    * @param parameters The method parameters.
-    * @return The created {@link IMethodSelector}.
-    */
-   public static IMethodSelector createMethodSelector(final String typeName, 
-                                                      final String methodName, 
-                                                      final String... parameters) {
-      return new IMethodSelector() {
-         @Override
-         public IMethod getMethod(IJavaProject project) throws Exception {
-            return TestUtilsUtil.getJdtMethod(project, typeName, methodName, parameters);
-         }
       };
+      doKeYDebugTargetTest("SWTBotKeYDebugTargetSuspendResumeTest_testSuspendResumeDebugTarget_Resume_Suspend_Resume", 
+                           "data/statements/test",
+                           true,
+                           createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"), 
+                           true, 
+                           6, 
+                           executor);
    }
    
    /**
@@ -857,7 +740,7 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
                                  String expectedModelPathInBundle,
                                  boolean showMethodReturnValues,
                                  boolean stepIntoInsteadOfRun) throws Exception {
-      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 8, false, stepIntoInsteadOfRun);
+      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 10, false, stepIntoInsteadOfRun);
    }
    
    /**
@@ -883,201 +766,109 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     */
    protected void assertSEDModel(String projectName,
                                  String pathInBundle,
-                                 boolean clearProofListInKeYBeforeResume,
+                                 final boolean clearProofListInKeYBeforeResume,
                                  IMethodSelector selector,
-                                 String expectedModelPathInBundle,
+                                 final String expectedModelPathInBundle,
                                  boolean showMethodReturnValues,
                                  int timeoutFactor,
-                                 boolean includeVariables,
-                                 boolean stepIntoInsteadOfRun) throws Exception {
-      // Create bot
-      SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      // Get current settings to restore them in finally block
-      SWTBotPerspective defaultPerspective = bot.activePerspective();
-      SWTBotTree debugTree = null;
-      long originalTimeout = SWTBotPreferences.TIMEOUT;
-      String originalRuntimeExceptions = null;
-      try {
-         // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
-         // Create test project
-         IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathInBundle, project.getProject().getFolder("src"));
-         // Get method
-         assertNotNull(selector);
-         IMethod method = selector.getMethod(project);
-         String targetName = TestSEDKeyCoreUtil.computeTargetName(method);
-         // Increase timeout
-         SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
-         // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!KeYUtil.isChoiceSettingInitialised()) {
-            TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
-            KeYUtil.clearProofList(MainWindow.getInstance());
-         }
-         originalRuntimeExceptions = KeYUtil.getChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
-         assertNotNull(originalRuntimeExceptions);
-         // Set choice settings in KeY.
-         KeYUtil.setChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
-         assertEquals(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, KeYUtil.getChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
-         // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, showMethodReturnValues);
-         // Find the launched ILaunch in the debug view
-         SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
-         debugTree = debugView.bot().tree();
-         ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
-         ILaunch launch = target.getLaunch();
-         // Test launch commands after loading completed
-         assertTrue(launch.canTerminate());
-         assertFalse(launch.isTerminated());
-         assertTrue(target instanceof ISEDDebugTarget);
-         assertTrue(target.canDisconnect());
-         assertTrue(target.canResume());
-         assertFalse(target.canSuspend());
-         assertTrue(target.canTerminate());
-         assertFalse(target.isDisconnected());
-         assertTrue(target.isSuspended());
-         assertFalse(target.isTerminated());
-         // Make sure that the debug target is in the initial state.
-         TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
-         // Get debug target TreeItem
-         SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
-         // Create tree
-         if (stepIntoInsteadOfRun) {
-            // Step into on each SET node
-            Set<Object> stepDone = new HashSet<Object>();
-            boolean newStepDone = true;
-            do {
-               newStepDone = false;
-               List<SWTBotTreeItem> leafItems = TestUtilsUtil.collectLeafs(item);
-               for (SWTBotTreeItem leafItem : leafItems) {
-                  Object leafData = TestUtilsUtil.getTreeItemData(leafItem);
-                  if (stepDone.add(leafData)) {
-                     newStepDone = true;
-                     if (leafData instanceof IStep) {
-                        IStep leafStep = (IStep)leafData;
-                        assertTrue(leafStep.canStepInto());
-                        leafItem.select();
-                        SWTBotMenu menuItem = leafItem.contextMenu("Step Into"); 
-                        menuItem.click();
-                        TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
-                        assertFalse(leafStep.canStepInto());
-                        TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
-                        assertTrue(leafStep.canStepInto());
-                     }
-                  }
-               }
-            } while (newStepDone);
-         }
-         else {
-            // Find resume menu item; must be done before proof is removed.
-            SWTBotMenu menuItem = item.contextMenu("Resume");
-            // Remove proof in KeY if required
-            if (clearProofListInKeYBeforeResume) {
-               assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-               KeYUtil.clearProofList(MainWindow.getInstance());
-               assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-            }
-            // Resume
-            menuItem.click();
-         }
-         // Evaluate created tree
-         if (clearProofListInKeYBeforeResume) {
+                                 final boolean includeVariables,
+                                 final boolean stepIntoInsteadOfRun) throws Exception {
+      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         @Override
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+            // Test launch commands after loading completed
             assertTrue(launch.canTerminate());
             assertFalse(launch.isTerminated());
+            assertTrue(target instanceof ISEDDebugTarget);
             assertTrue(target.canDisconnect());
+            assertTrue(target.canResume());
             assertFalse(target.canSuspend());
             assertTrue(target.canTerminate());
             assertFalse(target.isDisconnected());
             assertTrue(target.isSuspended());
             assertFalse(target.isTerminated());
-            assertFalse(target.canResume());
-            // Test the execution tree
+            // Make sure that the debug target is in the initial state.
             TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
-         }
-         else {
-            if (!stepIntoInsteadOfRun) {
-               TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
+            // Get debug target TreeItem
+            SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, 0, 0); // Select first debug target
+            // Create tree
+            if (stepIntoInsteadOfRun) {
+               // Step into on each SET node
+               Set<Object> stepDone = new HashSet<Object>();
+               boolean newStepDone = true;
+               do {
+                  newStepDone = false;
+                  List<SWTBotTreeItem> leafItems = TestUtilsUtil.collectLeafs(item);
+                  for (SWTBotTreeItem leafItem : leafItems) {
+                     Object leafData = TestUtilsUtil.getTreeItemData(leafItem);
+                     if (stepDone.add(leafData)) {
+                        newStepDone = true;
+                        stepInto(bot, leafItem, target);
+                     }
+                  }
+               } while (newStepDone);
+            }
+            else {
+               // Find resume menu item; must be done before proof is removed.
+               SWTBotMenu menuItem = item.contextMenu("Resume");
+               // Remove proof in KeY if required
+               if (clearProofListInKeYBeforeResume) {
+                  assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+                  KeYUtil.clearProofList(MainWindow.getInstance());
+                  assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+               }
+               // Resume
+               menuItem.click();
+            }
+            // Evaluate created tree
+            if (clearProofListInKeYBeforeResume) {
                assertTrue(launch.canTerminate());
                assertFalse(launch.isTerminated());
                assertTrue(target.canDisconnect());
-               assertFalse(target.canResume());
-               assertTrue(target.canSuspend());
+               assertFalse(target.canSuspend());
                assertTrue(target.canTerminate());
                assertFalse(target.isDisconnected());
-               assertFalse(target.isSuspended());
+               assertTrue(target.isSuspended());
                assertFalse(target.isTerminated());
-               TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
+               assertFalse(target.canResume());
+               // Test the execution tree
+               TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
             }
-            assertTrue(launch.canTerminate());
-            assertFalse(launch.isTerminated());
-            assertTrue(target.canDisconnect());
-            assertFalse(target.canSuspend());
-            assertTrue(target.canTerminate());
-            assertFalse(target.isDisconnected());
-            assertTrue(target.isSuspended());
-            assertFalse(target.isTerminated());
-            assertTrue(target.canResume());
-            // Test the execution tree
-            if (oracleDirectory != null) {
-               createOracleFile(target, expectedModelPathInBundle, includeVariables);
+            else {
+               if (!stepIntoInsteadOfRun) {
+                  TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
+                  assertTrue(launch.canTerminate());
+                  assertFalse(launch.isTerminated());
+                  assertTrue(target.canDisconnect());
+                  assertFalse(target.canResume());
+                  assertTrue(target.canSuspend());
+                  assertTrue(target.canTerminate());
+                  assertFalse(target.isDisconnected());
+                  assertFalse(target.isSuspended());
+                  assertFalse(target.isTerminated());
+                  TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
+               }
+               assertTrue(launch.canTerminate());
+               assertFalse(launch.isTerminated());
+               assertTrue(target.canDisconnect());
+               assertFalse(target.canSuspend());
+               assertTrue(target.canTerminate());
+               assertFalse(target.isDisconnected());
+               assertTrue(target.isSuspended());
+               assertFalse(target.isTerminated());
+               assertTrue(target.canResume());
+               // Test the execution tree
+               assertDebugTargetViaOracle(target, expectedModelPathInBundle, includeVariables);
             }
-            ISEDDebugTarget expectedDebugTarget = TestSEDKeyCoreUtil.createExpectedModel(expectedModelPathInBundle);
-            TestSedCoreUtil.compareDebugTarget(expectedDebugTarget, target, false, includeVariables);
          }
-      }
-      finally {
-         // Restore timeout
-         SWTBotPreferences.TIMEOUT = originalTimeout;
-         // Restore runtime option
-         if (originalRuntimeExceptions != null) {
-            KeYUtil.setChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
-         }
-         // Restore perspective
-         defaultPerspective.activate();
-         // Terminate and remove all launches
-         TestSedCoreUtil.terminateAndRemoveAll(debugTree);
-      }
-   }
-
-   /**
-    * Creates a new oracle file for the given {@link ISEDDebugTarget}.
-    * @param target The given {@link ISEDDebugTarget} which provides the oracle data.
-    * @param expectedModelPathInBundle The path in the bundle under that the created oracle file will be later available. It is used to create sub directories in temp directory.
-    * @param saveVariables Save variables?
-    * @throws IOException Occurred Exception.
-    * @throws DebugException Occurred Exception.
-    */
-   protected void createOracleFile(ISEDDebugTarget target, 
-                                   String expectedModelPathInBundle, 
-                                   boolean saveVariables) throws IOException, DebugException {
-      if (oracleDirectory != null && oracleDirectory.isDirectory()) {
-         // Create sub folder structure
-         File oracleFile = new File(oracleDirectory, expectedModelPathInBundle);
-         oracleFile.getParentFile().mkdirs();
-         // Create oracle file
-         SEDXMLWriter writer = new SEDXMLWriter();
-         writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile), saveVariables);
-         // Print message to the user.
-         printOracleDirectory();
-      }
-   }
-   
-   /**
-    * Prints {@link #oracleDirectory} to the user via {@link System#out}.
-    */
-   protected void printOracleDirectory() {
-      if (oracleDirectory != null) {
-         final String HEADER_LINE = "Oracle Directory is:";
-         final String PREFIX = "### ";
-         final String SUFFIX = " ###";
-         String path = oracleDirectory.toString();
-         int length = Math.max(path.length(), HEADER_LINE.length());
-         String borderLines = StringUtil.createLine("#", PREFIX.length() + length + SUFFIX.length());
-         System.out.println(borderLines);
-         System.out.println(PREFIX + HEADER_LINE + StringUtil.createLine(" ", length - HEADER_LINE.length()) + SUFFIX);
-         System.out.println(PREFIX + path + StringUtil.createLine(" ", length - path.length()) + SUFFIX);
-         System.out.println(borderLines);
-      }
+      };
+      doKeYDebugTargetTest(projectName, 
+                           pathInBundle, 
+                           true,
+                           selector, 
+                           showMethodReturnValues, 
+                           timeoutFactor, 
+                           executor);
    }
 
    /**
@@ -1135,80 +926,59 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * @throws Exception Occurred Exception.
     */
    protected void doTestSuspendResumeWhileDisconnected(String projectName,
-                                                       boolean clearProofListInKeYBeforeDisconnect,
-                                                       int... pathToElementInDebugTreeWhichProvidesDisconnectMenuItem) throws Exception {
-      // Create bot
-      SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      // Get current settings to restore them in finally block
-      SWTBotPerspective defaultPerspective = bot.activePerspective();
-      SWTBotTree debugTree = null;
-      long originalTimeout = SWTBotPreferences.TIMEOUT;
-      try {
-         // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
-         // Create test project
-         IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements/test", project.getProject().getFolder("src"));
-         // Get method
-         IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
-         // Increase timeout
-         SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 8;
-         // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, true);
-         // Find the launched ILaunch in the debug view
-         SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
-         debugTree = debugView.bot().tree();
-         ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
-         ILaunch launch = target.getLaunch();
-         // Test launch commands after loading completed
-         assertTrue(launch.canTerminate());
-         assertFalse(launch.isTerminated());
-         assertTrue(target instanceof ISEDDebugTarget);
-         assertTrue(target.canDisconnect());
-         assertTrue(target.canResume());
-         assertFalse(target.canSuspend());
-         assertTrue(target.canTerminate());
-         assertFalse(target.isDisconnected());
-         assertTrue(target.isSuspended());
-         assertFalse(target.isTerminated());
-         // Make sure that the debug target is in the initial state.
-         String targetName = TestSEDKeyCoreUtil.computeTargetName(method);
-         TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
-         // Clear proof list in KeY if required
-         if (clearProofListInKeYBeforeDisconnect) {
-            assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-            KeYUtil.clearProofList(MainWindow.getInstance());
-            assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+                                                       final boolean clearProofListInKeYBeforeDisconnect,
+                                                       final int... pathToElementInDebugTreeWhichProvidesDisconnectMenuItem) throws Exception {
+      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         @Override
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+            // Test launch commands after loading completed
+            assertTrue(launch.canTerminate());
+            assertFalse(launch.isTerminated());
+            assertTrue(target instanceof ISEDDebugTarget);
+            assertTrue(target.canDisconnect());
+            assertTrue(target.canResume());
+            assertFalse(target.canSuspend());
+            assertTrue(target.canTerminate());
+            assertFalse(target.isDisconnected());
+            assertTrue(target.isSuspended());
+            assertFalse(target.isTerminated());
+            // Make sure that the debug target is in the initial state.
+            TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
+            // Clear proof list in KeY if required
+            if (clearProofListInKeYBeforeDisconnect) {
+               assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+               KeYUtil.clearProofList(MainWindow.getInstance());
+               assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+            }
+            // Disconnect
+            SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, pathToElementInDebugTreeWhichProvidesDisconnectMenuItem); // Select first debug target
+            item.contextMenu("Disconnect").click();
+            assertTrue(launch.canTerminate());
+            assertTrue(launch.isTerminated()); // Also disconnected debug targets are seen as terminated by the Eclipse Debug API.
+            assertTrue(target instanceof ISEDDebugTarget);
+            assertFalse(target.canDisconnect());
+            assertFalse(target.canResume());
+            assertFalse(target.canSuspend());
+            assertTrue(target.canTerminate());
+            assertTrue(target.isDisconnected());
+            assertTrue(target.isSuspended());
+            assertFalse(target.isTerminated());
+            // Resume launch directly in KeY
+            if (!clearProofListInKeYBeforeDisconnect) {
+               MainWindow.getInstance().getMediator().startAutoMode();
+               KeYUtil.waitWhileMainWindowIsFrozen(MainWindow.getInstance());
+            }
+            // Test the unmodified execution tree
+            TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
          }
-         // Disconnect
-         SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, pathToElementInDebugTreeWhichProvidesDisconnectMenuItem); // Select first debug target
-         item.contextMenu("Disconnect").click();
-         assertTrue(launch.canTerminate());
-         assertTrue(launch.isTerminated()); // Also disconnected debug targets are seen as terminated by the Eclipse Debug API.
-         assertTrue(target instanceof ISEDDebugTarget);
-         assertFalse(target.canDisconnect());
-         assertFalse(target.canResume());
-         assertFalse(target.canSuspend());
-         assertTrue(target.canTerminate());
-         assertTrue(target.isDisconnected());
-         assertTrue(target.isSuspended());
-         assertFalse(target.isTerminated());
-         // Resume launch directly in KeY
-         if (!clearProofListInKeYBeforeDisconnect) {
-            MainWindow.getInstance().getMediator().startAutoMode();
-            KeYUtil.waitWhileMainWindowIsFrozen(MainWindow.getInstance());
-         }
-         // Test the unmodified execution tree
-         TestSEDKeyCoreUtil.assertInitialTarget(target, targetName);
-      }
-      finally {
-         // Restore timeout
-         SWTBotPreferences.TIMEOUT = originalTimeout;
-         // Restore perspective
-         defaultPerspective.activate();
-         // Terminate and remove all launches
-         TestSedCoreUtil.terminateAndRemoveAll(debugTree);
-      }
+      };
+      doKeYDebugTargetTest(projectName, 
+                           "data/statements/test", 
+                           true,
+                           createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"), 
+                           true, 
+                           8, 
+                           executor);
    }
 
    /**
@@ -1254,72 +1024,52 @@ public class SWTBotKeYDebugTargetTest extends TestCase {
     * @throws Exception Occurred Exception.
     */
    protected void doTerminationTest(String projectName,
-                                    boolean clearProofListInKeYBeforeTermination,
-                                    int... pathToElementInDebugTreeWhichProvidesTerminateMenuItem) throws Exception {
-      // Create bot
-      SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      // Get current settings to restore them in finally block
-      SWTBotPerspective defaultPerspective = bot.activePerspective();
-      SWTBotTree debugTree = null;
-      long originalTimeout = SWTBotPreferences.TIMEOUT;
-      try {
-         // Open symbolic debug perspective
-         TestSedCoreUtil.openSymbolicDebugPerspective();
-         // Create test project
-         IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/statements/test", project.getProject().getFolder("src"));
-         // Get method
-         IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
-         // Increase timeout
-         SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 8;
-         // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, true);
-         // Find the launched ILaunch in the debug view
-         SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
-         debugTree = debugView.bot().tree();
-         IDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
-         ILaunch launch = target.getLaunch();
-         // Test launch commands after loading completed
-         assertTrue(launch.canTerminate());
-         assertFalse(launch.isTerminated());
-         assertTrue(target instanceof ISEDDebugTarget);
-         assertTrue(target.canDisconnect());
-         assertTrue(target.canResume());
-         assertFalse(target.canSuspend());
-         assertTrue(target.canTerminate());
-         assertFalse(target.isDisconnected());
-         assertTrue(target.isSuspended());
-         assertFalse(target.isTerminated());
-         // Remove proof in KeY if required
-         if (clearProofListInKeYBeforeTermination) {
-            assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-            KeYUtil.clearProofList(MainWindow.getInstance());
-            assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+                                    final boolean clearProofListInKeYBeforeTermination,
+                                    final int... pathToElementInDebugTreeWhichProvidesTerminateMenuItem) throws Exception {
+      IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+         @Override
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+            // Test launch commands after loading completed
+            assertTrue(launch.canTerminate());
+            assertFalse(launch.isTerminated());
+            assertTrue(target instanceof ISEDDebugTarget);
+            assertTrue(target.canDisconnect());
+            assertTrue(target.canResume());
+            assertFalse(target.canSuspend());
+            assertTrue(target.canTerminate());
+            assertFalse(target.isDisconnected());
+            assertTrue(target.isSuspended());
+            assertFalse(target.isTerminated());
+            // Remove proof in KeY if required
+            if (clearProofListInKeYBeforeTermination) {
+               assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+               KeYUtil.clearProofList(MainWindow.getInstance());
+               assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
+            }
+            // Terminate launch
+            SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, pathToElementInDebugTreeWhichProvidesTerminateMenuItem); // Select first launch
+            item.contextMenu("Terminate").click();
+            TestSedCoreUtil.waitUntilLaunchIsTerminated(bot, launch);
+            assertFalse(launch.canTerminate());
+            assertTrue(launch.isTerminated());
+            assertFalse(target.canDisconnect());
+            assertFalse(target.canResume());
+            assertFalse(target.canSuspend());
+            assertFalse(target.canTerminate());
+            assertFalse(target.isDisconnected());
+            assertTrue(target.isSuspended());
+            assertTrue(target.isTerminated());
+            // Remove terminated launch
+            item.contextMenu("Remove All Terminated").click();
+            assertEquals(0, debugTree.getAllItems().length);
          }
-         // Terminate launch
-         SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, pathToElementInDebugTreeWhichProvidesTerminateMenuItem); // Select first launch
-         item.contextMenu("Terminate").click();
-         TestSedCoreUtil.waitUntilLaunchIsTerminated(bot, launch);
-         assertFalse(launch.canTerminate());
-         assertTrue(launch.isTerminated());
-         assertFalse(target.canDisconnect());
-         assertFalse(target.canResume());
-         assertFalse(target.canSuspend());
-         assertFalse(target.canTerminate());
-         assertFalse(target.isDisconnected());
-         assertTrue(target.isSuspended());
-         assertTrue(target.isTerminated());
-         // Remove terminated launch
-         item.contextMenu("Remove All Terminated").click();
-         assertEquals(0, debugTree.getAllItems().length);
-      }
-      finally {
-         // Restore timeout
-         SWTBotPreferences.TIMEOUT = originalTimeout;
-         // Restore perspective
-         defaultPerspective.activate();
-         // Terminate and remove all launches
-         TestSedCoreUtil.terminateAndRemoveAll(debugTree);
-      }
+      };
+      doKeYDebugTargetTest(projectName, 
+                           "data/statements/test", 
+                           true,
+                           createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"), 
+                           true, 
+                           8, 
+                           executor);
    }
 }

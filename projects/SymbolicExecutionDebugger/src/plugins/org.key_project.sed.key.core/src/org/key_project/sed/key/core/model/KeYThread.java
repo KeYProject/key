@@ -113,4 +113,36 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    public void stepInto() throws DebugException {
       getDebugTarget().stepInto(this);
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canStepOver() {
+      return getDebugTarget().canStepOver(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void stepOver() throws DebugException {
+      getDebugTarget().stepOver(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canStepReturn() {
+      return getDebugTarget().canStepReturn(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void stepReturn() throws DebugException {
+      getDebugTarget().stepReturn(this);
+   }
 }
