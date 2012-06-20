@@ -60,7 +60,7 @@ public abstract class AbstractCallStackBasedStopCondition implements IStopCondit
             NodeStartEntry startingCallStackSizeEntry = startingCallStackSizePerGoal.get(goal);
             if (startingCallStackSizeEntry == null) {
                Node parentSetNode = SymbolicExecutionUtil.findParentSetNode(node);
-               int startingCallStackSize = SymbolicExecutionUtil.computeStackSize(parentSetNode, parentSetNode.getAppliedRuleApp());
+               int startingCallStackSize = SymbolicExecutionUtil.computeStackSize(parentSetNode, parentSetNode != null ? parentSetNode.getAppliedRuleApp() : null);
                startingCallStackSizeEntry = new NodeStartEntry(node, startingCallStackSize);
                startingCallStackSizePerGoal.put(goal, startingCallStackSizeEntry);
                return true; // Initial check, no need to stop
