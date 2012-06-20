@@ -50,8 +50,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         final boolean transaction =
               (target.op() != null &&
                   (target.op() == Modality.DIA_TRANSACTION || target.op() == Modality.BOX_TRANSACTION));
-        final HeapContext hc = transaction ? HeapContext.LOOP_TR_HC : HeapContext.LOOP_HC;
-        
+       
         //the target term should have a Java block 
         final ProgramElement pe = target.javaBlock().program();
         assert pe != null;
@@ -93,7 +92,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         Term atPreUpdate = null;
         Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
-        for(LocationVariable heap : hc.getModHeaps(services)) {
+        for(LocationVariable heap : HeapContext.getModHeaps(services,transaction)) {
           final LocationVariable l = TB.heapAtPreVar(services, heap.name()+"Before_" + methodName, true);
           final Term u = TB.elementary(services,
             l,
@@ -115,25 +114,21 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     //we're calling a static method from an instance context
                     selfTerm = null;
                 }
-                final Term newTransactionInvariant =
-                  transaction ?
-                     inv.getInvariant(selfTerm, atPres, services, true)
-                   : null;
 
-                final Term newInvariant 
-                    = inv.getInvariant(selfTerm, atPres, services, false);
                 final Term newVariant
                     = inv.getVariant(selfTerm, atPres, services);
 
                 Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
-                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
+                for(LocationVariable heap : HeapContext.getModHeaps(services, transaction)) {
                   final Term m = inv.getModifies(heap, selfTerm, atPres, services);
+                  final Term i = inv.getInvariant(heap, selfTerm, atPres, services);
                   newMods.put(heap, m);
+                  newInvariants.put(heap, i);
                 }
                 final LoopInvariant newInv 
              	       = new LoopInvariantImpl(loop, 
-                                            newInvariant,
-                                            newTransactionInvariant,
+                                            newInvariants,
                                             newMods, 
                                             newVariant, 
                                             selfTerm,
@@ -141,7 +136,6 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 services.getSpecificationRepository().setLoopInvariant(newInv);                
             }
         }
-        hc.reset();
         return TB.apply(atPreUpdate, target);
     }
 }

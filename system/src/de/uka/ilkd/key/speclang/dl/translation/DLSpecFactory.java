@@ -295,7 +295,13 @@ public final class DLSpecFactory {
 		                + modality + "; please use #catchAll block");
 	    }
 	}
-	
+
+        Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable,Term>();
+        pres.put(heapLDT.getHeap(), pre);
+
+        Map<LocationVariable,Term> posts = new LinkedHashMap<LocationVariable,Term>();
+        posts.put(heapLDT.getHeap(), post);
+      	
 	final boolean isLibraryClass 
 		= ((TypeDeclaration)pm.getContainerType() 
 			              .getJavaType()).isLibraryClass();
@@ -303,9 +309,9 @@ public final class DLSpecFactory {
 					 pm.getContainerType(),		
 					 pm, 
 					 modality, 
-					 pre,
+					 pres,
 					 null,// TODO measured_by in DL contracts not supported yet
-					 post, 
+					 posts, 
 					 mods, 
 					 true, // TODO strictly pure in DL contracts not supported yet
 					 selfVar, 

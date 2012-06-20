@@ -1143,8 +1143,8 @@ public final class TestKeyUtil {
       b.getImplementsFullnames().add("InterfaceB");
       b.getImplements().add(interfaceB);
       con.addClass(b);
-      MemoryClass c = new MemoryClass("C", DSVisibility.PUBLIC);
-      c.addConstructor(createDefaultConstructor("C()", "X", false, false));
+      MemoryClass c = new MemoryClass("CX", DSVisibility.PUBLIC);
+      c.addConstructor(createDefaultConstructor("CX()", "X", false, false));
       c.getExtendsFullnames().add("B");
       c.getExtends().add(b);
       c.getImplementsFullnames().add("InterfaceC");

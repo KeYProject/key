@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_2fb58816-e72a-4200-ba4c-ce92e5f5fd24" name="ManyStatements[ManyStatements::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_39794e6f-f9e9-404b-b872-709bbcc57866" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_36c74687-0de8-4cb6-b0c9-590cdf31c91e" name="self.main();" pathCondition="true" lineNumber="-1" charStart="45" charEnd="49">
+            <sedStatement xml:id="_a400715f-2753-4c5e-9bdc-a9d5b76519b2" name="int a = 1;" pathCondition="true" lineNumber="-1" charStart="57" charEnd="67">
+               <sedStatement xml:id="_74cd3c6f-27d2-4b09-8b20-b675c4be935c" name="int b = 1;" pathCondition="true" lineNumber="-1" charStart="71" charEnd="81">
+                  <sedStatement xml:id="_4c6bc608-a9ba-4a13-b358-e82a83d9b0a5" name="int c = 1;" pathCondition="true" lineNumber="-1" charStart="85" charEnd="95">
+                     <sedStatement xml:id="_de641632-17c4-46b6-a946-432ff9a7d7eb" name="int d = 1;" pathCondition="true" lineNumber="-1" charStart="99" charEnd="109">
+                        <sedStatement xml:id="_dfa2a743-e4ca-495c-9db1-8712fb654f2d" name="int e = 1;" pathCondition="true" lineNumber="-1" charStart="113" charEnd="123">
+                        </sedStatement>
+                     </sedStatement>
+                  </sedStatement>
+               </sedStatement>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

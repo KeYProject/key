@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.List;
+
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -18,6 +21,8 @@ public interface IBuiltInRuleApp extends RuleApp {
      * For an example implementation see e.g. {@link UseOperationContractRule} or {@link UseDependencyContractRule}.    
      */
     IBuiltInRuleApp tryToInstantiate(Goal goal);
+
+    List<LocationVariable> getHeapContext();
 
     /**
      * returns true if tryToInstantiate may be able to complete the app

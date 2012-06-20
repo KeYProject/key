@@ -300,8 +300,12 @@ public class TestUtilsUtil {
     */
    private static void internalCollectLeafs(List<SWTBotTreeItem> leafItems, SWTBotTreeItem item) {
       if (item != null) {
-         item.select();
-         item.expand();
+         if (getTreeItemData(item) == null) {
+            item.select();
+         }
+         if (!item.isExpanded()) {
+            item.expand();
+         }
          SWTBotTreeItem[] children = item.getItems();
          if (ArrayUtil.isEmpty(children)) {
             leafItems.add(item);
@@ -914,5 +918,25 @@ public class TestUtilsUtil {
       }
       TestCase.assertNotNull(run.getResult());
       return run.getResult();
+   }
+
+   /**
+    * Closes a view with the given ID in the active {@link IWorkbenchPage}.
+    * @param viewId The ID of the view to close.
+    * @return {@code true} view was closed, {@code false} view was not opened.
+    */
+   public static boolean closeView(final String viewId) {
+      IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+         @Override
+         public void run() {
+            IViewPart view = WorkbenchUtil.findView(viewId);
+            if (view != null) {
+               WorkbenchUtil.closeView(view);
+               setResult(Boolean.TRUE);
+            }
+         }
+      };
+      Display.getDefault().syncExec(run);
+      return run.getResult() != null && run.getResult().booleanValue();
    }
 }

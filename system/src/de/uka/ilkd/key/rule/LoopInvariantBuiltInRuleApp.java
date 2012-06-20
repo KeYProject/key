@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Expression;
@@ -13,8 +17,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 
@@ -27,26 +33,28 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     private final LoopInvariant inv;
 
+    private final List<LocationVariable> heapContext;
+
     public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pos) {
-        this(rule, pos, null, null);
+        this(rule, pos, null, null, null);
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
-            LoopInvariant inv) {
+            LoopInvariant inv, List<LocationVariable> heapContext) {
         super(rule, pio, ifInsts);
         assert pio != null;
         this.loop = (While) JavaTools.getActiveStatement(programTerm()
                 .javaBlock());
         assert loop != null;
         this.inv = instantiateIndex(inv);
+        this.heapContext = heapContext;
     }
     
     private LoopInvariant instantiateIndex(LoopInvariant rawInv){
     	if (rawInv == null) return null;
-    	Term inv = rawInv.getInternalInvariant(false);
+    	Map<LocationVariable,Term> invs = rawInv.getInternalInvariants();
     	Term var = rawInv.getInternalVariant();
-    	Term tnv = rawInv.getInternalInvariant(true);
     	
     	// try to retrieve a loop index variable
     	de.uka.ilkd.key.java.statement.IGuard guard = loop.getGuard();
@@ -94,20 +102,20 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 		
 		// replace it!
 		IndexTermReplacementVisitor v = new IndexTermReplacementVisitor();
-		if (inv != null) {
-		    v.visit(inv);
-		    inv = v.getResult();
-		}
+                Map<LocationVariable,Term> newInvs = new LinkedHashMap<LocationVariable,Term>();
+                for(LocationVariable heap : invs.keySet()) {
+                   Term inv = invs.get(heap);
+		   if (inv != null) {
+		     v.visit(inv);
+		     inv = v.getResult();
+                     newInvs.put(heap, inv);
+  		   }                   
+                }
 		if (var != null) {
 		    v.visit(var);
 		    var = v.getResult();
 		}
-		if (tnv != null) {
-		    v.visit(tnv);
-		    tnv = v.getResult();
-		}
-		
-		return new LoopInvariantImpl(rawInv.getLoop(), inv, tnv, rawInv.getInternalModifies(),
+		return new LoopInvariantImpl(rawInv.getLoop(), newInvs, rawInv.getInternalModifies(),
 				var, rawInv.getInternalSelfTerm(),
 				rawInv.getInternalAtPres());
     	
@@ -115,7 +123,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
             PosInOccurrence pio, LoopInvariant inv) {
-        this(rule, pio, null, inv);
+        this(rule, pio, null, inv, null);
 
     }
 
@@ -133,7 +141,18 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     public boolean invariantAvailable() {
-        return inv != null && inv.getInternalInvariant(false) != null;
+        boolean result = inv != null && inv.getInternalInvariants() != null;
+        if(result) {
+          Map<LocationVariable,Term> invs = inv.getInternalInvariants();
+          result = false;
+          for(LocationVariable heap : heapContext) {
+            if(invs.get(heap) != null) {
+              result = true;
+              break;
+            }
+          }
+        }
+        return result;
     }
 
     public boolean isSufficientlyComplete() {
@@ -149,7 +168,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 
     @Override
     public LoopInvariantBuiltInRuleApp replacePos(PosInOccurrence newPos) {
-        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv);
+        return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv, heapContext);
     }
 
     public LoopInvariant retrieveLoopInvariantFromSpecification(
@@ -162,13 +181,11 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             ImmutableList<PosInOccurrence> ifInsts) {
         setMutable(ifInsts);
         return this;
-        // return new InvariantBuiltInRuleApp(builtInRule, newPos, ifInsts,
-        // loop, inv);
 
     }
 
     public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopInvariant inv) {
-        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv);
+        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext);
     }
 
     @Override
@@ -177,12 +194,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             return this;
         }
         final LoopInvariant inv = retrieveLoopInvariantFromSpecification(goal.proof().getServices());
-
-        if (inv == null) {
-            return this;
-        }
-
-        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv);
+        Modality m = (Modality)programTerm().op();
+        boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION); 
+        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, HeapContext.getModHeaps(goal.proof().getServices(), transaction));
     }
 
     public boolean variantAvailable() {
@@ -192,5 +206,10 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     public boolean variantRequired() {
         return ((Modality) programTerm().op()).terminationSensitive();
     }
+
+    @Override
+    public List<LocationVariable> getHeapContext() {
+      return heapContext;
+    }   
 
 }

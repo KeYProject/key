@@ -144,7 +144,7 @@ public final class DependencyContractPO extends AbstractPO
 			                     contract.getKJT(), 
 					     paramVars,
 					     anonHeap),
-			        contract.getPre(selfVar, paramVars, null, services));
+			        contract.getPre(heapLDT.getHeap(), selfVar, paramVars, null, services));
 	final Term dep = getContract().getDep(selfVar, paramVars, services);
 	
 	//prepare update

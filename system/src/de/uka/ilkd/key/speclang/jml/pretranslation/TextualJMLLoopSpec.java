@@ -26,73 +26,45 @@ import de.uka.ilkd.key.speclang.PositionedString;
  */
 public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
-    private ImmutableList<PositionedString> invariant          
-            = ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> transaction_invariant          
-            = ImmutableSLList.<PositionedString>nil();
     private PositionedString variant                  
             = null;
+
     private Map<String, ImmutableList<PositionedString>>
       assignables = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+
+    private Map<String, ImmutableList<PositionedString>>
+      invariants = new LinkedHashMap<String, ImmutableList<PositionedString>>();
     
     
     public TextualJMLLoopSpec(ImmutableList<String> mods) {
         super(mods);
         for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
           assignables.put(heap.toString(), ImmutableSLList.<PositionedString>nil());
+          invariants.put(heap.toString(), ImmutableSLList.<PositionedString>nil());          
         }
     }
 
        
     public void addInvariant(PositionedString ps) {
-        invariant = invariant.append(ps);
+        addGeneric(invariants, ps);
     }
 
-    public void addTransactionInvariant(PositionedString ps) {
-        transaction_invariant = transaction_invariant.append(ps);
-    }
-    
-    
     public void addAssignable(PositionedString ps) {
-        String t = ps.text;
-        if(!t.startsWith("<")) {
-           ImmutableList<PositionedString> l = assignables.get(HeapLDT.BASE_HEAP_NAME.toString());
-           l = l.append(ps);
-           assignables.put(HeapLDT.BASE_HEAP_NAME.toString(), l);
-           return; 
-        }
-        List<String> hs = new ArrayList<String>();
-        for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
-          String h = "<" + heap + ">";
-          if(t.startsWith(h)) {
-            hs.add(heap.toString());
-            t = t.substring(h.length());
-          }
-        }
-        ps = new PositionedString(t, ps.fileName, ps.pos);
-        for(String h : hs) {
-           ImmutableList<PositionedString> l = assignables.get(h);
-           l = l.append(ps);
-           assignables.put(h, l); 
-        }
+        addGeneric(assignables, ps);
     }
     
-//    public void addAssignableBackup(PositionedString ps) {
-//        assignable_backup = assignable_backup.append(ps);
-//    }
     
     public void setVariant(PositionedString ps) {
         assert variant == null;
         variant = ps;
     }
-    
+
+    public ImmutableList<PositionedString> getInvariant(String hName) {
+        return invariants.get(hName);
+    }    
     
     public ImmutableList<PositionedString> getInvariant() {
-        return invariant;
-    }
-    
-    public ImmutableList<PositionedString> getTransactionInvariant() {
-        return transaction_invariant;
+        return invariants.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
     
     public ImmutableList<PositionedString> getAssignable() {
@@ -107,6 +79,10 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         return assignables;
     }
 
+    public Map<String,ImmutableList<PositionedString>> getInvariants() {
+        return invariants;
+    }
+
     public PositionedString getVariant() {
         return variant;
     }
@@ -117,13 +93,11 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         StringBuffer sb = new StringBuffer();
         Iterator<PositionedString> it;
         
-        it = invariant.iterator();
-        while(it.hasNext()) {
-            sb.append("invariant: " + it.next() + "\n");
-        }
-        it = transaction_invariant.iterator();
-        while(it.hasNext()) {
-            sb.append("transaction_invariant: " + it.next() + "\n");
+        for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
+          it = invariants.get(heap.toString()).iterator();
+          while(it.hasNext()) {
+            sb.append("invariant<"+heap+">: " + it.next() + "\n");
+          }
         }
         for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
           it = assignables.get(heap.toString()).iterator();
@@ -146,8 +120,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         }
         TextualJMLLoopSpec ls = (TextualJMLLoopSpec) o;
         return mods.equals(ls.mods)
-               && invariant.equals(ls.invariant)
-               && transaction_invariant.equals(ls.transaction_invariant)
+               && invariants.equals(ls.invariants)
                && assignables.equals(ls.assignables)
                && (variant == null && ls.variant == null
                    || variant != null && variant.equals(ls.variant));
@@ -156,8 +129,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     @Override
     public int hashCode() {
         return mods.hashCode()
-                + invariant.hashCode() 
-                + transaction_invariant.hashCode() 
+                + invariants.hashCode() 
                 + assignables.hashCode();
     }
 }

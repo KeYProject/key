@@ -283,7 +283,9 @@ public final class ProofCorrectnessMgt {
     
     
     public void removeProofListener(){
-        mediator.removeRuleAppListener(proofListener);
+        if(mediator != null) {
+          mediator.removeRuleAppListener(proofListener);
+        }
     }
 
         

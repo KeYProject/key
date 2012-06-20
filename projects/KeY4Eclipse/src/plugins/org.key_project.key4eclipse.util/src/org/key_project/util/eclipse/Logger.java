@@ -10,7 +10,13 @@ import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 
 /**
+ * <p>
  * Provides static methods for logging.
+ * </p>
+ * <p>
+ * The eclipse log can be configured to log also into console or not,
+ * see  <a href="http://help.eclipse.org/indigo/index.jsp?topic=%2Forg.eclipse.platform.doc.isv%2Freference%2Fmisc%2Fruntime-options.html">Eclipse runtime option "consoleLog"</a>.
+ * </p>
  * @author Martin Hentschel
  */
 public class Logger {
@@ -54,7 +60,6 @@ public class Logger {
     */
    public void logWarning(String message) {
       if (message != null) {
-         System.out.println(message);
          IStatus status = new Status(IStatus.WARNING, plugInId, message);
          plugin.getLog().log(status);
       }
@@ -66,7 +71,6 @@ public class Logger {
     */
    public void logError(String message) {
       if (message != null) {
-         System.out.println(message);
          IStatus status = new Status(IStatus.ERROR, plugInId, message);
          plugin.getLog().log(status);
       }
@@ -78,7 +82,6 @@ public class Logger {
     */
    public void logError(Throwable t) {
       if (t != null) {
-         t.printStackTrace();
          IStatus status = createErrorStatus(t);
          plugin.getLog().log(status);
       }
@@ -91,8 +94,6 @@ public class Logger {
     */
    public void logError(String message, Throwable t) {
       if (message != null) {
-         System.out.print(message + " caused by ");
-         t.printStackTrace();
          IStatus status = new Status(IStatus.ERROR, plugInId, message, t);
          plugin.getLog().log(status);
       }

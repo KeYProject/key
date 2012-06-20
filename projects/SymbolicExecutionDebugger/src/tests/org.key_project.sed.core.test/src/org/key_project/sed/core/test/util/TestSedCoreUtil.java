@@ -28,6 +28,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
@@ -40,9 +41,12 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.navigator.resources.ProjectExplorer;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.key_project.sed.core.model.ISEDBranchCondition;
@@ -67,7 +71,9 @@ import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithException;
+import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 /**
@@ -76,11 +82,6 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 @SuppressWarnings("restriction")
 public final class TestSedCoreUtil {
-   /**
-    * Waiting time of the user interface.
-    */
-   public static final int USER_INTERFACE_DEBUG_TREE_WAIT_TIME = 2000;
-   
    /**
     * The ID of the fixed example launch configuration type.
     */
@@ -175,13 +176,33 @@ public final class TestSedCoreUtil {
          @Override
          public void run() {
             try {
-               String perspectiveId = SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID;
-               IPerspectiveDescriptor perspective = PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
-               TestCase.assertNotNull(perspective);
+               // Make sure that the view is not already opened
                IWorkbenchPage activePage = WorkbenchUtil.getActivePage();
                TestCase.assertNotNull(activePage);
-               activePage.setPerspective(perspective);
-               TestCase.assertEquals(perspective, activePage.getPerspective());
+               if (activePage.getPerspective() == null || !ObjectUtil.equals(activePage.getPerspective().getId(), SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID)) {
+                  // Make sure that the project explorer is not active to avoid NullPointerException in constructor of org.eclipse.ui.internal.navigator.resources.workbench.TabbedPropertySheetTitleProvider
+                  IWorkbenchPart part = activePage.findView(ProjectExplorer.VIEW_ID);
+                  if (WorkbenchUtil.isActive(part)) {
+                     // Project explorer is active, so select another view if possible
+                     IViewReference[] viewRefs = activePage.getViewReferences();
+                     boolean done = false;
+                     int i = 0;
+                     while (!done && i < viewRefs.length) {
+                        if (!ObjectUtil.equals(viewRefs[i].getId(), ProjectExplorer.VIEW_ID)) {
+                           WorkbenchUtil.activate(viewRefs[i].getView(true));
+                           done = true;
+                        }
+                        i++;
+                     }
+                  }
+                  // Change perspective
+                  String perspectiveId = SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID;
+                  IPerspectiveDescriptor perspective = PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
+                  TestCase.assertNotNull(perspective);
+                  activePage.setPerspective(perspective);
+                  // Make sure that correct perspective is open
+                  TestCase.assertEquals(perspective, activePage.getPerspective());
+               }
             }
             catch (Exception e) {
                setException(e);
@@ -506,26 +527,25 @@ public final class TestSedCoreUtil {
        */
       @Override
       public boolean test() throws Exception {
-         SWTBotTreeItem[] rootItems = debugTree.getAllItems();
-         if (rootItems != null && rootItems.length >= 1) {
-            SWTBotTreeItem[] level1Items = rootItems[0].getItems();
-            if (level1Items != null && level1Items.length >= 1) {
-               Object data = TestUtilsUtil.getTreeItemData(level1Items[0]);
-               if (data instanceof ISEDDebugTarget) {
-                  target = (ISEDDebugTarget)data;
-                  return true;
-               }
-               else {
-                  return false;
+         IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+            @Override
+            public void run() {
+               setResult(Boolean.FALSE);
+               TreeItem[] rootItems = debugTree.widget.getItems();
+               if (rootItems != null && rootItems.length >= 1) {
+                  TreeItem[] level1Items = rootItems[0].getItems();
+                  if (level1Items != null && level1Items.length >= 1) {
+                     Object data = level1Items[0].getData();
+                     if (data instanceof ISEDDebugTarget) {
+                        target = (ISEDDebugTarget)data;
+                        setResult(Boolean.TRUE);
+                     }
+                  }
                }
             }
-            else {
-               return false;
-            }
-         }
-         else {
-            return false;
-         }
+         };
+         debugTree.display.syncExec(run);
+         return run.getResult() != null && run.getResult().booleanValue();
       }
       
       /**

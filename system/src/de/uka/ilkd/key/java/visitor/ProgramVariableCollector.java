@@ -81,16 +81,12 @@ public final class ProgramVariableCollector extends JavaASTVisitor {
         
         Map<LocationVariable,Term> atPres = x.getInternalAtPres();
 
-        //invariant
-        Term inv = x.getInvariant(selfTerm, atPres, services, false);
-        if(inv != null) {
-            inv.execPostOrder(tpvc);
-        }
-
-        //transaction invariant
-        Term transInv = x.getInvariant(selfTerm, atPres, services, true);
-        if(transInv != null) {
-            transInv.execPostOrder(tpvc);
+        //invariants
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+           Term inv = x.getInvariant(heap, selfTerm, atPres, services);
+           if(inv != null) {
+              inv.execPostOrder(tpvc);
+           }
         }
 
         //modifies
