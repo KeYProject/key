@@ -13,7 +13,6 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -275,7 +274,10 @@ public class ContractFactory {
         }
         
         //collect information
-        Map<LocationVariable,Term> pres = t.originalPres;
+        Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable h : t.originalPres.keySet()) {
+           pres.put(h, t.originalPres.get(h));
+        }
         Term mby = t.originalMby;        
         Map<LocationVariable,Term> posts = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -386,7 +388,7 @@ public class ContractFactory {
     }
 
     private Term atPreify(Term t, Map<LocationVariable,? extends ProgramVariable> atPreVars) {
-        final Map<Term,Term> map = new HashMap<Term,Term>();
+        final Map<Term,Term> map = new LinkedHashMap<Term,Term>();
         for(LocationVariable h : atPreVars.keySet()) {
           if(atPreVars.get(h) != null) {
             map.put(tb.var(h), tb.var(atPreVars.get(h)));
