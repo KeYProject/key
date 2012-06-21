@@ -16,4 +16,5 @@ Export-Package: org.key_project.sed.core.model,
  org.key_project.sed.core.model.impl,
  org.key_project.sed.core.model.memory,
  org.key_project.sed.core.model.serialization,
+ org.key_project.sed.core.provider,
  org.key_project.sed.core.util
