@@ -3,6 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
@@ -26,10 +27,11 @@ public abstract class AbstractExecutionNode extends AbstractExecutionElement imp
    
    /**
     * Constructor.
+    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public AbstractExecutionNode(Node proofNode) {
-      super(proofNode);
+   public AbstractExecutionNode(KeYMediator mediator, Node proofNode) {
+      super(mediator, proofNode);
    }
 
    /**

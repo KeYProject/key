@@ -8,6 +8,7 @@ import java.util.Set;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -73,22 +74,24 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
 
    /**
     * Constructor for a "normal" value.
+    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNodeThe {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param parentVariable The parent {@link ExecutionVariable} or {@code null} if not available.
     * @param programVariable The represented {@link IProgramVariable} which value is shown.
     */
-   public ExecutionVariable(Node proofNode, IProgramVariable programVariable) {
-      this(proofNode, null, programVariable);
+   public ExecutionVariable(KeYMediator mediator, Node proofNode, IProgramVariable programVariable) {
+      this(mediator, proofNode, null, programVariable);
    }
    
    /**
     * Constructor for a "normal" child value.
+    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNodeThe {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param parentVariable The parent {@link ExecutionVariable} or {@code null} if not available.
     * @param programVariable The represented {@link IProgramVariable} which value is shown.
     */
-   public ExecutionVariable(Node proofNode, ExecutionVariable parentVariable, IProgramVariable programVariable) {
-      super(proofNode);
+   public ExecutionVariable(KeYMediator mediator, Node proofNode, ExecutionVariable parentVariable, IProgramVariable programVariable) {
+      super(mediator, proofNode);
       assert programVariable != null;
       this.parentVariable = parentVariable;
       this.programVariable = programVariable;
@@ -97,12 +100,13 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    
    /**
     * Constructor for an array cell value.
+    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNodeThe {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param parentVariable The parent {@link ExecutionVariable} or {@code null} if not available.
     * @param arrayIndex The index in the parent array.
     */
-   public ExecutionVariable(Node proofNode, ExecutionVariable parentVariable, int arrayIndex) {
-      super(proofNode);
+   public ExecutionVariable(KeYMediator mediator, Node proofNode, ExecutionVariable parentVariable, int arrayIndex) {
+      super(mediator, proofNode);
       this.parentVariable = parentVariable;
       this.arrayIndex = arrayIndex;
    }
@@ -278,12 +282,12 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
             ArrayDeclaration ad = (ArrayDeclaration)javaType;
             Set<IProgramVariable> pvs = getProgramVariables(ad.length());
             if (pvs.size() == 1) {
-               ExecutionVariable lengthVariable = new ExecutionVariable(getProofNode(), this, pvs.iterator().next());
+               ExecutionVariable lengthVariable = new ExecutionVariable(getMediator(), getProofNode(), this, pvs.iterator().next());
                children.add(lengthVariable);
                try {
                   int length = Integer.valueOf(lengthVariable.getValueString());
                   for (int i = 0; i < length; i++) {
-                     ExecutionVariable childI = new ExecutionVariable(getProofNode(), this, i);
+                     ExecutionVariable childI = new ExecutionVariable(getMediator(), getProofNode(), this, i);
                      children.add(childI);
                   }
                }
@@ -299,7 +303,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
                ImmutableList<ProgramVariable> vars = getServices().getJavaInfo().getAllAttributes(field.getFullName(), keyType);
                for (ProgramVariable var : vars) {
                   if (!var.isImplicit() && !var.isStatic()) {
-                     children.add(new ExecutionVariable(getProofNode(), this, field.getProgramVariable()));
+                     children.add(new ExecutionVariable(getMediator(), getProofNode(), this, field.getProgramVariable()));
                   }
                }
             }

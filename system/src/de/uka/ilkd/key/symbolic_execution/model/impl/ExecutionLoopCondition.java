@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -16,10 +17,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 public class ExecutionLoopCondition extends AbstractExecutionStateNode<LoopStatement> implements IExecutionLoopCondition {
    /**
     * Constructor.
+    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public ExecutionLoopCondition(Node proofNode) {
-      super(proofNode);
+   public ExecutionLoopCondition(KeYMediator mediator, Node proofNode) {
+      super(mediator, proofNode);
    }
 
    /**

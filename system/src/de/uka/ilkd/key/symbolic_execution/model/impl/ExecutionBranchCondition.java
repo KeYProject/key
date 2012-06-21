@@ -2,6 +2,7 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -46,10 +47,11 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
    
    /**
     * Constructor.
+    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public ExecutionBranchCondition(Node proofNode) {
-      super(proofNode);
+   public ExecutionBranchCondition(KeYMediator mediator, Node proofNode) {
+      super(mediator, proofNode);
    }
 
    /**
