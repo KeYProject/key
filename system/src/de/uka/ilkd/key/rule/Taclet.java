@@ -1173,12 +1173,12 @@ public abstract class Taclet implements Rule, Named {
                                     MatchConditions matchCond) {
         ImmutableList<RenamingTable> renamings = ImmutableSLList.<RenamingTable>nil();
 	for (final SchemaVariable sv : pvs) {
-	    ProgramVariable inst // TODO: should be instance of LocalVariable
+	    ProgramVariable inst
 		= (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
 	    final VariableNamer vn = services.getVariableNamer();
 	    inst = vn.rename(inst, goal, posOfFind);
             final RenamingTable rt = 
-                RenamingTable.getRenamingTable((HashMap)vn.getRenamingMap());
+                RenamingTable.getRenamingTable(vn.getRenamingMap());
             if (rt != null) {
                 renamings = renamings.append(rt);
             }
