@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
@@ -265,7 +264,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Map<LocationVariable,Map<Term,Term>> heapToBeforeLoop = new LinkedHashMap<LocationVariable,Map<Term,Term>>();
 
         for(LocationVariable heap : heapContext) {
-          heapToBeforeLoop.put(heap, new HashMap<Term,Term>());
+          heapToBeforeLoop.put(heap, new LinkedHashMap<Term,Term>());
           final LocationVariable lv = TB.heapAtPreVar(services, heap.name()+"BeforeLoop", true);
    	  services.getNamespaces().programVariables().addSafely(lv);
           final Term u = TB.elementary(services, lv, TB.var(heap));
