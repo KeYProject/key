@@ -198,7 +198,7 @@ public final class ProblemLoader implements Runnable {
             		   new Services(mediator.getExceptionHandler()), true, ui);; 
                
                InitConfig initConfig = init.prepare(envInput);
-
+               int proofNum = 0;
                final String chooseContract;
                if(envInput instanceof KeYFile) {
         	   chooseContract = ((KeYFile)envInput).chooseContract();
@@ -209,13 +209,21 @@ public final class ProblemLoader implements Runnable {
         	   po = (ProofOblInput) envInput;
                } else if(chooseContract != null 
         	         && chooseContract.length() > 0) {
+                   String baseContractName = null;
+                   int ind = chooseContract.indexOf(".transaction_");
+                   if(ind == -1) {
+                     baseContractName = chooseContract;
+                   }else{
+                     baseContractName = chooseContract.substring(0, ind);
+                     proofNum = chooseContract.indexOf(".transaction_active") > 0 ? 1 : 0;
+                   }
         	   final Contract contract
         	   	= initConfig.getServices()
         	                    .getSpecificationRepository()
-        	                    .getContractByName(chooseContract);
+        	                    .getContractByName(baseContractName);
         	   if(contract == null) {
         	       throw new RuntimeException("Contract not found: " 
-        		                          + chooseContract);
+        		                          + baseContractName);
         	   } else {
                        po = contract.createProofObl(initConfig, contract);
                    }
@@ -229,7 +237,7 @@ public final class ProblemLoader implements Runnable {
         	   }
                }
 
-               init.startProver(initConfig, po);
+               mediator.setProof(init.startProver(initConfig, po, proofNum));
 
                proof = mediator.getSelectedProof();
                mediator.stopInterface(true); // first stop (above) is not enough

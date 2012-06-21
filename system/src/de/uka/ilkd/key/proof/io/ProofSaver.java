@@ -108,7 +108,7 @@ public class ProofSaver {
           			     .getPOForProof(proof);
           if(po != null) {
               ps.println("\\chooseContract \"" 
-        	         + po.getContract().getName() 
+        	         + proof.name()
         	         + "\";\n");
           } else {
               Sequent problemSeq = proof.root().sequent();

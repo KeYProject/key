@@ -535,7 +535,7 @@ public final class ProblemInitializer {
     }
 
     
-    public Proof startProver(InitConfig initConfig, ProofOblInput po) 
+    public Proof startProver(InitConfig initConfig, ProofOblInput po, int proofNum) 
     		throws ProofInputException {
 	assert initConfig != null;
 	if(listener!= null){
@@ -550,13 +550,13 @@ public final class ProblemInitializer {
     	    po.readProblem();
     	    ProofAggregate pa = po.getPO();
     	    //final work
-    	    setUpProofHelper(po, pa,initConfig);
+    	    setUpProofHelper(po, pa, initConfig);
 
 	    //done
     	    if(listener != null){
                 listener.proofCreated(this, pa);
             }
-          return pa.getFirstProof();
+          return pa.getProofs()[proofNum];
                	    
         } catch (ProofInputException e) {    
             if(listener != null){
@@ -576,7 +576,7 @@ public final class ProblemInitializer {
     public void startProver(ProofEnvironment env, ProofOblInput po) 
     		throws ProofInputException {
 	assert env.getInitConfig().getProofEnv() == env;
-        startProver(env.getInitConfig(), po);
+        startProver(env.getInitConfig(), po, 0);
     }
     
     
@@ -584,7 +584,7 @@ public final class ProblemInitializer {
     		throws ProofInputException {
 	try {
 	    InitConfig initConfig = prepare(envInput);
-	    startProver(initConfig, po);
+	    startProver(initConfig, po, 0);
 	} catch(ProofInputException e) {
 	    reportStatus(envInput.name() + " failed");
 	    throw e;
