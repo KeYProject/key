@@ -10,9 +10,9 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -78,8 +78,8 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     protected final Services services;
 
-    protected final Map map = new LinkedHashMap();
-    protected Map renamingHistory = new LinkedHashMap();
+    protected final HashMap<ProgramVariable,ProgramVariable> map = new LinkedHashMap<ProgramVariable,ProgramVariable>();
+    protected HashMap<ProgramVariable,ProgramVariable> renamingHistory = new LinkedHashMap<ProgramVariable,ProgramVariable>();
 
     //-------------------------------------------------------------------------
     //constructors
@@ -127,7 +127,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     }
 
 
-    public Map getRenamingMap(){
+    public HashMap<ProgramVariable, ProgramVariable> getRenamingMap(){
 	return renamingHistory;
     }
 
