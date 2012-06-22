@@ -218,11 +218,7 @@ public class JMLSpecFactory {
                                                 Behavior originalBehavior)
             throws SLTranslationException {
         ContractClauses clauses = new ContractClauses();
-//        Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable, Term>();
         final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
-//        if(textualSpecCase.getMods().contains("transaction")) {
-//           atPres.put(savedHeap, progVars.atPres.get(savedHeap));
-//        }
         clauses.measuredBy =
                 translateMeasuredBy(pm, progVars.selfVar,
                                     progVars.paramVars,

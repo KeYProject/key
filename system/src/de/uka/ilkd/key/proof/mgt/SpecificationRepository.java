@@ -515,7 +515,7 @@ public final class SpecificationRepository {
 	ImmutableSet<FunctionalOperationContract> result = getOperationContracts(kjt, pm);
 	final boolean transactionModality = (modality == Modality.DIA_TRANSACTION || modality == Modality.BOX_TRANSACTION);
 	final Modality matchModality = transactionModality ? ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA :
-	          Modality.BOX) : null;
+	          Modality.BOX) : modality;
 	for(FunctionalOperationContract contract : result) {
             if(!contract.getModality().equals(matchModality)
              || (transactionModality && !contract.transactionApplicableContract() && !contract.isReadOnlyContract(services))) {
