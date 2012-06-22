@@ -116,7 +116,7 @@ public class JMLSpecFactory {
 
     private String getContractName(ProgramMethod programMethod,
                                    Behavior behavior) {
-        return "JML " + behavior.toString();
+        return "JML " + behavior.toString() + "operation contract";
     }
 
 

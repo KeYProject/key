@@ -534,7 +534,6 @@ public final class SpecificationRepository {
         if(name == null || name.length() == 0) {
             return null;
         }
-        
         String[] baseNames = name.split(CONTRACT_COMBINATION_MARKER);
         if(baseNames.length == 1) {
             return contractsByName.get(baseNames[0]);
