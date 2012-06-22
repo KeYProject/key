@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -11,6 +12,12 @@ import de.uka.ilkd.key.proof.Proof;
  * @author Martin Hentschel
  */
 public interface IExecutionElement {
+   /**
+    * Returns the used {@link KeYMediator} during proof.
+    * @return The used {@link KeYMediator} during proof.
+    */
+   public KeYMediator getMediator();
+   
    /**
     * Returns the {@link Services} used in {@link #getProof()}.
     * @return The {@link Services} used in {@link #getProof()}.

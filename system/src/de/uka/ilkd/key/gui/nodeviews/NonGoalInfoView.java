@@ -34,10 +34,30 @@ import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.logic.op.FormulaSV;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
+import de.uka.ilkd.key.pp.InitialPositionTable;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.Range;
+import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.NewDependingOn;
+import de.uka.ilkd.key.rule.NewVarcond;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -48,7 +68,6 @@ public class NonGoalInfoView extends JTextArea {
      * 
      */
     private static final long serialVersionUID = -868094158643337989L;
-    private LogicPrinter printer;	 
     private SequentPrintFilter filter;
     private InitialPositionTable posTable;
     private ConfigChangeListener configChangeListener 
@@ -141,56 +160,20 @@ public class NonGoalInfoView extends JTextArea {
     
     public NonGoalInfoView (Node node, KeYMediator mediator) {
 	filter = new IdentitySequentPrintFilter( node.sequent () );
-	printer = new LogicPrinter
-	    (new ProgramPrinter(null), 
-	     mediator.getNotationInfo(),
-	     mediator.getServices());
-	printer.printSequent (null, filter);
-	String s = printer.toString();
-        posTable = printer.getPositionTable();
-        printer=null;
-	RuleApp app = node.getAppliedRuleApp();
-        s += "\nNode Nr "+node.serialNr()+"\n";
-        
-	if ( app != null ) {
-	    s = s + "\n \nUpcoming rule application: \n";
-	    if (app.rule() instanceof Taclet) {
-		LogicPrinter tacPrinter = new LogicPrinter 
-		    (new ProgramPrinter(null),	                     
-		     mediator.getNotationInfo(),
-		     mediator.getServices(),
-		     true);	 
-		tacPrinter.printTaclet((Taclet)(app.rule()));	 
-		s += tacPrinter;
-	    } else {
-	    	s = s + app.rule();
-	    }
+	
+   LogicPrinter printer = new LogicPrinter
+         (new ProgramPrinter(null), 
+          mediator.getNotationInfo(),
+          mediator.getServices());
+   String s = computeText(mediator, node, filter, printer);
+   posTable = printer.getPositionTable();
 
-	    if ( app instanceof TacletApp ) {
-		TacletApp tapp = (TacletApp)app;
-		if ( tapp.instantiations ().getGenericSortInstantiations () !=
-		     GenericSortInstantiations.EMPTY_INSTANTIATIONS ) {
-		    s = s + "\n\nWith sorts:\n";
-		    s = s +
-			tapp.instantiations ().getGenericSortInstantiations ();
-		}
-
-		StringBuffer sb = new StringBuffer("\n\n");
-                writeTacletSchemaVariablesHelper(sb,tapp.taclet());
-		s = s + sb;
-	    }
-            
-//            s = s + "\n\nApplication justified by: ";
-//            s = s + mediator.getSelectedProof().env().getJustifInfo()
-//                                .getJustification(app, mediator.getServices())+"\n";            
-	}
-
-           
 	Config.DEFAULT.addConfigChangeListener(configChangeListener);
 
 	updateUI();
 	setText(s);
 
+	RuleApp app = node.getAppliedRuleApp();
 	if (app != null) {	 
 	    highlightRuleAppPosition(app);	 
 	} else {	 
@@ -199,6 +182,88 @@ public class NonGoalInfoView extends JTextArea {
 	}
 	
 	setEditable(false);
+    }
+
+    /**
+     * <p>
+     * Computes the text to show in this {@link JTextArea} which consists
+     * of the sequent including the applied rule.
+     * </p>
+     * <p>
+     * This information is also relevant for other tools like the
+     * Symbolic Execution Debugger.
+     * </p>
+     * @param mediator The {@link KeYMediator} to use.
+     * @param node The {@link Node} to use.
+     * @return The text to show.
+     */
+    public static String computeText(KeYMediator mediator, Node node) {
+       SequentPrintFilter filter = new IdentitySequentPrintFilter(node.sequent());
+       LogicPrinter printer = new LogicPrinter(new ProgramPrinter(null), 
+                                               mediator.getNotationInfo(), 
+                                               mediator.getServices());
+       return computeText(mediator, node, filter, printer);
+    }
+
+    /**
+     * <p>
+     * Computes the text to show in this {@link JTextArea} which consists
+     * of the sequent including the applied rule.
+     * </p>
+     * <p>
+     * This information is also relevant for other tools like the
+     * Symbolic Execution Debugger.
+     * </p>
+     * @param mediator The {@link KeYMediator} to use.
+     * @param node The {@link Node} to use.
+     * @param filter The {@link SequentPrintFilter} to use.
+     * @param printer The {@link LogicPrinter} to use.
+     * @return The text to show.
+     */
+    public static String computeText(KeYMediator mediator, 
+                                     Node node, 
+                                     SequentPrintFilter filter, 
+                                     LogicPrinter printer) {
+       
+         printer.printSequent (null, filter);
+         String s = printer.toString();
+              printer=null;
+         RuleApp app = node.getAppliedRuleApp();
+              s += "\nNode Nr "+node.serialNr()+"\n";
+              
+         if ( app != null ) {
+             s = s + "\n \nUpcoming rule application: \n";
+             if (app.rule() instanceof Taclet) {
+            LogicPrinter tacPrinter = new LogicPrinter 
+                (new ProgramPrinter(null),                        
+                 mediator.getNotationInfo(),
+                 mediator.getServices(),
+                 true);  
+            tacPrinter.printTaclet((Taclet)(app.rule()));    
+            s += tacPrinter;
+             } else {
+               s = s + app.rule();
+             }
+
+             if ( app instanceof TacletApp ) {
+            TacletApp tapp = (TacletApp)app;
+            if ( tapp.instantiations ().getGenericSortInstantiations () !=
+                 GenericSortInstantiations.EMPTY_INSTANTIATIONS ) {
+                s = s + "\n\nWith sorts:\n";
+                s = s +
+               tapp.instantiations ().getGenericSortInstantiations ();
+            }
+
+            StringBuffer sb = new StringBuffer("\n\n");
+                      writeTacletSchemaVariablesHelper(sb,tapp.taclet());
+            s = s + sb;
+             }
+                  
+//                  s = s + "\n\nApplication justified by: ";
+//                  s = s + mediator.getSelectedProof().env().getJustifInfo()
+//                                      .getJustification(app, mediator.getServices())+"\n";            
+         }
+         return s;
     }
     
     

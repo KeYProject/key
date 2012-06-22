@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Node;
@@ -19,10 +20,11 @@ public abstract class AbstractExecutionStateNode<S extends SourceElement> extend
    
    /**
     * Constructor.
+    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public AbstractExecutionStateNode(Node proofNode) {
-      super(proofNode);
+   public AbstractExecutionStateNode(KeYMediator mediator, Node proofNode) {
+      super(mediator, proofNode);
    }
 
    /**

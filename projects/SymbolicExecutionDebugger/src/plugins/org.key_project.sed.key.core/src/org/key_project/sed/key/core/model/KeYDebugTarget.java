@@ -16,6 +16,7 @@ import org.key_project.sed.key.core.util.LogUtil;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -83,17 +84,19 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    /**
     * Constructor.
     * @param launch The parent {@link ILaunch}.
+    * @param mediator the used {@link KeYMediator} during proof.
     * @param proof The {@link Proof} in KeY to treat.
     * @param showMethodReturnValuesInDebugNodes
     * @throws DebugException Occurred Exception
     */
-   public KeYDebugTarget(ILaunch launch, 
+   public KeYDebugTarget(ILaunch launch,
+                         KeYMediator mediator,
                          Proof proof, 
                          boolean showMethodReturnValuesInDebugNodes) throws DebugException {
       super(launch);
       // Update references
       Assert.isNotNull(proof);
-      this.builder = new SymbolicExecutionTreeBuilder(proof);
+      this.builder = new SymbolicExecutionTreeBuilder(mediator, proof);
       this.showMethodReturnValuesInDebugNodes = showMethodReturnValuesInDebugNodes; 
       // Update initial model
       setModelIdentifier(MODEL_IDENTIFIER);

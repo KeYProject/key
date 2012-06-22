@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -7,7 +8,16 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
+/**
+ * Provides a basic implementation of {@link IExecutionElement}.
+ * @author Martin Hentschel
+ */
 public abstract class AbstractExecutionElement implements IExecutionElement {
+   /**
+    * The used {@link KeYMediator} during proof.
+    */
+   private KeYMediator mediator;
+
    /**
     * The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
@@ -20,13 +30,24 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
    
    /**
     * Constructor.
+    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public AbstractExecutionElement(Node proofNode) {
+   public AbstractExecutionElement(KeYMediator mediator, Node proofNode) {
+      assert mediator != null;
       assert proofNode != null;
+      this.mediator = mediator;
       this.proofNode = proofNode;
    }
 
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYMediator getMediator() {
+      return mediator;
+   }
+   
    /**
     * {@inheritDoc}
     */

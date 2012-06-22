@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import junit.framework.TestCase;
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -11,6 +12,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStartNode;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * Tests for {@link ExecutionNodePreorderIterator}.
@@ -22,6 +25,8 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testNodesThreeLevel() {
       // Create tree to test
+      UserInterface ui = new CustomConsoleUserInterface(false);
+      KeYMediator mediator = new KeYMediator(ui);
       Proof proof = new Proof("target", new Services());
       Node root = appendRoot(proof);
       Node l1 = appendNode(proof, root);
@@ -38,20 +43,20 @@ public class TestExecutionNodePreorderIterator extends TestCase {
       Node l4 = appendNode(proof, root);
       Node l41 = appendNode(proof, l4);
       // Create execution test model
-      ExecutionStartNode executionRoot = new ExecutionStartNode(root);
-      ExecutionBranchCondition el1 = appendNode(executionRoot, new ExecutionBranchCondition(l1));
-      ExecutionBranchCondition el11 = appendNode(el1, new ExecutionBranchCondition(l11));
-      appendNode(el11, new ExecutionBranchCondition(l111));
-      appendNode(el1, new ExecutionBranchCondition(l12));
-      ExecutionBranchCondition el2 = appendNode(executionRoot, new ExecutionBranchCondition(l2));
-      appendNode(el2, new ExecutionBranchCondition(l21));
-      ExecutionBranchCondition el22 = appendNode(el2, new ExecutionBranchCondition(l22));
-      appendNode(el22, new ExecutionBranchCondition(l221));
-      appendNode(el22, new ExecutionBranchCondition(l222));
-      appendNode(el2, new ExecutionBranchCondition(l23));
-      appendNode(executionRoot, new ExecutionBranchCondition(l3));
-      ExecutionBranchCondition el4 = appendNode(executionRoot, new ExecutionBranchCondition(l4));
-      appendNode(el4, new ExecutionBranchCondition(l41));
+      ExecutionStartNode executionRoot = new ExecutionStartNode(mediator, root);
+      ExecutionBranchCondition el1 = appendNode(executionRoot, new ExecutionBranchCondition(mediator, l1));
+      ExecutionBranchCondition el11 = appendNode(el1, new ExecutionBranchCondition(mediator, l11));
+      appendNode(el11, new ExecutionBranchCondition(mediator, l111));
+      appendNode(el1, new ExecutionBranchCondition(mediator, l12));
+      ExecutionBranchCondition el2 = appendNode(executionRoot, new ExecutionBranchCondition(mediator, l2));
+      appendNode(el2, new ExecutionBranchCondition(mediator, l21));
+      ExecutionBranchCondition el22 = appendNode(el2, new ExecutionBranchCondition(mediator, l22));
+      appendNode(el22, new ExecutionBranchCondition(mediator, l221));
+      appendNode(el22, new ExecutionBranchCondition(mediator, l222));
+      appendNode(el2, new ExecutionBranchCondition(mediator, l23));
+      appendNode(executionRoot, new ExecutionBranchCondition(mediator, l3));
+      ExecutionBranchCondition el4 = appendNode(executionRoot, new ExecutionBranchCondition(mediator, l4));
+      appendNode(el4, new ExecutionBranchCondition(mediator, l41));
       // Test tree
       ExpectedNode[] level111 = createExpectedNodes("3");
       ExpectedNode[] level11 = createExpectedNodes(new String[] {"2", "4"}, level111, null);
@@ -67,6 +72,8 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testNodesTwoLevel() {
       // Create tree to test
+      UserInterface ui = new CustomConsoleUserInterface(false);
+      KeYMediator mediator = new KeYMediator(ui);
       Proof proof = new Proof("target", new Services());
       Node root = appendRoot(proof);
       Node l1 = appendNode(proof, root);
@@ -80,17 +87,17 @@ public class TestExecutionNodePreorderIterator extends TestCase {
       Node l4 = appendNode(proof, root);
       Node l41 = appendNode(proof, l4);
       // Create execution test model
-      ExecutionStartNode executionRoot = new ExecutionStartNode(root);
-      ExecutionBranchCondition el1 = appendNode(executionRoot, new ExecutionBranchCondition(l1));
-      appendNode(el1, new ExecutionBranchCondition(l11));
-      appendNode(el1, new ExecutionBranchCondition(l12));
-      ExecutionBranchCondition el2 = appendNode(executionRoot, new ExecutionBranchCondition(l2));
-      appendNode(el2, new ExecutionBranchCondition(l21));
-      appendNode(el2, new ExecutionBranchCondition(l22));
-      appendNode(el2, new ExecutionBranchCondition(l23));
-      appendNode(executionRoot, new ExecutionBranchCondition(l3));
-      ExecutionBranchCondition el4 = appendNode(executionRoot, new ExecutionBranchCondition(l4));
-      appendNode(el4, new ExecutionBranchCondition(l41));
+      ExecutionStartNode executionRoot = new ExecutionStartNode(mediator, root);
+      ExecutionBranchCondition el1 = appendNode(executionRoot, new ExecutionBranchCondition(mediator, l1));
+      appendNode(el1, new ExecutionBranchCondition(mediator, l11));
+      appendNode(el1, new ExecutionBranchCondition(mediator, l12));
+      ExecutionBranchCondition el2 = appendNode(executionRoot, new ExecutionBranchCondition(mediator, l2));
+      appendNode(el2, new ExecutionBranchCondition(mediator, l21));
+      appendNode(el2, new ExecutionBranchCondition(mediator, l22));
+      appendNode(el2, new ExecutionBranchCondition(mediator, l23));
+      appendNode(executionRoot, new ExecutionBranchCondition(mediator, l3));
+      ExecutionBranchCondition el4 = appendNode(executionRoot, new ExecutionBranchCondition(mediator, l4));
+      appendNode(el4, new ExecutionBranchCondition(mediator, l41));
       // Test tree
       ExpectedNode[] level11 = createExpectedNodes("2", "3");
       ExpectedNode[] level12 = createExpectedNodes("5", "6", "7");
@@ -104,6 +111,8 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testNodesOneLevel() {
       // Create tree to test
+      UserInterface ui = new CustomConsoleUserInterface(false);
+      KeYMediator mediator = new KeYMediator(ui);
       Proof proof = new Proof("target", new Services());
       Node root = appendRoot(proof);
       Node child1 = appendNode(proof, root);
@@ -111,11 +120,11 @@ public class TestExecutionNodePreorderIterator extends TestCase {
       Node child3 = appendNode(proof, root);
       Node child4 = appendNode(proof, root);
       // Create execution test model
-      ExecutionStartNode executionRoot = new ExecutionStartNode(root);
-      appendNode(executionRoot, new ExecutionBranchCondition(child1));
-      appendNode(executionRoot, new ExecutionBranchCondition(child2));
-      appendNode(executionRoot, new ExecutionBranchCondition(child3));
-      appendNode(executionRoot, new ExecutionBranchCondition(child4));
+      ExecutionStartNode executionRoot = new ExecutionStartNode(mediator, root);
+      appendNode(executionRoot, new ExecutionBranchCondition(mediator, child1));
+      appendNode(executionRoot, new ExecutionBranchCondition(mediator, child2));
+      appendNode(executionRoot, new ExecutionBranchCondition(mediator, child3));
+      appendNode(executionRoot, new ExecutionBranchCondition(mediator, child4));
       // Test tree
       ExpectedNode[] level1 = createExpectedNodes("1", "2", "3", "4");
       assertRoot(executionRoot, createExpectedNodes(new String[] {"<start>"}, level1));
@@ -133,10 +142,12 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     */
    public void testEmptyRoot() {
       // Create tree to test
+      UserInterface ui = new CustomConsoleUserInterface(false);
+      KeYMediator mediator = new KeYMediator(ui);
       Proof proof = new Proof("target", new Services());
       Node root = appendRoot(proof);
       // Create execution test model
-      ExecutionStartNode executionRoot = new ExecutionStartNode(root);
+      ExecutionStartNode executionRoot = new ExecutionStartNode(mediator, root);
       // Test tree
       assertRoot(executionRoot, createExpectedNodes("<start>"));
    }

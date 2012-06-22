@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
@@ -113,6 +114,11 @@ import de.uka.ilkd.key.util.NodePreorderIterator;
  */
 public class SymbolicExecutionTreeBuilder {
    /**
+    * The used mediator during proof.
+    */
+   private KeYMediator mediator;
+   
+   /**
     * The {@link Proof} from which the symbolic execution tree is extracted.
     */
    private Proof proof;
@@ -152,14 +158,16 @@ public class SymbolicExecutionTreeBuilder {
 
    /**
     * Constructor.
+    * @param mediator The used {@link KeYMediator} during proof.
     * @param proof The {@link Proof} to extract the symbolic execution tree from.
     */
-   public SymbolicExecutionTreeBuilder(Proof proof) {
-      super();
+   public SymbolicExecutionTreeBuilder(KeYMediator mediator, Proof proof) {
+      assert mediator != null;
       assert proof != null;
+      this.mediator = mediator;
       this.proof = proof;
       this.exceptionVariable = extractExceptionVariable(proof);
-      this.startNode = new ExecutionStartNode(proof.root());
+      this.startNode = new ExecutionStartNode(mediator, proof.root());
       this.keyNodeMapping.put(proof.root(), this.startNode);
    }
    
@@ -228,6 +236,14 @@ public class SymbolicExecutionTreeBuilder {
       startNode = null;
    }
    
+   /**
+    * Returns the used {@link KeYMediator} during proof.
+    * @return The used {@link KeYMediator} during proof.
+    */
+   public KeYMediator getMediator() {
+      return mediator;
+   }
+
    /**
     * Returns the {@link Proof} from which the symbolic execution tree is extracted.
     * @return The {@link Proof} from which the symbolic execution tree is extracted.
@@ -316,7 +332,7 @@ public class SymbolicExecutionTreeBuilder {
                if (!keyNodeBranchConditionMapping.containsKey(childNode)) {
                   if (!visitedNode.isClosed()) { // Filter out branches that are closed
                      // Create branch condition
-                     ExecutionBranchCondition condition = new ExecutionBranchCondition(childNode);
+                     ExecutionBranchCondition condition = new ExecutionBranchCondition(mediator, childNode);
                      // Add branch condition to the branch condition attributes for later adding to the proof tree. This is required for instance to filter out branches after the symbolic execution has finished.
                      List<ExecutionBranchCondition> list = parentToBranchConditionMapping.get(parentToAddTo);
                      if (list == null) {
@@ -404,7 +420,7 @@ public class SymbolicExecutionTreeBuilder {
                 !SymbolicExecutionUtil.isForLoopCondition(node, statement)) { // do while and for loops exists only in the first iteration where the loop condition is not evaluated. They are transfered into while loops in later proof nodes. 
                ExecutionLoopCondition condition = keyNodeLoopConditionMapping.get(node);
                if (condition == null) {
-                  condition = new ExecutionLoopCondition(node);
+                  condition = new ExecutionLoopCondition(mediator, node);
                   addChild(parentToAddTo, condition);
                   keyNodeLoopConditionMapping.put(node, condition);
                }
@@ -433,7 +449,7 @@ public class SymbolicExecutionTreeBuilder {
          PositionInfo posInfo = statement.getPositionInfo();
          // Determine the node representation and create it if one is available
          if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
-            result = new ExecutionMethodCall(node);
+            result = new ExecutionMethodCall(mediator, node);
          }
          else if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
             // Find the Node in the proof tree of KeY for that this Node is the return
@@ -443,23 +459,23 @@ public class SymbolicExecutionTreeBuilder {
                IExecutionNode callSEDNode = keyNodeMapping.get(callNode);
                if (callSEDNode != null) {
                   assert callSEDNode instanceof IExecutionMethodCall;
-                  result = new ExecutionMethodReturn(node, (IExecutionMethodCall)callSEDNode);
+                  result = new ExecutionMethodReturn(mediator, node, (IExecutionMethodCall)callSEDNode);
                }
             }
          }
          else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
-            result = new ExecutionTermination(node, exceptionVariable);
+            result = new ExecutionTermination(mediator, node, exceptionVariable);
          }
          else if (SymbolicExecutionUtil.isBranchNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
-            result = new ExecutionBranchNode(node);
+            result = new ExecutionBranchNode(mediator, node);
          }
          else if (SymbolicExecutionUtil.isLoopNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
             if (SymbolicExecutionUtil.isFirstLoopIteration(node, node.getAppliedRuleApp(), statement)) {
-               result = new ExecutionLoopNode(node);
+               result = new ExecutionLoopNode(mediator, node);
             }
          }
          else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
-            result = new ExecutionStatement(node);
+            result = new ExecutionStatement(mediator, node);
          }
       }
       return result;

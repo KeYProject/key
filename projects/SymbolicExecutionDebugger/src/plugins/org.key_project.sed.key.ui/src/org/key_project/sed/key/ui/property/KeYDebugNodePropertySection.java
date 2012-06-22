@@ -1,4 +1,4 @@
-package org.key_project.sed.ui.property;
+package org.key_project.sed.key.ui.property;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -6,17 +6,18 @@ import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
  * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
  * @author Martin Hentschel
  */
-public class SEDDebugNodePropertySection extends AbstractPropertySection {
+public class KeYDebugNodePropertySection extends AbstractPropertySection {
    /**
     * The shown content.
     */
-   private NodeTabComposite contentComposite;
+   private KeYTabComposite contentComposite;
    
    /**
     * {@inheritDoc}
@@ -24,7 +25,7 @@ public class SEDDebugNodePropertySection extends AbstractPropertySection {
    @Override
    public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
       super.createControls(parent, tabbedPropertySheetPage);
-      contentComposite = new NodeTabComposite(parent, SWT.NONE, getWidgetFactory());
+      contentComposite = new KeYTabComposite(parent, SWT.NONE, getWidgetFactory());
    }
    
    /**
@@ -39,8 +40,8 @@ public class SEDDebugNodePropertySection extends AbstractPropertySection {
     * Returns the {@link ISEDDebugNode} to show.
     * @return The {@link ISEDDebugNode} to show or {@code null} if no one should be shown.
     */
-   protected ISEDDebugNode getDebugNode() {
+   protected IKeYSEDDebugNode<?> getDebugNode() {
       Object object = SWTUtil.getFirstElement(getSelection());
-      return object instanceof ISEDDebugNode ? (ISEDDebugNode)object : null;
+      return object instanceof IKeYSEDDebugNode<?> ? (IKeYSEDDebugNode<?>)object : null;
    }
 }

@@ -588,7 +588,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
       proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
       // Create symbolic execution tree which contains only the start node at beginning
-      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof);
+      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof);
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment(ui, initConfig, builder);
