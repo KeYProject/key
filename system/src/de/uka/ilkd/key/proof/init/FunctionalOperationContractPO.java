@@ -188,7 +188,7 @@ public class FunctionalOperationContractPO
                                             exceptionVar, atPreVars.keySet().contains(getSavedHeap()));
 
         //create program term
-        final Term programTerm = TB.prog(getContract().getPOModality(), jb,
+        final Term programTerm = TB.prog(getContract().getModality(), jb,
                                          postTerm);
 
         //create update
@@ -227,7 +227,7 @@ public class FunctionalOperationContractPO
 
         final boolean[] transactionFlags;
 
-        if(getContract().transactionContract()) {
+        if(getContract().transactionApplicableContract()) {
           transactionFlags = new boolean[]{ false, true };
           poNames = new String[2];
         }else{

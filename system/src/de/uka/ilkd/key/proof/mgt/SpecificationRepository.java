@@ -514,10 +514,11 @@ public final class SpecificationRepository {
 	    				       Modality modality) {
 	ImmutableSet<FunctionalOperationContract> result = getOperationContracts(kjt, pm);
 	final boolean transactionModality = (modality == Modality.DIA_TRANSACTION || modality == Modality.BOX_TRANSACTION);
-	final Modality otherMatchModality = transactionModality ? ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA :
+	final Modality matchModality = transactionModality ? ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA :
 	          Modality.BOX) : null;
 	for(FunctionalOperationContract contract : result) {
-	    if(!contract.getModality().equals(modality) && !(contract.isReadOnlyContract(services) && contract.getModality().equals(otherMatchModality))) {
+            if(!contract.getModality().equals(matchModality)
+             || (transactionModality && !contract.transactionApplicableContract() && !contract.isReadOnlyContract(services))) {
 		result = result.remove(contract);
 	    }
 	}

@@ -245,7 +245,6 @@ modifier returns [String result = null]:
     |   spr:SPEC_PROTECTED      { result = spr.getText(); }
     |   spu:SPEC_PUBLIC         { result = spu.getText(); }
     |   sta:STATIC              { result = sta.getText(); }
-    |   tra:TRANSACTION         { result = tra.getText(); }
 ;
 
 

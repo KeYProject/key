@@ -115,10 +115,8 @@ public class JMLSpecFactory {
 
 
     private String getContractName(ProgramMethod programMethod,
-                                   Behavior behavior,
-                                   boolean transaction) {
-        return "JML " + behavior.toString()
-               + (transaction ? "transaction " : "") + "operation contract";
+                                   Behavior behavior) {
+        return "JML " + behavior.toString();
     }
 
 
@@ -220,11 +218,11 @@ public class JMLSpecFactory {
                                                 Behavior originalBehavior)
             throws SLTranslationException {
         ContractClauses clauses = new ContractClauses();
-        Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable, Term>();
+//        Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable, Term>();
         final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
-        if(textualSpecCase.getMods().contains("transaction")) {
-           atPres.put(savedHeap, progVars.atPres.get(savedHeap));
-        }
+//        if(textualSpecCase.getMods().contains("transaction")) {
+//           atPres.put(savedHeap, progVars.atPres.get(savedHeap));
+//        }
         clauses.measuredBy =
                 translateMeasuredBy(pm, progVars.selfVar,
                                     progVars.paramVars,
@@ -234,42 +232,31 @@ public class JMLSpecFactory {
                         progVars.paramVars,
                         textualSpecCase.getAssignable());
         for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-           if(heap == savedHeap && !textualSpecCase.getMods().contains("transaction")) {
-             if(textualSpecCase.getAssignable(heap.name().toString()).size() != 0 ) {
-                 throw new SLTranslationException(
-                        "accessing "+savedHeap.name()+" not allowed in a non-transaction spec case.",
-                        textualSpecCase.getAssignable(heap.name().toString()).head().fileName,
-                        textualSpecCase.getAssignable(heap.name().toString()).head().pos);
-             } else if (textualSpecCase.getRequires(heap.name().toString()).size() != 0 ) {
-                 throw new SLTranslationException(
-                        "accessing "+savedHeap.name()+" not allowed in a non-transaction spec case.",
-                        textualSpecCase.getRequires(heap.name().toString()).head().fileName,
-                        textualSpecCase.getRequires(heap.name().toString()).head().pos);
-             } else if (textualSpecCase.getEnsures(heap.name().toString()).size() != 0 ) {
-                 throw new SLTranslationException(
-                        "accessing "+savedHeap.name()+" not allowed in a non-transaction spec case.",
-                        textualSpecCase.getEnsures(heap.name().toString()).head().fileName,
-                        textualSpecCase.getEnsures(heap.name().toString()).head().pos);
-             } else {
-                clauses.assignables.put(heap, null);
-                clauses.requires.put(heap, null);
-                clauses.ensures.put(heap, null);
-                continue;
-             }
-           }
-           clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
+           if(heap == savedHeap && textualSpecCase.getAssignable(heap.name().toString()).isEmpty()) {
+             clauses.assignables.put(heap, null);
+           }else{
+             clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
                                     progVars.paramVars,
                                     textualSpecCase.getAssignable(heap.name().toString())));
-           clauses.requires.put(heap, translateAndClauses(pm, progVars.selfVar, progVars.paramVars,
-                                    null, null, atPres,
-                                    textualSpecCase.getRequires(heap.name().toString())));
+           }
 
-           clauses.ensures.put(heap, translateEnsures(pm, progVars.selfVar,
+           if(heap == savedHeap && textualSpecCase.getRequires(heap.name().toString()).isEmpty()) {
+             clauses.requires.put(heap, null);
+           }else{
+             clauses.requires.put(heap, translateAndClauses(pm, progVars.selfVar, progVars.paramVars,
+                                    null, null, progVars.atPres,
+                                    textualSpecCase.getRequires(heap.name().toString())));
+           }
+           if(heap == savedHeap && textualSpecCase.getEnsures(heap.name().toString()).isEmpty()) {
+             clauses.ensures.put(heap, null);
+           }else{
+             clauses.ensures.put(heap, translateEnsures(pm, progVars.selfVar,
                                            progVars.paramVars,
                                            progVars.resultVar, progVars.excVar,
                                            progVars.atPres,
                                            originalBehavior,
                                            textualSpecCase.getEnsures(heap.name().toString())));
+          }
         }
         clauses.accessible =
                 translateAccessible(pm, progVars.selfVar,
@@ -548,9 +535,7 @@ public class JMLSpecFactory {
         String customName = textualSpecCase.getName();
         String name = ((!(customName == null) && customName.length() > 0)
                        ? customName
-                       : getContractName(pm, originalBehavior,
-                                         textualSpecCase.getMods().contains(
-                "transaction")));
+                       : getContractName(pm, originalBehavior));
         return name;
     }
 

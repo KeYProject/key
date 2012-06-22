@@ -225,19 +225,12 @@ public class ContractFactory {
                 mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
        
-    // FIXME - kick out?
     public FunctionalOperationContract func (String baseName, ProgramMethod pm, boolean terminates, Map<LocationVariable,Term> pres,
                Term mby, Map<LocationVariable,Term> posts, Map<LocationVariable,Term> mods, boolean hasMod, ProgramVariableCollection pv){
-        boolean transaction = mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null;
-        final Modality modality;
-        if(!transaction) {
-          modality = terminates ? Modality.DIA : Modality.BOX;
-        } else {
-          modality = terminates ? Modality.DIA_TRANSACTION : Modality.BOX_TRANSACTION;
-        }
-        return func(baseName, pm, modality, pres, mby, posts, mods, hasMod, pv, false, transaction);
+        return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres, mby, posts, mods, hasMod, pv, false, mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
   
+
     public FunctionalOperationContract func (String baseName, ProgramMethod pm,
             Modality modality, Map<LocationVariable,Term> pres, Term mby, Map<LocationVariable,Term> posts, Map<LocationVariable,Term> mods, boolean hasMod,
             ProgramVariableCollection progVars, boolean toBeSaved, boolean transaction) {

@@ -52,7 +52,6 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     final KeYJavaType kjt;    
     final ProgramMethod pm;
     final Modality modality;
-    final Modality poModality;
     final Map<LocationVariable,Term> originalPres;
     final Term originalMby;    
     final Map<LocationVariable,Term> originalPosts;
@@ -131,9 +130,6 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	this.originalAtPreVars      = atPreVars;
 	this.id                     = id;
         this.transaction            = transaction;
-        this.poModality             = (modality == Modality.DIA_TRANSACTION ? 
-                                          Modality.DIA : 
-                                          (modality == Modality.BOX_TRANSACTION ? Modality.BOX : modality));	
 	this.toBeSaved	            = toBeSaved;
     }
 
@@ -578,6 +574,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                    : "")                
                 + "<br><b>termination</b> "
                 + getModality()
+                + (transactionApplicableContract() ? "<br><b>transaction applicable</b>" : "")
                 + "</html>";
     }    
     
@@ -679,12 +676,6 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         return modality;
     }
     
-    @Override
-    public Modality getPOModality() {
-        return poModality;
-    }
-
-  
     @Override
     public Term getPost(LocationVariable heap,
                         ProgramVariable selfVar, 
@@ -853,7 +844,9 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 		+ "; hasMod: "
 		+ hasRealModifiesClause
 		+ "; termination: "
-		+ getModality();
+		+ getModality()
+                + "; transaction: "
+		+ transactionApplicableContract();
     }
 
 
@@ -877,7 +870,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	return null;
     }
 
-    public boolean transactionContract() {
+    public boolean transactionApplicableContract() {
         return transaction;
     }
 
