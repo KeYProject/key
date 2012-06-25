@@ -8,8 +8,8 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.key.core.launch.KeYLaunchSettings;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.core.util.LogUtil;
@@ -44,6 +44,11 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    public static final String MODEL_IDENTIFIER = "org.key_project.sed.key.core";
    
    /**
+    * The {@link KeYLaunchSettings} to use.
+    */
+   private KeYLaunchSettings launchSettings;
+   
+   /**
     * The only contained child thread.
     */
    private KeYThread thread;
@@ -62,14 +67,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
          handleAutoModeStopped(e);
       }
    };
-   
-   /**
-    * If this is {@code true} an {@link ISEDMethodReturn} will contain the return value,
-    * but the performance will suffer.
-    * If it is {@code false} only the name of the returned method is shown in an {@link ISEDMethodReturn}.
-    */
-   private boolean showMethodReturnValuesInDebugNodes;
-   
+
    /**
     * The {@link SymbolicExecutionTreeBuilder} which is used to extract
     * the symbolic execution tree from KeY's proof tree.
@@ -86,18 +84,19 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param launch The parent {@link ILaunch}.
     * @param mediator the used {@link KeYMediator} during proof.
     * @param proof The {@link Proof} in KeY to treat.
-    * @param showMethodReturnValuesInDebugNodes
+    * @param launchSettings The {@link KeYLaunchSettings} to use.
     * @throws DebugException Occurred Exception
     */
    public KeYDebugTarget(ILaunch launch,
                          KeYMediator mediator,
                          Proof proof, 
-                         boolean showMethodReturnValuesInDebugNodes) throws DebugException {
+                         KeYLaunchSettings launchSettings) throws DebugException {
       super(launch);
       // Update references
       Assert.isNotNull(proof);
+      Assert.isNotNull(launchSettings);
+      this.launchSettings = launchSettings; 
       this.builder = new SymbolicExecutionTreeBuilder(mediator, proof);
-      this.showMethodReturnValuesInDebugNodes = showMethodReturnValuesInDebugNodes; 
       // Update initial model
       setModelIdentifier(MODEL_IDENTIFIER);
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");
@@ -328,13 +327,21 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    public IKeYSEDDebugNode<?> getDebugNode(IExecutionNode executionNode) {
       return executionToDebugMapping.get(executionNode);
    }
+   
+   /**
+    * Returns the used {@link KeYLaunchSettings}.
+    * @return The used {@link KeYLaunchSettings}.
+    */
+   public KeYLaunchSettings getLaunchSettings() {
+      return launchSettings;
+   }
 
    /**
     * Checks if method return values are shown in {@link KeYMethodCall}s.
     * @return {@code true} include return value in node names, {@code false} do not show return values in node names.
     */
    public boolean isShowMethodReturnValuesInDebugNodes() {
-      return showMethodReturnValuesInDebugNodes;
+      return launchSettings.isShowMethodReturnValues();
    }
 
    /**
