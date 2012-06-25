@@ -41,6 +41,15 @@ public class SEDDebugNodePropertySection extends AbstractPropertySection {
     */
    protected ISEDDebugNode getDebugNode() {
       Object object = SWTUtil.getFirstElement(getSelection());
+      return getDebugNode(object);
+   }
+   
+   /**
+    * Converts the given {@link Object} into an {@link IKeYSEDDebugNode} if possible.
+    * @param object The given {@link Object}.
+    * @return The {@link IKeYSEDDebugNode} or {@code null} if conversion is not possible.
+    */
+   public static ISEDDebugNode getDebugNode(Object object) {
       return object instanceof ISEDDebugNode ? (ISEDDebugNode)object : null;
    }
 }
