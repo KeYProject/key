@@ -17,8 +17,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -42,7 +42,7 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns the contracted function symbol.
      */
-    public ObserverFunction getTarget();
+    public IObserverFunction getTarget();
         
     /**
      * Tells whether the contract contains a measured_by clause.
@@ -135,7 +135,7 @@ public interface Contract extends SpecificationElement {
      * Returns a contract which is identical this contract except that
      * the KeYJavaType and ObserverFunction are set to the new values.
      */
-    public Contract setTarget(KeYJavaType newKJT, ObserverFunction newPM);
+    public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
     
     
     /**

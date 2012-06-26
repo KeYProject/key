@@ -96,7 +96,7 @@ public class ExpandMethodBody extends ProgramTransformer {
 	    new MethodFrame(mbs.getResultVariable(),
 			    new ExecutionContext(classContext, pm, newCalled),
 			    result,
-                            pm, PositionInfo.UNDEFINED); 
+                            PositionInfo.UNDEFINED); 
     }
 
 }

@@ -29,7 +29,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
@@ -40,9 +40,6 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
@@ -93,16 +90,16 @@ public final class MiscTools {
     }
     
     
-    public static ImmutableSet<Pair<Sort,ObserverFunction>> 
+    public static ImmutableSet<Pair<Sort,IObserverFunction>> 
     						collectObservers(Term t) {
-	ImmutableSet<Pair<Sort, ObserverFunction>> result 
+	ImmutableSet<Pair<Sort, IObserverFunction>> result 
 		= DefaultImmutableSet.nil();
-	if(t.op() instanceof ObserverFunction) {
-	    final ObserverFunction obs = (ObserverFunction)t.op();
+	if(t.op() instanceof IObserverFunction) {
+	    final IObserverFunction obs = (IObserverFunction)t.op();
 	    final Sort s = obs.isStatic() 
 	             	   ? obs.getContainerType().getSort() 
 	                   : t.sub(1).sort();
-	    result = result.add(new Pair<Sort,ObserverFunction>(s, obs));	    
+	    result = result.add(new Pair<Sort,IObserverFunction>(s, obs));	    
 	}
 	for(Term sub : t.subs()) {
 	    result = result.union(collectObservers(sub));

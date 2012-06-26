@@ -44,9 +44,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -150,14 +150,14 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Creates a new default contract for the given {@link ProgramMethod}
+    * Creates a new default contract for the given {@link IProgramMethod}
     * which only ensures that the own invariants ({@code this.<inv>}) hold.
     * @param services The {@link Services} to use.
-    * @param pm The {@link ProgramMethod} to create a default contract for.
+    * @param pm The {@link IProgramMethod} to create a default contract for.
     * @return The created {@link Contract}.
     * @throws SLTranslationException Occurred Exception.
     */
-   public static FunctionalOperationContract createDefaultContract(Services services, ProgramMethod pm) throws SLTranslationException {
+   public static FunctionalOperationContract createDefaultContract(Services services, IProgramMethod pm) throws SLTranslationException {
       // Create TextualJMLSpecCase
       ImmutableList<String> mods = ImmutableSLList.nil();
       mods = mods.append("public");
@@ -228,6 +228,7 @@ public final class SymbolicExecutionUtil {
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
     * @param contextObjectType The type of the current object (this reference).
+    * @param contextMethod The current method.
     * @param contextObject The current object (this reference).
     * @param node The original {@link Node} which provides the sequent to extract from.
     * @param variable The {@link IProgramVariable} of the value which is interested.
@@ -235,11 +236,12 @@ public final class SymbolicExecutionUtil {
     */
    public static SiteProofVariableValueInput createExtractReturnVariableValueSequent(Services services,
                                                                                      TypeReference contextObjectType,
+                                                                                     IProgramMethod contextMethod,
                                                                                      ReferencePrefix contextObject,
                                                                                      Node node,
                                                                                      IProgramVariable variable) {
       // Create execution context in that the method was called.
-      IExecutionContext context = new ExecutionContext(contextObjectType, contextObject);
+      IExecutionContext context = new ExecutionContext(contextObjectType, contextMethod, contextObject);
       // Create sequent
       return createExtractReturnVariableValueSequent(services, context, node, variable);
    }
@@ -651,7 +653,7 @@ public final class SymbolicExecutionUtil {
             }
             else {
                MethodBodyStatement mbs = (MethodBodyStatement)statement;
-               ProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
+               IProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
                return !pm.isImplicit(); // Do not include implicit methods
             }
          }
@@ -800,9 +802,7 @@ public final class SymbolicExecutionUtil {
          SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
          PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
          if (isMethodReturnNode(node, ruleApp, statement, posInfo)) {
-            LinkedList<Node> stack = temporaryCreateMethodCallStack(node);
-            Node callNode = temporaryFindMethodCallNode(stack, node, ruleApp);
-            return callNode != null && isMethodCallNode(callNode, callNode.getAppliedRuleApp(), callNode.getNodeInfo().getActiveStatement());
+            return !isInImplicitMethod(node, ruleApp);
          }
          else if (isLoopNode(node, ruleApp, statement, posInfo)) { 
             return isFirstLoopIteration(node, ruleApp, statement);
@@ -825,6 +825,21 @@ public final class SymbolicExecutionUtil {
       else {
          return false;
       }
+   }
+   
+   /**
+    * Checks if the currently executed code is in an implicit method
+    * ({@link IProgramMethod#isImplicit()} is {@code true}).
+    * @param node The {@link Node} of KeY's proof tree to check.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @return {@code true} is in implicit method, {@code false} is not in implicit method.
+    */
+   public static boolean isInImplicitMethod(Node node, RuleApp ruleApp) {
+      Term term = ruleApp.posInOccurrence().constrainedFormula().formula();
+      term = TermBuilder.DF.goBelowUpdates(term);
+      JavaBlock block = term.javaBlock();
+      IExecutionContext context = JavaTools.getInnermostExecutionContext(block, node.proof().getServices());
+      return context != null && context.getMethodContext() != null && context.getMethodContext().isImplicit();
    }
 
    // TODO: Remove temporary methods when the current method is part of an ExecutionContext.

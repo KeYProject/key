@@ -13,14 +13,14 @@ package de.uka.ilkd.key.speclang;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 public interface OperationContract extends Contract {
     
     @Override
-    public ProgramMethod getTarget();
+    public IProgramMethod getTarget();
     
     /**
      * Returns <code>true</code> iff the method (according to the contract) does

@@ -23,7 +23,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -42,14 +41,14 @@ public final class RepresentsAxiom extends ClassAxiom {
     
     
     private final String name;
-    private final ObserverFunction target;
+    private final IObserverFunction target;
     private final KeYJavaType kjt;
     private final VisibilityModifier visibility;
     private final Term originalRep;
     private final ProgramVariable originalSelfVar;
     
     public RepresentsAxiom(String name,
-	    		   ObserverFunction target, 
+	    		   IObserverFunction target, 
 	                   KeYJavaType kjt,
 	                   VisibilityModifier visibility,
 	                   Term rep,
@@ -60,7 +59,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     
     public RepresentsAxiom(String name,
             String displayName,
-            ObserverFunction target, 
+            IObserverFunction target, 
                 KeYJavaType kjt,
                 VisibilityModifier visibility,
                 Term rep,
@@ -113,7 +112,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
     
     
-    public ObserverFunction getTarget() {
+    public IObserverFunction getTarget() {
 	return target;
     }    
     
@@ -141,13 +140,13 @@ public final class RepresentsAxiom extends ClassAxiom {
         TacletGenerator TG = TacletGenerator.getInstance();
         if (isFunctional()) {
             return TG.generateFunctionalRepresentsTaclets(tacletName,
-                                                         originalRep,
-                                                         kjt,
-                                                         target,
-                                                         heap,
-                                                         self,
-                                                         toLimit,
-                                                         services);
+                                                          originalRep,
+                                                          kjt,
+                                                          target,
+                                                          heap,
+                                                          self,
+                                                          toLimit,
+                                                          services);
         } else {
             Taclet taclet =
                     TG.generateRelationalRepresentsTaclet(tacletName,

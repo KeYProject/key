@@ -620,4 +620,22 @@ public final class ProgramSV extends AbstractSV
    public KeYJavaType getParamType(int i) {
       return null;
    }
+
+
+   @Override
+   public TypeReference getTypeReference() {
+      return null;
+   }
+
+
+   @Override
+   public IProgramMethod getMethodContext() {
+      return null;
+   }
+
+
+   @Override
+   public ReferencePrefix getRuntimeInstance() {
+      return null;
+   }
 }

@@ -25,7 +25,6 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -46,8 +45,6 @@ public class MethodFrame extends JavaStatement implements
     
     private final IExecutionContext execContext;
     
-    private final IProgramMethod method;
-
     private final ImmutableArray<ProgramPrefix> prefixElementArray;
     
     private PosInProgram firstActiveChildPos = null;
@@ -64,8 +61,7 @@ public class MethodFrame extends JavaStatement implements
         this.resultVar   = resultVar;
         this.body        = body;
         this.execContext = execContext;
-        this.method      = null;
-        
+     
         prefixElementArray = computePrefix(body);
 	Debug.assertTrue(execContext != null, 
 			 "methodframe: executioncontext missing");
@@ -76,20 +72,17 @@ public class MethodFrame extends JavaStatement implements
     /**
      *      Labeled statement.
      *      @param resultVar the ProgramVariable the return value is assigned to
-     *      @param body a Statement containing the method body of
+    * @param body a Statement containing the method body of
      *      the called method
-     *      @param method the corresponding ProgramMethod object
      */
     public MethodFrame(IProgramVariable resultVar, 
 		       IExecutionContext execContext,
 		       StatementBlock body,
-                       IProgramMethod method, 
                        PositionInfo pos) {
         super(pos);
         this.resultVar   = resultVar;
         this.body        = body;
         this.execContext = execContext;
-        this.method      = method;
      
         prefixElementArray = computePrefix(body);
 	Debug.assertTrue(execContext != null, 
@@ -164,7 +157,7 @@ public class MethodFrame extends JavaStatement implements
      *      @return the method
      */
     public IProgramMethod getProgramMethod() {
-        return method;
+        return getExecutionContext().getMethodContext();
     }
 
 

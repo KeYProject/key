@@ -2735,7 +2735,14 @@ public class PrettyPrinter {
             else {
                 afterFirst = true;
             }
-            write(pd.getTypeReference().getKeYJavaType().getFullName());
+            boolean originalNoLinefeed = noLinefeed;
+            try {
+               noLinefeed = true;
+               writeElement(pd.getTypeReference());
+            }
+            finally {
+               noLinefeed = originalNoLinefeed;
+            }
         }
         write(")");
     }

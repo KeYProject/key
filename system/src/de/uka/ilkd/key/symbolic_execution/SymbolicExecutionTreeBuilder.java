@@ -487,15 +487,7 @@ public class SymbolicExecutionTreeBuilder {
     * @return {@code true} is in implicit method, {@code false} is not in implicit method.
     */
    protected boolean isInImplicitMethod(Node node) {
-      Node callNode = SymbolicExecutionUtil.temporaryFindMethodCallNode(methodCallStack, node, node.getAppliedRuleApp());
-      if (callNode != null) {
-         NodeInfo callInfo = callNode.getNodeInfo();
-         SourceElement callStatement = callInfo.getActiveStatement();
-         return !SymbolicExecutionUtil.isMethodCallNode(callNode, callNode.getAppliedRuleApp(), callStatement);
-      }
-      else {
-         return false;
-      }
+      return SymbolicExecutionUtil.isInImplicitMethod(node, node.getAppliedRuleApp());
    }
 
    /**

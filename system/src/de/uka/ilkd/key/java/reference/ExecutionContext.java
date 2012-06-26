@@ -104,25 +104,25 @@ public class ExecutionContext
     }
 
     /**
-     * returns the type reference to the next enclosing class
-     * @return the type reference to the next enclosing class
+     * {@inheritDoc}
      */
+    @Override
     public TypeReference getTypeReference() {
 	return classContext;
     }
 
     /**
-     * returns the program method which is currently active
-     * @return the currently active method
+     * {@inheritDoc}
      */
+    @Override
     public IProgramMethod getMethodContext() {
       return methodContext;
    }
 
    /**
-     * returns the runtime instance object
-     * @return the runtime instance object
+     * {@inheritDoc}
      */
+    @Override
     public ReferencePrefix getRuntimeInstance() {
 	return runtimeInstance;
     }
