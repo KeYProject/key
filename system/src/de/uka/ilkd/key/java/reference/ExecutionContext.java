@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Reference;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.ExtList;
 
 public class ExecutionContext
@@ -31,18 +31,24 @@ public class ExecutionContext
      * the reference to the active object
      */
     protected final ReferencePrefix runtimeInstance;
+
+    /**
+     * the currently active method
+     */
+    private ProgramMethod methodContext;
    
     /**
      * creates an execution context reference
      * @param classContext the TypeReference refering to the next enclosing
      * class 
+    * @param methodContext the ProgramMethod referring to the currently active method
      * @param runtimeInstance a ReferencePrefix to the object that
      * is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, 
-			    ReferencePrefix runtimeInstance) {
-	if (classContext == null) Debug.printStackTrace();
+			    ProgramMethod methodContext, ReferencePrefix runtimeInstance) {
 	this.classContext = classContext;
+	this.methodContext = methodContext;
 	this.runtimeInstance = runtimeInstance;
     }
     
@@ -53,10 +59,8 @@ public class ExecutionContext
      */
     public ExecutionContext(ExtList children) {
 	this.classContext = children.get(TypeReference.class);	
-	if (classContext == null)
-	    { System.out.println("||||"+children); Debug.printStackTrace(); }
-
 	children.remove(this.classContext);
+	this.methodContext = children.get(ProgramMethod.class);
 	this.runtimeInstance = children.get(ReferencePrefix.class);
     }
 
@@ -69,6 +73,7 @@ public class ExecutionContext
     public int getChildCount() {
 	int count = 0;
 	if (classContext != null) count++;
+   if (methodContext != null) count++;
 	if (runtimeInstance != null) count++;
 	return count;
     }
@@ -86,6 +91,10 @@ public class ExecutionContext
 	    if (index == 0) return classContext;
 	    index--;
 	}
+   if (methodContext != null) {
+      if (index == 0) return methodContext;
+      index--;
+  }
 	if (runtimeInstance != null) {
 	    if (index == 0) return runtimeInstance;
 	    index--;
@@ -102,6 +111,14 @@ public class ExecutionContext
     }
 
     /**
+     * returns the program method which is currently active
+     * @return the currently active method
+     */
+    public ProgramMethod getMethodContext() {
+      return methodContext;
+   }
+
+   /**
      * returns the runtime instance object
      * @return the runtime instance object
      */
@@ -122,7 +139,7 @@ public class ExecutionContext
     }
 
     public String toString() {
-        return "Context: "+classContext+" Instance: "+runtimeInstance;
+        return "Context: "+classContext+ "#" + methodContext + " Instance: "+runtimeInstance;
     }
     
 }

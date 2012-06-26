@@ -945,7 +945,7 @@ public class Recoder2KeYConverter {
         return new ProgramElementName(id.getText(),
                 collectComments(id).collect(Comment.class));
     }
-
+    
     /** convert a recoderext MethodFrameStatement to a KeY MethodFrameStatement */
     public MethodFrame convert(
             de.uka.ilkd.key.java.recoderext.MethodCallStatement rmcs) {
@@ -2039,7 +2039,30 @@ public class Recoder2KeYConverter {
     }
 
     public ExecutionContext convert(de.uka.ilkd.key.java.recoderext.ExecutionContext arg) {
-        return new ExecutionContext(collectChildrenAndComments(arg));
+       TypeReference classContext = convert(arg.getTypeReference()); 
+
+       ProgramMethod methodContext = null;
+       if (arg.getMethodContext() != null) {
+          JavaInfo jInfo = services.getJavaInfo();
+          
+          ImmutableList<KeYJavaType> paramTypes = ImmutableSLList.<KeYJavaType>nil();
+          for (recoder.java.reference.TypeReference tr : arg.getMethodContext().getParamTypes()) {
+             TypeReference keyTR = convert(tr);
+             paramTypes = paramTypes.append(keyTR.getKeYJavaType());
+          }
+          
+          methodContext = jInfo.getProgramMethod(classContext.getKeYJavaType(), 
+                                                 arg.getMethodContext().getMethodName().getText(), 
+                                                 paramTypes, 
+                                                 classContext.getKeYJavaType());
+       }
+       
+       ReferencePrefix runtimeInstance = null;
+       if (arg.getRuntimeInstance() != null) {
+          runtimeInstance = (ReferencePrefix) callConvert(arg.getRuntimeInstance());
+       }
+       
+       return new ExecutionContext(classContext, methodContext, runtimeInstance);
     }
 
     public ThisConstructorReference convert(recoder.java.reference.ThisConstructorReference arg) {
