@@ -120,6 +120,7 @@ public final class JavaInfo {
     
     /** the name of the class used as default execution context */
     protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
+    protected static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<default>";
     
     private ObserverFunction inv;
     private HashMap<KeYJavaType,ObserverFunction> staticInvs = new HashMap<KeYJavaType,ObserverFunction>();
@@ -1160,7 +1161,7 @@ public final class JavaInfo {
             final KeYJavaType kjt = 
                 getKeYJavaTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);                            
             defaultExecutionContext = 
-                new ExecutionContext(new TypeRef(kjt), null);
+                new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null);
         }
         return defaultExecutionContext;
     }
