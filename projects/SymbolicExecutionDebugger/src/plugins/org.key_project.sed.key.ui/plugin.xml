@@ -127,4 +127,52 @@
                name="KeY Launch Defaults">
          </page>
       </extension>
+      <extension
+            point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+         <propertyTabs
+               contributorId="org.key_project.sed.launchViewPropertyContributor">
+            <propertyTab
+                  afterTab="org.key_project.sed.ui.node.tab"
+                  category="Debug"
+                  id="org.key_project.sed.ui.key.tab"
+                  label="KeY">
+            </propertyTab>
+         </propertyTabs>
+      </extension>
+      <extension
+            point="org.eclipse.ui.views.properties.tabbed.propertySections">
+         <propertySections
+               contributorId="org.key_project.sed.launchViewPropertyContributor">
+            <propertySection
+                  class="org.key_project.sed.key.ui.property.KeYDebugNodePropertySection"
+                  filter="org.key_project.sed.key.ui.property.KeYDebugNodeTreeFilter"
+                  id="org.key_project.sed.key.ui.property.KeYDebugNodePropertySection"
+                  tab="org.key_project.sed.ui.key.tab">
+            </propertySection>
+         </propertySections>
+      </extension>
+      <extension
+            point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+         <propertyTabs
+               contributorId="symbolicExecutionTreeDiagram.PropertyContributor">
+            <propertyTab
+                  afterTab="org.key_project.sed.ui.visualization.node.tab"
+                  category="Graphiti"
+                  id="org.key_project.sed.ui.visualization.key.tab"
+                  label="KeY">
+            </propertyTab>
+         </propertyTabs>
+      </extension>
+      <extension
+            point="org.eclipse.ui.views.properties.tabbed.propertySections">
+         <propertySections
+               contributorId="symbolicExecutionTreeDiagram.PropertyContributor">
+            <propertySection
+                  class="org.key_project.sed.key.ui.property.KeYGraphitiDebugNodePropertySection"
+                  filter="org.key_project.sed.key.ui.property.KeYGraphitiDebugNodeTreeFilter"
+                  id="org.key_project.sed.key.ui.property.KeYGraphitiDebugNodePropertySection"
+                  tab="org.key_project.sed.ui.visualization.key.tab">
+            </propertySection>
+         </propertySections>
+      </extension>
 </plugin>

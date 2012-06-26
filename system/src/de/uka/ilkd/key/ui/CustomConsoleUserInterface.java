@@ -77,7 +77,7 @@ public class CustomConsoleUserInterface extends ConsoleUserInterface {
     * @throws ProofInputException Occurred Exception.
     */
    public Proof createProof(InitConfig initConfig, ProofOblInput input) throws ProofInputException {
-      return createProblemInitializer().startProver(initConfig, input);
+      return createProblemInitializer().startProver(initConfig, input, 0);
    }
    
    /**

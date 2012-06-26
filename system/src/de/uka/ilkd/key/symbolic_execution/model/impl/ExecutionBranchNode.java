@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
@@ -14,10 +15,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 public class ExecutionBranchNode extends AbstractExecutionStateNode<BranchStatement> implements IExecutionBranchNode {
    /**
     * Constructor.
+    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public ExecutionBranchNode(Node proofNode) {
-      super(proofNode);
+   public ExecutionBranchNode(KeYMediator mediator, Node proofNode) {
+      super(mediator, proofNode);
    }
 
    /**

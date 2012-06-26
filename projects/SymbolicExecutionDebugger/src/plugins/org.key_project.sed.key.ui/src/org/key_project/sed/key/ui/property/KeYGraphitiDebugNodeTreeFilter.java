@@ -1,4 +1,4 @@
-package org.key_project.sed.ui.visualization.execution_tree.property;
+package org.key_project.sed.key.ui.property;
 
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.platform.AbstractPropertySectionFilter;
@@ -7,11 +7,11 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
- * {@link IFilter} implementation used to define if a {@link GraphitiDebugNodePropertySection}
+ * {@link IFilter} implementation used to define if a {@link KeYGraphitiDebugNodePropertySection}
  * is available or not.
  * @author Martin Hentschel
  */
-public class GraphitiDebugNodeTreeFilter extends AbstractPropertySectionFilter {
+public class KeYGraphitiDebugNodeTreeFilter extends AbstractPropertySectionFilter {
    /**
     * {@inheritDoc}
     */
@@ -19,7 +19,7 @@ public class GraphitiDebugNodeTreeFilter extends AbstractPropertySectionFilter {
    protected boolean accept(PictogramElement pe) {
       IWorkbenchPart part = WorkbenchUtil.getActivePart();
       if (part != null) {
-         GraphitiDebugNodePropertySection section = new GraphitiDebugNodePropertySection();
+         KeYGraphitiDebugNodePropertySection section = new KeYGraphitiDebugNodePropertySection();
          section.setInput(WorkbenchUtil.getActivePart(), null);
          return section.getDebugNode(pe) != null;
       }

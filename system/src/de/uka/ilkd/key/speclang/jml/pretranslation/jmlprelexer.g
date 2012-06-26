@@ -122,7 +122,6 @@ tokens {
     STATIC 			= "static";
     STRICTFP 			= "strictfp";
     SYNCHRONIZED 		= "synchronized";
-    TRANSACTION                 = "transaction";
     TRANSIENT 			= "transient";
     UNINITIALIZED 		= "uninitialized";
     VOLATILE 			= "volatile";

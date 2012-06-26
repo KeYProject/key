@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -198,7 +199,7 @@ public final class ProblemLoader implements Runnable {
             		   new Services(mediator.getExceptionHandler()), true, ui);; 
                
                InitConfig initConfig = init.prepare(envInput);
-
+               int proofNum = 0;
                final String chooseContract;
                if(envInput instanceof KeYFile) {
         	   chooseContract = ((KeYFile)envInput).chooseContract();
@@ -209,13 +210,28 @@ public final class ProblemLoader implements Runnable {
         	   po = (ProofOblInput) envInput;
                } else if(chooseContract != null 
         	         && chooseContract.length() > 0) {
+                   String baseContractName = null;
+                   int ind = -1;
+                   for(String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
+                     ind = chooseContract.indexOf("."+tag);
+                     if(ind > 0) {
+                       break;
+                     }
+                     proofNum++;
+                   }
+                   if(ind == -1) {
+                     baseContractName = chooseContract;
+                     proofNum = 0;
+                   }else{
+                     baseContractName = chooseContract.substring(0, ind);
+                   }
         	   final Contract contract
         	   	= initConfig.getServices()
         	                    .getSpecificationRepository()
-        	                    .getContractByName(chooseContract);
+        	                    .getContractByName(baseContractName);
         	   if(contract == null) {
         	       throw new RuntimeException("Contract not found: " 
-        		                          + chooseContract);
+        		                          + baseContractName);
         	   } else {
                        po = contract.createProofObl(initConfig, contract);
                    }
@@ -229,7 +245,7 @@ public final class ProblemLoader implements Runnable {
         	   }
                }
 
-               init.startProver(initConfig, po);
+               mediator.setProof(init.startProver(initConfig, po, proofNum));
 
                proof = mediator.getSelectedProof();
                mediator.stopInterface(true); // first stop (above) is not enough

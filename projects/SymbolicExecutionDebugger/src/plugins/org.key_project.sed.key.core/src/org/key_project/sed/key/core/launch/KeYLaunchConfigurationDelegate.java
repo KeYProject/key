@@ -68,7 +68,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           }
           // Add debug target to ILaunch
           boolean showMethodReturnValues = KeySEDUtil.isShowMethodReturnValuesInDebugNodes(configuration);
-          KeYDebugTarget target = new KeYDebugTarget(launch, proof, showMethodReturnValues);
+          KeYDebugTarget target = new KeYDebugTarget(launch, MainWindow.getInstance().getMediator(), proof, showMethodReturnValues);
           launch.addDebugTarget(target);
        }
        catch (CoreException e) {

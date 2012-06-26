@@ -48,6 +48,13 @@ import de.uka.ilkd.key.speclang.HeapContext;
 public class FunctionalOperationContractPO
         extends AbstOpContractPO {
 
+    public static Map<Boolean,String> TRANSACTION_TAGS = new LinkedHashMap<Boolean,String>();
+ 
+    static {
+      TRANSACTION_TAGS.put(false, "transaction_inactive");
+      TRANSACTION_TAGS.put(true, "transaction_active");
+    }
+
     public FunctionalOperationContractPO(InitConfig initConfig,
                                          FunctionalOperationContract contract) {
         super(initConfig, contract.getName(), contract);
@@ -188,7 +195,7 @@ public class FunctionalOperationContractPO
                                             exceptionVar, atPreVars.keySet().contains(getSavedHeap()));
 
         //create program term
-        final Term programTerm = TB.prog(getContract().getPOModality(), jb,
+        final Term programTerm = TB.prog(getContract().getModality(), jb,
                                          postTerm);
 
         //create update
@@ -227,7 +234,7 @@ public class FunctionalOperationContractPO
 
         final boolean[] transactionFlags;
 
-        if(getContract().transactionContract()) {
+        if(getContract().transactionApplicableContract()) {
           transactionFlags = new boolean[]{ false, true };
           poNames = new String[2];
         }else{
@@ -312,8 +319,7 @@ public class FunctionalOperationContractPO
                                                  post);
           termPOs.add(TB.imp(pre, progPost));
           if(poNames != null) {
-            poNames[nameIndex++] = getContract().getName()+"."+
-              (transactionFlag ? "transaction_active" : "transaction_inactive");
+            poNames[nameIndex++] = getContract().getName()+"."+TRANSACTION_TAGS.get(transactionFlag);
           }
         }
         //save in field

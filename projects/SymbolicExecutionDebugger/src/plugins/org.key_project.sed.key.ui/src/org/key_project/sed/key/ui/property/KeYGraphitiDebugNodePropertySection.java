@@ -1,4 +1,4 @@
-package org.key_project.sed.ui.visualization.execution_tree.property;
+package org.key_project.sed.key.ui.property;
 
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -12,17 +12,17 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.ui.property.NodeTabComposite;
+import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 
 /**
  * {@link ISection} implementation to show the properties of {@link ISEDDebugNode}s.
  * @author Martin Hentschel
  */
-public class GraphitiDebugNodePropertySection extends GFPropertySection {
+public class KeYGraphitiDebugNodePropertySection extends GFPropertySection {
    /**
     * The shown content.
     */
-   private NodeTabComposite contentComposite;
+   private KeYTabComposite contentComposite;
    
    /**
     * {@inheritDoc}
@@ -30,7 +30,7 @@ public class GraphitiDebugNodePropertySection extends GFPropertySection {
    @Override
    public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
       super.createControls(parent, tabbedPropertySheetPage);
-      contentComposite = new NodeTabComposite(parent, SWT.NONE, getWidgetFactory());
+      contentComposite = new KeYTabComposite(parent, SWT.NONE, getWidgetFactory());
    }
 
    /**
@@ -45,7 +45,7 @@ public class GraphitiDebugNodePropertySection extends GFPropertySection {
     * Returns the {@link ISEDDebugNode} to show.
     * @return The {@link ISEDDebugNode} to show or {@code null} if no one should be shown.
     */
-   public ISEDDebugNode getDebugNode() {
+   public IKeYSEDDebugNode<?> getDebugNode() {
       return getDebugNode(getSelectedPictogramElement());
    }
    
@@ -54,16 +54,16 @@ public class GraphitiDebugNodePropertySection extends GFPropertySection {
     * @param pe The currently selected {@link PictogramElement}.
     * @return The {@link ISEDDebugNode} to show or {@code null} if no one should be shown.
     */
-   public ISEDDebugNode getDebugNode(PictogramElement pe) {
-      ISEDDebugNode node = null;
+   public IKeYSEDDebugNode<?> getDebugNode(PictogramElement pe) {
+      IKeYSEDDebugNode<?> node = null;
       if (pe != null) {
          IDiagramTypeProvider diagramProvider = getDiagramTypeProvider();
          if (diagramProvider != null) {
             IFeatureProvider featureProvider = diagramProvider.getFeatureProvider();
             if (featureProvider != null) {
                Object bo = diagramProvider.getFeatureProvider().getBusinessObjectForPictogramElement(pe);
-               if (bo instanceof ISEDDebugNode) {
-                  node = (ISEDDebugNode)bo;
+               if (bo instanceof IKeYSEDDebugNode<?>) {
+                  node = (IKeYSEDDebugNode<?>)bo;
                }
             }
          }
