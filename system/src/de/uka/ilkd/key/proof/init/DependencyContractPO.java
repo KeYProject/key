@@ -10,11 +10,14 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
@@ -112,7 +115,7 @@ public final class DependencyContractPO extends AbstractPO
     
     @Override
     public void readProblem() throws ProofInputException {
-	ObserverFunction target = contract.getTarget();
+	IObserverFunction target = contract.getTarget();
 	if(target instanceof ProgramMethod) {
 	    target = javaInfo.getToplevelPM(contract.getKJT(), 
 		    			    (ProgramMethod)target);

@@ -14,12 +14,38 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Point;
-import java.awt.event.*;
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -27,6 +53,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
@@ -62,7 +89,7 @@ public final class ProofManagementDialog extends JDialog {
     private SpecificationRepository specRepos;
 
     private JTabbedPane tabbedPane;
-    private Map<Pair<KeYJavaType,ObserverFunction>,Icon> targetIcons;
+    private Map<Pair<KeYJavaType,IObserverFunction>,Icon> targetIcons;
     private ClassTree classTree;
     private JList proofList;
     private ContractSelectionPanel contractPanelByMethod;
@@ -85,7 +112,7 @@ public final class ProofManagementDialog extends JDialog {
 	this.mediator = mediator;
 	
 	//create class tree
-	targetIcons = new HashMap<Pair<KeYJavaType,ObserverFunction>,Icon>();
+	targetIcons = new HashMap<Pair<KeYJavaType,IObserverFunction>,Icon>();
 	classTree = new ClassTree(true, true, services, targetIcons);
 	classTree.addTreeSelectionListener(new TreeSelectionListener() {
 	    public void valueChanged(TreeSelectionEvent e) {
@@ -272,7 +299,7 @@ public final class ProofManagementDialog extends JDialog {
     					 KeYMediator mediator,
     					 InitConfig initConfig,
 	    			     KeYJavaType selectedKJT,
-	    			     ObserverFunction selectedTarget,
+	    			     IObserverFunction selectedTarget,
 	    			     Proof selectedProof) {
 	if(instance == null
            || instance.initConfig != initConfig
@@ -318,14 +345,14 @@ public final class ProofManagementDialog extends JDialog {
         	                               .isLibraryClass()) {
         		continue;
         	    }
-        	    final ImmutableSet<ObserverFunction> targets
+        	    final ImmutableSet<IObserverFunction> targets
         	    	= services.getSpecificationRepository()
         	    	          .getContractTargets(kjt);
-        	    final ObserverFunction[] targetsArr
-        	    	= targets.toArray(new ObserverFunction[targets.size()]);
-        	    Arrays.sort(targetsArr, new Comparator<ObserverFunction>() {
-        		public int compare(ObserverFunction o1, 
-        			           ObserverFunction o2) {
+        	    final IObserverFunction[] targetsArr
+        	    	= targets.toArray(new IObserverFunction[targets.size()]);
+        	    Arrays.sort(targetsArr, new Comparator<IObserverFunction>() {
+        		public int compare(IObserverFunction o1, 
+        			           IObserverFunction o2) {
                 	    if(o1 instanceof ProgramMethod 
                      	       && !(o2 instanceof ProgramMethod)) {
                      		return -1;
@@ -343,7 +370,7 @@ public final class ProofManagementDialog extends JDialog {
                      	    }
         		}
         	    });
-        	    for(ObserverFunction target : targetsArr) {
+        	    for(IObserverFunction target : targetsArr) {
         		if(!services.getSpecificationRepository()
         			    .getContracts(kjt, target)
         			    .isEmpty()) {
@@ -375,7 +402,7 @@ public final class ProofManagementDialog extends JDialog {
     }
 
     
-    private void select(KeYJavaType kjt, ObserverFunction target) {
+    private void select(KeYJavaType kjt, IObserverFunction target) {
 	tabbedPane.setSelectedIndex(0);
 	classTree.select(kjt, target);
     }
@@ -503,9 +530,9 @@ public final class ProofManagementDialog extends JDialog {
 	//target icons
 	Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
 	for(KeYJavaType kjt : kjts) {
-	    ImmutableSet<ObserverFunction> targets 
+	    ImmutableSet<IObserverFunction> targets 
 	    	= specRepos.getContractTargets(kjt);
-	    for(ObserverFunction target : targets) {
+	    for(IObserverFunction target : targets) {
 		ImmutableSet<Contract> contracts 
 			= specRepos.getContracts(kjt, target);
 		boolean startedProving = false;
@@ -527,7 +554,7 @@ public final class ProofManagementDialog extends JDialog {
 			}		    
 		    }
 		}
-		targetIcons.put(new Pair<KeYJavaType,ObserverFunction>(kjt, target), 
+		targetIcons.put(new Pair<KeYJavaType,IObserverFunction>(kjt, target), 
 			        startedProving
 			        ? (allClosed
 			           ? (lemmasLeft 
@@ -577,7 +604,7 @@ public final class ProofManagementDialog extends JDialog {
      */
     public static void showInstance(KeYMediator mediator, InitConfig initConfig,
 	    		            KeYJavaType selectedKJT,
-	    			    ObserverFunction selectedTarget) {
+	    			    IObserverFunction selectedTarget) {
 	showInstance(mediator, initConfig, selectedKJT, selectedTarget, null);
     }
 

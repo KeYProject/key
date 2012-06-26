@@ -143,6 +143,7 @@ import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -1460,7 +1461,7 @@ public class PrettyPrinter {
 	for(int i=0; i<members.size(); i++){
 	    MemberDeclaration md = members.get(i);
 	    if(md instanceof ProgramMethod){
-		md = ((ProgramMethod) md).getMethodDeclaration();
+		md = ((IProgramMethod) md).getMethodDeclaration();
 	    }
 	    if((md instanceof ConstructorDeclaration) && 
 	       ((ConstructorDeclaration) md).
@@ -2723,8 +2724,8 @@ public class PrettyPrinter {
 	//        printFooter(x);
     }
 
-    public void printFullMethodSignature(ProgramMethod x) throws java.io.IOException {
-        write(x.name().toString());
+    public void printFullMethodSignature(IProgramMethod x) throws java.io.IOException {
+        write(x.getName().toString());
         write("(");
         boolean afterFirst = false;
         for (ParameterDeclaration pd : x.getParameters()) {
@@ -2742,9 +2743,9 @@ public class PrettyPrinter {
     public void printExecutionContext(ExecutionContext x) 
 	throws java.io.IOException {
 	write("source=");
-	writeElement(x.getTypeReference());
-	write("#");
 	printFullMethodSignature(x.getMethodContext());
+	write("@");
+	writeElement(x.getTypeReference());
 	if (x.getRuntimeInstance() != null) {
 	    write(",this=");
 	    writeElement(x.getRuntimeInstance());

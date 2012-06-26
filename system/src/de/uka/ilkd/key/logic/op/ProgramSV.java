@@ -15,6 +15,11 @@ import java.io.IOException;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.declaration.Modifier;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.Throws;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -441,4 +446,178 @@ public final class ProgramSV extends AbstractSV
     public String proofToString() {
 	return "\\schemaVar \\program " + sort().declarationString() + " " + name() + ";\n";
     }
+
+
+   @Override
+   public MethodDeclaration getMethodDeclaration() {
+      return null;
+   }
+
+
+   @Override
+   public KeYJavaType getParameterType(int i) {
+      return null;
+   }
+
+
+   @Override
+   public StatementBlock getBody() {
+      return null;
+   }
+
+
+   @Override
+   public boolean isConstructor() {
+      return false;
+   }
+
+
+   @Override
+   public boolean isModel() {
+      return false;
+   }
+
+
+   @Override
+   public boolean isVoid() {
+      return false;
+   }
+
+
+   @Override
+   public KeYJavaType getReturnType() {
+      return null;
+   }
+
+
+   @Override
+   public String getFullName() {
+      return null;
+   }
+
+
+   @Override
+   public boolean isAbstract() {
+      return false;
+   }
+
+
+   @Override
+   public boolean isImplicit() {
+      return false;
+   }
+
+
+   @Override
+   public boolean isNative() {
+      return false;
+   }
+
+
+   @Override
+   public boolean isFinal() {
+      return false;
+   }
+
+
+   @Override
+   public boolean isSynchronized() {
+      return false;
+   }
+
+
+   @Override
+   public Throws getThrown() {
+      return null;
+   }
+
+
+   @Override
+   public ParameterDeclaration getParameterDeclarationAt(int index) {
+      return null;
+   }
+
+
+   @Override
+   public VariableSpecification getVariableSpecification(int index) {
+      return null;
+   }
+
+
+   @Override
+   public int getParameterDeclarationCount() {
+      return 0;
+   }
+
+
+   @Override
+   public ImmutableArray<ParameterDeclaration> getParameters() {
+      return null;
+   }
+
+
+   @Override
+   public boolean isPrivate() {
+      return false;
+   }
+
+
+   @Override
+   public boolean isProtected() {
+      return false;
+   }
+
+
+   @Override
+   public boolean isPublic() {
+      return false;
+   }
+
+
+   @Override
+   public boolean isStatic() {
+      return false;
+   }
+
+
+   @Override
+   public boolean isStrictFp() {
+      return false;
+   }
+
+
+   @Override
+   public ImmutableArray<Modifier> getModifiers() {
+      return null;
+   }
+
+
+   @Override
+   public ImmutableArray<KeYJavaType> getParamTypes() {
+      return null;
+   }
+
+
+   @Override
+   public KeYJavaType getType() {
+      return null;
+   }
+
+
+   @Override
+   public KeYJavaType getContainerType() {
+      return null;
+   }
+
+
+   @Override
+   public int getNumParams() {
+      return 0;
+   }
+
+
+   @Override
+   public KeYJavaType getParamType(int i) {
+      return null;
+   }
 }

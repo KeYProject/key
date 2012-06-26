@@ -12,11 +12,18 @@
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Debug;
@@ -39,7 +46,7 @@ public class MethodFrame extends JavaStatement implements
     
     private final IExecutionContext execContext;
     
-    private final ProgramMethod method;
+    private final IProgramMethod method;
 
     private final ImmutableArray<ProgramPrefix> prefixElementArray;
     
@@ -76,7 +83,7 @@ public class MethodFrame extends JavaStatement implements
     public MethodFrame(IProgramVariable resultVar, 
 		       IExecutionContext execContext,
 		       StatementBlock body,
-                       ProgramMethod method, 
+                       IProgramMethod method, 
                        PositionInfo pos) {
         super(pos);
         this.resultVar   = resultVar;
@@ -156,7 +163,7 @@ public class MethodFrame extends JavaStatement implements
      *      Get method.
      *      @return the method
      */
-    public ProgramMethod getProgramMethod() {
+    public IProgramMethod getProgramMethod() {
         return method;
     }
 

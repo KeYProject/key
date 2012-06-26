@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -168,7 +169,7 @@ public abstract class VariableNamer implements InstantiationProposer {
      * PosInOccurrence
      */
     protected NameCreationInfo getMethodStack(PosInOccurrence posOfFind) {
-        ImmutableList<ProgramMethod> list = ImmutableSLList.<ProgramMethod>nil();
+        ImmutableList<IProgramMethod> list = ImmutableSLList.<IProgramMethod>nil();
 
         SourceElement element = getProgramFromPIO(posOfFind);
         while(element != element.getFirstElement()) {
@@ -176,7 +177,7 @@ public abstract class VariableNamer implements InstantiationProposer {
 
             if(element instanceof MethodFrame) {
                 MethodFrame frame = (MethodFrame)element;
-                ProgramMethod method = frame.getProgramMethod();
+                IProgramMethod method = frame.getProgramMethod();
                 if(method != null) {
                     list = list.append(method);
                 }

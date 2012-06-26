@@ -1054,7 +1054,7 @@ public final class LogicPrinter {
 	if(NotationInfo.PRETTY_SYNTAX
            && heapLDT != null 
            && t.sub(0).op() == heapLDT.getHeap()) {
-	    final ObserverFunction obs = (ObserverFunction) t.op();
+	    final IObserverFunction obs = (IObserverFunction) t.op();
             startTerm(t.arity());
             markStartSub();
             //heap not printed

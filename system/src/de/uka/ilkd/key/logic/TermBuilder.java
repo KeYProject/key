@@ -180,7 +180,7 @@ public final class TermBuilder {
      * in the namespaces!
      */
     public LocationVariable selfVar(Services services, 
-                                    ProgramMethod pm,
+                                    IProgramMethod pm,
                                     KeYJavaType kjt,
                                     boolean makeNameUnique) {
         if(pm.isStatic()) {
@@ -196,7 +196,7 @@ public final class TermBuilder {
      * in the namespaces!
      */
     public ImmutableList<ProgramVariable> paramVars(Services services, 
-                                                    ObserverFunction obs,
+                                                    IObserverFunction obs,
                                                     boolean makeNamesUnique) {
         ImmutableList<ProgramVariable> result 
         	= ImmutableSLList.<ProgramVariable>nil(); 
@@ -204,7 +204,7 @@ public final class TermBuilder {
             final KeYJavaType paramType = obs.getParamType(i);
             String name; 
             if(obs instanceof ProgramMethod) {
-        	name = ((ProgramMethod)obs).getParameterDeclarationAt(i)
+        	name = ((IProgramMethod)obs).getParameterDeclarationAt(i)
         	                           .getVariableSpecification()
         	                           .getName();
             } else {
@@ -226,7 +226,7 @@ public final class TermBuilder {
      * in the namespaces!
      */
     public ImmutableList<ProgramVariable> paramVars(Services services,
-	    String postfix, ObserverFunction obs, boolean makeNamesUnique) {
+	    String postfix, IObserverFunction obs, boolean makeNamesUnique) {
 	final ImmutableList<ProgramVariable> paramVars 
 		= paramVars(services, obs, true);
 	ImmutableList<ProgramVariable> result 
@@ -247,7 +247,7 @@ public final class TermBuilder {
      * in the namespaces.
      */
     public LocationVariable resultVar(Services services, 
-                                      ProgramMethod pm,
+                                      IProgramMethod pm,
                                       boolean makeNameUnique) {
 	return resultVar(services, "result", pm, makeNameUnique);
     }
@@ -258,7 +258,7 @@ public final class TermBuilder {
      * register it in the namespaces.
      */
     public LocationVariable resultVar(Services services, String name,
-	    ProgramMethod pm, boolean makeNameUnique) {
+	    IProgramMethod pm, boolean makeNameUnique) {
 	if(pm.isVoid() || pm.isConstructor()) {
 	    return null;
 	} else {
@@ -276,7 +276,7 @@ public final class TermBuilder {
      * register it in the namespaces.
      */
     public LocationVariable excVar(Services services, 
-                                   ProgramMethod pm,
+                                   IProgramMethod pm,
                                    boolean makeNameUnique) {
 	return excVar(services, "exc", pm, makeNameUnique);
     }
@@ -288,7 +288,7 @@ public final class TermBuilder {
      */
     public LocationVariable excVar(Services services,
 	    			   String name,
-                                   ProgramMethod pm,
+                                   IProgramMethod pm,
                                    boolean makeNameUnique) {
 	if(makeNameUnique) {
 	    name = newName(services, name);
@@ -378,6 +378,10 @@ public final class TermBuilder {
         return tf.createTerm(f, s, null, null);
     }
     
+    public Term func(IObserverFunction f, Term ... s) {
+       return tf.createTerm(f, s, null, null);
+   }
+   
     public Term func(Function f, 
 	    	     Term[] s, 
 	    	     ImmutableArray<QuantifiableVariable> boundVars) {

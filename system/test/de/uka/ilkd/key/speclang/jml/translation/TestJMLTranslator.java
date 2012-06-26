@@ -79,7 +79,7 @@ public class TestJMLTranslator extends TestCase {
     }
 
 
-    protected ProgramVariable buildResultVar(ProgramMethod pm) {
+    protected ProgramVariable buildResultVar(IProgramMethod pm) {
         ProgramElementName resPEN = new ProgramElementName("result");
         ProgramVariable result = new LocationVariable(resPEN,
                                                       pm.getReturnType());
@@ -378,7 +378,7 @@ public class TestJMLTranslator extends TestCase {
         ImmutableList<KeYJavaType> signature =
                 ImmutableSLList.<KeYJavaType>nil();
 
-        ProgramMethod pm = javaInfo.getProgramMethod(testClassType, "getOne",
+        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "getOne",
                                                      signature, testClassType);
 
         ProgramVariable resultVar = buildResultVar(pm);
@@ -485,7 +485,7 @@ public class TestJMLTranslator extends TestCase {
         signature = signature.append(javaInfo.getKeYJavaType(
                 PrimitiveType.JAVA_INT));
 
-        ProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m",
+        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m",
                                                      signature, testClassType);
 
         try {
@@ -514,7 +514,7 @@ public class TestJMLTranslator extends TestCase {
         signature = signature.append(javaInfo.getKeYJavaType(
                 PrimitiveType.JAVA_LONG));
 
-        ProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m",
+        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m",
                                                      signature, testClassType);
 
         try {
@@ -543,7 +543,7 @@ public class TestJMLTranslator extends TestCase {
         signature = signature.append(javaInfo.getKeYJavaType(
                 PrimitiveType.JAVA_INT));
 
-        ProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m",
+        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m",
                                                      signature, testClassType);
 
         try {
@@ -570,7 +570,7 @@ public class TestJMLTranslator extends TestCase {
         ImmutableList<KeYJavaType> signature =
                 ImmutableSLList.<KeYJavaType>nil();
 
-        ProgramMethod pm = javaInfo.getProgramMethod(testClassType,
+        IProgramMethod pm = javaInfo.getProgramMethod(testClassType,
                                                      "staticMethod", signature,
                                                      testClassType);
 

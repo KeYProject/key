@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -348,7 +349,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public KeYJavaType getKeYJavaType(Services services, 
 				      ExecutionContext ec) {
-	ProgramMethod meth = method(services, 
+	IProgramMethod meth = method(services, 
 	        determineStaticPrefixType(services, ec), ec);
 	if(meth == null){
 	    return ec.getTypeReference().getKeYJavaType();

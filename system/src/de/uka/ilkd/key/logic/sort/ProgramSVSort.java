@@ -32,6 +32,7 @@ import de.uka.ilkd.key.java.recoderext.InstanceAllocationMethodBuilder;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -109,6 +110,8 @@ public abstract class ProgramSVSort extends AbstractSort {
     public static final ProgramSVSort NONMODELMETHODBODY
 	= new NonModelMethodBodySort();
 
+    public static final ProgramSVSort PROGRAMMETHOD
+    = new ProgramMethodSort();
 
     //-----------Types--------------------------------------------------------
     
@@ -743,7 +746,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
 	public boolean canStandFor(Term t) {
 	    return (t.op() instanceof ProgramMethod && 
-		    !((ProgramMethod) t.op()).isModel());
+		    !((IProgramMethod) t.op()).isModel());
 	}
     }
 
@@ -813,7 +816,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 		return false;
 	    }
 	    
-            final ProgramMethod pm = 
+            final IProgramMethod pm = 
 		((MethodBodyStatement) pe).getProgramMethod(services);
             if(pm == null) {
                 return false;
@@ -870,7 +873,20 @@ public abstract class ProgramSVSort extends AbstractSort {
 	}
     }
 
+    /**
+     * This sort represents a type of program schema variables that
+     * match only on program methods
+     */    
+    private static final class ProgramMethodSort extends ProgramSVSort {
 
+   public ProgramMethodSort() {
+       super(new Name("ProgramMethod"));
+   }
+
+   protected boolean canStandFor(ProgramElement check, Services services) {
+       return (check instanceof ProgramMethod);
+   }
+    }
 
     //-----------Types--------------------------------------------------------
 
@@ -1374,7 +1390,7 @@ public abstract class ProgramSVSort extends AbstractSort {
 
 	public boolean canStandFor(Term t) {
 	    return (t.op() instanceof ProgramMethod && 
-		    !((ProgramMethod) t.op()).isModel());
+		    !((IProgramMethod) t.op()).isModel());
 	}
 
     }

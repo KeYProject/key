@@ -11,12 +11,22 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
@@ -25,6 +35,7 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Pair;
@@ -36,7 +47,7 @@ public class ClassTree extends JTree {
      * 
      */
     private static final long serialVersionUID = -3006761219011776834L;
-    private final Map<Pair<KeYJavaType,ObserverFunction>,Icon> targetIcons;
+    private final Map<Pair<KeYJavaType,IObserverFunction>,Icon> targetIcons;
     
     
     //-------------------------------------------------------------------------
@@ -46,7 +57,7 @@ public class ClassTree extends JTree {
     public ClassTree(boolean addContractTargets, 
 	             boolean skipLibraryClasses,
 	    	     Services services,
-	    	     Map<Pair<KeYJavaType,ObserverFunction>,Icon> targetIcons) {
+	    	     Map<Pair<KeYJavaType,IObserverFunction>,Icon> targetIcons) {
 	super(new DefaultTreeModel(createTree(addContractTargets, 
 					      skipLibraryClasses, 
 					      services)));
@@ -90,7 +101,7 @@ public class ClassTree extends JTree {
 		    if(result instanceof JLabel) {
 			((JLabel) result).setIcon(
 				ClassTree.this.targetIcons.get(
-		          new Pair<KeYJavaType,ObserverFunction>(
+		          new Pair<KeYJavaType,IObserverFunction>(
 		        	  			entry.kjt, 
 		        	                        entry.target)));
 		    }
@@ -108,7 +119,7 @@ public class ClassTree extends JTree {
 	this(addContractTargets, 
 	     skipLibraryClasses, 
 	     services, 
-	     new HashMap<Pair<KeYJavaType,ObserverFunction>,Icon>());
+	     new HashMap<Pair<KeYJavaType,IObserverFunction>,Icon>());
     }
     
     
@@ -136,7 +147,7 @@ public class ClassTree extends JTree {
     
     private static DefaultMutableTreeNode getChildByTarget(
 	    				     DefaultMutableTreeNode parentNode,
-	    				     ObserverFunction target) {
+	    				     IObserverFunction target) {
         int numChildren = parentNode.getChildCount();
         for(int i = 0; i < numChildren; i++) {
             DefaultMutableTreeNode childNode 
@@ -185,14 +196,14 @@ public class ClassTree extends JTree {
         
         //add all contract targets of kjt
         if(addContractTargets) {
-            final ImmutableSet<ObserverFunction> targets
+            final ImmutableSet<IObserverFunction> targets
             	= services.getSpecificationRepository().getContractTargets(kjt);
             
             //sort targets alphabetically
-            final ObserverFunction[] targetsArr
-            	= targets.toArray(new ObserverFunction[targets.size()]);            
-            Arrays.sort(targetsArr, new Comparator<ObserverFunction>() {
-        	public int compare(ObserverFunction o1, ObserverFunction o2) {
+            final IObserverFunction[] targetsArr
+            	= targets.toArray(new IObserverFunction[targets.size()]);            
+            Arrays.sort(targetsArr, new Comparator<IObserverFunction>() {
+        	public int compare(IObserverFunction o1, IObserverFunction o2) {
         	    if(o1 instanceof ProgramMethod 
         	       && !(o2 instanceof ProgramMethod)) {
         		return -1;
@@ -211,7 +222,7 @@ public class ClassTree extends JTree {
         	}
             });
             
-            for(ObserverFunction target : targetsArr) {
+            for(IObserverFunction target : targetsArr) {
         	Entry te = new Entry(getDisplayName(services, target));
         	DefaultMutableTreeNode childNode 
         		= new DefaultMutableTreeNode(te);
@@ -235,7 +246,7 @@ public class ClassTree extends JTree {
      * @param ov The {@link ObserverFunction} for that a display name is needed.
      * @return The display name for the given {@link ObserverFunction}.
      */
-    public static final String getDisplayName(Services services, ObserverFunction ov) {
+    public static final String getDisplayName(Services services, IObserverFunction ov) {
         StringBuffer sb = new StringBuffer();
         String prettyName = services.getTypeConverter()
                                     .getHeapLDT()
@@ -300,7 +311,7 @@ public class ClassTree extends JTree {
     }
     
     
-    private void open(KeYJavaType kjt, ObserverFunction target) {
+    private void open(KeYJavaType kjt, IObserverFunction target) {
         //get tree path to class
         Vector<DefaultMutableTreeNode> pathVector 
         	= new Vector<DefaultMutableTreeNode>();
@@ -357,7 +368,7 @@ public class ClassTree extends JTree {
     }
     
     
-    public void select(KeYJavaType kjt, ObserverFunction target) {
+    public void select(KeYJavaType kjt, IObserverFunction target) {
 	open(kjt, target);
     }
     
@@ -389,7 +400,7 @@ public class ClassTree extends JTree {
     static class Entry {
         public final String string;
         public KeYJavaType kjt = null;
-        public ObserverFunction target = null;
+        public IObserverFunction target = null;
         public int numMembers = 0;
         public int numSelectedMembers = 0;      
         

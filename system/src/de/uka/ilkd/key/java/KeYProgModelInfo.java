@@ -9,20 +9,34 @@
 //
 package de.uka.ilkd.key.java;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Constructor;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.abstraction.ArrayType;
+import de.uka.ilkd.key.java.abstraction.Field;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Method;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
@@ -101,7 +115,7 @@ public class KeYProgModelInfo{
         for (int i=rmethods.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rmethods.get(i);
             Method m= 
-		((ProgramMethod)rec2key().toKeY(rm)).getMethodDeclaration();
+		((IProgramMethod)rec2key().toKeY(rm)).getMethodDeclaration();
             result=result.prepend(m);
         }
         return result;
@@ -114,9 +128,9 @@ public class KeYProgModelInfo{
      * @return the list of visible methods of this type and its supertypes.
      */
 
-    public ImmutableList<ProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
+    public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
         List<recoder.abstraction.Method> rmethods=getAllRecoderMethods(kjt);
-        ImmutableList<ProgramMethod> result = ImmutableSLList.<ProgramMethod>nil();
+        ImmutableList<IProgramMethod> result = ImmutableSLList.<IProgramMethod>nil();
         for (int i=rmethods.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rmethods.get(i);
             ProgramMethod m=(ProgramMethod)rec2key().toKeY(rm);
@@ -355,7 +369,7 @@ public class KeYProgModelInfo{
         for (int i=rml.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rml.get(i);
 	    if(!(rm instanceof recoder.bytecode.MethodInfo)){
-		Method m = ((ProgramMethod) rec2key().toKeY(rm)).
+		Method m = ((IProgramMethod) rec2key().toKeY(rm)).
 		    getMethodDeclaration();
 		result=result.prepend(m);
 	    }
@@ -369,9 +383,9 @@ public class KeYProgModelInfo{
 	 * the returned list matches the syntactic order.
 	 * @param ct a class type.
 	 */
-    public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType ct){
+    public ImmutableList<IProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType ct){
         List<recoder.abstraction.Method> rml = getRecoderMethods(ct);
-        ImmutableList<ProgramMethod> result = ImmutableSLList.<ProgramMethod>nil();
+        ImmutableList<IProgramMethod> result = ImmutableSLList.<IProgramMethod>nil();
         for (int i=rml.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rml.get(i);
 	    if(!(rm instanceof recoder.bytecode.MethodInfo)){
@@ -388,9 +402,9 @@ public class KeYProgModelInfo{
 	 * @param ct a class type.
 	 */
 
-    public ImmutableList<ProgramMethod> getConstructors(KeYJavaType ct){
+    public ImmutableList<IProgramMethod> getConstructors(KeYJavaType ct){
         List<? extends Constructor> rcl = getRecoderConstructors(ct);
-        ImmutableList<ProgramMethod> result = ImmutableSLList.<ProgramMethod>nil();
+        ImmutableList<IProgramMethod> result = ImmutableSLList.<IProgramMethod>nil();
         for (int i=rcl.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rcl.get(i);
 	    ProgramMethod m=(ProgramMethod) rec2key().toKeY(rm);
@@ -446,7 +460,7 @@ public class KeYProgModelInfo{
  	for (int i = 0; i<members.size(); i++) {
  	    final MemberDeclaration member = members.get(i);
  	    if (member instanceof ProgramMethod &&
- 		((ProgramMethod)member).getMethodDeclaration().getName().equals(name)) {
+ 		((IProgramMethod)member).getMethodDeclaration().getName().equals(name)) {
  		return (ProgramMethod)member;
  	    }
  	}

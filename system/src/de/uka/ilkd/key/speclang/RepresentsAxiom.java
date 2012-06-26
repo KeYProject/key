@@ -18,8 +18,15 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.Taclet;
@@ -122,7 +129,7 @@ public final class RepresentsAxiom extends ClassAxiom {
 
     
     public ImmutableSet<Taclet> getTaclets(
-            ImmutableSet<Pair<Sort, ObserverFunction>> toLimit,
+            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
         LocationVariable heap =
                 services.getTypeConverter().getHeapLDT().getHeap();
@@ -133,7 +140,7 @@ public final class RepresentsAxiom extends ClassAxiom {
         Name tacletName = MiscTools.toValidTacletName(name);
         TacletGenerator TG = TacletGenerator.getInstance();
         if (isFunctional()) {
-            return TG.generateFuncionalRepresentsTaclets(tacletName,
+            return TG.generateFunctionalRepresentsTaclets(tacletName,
                                                          originalRep,
                                                          kjt,
                                                          target,
@@ -155,7 +162,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
     
     
-    public ImmutableSet<Pair<Sort, ObserverFunction>> getUsedObservers(
+    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
 	    						Services services) {
 	if(!isFunctional()) {
 	    return DefaultImmutableSet.nil();

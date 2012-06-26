@@ -17,7 +17,11 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
@@ -82,7 +86,7 @@ public final class PartialInvAxiom extends ClassAxiom {
     
     @Override
     public ImmutableSet<Taclet> getTaclets(
-            ImmutableSet<Pair<Sort, ObserverFunction>> toLimit,
+            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
         ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
 
@@ -136,7 +140,7 @@ public final class PartialInvAxiom extends ClassAxiom {
     
     
     @Override
-    public ImmutableSet<Pair<Sort, ObserverFunction>> getUsedObservers(
+    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
 	    						Services services) {
 	final ProgramVariable dummySelfVar 
 		= TB.selfVar(services, inv.getKJT(), false);

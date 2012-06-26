@@ -161,6 +161,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
@@ -205,7 +206,7 @@ public class Recoder2KeYConverter {
         return (ProgramElement) result;
     }
 
-    public ProgramMethod processDefaultConstructor(
+    public IProgramMethod processDefaultConstructor(
             recoder.abstraction.DefaultConstructor df) {
         return convert(df);
     }
@@ -1093,7 +1094,7 @@ public class Recoder2KeYConverter {
      * (especially the declaration type of its parent is determined and handed
      * over)
      */
-    public ProgramMethod convert(
+    public IProgramMethod convert(
             recoder.java.declaration.ConstructorDeclaration cd) {
         ConstructorDeclaration consDecl = new ConstructorDeclaration(
                 collectChildren(cd),
@@ -1120,7 +1121,7 @@ public class Recoder2KeYConverter {
      * convert a recoder DefaultConstructor to a KeY ProgramMethod (especially
      * the declaration type of its parent is determined and handed over)
      */
-    public ProgramMethod convert(recoder.abstraction.DefaultConstructor dc) {
+    public IProgramMethod convert(recoder.abstraction.DefaultConstructor dc) {
         ExtList children = new ExtList();
         children.add(new ProgramElementName(dc.getName()));
         ConstructorDeclaration consDecl = new ConstructorDeclaration(children,
@@ -1226,7 +1227,7 @@ public class Recoder2KeYConverter {
      * convert a recoder MethodDeclaration to a KeY ProgramMethod (especially
      * the declaration type of its parent is determined and handed over)
      */
-    public ProgramMethod convert(recoder.java.declaration.MethodDeclaration md) {
+    public IProgramMethod convert(recoder.java.declaration.MethodDeclaration md) {
         ProgramMethod result = null;
 
         // methodsDeclaring contains the recoder method declarations as keys
@@ -1562,7 +1563,7 @@ public class Recoder2KeYConverter {
         .getSourceInfo();
         recoder.abstraction.Method method = sourceInfo.getMethod(mr);
 
-        final ProgramMethod pm;
+        final IProgramMethod pm;
         if (!getMapping().mapped(method)) {
             if (method instanceof recoder.java.declaration.MethodDeclaration) {
                 // method reference before method decl, also recursive calls.
@@ -1586,7 +1587,7 @@ public class Recoder2KeYConverter {
                 pm = null;
             }
         } else {
-            pm = (ProgramMethod) getMapping().toKeY(method);
+            pm = (IProgramMethod) getMapping().toKeY(method);
         }
 
         ExtList children = collectChildren(mr);

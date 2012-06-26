@@ -21,6 +21,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.*;
@@ -143,11 +144,11 @@ public final class ProofCorrectnessMgt {
     
     @Deprecated
     public boolean contractApplicableFor(KeYJavaType kjt,
-	                                 ObserverFunction target) {
+	                                 IObserverFunction target) {
 	target = specRepos.unlimitObs(target);
 	
         //get the target which is being verified in the passed goal
-        final ObserverFunction targetUnderVerification 
+        final IObserverFunction targetUnderVerification 
             = specRepos.getTargetOfProof(proof);
         if(targetUnderVerification == null) {
             return true;
@@ -175,7 +176,7 @@ public final class ProofCorrectnessMgt {
         
         //is one of those proofs about the target under verification? 
         for(Proof p : proofs) {
-            final ObserverFunction target2 = specRepos.getTargetOfProof(p);
+            final IObserverFunction target2 = specRepos.getTargetOfProof(p);
             if(target2.equals(targetUnderVerification)) {
                 return false;
             }

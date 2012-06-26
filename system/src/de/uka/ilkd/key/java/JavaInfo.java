@@ -14,9 +14,26 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.abstraction.ArrayType;
+import de.uka.ilkd.key.java.abstraction.ClassType;
+import de.uka.ilkd.key.java.abstraction.Field;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Method;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -26,8 +43,15 @@ import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
@@ -120,7 +144,7 @@ public final class JavaInfo {
     
     /** the name of the class used as default execution context */
     protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
-    protected static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<default>";
+    protected static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
     
     private ObserverFunction inv;
     private HashMap<KeYJavaType,ObserverFunction> staticInvs = new HashMap<KeYJavaType,ObserverFunction>();
@@ -529,19 +553,19 @@ public final class JavaInfo {
     /**
      * returns all methods from the given Type as ProgramMethods
      */
-    public ImmutableList<ProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
+    public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
         return kpmi.getAllProgramMethods(kjt);
     }
     
     /**
      * returns all methods declared in the given Type as ProgramMethods
      */
-    public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {        
+    public ImmutableList<IProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {        
         return kpmi.getAllProgramMethodsLocallyDeclared(kjt);
     }
     
 
-    public ImmutableList<ProgramMethod> getConstructors(KeYJavaType kjt) {
+    public ImmutableList<IProgramMethod> getConstructors(KeYJavaType kjt) {
 	return kpmi.getConstructors(kjt);
     }
     
@@ -582,7 +606,7 @@ public final class JavaInfo {
     }
 
     
-    public ProgramMethod getToplevelPM(KeYJavaType kjt, ProgramMethod pm) {
+    public ProgramMethod getToplevelPM(KeYJavaType kjt, IProgramMethod pm) {
 	final String methodName = pm.getName();
     	final ImmutableList<KeYJavaType> sig 
 		= ImmutableSLList.<KeYJavaType>nil()

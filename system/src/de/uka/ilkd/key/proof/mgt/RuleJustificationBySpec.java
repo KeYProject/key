@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.speclang.Contract;
 
@@ -29,7 +30,7 @@ public class RuleJustificationBySpec implements RuleJustification {
      */
     public boolean isAxiomJustification() {
         return spec.getTarget() instanceof ProgramMethod
-               && ((ProgramMethod)spec.getTarget()).getBody() == null;
+               && ((IProgramMethod)spec.getTarget()).getBody() == null;
     }
     
     

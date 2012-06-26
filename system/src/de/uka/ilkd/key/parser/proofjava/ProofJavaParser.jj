@@ -3774,7 +3774,7 @@ ExecutionContext ExecutionContext() :
 {
 
   "source="
-  classContext = Type() "#" methodSignature = MethodSignature()
+  methodSignature = MethodSignature() "@" classContext = Type()
   [ ",this=" runtimeInstance = Expression() ]
 
   { return new ExecutionContext

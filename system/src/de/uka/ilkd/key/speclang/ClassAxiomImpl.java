@@ -18,8 +18,12 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.OpCollector;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -96,7 +100,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
     
     @Override
     public ImmutableSet<Taclet> getTaclets(
-            ImmutableSet<Pair<Sort, ObserverFunction>> toLimit,
+            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
         ImmutableList<ProgramVariable> replaceVars =
                 ImmutableSLList.<ProgramVariable>nil();
@@ -119,7 +123,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
 
     @Override
-    public ImmutableSet<Pair<Sort, ObserverFunction>> getUsedObservers(
+    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
 	    Services services) {
 	return DefaultImmutableSet.nil();
     }    

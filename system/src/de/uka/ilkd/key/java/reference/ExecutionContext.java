@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Reference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -35,7 +36,7 @@ public class ExecutionContext
     /**
      * the currently active method
      */
-    private ProgramMethod methodContext;
+    private IProgramMethod methodContext;
    
     /**
      * creates an execution context reference
@@ -46,7 +47,7 @@ public class ExecutionContext
      * is currently active/executed
      */
     public ExecutionContext(TypeReference classContext, 
-			    ProgramMethod methodContext, ReferencePrefix runtimeInstance) {
+			    IProgramMethod methodContext, ReferencePrefix runtimeInstance) {
 	this.classContext = classContext;
 	this.methodContext = methodContext;
 	this.runtimeInstance = runtimeInstance;
@@ -114,7 +115,7 @@ public class ExecutionContext
      * returns the program method which is currently active
      * @return the currently active method
      */
-    public ProgramMethod getMethodContext() {
+    public IProgramMethod getMethodContext() {
       return methodContext;
    }
 

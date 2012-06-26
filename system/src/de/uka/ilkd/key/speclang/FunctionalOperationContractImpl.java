@@ -50,7 +50,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     final String baseName;
     final String name;
     final KeYJavaType kjt;    
-    final ProgramMethod pm;
+    final IProgramMethod pm;
     final Modality modality;
     final Map<LocationVariable,Term> originalPres;
     final Term originalMby;    
@@ -80,7 +80,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     FunctionalOperationContractImpl(String baseName,
 	                          String name,
                                   KeYJavaType kjt,	                          
-                                  ProgramMethod pm,
+                                  IProgramMethod pm,
             		          Modality modality,
             		          Map<LocationVariable,Term> pres,
             		          Term mby,
@@ -164,7 +164,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
      */
     FunctionalOperationContractImpl(String baseName,
                                  KeYJavaType kjt,	    
-                                 ProgramMethod pm,
+                                 IProgramMethod pm,
             		         Modality modality,
             		         Map<LocationVariable,Term> pres,
             		         Term mby,            		         
@@ -369,7 +369,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     
     
     @Override
-    public ProgramMethod getTarget() {
+    public IProgramMethod getTarget() {
         return pm;
     }
     
@@ -899,12 +899,12 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 
     @Override
     public Contract setTarget(KeYJavaType newKJT,
-                              ObserverFunction newPM) {
+                              IObserverFunction newPM) {
         assert newPM instanceof ProgramMethod;
         return new FunctionalOperationContractImpl(baseName,
                                                    null,
                                                    newKJT,
-                                                   (ProgramMethod) newPM,
+                                                   (IProgramMethod) newPM,
                                                    modality,
                                                    originalPres,
                                                    originalMby,

@@ -221,7 +221,7 @@ public abstract class TypeResolver {
             if (op instanceof ProgramVariable) {
                 result  = ((ProgramVariable)op).getContainerType().getSort();
             } else if(op instanceof ObserverFunction) {
-        	result = ((ObserverFunction)op).getContainerType().getSort();
+        	result = ((IObserverFunction)op).getContainerType().getSort();
             } else if(op instanceof Function
         	      && ((Function)op).isUnique()
         	      && ((Function)op).name().toString().contains("::")) {

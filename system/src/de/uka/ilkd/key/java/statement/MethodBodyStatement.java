@@ -12,10 +12,21 @@
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -63,7 +74,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     private final MethodReference methodReference;
     
     /** cache resolved method */
-    private ProgramMethod method;
+    private IProgramMethod method;
 
     /** indicates whether this stands for the specification of 
      * a method rather than the concrete body*/
@@ -102,7 +113,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         checkOnlyProgramVarsAsArguments(methodReference.getArguments());
     }    
 
-    public MethodBodyStatement(ProgramMethod method, 
+    public MethodBodyStatement(IProgramMethod method, 
             ReferencePrefix newContext, 
             IProgramVariable res, 
             ImmutableArray<Expression> args,
@@ -110,7 +121,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         this(method, newContext, res, args, useSpecification, null);
     }
 
-    public MethodBodyStatement(ProgramMethod method, 
+    public MethodBodyStatement(IProgramMethod method, 
                                ReferencePrefix newContext, 
                                IProgramVariable res, 
                                ImmutableArray<Expression> args,
@@ -150,14 +161,14 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         }
     }
 
-    public MethodBodyStatement(ProgramMethod method, 
+    public MethodBodyStatement(IProgramMethod method, 
             ReferencePrefix newContext, 
             IProgramVariable res, 
             ImmutableArray<Expression> args) {
         this(method, newContext, res, args, false);
     }
     
-    public MethodBodyStatement(ProgramMethod method, 
+    public MethodBodyStatement(IProgramMethod method, 
             ReferencePrefix newContext, 
             IProgramVariable res, 
             ImmutableArray<Expression> args,
@@ -261,7 +272,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     }
     
     
-    public ProgramMethod getProgramMethod(Services services) {
+    public IProgramMethod getProgramMethod(Services services) {
         if (method == null) {
             resolveMethod(services);
         }

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.statement.Branch;
 import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.java.statement.ILoopInit;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 /** A type that implement this interface can be used in all java
@@ -31,6 +32,6 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
  */
 public interface ProgramConstruct extends Expression, Statement, ILoopInit, 
     IForUpdates, IGuard, Label, TerminalProgramElement, ExpressionStatement,
-    TypeReference, IProgramVariable, Branch, IExecutionContext, MethodName {  
+    TypeReference, IProgramVariable, IProgramMethod, Branch, IExecutionContext, MethodName {  
 }
     

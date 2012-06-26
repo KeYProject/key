@@ -41,7 +41,7 @@ public final class DependencyContractImpl implements DependencyContract {
     final String baseName;    
     final String name;
     final KeYJavaType kjt;
-    final ObserverFunction target;
+    final IObserverFunction target;
     final Term originalPre;
     final Term originalMby;    
     final Term originalDep;
@@ -57,7 +57,7 @@ public final class DependencyContractImpl implements DependencyContract {
     DependencyContractImpl(String baseName,
 	                           String name, 
 	                           KeYJavaType kjt,
-	    			   ObserverFunction target,
+	    			   IObserverFunction target,
 	    			   Term pre,
 	                  	   Term mby,	    			   
 	                  	   Term dep,
@@ -91,7 +91,7 @@ public final class DependencyContractImpl implements DependencyContract {
     
     DependencyContractImpl(String baseName, 
 	                          KeYJavaType kjt,
-	    			  ObserverFunction target,
+	    			  IObserverFunction target,
 	    			  Term pre,
 	                  	  Term mby,	    			  
 	                  	  Term dep,
@@ -133,7 +133,7 @@ public final class DependencyContractImpl implements DependencyContract {
 
     
     @Override
-    public ObserverFunction getTarget() {
+    public IObserverFunction getTarget() {
 	return target;
     }
     
@@ -402,7 +402,7 @@ public final class DependencyContractImpl implements DependencyContract {
 
     @Override
     public Contract setTarget(KeYJavaType newKJT,
-                              ObserverFunction newPM) {
+                              IObserverFunction newPM) {
         return new DependencyContractImpl(baseName,
                                           null,
                                           newKJT,
