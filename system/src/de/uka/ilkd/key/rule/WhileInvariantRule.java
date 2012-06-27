@@ -265,7 +265,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         for(LocationVariable heap : heapContext) {
           heapToBeforeLoop.put(heap, new LinkedHashMap<Term,Term>());
-          final LocationVariable lv = TB.heapAtPreVar(services, heap.name()+"BeforeLoop", true);
+          final LocationVariable lv = TB.heapAtPreVar(services, heap.name()+"BeforeLoop", heap.sort(), true);
    	  services.getNamespaces().programVariables().addSafely(lv);
           final Term u = TB.elementary(services, lv, TB.var(heap));
           if(beforeLoopUpdate == null) {
