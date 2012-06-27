@@ -134,12 +134,12 @@ public final class ProgramMethod extends ObserverFunction
 
     @Override
     public SourceElement getFirstElement(){
-	return method.getFirstElement();
+	return this;
     }
 
     @Override
     public SourceElement getLastElement(){
-	return method.getLastElement();
+	return this;
     }
 
     @Override
@@ -266,12 +266,12 @@ public final class ProgramMethod extends ObserverFunction
 
     @Override
     public int getChildCount() {
-	return method.getChildCount();
+	return 0;
     }
 
     @Override
     public ProgramElement getChildAt(int i){
-	return method.getChildAt(i);
+       return null;
     }
   
     /** equals modulo renaming is described in class
