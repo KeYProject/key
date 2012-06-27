@@ -188,7 +188,6 @@ public final class NotationInfo {
     /** Register the standard set of notations (that can be defined without
      * a services object).
      */
-    @SuppressWarnings("unchecked")
     private void createDefaultNotationTable() {
         if (defaultNotationCache != null){
             notationTable = defaultNotationCache;
@@ -352,7 +351,7 @@ public final class NotationInfo {
     /** Get the Notation for a given Operator.  
      * If no notation is registered, a Function notation is returned.
      */
-    public Notation getNotation(Operator op, @SuppressWarnings("unused") Services services) {
+    public Notation getNotation(Operator op, Services services) {
         Notation result = notationTable.get(op);
         if(result != null) {
             return result;

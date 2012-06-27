@@ -132,20 +132,6 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         this.transaction            = transaction;
 	this.toBeSaved	            = toBeSaved;
     }
-
-
-    private String generateName(String baseName, String name, KeYJavaType kjt,
-            ProgramMethod pm, int id) {
-        return name != null 
-                                      ? name 
-                                      : baseName + " [id: " + id + " / " + pm 
-                                        + (kjt.equals(pm.getContainerType()) 
-                                           ? "" 
-                                           : " for " 
-                                             + kjt.getJavaType().getName()) 
-                                        + "]";
-    }    
-
     
     /**
      * Creates an operation contract.
