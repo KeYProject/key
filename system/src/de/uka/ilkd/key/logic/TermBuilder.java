@@ -1216,7 +1216,7 @@ public final class TermBuilder {
     }
 
     public Term wellFormed(Term heap, Services services) {
-        return func(services.getTypeConverter().getHeapLDT().getWellFormed(), 
+        return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()), 
         	    heap);
     }
     
