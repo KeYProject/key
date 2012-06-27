@@ -51,7 +51,18 @@ public class SourcePropertySection extends AbstractPropertySection {
     * @return The {@link IStackFrame} or {@code null} if conversion is not possible.
     */
    public static IStackFrame getStackFrame(Object object) {
-      return object instanceof ISEDDebugNode && // Only in symbolic debug nodes
-             object instanceof IStackFrame ? (IStackFrame)object : null;
+      if (object instanceof ISEDDebugNode && // Only in symbolic debug nodes
+          object instanceof IStackFrame) {
+         IStackFrame frame = (IStackFrame)object;
+         if (frame.getLaunch() != null) {
+            return frame;
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
+      }
    }
 }

@@ -64,7 +64,10 @@ public class GraphitiSourcePropertySection extends GFPropertySection {
             if (featureProvider != null) {
                Object bo = diagramProvider.getFeatureProvider().getBusinessObjectForPictogramElement(pe);
                if (bo instanceof ISEDDebugNode && bo instanceof IStackFrame) {
-                  node = (IStackFrame)bo;
+                  IStackFrame frame = (IStackFrame)bo;
+                  if (frame.getLaunch() != null) {
+                     node = frame;
+                  }
                }
             }
          }
