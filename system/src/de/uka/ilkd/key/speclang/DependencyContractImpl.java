@@ -373,7 +373,7 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
     @Override
-    public boolean transactionContract() {
+    public boolean transactionApplicableContract() {
         return false;
     }
 

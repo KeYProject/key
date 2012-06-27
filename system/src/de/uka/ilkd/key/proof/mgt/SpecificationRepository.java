@@ -514,10 +514,11 @@ public final class SpecificationRepository {
 	    				       Modality modality) {
 	ImmutableSet<FunctionalOperationContract> result = getOperationContracts(kjt, pm);
 	final boolean transactionModality = (modality == Modality.DIA_TRANSACTION || modality == Modality.BOX_TRANSACTION);
-	final Modality otherMatchModality = transactionModality ? ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA :
-	          Modality.BOX) : null;
+	final Modality matchModality = transactionModality ? ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA :
+	          Modality.BOX) : modality;
 	for(FunctionalOperationContract contract : result) {
-	    if(!contract.getModality().equals(modality) && !(contract.isReadOnlyContract(services) && contract.getModality().equals(otherMatchModality))) {
+            if(!contract.getModality().equals(matchModality)
+             || (transactionModality && !contract.transactionApplicableContract() && !contract.isReadOnlyContract(services))) {
 		result = result.remove(contract);
 	    }
 	}
@@ -533,7 +534,6 @@ public final class SpecificationRepository {
         if(name == null || name.length() == 0) {
             return null;
         }
-        
         String[] baseNames = name.split(CONTRACT_COMBINATION_MARKER);
         if(baseNames.length == 1) {
             return contractsByName.get(baseNames[0]);
