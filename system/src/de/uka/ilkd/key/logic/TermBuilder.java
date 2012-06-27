@@ -305,14 +305,14 @@ public final class TermBuilder {
      */
     public LocationVariable heapAtPreVar(Services services,
 	    				 String baseName,
+                                         Sort sort,
 	    			         boolean makeNameUnique) {
+        assert sort != null;
 	if(makeNameUnique) {
 	    baseName = newName(services, baseName);
 	}	
 	return new LocationVariable(new ProgramElementName(baseName),
-		            	    new KeYJavaType(services.getTypeConverter()
-		            	            		    .getHeapLDT()
-		            	            		    .targetSort()));
+		            	    new KeYJavaType(sort));
     }
         
     //-------------------------------------------------------------------------
