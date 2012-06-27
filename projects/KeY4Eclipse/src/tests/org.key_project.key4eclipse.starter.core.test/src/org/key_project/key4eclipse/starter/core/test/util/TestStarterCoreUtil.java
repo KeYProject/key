@@ -102,7 +102,7 @@ public final class TestStarterCoreUtil {
                   // Instantiate proof
                   ProofOblInput input = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract);
                   ProblemInitializer init = main.getUserInterface().createProblemInitializer();
-                  Proof proof = init.startProver(initConfig, input);
+                  Proof proof = init.startProver(initConfig, input, 0);
                   setResult(proof);
               }
               catch (Exception e) {

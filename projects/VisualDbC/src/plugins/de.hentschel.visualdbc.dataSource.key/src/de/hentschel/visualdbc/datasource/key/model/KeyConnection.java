@@ -1807,7 +1807,7 @@ public class KeyConnection extends MemoryConnection {
    public Proof openProof(ProofOblInput po) {
       try {
          if (po != null) {
-            Proof proof = init.startProver(initConfig, po);
+            Proof proof = init.startProver(initConfig, po, 0);
             return proof;
          }
          else {

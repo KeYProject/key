@@ -151,7 +151,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
 //                        input = contract.createProofObl(initConfig, contract);                        
                     }
                     ProblemInitializer init = main.getUserInterface().createProblemInitializer();
-                    Proof proof = init.startProver(initConfig, input);
+                    Proof proof = init.startProver(initConfig, input, 0);
                     setResult(proof);
                 }
                 catch (Exception e) {
