@@ -18,15 +18,20 @@ import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.ui.util.LogUtil;
 
 /**
- * Contains the controls to define performance settings.
+ * Contains the controls to define customization settings.
  * @author Martin Hentschel
  */
-public class KeYPerformanceLaunchConfigurationTabComposite extends AbstractTabbedPropertiesAndLaunchConfigurationTabComposite {
+public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTabbedPropertiesAndLaunchConfigurationTabComposite {
    /**
     * Defines if method return values are shown or not.
     */
    private Button showMethodReturnValuesInDebugNodesButton;
 
+   /**
+    * Defines if KeY's main window is shown or not.
+    */
+   private Button showKeYMainWindowButton;
+   
    /**
     * Constructor.
     * @param parent The parent {@link Composite}.
@@ -34,7 +39,7 @@ public class KeYPerformanceLaunchConfigurationTabComposite extends AbstractTabbe
     * @param parentTab An optional {@link AbstractTabbedPropertiesAndLaunchConfigurationTab} to make this {@link Composite} editable.
     * @param widgetFactory An optional {@link TabbedPropertySheetWidgetFactory} to use.
     */
-   public KeYPerformanceLaunchConfigurationTabComposite(Composite parent,
+   public KeYCustomizationLaunchConfigurationTabComposite(Composite parent,
                                                         int style, 
                                                         AbstractTabbedPropertiesAndLaunchConfigurationTab parentTab,
                                                         TabbedPropertySheetWidgetFactory widgetFactory) {
@@ -58,6 +63,18 @@ public class KeYPerformanceLaunchConfigurationTabComposite extends AbstractTabbe
             updateLaunchConfigurationDialog();
          }
       });
+      // KeY
+      Group keyGroup = widgetFactory.createGroup(composite, "KeY");
+      keyGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      keyGroup.setLayout(new GridLayout(1, false));
+      showKeYMainWindowButton = widgetFactory.createButton(keyGroup, "Show KeY's &main window (only for experienced user)", SWT.CHECK);
+      showKeYMainWindowButton.setEnabled(isEditable());
+      showKeYMainWindowButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateLaunchConfigurationDialog();
+         }
+      });
    }
 
    /**
@@ -75,6 +92,7 @@ public class KeYPerformanceLaunchConfigurationTabComposite extends AbstractTabbe
    public void initializeFrom(ILaunchConfiguration configuration) {
       try {
          showMethodReturnValuesInDebugNodesButton.setSelection(KeySEDUtil.isShowMethodReturnValuesInDebugNodes(configuration));
+         showKeYMainWindowButton.setSelection(KeySEDUtil.isShowKeYMainWindow(configuration));
       } 
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);
@@ -87,6 +105,7 @@ public class KeYPerformanceLaunchConfigurationTabComposite extends AbstractTabbe
    @Override
    public void initializeFrom(KeYLaunchSettings launchSettings) {
       showMethodReturnValuesInDebugNodesButton.setSelection(launchSettings.isShowMethodReturnValues());
+      showKeYMainWindowButton.setSelection(launchSettings.isShowKeYMainWindow());
    }
 
    /**
@@ -95,5 +114,6 @@ public class KeYPerformanceLaunchConfigurationTabComposite extends AbstractTabbe
    @Override
    public void performApply(ILaunchConfigurationWorkingCopy configuration) {
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValuesInDebugNodesButton.getSelection());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindowButton.getSelection());
    }
 }

@@ -146,9 +146,9 @@
             <propertyTab
                   afterTab="org.key_project.sed.ui.main.tab"
                   category="Debug"
-                  id="org.key_project.sed.ui.performance.tab"
-                  image="icons/keyPerformance.gif"
-                  label="Performance">
+                  id="org.key_project.sed.ui.customization.tab"
+                  image="icons/keyCustomization.gif"
+                  label="Customization">
             </propertyTab>
          </propertyTabs>
       </extension>
@@ -169,10 +169,10 @@
                   tab="org.key_project.sed.ui.main.tab">
             </propertySection>
             <propertySection
-                  class="org.key_project.sed.key.ui.property.PerformanceKeYDebugTargetPropertySection"
+                  class="org.key_project.sed.key.ui.property.CustomizationKeYDebugTargetPropertySection"
                   filter="org.key_project.sed.key.ui.property.KeYDebugTargetTreeFilter"
-                  id="org.key_project.sed.key.ui.property.PerformanceKeYDebugTargetPropertySection"
-                  tab="org.key_project.sed.ui.performance.tab">
+                  id="org.key_project.sed.key.ui.property.CustomizationKeYDebugTargetPropertySection"
+                  tab="org.key_project.sed.ui.customization.tab">
             </propertySection>
          </propertySections>
       </extension>

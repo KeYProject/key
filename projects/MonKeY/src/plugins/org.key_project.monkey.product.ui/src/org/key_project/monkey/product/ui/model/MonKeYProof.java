@@ -326,7 +326,7 @@ public class MonKeYProof extends Bean {
      */
     public void removeProofEnvFromKeY() {
        if (proof != null) {
-          KeYUtil.removeFromProofList(MainWindow.getInstance(), proof.env());
+          KeYUtil.removeFromProofList(MainWindow.getInstance(), proof);
        }
     }
 }

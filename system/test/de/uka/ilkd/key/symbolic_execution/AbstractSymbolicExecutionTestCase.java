@@ -27,7 +27,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
@@ -46,9 +45,9 @@ import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTree
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
@@ -566,7 +565,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @throws ProofInputException Occurred Exception.
     * @throws FileNotFoundException Occurred Exception.
     */
-   protected static SymbolicExecutionEnvironment createSymbolicExecutionEnvironment(File baseDir, String javaPathInBaseDir, String containerTypeName, String methodFullName) throws ProofInputException, FileNotFoundException {
+   protected static SymbolicExecutionEnvironment<CustomConsoleUserInterface> createSymbolicExecutionEnvironment(File baseDir, String javaPathInBaseDir, String containerTypeName, String methodFullName) throws ProofInputException, FileNotFoundException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
@@ -584,88 +583,11 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       Proof proof = ui.createProof(initConfig, input);
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
-      StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, true);
-      proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
-      proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
       // Create symbolic execution tree which contains only the start node at beginning
       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof);
       builder.analyse();
       assertNotNull(builder.getStartNode());
-      return new SymbolicExecutionEnvironment(ui, initConfig, builder);
-   }
-   
-   /**
-    * Contains all instances which are required for symbolic execution.
-    * @author Martin Hentschel
-    */
-   protected static class SymbolicExecutionEnvironment {
-      /**
-       * The {@link CustomConsoleUserInterface} in which the {@link Proof} is loaded.
-       */
-      private CustomConsoleUserInterface ui;
-      
-      /**
-       * The loaded project.
-       */
-      private InitConfig initConfig;
-      
-      /**
-       * The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
-       */
-      private SymbolicExecutionTreeBuilder builder;
-
-      /**
-       * Constructor.
-       * @param ui The {@link CustomConsoleUserInterface} in which the {@link Proof} is loaded.
-       * @param initConfig The loaded project.
-       * @param builder The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
-       */
-      public SymbolicExecutionEnvironment(CustomConsoleUserInterface ui,
-                                          InitConfig initConfig, 
-                                          SymbolicExecutionTreeBuilder builder) {
-         this.ui = ui;
-         this.initConfig = initConfig;
-         this.builder = builder;
-      }
-
-      /**
-       * Returns the {@link CustomConsoleUserInterface} in which the {@link Proof} is loaded.
-       * @return The {@link CustomConsoleUserInterface} in which the {@link Proof} is loaded.
-       */
-      public CustomConsoleUserInterface getUi() {
-         return ui;
-      }
-
-      /**
-       * Returns the loaded project.
-       * @return The loaded project.
-       */
-      public InitConfig getInitConfig() {
-         return initConfig;
-      }
-
-      /**
-       * Returns the {@link Services} of {@link #getInitConfig()}.
-       * @return The {@link Services} of {@link #getInitConfig()}.
-       */
-      public Services getServices() {
-         return initConfig.getServices();
-      }
-
-      /**
-       * Returns the {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
-       * @return The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
-       */
-      public SymbolicExecutionTreeBuilder getBuilder() {
-         return builder;
-      }
-      
-      /**
-       * Returns the {@link Proof} of {@link #getBuilder()}.
-       * @return The {@link Proof} of {@link #getBuilder()}.
-       */
-      public Proof getProof() {
-         return getBuilder().getProof();
-      }
+      return new SymbolicExecutionEnvironment<CustomConsoleUserInterface>(ui, initConfig, builder);
    }
 }

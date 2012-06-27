@@ -1,14 +1,21 @@
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProblemInitializer.ProblemInitializerListener;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -87,5 +94,64 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * </p>
      * @return The instantiated {@link ProblemInitializer}.
      */
-    ProblemInitializer createProblemInitializer();    
+    ProblemInitializer createProblemInitializer();
+    
+    /**
+     * Returns the used {@link KeYMediator}.
+     * @return The used {@link KeYMediator}.
+     */
+    KeYMediator getMediator();
+    
+    /**
+     * Opens a java file in this {@link UserInterface} and returns the instantiated {@link InitConfig}
+     * which can be used to instantiated proofs programmatically.
+     * @param file The java file to open.
+     * @param classPaths The class path entries to use.
+     * @param bootClassPath The boot class path to use.
+     * @return The opened {@link InitConfig}.
+     * @throws FileNotFoundException Occurred Exception.
+     * @throws ProofInputException Occurred Exception.
+     */
+    InitConfig load(File file, List<File> classPaths, File bootClassPath) throws FileNotFoundException, ProofInputException;
+    
+    /**
+     * Instantiates a new {@link Proof} in this {@link UserInterface} for the given
+     * {@link ProofOblInput} based on the {@link InitConfig}.
+     * @param initConfig The {@link InitConfig} which provides the source code.
+     * @param input The description of the {@link Proof} to instantiate.
+     * @return The instantiated {@link Proof}.
+     * @throws ProofInputException Occurred Exception.
+     */
+    Proof createProof(InitConfig initConfig, ProofOblInput input) throws ProofInputException;
+    
+    /**
+     * Checks if the auto mode of this {@link UserInterface} supports the given {@link Proof}.
+     * @param proof The {@link Proof} to check.
+     * @return {@code true} auto mode support proofs, {@code false} auto mode don't support proof.
+     */
+    boolean isAutoModeSupported(Proof proof);
+    
+    /**
+     * Starts the auto mode for the given {@link Proof} and the given {@link Goal}s. 
+     * @param proof The {@link Proof} to start auto mode of.
+     * @param goals The {@link Goal}s to close.
+     */
+    void startAutoMode(Proof proof, ImmutableList<Goal> goals);
+    
+    /**
+     * Stops the currently running auto mode.
+     */
+    void stopAutoMode();
+    
+    /**
+     * Blocks the current {@link Thread} while the auto mode of this
+     * {@link UserInterface} is active.
+     */
+    void waitWhileAutoMode();
+    
+    /**
+     * Removes the given {@link Proof} from this {@link UserInterface}.
+     * @param proof The {@link Proof} to remove.
+     */
+    void removeProof(Proof proof);
 }

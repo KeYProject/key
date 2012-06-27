@@ -7,16 +7,16 @@ import org.key_project.sed.key.ui.util.KeYSEDImages;
 
 /**
  * {@link AbstractLaunchConfigurationTab} implementation for the
- * performance options of the Symbolic Execution Debugger based on KeY.
+ * customization options of the Symbolic Execution Debugger based on KeY.
  * @author Martin Hentschel
  */
-public class KeYPerformanceLaunchConfigurationTab extends AbstractTabbedPropertiesAndLaunchConfigurationTab {
+public class KeYCustomizationLaunchConfigurationTab extends AbstractTabbedPropertiesAndLaunchConfigurationTab {
    /**
     * {@inheritDoc}
     */
    @Override
    public String getName() {
-      return "Performance";
+      return "Customization";
    }
 
    /**
@@ -24,7 +24,7 @@ public class KeYPerformanceLaunchConfigurationTab extends AbstractTabbedProperti
     */
    @Override
    public Image getImage() {
-      return KeYSEDImages.getImage(KeYSEDImages.LAUNCH_PERFORMANCE_TAB_GROUP);
+      return KeYSEDImages.getImage(KeYSEDImages.LAUNCH_CUSTOMIZATION_TAB_GROUP);
    }
 
    /**
@@ -32,6 +32,6 @@ public class KeYPerformanceLaunchConfigurationTab extends AbstractTabbedProperti
     */
    @Override
    protected AbstractTabbedPropertiesAndLaunchConfigurationTabComposite createContentComposite(Composite parent, int style) {
-      return new KeYPerformanceLaunchConfigurationTabComposite(parent, style, this, null);
+      return new KeYCustomizationLaunchConfigurationTabComposite(parent, style, this, null);
    }
 }

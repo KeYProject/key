@@ -48,7 +48,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
       try {
          // Set preference
          SWTWorkbenchBot bot = new SWTWorkbenchBot();
-         SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Debug", "KeY Launch Defaults");
+         SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
          if (showMethodReturnValuesInDebugNodes) {
             preferenceShell.bot().checkBox("Show method return values in debug nodes").select();
          }

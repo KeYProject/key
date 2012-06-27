@@ -1631,13 +1631,9 @@ public class KeyConnection extends MemoryConnection {
          main.getMediator().removeGUIListener(mainGuiListener);
          try {
             final MainWindow oldMain = main;
-            final InitConfig oldInitConfig = initConfig;
             Runnable run = new Runnable() {
                @Override
                public void run() {
-                  if (oldInitConfig != null) {
-                     KeYUtil.removeFromProofList(oldMain, oldInitConfig.getProofEnv());
-                  }
                   if (closeKeYMain && KeYUtil.isProofListEmpty(oldMain) && oldMain.getExitMainAction() != null) {
                      oldMain.getExitMainAction().exitMainWithoutInteraction();
                   }

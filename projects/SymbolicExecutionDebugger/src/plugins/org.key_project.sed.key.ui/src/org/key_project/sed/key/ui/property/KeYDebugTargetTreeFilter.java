@@ -4,7 +4,7 @@ import org.eclipse.jface.viewers.IFilter;
 
 /**
  * {@link IFilter} implementation used to define if a {@link MainKeYDebugTargetPropertySection}
- * or a {@link PerformanceKeYDebugTargetPropertySection} is available or not.
+ * or a {@link CustomizationKeYDebugTargetPropertySection} is available or not.
  * @author Martin Hentschel
  */
 public class KeYDebugTargetTreeFilter implements IFilter {

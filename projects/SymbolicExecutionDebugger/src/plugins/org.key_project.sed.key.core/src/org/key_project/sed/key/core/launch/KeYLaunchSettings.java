@@ -35,6 +35,11 @@ public class KeYLaunchSettings {
     * If it is {@code false} only the name of the returned method is shown in an {@link ISEDMethodReturn}.
     */
    private boolean showMethodReturnValues;
+   
+   /**
+    * Show KeY's main window?
+    */
+   private boolean showKeYMainWindow;
 
    /**
     * Constructor.
@@ -42,15 +47,18 @@ public class KeYLaunchSettings {
     * @param useExistingContract Use an existing contract or generate default contract?
     * @param existingContract The ID of the existing contract to use.
     * @param showMethodReturnValues Show method return values of {@link ISEDMethodReturn} instances?
+    * @param showKeYMainWindow Show KeY's main window?
     */
    public KeYLaunchSettings(IMethod method, 
                             boolean useExistingContract, 
                             String existingContract, 
-                            boolean showMethodReturnValues) {
+                            boolean showMethodReturnValues,
+                            boolean showKeYMainWindow) {
       this.method = method;
       this.useExistingContract = useExistingContract;
       this.existingContract = existingContract;
       this.showMethodReturnValues = showMethodReturnValues;
+      this.showKeYMainWindow = showKeYMainWindow;
    }
 
    /**
@@ -83,5 +91,13 @@ public class KeYLaunchSettings {
     */
    public boolean isShowMethodReturnValues() {
       return showMethodReturnValues;
+   }
+
+   /**
+    * Checks if KeY's main window should be shown.
+    * @return Show KeY's main window?
+    */
+   public boolean isShowKeYMainWindow() {
+      return showKeYMainWindow;
    }
 }

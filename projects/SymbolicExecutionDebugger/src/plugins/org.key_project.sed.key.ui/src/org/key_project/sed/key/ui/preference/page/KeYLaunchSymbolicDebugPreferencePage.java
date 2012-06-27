@@ -43,5 +43,11 @@ public class KeYLaunchSymbolicDebugPreferencePage extends FieldEditorPreferenceP
       BooleanFieldEditor edit = new BooleanFieldEditor(KeYSEDPreferences.SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, "&Show method return values in debug nodes", SWT.NONE, spacer);
       edit.fillIntoGrid(spacer, 2);
       addField(edit);
+
+      group = SWTFactory.createGroup(getFieldEditorParent(), "KeY", 1, 1, GridData.FILL_HORIZONTAL);
+      spacer = SWTFactory.createComposite(group, 1, 1, GridData.FILL_HORIZONTAL);
+      edit = new BooleanFieldEditor(KeYSEDPreferences.SHOW_KEY_MAIN_WINDOW, "Show KeY's &main window (only for experienced user)", SWT.NONE, spacer);
+      edit.fillIntoGrid(spacer, 2);
+      addField(edit);
    }
 }

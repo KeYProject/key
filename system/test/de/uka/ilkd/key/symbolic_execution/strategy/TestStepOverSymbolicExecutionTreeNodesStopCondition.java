@@ -8,6 +8,8 @@ import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * Tests for {@link StepOverSymbolicExecutionTreeNodesStopCondition} and
@@ -29,7 +31,7 @@ public class TestStepOverSymbolicExecutionTreeNodesStopCondition extends Abstrac
       String oraclePathInkeyRepDirectoryFile = "examples/_testcase/set/stepOverOnTwoBranches/oracle/StepOverOnTwoBranches";
       String oracleFileExtension = ".xml";
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
+      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName);
       // Make sure that initial tree is valid
       int oracleIndex = 0;
       assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);

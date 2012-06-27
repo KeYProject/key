@@ -23,6 +23,11 @@ public class KeYSEDPreferences {
     * Preference key to show method return values in debug nodes.
     */
    public static final String SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES = "org.key_project.sed.key.core.preference.showMethodReturnValuesInDebugNodes";
+
+   /**
+    * Preference key to define if KeY's main window should be shown or not.
+    */
+   public static final String SHOW_KEY_MAIN_WINDOW = "org.key_project.sed.key.core.preference.showKeYMainWindow";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -94,5 +99,37 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultShowMethodReturnValuesInDebugNode(boolean defaultValue) {
       getStore().setDefault(SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, defaultValue);
+   }
+   
+   /**
+    * Checks if KeY's main window should be shown or not.
+    * @return Show or hide KeY's main window.
+    */
+   public static boolean isShowKeYMainWindow() {
+      return getStore().getBoolean(SHOW_KEY_MAIN_WINDOW);
+   }
+   
+   /**
+    * Checks if KeY's main window should be shown or not by default.
+    * @return Show or hide KeY's main window.
+    */
+   public static boolean isDefaultShowKeYMainWindow() {
+      return getStore().getDefaultBoolean(SHOW_KEY_MAIN_WINDOW);
+   }
+   
+   /**
+    * Sets if KeY's main window should be shown or not.
+    * @param value Show or hide KeY's main window.
+    */
+   public static void setShowKeYMainWindow(boolean value) {
+      getStore().setValue(SHOW_KEY_MAIN_WINDOW, value);
+   }
+   
+   /**
+    * Sets if KeY's main window should be shown or not by default.
+    * @param defaultValue Show or hide KeY's main window.
+    */
+   public static void setDefaultShowKeYMainWindow(boolean defaultValue) {
+      getStore().setDefault(SHOW_KEY_MAIN_WINDOW, defaultValue);
    }
 }

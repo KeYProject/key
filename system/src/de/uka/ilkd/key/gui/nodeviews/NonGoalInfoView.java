@@ -201,7 +201,7 @@ public class NonGoalInfoView extends JTextArea {
        SequentPrintFilter filter = new IdentitySequentPrintFilter(node.sequent());
        LogicPrinter printer = new LogicPrinter(new ProgramPrinter(null), 
                                                mediator.getNotationInfo(), 
-                                               mediator.getServices());
+                                               node.proof().getServices());
        return computeText(mediator, node, filter, printer);
     }
 
