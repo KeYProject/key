@@ -22,7 +22,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -141,7 +140,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
      * Class axioms do not have targets (in opposition to represents clauses)
      */
     @Override
-    public ObserverFunction getTarget() {
+    public IObserverFunction getTarget() {
 	return null;
     }
 

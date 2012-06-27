@@ -36,8 +36,8 @@ import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -204,11 +204,11 @@ public class ClassTree extends JTree {
             	= targets.toArray(new IObserverFunction[targets.size()]);            
             Arrays.sort(targetsArr, new Comparator<IObserverFunction>() {
         	public int compare(IObserverFunction o1, IObserverFunction o2) {
-        	    if(o1 instanceof ProgramMethod 
-        	       && !(o2 instanceof ProgramMethod)) {
+        	    if(o1 instanceof IProgramMethod 
+        	       && !(o2 instanceof IProgramMethod)) {
         		return -1;
-        	    } else if(!(o1 instanceof ProgramMethod) 
-        		      && o2 instanceof ProgramMethod) {
+        	    } else if(!(o1 instanceof IProgramMethod) 
+        		      && o2 instanceof IProgramMethod) {
         		return 1;
         	    } else {
         		String s1 = o1.name() instanceof ProgramElementName 
@@ -258,7 +258,7 @@ public class ClassTree extends JTree {
         } else {
             sb.append(ov.name());
         }
-        if(ov.getNumParams() > 0 || ov instanceof ProgramMethod) {
+        if(ov.getNumParams() > 0 || ov instanceof IProgramMethod) {
             sb.append("(");
         }
         for(KeYJavaType paramType : ov.getParamTypes()) {
@@ -267,7 +267,7 @@ public class ClassTree extends JTree {
         if(ov.getNumParams() > 0) {
             sb.setLength(sb.length() - 2);
         }
-        if(ov.getNumParams() > 0 || ov instanceof ProgramMethod) {
+        if(ov.getNumParams() > 0 || ov instanceof IProgramMethod) {
             sb.append(")");
         }
         return sb.toString();

@@ -13,7 +13,10 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -41,7 +44,7 @@ public final class ObserverCondition implements VariableCondition {
 	
 	if(obsInst == null) {
 	    return mc;
-	} else if(!(obsInst.op() instanceof ObserverFunction)) { 
+	} else if(!(obsInst.op() instanceof IObserverFunction)) { 
 	    return null;
 	} 
 	

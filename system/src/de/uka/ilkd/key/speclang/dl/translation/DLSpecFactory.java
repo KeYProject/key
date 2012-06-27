@@ -10,8 +10,8 @@
 
 package de.uka.ilkd.key.speclang.dl.translation;
 
-import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -25,11 +25,21 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.ClassInvariantImpl;
+import de.uka.ilkd.key.speclang.ContractFactory;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 
 /**
@@ -119,7 +129,7 @@ public final class DLSpecFactory {
     }
 
     
-    private ProgramMethod extractProgramMethod(
+    private IProgramMethod extractProgramMethod(
 	    			UseOperationContractRule.Instantiation inst) 
     		throws ProofInputException {
 	return inst.pm;
@@ -243,7 +253,7 @@ public final class DLSpecFactory {
 	LocationVariable heapAtPreVar = extractHeapAtPre(fma);
 	ProgramVariable excVar = extractExcVar(fma);	
 	final UseOperationContractRule.Instantiation inst = extractInst(fma);
-	final ProgramMethod pm = extractProgramMethod(inst);
+	final IProgramMethod pm = extractProgramMethod(inst);
 	final Modality modality = extractModality(inst);
 	final ProgramVariable selfVar = pm.isConstructor() 
 	                                ? extractResultVar(inst) 

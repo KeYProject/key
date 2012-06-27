@@ -16,7 +16,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -116,9 +116,9 @@ public final class DependencyContractPO extends AbstractPO
     @Override
     public void readProblem() throws ProofInputException {
 	IObserverFunction target = contract.getTarget();
-	if(target instanceof ProgramMethod) {
+	if(target instanceof IProgramMethod) {
 	    target = javaInfo.getToplevelPM(contract.getKJT(), 
-		    			    (ProgramMethod)target);
+		    			    (IProgramMethod)target);
 	    // FIXME: for some reason the above method call returns null now and then, the following line (hopefully) is a work-around
 	    if (target == null) target = contract.getTarget();
 	}

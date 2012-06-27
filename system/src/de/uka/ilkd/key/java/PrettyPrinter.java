@@ -145,7 +145,6 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -977,7 +976,7 @@ public class PrettyPrinter {
 	printFooter(x);
     }
     
-    public void printProgramMethod(ProgramMethod x)
+    public void printProgramMethod(IProgramMethod x)
 	throws java.io.IOException {
 
         printHeader(x);
@@ -1460,7 +1459,7 @@ public class PrettyPrinter {
     protected boolean containsDefaultConstructor(ImmutableArray<MemberDeclaration> members){
 	for(int i=0; i<members.size(); i++){
 	    MemberDeclaration md = members.get(i);
-	    if(md instanceof ProgramMethod){
+	    if(md instanceof IProgramMethod){
 		md = ((IProgramMethod) md).getMethodDeclaration();
 	    }
 	    if((md instanceof ConstructorDeclaration) && 
@@ -2718,7 +2717,7 @@ public class PrettyPrinter {
 	
     }
 
-    public void printMethod(ProgramMethod x) throws java.io.IOException {
+    public void printMethod(IProgramMethod x) throws java.io.IOException {
 	//        printHeader(x);
 	write(x.name().toString());
 	//        printFooter(x);

@@ -13,10 +13,17 @@ package de.uka.ilkd.key.logic;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.ContextStatementBlock;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ScopeDefiningElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -29,7 +36,6 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTWalker;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
@@ -39,11 +45,11 @@ import de.uka.ilkd.key.proof.InstantiationProposer;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.NewVarcond;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -911,12 +917,12 @@ public abstract class VariableNamer implements InstantiationProposer {
 	}
 
 	protected void walk(ProgramElement node) {
-	    //ignore ExecutionContext and ProgramMethod branches;
+	    //ignore ExecutionContext and IProgramMethod branches;
 	    //ignore anything rooted at a depth less or equal than the depth
 	    //of the scope containing the declaration (except for this
 	    //"declaration scope" itself);
 	    if(node instanceof ExecutionContext
-		|| node instanceof ProgramMethod) {
+		|| node instanceof IProgramMethod) {
 		return;
 	    } else if(node instanceof ScopeDefiningElement) {
 		currentScopeDepth = depth();

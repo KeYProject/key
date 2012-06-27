@@ -584,7 +584,7 @@ public class JMLSpecFactory {
      * Generate functional operation contracts.
      * 
      * @param name  base name of the contract (does not have to be unique)
-     * @param pm    the ProgramMethod to which the contract belongs
+     * @param pm    the IProgramMethod to which the contract belongs
      * @param progVars  pre-generated collection of variables for the receiver
      *          object, operation parameters, operation result, thrown
      *          exception and the pre-heap
@@ -642,7 +642,7 @@ public class JMLSpecFactory {
     /**
      * Generate dependency operation contract out of the JML accessible clause.
      * 
-     * @param pm    the ProgramMethod to which the contract belongs
+     * @param pm    the IProgramMethod to which the contract belongs
      * @param progVars  collection of variables for the receiver object,
      *          operation parameters, operation result, thrown exception
      *          and the pre-heap

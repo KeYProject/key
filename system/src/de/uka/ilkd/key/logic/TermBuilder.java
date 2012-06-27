@@ -203,7 +203,7 @@ public final class TermBuilder {
         for(int i = 0, n = obs.getNumParams(); i < n; i++) {
             final KeYJavaType paramType = obs.getParamType(i);
             String name; 
-            if(obs instanceof ProgramMethod) {
+            if(obs instanceof IProgramMethod) {
         	name = ((IProgramMethod)obs).getParameterDeclarationAt(i)
         	                           .getVariableSpecification()
         	                           .getName();

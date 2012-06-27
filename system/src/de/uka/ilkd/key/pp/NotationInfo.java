@@ -20,16 +20,16 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
@@ -264,8 +264,8 @@ public final class NotationInfo {
 	//heap operators
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	tbl.put(HeapLDT.SELECT_NAME, new Notation.SelectNotation());
-	tbl.put(ObserverFunction.class, new Notation.ObserverNotation());
-	tbl.put(ProgramMethod.class, new Notation.ObserverNotation());
+	tbl.put(IObserverFunction.class, new Notation.ObserverNotation());
+	tbl.put(IProgramMethod.class, new Notation.ObserverNotation());
 	tbl.put(heapLDT.getLength(), new Notation.LengthNotation());
 	
 	//set operators
@@ -368,6 +368,20 @@ public final class NotationInfo {
             if(result != null) {
                 return result;
             }
+        }
+        
+        if(op instanceof IProgramMethod) {
+           result = notationTable.get(IProgramMethod.class);
+           if(result != null) {
+               return result;
+           }
+        }
+
+        if(op instanceof IObserverFunction) {
+           result = notationTable.get(IObserverFunction.class);
+           if(result != null) {
+               return result;
+           }
         }
 
         if(op instanceof SortDependingFunction) {

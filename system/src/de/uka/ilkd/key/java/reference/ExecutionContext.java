@@ -16,7 +16,6 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Reference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.ExtList;
 
 public class ExecutionContext
@@ -42,7 +41,7 @@ public class ExecutionContext
      * creates an execution context reference
      * @param classContext the TypeReference refering to the next enclosing
      * class 
-    * @param methodContext the ProgramMethod referring to the currently active method
+    * @param methodContext the IProgramMethod referring to the currently active method
      * @param runtimeInstance a ReferencePrefix to the object that
      * is currently active/executed
      */
@@ -61,7 +60,7 @@ public class ExecutionContext
     public ExecutionContext(ExtList children) {
 	this.classContext = children.get(TypeReference.class);	
 	children.remove(this.classContext);
-	this.methodContext = children.get(ProgramMethod.class);
+	this.methodContext = children.get(IProgramMethod.class);
 	this.runtimeInstance = children.get(ReferencePrefix.class);
     }
 

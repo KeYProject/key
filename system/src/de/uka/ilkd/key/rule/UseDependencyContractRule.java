@@ -32,7 +32,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -268,7 +267,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     
     private static Map<Term, PosInOccurrence> collectBaseOccs(Term focus, 
 	    					       Sequent seq) {
-	assert focus.op() instanceof ObserverFunction;
+	assert focus.op() instanceof IObserverFunction;
 	final Map<Term, PosInOccurrence> result 
 		= new LinkedHashMap<Term, PosInOccurrence>();
 	for(SequentFormula cf : seq.antecedent()) {
@@ -289,7 +288,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    				  Sequent seq,
 	    				  Services services) {
 	final Term focus = pos.subTerm();
-	assert focus.op() instanceof ObserverFunction;
+	assert focus.op() instanceof IObserverFunction;
 	
 	final List<PosInOccurrence> result 
 		= new LinkedList<PosInOccurrence>();
@@ -344,7 +343,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     public static ImmutableSet<Contract> getApplicableContracts(
 	    					Services services,  
                                                 KeYJavaType kjt,
-                                                ObserverFunction target) {
+                                                IObserverFunction target) {
         ImmutableSet<Contract> result 
         	= services.getSpecificationRepository().getContracts(kjt, 
         							     target);
@@ -371,7 +370,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	
 	//top level symbol must be observer
 	final Term focus = pio.subTerm();
-	if(!(focus.op() instanceof ObserverFunction)) {
+	if(!(focus.op() instanceof IObserverFunction)) {
 	    return false;
 	}
 	
@@ -388,7 +387,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	}
 
 	//there must be contracts for the observer
-	final ObserverFunction target = (ObserverFunction) focus.op();
+	final IObserverFunction target = (IObserverFunction) focus.op();
 	final KeYJavaType kjt 
 		= target.isStatic() 
 		  ? target.getContainerType()

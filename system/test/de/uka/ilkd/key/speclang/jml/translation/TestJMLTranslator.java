@@ -10,8 +10,8 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.io.File;
-import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -26,7 +26,15 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -201,7 +209,7 @@ public class TestJMLTranslator extends TestCase {
         Term result = null;
 
         ProgramVariable selfVar = buildSelfVarAsProgVar();
-        ProgramMethod getOne = javaInfo.getProgramMethod(testClassType,
+        IProgramMethod getOne = javaInfo.getProgramMethod(testClassType,
                                                          "getOne",
                                                          ImmutableSLList.<KeYJavaType>nil(),
                                                          testClassType);

@@ -14,18 +14,49 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.MethodOrConstructorReference;
+import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.reference.SuperReference;
+import de.uka.ilkd.key.java.reference.ThisReference;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInProgram;
+import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -142,12 +173,12 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
     
     
-    private static ProgramMethod getProgramMethod(
+    private static IProgramMethod getProgramMethod(
             MethodOrConstructorReference mr,
             KeYJavaType staticType, 
             ExecutionContext ec,
             Services services) {
-        ProgramMethod result;	
+        IProgramMethod result;	
         if(mr instanceof MethodReference) { //from MethodCall.java
             MethodReference methRef = (MethodReference) mr;
             if(ec != null) {
@@ -181,7 +212,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     
     
     private static Term getActualSelf(MethodOrConstructorReference mr,
-	    		              ProgramMethod pm,
+	    		              IProgramMethod pm,
 	    		              ExecutionContext ec, 
 	    		              Services services) {
 	final TypeConverter tc = services.getTypeConverter();
@@ -237,7 +268,7 @@ public final class UseOperationContractRule implements BuiltInRule {
      */
     private static ImmutableSet<FunctionalOperationContract> getApplicableContracts(
 	    						  						  Services services, 
-                                                          ProgramMethod pm, 
+                                                          IProgramMethod pm, 
                                                           KeYJavaType kjt,
                                                           Modality modality) {
         ImmutableSet<FunctionalOperationContract> result 
@@ -265,7 +296,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     /**
      * @return (assumption, anon update, anon heap)
      */
-    private static Triple<Term,Term,Term> createAnonUpdate(LocationVariable heap, ProgramMethod pm, 
+    private static Triple<Term,Term,Term> createAnonUpdate(LocationVariable heap, IProgramMethod pm, 
 	                                     	    	   Term mod, 
 	                                     	    	   Services services) {
 	assert pm != null;
@@ -290,7 +321,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     } 
     
     
-    private static Term getFreePost(ProgramMethod pm,
+    private static Term getFreePost(IProgramMethod pm,
 	    		     	    KeYJavaType kjt,
 	    		     	    Term resultTerm,
 	    		     	    Term selfTerm,
@@ -444,7 +475,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	//collect further information
 	final KeYJavaType staticType = getStaticPrefixType(mr, services, ec);
 	assert staticType != null;
-	final ProgramMethod pm = getProgramMethod(mr, 
+	final IProgramMethod pm = getProgramMethod(mr, 
 	        staticType,
 	        ec, 
 	        services);
@@ -808,7 +839,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	public final Term actualSelf;	
 	public final KeYJavaType staticType;	
 	public final MethodOrConstructorReference mr;
-	public final ProgramMethod pm;
+	public final IProgramMethod pm;
 	public final ImmutableList<Term> actualParams;
 	
 	public Instantiation(Term u, 
@@ -818,7 +849,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 			     Term actualSelf,
 			     KeYJavaType staticType,
 			     MethodOrConstructorReference mr,
-			     ProgramMethod pm,
+			     IProgramMethod pm,
 			     ImmutableList<Term> actualParams) {
 	    assert u != null;
 	    assert u.sort() == Sort.UPDATE;

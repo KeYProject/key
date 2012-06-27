@@ -18,7 +18,6 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
@@ -38,7 +37,7 @@ import de.uka.ilkd.key.util.Pair;
 public final class PartialInvAxiom extends ClassAxiom {
     
     private final ClassInvariant inv;
-    private final ObserverFunction target;
+    private final IObserverFunction target;
     
     /** Creates a new class axiom.
      * 
@@ -67,7 +66,7 @@ public final class PartialInvAxiom extends ClassAxiom {
 
     
     @Override
-    public ObserverFunction getTarget() {
+    public IObserverFunction getTarget() {
 	return target;
     }
     

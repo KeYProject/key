@@ -255,10 +255,10 @@ public class Recoder2KeYConverter {
     /**
      * methodsDeclaring contains the recoder method declarations as keys that
      * have been started to convert but are not yet finished. The mapped value
-     * is the reference to the later completed ProgramMethod.
+     * is the reference to the later completed IProgramMethod.
      */
-    private HashMap<recoder.java.declaration.MethodDeclaration, ProgramMethod> methodsDeclaring = 
-	new HashMap<recoder.java.declaration.MethodDeclaration, ProgramMethod>();
+    private HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod> methodsDeclaring = 
+	new HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod>();
 
     /**
      * locClass2finalVar stores the final variables that need to be passed
@@ -1090,7 +1090,7 @@ public class Recoder2KeYConverter {
     }
 
     /**
-     * convert a recoder ConstructorDeclaration to a KeY ProgramMethod
+     * convert a recoder ConstructorDeclaration to a KeY IProgramMethod
      * (especially the declaration type of its parent is determined and handed
      * over)
      */
@@ -1107,7 +1107,7 @@ public class Recoder2KeYConverter {
                             ? Sort.ANY
                             : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();    
         final KeYJavaType containerKJT = getKeYJavaType(cont);
-        ProgramMethod result 
+        IProgramMethod result 
         	= new ProgramMethod(consDecl,
         			    containerKJT, 
         			    KeYJavaType.VOID_TYPE,
@@ -1118,7 +1118,7 @@ public class Recoder2KeYConverter {
     }
 
     /**
-     * convert a recoder DefaultConstructor to a KeY ProgramMethod (especially
+     * convert a recoder DefaultConstructor to a KeY IProgramMethod (especially
      * the declaration type of its parent is determined and handed over)
      */
     public IProgramMethod convert(recoder.abstraction.DefaultConstructor dc) {
@@ -1131,7 +1131,7 @@ public class Recoder2KeYConverter {
                             ? Sort.ANY
                             : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();        
         final KeYJavaType containerKJT = getKeYJavaType(cont);
-        ProgramMethod result = new ProgramMethod(consDecl,
+        IProgramMethod result = new ProgramMethod(consDecl,
                 containerKJT, KeYJavaType.VOID_TYPE,
                 PositionInfo.UNDEFINED,
                 heapSort);
@@ -1224,16 +1224,16 @@ public class Recoder2KeYConverter {
     }
 
     /**
-     * convert a recoder MethodDeclaration to a KeY ProgramMethod (especially
+     * convert a recoder MethodDeclaration to a KeY IProgramMethod (especially
      * the declaration type of its parent is determined and handed over)
      */
     public IProgramMethod convert(recoder.java.declaration.MethodDeclaration md) {
-        ProgramMethod result = null;
+        IProgramMethod result = null;
 
         // methodsDeclaring contains the recoder method declarations as keys
         // that have been started to convert but are not yet finished.
         // The mapped value is the reference to the later completed
-        // ProgramMethod.
+        // IProgramMethod.
         if (methodsDeclaring.containsKey(md)) {
             // a recursive call from a method reference
             return methodsDeclaring.get(md);
@@ -1285,7 +1285,7 @@ public class Recoder2KeYConverter {
             insertToMap(md, result);
         }
         methodsDeclaring.remove(md);
-        result = (ProgramMethod) getMapping().toKeY(md);
+        result = (IProgramMethod) getMapping().toKeY(md);
         return result;
     }
 
@@ -2042,7 +2042,7 @@ public class Recoder2KeYConverter {
     public ExecutionContext convert(de.uka.ilkd.key.java.recoderext.ExecutionContext arg) {
        TypeReference classContext = convert(arg.getTypeReference()); 
 
-       ProgramMethod methodContext = null;
+       IProgramMethod methodContext = null;
        if (arg.getMethodContext() != null) {
           JavaInfo jInfo = services.getJavaInfo();
           

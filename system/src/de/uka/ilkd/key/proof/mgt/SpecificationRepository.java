@@ -40,7 +40,6 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
@@ -129,10 +128,10 @@ public final class SpecificationRepository {
 	    				            KeYJavaType kjt) {
 	assert obs != null;
 	assert kjt != null;
-	if(!(obs instanceof ProgramMethod) || obs.getContainerType().equals(kjt)) {
+	if(!(obs instanceof IProgramMethod) || obs.getContainerType().equals(kjt)) {
 	    return unlimitObs(obs);
 	}
-	final ProgramMethod pm = (ProgramMethod) obs;
+	final IProgramMethod pm = (IProgramMethod) obs;
 	if(pm.isConstructor()) {
 	    assert pm.getContainerType().equals(kjt);
 	    return pm;
@@ -161,8 +160,8 @@ public final class SpecificationRepository {
 	for(KeYJavaType sup : services.getJavaInfo()
 		                      .getAllSupertypes(kjt)
 		                      .removeAll(kjt)) {
-	    final ProgramMethod result 
-	    	= (ProgramMethod) getCanonicalFormForKJT(obs, sup);
+	    final IProgramMethod result 
+	    	= (IProgramMethod) getCanonicalFormForKJT(obs, sup);
 	    if(result != null) {
 		return result;
 	    }
@@ -201,7 +200,7 @@ public final class SpecificationRepository {
     
     private ImmutableSet<Pair<KeYJavaType,IObserverFunction>> 
     		getOverridingTargets(KeYJavaType kjt, IObserverFunction target) {
-	if(target instanceof ProgramMethod) {
+	if(target instanceof IProgramMethod) {
 	    return getOverridingMethods(kjt, (IProgramMethod)target);
 	} else {
 	    ImmutableSet<Pair<KeYJavaType,IObserverFunction>> result 
@@ -539,7 +538,7 @@ public final class SpecificationRepository {
      */
     public ImmutableSet<FunctionalOperationContract> getOperationContracts(
 	    				       KeYJavaType kjt,	    
-	    				       ProgramMethod pm,
+	    				       IProgramMethod pm,
 	    				       Modality modality) {
 	ImmutableSet<FunctionalOperationContract> result = getOperationContracts(kjt, pm);
 	final boolean transactionModality = (modality == Modality.DIA_TRANSACTION || modality == Modality.BOX_TRANSACTION);
@@ -815,7 +814,7 @@ public final class SpecificationRepository {
 	invDef = TB.tf().createTerm(Equality.EQV, 
 		                    TB.inv(services, TB.var(selfVar)), 
 		                    invDef);
-	final ObserverFunction invSymbol = services.getJavaInfo().getInv();
+	final IObserverFunction invSymbol = services.getJavaInfo().getInv();
 	final ClassAxiom invRepresentsAxiom 
 		= new RepresentsAxiom("Class invariant axiom for " 
 			                 + kjt.getFullName(),
@@ -1075,7 +1074,7 @@ public final class SpecificationRepository {
 	    					IObserverFunction obs) {
 	assert limitedToUnlimited.get(obs) == null 
 	       : " observer is already limited: " + obs;
-	if(obs instanceof IProgramMethod) { // TODO Was the exact class match correctly converted into IProtramMethod?
+	if(!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) { // TODO Was the exact class match "obs.getClass() != ObserverFunction.class" correctly converted into IProtramMethod?
 	    return null;
 	}
 	

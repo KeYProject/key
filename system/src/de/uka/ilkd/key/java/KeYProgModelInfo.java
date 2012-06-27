@@ -37,7 +37,6 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
@@ -48,8 +47,8 @@ public class KeYProgModelInfo{
     private KeYCrossReferenceServiceConfiguration sc = null;
     private KeYRecoderMapping mapping;
     private TypeConverter typeConverter;
-    private HashMap<KeYJavaType, HashMap<String, ProgramMethod>> implicits = 
-        new HashMap<KeYJavaType, HashMap<String, ProgramMethod>>();
+    private HashMap<KeYJavaType, HashMap<String, IProgramMethod>> implicits = 
+        new HashMap<KeYJavaType, HashMap<String, IProgramMethod>>();
     private KeYExceptionHandler exceptionHandler = null;
     
     public KeYProgModelInfo(Services services, TypeConverter typeConverter, 
@@ -133,7 +132,7 @@ public class KeYProgModelInfo{
         ImmutableList<IProgramMethod> result = ImmutableSLList.<IProgramMethod>nil();
         for (int i=rmethods.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rmethods.get(i);
-            ProgramMethod m=(ProgramMethod)rec2key().toKeY(rm);
+            IProgramMethod m=(IProgramMethod)rec2key().toKeY(rm);
 	    if (m!=null) {
 		result=result.prepend(m);
 	    } 
@@ -378,7 +377,7 @@ public class KeYProgModelInfo{
     }
 
 	/**
-	 * Returns the ProgramMethods locally defined within the given
+	 * Returns the IProgramMethods locally defined within the given
 	 * class type. If the type is represented in source code,
 	 * the returned list matches the syntactic order.
 	 * @param ct a class type.
@@ -389,7 +388,7 @@ public class KeYProgModelInfo{
         for (int i=rml.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rml.get(i);
 	    if(!(rm instanceof recoder.bytecode.MethodInfo)){
-		result = result.prepend((ProgramMethod) rec2key().toKeY(rm));
+		result = result.prepend((IProgramMethod) rec2key().toKeY(rm));
 	    }
         }
         return result;
@@ -407,7 +406,7 @@ public class KeYProgModelInfo{
         ImmutableList<IProgramMethod> result = ImmutableSLList.<IProgramMethod>nil();
         for (int i=rcl.size()-1; i>=0; i--) {
             recoder.abstraction.Method rm=rcl.get(i);
-	    ProgramMethod m=(ProgramMethod) rec2key().toKeY(rm);
+	    IProgramMethod m=(IProgramMethod) rec2key().toKeY(rm);
 	    if(m != null){
 		result=result.prepend(m);
 	    }
@@ -422,18 +421,18 @@ public class KeYProgModelInfo{
      * @param signature IList<KeYJavaType> representing the signature of the constructor
      * @return the most specific constructor declared in the given type 
      */
-    public ProgramMethod getConstructor(KeYJavaType ct, 
+    public IProgramMethod getConstructor(KeYJavaType ct, 
 				       ImmutableList<KeYJavaType> signature) {
         List<? extends recoder.abstraction.Constructor> constructors =
             getRecoderConstructors(ct, signature);
         if (constructors.size()==1) {
-            return (ProgramMethod) rec2key().toKeY(constructors.get(0));
+            return (IProgramMethod) rec2key().toKeY(constructors.get(0));
 //	    Object o = rec2key().toKeY(constructors.get(0));
 //	    if(o instanceof Constructor){
 //		return (Constructor) o;
 //	    }
-//	    if(o instanceof ProgramMethod){
-//		return (Constructor) ((ProgramMethod) o).getMethodDeclaration();
+//	    if(o instanceof IProgramMethod){
+//		return (Constructor) ((IProgramMethod) o).getMethodDeclaration();
 //	    }
         }
         if (constructors.size()==0) {
@@ -447,10 +446,10 @@ public class KeYProgModelInfo{
     /**
      * retrieves implicit methods
      */
-    private ProgramMethod getImplicitMethod(KeYJavaType ct, String name) {
-	final HashMap<String, ProgramMethod> m = implicits.get(ct);
+    private IProgramMethod getImplicitMethod(KeYJavaType ct, String name) {
+	final HashMap<String, IProgramMethod> m = implicits.get(ct);
 	if (m!=null) {
-	    final ProgramMethod pm = m.get(name);
+	    final IProgramMethod pm = m.get(name);
 	    if (pm!=null) {
 		return pm;
 	    }
@@ -459,9 +458,9 @@ public class KeYProgModelInfo{
  	ImmutableArray<MemberDeclaration> members = cd.getMembers();
  	for (int i = 0; i<members.size(); i++) {
  	    final MemberDeclaration member = members.get(i);
- 	    if (member instanceof ProgramMethod &&
+ 	    if (member instanceof IProgramMethod &&
  		((IProgramMethod)member).getMethodDeclaration().getName().equals(name)) {
- 		return (ProgramMethod)member;
+ 		return (IProgramMethod)member;
  	    }
  	}
  	Debug.out("keyprogmodelinfo: implicit method %1 not found in %2 (%1, %2) ", 
@@ -471,17 +470,17 @@ public class KeYProgModelInfo{
 
 
     /**
-     * Returns the programmethods with the given name that is defined
+     * Returns the IProgramMethods with the given name that is defined
      * in the given type or in a supertype where it is visible for the
      * given type, and has a signature that is compatible to the given one.
      * @param ct the class type to get methods from.
      * @param m the name of the methods in question.
      * @param signature the statical type signature of a callee.
-     * @return the programmethod, if one is found,
-     * null if none or more than one programmethod is found (in this case
+     * @return the IProgramMethods, if one is found,
+     * null if none or more than one IProgramMethod is found (in this case
      * a debug output is written to console).
      */
-    public ProgramMethod getProgramMethod(KeYJavaType ct, String m,
+    public IProgramMethod getProgramMethod(KeYJavaType ct, String m,
 					  ImmutableList<? extends Type> signature,
 					  KeYJavaType context) {
 	if (ct.getJavaType() instanceof ArrayType || 
@@ -493,7 +492,7 @@ public class KeYProgModelInfo{
             getRecoderMethods(ct, m, signature, context);		
 
         if (methodlist.size()==1) {
-            return (ProgramMethod) rec2key().toKeY(methodlist.get(0));
+            return (IProgramMethod) rec2key().toKeY(methodlist.get(0));
         } else if (methodlist.size()==0) {
             Debug.out("javainfo: Program Method not found: ", m);
             return null;
@@ -820,10 +819,10 @@ public class KeYProgModelInfo{
 	return false;
     }
 
-    public void putImplicitMethod(ProgramMethod m, KeYJavaType t) {
-	HashMap<String, ProgramMethod> map = implicits.get(t);
+    public void putImplicitMethod(IProgramMethod m, KeYJavaType t) {
+	HashMap<String, IProgramMethod> map = implicits.get(t);
 	if (map==null) {
-	    map = new HashMap<String, ProgramMethod>();
+	    map = new HashMap<String, IProgramMethod>();
 	    implicits.put(t, map);
 	}
 	map.put(m.name().toString(), m);

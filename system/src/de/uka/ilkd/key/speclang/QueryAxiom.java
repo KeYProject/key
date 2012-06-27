@@ -33,7 +33,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
@@ -50,7 +49,7 @@ import de.uka.ilkd.key.util.Pair;
 
 /**
  * A class axiom that connects an observer symbol representing a Java
- * method (i.e., an object of type ProgramMethod), with the corresponding
+ * method (i.e., an object of type IProgramMethod), with the corresponding
  * method body.
  */
 public final class QueryAxiom extends ClassAxiom {
@@ -64,9 +63,8 @@ public final class QueryAxiom extends ClassAxiom {
 	assert target != null;
 	assert target.getReturnType() != null;	
 	assert kjt != null;
-	assert target instanceof ProgramMethod;
 	this.name = name;
-	this.target = (ProgramMethod)target;	
+	this.target = (IProgramMethod)target;	
 	this.kjt = kjt;
     }
     
@@ -177,7 +175,7 @@ public final class QueryAxiom extends ClassAxiom {
 		                 .append(target.getParamTypes()
 		                	       .toArray(
 		                      new KeYJavaType[target.getNumParams()]));	
-	final ProgramMethod targetImpl 
+	final IProgramMethod targetImpl 
 		= services.getJavaInfo().getProgramMethod(kjt, 
 							  target.getName(), 
 							  sig, 

@@ -16,8 +16,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 /**
  * Resolver for method calls in specifications.
@@ -55,7 +55,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
         
         ImmutableList<KeYJavaType> signature = parameters.getSignature(javaInfo.getServices());
         
-        ProgramMethod pm = null;
+        IProgramMethod pm = null;
         Term recTerm = receiver.getTerm(); 
         
         

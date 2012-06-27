@@ -32,12 +32,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -108,7 +108,7 @@ public class QueryExpand implements BuiltInRule {
      */
     public Term queryEvalTerm(Services services, Term query, LogicVariable[] instVars){
     	
-    	   final ProgramMethod method = (ProgramMethod)query.op();
+    	   final IProgramMethod method = (IProgramMethod)query.op();
     	   
            final ImmutableArray<ProgramVariable> args = getRegisteredArgumentVariables(method.getParameters(), services);
 
@@ -316,7 +316,7 @@ public class QueryExpand implements BuiltInRule {
     	}
     	final Operator op = t.op();
     	final int nextLevel = level+1;
-    	if(op instanceof ProgramMethod){ //Query found
+    	if(op instanceof IProgramMethod){ //Query found
     		//System.out.println("Query found:"+t+ " position:"+(positive?"positive":"negative"));
     		QueryEvalPos qep = new QueryEvalPos(t, (Vector<Integer>)pathInTerm.clone(), qepLevel+1, instVars, qepIsPositive);
     		qeps.add(qep);
@@ -392,7 +392,7 @@ public class QueryExpand implements BuiltInRule {
     		//System.out.println("collectQueriesRec encountered javaBlock.");
     		return;
     	}
-    	if(t.op() instanceof ProgramMethod){ //Query found
+    	if(t.op() instanceof IProgramMethod){ //Query found
     		//System.out.println("Query found:"+t);
     		result.add(t);
     		return;
@@ -579,9 +579,9 @@ public class QueryExpand implements BuiltInRule {
      * for <code>QueryExpandCost</cost>.
      */
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {		
-        if (pio!=null && pio.subTerm().op() instanceof ProgramMethod && pio.subTerm().freeVars().isEmpty()) {
+        if (pio!=null && pio.subTerm().op() instanceof IProgramMethod && pio.subTerm().freeVars().isEmpty()) {
             final Term pmTerm = pio.subTerm();
-            ProgramMethod pm = (ProgramMethod) pmTerm.op();
+            IProgramMethod pm = (IProgramMethod) pmTerm.op();
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();
             if (pm.isStatic() || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort()) && 
                     !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
@@ -606,7 +606,7 @@ public class QueryExpand implements BuiltInRule {
     }
     
     public Long getTimeOfQuery(Term t){
-    	if(t==null || !(t.op() instanceof ProgramMethod)){
+    	if(t==null || !(t.op() instanceof IProgramMethod)){
     		System.err.println("QueryExpand::getAgeOfQuery(t). The term is expected to be a query but it is:"+(t!=null?t:"null"));
     		return null;
     	}

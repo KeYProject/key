@@ -34,7 +34,6 @@ import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
@@ -267,7 +266,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 if((child instanceof FieldDeclaration 
                        && (((FieldDeclaration) child).isGhost()
                            || ((FieldDeclaration) child).isModel()))
-                    || (child instanceof ProgramMethod 
+                    || (child instanceof IProgramMethod 
                         && ((IProgramMethod) child).isModel())) {
                     continue;
                 }
