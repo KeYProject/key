@@ -80,16 +80,18 @@ public class KeYBranchNode extends AbstractSEDBranchNode implements IKeYSEDDebug
    /**
     * {@inheritDoc}
     */
-  @Override
+   @Override
    public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
-      IExecutionNode[] executionChildren = executionNode.getChildren();
-      if (children == null) {
-         children = KeYModelUtil.createChildren(this, executionChildren);
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         IExecutionNode[] executionChildren = executionNode.getChildren();
+         if (children == null) {
+            children = KeYModelUtil.createChildren(this, executionChildren);
+         }
+         else if (children.length != executionChildren.length) { // Assumption: Only new children are added, they are never replaced or removed
+            children = KeYModelUtil.updateChildren(this, children, executionChildren);
+         }
+         return children;
       }
-      else if (children.length != executionChildren.length) { // Assumption: Only new children are added, they are never replaced or removed
-         children = KeYModelUtil.updateChildren(this, children, executionChildren);
-      }
-      return children;
    }
 
    /**
