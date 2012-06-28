@@ -65,7 +65,8 @@ public class TestJMLTranslator extends TestCase {
                 new File(testFile)).getFirstProof().getJavaInfo();
         services = javaInfo.getServices();
         testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
-        atPres.put(services.getTypeConverter().getHeapLDT().getHeap(), TB.var(TB.heapAtPreVar(services, "heapAtPre", false)));
+        atPres.put(services.getTypeConverter().getHeapLDT().getHeap(), TB.var(TB.heapAtPreVar(services, "heapAtPre",
+          services.getTypeConverter().getHeapLDT().getHeap().sort(), false)));
     }
 
 

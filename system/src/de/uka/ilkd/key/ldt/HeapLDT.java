@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.ldt;
 
+import java.util.Map;
+import java.util.LinkedHashMap;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -73,7 +76,7 @@ public final class HeapLDT extends LDT {
     private final Function nullFunc;
     
     //predicates
-    private final Function wellFormed;    
+    private final Map<Sort,Function> wellFormed;    
     private final Function acc;
     private final Function reach;
     
@@ -107,13 +110,14 @@ public final class HeapLDT extends LDT {
         classErroneous    = addSortDependingFunction(services, "<classErroneous>");
         length            = addFunction(services, "length");        
         nullFunc          = addFunction(services, "null");
-        wellFormed        = addFunction(services, "wellFormed");
         acc               = addFunction(services, "acc");
         reach             = addFunction(services, "reach");
         heaps = new ImmutableArray<LocationVariable>(new LocationVariable[]{
                 (LocationVariable) progVars.lookup(BASE_HEAP_NAME),
                 (LocationVariable) progVars.lookup(SAVED_HEAP_NAME)
         });
+        wellFormed = new LinkedHashMap<Sort,Function>();
+        wellFormed.put((Sort)sorts.lookup(new Name("Heap")), addFunction(services, "wellFormed"));
     }
     
     
@@ -272,8 +276,8 @@ public final class HeapLDT extends LDT {
     }
     
     
-    public Function getWellFormed() {
-	return wellFormed;
+    public Function getWellFormed(Sort sort) {
+	return wellFormed.get(sort);
     }
     
     
