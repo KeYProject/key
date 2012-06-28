@@ -392,7 +392,8 @@ public class JavaIntegerSemanticsHelper {
 	    if (cast != null)
             return new SLExpression(TB.func(cast, a.getTerm()), resultType);
 	    else { // there is no cast to \bigint
-	        assert isBigint(resultType);
+	        if (! isBigint(resultType))
+	            raiseError("Cannot cast expression "+a+" to "+resultType+".");
 	        return new SLExpression(a.getTerm(), resultType);
 	    }
         } catch (RuntimeException e) {
