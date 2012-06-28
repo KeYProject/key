@@ -25,6 +25,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 
     /** the empty map*/
 
+    @SuppressWarnings("unchecked")
     public static <S,T> DefaultImmutableMap<S,T> nilMap() {
 	return (DefaultImmutableMap<S, T>) NILMap.EMPTY_MAP;
     }
@@ -152,7 +153,8 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
      */
     public DefaultImmutableMap<S,T> remove(S key) {
 	DefaultImmutableMap<S,T> queue = this;
-	final ImmutableMapEntry<S,T>[] stack = new ImmutableMapEntry[size()];
+	@SuppressWarnings("unchecked")
+    final ImmutableMapEntry<S,T>[] stack = new ImmutableMapEntry[size()];
 	int counter = 0;
 	while (!queue.isEmpty()) {
 	    final ImmutableMapEntry<S,T> e = queue.entry;
@@ -177,7 +179,8 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
      */
     public ImmutableMap<S,T> removeAll(T value) {
 	DefaultImmutableMap<S,T> queue = this;
-	final ImmutableMapEntry<S,T>[] stack = new ImmutableMapEntry[size()];
+	@SuppressWarnings("unchecked")
+    final ImmutableMapEntry<S,T>[] stack = new ImmutableMapEntry[size()];
 	int counter = 0;
 	while (!queue.isEmpty()) {
 	    final ImmutableMapEntry<S,T> e = queue.entry;
@@ -224,16 +227,22 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	return sb.toString();
     }
 
+    @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
 	if ( ! ( o instanceof ImmutableMap ) )
 	    return false;
 	if (o == this) {
 	    return true;
 	}
-
-	final ImmutableMap<S,T> o1 = (ImmutableMap<S,T>)o;
+	
+	ImmutableMap<S,T> o1 = null;
+	try {
+	    o1 = (ImmutableMap<S,T>)o;
 	if ( o1.size() != size() )
 	    return false;
+	} catch (ClassCastException cce){
+	    return false;
+	}
 
 
 	final Iterator<ImmutableMapEntry<S,T>> p = entryIterator();
@@ -261,6 +270,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     /** the empty map */
     private static class NILMap<S,T> extends DefaultImmutableMap<S,T>{
 
+        @SuppressWarnings("rawtypes")
         static final NILMap<?,?> EMPTY_MAP=new NILMap();
 	
 	/**
@@ -360,7 +370,8 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	    if (!(obj instanceof ImmutableMapEntry)) {
 		return false;
 	    }
-	    final ImmutableMapEntry<S,T> cmp = (ImmutableMapEntry<S,T>) obj;
+	    @SuppressWarnings("unchecked")
+        final ImmutableMapEntry<S,T> cmp = (ImmutableMapEntry<S,T>) obj;
 	    final S cmpKey = cmp.key();
 	    final T cmpVal = cmp.value();
 	    return (key == cmpKey && value == cmpVal) ||

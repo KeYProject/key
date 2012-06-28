@@ -153,12 +153,12 @@ public class KeYResourceManager {
 	return copyIfNotExists(o.getClass(),resourcename,targetLocation);
     }
     
-    public boolean copyIfNotExists(Class cl, String resourcename, 
+    public boolean copyIfNotExists(Class<?> cl, String resourcename, 
 		   String targetLocation) {
 	return copy(cl, resourcename, targetLocation, false);
     }
 
-    public boolean copy(Class cl, String resourcename, 
+    public boolean copy(Class<?> cl, String resourcename, 
 			String targetLocation, boolean overwrite) {
 	URL resourceURL = cl.getResource(resourcename);
 
@@ -218,7 +218,7 @@ public class KeYResourceManager {
      * @param resourcename the String that contains the name of the resource
      * @return the URL of the resource
      */
-    public URL getResourceFile(Class cl, String resourcename) {
+    public URL getResourceFile(Class<?> cl, String resourcename) {
         URL resourceURL = cl.getResource(resourcename);
 	if (resourceURL == null && cl.getSuperclass() != null) {
 	    return getResourceFile(cl.getSuperclass(), resourcename);

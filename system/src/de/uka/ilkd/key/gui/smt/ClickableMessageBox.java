@@ -1,20 +1,20 @@
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
 import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
 public class ClickableMessageBox extends JTextPane{
 	
-	public static interface ClickableMessageBoxListener{
+    private static final long serialVersionUID = 7588093268080119674L;
+
+    public static interface ClickableMessageBoxListener{
 		public void eventMessageClicked(Object object);
 	}
 	
