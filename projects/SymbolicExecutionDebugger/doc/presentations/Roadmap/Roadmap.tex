@@ -116,17 +116,17 @@
                \end{itemize}         
          \item M2
                \begin{itemize}
+                  \item Release on \KeY website
                   \item Incompatibility between \KeY GPL and Eclipse EPL solved
                \end{itemize}         
          \item M3
                \begin{itemize}
-                  \item Not planed yet, ideas are welcome
-                  \item Maybe something from the following slides
+                  \item Launching (Any statement/block and save/load)
+                  \item Symbolic Object Diagram including Equivalent classes
+                  \item Paper "`Debug anything at any time"'
                \end{itemize}
-         \item Off topic
-               \begin{itemize}
-                  \item Setup continuous integration server
-               \end{itemize}         
+         \item M4: Identification of bugs in SET
+         \item Off topic: Setup continuous integration server
       \end{itemize}
 	\end{frame}
    
@@ -138,10 +138,10 @@
          \item Launching
                \begin{itemize}
                   \item Any statement or block of statements
-                  \item Optional definition of method parameters and heap initialization
-                  \item Save/Load execution tree to/from *.key files
+                  \item Optional definition of method parameters \& heap initialization (or precondition?)
+                  \item Save/Load execution tree to/from *.proof files
                \end{itemize}
-         \item Execution
+         \item Execution (Bachelor Thesis)
                \begin{itemize}
                   \item Breakpoints (Full JDT functionality, e.g. including conditions)
                   \item Watchpoints (Condition without source code line)
@@ -152,8 +152,8 @@
                   \item Different return values, multiple values of variables (open question)
                   \item Avoid unknown identifiers in values (open question)
                   \item Avoid unknown identifiers in SET caused by variable declaration (open question)
-                  \item Simplification of path condition (open question)
-                  \item Integration of loop conditions in path conditions? (open question)
+                  \item Path condition simplification (open question), maybe SMT, Values as update
+                  \item Loop conditions in path conditions? (open question) (Allow single BC)
                   \item Execution path hiding: Set Root, Expand, Collapse, Isolate, Show all
                   \item Extract constraints from Antecedent per SET node and show them to the user
                \end{itemize}
@@ -174,7 +174,7 @@
          \item Bug detection
                \begin{itemize}
                   \item Highlighting method calls/returns which violate specifications
-                  \item Declarative Debugging
+                  \item Declarative Debugging (Master Thesis)
                   \item Definition of failure states (search comparable to watchpoints)
                   \item Reconstruction of stack traces (maybe helpful for Johannes)
                \end{itemize}
@@ -184,6 +184,8 @@
                   \item Optional use loop invariants to treat loops
                   \item Use Symbolic Execution Debugger as frontend for verification
                \end{itemize}
+         \item Extension to full Java (Float, Threads, dynamic class loading, API, $\dots$)
+         \item Experimental evaluation (e.g as part of the EISE exercises)
       \end{itemize}
 	\end{frame}
    
