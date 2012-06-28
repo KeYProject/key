@@ -39,8 +39,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -514,7 +514,7 @@ public final class ProblemInitializer {
                         }
                     }
                 }
-                for(ProgramMethod pm
+                for(IProgramMethod pm
                         : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
                     if(!(pm.isVoid() || pm.isConstructor())) {
                         functions.add(pm);

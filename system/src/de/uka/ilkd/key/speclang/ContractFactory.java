@@ -11,18 +11,23 @@
 
 package de.uka.ilkd.key.speclang;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
@@ -146,7 +151,7 @@ public class ContractFactory {
     }
 
     public DependencyContract dep(KeYJavaType containerType,
-                                  ObserverFunction pm,
+                                  IObserverFunction pm,
                                   Term requires,
                                   Term measuredBy,
                                   Term accessible,
@@ -158,7 +163,7 @@ public class ContractFactory {
     }
     
     public DependencyContract dep(KeYJavaType kjt,
-                                  Triple<ObserverFunction, Term, Term> dep,
+                                  Triple<IObserverFunction, Term, Term> dep,
                                   ProgramVariable selfVar) {
         final ImmutableList<ProgramVariable> paramVars =
                 tb.paramVars(services, dep.first, false);
@@ -175,7 +180,7 @@ public class ContractFactory {
 
     public DependencyContract dep(String string,
                                   KeYJavaType containerType,
-                                  ObserverFunction pm,
+                                  IObserverFunction pm,
                                   Term requires,
                                   Term measuredBy,
                                   Term accessible,
@@ -196,7 +201,7 @@ public class ContractFactory {
         }
     }
 
-    public FunctionalOperationContract func (ProgramMethod pm, InitiallyClause ini){
+    public FunctionalOperationContract func (IProgramMethod pm, InitiallyClause ini){
         try {
             return new JMLSpecFactory(services).initiallyClauseToContract(ini, pm);
         } catch (SLTranslationException e) {
@@ -207,7 +212,7 @@ public class ContractFactory {
 
     public FunctionalOperationContract func (String baseName,
             KeYJavaType kjt,       
-            ProgramMethod pm,
+            IProgramMethod pm,
             Modality modality,
             Map<LocationVariable,Term> pres,
             Term mby,                           
@@ -225,13 +230,13 @@ public class ContractFactory {
                 mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
        
-    public FunctionalOperationContract func (String baseName, ProgramMethod pm, boolean terminates, Map<LocationVariable,Term> pres,
+    public FunctionalOperationContract func (String baseName, IProgramMethod pm, boolean terminates, Map<LocationVariable,Term> pres,
                Term mby, Map<LocationVariable,Term> posts, Map<LocationVariable,Term> mods, boolean hasMod, ProgramVariableCollection pv){
         return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres, mby, posts, mods, hasMod, pv, false, mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
   
 
-    public FunctionalOperationContract func (String baseName, ProgramMethod pm,
+    public FunctionalOperationContract func (String baseName, IProgramMethod pm,
             Modality modality, Map<LocationVariable,Term> pres, Term mby, Map<LocationVariable,Term> posts, Map<LocationVariable,Term> mods, boolean hasMod,
             ProgramVariableCollection progVars, boolean toBeSaved, boolean transaction) {
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm, modality, pres, mby,
@@ -436,7 +441,7 @@ public class ContractFactory {
     
     public static String generateDisplayName(String myBaseName,
                                              KeYJavaType myKjt,
-                                             ObserverFunction myTarget,
+                                             IObserverFunction myTarget,
                                              int myId) {
         return myBaseName + " " + myId +
                 (myKjt.equals(myTarget.getContainerType())
@@ -448,7 +453,7 @@ public class ContractFactory {
     
     public static String generateContractName(String myBaseName,
                                               KeYJavaType myKjt,
-                                              ObserverFunction myTarget,
+                                              IObserverFunction myTarget,
                                               int myId) {
         return generateContractTypeName(myBaseName, myKjt, myTarget)
                + "." + myId;
@@ -457,7 +462,7 @@ public class ContractFactory {
 
     public static String generateContractTypeName(String myBaseName,
                                                   KeYJavaType myKjt,
-                                                  ObserverFunction myTarget) {
+                                                  IObserverFunction myTarget) {
         return myKjt.getJavaType().getFullName() + "[" +
                myTarget + "(" +
                concadinate(",", myTarget.getParamTypes()) + ")" + "]"

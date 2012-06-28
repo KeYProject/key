@@ -10,8 +10,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
 
@@ -103,7 +103,7 @@ public class UseDependencyContractApp extends AbstractContractRuleApp {
 
 	public UseDependencyContractApp tryToInstantiateContract(final Services services) {
 	    final Term focus = posInOccurrence().subTerm();
-    	final ObserverFunction target = (ObserverFunction) focus.op();
+    	final IObserverFunction target = (IObserverFunction) focus.op();
     
     	final Term selfTerm;
     	final KeYJavaType kjt;

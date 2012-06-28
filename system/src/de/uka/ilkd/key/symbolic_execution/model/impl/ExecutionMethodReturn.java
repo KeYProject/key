@@ -133,10 +133,11 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
          if (methodReturnNode != null) {
             // Start site proof to extract the value of the result variable.
             de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput sequentToProve = SymbolicExecutionUtil.createExtractReturnVariableValueSequent(getServices(),
-                                                                                                                       mbs.getBodySourceAsTypeReference(),  
-                                                                                                                       mbs.getDesignatedContext(), 
-                                                                                                                       methodReturnNode, 
-                                                                                                                       resultVar);
+                                                                                                                                                                                     mbs.getBodySourceAsTypeReference(),
+                                                                                                                                                                                     mbs.getProgramMethod(getServices()),
+                                                                                                                                                                                     mbs.getDesignatedContext(), 
+                                                                                                                                                                                     methodReturnNode, 
+                                                                                                                                                                                     resultVar);
             ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequentToProve.getSequentToProve());
             returnValue = SymbolicExecutionUtil.extractOperatorValue(info, sequentToProve.getOperator());
             assert returnValue != null;

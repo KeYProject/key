@@ -23,7 +23,16 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.KeyStroke;
+import javax.swing.WindowConstants;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -40,7 +49,7 @@ import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.AbstractEnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
@@ -274,9 +283,9 @@ public final class SLEnvInput extends AbstractEnvInput {
             }
             
             //contracts, loop invariants
-            final ImmutableList<ProgramMethod> pms 
+            final ImmutableList<IProgramMethod> pms 
                 = javaInfo.getAllProgramMethodsLocallyDeclared(kjt);
-            for(ProgramMethod pm : pms) {
+            for(IProgramMethod pm : pms) {
                 //contracts
         	final ImmutableSet<SpecificationElement> methodSpecs
         	    = specExtractor.extractMethodSpecs(pm,staticInvPresent);
@@ -297,9 +306,9 @@ public final class SLEnvInput extends AbstractEnvInput {
             }
             
             //constructor contracts
-            final ImmutableList<ProgramMethod> constructors 
+            final ImmutableList<IProgramMethod> constructors 
             	= javaInfo.getConstructors(kjt);
-            for(ProgramMethod constructor : constructors) {
+            for(IProgramMethod constructor : constructors) {
         	assert constructor.isConstructor();
         	final ImmutableSet<SpecificationElement> constructorSpecs 
 			= specExtractor.extractMethodSpecs(constructor, staticInvPresent);

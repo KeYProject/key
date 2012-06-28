@@ -22,7 +22,7 @@ import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -61,7 +61,7 @@ public class StaticInitialisation extends ProgramTransformer {
 	    final MethodReference mr = (MethodReference)pe;
 	    final ExecutionContext ec = 
                 insts.getContextInstantiation().activeStatementContext(); 
-	    final ProgramMethod m;
+	    final IProgramMethod m;
 	    final KeYJavaType mrPrefixType = 
 	        mr.determineStaticPrefixType(services, ec);
 	    if (ec == null) {

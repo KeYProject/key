@@ -10,16 +10,16 @@
 
 package de.uka.ilkd.key.pp;
 
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Stack;
+import java.util.StringTokenizer;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -27,11 +27,44 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.OpCollector;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ModalOperatorSV;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.AntecTaclet;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.NewDependingOn;
+import de.uka.ilkd.key.rule.NewVarcond;
+import de.uka.ilkd.key.rule.NotFreeIn;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.SuccTaclet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.pp.Backend;
 import de.uka.ilkd.key.util.pp.Layouter;
@@ -1046,7 +1079,7 @@ public final class LogicPrinter {
     
     
     public void printObserver(Term t) throws IOException {
-	assert t.op() instanceof ObserverFunction;
+	assert t.op() instanceof IObserverFunction;
 	assert t.boundVars().isEmpty();
 	final HeapLDT heapLDT = services == null 
 			        ? null 
@@ -1054,7 +1087,7 @@ public final class LogicPrinter {
 	if(NotationInfo.PRETTY_SYNTAX
            && heapLDT != null 
            && t.sub(0).op() == heapLDT.getHeap()) {
-	    final ObserverFunction obs = (ObserverFunction) t.op();
+	    final IObserverFunction obs = (IObserverFunction) t.op();
             startTerm(t.arity());
             markStartSub();
             //heap not printed
@@ -1073,7 +1106,7 @@ public final class LogicPrinter {
                           .getPrettyFieldName((Function)t.op());
             layouter.print(prettyFieldName);
             
-            if(obs.getNumParams() > 0 || obs instanceof ProgramMethod) {
+            if(obs.getNumParams() > 0 || obs instanceof IProgramMethod) {
         	layouter.print("(").beginC(0);
         	for(int i = 0, n = obs.getNumParams(); i < n; i++) {
         	    markStartSub();

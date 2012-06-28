@@ -139,7 +139,7 @@ options {
 
     // if this is used then we can capture parts of the input for later use
     private DeclPicker capturer = null;
-    private ProgramMethod pm = null;
+    private IProgramMethod pm = null;
 
     private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil(); 
     private ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
@@ -1170,9 +1170,9 @@ options {
         kjt = getTypeByClassName(className.toString());
         if (kjt != null) { 
            if (LA(n+1) == DOT && LA(n+3) == LPAREN) {
-               Iterator<ProgramMethod> it = javaInfo.getAllProgramMethods(kjt).iterator();
+               Iterator<IProgramMethod> it = javaInfo.getAllProgramMethods(kjt).iterator();
                while(it.hasNext()) {
-                 final ProgramMethod pm = it.next();
+                 final IProgramMethod pm = it.next();
                  final String name = kjt.getFullName()+"::"+LT(n+2).getText();                 
                  if(pm != null && pm.isStatic() && pm.name().toString().equals(name) ) {
                    result = true;
@@ -1319,7 +1319,7 @@ options {
     /**
      * returns the ProgramMethod parsed in the jml_specifications section.
      */
-    public ProgramMethod getProgramMethod(){
+    public IProgramMethod getProgramMethod(){
         return pm;
     }
 

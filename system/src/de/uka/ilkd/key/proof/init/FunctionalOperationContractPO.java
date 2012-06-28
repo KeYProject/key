@@ -230,7 +230,7 @@ public class FunctionalOperationContractPO
     @Override
     public void readProblem()
             throws ProofInputException {
-        final ProgramMethod pm = getContract().getTarget();
+        final IProgramMethod pm = getContract().getTarget();
 
         final boolean[] transactionFlags;
 

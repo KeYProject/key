@@ -10,7 +10,11 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
-import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -18,14 +22,37 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
+import de.uka.ilkd.key.java.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.declaration.Modifier;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.speclang.*;
-import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.InitiallyClause;
+import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.SpecExtractor;
+import de.uka.ilkd.key.speclang.SpecificationElement;
+import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
+import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassAxiom;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLDepends;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLInitially;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
@@ -86,7 +113,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     
-    private int getIndexOfMethodDecl(ProgramMethod pm,
+    private int getIndexOfMethodDecl(IProgramMethod pm,
                                      TextualJMLConstruct[] constructsArray) {
         for(int i = 0; i < constructsArray.length; i++) {
             if(constructsArray[i] instanceof TextualJMLMethodDecl) {
@@ -102,7 +129,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     
  
-    private String getDefaultSignalsOnly(ProgramMethod pm) {
+    private String getDefaultSignalsOnly(IProgramMethod pm) {
         if(pm.getThrown() == null) {
             return "signals_only \\nothing;";
         }
@@ -239,8 +266,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 if((child instanceof FieldDeclaration 
                        && (((FieldDeclaration) child).isGhost()
                            || ((FieldDeclaration) child).isModel()))
-                    || (child instanceof ProgramMethod 
-                        && ((ProgramMethod) child).isModel())) {
+                    || (child instanceof IProgramMethod 
+                        && ((IProgramMethod) child).isModel())) {
                     continue;
                 }
             } else if(td.getComments() != null) {
@@ -301,7 +328,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
 
     @Override    
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm)
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm)
     throws SLTranslationException {
         return extractMethodSpecs(pm,true);
     }
@@ -312,7 +339,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * @param addInvariant whether to add <i>static</i> invarants to pre- and post-conditions
      */
     @Override    
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm, boolean addInvariant)
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm, boolean addInvariant)
     throws SLTranslationException {
         ImmutableSet<SpecificationElement> result 
         = DefaultImmutableSet.<SpecificationElement>nil();
@@ -441,7 +468,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     
     @Override    
-    public LoopInvariant extractLoopInvariant(ProgramMethod pm,
+    public LoopInvariant extractLoopInvariant(IProgramMethod pm,
                                               LoopStatement loop) 
             throws SLTranslationException {
         LoopInvariant result = null;

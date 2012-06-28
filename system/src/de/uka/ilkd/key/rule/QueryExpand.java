@@ -21,11 +21,29 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.PIOPathIterator;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.VariableNameProposer;
 
 
 /**
@@ -90,7 +108,7 @@ public class QueryExpand implements BuiltInRule {
      */
     public Term queryEvalTerm(Services services, Term query, LogicVariable[] instVars){
     	
-    	   final ProgramMethod method = (ProgramMethod)query.op();
+    	   final IProgramMethod method = (IProgramMethod)query.op();
     	   
            final ImmutableArray<ProgramVariable> args = getRegisteredArgumentVariables(method.getParameters(), services);
 
@@ -169,7 +187,7 @@ public class QueryExpand implements BuiltInRule {
            
            
            final MethodFrame mf = new MethodFrame(null, 
-                   new ExecutionContext(new TypeRef(method.getContainerType()), null),
+                   new ExecutionContext(new TypeRef(method.getContainerType()), method, null),
                    //new StatementBlock(assignment)
                    s);
            final JavaBlock jb = JavaBlock.createJavaBlock(new StatementBlock(mf));	
@@ -298,7 +316,7 @@ public class QueryExpand implements BuiltInRule {
     	}
     	final Operator op = t.op();
     	final int nextLevel = level+1;
-    	if(op instanceof ProgramMethod){ //Query found
+    	if(op instanceof IProgramMethod){ //Query found
     		//System.out.println("Query found:"+t+ " position:"+(positive?"positive":"negative"));
     		QueryEvalPos qep = new QueryEvalPos(t, (Vector<Integer>)pathInTerm.clone(), qepLevel+1, instVars, qepIsPositive);
     		qeps.add(qep);
@@ -374,7 +392,7 @@ public class QueryExpand implements BuiltInRule {
     		//System.out.println("collectQueriesRec encountered javaBlock.");
     		return;
     	}
-    	if(t.op() instanceof ProgramMethod){ //Query found
+    	if(t.op() instanceof IProgramMethod){ //Query found
     		//System.out.println("Query found:"+t);
     		result.add(t);
     		return;
@@ -561,9 +579,9 @@ public class QueryExpand implements BuiltInRule {
      * for <code>QueryExpandCost</cost>.
      */
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {		
-        if (pio!=null && pio.subTerm().op() instanceof ProgramMethod && pio.subTerm().freeVars().isEmpty()) {
+        if (pio!=null && pio.subTerm().op() instanceof IProgramMethod && pio.subTerm().freeVars().isEmpty()) {
             final Term pmTerm = pio.subTerm();
-            ProgramMethod pm = (ProgramMethod) pmTerm.op();
+            IProgramMethod pm = (IProgramMethod) pmTerm.op();
             final Sort nullSort = goal.proof().getJavaInfo().nullSort();
             if (pm.isStatic() || (pmTerm.sub(1).sort().extendsTrans(goal.proof().getJavaInfo().objectSort()) && 
                     !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
@@ -588,7 +606,7 @@ public class QueryExpand implements BuiltInRule {
     }
     
     public Long getTimeOfQuery(Term t){
-    	if(t==null || !(t.op() instanceof ProgramMethod)){
+    	if(t==null || !(t.op() instanceof IProgramMethod)){
     		System.err.println("QueryExpand::getAgeOfQuery(t). The term is expected to be a query but it is:"+(t!=null?t:"null"));
     		return null;
     	}

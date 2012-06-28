@@ -11,22 +11,21 @@
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 
 public class MethodStackInfo implements NameCreationInfo {
 
-    ImmutableList<ProgramMethod> methods;
+    ImmutableList<IProgramMethod> methods;
     
-    public MethodStackInfo(ImmutableList<ProgramMethod> methods) {
+    public MethodStackInfo(ImmutableList<IProgramMethod> methods) {
         this.methods = methods;
     }
 
     public String infoAsString() {
         String result = "Method stack:\n";
 
-        for (ProgramMethod method : methods) {
-            ProgramMethod m = method;
-            result += "- " + m.getProgramElementName().toString() + "\n";
+        for (IProgramMethod method : methods) {
+            result += "- " + method.getProgramElementName().toString() + "\n";
         }
 
 	if(result.length() < 1) return "";
