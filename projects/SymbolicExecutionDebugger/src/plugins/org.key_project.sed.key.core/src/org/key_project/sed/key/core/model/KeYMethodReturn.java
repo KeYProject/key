@@ -202,6 +202,14 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
     * {@inheritDoc}
     */
    @Override
+   public boolean hasVariables() throws DebugException {
+      return super.hasVariables() && getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public String getPathCondition() throws DebugException {
       try {
          return executionNode.getFormatedPathCondition();

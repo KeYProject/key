@@ -79,6 +79,11 @@ public final class KeySEDUtil {
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES = "org.key_project.sed.key.core.launch.sed.key.attribute.showMethodReturnValuesInDebugNodes";
 
     /**
+     * The key of the attribute "show variables of selected debug node" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE = "org.key_project.sed.key.core.launch.sed.key.attribute.showVariablesOfSelectedDebugNode";
+
+    /**
      * The key of the attribute "show KeY's main window" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
      */
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW = "org.key_project.sed.key.core.launch.sed.key.attribute.showKeYMainWindow";
@@ -198,6 +203,16 @@ public final class KeySEDUtil {
      */
     public static boolean isShowMethodReturnValuesInDebugNodes(ILaunchConfiguration configuration) throws CoreException {
         return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, KeYSEDPreferences.isShowMethodReturnValuesInDebugNode()) : KeYSEDPreferences.isShowMethodReturnValuesInDebugNode();
+    }
+    
+    /**
+     * Checks if variables of the selected debug node should be shown.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} show variables of selected debug node, {@code false} do not show variables of selected debug node.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isShowVariablesOfSelectedDebugNode(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, KeYSEDPreferences.isShowVariablesOfSelectedDebugNode()) : KeYSEDPreferences.isShowVariablesOfSelectedDebugNode();
     }
     
     /**

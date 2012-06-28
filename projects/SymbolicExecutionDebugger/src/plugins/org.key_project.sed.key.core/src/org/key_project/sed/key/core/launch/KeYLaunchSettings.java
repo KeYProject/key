@@ -37,6 +37,11 @@ public class KeYLaunchSettings {
    private boolean showMethodReturnValues;
    
    /**
+    * Show variables of selected debug node?
+    */
+   private boolean showVariablesOfSelectedDebugNode;
+   
+   /**
     * Show KeY's main window?
     */
    private boolean showKeYMainWindow;
@@ -47,17 +52,20 @@ public class KeYLaunchSettings {
     * @param useExistingContract Use an existing contract or generate default contract?
     * @param existingContract The ID of the existing contract to use.
     * @param showMethodReturnValues Show method return values of {@link ISEDMethodReturn} instances?
+    * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     */
    public KeYLaunchSettings(IMethod method, 
                             boolean useExistingContract, 
                             String existingContract, 
                             boolean showMethodReturnValues,
+                            boolean showVariablesOfSelectedDebugNode,
                             boolean showKeYMainWindow) {
       this.method = method;
       this.useExistingContract = useExistingContract;
       this.existingContract = existingContract;
       this.showMethodReturnValues = showMethodReturnValues;
+      this.showVariablesOfSelectedDebugNode = showVariablesOfSelectedDebugNode;
       this.showKeYMainWindow = showKeYMainWindow;
    }
 
@@ -99,5 +107,13 @@ public class KeYLaunchSettings {
     */
    public boolean isShowKeYMainWindow() {
       return showKeYMainWindow;
+   }
+
+   /**
+    * Checks if variables of selected debug node should be shown.
+    * @return Show variables of selected debug node?
+    */
+   public boolean isShowVariablesOfSelectedDebugNode() {
+      return showVariablesOfSelectedDebugNode;
    }
 }

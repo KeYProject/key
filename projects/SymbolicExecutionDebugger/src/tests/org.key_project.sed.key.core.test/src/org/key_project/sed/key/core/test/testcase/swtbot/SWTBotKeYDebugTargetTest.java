@@ -81,6 +81,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      8,
                      true,
+                     false,
                      false);
    }
    
@@ -97,6 +98,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      8,
                      true,
+                     false,
                      false);
    }
    
@@ -113,6 +115,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      8,
                      true,
+                     false,
                      false);
    }
    
@@ -129,6 +132,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      8,
                      true,
+                     false,
                      false);
    }
    
@@ -565,7 +569,11 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      true,
                      createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"),
                      "data/statements/oracle/FlatSteps.xml",
-                     false);
+                     false,
+                     10, 
+                     false, 
+                     false, 
+                     true);
    }
    
    /**
@@ -580,6 +588,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      "data/recursiveFibonacci/oracle/RecursiveFibonacci.xml",
                      false,
                      30,
+                     false,
                      false,
                      false);
    }
@@ -663,7 +672,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            "data/statements/test",
                            true,
                            createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"), 
-                           true, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE,
                            6, 
                            executor);
    }
@@ -740,7 +751,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                  String expectedModelPathInBundle,
                                  boolean showMethodReturnValues,
                                  boolean stepIntoInsteadOfRun) throws Exception {
-      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 10, false, stepIntoInsteadOfRun);
+      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 10, false, stepIntoInsteadOfRun, false);
    }
    
    /**
@@ -762,6 +773,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param includeVariables Include variables?
     * @param stepIntoInsteadOfRun Use step into functionality instead of the run functionality to create the tree?
+    * @param showKeYMainWindow Show KeY's main window?
     * @throws Exception Occurred Exception.
     */
    protected void assertSEDModel(String projectName,
@@ -772,7 +784,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                  boolean showMethodReturnValues,
                                  int timeoutFactor,
                                  final boolean includeVariables,
-                                 final boolean stepIntoInsteadOfRun) throws Exception {
+                                 final boolean stepIntoInsteadOfRun,
+                                 final boolean showKeYMainWindow) throws Exception {
       IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
@@ -866,7 +879,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            pathInBundle, 
                            true,
                            selector, 
-                           showMethodReturnValues, 
+                           Boolean.valueOf(showMethodReturnValues), 
+                           Boolean.valueOf(includeVariables),
+                           Boolean.valueOf(showKeYMainWindow),
                            timeoutFactor, 
                            executor);
    }
@@ -976,7 +991,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            "data/statements/test", 
                            true,
                            createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"), 
-                           true, 
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.TRUE,
                            8, 
                            executor);
    }
@@ -1068,7 +1085,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            "data/statements/test", 
                            true,
                            createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"), 
-                           true, 
+                           Boolean.FALSE,
+                           Boolean.FALSE,
+                           Boolean.TRUE,
                            8, 
                            executor);
    }

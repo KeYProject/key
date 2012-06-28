@@ -2,7 +2,6 @@ package org.key_project.sed.key.core.model;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
-import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDValue;
 import org.key_project.sed.core.model.impl.AbstractSEDValue;
 import org.key_project.sed.core.util.LogUtil;
@@ -29,13 +28,21 @@ public class KeYValue extends AbstractSEDValue {
    
    /**
     * Constructor.
-    * @param target The {@link ISEDDebugTarget} in that this element is contained.
+    * @param target The {@link KeYDebugTarget} in that this element is contained.
     * @param executionVariable The {@link IExecutionVariable} to represent in debug model.
     */
-   public KeYValue(ISEDDebugTarget target, IExecutionVariable executionVariable) {
+   public KeYValue(KeYDebugTarget target, IExecutionVariable executionVariable) {
       super(target);
       Assert.isNotNull(executionVariable);
       this.executionVariable = executionVariable;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYDebugTarget getDebugTarget() {
+      return (KeYDebugTarget)super.getDebugTarget();
    }
 
    /**
@@ -91,6 +98,14 @@ public class KeYValue extends AbstractSEDValue {
          LogUtil.getLogger().logError(e);
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute child variables.", e));
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasVariables() throws DebugException {
+      return super.hasVariables() && getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
    }
 
    /**

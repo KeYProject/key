@@ -72,7 +72,8 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           }
           // Add debug target to ILaunch
           boolean showMethodReturnValues = KeySEDUtil.isShowMethodReturnValuesInDebugNodes(configuration);
-          KeYLaunchSettings settings = new KeYLaunchSettings(method, useExistingContract, existingContract, showMethodReturnValues, showKeYMainWindow); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
+          boolean showVariablesOfSelectedDebugNode = KeySEDUtil.isShowVariablesOfSelectedDebugNode(configuration);
+          KeYLaunchSettings settings = new KeYLaunchSettings(method, useExistingContract, existingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
           KeYDebugTarget target = new KeYDebugTarget(launch, environment, settings);
           launch.addDebugTarget(target);
        }

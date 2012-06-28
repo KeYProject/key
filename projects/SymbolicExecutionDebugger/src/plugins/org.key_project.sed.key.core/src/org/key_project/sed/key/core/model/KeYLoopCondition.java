@@ -181,6 +181,14 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     * {@inheritDoc}
     */
    @Override
+   public boolean hasVariables() throws DebugException {
+      return super.hasVariables() && getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public String getPathCondition() throws DebugException {
       try {
          return executionNode.getFormatedPathCondition();

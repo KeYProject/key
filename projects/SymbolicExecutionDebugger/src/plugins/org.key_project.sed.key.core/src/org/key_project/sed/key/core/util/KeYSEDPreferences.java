@@ -25,6 +25,11 @@ public class KeYSEDPreferences {
    public static final String SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES = "org.key_project.sed.key.core.preference.showMethodReturnValuesInDebugNodes";
 
    /**
+    * Preference key to enable or disables the variables of selected debug nodes.
+    */
+   public static final String SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE = "org.key_project.sed.key.core.preference.showVariablesOfSelectedDebugNode";
+
+   /**
     * Preference key to define if KeY's main window should be shown or not.
     */
    public static final String SHOW_KEY_MAIN_WINDOW = "org.key_project.sed.key.core.preference.showKeYMainWindow";
@@ -131,5 +136,37 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultShowKeYMainWindow(boolean defaultValue) {
       getStore().setDefault(SHOW_KEY_MAIN_WINDOW, defaultValue);
+   }
+   
+   /**
+    * Checks if variables should be shown of selected debug node.
+    * @return Show or hide KeY's main window.
+    */
+   public static boolean isShowVariablesOfSelectedDebugNode() {
+      return getStore().getBoolean(SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE);
+   }
+   
+   /**
+    * Checks if variables should be shown of selected debug node by default.
+    * @return Show or hide KeY's main window.
+    */
+   public static boolean isDefaultShowVariablesOfSelectedDebugNode() {
+      return getStore().getDefaultBoolean(SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE);
+   }
+   
+   /**
+    * Sets if variables should be shown of selected debug node.
+    * @param value Show or hide KeY's main window.
+    */
+   public static void setShowVariablesOfSelectedDebugNode(boolean value) {
+      getStore().setValue(SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, value);
+   }
+   
+   /**
+    * Sets if variables should be shown of selected debug node by default.
+    * @param defaultValue Show or hide KeY's main window.
+    */
+   public static void setDefaultShowVariablesOfSelectedDebugNode(boolean defaultValue) {
+      getStore().setDefault(SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, defaultValue);
    }
 }

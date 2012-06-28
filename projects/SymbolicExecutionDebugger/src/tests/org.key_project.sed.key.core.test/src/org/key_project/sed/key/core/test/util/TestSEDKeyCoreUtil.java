@@ -53,10 +53,14 @@ public final class TestSEDKeyCoreUtil {
     * based on KeY.
     * @param method The {@link IMethod} to debug.
     * @param showMethodReturnValues Show method return values? Use {@code null} to use default value.
+    * @param showVariablesOfSelectedDebugNode Show variables of selected debug node? Use {@code null} to use default value.
+    * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IMethod method,
-                                final Boolean showMethodReturnValues) throws Exception {
+                                final Boolean showMethodReturnValues,
+                                final Boolean showVariablesOfSelectedDebugNode,
+                                final Boolean showKeYMainWindow) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -65,6 +69,12 @@ public final class TestSEDKeyCoreUtil {
                ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
                if (showMethodReturnValues != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
+               }
+               if (showVariablesOfSelectedDebugNode != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNode);
+               }
+               if (showKeYMainWindow != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindow);
                }
                config = wc.doSave();
                DebugUITools.launch(config, KeySEDUtil.MODE);

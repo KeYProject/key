@@ -228,6 +228,15 @@ public final class TestSedCoreUtil {
    }
 
    /**
+    * Returns the {@link SWTBotView} for the variables view.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @return The {@link SWTBotView}.
+    */
+   public static SWTBotView getVariablesView(SWTWorkbenchBot bot) {
+      return bot.viewById(IDebugUIConstants.ID_VARIABLE_VIEW);
+   }
+
+   /**
     * Makes sure that only the fixed example is shown in the given {@link SWTBotTree}.
     * @param debugTree The {@link SWTBotTree} to check.
     */

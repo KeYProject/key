@@ -11,8 +11,10 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.util.TestSEDKeyCoreUtil;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.MainWindow;
@@ -22,6 +24,80 @@ import de.uka.ilkd.key.gui.MainWindow;
  * @author Martin Hentschel
  */
 public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTestCase {
+   /**
+    * Tests the launch where variable values are shown.
+    */
+   @Test
+   public void testShowVariableValues() throws Exception {
+      doTestShowVariableValues("SWTBotLaunchDefaultPreferencesTest_testShowVariableValues", true);
+   }
+
+   /**
+    * Tests the launch where variable values are hidden.
+    */
+   @Test
+   public void testDoNotShowVariableValues() throws Exception {
+      doTestShowVariableValues("SWTBotLaunchDefaultPreferencesTest_testDoNotShowVariableValues", false);
+   }
+   
+   /**
+    * Does the test steps of {@link #testShowVariableValues()}
+    * and {@link #testDoNotShowVariableValues()}.
+    * @param projectName The project name to use.
+    * @param showVariableValues Show variable values?
+    * @throws Exception Occurred Exception
+    */
+   protected void doTestShowVariableValues(String projectName, 
+                                           final boolean showVariableValues) throws Exception {
+      boolean originalShowVariableValues = KeYSEDPreferences.isShowVariablesOfSelectedDebugNode();
+      try {
+         // Set preference
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
+         if (showVariableValues) {
+            preferenceShell.bot().checkBox("Show variables of selected debug node").select();
+         }
+         else {
+            preferenceShell.bot().checkBox("Show variables of selected debug node").deselect();
+         }
+         preferenceShell.bot().button("OK").click();
+         assertEquals(showVariableValues, KeYSEDPreferences.isShowVariablesOfSelectedDebugNode());
+         // Launch something
+         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+            @Override
+            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               // Get debug target TreeItem
+               SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+               // Do run
+               resume(bot, item, target);
+               // Select statement int result;
+               item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, 0, 0, 0, 1); 
+               // Wait for jobs
+               TestUtilsUtil.waitForJobs();
+               // Get variables view
+               SWTBotView variablesView = TestSedCoreUtil.getVariablesView(bot);
+               SWTBotTree variablesTree = variablesView.bot().tree();
+               SWTBotTreeItem[] items = variablesTree.getAllItems();
+               assertEquals(items != null ? "items found: " + items.length : "items are null", showVariableValues, !ArrayUtil.isEmpty(items));
+            }
+         };
+         doKeYDebugTargetTest(projectName,
+                              "data/simpleIf/test",
+                              true,
+                              createMethodSelector("SimpleIf", "min", "I", "I"),
+                              Boolean.FALSE,
+                              null,
+                              Boolean.FALSE,
+                              8,
+                              executor);
+      }
+      finally {
+         // Restore original value
+         KeYSEDPreferences.setShowVariablesOfSelectedDebugNode(originalShowVariableValues);
+         assertEquals(originalShowVariableValues, KeYSEDPreferences.isShowVariablesOfSelectedDebugNode());
+      }
+   }
+   
    /**
     * Tests a launch in which KeY's main window is shown.
     */
@@ -85,6 +161,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               "data/simpleIf/test",
                               false,
                               createMethodSelector("SimpleIf", "min", "I", "I"),
+                              Boolean.FALSE,
+                              Boolean.FALSE,
                               null,
                               8,
                               executor);
@@ -151,6 +229,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               false,
                               createMethodSelector("SimpleIf", "min", "I", "I"),
                               null,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
                               8,
                               executor);
       }

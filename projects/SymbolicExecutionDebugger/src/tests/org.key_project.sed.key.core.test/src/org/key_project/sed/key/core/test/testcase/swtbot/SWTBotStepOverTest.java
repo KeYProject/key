@@ -58,7 +58,9 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
                            "data/stepOverOnTwoBranches/test", 
                            true,
                            createMethodSelector("StepOverOnTwoBranches", "main", "I"), 
-                           false, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE,
+                           Boolean.FALSE,
                            14, 
                            executor);
    }
@@ -96,7 +98,9 @@ public class SWTBotStepOverTest extends AbstractKeYDebugTargetTestCase {
                            "data/stepOverOnTwoBranches/test", 
                            true,
                            createMethodSelector("StepOverOnTwoBranches", "main", "I"), 
-                           false, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE, 
+                           Boolean.FALSE,
                            4, 
                            executor);
    }

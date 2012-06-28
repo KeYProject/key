@@ -28,6 +28,11 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
    private Button showMethodReturnValuesInDebugNodesButton;
 
    /**
+    * Defines if variables of selected debug node should be shown.
+    */
+   private Button showVariablesOfSelectedDebugNodeButton;
+
+   /**
     * Defines if KeY's main window is shown or not.
     */
    private Button showKeYMainWindowButton;
@@ -40,9 +45,9 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
     * @param widgetFactory An optional {@link TabbedPropertySheetWidgetFactory} to use.
     */
    public KeYCustomizationLaunchConfigurationTabComposite(Composite parent,
-                                                        int style, 
-                                                        AbstractTabbedPropertiesAndLaunchConfigurationTab parentTab,
-                                                        TabbedPropertySheetWidgetFactory widgetFactory) {
+                                                          int style, 
+                                                          AbstractTabbedPropertiesAndLaunchConfigurationTab parentTab,
+                                                          TabbedPropertySheetWidgetFactory widgetFactory) {
       super(parent, style, parentTab);
       setLayout(new FillLayout());
       if (widgetFactory == null) {
@@ -58,6 +63,14 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       showMethodReturnValuesInDebugNodesButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "&Show method return values in debug nodes", SWT.CHECK);
       showMethodReturnValuesInDebugNodesButton.setEnabled(isEditable());
       showMethodReturnValuesInDebugNodesButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateLaunchConfigurationDialog();
+         }
+      });
+      showVariablesOfSelectedDebugNodeButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "&Show &variables of selected debug node", SWT.CHECK);
+      showVariablesOfSelectedDebugNodeButton.setEnabled(isEditable());
+      showVariablesOfSelectedDebugNodeButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
             updateLaunchConfigurationDialog();
@@ -92,6 +105,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
    public void initializeFrom(ILaunchConfiguration configuration) {
       try {
          showMethodReturnValuesInDebugNodesButton.setSelection(KeySEDUtil.isShowMethodReturnValuesInDebugNodes(configuration));
+         showVariablesOfSelectedDebugNodeButton.setSelection(KeySEDUtil.isShowVariablesOfSelectedDebugNode(configuration));
          showKeYMainWindowButton.setSelection(KeySEDUtil.isShowKeYMainWindow(configuration));
       } 
       catch (CoreException e) {
@@ -105,6 +119,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
    @Override
    public void initializeFrom(KeYLaunchSettings launchSettings) {
       showMethodReturnValuesInDebugNodesButton.setSelection(launchSettings.isShowMethodReturnValues());
+      showVariablesOfSelectedDebugNodeButton.setSelection(launchSettings.isShowVariablesOfSelectedDebugNode());
       showKeYMainWindowButton.setSelection(launchSettings.isShowKeYMainWindow());
    }
 
@@ -114,6 +129,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
    @Override
    public void performApply(ILaunchConfigurationWorkingCopy configuration) {
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValuesInDebugNodesButton.getSelection());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNodeButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindowButton.getSelection());
    }
 }

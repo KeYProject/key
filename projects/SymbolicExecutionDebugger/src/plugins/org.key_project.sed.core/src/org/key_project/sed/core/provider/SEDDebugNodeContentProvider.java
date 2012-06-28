@@ -60,7 +60,13 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
    protected Object[] getAllChildren(Object parent, IPresentationContext context) throws CoreException {
       if (IDebugUIConstants.ID_VARIABLE_VIEW.equals(context.getId())) {
          if (parent instanceof IStackFrame) {
-            return ((IStackFrame)parent).getVariables();
+            IStackFrame frame = ((IStackFrame)parent);
+            if (frame.hasVariables()) {
+               return frame.getVariables();
+            }
+            else {
+               return EMPTY;
+            }
          }
          else {
             return EMPTY;
@@ -68,7 +74,13 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
       }
       else if (IDebugUIConstants.ID_REGISTER_VIEW.equals(context.getId())) {
          if (parent instanceof IStackFrame) {
-            return ((IStackFrame)parent).getRegisterGroups();
+            IStackFrame frame = ((IStackFrame)parent);
+            if (frame.hasRegisterGroups()) {
+               return frame.getRegisterGroups();
+            }
+            else {
+               return EMPTY;
+            }
          }
          else {
             return EMPTY;
