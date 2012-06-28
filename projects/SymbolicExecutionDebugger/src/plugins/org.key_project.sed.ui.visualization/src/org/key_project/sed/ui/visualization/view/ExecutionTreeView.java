@@ -31,21 +31,23 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
+import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.ILazyTreePathContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewSite;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
+import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
 import org.key_project.sed.ui.visualization.execution_tree.editor.AbstractExecutionTreeDiagramEditorJob;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ReadonlyDiagramEditorActionBarContributor;
@@ -58,11 +60,14 @@ import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.JobUtil;
 import org.key_project.util.eclipse.job.ScheduledJobCollector;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithResult;
 
 /**
@@ -71,6 +76,11 @@ import org.key_project.util.java.thread.IRunnableWithResult;
  * @author Martin Hentschel
  */
 public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<ExecutionTreeDiagramEditor, ReadonlyDiagramEditorActionBarContributor> {
+   /**
+    * The ID of this view.
+    */
+   public static final String VIEW_ID = "org.key_project.sed.ui.graphiti.view.ExecutionTreeView";
+   
    /**
     * The message which is shown to the user if the debug view is not opened.
     */
@@ -165,6 +175,9 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
       editorPart.setGridVisible(false);
       ZoomManager zoomManager = (ZoomManager)editorPart.getAdapter(ZoomManager.class);
       contributor.setZoomManager(zoomManager);
+      if (getDebugView() != null) {
+         updateDiagram(getDebugView().getViewer().getSelection());
+      }
    }
    
    /**
@@ -238,10 +251,10 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                            try {
                               monitor.beginTask(getName(), IProgressMonitor.UNKNOWN);
                               monitor.subTask("Collecting unknown elements");
-                              Deque<Object> expandQue = collectUnknownParents(treeViewer, element);
+                              Deque<Object> expandQue = collectUnknownElementsInParentHierarchy(treeViewer, element);
                               monitor.beginTask(getName(), expandQue.size() + 1);
                               monitor.subTask("Expanding unknown elements");
-                              expandElements(treeViewer, expandQue, monitor);
+                              injectElements(treeViewer, expandQue, monitor);
                            }
                            catch (DebugException e) {
                               LogUtil.getLogger().logError("Can't expand debug view to element \"" + element + "\".", e);
@@ -268,8 +281,8 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    
    /**
     * <p>
-    * Collects all parent elements starting from the given one that
-    * are unknown in the given {@link TreeViewer}.
+    * Collects all elements in the parent hierarchy starting from the given one
+    * which are unknown in the given {@link TreeViewer}.
     * </p>
     * <p>
     * Unknown elements are possible if an {@link ILazyTreeContentProvider} or
@@ -280,112 +293,153 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     * @return A {@link Deque} which contains all unknown elements in order from root to given element.
     * @throws DebugException Occurred Exception.
     */
-   protected Deque<Object> collectUnknownParents(final TreeViewer treeViewer, Object element) throws DebugException {
-      // List parents to expand them first unknown element up to the given element.
+   protected Deque<Object> collectUnknownElementsInParentHierarchy(final TreeViewer treeViewer, Object element) throws DebugException {
       Deque<Object> expandQue = new LinkedList<Object>();
-      Object previous = null;
       while (element != null) {
-         boolean goOn = true;
-         if (previous != null) { // Ignore first element
-            // Check if the previous element is known in tree
-            final Object toTest = previous;
-            IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
-               @Override
-               public void run() {
-                  Widget item = treeViewer.testFindItem(toTest);
-                  setResult(item == null);
-               }
-            };
-            treeViewer.getControl().getDisplay().syncExec(run);
-            if (run.getResult() != null && run.getResult().booleanValue()) {
-               // Previous element is not known, add to Deque and continue with parent.
-               expandQue.addFirst(element);
+         // Check if the element is unknown in tree
+         final Object toTest = element;
+         IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+            @Override
+            public void run() {
+               Widget item = treeViewer.testFindItem(toTest);
+               setResult(item == null);
             }
-            else {
-               // Previous element is known in tree, search can be stopped.
-               goOn = false;
-            }
-         }
-         // Update previous and current element for next iteration.
-         if (goOn) {
-            previous = element;
-            if (element instanceof ISEDThread) {
-               element = ((ISEDThread)element).getDebugTarget();
-            }
-            else if (element instanceof ISEDDebugNode) {
-               element = ((ISEDDebugNode)element).getParent();
-            }
-            else if (element instanceof ISEDDebugTarget) {
-               element = ((ISEDDebugTarget)element).getLaunch();
-            }
-            else {
-               element = null;
-            }
+         };
+         treeViewer.getControl().getDisplay().syncExec(run);
+         if (run.getResult() != null && run.getResult().booleanValue()) {
+            // Element is not known, add to deque and continue with parent.
+            expandQue.addFirst(element);
+            // Update current element for next loop iteration.
+            element = getParent(element);
          }
          else {
+            // Element is known in tree, search can be stopped.
             element = null;
          }
       }
       return expandQue;
    }
+   
+   /**
+    * Computes the parent of the given element, because the used
+    * {@link ILazyTreePathContentProvider} implementation
+    * of the debug viewer returns {@code null} via
+    * {@link ILazyTreePathContentProvider#getParents(Object)}.
+    * @param element The current element.
+    * @return The parent element if available or {@code null} otherwise.
+    * @throws DebugException Occurred Exception.
+    */
+   protected Object getParent(Object element) throws DebugException {
+      if (element instanceof ISEDDebugNode) {
+         return SEDDebugNodeContentProvider.getDefaultInstance().getDebugNodeParent(element);
+      }
+      else if (element instanceof ISEDDebugTarget) {
+         return SEDDebugTargetContentProvider.getDefaultInstance().getParent(element);
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Returns the children of the given {@link Object} shown in
+    * the viewer of view "Debug".
+    * @param element The element to get children for.
+    * @return The available children.
+    * @throws DebugException Occurred Exception.
+    */
+   protected Object[] getChildren(Object element) throws DebugException {
+      if (element instanceof ISEDDebugTarget) {
+         return SEDDebugTargetContentProvider.getDefaultInstance().getAllChildren(element);
+      }
+      else if (element instanceof ISEDDebugNode) {
+         return SEDDebugNodeContentProvider.getDefaultInstance().getAllDebugNodeChildren(element);
+      }
+      else {
+         return null;
+      }
+   }
 
    /**
-    * Expands all elements in the given {@link Deque}.
-    * @param treeViewer The {@link TreeViewer} to expand in.
-    * @param expandQue The {@link Deque} which defines the elements to expand in order from root to child.
+    * Injects all unknown elements of the {@link TreeViewer} in the
+    * parent hierarchy order defined by the given {@link Deque}.
+    * @param treeViewer The {@link TreeViewer} to make elements known in.
+    * @param injectQue The {@link Deque} which contains the unknown elements from parent to leaf.
     * @param monitor The {@link IProgressMonitor} to use.
+    * @throws DebugException Occurred Exception
     */
-   protected void expandElements(final TreeViewer treeViewer, 
-                                 Deque<Object> expandQue,
-                                 IProgressMonitor monitor) {
-      
-      // Expand elements starting at the root to make the familiar in tree
-      for (final Object toExpand : expandQue) {
-         SWTUtil.checkCanceled(monitor);
-         IFilter<Job> jobFilter = new IFilter<Job>() {
-            @Override
-            public boolean select(Job element) {
-               String className = element.getClass().getName();
-               return className.startsWith("org.eclipse.debug") ||
-                      className.startsWith("org.eclipse.ui.internal.progress");
+   protected void injectElements(final TreeViewer treeViewer, 
+                                 Deque<Object> injectQue,
+                                 final IProgressMonitor monitor) throws DebugException {
+      // Check if something must be done
+      if (!CollectionUtil.isEmpty(injectQue)) {
+         // Check if the provider is of the expected form.
+         IContentProvider cp = treeViewer.getContentProvider();
+         if (cp instanceof ILazyTreePathContentProvider) {
+            final ILazyTreePathContentProvider lazyContentProvider = (ILazyTreePathContentProvider)cp;
+            // Create tree path to last known element
+            final LinkedList<Object> tpElements = new LinkedList<Object>();
+            Object knownParent = getParent(injectQue.getFirst());
+            while (knownParent != null) {
+               SWTUtil.checkCanceled(monitor);
+               tpElements.addFirst(knownParent);
+               knownParent = getParent(knownParent);
             }
-         };
-         ScheduledJobCollector collector = new ScheduledJobCollector(jobFilter);
-         try {
-            // Start collecting update jobs started by the debug view
-            collector.start();
-            // Expand tree
-            treeViewer.getTree().getDisplay().syncExec(new Runnable() {
-               @Override
-               public void run() {
-                  if (!treeViewer.getExpandedState(toExpand)) {
-                     // Search item to expand
-                     Widget item = treeViewer.testFindItem(toExpand);
-                     Assert.isTrue(item instanceof TreeItem);
-                     TreeItem treeItem = (TreeItem)item;
-                     // Make item visible and expand it. Invisible elements are not expanded.
-                     treeViewer.getTree().showItem(treeItem);
-                     treeViewer.setExpandedState(toExpand, true);
-                     // Make all children visible because otherwise lazy loading will not update them if the expanded element is exactly the last visible element.
-                     for (TreeItem child : treeItem.getItems()) {
-                        treeViewer.getTree().showItem(child);
+            // Injects elements starting at the root to make them familiar in tree
+            for (final Object toInject : injectQue) {
+               SWTUtil.checkCanceled(monitor);
+               // Compute index on parent
+               Object parent = getParent(toInject);
+               final int viewIndex = ArrayUtil.indexOf(getChildren(parent), toInject);
+               // Create tree path to current element
+               final TreePath tp = new TreePath(tpElements.toArray());
+               // Create job collector to collect update jobs started by the Debug API
+               IFilter<Job> jobFilter = new IFilter<Job>() {
+                  @Override
+                  public boolean select(Job element) {
+                     String className = element.getClass().getName();
+                     return className.startsWith("org.eclipse.debug") ||
+                            className.startsWith("org.eclipse.ui.internal.progress");
+                  }
+               };
+               ScheduledJobCollector collector = new ScheduledJobCollector(jobFilter);
+               try {
+                  // Start collecting update jobs started by the debug view
+                  collector.start();
+                  IRunnableWithException run = new AbstractRunnableWithException() {
+                     @Override
+                     public void run() {
+                        try {
+                           // Inject the element into the TreeViewer
+                           lazyContentProvider.updateChildCount(tp, 0);
+                           lazyContentProvider.updateElement(tp, viewIndex);
+                        }
+                        catch (Exception e) {
+                           setException(e);
+                        }
                      }
+                  };
+                  treeViewer.getControl().getDisplay().syncExec(run);
+                  if (run.getException() != null) {
+                     throw new DebugException(LogUtil.getLogger().createErrorStatus(run.getException().getMessage(), run.getException()));
                   }
                }
-            });
+               finally {
+                  // Stop collecting update jobs
+                  collector.stop();
+               }
+               // Wait until all update jobs have finished before
+               Job[] jobs = collector.getJobs();
+               for (Job job : jobs) {
+                  SWTUtil.checkCanceled(monitor);
+                  JobUtil.waitFor(job, 10);
+               }         
+               // Update tree path for next loop iteration
+               tpElements.add(toInject);
+               // Update monitor
+               monitor.worked(1);
+            }
          }
-         finally {
-            // Stop collecting update jobs
-            collector.stop();
-         }
-         // Wait until all update jobs have finished before
-         Job[] jobs = collector.getJobs();
-         for (Job job : jobs) {
-            SWTUtil.checkCanceled(monitor);
-            JobUtil.waitFor(job, 10);
-         }
-         // Update monitor
-         monitor.worked(1);
       }
    }
    

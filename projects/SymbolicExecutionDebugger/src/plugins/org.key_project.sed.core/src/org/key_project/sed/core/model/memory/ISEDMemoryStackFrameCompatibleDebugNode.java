@@ -1,6 +1,7 @@
 package org.key_project.sed.core.model.memory;
 
 import org.eclipse.debug.core.model.IStackFrame;
+import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDStackFrameCompatibleDebugNode;
 
 /**
@@ -31,4 +32,10 @@ public interface ISEDMemoryStackFrameCompatibleDebugNode extends ISEDMemoryDebug
     * @param sourceName The source name to set.
     */
    public void setSourceName(String sourceName);
+   
+   /**
+    * Adds the given {@link IVariable}.
+    * @param variable The {@link IVariable} to add.
+    */
+   public void addVariable(IVariable variable);
 }

@@ -39,8 +39,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
@@ -301,6 +301,8 @@ public final class ProblemInitializer {
      * Removes all schema variables, all generic sorts and all sort
      * depending symbols for a generic sort out of the namespaces.
      * Helper for readEnvInput().
+     * 
+     * See bug report #1185, #1189
      */
     private void cleanupNamespaces(InitConfig initConfig) {
 	Namespace newVarNS = new Namespace();	    
@@ -512,7 +514,7 @@ public final class ProblemInitializer {
                         }
                     }
                 }
-                for(ProgramMethod pm
+                for(IProgramMethod pm
                         : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
                     if(!(pm.isVoid() || pm.isConstructor())) {
                         functions.add(pm);
@@ -533,7 +535,7 @@ public final class ProblemInitializer {
     }
 
     
-    public Proof startProver(InitConfig initConfig, ProofOblInput po) 
+    public Proof startProver(InitConfig initConfig, ProofOblInput po, int proofNum) 
     		throws ProofInputException {
 	assert initConfig != null;
 	if(listener!= null){
@@ -548,13 +550,13 @@ public final class ProblemInitializer {
     	    po.readProblem();
     	    ProofAggregate pa = po.getPO();
     	    //final work
-    	    setUpProofHelper(po, pa,initConfig);
+    	    setUpProofHelper(po, pa, initConfig);
 
 	    //done
     	    if(listener != null){
                 listener.proofCreated(this, pa);
             }
-          return pa.getFirstProof();
+          return pa.getProofs()[proofNum];
                	    
         } catch (ProofInputException e) {    
             if(listener != null){
@@ -574,7 +576,7 @@ public final class ProblemInitializer {
     public void startProver(ProofEnvironment env, ProofOblInput po) 
     		throws ProofInputException {
 	assert env.getInitConfig().getProofEnv() == env;
-        startProver(env.getInitConfig(), po);
+        startProver(env.getInitConfig(), po, 0);
     }
     
     
@@ -582,7 +584,7 @@ public final class ProblemInitializer {
     		throws ProofInputException {
 	try {
 	    InitConfig initConfig = prepare(envInput);
-	    startProver(initConfig, po);
+	    startProver(initConfig, po, 0);
 	} catch(ProofInputException e) {
 	    reportStatus(envInput.name() + " failed");
 	    throw e;

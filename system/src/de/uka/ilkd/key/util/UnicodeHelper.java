@@ -19,7 +19,8 @@ public final class UnicodeHelper {
     public static final char FORALL = '\u2200';
     public static final char EXISTS = '\u2203';
     public static final char AND = '\u2227';
-    public static final char OR = '\u2228'; 
+    public static final char OR = '\u2228';
+    public static final char NEQ = '\u2260';
 
     // temporal operators
     public static final char BOX = '\u25A1';
@@ -30,15 +31,51 @@ public final class UnicodeHelper {
     // arithmetic stuff
     public static final char LEQ = '\u2264';
     public static final char GEQ = '\u2265';
+    public static final char SUM = '\u2211';
+    public static final char PROD = '\u220F';
     
     // sets
-    public static final char IN = '\u220A'; // aka. contains
+    public static final char IN = '\u220A';
     public static final char EMPTY = '\u2205';
     public static final char UNION = '\u222A';
     public static final char INTERSECT = '\u2229';
     public static final char SUBSET = '\u2286';
     public static final char SETMINUS = '\u2216';
+    public static final char NATURALS = '\u2115';
     public static final char INTEGERS = '\u2124';
+    
+    // delimiters (for modalities)
+    public static final char LANGLE = '\u27E8';
+    public static final char RANGLE = '\u27E9';
+    public static final char LLBRACKET = '\u27E6';
+    public static final char RRBRACKET = '\u27E7';
+    
+    // greek alphabet
+    public static final char ALPHA = '\u03B1';
+    public static final char BETA = '\u03B2';
+    public static final char GAMMA = '\u03B3';
+    public static final char DELTA = '\u03B4';
+    public static final char EPSILON = '\u03B5';
+    public static final char ZETA = '\u03B6';
+    public static final char ETA = '\u03B7';
+    public static final char THETA = '\u03B8';
+    public static final char IOTA = '\u03B9';
+    public static final char KAPPA = '\u03BA';
+    public static final char LAMBDA = '\u03BB';
+    public static final char MU = '\u03BC';
+    public static final char NU = '\u03BD';
+    public static final char XI = '\u03BE';
+    public static final char OMICRON = '\u03BF';
+    public static final char PI = '\u03C0';
+    public static final char RHO = '\u03C1';
+    public static final char SIGMA = '\u03C3';
+    public static final char TAU = '\u03C4';
+    public static final char UPSILON = '\u03C5';
+    public static final char PHI = '\u03C6';
+    public static final char CHI = '\u03C7';
+    public static final char PSI = '\u03C8';
+    public static final char OMEGA = '\u03C9';
+    
     
     // also quite popular
     public static final char TOP = '\u22A4';
@@ -47,5 +84,17 @@ public final class UnicodeHelper {
     public static final char MODELS = '\u22A7';
     
     
+    /** For testing Unicode symbols. */
+//    public static void main(String[] args){
+//        System.out.println("Testing Unicode symbols:");
+//        for (java.lang.reflect.Field f: UnicodeHelper.class.getDeclaredFields()){
+//            try {
+//                System.out.print(f.get(null));
+//            } catch (Exception e) {
+//                System.out.println("Error in Unicode test.");
+//                e.printStackTrace();
+//            }
+//        }
+//    }
     
 }

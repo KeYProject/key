@@ -18,9 +18,9 @@ import de.uka.ilkd.key.java.SourceElement;
 
 public class MultiRenamingTable extends RenamingTable{
 
-    private final HashMap hmap;
+    private final HashMap<? extends SourceElement, ? extends SourceElement> hmap;
 
-    public MultiRenamingTable(HashMap hmap){
+    public MultiRenamingTable(HashMap<? extends SourceElement, ? extends SourceElement> hmap){
 	this.hmap = hmap;
     }
 
@@ -28,7 +28,7 @@ public class MultiRenamingTable extends RenamingTable{
 	return (SourceElement) hmap.get(se);
     }
 
-    public Iterator getRenamingIterator(){
+    public Iterator<? extends SourceElement> getRenamingIterator(){
 	return hmap.keySet().iterator();
     }
     
@@ -36,7 +36,7 @@ public class MultiRenamingTable extends RenamingTable{
 	return ("MultiRenamingTable: "+hmap);
     }
     
-    public HashMap getHashMap(){
+    public HashMap<? extends SourceElement, ? extends SourceElement> getHashMap(){
         return hmap;
     }
     

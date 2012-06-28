@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;">
-   <methodCall name="self.main();">
-      <statement name="foo();">
-         <methodCall name="self.foo();">
-            <methodReturn name="&lt;return of self.foo();&gt;" nameIncludingReturnValue="&lt;return of self.foo();&gt;">
-               <statement name="int i;">
-                  <statement name="boolean b = true;">
-                     <statement name="i=0;">
-                        <statement name="i=i+1;">
-                           <statement name="i+=2;">
-                              <statement name="i++;">
-                                 <statement name="i--;">
-                                    <statement name="i-=2;">
-                                       <statement name="i*=2;">
-                                          <statement name="i/=2;">
-                                             <statement name="i%=4;">
-                                                <statement name="i=get42();">
-                                                   <methodCall name="self.get42();">
-                                                      <statement name="return 42;">
-                                                         <methodReturn name="&lt;return of self.get42();&gt;" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.get42();&gt;">
-                                                            <statement name="i=(2+4)*2;">
-                                                               <methodReturn name="&lt;return of self.main();&gt;" nameIncludingReturnValue="&lt;return of self.main();&gt;">
-                                                                  <termination name="&lt;end&gt;" exceptionalTermination="false">
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
+      <statement name="foo();" pathCondition="true" pathConditionChanged="false">
+         <methodCall name="self.foo();" pathCondition="true" pathConditionChanged="false">
+            <methodReturn name="&lt;return of self.foo();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.foo();&gt;">
+               <statement name="int i;" pathCondition="true" pathConditionChanged="false">
+                  <statement name="boolean b = true;" pathCondition="true" pathConditionChanged="false">
+                     <statement name="i=0;" pathCondition="true" pathConditionChanged="false">
+                        <statement name="i=i+1;" pathCondition="true" pathConditionChanged="false">
+                           <statement name="i+=2;" pathCondition="true" pathConditionChanged="false">
+                              <statement name="i++;" pathCondition="true" pathConditionChanged="false">
+                                 <statement name="i--;" pathCondition="true" pathConditionChanged="false">
+                                    <statement name="i-=2;" pathCondition="true" pathConditionChanged="false">
+                                       <statement name="i*=2;" pathCondition="true" pathConditionChanged="false">
+                                          <statement name="i/=2;" pathCondition="true" pathConditionChanged="false">
+                                             <statement name="i%=4;" pathCondition="true" pathConditionChanged="false">
+                                                <statement name="i=get42();" pathCondition="true" pathConditionChanged="false">
+                                                   <methodCall name="self.get42();" pathCondition="true" pathConditionChanged="false">
+                                                      <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
+                                                         <methodReturn name="&lt;return of self.get42();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.get42();&gt;">
+                                                            <statement name="i=(2+4)*2;" pathCondition="true" pathConditionChanged="false">
+                                                               <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.main();&gt;">
+                                                                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
                                                                   </termination>
                                                                </methodReturn>
                                                             </statement>

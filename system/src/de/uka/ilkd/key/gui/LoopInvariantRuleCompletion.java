@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
@@ -36,17 +37,16 @@ public class LoopInvariantRuleCompletion implements
         final While loop = loopApp.getLoopStatement();
 
         LoopInvariant inv = loopApp.getInvariant();
-        final boolean isTransaction = ((Modality)loopApp.programTerm().op()).transaction();
         if (inv == null) { // no invariant present, get it interactively
             inv = new LoopInvariantImpl(loop,
-                    MiscTools.getInnermostMethodFrame(progPost.javaBlock(),
+                    JavaTools.getInnermostMethodFrame(progPost.javaBlock(),
                             services) == null ? null : MiscTools
-                                    .getSelfTerm(MiscTools.getInnermostMethodFrame(
+                                    .getSelfTerm(JavaTools.getInnermostMethodFrame(
                                             progPost.javaBlock(), services),
-                                            services), (Term) null);
+                                            services), null);
             try {
                 inv = InvariantConfigurator.getInstance().getLoopInvariant(inv,
-                        services, false, isTransaction);
+                        services, false, loopApp.getHeapContext());
             } catch (RuleAbortException e) {
                 return null;
             }
@@ -59,7 +59,7 @@ public class LoopInvariantRuleCompletion implements
                 // get invariant or variant interactively
                 try {
                     inv = InvariantConfigurator.getInstance().getLoopInvariant(
-                            inv, services, requiresVariant, isTransaction);
+                            inv, services, requiresVariant, loopApp.getHeapContext());
                 } catch (RuleAbortException e) {
                     return null;
                 }

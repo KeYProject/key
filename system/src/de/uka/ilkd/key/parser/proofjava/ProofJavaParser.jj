@@ -3769,17 +3769,39 @@ ExecutionContext ExecutionContext() :
 {
   TypeReference classContext;
   Expression runtimeInstance = null;
+  MethodSignature methodSignature;
 } 
 {
 
   "source="
-  classContext = Type() 
+  methodSignature = MethodSignature() "@" classContext = Type()
   [ ",this=" runtimeInstance = Expression() ]
 
   { return new ExecutionContext
-        (classContext, 
+        (classContext, methodSignature,
         (ReferencePrefix)runtimeInstance);
   }
+}
+
+
+MethodSignature MethodSignature() :
+{
+     UncollatedReferenceQualifier name;
+     TypeReference tr;
+     ASTList<TypeReference> paramTypes = new ASTArrayList<TypeReference>();
+}
+{
+     name = Name() "(" 
+        [ tr = Type() { paramTypes.add(tr); }
+         ( "," tr = Type() { 
+                // check if more params are admissible (no more after a vararg) occurs in FormalParameter()
+                paramTypes.add(tr); 
+           } 
+         )* 
+       ] ")"
+     {
+        return factory.createMethodSignature(name.getIdentifier(), paramTypes);    
+     }
 }
 
 StatementBlock Block() :

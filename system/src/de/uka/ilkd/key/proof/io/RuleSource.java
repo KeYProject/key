@@ -51,6 +51,7 @@ public class RuleSource {
 		    numberOfChars++;
 		    i=input.read();
 		}
+		input.close();
 	    } catch (IOException ioex){
 		System.err.println("IOException in class RuleSource");
 	    }

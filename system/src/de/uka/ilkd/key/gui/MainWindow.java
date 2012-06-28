@@ -1210,8 +1210,11 @@ public final class MainWindow extends JFrame  {
          * invoked if automatic execution has stopped
          */
         public synchronized void autoModeStopped(ProofEvent e) {
-            Debug.log4jWarn("Automode stopped", MainWindow.class.getName());
-            Debug.log4jDebug("From " + Debug.stackTrace(), MainWindow.class.getName());
+            if (Debug.ENABLE_DEBUG) {
+		Debug.log4jWarn("Automode stopped", MainWindow.class.getName());
+		Debug.log4jDebug("From " + Debug.stackTrace(),
+				 MainWindow.class.getName());
+	    }
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
             setProofNodeDisplay();

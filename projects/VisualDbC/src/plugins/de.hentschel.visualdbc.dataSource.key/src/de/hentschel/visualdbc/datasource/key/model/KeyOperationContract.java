@@ -21,7 +21,7 @@ import de.hentschel.visualdbc.datasource.model.exception.DSCanceledException;
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryOperationContract;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.OperationContract;
 
 /**
@@ -35,9 +35,9 @@ public class KeyOperationContract extends MemoryOperationContract {
    private KeYJavaType type;
    
    /**
-    * The {@link ProgramMethod} that contains this operation contract.
+    * The {@link IProgramMethod} that contains this operation contract.
     */
-   private ProgramMethod pm;
+   private IProgramMethod pm;
    
    /**
     * The represented KeY {@link OperationContract}.
@@ -53,12 +53,12 @@ public class KeyOperationContract extends MemoryOperationContract {
     * Constructor.
     * @param connection The {@link KeyConnection} that has created this instance.
     * @param type The {@link KeYJavaType}.
-    * @param pm The {@link ProgramMethod} that contains this operation contract.
+    * @param pm The {@link IProgramMethod} that contains this operation contract.
     * @param oc The represented KeY {@link OperationContract}.
     */
    public KeyOperationContract(KeyConnection connection,
                                KeYJavaType type,
-                               ProgramMethod pm,
+                               IProgramMethod pm,
                                OperationContract oc) {
       super();
       Assert.isNotNull(connection);

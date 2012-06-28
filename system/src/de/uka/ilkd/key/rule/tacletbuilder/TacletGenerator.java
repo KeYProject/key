@@ -4,6 +4,12 @@
  */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -20,8 +26,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -35,11 +41,6 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Pair;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 
 
@@ -119,7 +120,7 @@ public class TacletGenerator {
     public Taclet generateRelationalRepresentsTaclet(Name tacletName,
                                                      Term originalAxiom,
                                                      KeYJavaType kjt,
-                                                     ObserverFunction target,
+                                                     IObserverFunction target,
                                                      ProgramVariable heap,
                                                      ProgramVariable self,
                                                      Services services) {
@@ -161,14 +162,14 @@ public class TacletGenerator {
     }
 
 
-    public ImmutableSet<Taclet> generateFuncionalRepresentsTaclets(
+    public ImmutableSet<Taclet> generateFunctionalRepresentsTaclets(
             Name name,
             Term originalRepresentsTerm,
             KeYJavaType kjt,
-            ObserverFunction target,
+            IObserverFunction target,
             ProgramVariable heap,
             ProgramVariable self,
-            ImmutableSet<Pair<Sort, ObserverFunction>> toLimit,
+            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
         ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
 
@@ -286,14 +287,14 @@ public class TacletGenerator {
                                                          SchemaVariable eqSV,
                                                          Term term,
                                                          KeYJavaType kjt,
-                                                         ImmutableSet<Pair<Sort, ObserverFunction>> toLimit,
+                                                         ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
                                                          boolean isStatic,
                                                          boolean eqVersion,
                                                          Services services) {
         ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
         
         //instantiate axiom with schema variables
-        final Term rawAxiom = OpReplacer.replace(TB.heap(services),
+        final Term rawAxiom = OpReplacer.replace(TB.getBaseHeap(services),
                                                  TB.var(heapSV),
                                                  term);
         final TermAndBoundVarPair schemaAxiom =
@@ -533,7 +534,7 @@ public class TacletGenerator {
 
 
     private Pair<Term, ImmutableSet<Taclet>> limitTerm(Term t,
-                                                      ImmutableSet<Pair<Sort, ObserverFunction>> toLimit,
+                                                      ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
                                                       Services services) {
         ImmutableSet<Taclet> taclets = DefaultImmutableSet.nil();
 
@@ -548,13 +549,13 @@ public class TacletGenerator {
 
         //top level operator
         Operator newOp = t.op();
-        if (t.op() instanceof ObserverFunction) {
-            final ObserverFunction obs = (ObserverFunction) t.op();
-            for (Pair<Sort, ObserverFunction> pair : toLimit) {
+        if (t.op() instanceof IObserverFunction) {
+            final IObserverFunction obs = (IObserverFunction) t.op();
+            for (Pair<Sort, IObserverFunction> pair : toLimit) {
                 if (pair.second.equals(t.op())
                     && (obs.isStatic()
                         || t.sub(1).sort().extendsTrans(pair.first))) {
-                    Pair<ObserverFunction, ImmutableSet<Taclet>> limited = services.getSpecificationRepository().limitObs(
+                    Pair<IObserverFunction, ImmutableSet<Taclet>> limited = services.getSpecificationRepository().limitObs(
                             obs);
                     newOp = limited.first;
                     taclets = taclets.union(limited.second);
@@ -570,7 +571,7 @@ public class TacletGenerator {
 
 
     private SequentFormula generateGuard(KeYJavaType kjt,
-                                         ObserverFunction target,
+                                         IObserverFunction target,
                                          Services services,
                                          final SchemaVariable selfSV,
                                          final SchemaVariable heapSV,
@@ -590,7 +591,7 @@ public class TacletGenerator {
     }
 
 
-    private Term prepareSatisfiabilityGuard(ObserverFunction target,
+    private Term prepareSatisfiabilityGuard(IObserverFunction target,
                                             final SchemaVariable heapSV,
                                             final SchemaVariable selfSV,
                                             final Term schemaAxiom,
@@ -629,7 +630,7 @@ public class TacletGenerator {
 
 
     private Term prepareExactInstanceGuard(KeYJavaType kjt,
-                                           ObserverFunction target,
+                                           IObserverFunction target,
                                            Services services,
                                            final SchemaVariable selfSV) {
         final boolean finalClass =

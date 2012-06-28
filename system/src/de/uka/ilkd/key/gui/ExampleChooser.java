@@ -212,22 +212,23 @@ public final class ExampleChooser extends JDialog {
 	final File selectedExample = (File) exampleList.getSelectedValue();
 	final File readme = new File(selectedExample, README_NAME);
 	if(readme.isFile()) {
-	    try {
-		final BufferedReader br 
-			= new BufferedReader(new FileReader(readme));
-		final StringBuilder sb = new StringBuilder();
-	        final String ls = System.getProperty("line.separator");
-	        String line;
-	        while((line = br.readLine()) != null) {
-	            sb.append(line);
-	            sb.append(ls);
-	        }
-	        descriptionText.setText(sb.toString());
-	        descriptionText.getCaret().setDot(0);
-	    } catch(IOException e) {
-		descriptionText.setText("Reading description from "
-			                 + "README file failed.");
-	    }
+            final BufferedReader br;
+            try {
+                br = new BufferedReader(new FileReader(readme));
+                final StringBuilder sb = new StringBuilder();
+                final String ls = System.getProperty("line.separator");
+                String line;
+                while((line = br.readLine()) != null) {
+                    sb.append(line);
+                    sb.append(ls);
+                }
+                descriptionText.setText(sb.toString());
+                descriptionText.getCaret().setDot(0);	        
+                br.close();
+            } catch(IOException e) {
+                descriptionText.setText("Reading description from "
+                        + "README file failed.");
+            } 
 	} else {
 	    descriptionText.setText("No description available.");
 	}

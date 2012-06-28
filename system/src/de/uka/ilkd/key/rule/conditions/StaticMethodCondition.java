@@ -19,8 +19,8 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.NullSort;
@@ -85,7 +85,7 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
 	    ExecutionContext ec 
 		= svInst.getContextInstantiation().activeStatementContext();
 	    MethodReference mr =new MethodReference(ar, mn, rp);
-	    ProgramMethod method = null;
+	    IProgramMethod method = null;
 	    KeYJavaType prefixType = services.getTypeConverter().
 		getKeYJavaType((Expression) rp, ec);
 	    if((rp instanceof LocationVariable) && 

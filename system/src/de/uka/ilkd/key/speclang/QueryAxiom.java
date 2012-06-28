@@ -10,9 +10,11 @@
 
 package de.uka.ilkd.key.speclang;
 
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -21,33 +23,48 @@ import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
 /**
  * A class axiom that connects an observer symbol representing a Java
- * method (i.e., an object of type ProgramMethod), with the corresponding
+ * method (i.e., an object of type IProgramMethod), with the corresponding
  * method body.
  */
 public final class QueryAxiom extends ClassAxiom {
     
     private final String name;
-    private final ProgramMethod target;    
+    private final IProgramMethod target;    
     private final KeYJavaType kjt;        
     
-    public QueryAxiom(String name, ProgramMethod target, KeYJavaType kjt) {
+    public QueryAxiom(String name, IProgramMethod target, KeYJavaType kjt) {
 	assert name != null;
 	assert target != null;
 	assert target.getReturnType() != null;	
 	assert kjt != null;
 	this.name = name;
-	this.target = target;	
+	this.target = (IProgramMethod)target;	
 	this.kjt = kjt;
     }
     
@@ -59,7 +76,7 @@ public final class QueryAxiom extends ClassAxiom {
     
     
     @Override
-    public ObserverFunction getTarget() {
+    public IObserverFunction getTarget() {
 	return target;
     }    
     
@@ -78,7 +95,7 @@ public final class QueryAxiom extends ClassAxiom {
     
     @Override
     public ImmutableSet<Taclet> getTaclets(
-	    		ImmutableSet<Pair<Sort, ObserverFunction>> toLimit, 
+	    		ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, 
 	    		Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	
@@ -158,7 +175,7 @@ public final class QueryAxiom extends ClassAxiom {
 		                 .append(target.getParamTypes()
 		                	       .toArray(
 		                      new KeYJavaType[target.getNumParams()]));	
-	final ProgramMethod targetImpl 
+	final IProgramMethod targetImpl 
 		= services.getJavaInfo().getProgramMethod(kjt, 
 							  target.getName(), 
 							  sig, 
@@ -237,7 +254,7 @@ public final class QueryAxiom extends ClassAxiom {
     
     
     @Override
-    public ImmutableSet<Pair<Sort, ObserverFunction>> getUsedObservers(
+    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
 	    						Services services) {
 	return DefaultImmutableSet.nil();
     }

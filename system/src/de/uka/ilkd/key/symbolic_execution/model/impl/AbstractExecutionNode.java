@@ -3,17 +3,18 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.NodeInfo;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 
 /**
  * Provides a basic implementation of {@link IExecutionNode}.
  * @author Martin Hentschel
  */
-public abstract class AbstractExecutionNode implements IExecutionNode {
+public abstract class AbstractExecutionNode extends AbstractExecutionElement implements IExecutionNode {
    /**
     * Reference to the parent {@link IExecutionNode}.
     */
@@ -23,24 +24,14 @@ public abstract class AbstractExecutionNode implements IExecutionNode {
     * Contains all child {@link IExecutionNode}s.
     */
    private List<IExecutionNode> children = new LinkedList<IExecutionNode>();
-
-   /**
-    * The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
-    */
-   private Node proofNode;
-   
-   /**
-    * The human readable name of this node.
-    */
-   private String name;
    
    /**
     * Constructor.
+    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public AbstractExecutionNode(Node proofNode) {
-      assert proofNode != null;
-      this.proofNode = proofNode;
+   public AbstractExecutionNode(KeYMediator mediator, Node proofNode) {
+      super(mediator, proofNode);
    }
 
    /**
@@ -50,7 +41,7 @@ public abstract class AbstractExecutionNode implements IExecutionNode {
    public AbstractExecutionNode getParent() {
       return parent;
    }
-   
+
    /**
     * Sets the parent {@link AbstractExecutionNode}.
     * @param parent The parent {@link AbstractExecutionNode} to set.
@@ -76,54 +67,52 @@ public abstract class AbstractExecutionNode implements IExecutionNode {
          children.add(child);
       }
    }
-   
+
    /**
     * {@inheritDoc}
     */
    @Override
-   public Services getServices() {
-      return getProof().getServices();
+   public boolean isPathConditionChanged() {
+      return false;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public Proof getProof() {
-      return getProofNode().proof();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public Node getProofNode() {
-      return proofNode;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public NodeInfo getProofNodeInfo() {
-      return getProofNode().getNodeInfo();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getName() {
-      if (name == null) {
-         name = lazyComputeName();
+   public Term getPathCondition() throws ProofInputException {
+      // Search path condition of the parent which is used by default.
+      Term result = null;
+      AbstractExecutionNode parent = getParent();
+      while (result == null && parent != null) {
+         if (parent.isPathConditionChanged()) {
+            result = parent.getPathCondition();
+         }
+         else {
+            parent = parent.getParent();
+         }
       }
-      return name;
+      // Check if a path condition was found.
+      return result != null ? result :  TermBuilder.DF.tt();
    }
 
    /**
-    * Computes the name of this node lazily when {@link #getName()}
-    * is called the first time.
-    * @return The human readable name of this {@link IExecutionNode}.
+    * {@inheritDoc}
     */
-   protected abstract String lazyComputeName();
+   @Override
+   public String getFormatedPathCondition() throws ProofInputException {
+      // Search path condition of the parent which is used by default.
+      String result = null;
+      AbstractExecutionNode parent = getParent();
+      while (result == null && parent != null) {
+         if (parent.isPathConditionChanged()) {
+            result = parent.getFormatedPathCondition();
+         }
+         else {
+            parent = parent.getParent();
+         }
+      }
+      // Check if a path condition was found.
+      return result != null ? result :  TermBuilder.DF.tt().toString();
+   }
 }

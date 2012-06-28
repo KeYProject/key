@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
 
@@ -17,4 +19,15 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
  * @see ExecutionBranchCondition
  */
 public interface IExecutionBranchCondition extends IExecutionNode {
+   /**
+    * Returns the branch condition as {@link Term}.
+    * @return The branch condition as {@link Term}.
+    */
+   public Term getBranchCondition() throws ProofInputException;
+   
+   /**
+    * Returns the human readable branch condition as string. 
+    * @return The human readable branch condition.
+    */
+   public String getFormatedBranchCondition() throws ProofInputException;
 }

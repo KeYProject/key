@@ -49,7 +49,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  *  setting back several proof steps. The sequent has to be changed using the
  *  methods of Goal.  
  */
-public class Goal  {
+public final class Goal  {
 
     private Node node;
 

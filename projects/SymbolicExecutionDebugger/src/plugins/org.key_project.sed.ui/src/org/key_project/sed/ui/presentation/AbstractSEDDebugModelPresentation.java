@@ -6,15 +6,7 @@ import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDExceptionalTermination;
-import org.key_project.sed.core.model.ISEDLoopCondition;
-import org.key_project.sed.core.model.ISEDLoopNode;
-import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.ISEDMethodReturn;
-import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.util.SEDImages;
 import org.key_project.util.java.StringUtil;
@@ -64,29 +56,8 @@ public abstract class AbstractSEDDebugModelPresentation extends LabelProvider im
     */
    @Override
    public Image getImage(Object element) {
-      if (element instanceof ISEDMethodCall) {
-         return SEDImages.getImage(SEDImages.METHOD_CALL);
-      }
-      else if (element instanceof ISEDMethodReturn) {
-         return SEDImages.getImage(SEDImages.METHOD_RETURN);
-      }
-      else if (element instanceof ISEDExceptionalTermination) {
-         return SEDImages.getImage(SEDImages.EXCEPTIONAL_TERMINATION);
-      }
-      else if (element instanceof ISEDTermination) {
-         return SEDImages.getImage(SEDImages.TERMINATION);
-      }
-      else if (element instanceof ISEDBranchCondition) {
-         return SEDImages.getImage(SEDImages.BRANCH_CONDITION);
-      }
-      else if (element instanceof ISEDBranchNode) {
-         return SEDImages.getImage(SEDImages.BRANCH_NODE);
-      }
-      else if (element instanceof ISEDLoopNode) {
-         return SEDImages.getImage(SEDImages.LOOP_NODE);
-      }
-      else if (element instanceof ISEDLoopCondition) {
-         return SEDImages.getImage(SEDImages.LOOP_CONDITION);
+      if (element instanceof ISEDDebugNode) {
+         return SEDImages.getNodeImage((ISEDDebugNode)element);
       }
       else {
          return super.getImage(element);

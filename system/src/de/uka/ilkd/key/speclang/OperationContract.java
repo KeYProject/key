@@ -13,13 +13,14 @@ package de.uka.ilkd.key.speclang;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 public interface OperationContract extends Contract {
     
     @Override
-    public ProgramMethod getTarget();
+    public IProgramMethod getTarget();
     
     /**
      * Returns <code>true</code> iff the method (according to the contract) does
@@ -32,7 +33,7 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifies clause of the contract.
      */
-    public Term getMod(ProgramVariable selfVar, 
+    public Term getMod(LocationVariable heapVar, ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Services services);
     
@@ -40,7 +41,7 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifies clause of the contract.
      */
-    public Term getMod(Term heapTerm,
+    public Term getMod(LocationVariable heapVar, Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Services services);
@@ -48,17 +49,17 @@ public interface OperationContract extends Contract {
     /**
      * Returns the modifies_backup clause of the contract.
      */
-    public Term getBackupMod(ProgramVariable selfVar, 
-	    	       ImmutableList<ProgramVariable> paramVars,
-                       Services services);
+//    public Term getBackupMod(ProgramVariable selfVar, 
+//	    	       ImmutableList<ProgramVariable> paramVars,
+//                       Services services);
     
     
     /**
      * Returns the modifies_backup clause of the contract.
      */
-    public Term getBackupMod(Term heapTerm,
-	               Term selfTerm, 
-	    	       ImmutableList<Term> paramTerms,
-                       Services services);
+//    public Term getBackupMod(Term heapTerm,
+//	               Term selfTerm, 
+//	    	       ImmutableList<Term> paramTerms,
+//                       Services services);
     
 }

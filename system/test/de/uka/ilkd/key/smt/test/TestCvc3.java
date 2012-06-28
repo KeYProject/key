@@ -14,6 +14,7 @@ package de.uka.ilkd.key.smt.test;
 import de.uka.ilkd.key.smt.SolverType;
 
 public class TestCvc3 extends TestSMTSolver {
+    private static final String SYSTEM_PROPERTY_SOLVER_PATH = "cvc3SolverPath";
 
     private static boolean isInstalled = false;
     private static boolean installChecked = false;
@@ -26,6 +27,7 @@ public class TestCvc3 extends TestSMTSolver {
 	    installChecked = true;
 	    if(!isInstalled) {
 	    	System.out.println("Warning: " + getSolverType().getName() + " is not installed, tests skipped.");
+	      System.out.println("Maybe use JVM system property \"" + SYSTEM_PROPERTY_SOLVER_PATH + "\" to define the path to the CVC3 command.");
 	    }	  
 		if(isInstalled &&!getSolverType().supportHasBeenChecked()){
 			if(!getSolverType().checkForSupport()){
@@ -40,6 +42,11 @@ public class TestCvc3 extends TestSMTSolver {
     
     @Override
     public SolverType getSolverType() {
-	return SolverType.CVC3_SOLVER;
+       SolverType type = SolverType.CVC3_SOLVER;
+       String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
+       if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
+          type.setSolverCommand(solverPathProperty);
+       }
+       return type;
     }
 }

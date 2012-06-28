@@ -1,9 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.NodeInfo;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 
 /**
@@ -31,7 +29,7 @@ import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
  * </p>
  * @author Martin Hentschel
  */
-public interface IExecutionNode {
+public interface IExecutionNode extends IExecutionElement {
    /**
     * Prefix that is used in {@link IExecutionNode}s which represents an internal state in KeY which is not part of the source code.
     */
@@ -56,32 +54,20 @@ public interface IExecutionNode {
    public IExecutionNode[] getChildren();
    
    /**
-    * Returns the {@link Services} used in {@link #getProof()}.
-    * @return The {@link Services} used in {@link #getProof()}.
+    * Checks if this node has changed the path condition of the parent.
+    * @return {@code true} has different path condition compared to its parent, {@code false} has same path condition as parent.
     */
-   public Services getServices();
+   public boolean isPathConditionChanged();
    
    /**
-    * Returns the {@link Proof} from which the symbolic execution tree was extracted.
-    * @return The {@link Proof} from which the symbolic execution tree was extracted.
+    * Returns the path condition to reach this node as {@link Term}.
+    * @return The path condition to reach this node as {@link Term}.
     */
-   public Proof getProof();
+   public Term getPathCondition() throws ProofInputException;
    
    /**
-    * Returns the {@link Node} in KeY's proof tree which is represented by this execution tree node.
-    * @return The {@link Node} in KeY's proof tree which is represented by this execution tree node.
+    * Returns the human readable path condition to reach this node as string. 
+    * @return The human readable path condition as string.
     */
-   public Node getProofNode();
-   
-   /**
-    * Returns the {@link NodeInfo} of {@link #getProofNode()}.
-    * @return The {@link NodeInfo} of {@link #getProofNode()}.
-    */
-   public NodeInfo getProofNodeInfo();
-   
-   /**
-    * Returns a human readable name which describes this node in the symbolic execution tree.
-    * @return The human readable name which describes this node in the symbolic execution tree.
-    */
-   public String getName();
+   public String getFormatedPathCondition() throws ProofInputException;
 }

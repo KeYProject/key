@@ -127,6 +127,7 @@ public class GenericParser {
 		    chr = fr.read();
 		}
 		bos.write((byte)'\n');
+	        fr.close();
 	    }
 	    if (args.length > 1) {
 		System.out.print("[creating Makefile entries ");

@@ -2016,12 +2016,13 @@ ExecutionContext ExecutionContext() :
 {
     ExecutionContext ctxt = null;
     TypeSVWrapper tr = null;
+    MethodSignatureSVWrapper pm = null;
     ExpressionSVWrapper instance = null;
 }
 {
-    tr = TypeSV() "(" (instance = ExpressionSV())? ")" 
+    pm = MethodSignatureSV() "@" tr = TypeSV() "(" (instance = ExpressionSV())? ")" 
     {
-	return new ExecutionContext(tr, instance);
+	return new ExecutionContext(tr, pm, instance);
     } 
 } 
 
@@ -2033,6 +2034,14 @@ ExecCtxtSVWrapper ExecutionContextSV() : {}
 	{
 	    return factory.getExecutionContextSV(token.image);	   
 	}
+}
+
+MethodSignatureSVWrapper MethodSignatureSV() : {}
+{
+    <SVIDENTIFIER>
+        {
+            return factory.getMethodSignatureSVWrapper(token.image);    
+        }
 }
 
 JumpLabelSVWrapper JumpLabelSV() : {}
@@ -3673,19 +3682,20 @@ StatementBlock StartBlock() :
     Statement stat;
     ExecCtxtSVWrapper ec = null;
     TypeSVWrapper tr = null;
+    MethodSignatureSVWrapper pm = null;
     ExpressionSVWrapper sv = null;
 }
 { 
    "{" (   LOOKAHEAD(2)
            ( <DOT> ( LOOKAHEAD(2) 
-		     tr = TypeSV() "(" (sv = ExpressionSV())? ")" |  
+		     pm=MethodSignatureSV() "@" tr = TypeSV()  "(" (sv = ExpressionSV())? ")" |  
 	             ec = ExecutionContextSV() ))? 
             <CONTEXTSTART> 
             {
               if (tr == null) {
                  result = factory.createContextStatementBlock(ec);
 	      } else { 
-                 result = factory.createContextStatementBlock(tr, sv);
+                 result = factory.createContextStatementBlock(tr, pm, sv);
 	      }
               setPrefixInfo(result);
             }        

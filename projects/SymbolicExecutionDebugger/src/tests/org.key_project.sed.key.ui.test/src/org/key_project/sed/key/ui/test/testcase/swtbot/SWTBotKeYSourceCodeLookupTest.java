@@ -91,8 +91,6 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          // Make sure that no editor is opened
          assertEquals(0, bot.editors().size());
          // Test statements
-         TestUtilsUtil.expandAll(debugTree);
-         TestUtilsUtil.sleep(TestSedCoreUtil.USER_INTERFACE_DEBUG_TREE_WAIT_TIME); // Give the user interface the chance to update the tree
          assertSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 1}, method, target, true);
          assertSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 2}, method, target, false);
          assertSelectedStatement(bot, debugTree, new int[] {0, 0, 0, 3}, method, target, true);
@@ -121,13 +119,13 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
     * @throws BadLocationException Occurred Exception
     */
    protected void assertSelectedStatement(SWTWorkbenchBot bot, 
-                                        SWTBotTree debugTree, 
-                                        int[] pathToStatementInTree,
-                                        IMethod method,
-                                        IDebugTarget target,
-                                        boolean closeEditor) throws CoreException, BadLocationException {
+                                          SWTBotTree debugTree, 
+                                          int[] pathToStatementInTree,
+                                          IMethod method,
+                                          IDebugTarget target,
+                                          boolean closeEditor) throws CoreException, BadLocationException {
       // Select statement in debug tree
-      SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, pathToStatementInTree);
+      SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, pathToStatementInTree);
       // Get statement that should be selected in opened editor.
       ISEDStatement statement = (ISEDStatement)TestUtilsUtil.getTreeItemData(item);
       // Make sure that an editor is opened

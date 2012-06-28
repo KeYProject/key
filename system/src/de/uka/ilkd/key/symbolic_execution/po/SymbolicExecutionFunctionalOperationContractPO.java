@@ -1,6 +1,9 @@
 package de.uka.ilkd.key.symbolic_execution.po;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -11,7 +14,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * <p>
@@ -64,14 +66,13 @@ public class SymbolicExecutionFunctionalOperationContractPO extends FunctionalOp
                                     ProgramVariable selfVar,
                                     ProgramVariable resultVar,
                                     ProgramVariable exceptionVar,
-                                    LocationVariable heapAtPreVar,
-                                    LocationVariable savedHeapAtPreVar,
+                                    Map<LocationVariable,LocationVariable> atPreVars,
                                     Term postTerm) {
         // Create parameters for predicate SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort) 
         ImmutableList<Term> arguments = TermBuilder.DF.var(paramVars); // Method parameters
-        arguments = arguments.prepend(TermBuilder.DF.heap(services)); // Heap (As first argument for the predicate)
+        arguments = arguments.prepend(TermBuilder.DF.getBaseHeap(services)); // Heap (As first argument for the predicate)
         // Create non-rigid predicate with signature: SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
-        ImmutableList<Sort> argumentSorts = MiscTools.getSorts(arguments);//.prepend(heapSort);
+        ImmutableList<Sort> argumentSorts = getSorts(arguments);//.prepend(heapSort);
         Function f = new Function(new Name(TermBuilder.DF.newName(services, "SETAccumulate")), 
                                   Sort.FORMULA, 
                                   argumentSorts.toArray(new Sort[argumentSorts.size()]));
@@ -80,6 +81,26 @@ public class SymbolicExecutionFunctionalOperationContractPO extends FunctionalOp
         Term postSubstitute = TermBuilder.DF.func(f, arguments.toArray(new Term[arguments.size()]));
         // Enrich post condition with the new predicate
         Term extendedPostTerm = TermBuilder.DF.and(postTerm, postSubstitute);
-        return super.buildProgramTerm(paramVars, selfVar, resultVar, exceptionVar, heapAtPreVar, savedHeapAtPreVar, extendedPostTerm);
+        return super.buildProgramTerm(paramVars, selfVar, resultVar, exceptionVar, atPreVars, extendedPostTerm);
     }
+
+    
+    /**
+     * <p>
+     * Returns the {@link Sort}s of the given {@link Term}s.
+     * </p>
+     * <p>
+     * This method is used for instance by the Symbolic Execution Debugger.
+     * </p>
+     * @param terms The given {@link Term}s.
+     * @return The {@link Term} {@link Sort}s.
+     */
+    private static ImmutableList<Sort> getSorts(Iterable<Term> terms) {
+        ImmutableList<Sort> result = ImmutableSLList.<Sort>nil();
+        for (Term t : terms) {
+            result = result.append(t.sort());
+        }
+        return result;
+    }
+    
 }

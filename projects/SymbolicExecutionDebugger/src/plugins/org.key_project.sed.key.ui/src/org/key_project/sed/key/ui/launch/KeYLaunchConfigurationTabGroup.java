@@ -17,8 +17,8 @@ public class KeYLaunchConfigurationTabGroup extends AbstractLaunchConfigurationT
      */
     @Override
     public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
-        setTabs(new ILaunchConfigurationTab[] {new KeYLaunchConfigurationTab(), // KeY specific tab 
-                                               new KeYPerformanceLaunchConfigurationTab(), // KeY specific performance tab
+        setTabs(new ILaunchConfigurationTab[] {new MainLaunchConfigurationTab(), // KeY specific tab 
+                                               new KeYCustomizationLaunchConfigurationTab(), // KeY specific customization tab
                                                new SourceLookupTab(),  // General source lookup tab
                                                new CommonTab()}); // General common tab.
     }

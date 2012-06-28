@@ -16,7 +16,13 @@ import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.QueryExpand;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
@@ -54,7 +60,7 @@ public class JavaProfile extends AbstractProfile {
         
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
-                                   .prepend(OneStepSimplifier.INSTANCE)
+                                   .prepend(getInitialOneStepSimpilifier())
         			   //.prepend(PullOutConditionalsRule.INSTANCE)  // rule at the moment unsound
         			   .prepend(QueryExpand.INSTANCE);
   
@@ -63,6 +69,22 @@ public class JavaProfile extends AbstractProfile {
         builtInRules = builtInRules.prepend(UseOperationContractRule.INSTANCE);
 
         return builtInRules;
+    }
+    
+    /**
+     * <p>
+     * Returns the {@link OneStepSimplifier} instance which should be used
+     * in this {@link JavaProfile}. It is added to the build in rules via
+     * {@link #initBuiltInRules()}.
+     * </p>
+     * <p>
+     * Sub profiles may exchange the {@link OneStepSimplifier} instance,
+     * for instance for site proofs used in the symbolic execution tree extraction.
+     * </p> 
+     * @return The {@link OneStepSimplifier} instance to use.
+     */
+    protected OneStepSimplifier getInitialOneStepSimpilifier() {
+       return OneStepSimplifier.INSTANCE;
     }
 
     /**

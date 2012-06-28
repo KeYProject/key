@@ -191,7 +191,7 @@ public final class StrategyProperties extends Properties {
     }
 
     
-    public Object clone() {
+    public synchronized Object clone() {
         final Properties p = (Properties) super.clone();
         final StrategyProperties sp = new StrategyProperties();
         sp.putAll(p);

@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;">
-   <methodCall name="self.main();">
-      <statement name="int result = 0;">
-         <statement name="int i = 0;">
-            <loopNode name="do {result_1++;i++;}while ( invert(i)&gt;-3 );">
-               <statement name="result_1++;">
-                  <statement name="i++;">
-                     <loopCondition name="invert(i)&gt;-3">
-                        <methodCall name="self.invert(i_1);">
-                           <statement name="return i_1*-1;">
-                              <methodReturn name="&lt;return of self.invert(i_1);&gt;" nameIncludingReturnValue="&lt;return &apos;-1&apos; as result of self.invert(i_1);&gt;">
-                                 <statement name="result_1++;">
-                                    <statement name="i++;">
-                                       <loopCondition name="invert(i)&gt;-3">
-                                          <methodCall name="self.invert(i_2);">
-                                             <statement name="return i_2*-1;">
-                                                <methodReturn name="&lt;return of self.invert(i_2);&gt;" nameIncludingReturnValue="&lt;return &apos;-2&apos; as result of self.invert(i_2);&gt;">
-                                                   <statement name="result_1++;">
-                                                      <statement name="i++;">
-                                                         <loopCondition name="invert(i)&gt;-3">
-                                                            <methodCall name="self.invert(i_3);">
-                                                               <statement name="return i_3*-1;">
-                                                                  <methodReturn name="&lt;return of self.invert(i_3);&gt;" nameIncludingReturnValue="&lt;return &apos;-3&apos; as result of self.invert(i_3);&gt;">
-                                                                     <statement name="return result_1;">
-                                                                        <methodReturn name="&lt;return of self.main();&gt;" nameIncludingReturnValue="&lt;return &apos;3&apos; as result of self.main();&gt;">
-                                                                           <termination name="&lt;end&gt;" exceptionalTermination="false">
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
+      <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
+         <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
+            <loopNode name="do {result_1++;i++;}while ( invert(i)&gt;-3 );" pathCondition="true" pathConditionChanged="false">
+               <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
+                  <statement name="i++;" pathCondition="true" pathConditionChanged="false">
+                     <loopCondition name="invert(i)&gt;-3" pathCondition="true" pathConditionChanged="false">
+                        <methodCall name="self.invert(i_1);" pathCondition="true" pathConditionChanged="false">
+                           <statement name="return i_1*-1;" pathCondition="true" pathConditionChanged="false">
+                              <methodReturn name="&lt;return of self.invert(i_1);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-1&apos; as result of self.invert(i_1);&gt;">
+                                 <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
+                                    <statement name="i++;" pathCondition="true" pathConditionChanged="false">
+                                       <loopCondition name="invert(i)&gt;-3" pathCondition="true" pathConditionChanged="false">
+                                          <methodCall name="self.invert(i_2);" pathCondition="true" pathConditionChanged="false">
+                                             <statement name="return i_2*-1;" pathCondition="true" pathConditionChanged="false">
+                                                <methodReturn name="&lt;return of self.invert(i_2);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-2&apos; as result of self.invert(i_2);&gt;">
+                                                   <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
+                                                      <statement name="i++;" pathCondition="true" pathConditionChanged="false">
+                                                         <loopCondition name="invert(i)&gt;-3" pathCondition="true" pathConditionChanged="false">
+                                                            <methodCall name="self.invert(i_3);" pathCondition="true" pathConditionChanged="false">
+                                                               <statement name="return i_3*-1;" pathCondition="true" pathConditionChanged="false">
+                                                                  <methodReturn name="&lt;return of self.invert(i_3);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-3&apos; as result of self.invert(i_3);&gt;">
+                                                                     <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
+                                                                        <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;3&apos; as result of self.main();&gt;">
+                                                                           <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
                                                                            </termination>
                                                                         </methodReturn>
                                                                      </statement>

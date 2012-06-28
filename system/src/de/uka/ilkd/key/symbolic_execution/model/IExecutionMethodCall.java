@@ -2,7 +2,7 @@ package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodCall;
 
@@ -27,8 +27,8 @@ public interface IExecutionMethodCall extends IExecutionStateNode<MethodBodyStat
    public MethodReference getMethodReference();
    
    /**
-    * Returns the called {@link ProgramMethod}.
-    * @return The called {@link ProgramMethod}.
+    * Returns the called {@link IProgramMethod}.
+    * @return The called {@link IProgramMethod}.
     */
-   public ProgramMethod getProgramMethod();
+   public IProgramMethod getProgramMethod();
 }

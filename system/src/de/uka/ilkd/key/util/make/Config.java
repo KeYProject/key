@@ -128,8 +128,6 @@ public class Config {
 		}
 		chr = fr.read();		    
 	    }
-	    fr.close();
-	    fw.close();
 	} catch (IOException io) {
 	    System.err.println("File "+filename+" can not be written.\n"+io);
 	    System.exit(-1);	   
@@ -142,11 +140,15 @@ public class Config {
 	    new File(de.uka.ilkd.key.gui.configuration.PathConfig.getKeyConfigDir()+File.separator).mkdir();
 	}
 	try {
-	    FileOutputStream out = 
-		new FileOutputStream(file);
-	    Properties props = new Properties();
-	    props.setProperty(key, prop);
-	    props.store(out, header);
+            Properties props = new Properties();
+            props.setProperty(key, prop);
+            FileOutputStream out = 
+                    new FileOutputStream(file);
+            try { 
+                props.store(out, header);
+	    } finally {
+	        out.close();
+	    }
 	} catch (Exception e) {
 	    System.err.println("Could not write property to config file "+file);
 	}

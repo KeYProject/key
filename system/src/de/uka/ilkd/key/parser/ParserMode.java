@@ -10,23 +10,54 @@
 
 package de.uka.ilkd.key.parser;
 
-public class ParserMode {
-    public static final ParserMode DECLARATION = new ParserMode();
-    public static final ParserMode TERM = new ParserMode();
-    public static final ParserMode GLOBALDECL = new ParserMode();
-    public static final ParserMode TACLET = new ParserMode();
-    public static final ParserMode PROBLEM = new ParserMode();  
+import de.uka.ilkd.key.logic.TestClashFreeSubst;
+
+/**
+ * The mode in which the parser is currently running.
+ * 
+ * The KeY parser goes over input files more than once. This enum is used to
+ * denote the mode of the current run.
+ */
+public enum ParserMode {
+
+    /**
+     * Only parse declarations. Used to read in sort, predicate and function
+     * declarations.
+     */
+    DECLARATION,
+
+    /**
+     * Only parse terms.
+     */
+    TERM,
+
+    /**
+     * Parse global declarations.
+     * 
+     * Apparently, this mode is only used in test case
+     * {@link TestClashFreeSubst}.
+     */
+    GLOBALDECL,
+
+    /**
+     * Only parse taclet definitions.
+     * 
+     * Used by
+     * {@link KeYParser#parseTaclet(String, de.uka.ilkd.key.java.Services)}
+     */
+    TACLET,
+
+    /**
+     * Only parse the problem declaration at the end of a KeY input file.
+     */
+    PROBLEM;
+
+    /**
+     * Get the name of this parser mode.
+     * 
+     * @return the same as {@link #toString()}
+     */
     public String getName() {
-	if(this == DECLARATION)
-	   return "DECLARATION";
-	if(this == TERM)
-	   return "TERM";
-	if(this == GLOBALDECL)
-	   return "GLOBALDECL";
-	if(this == TACLET)
-	   return "TACLET";
-	if(this == PROBLEM)
-	   return "PROBLEM";
-	return "UNKNOWN";
+        return toString();
     }
 }

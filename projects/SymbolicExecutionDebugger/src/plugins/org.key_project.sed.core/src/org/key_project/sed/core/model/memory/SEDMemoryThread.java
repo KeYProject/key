@@ -21,11 +21,29 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
    private List<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
    
    /**
+    * The name of this debug node.
+    */
+   private String name;
+   
+   /**
+    * The human readable path condition to this node.
+    */
+   private String pathCondition;
+   
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this thread is contained.
     */   
    public SEDMemoryThread(ISEDDebugTarget target) {
       super(target);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getName() throws DebugException {
+      return name;
    }
 
    /**
@@ -93,16 +111,11 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
    }
 
    /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
+    * Sets the name of this node.
+    * @param name the name to set.
     */
-   @Override
    public void setName(String name) {
-      super.setName(name);
+      this.name = name;
    }
 
    /**
@@ -116,5 +129,21 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
    @Override
    public void setId(String id) {
       super.setId(id);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getPathCondition() throws DebugException {
+      return pathCondition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setPathCondition(String pathCondition) {
+      this.pathCondition = pathCondition;
    }
 }

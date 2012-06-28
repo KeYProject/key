@@ -134,7 +134,7 @@ class TestCommons extends TestCase {
 	    
 	    initConfig = initializer.prepare(po);
 
-	    initializer.startProver(initConfig, po);
+	    initializer.startProver(initConfig, po, 0);
 	     
 	
 	    result = po.getPO();

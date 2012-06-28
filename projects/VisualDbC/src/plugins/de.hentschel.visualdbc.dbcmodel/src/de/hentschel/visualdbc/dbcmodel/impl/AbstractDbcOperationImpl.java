@@ -34,6 +34,7 @@ import de.hentschel.visualdbc.dbcmodel.AbstractDbcOperation;
 import de.hentschel.visualdbc.dbcmodel.DbcOperationContract;
 import de.hentschel.visualdbc.dbcmodel.DbcProof;
 import de.hentschel.visualdbc.dbcmodel.DbcProofObligation;
+import de.hentschel.visualdbc.dbcmodel.DbcProofReference;
 import de.hentschel.visualdbc.dbcmodel.DbcVisibility;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 import de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable;
@@ -46,6 +47,7 @@ import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcOperationImpl#getAllReferences <em>All References</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcOperationImpl#getProofObligations <em>Proof Obligations</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcOperationImpl#getAllProofs <em>All Proofs</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcOperationImpl#getOperationContracts <em>Operation Contracts</em>}</li>
@@ -58,6 +60,16 @@ import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
  * @generated
  */
 public abstract class AbstractDbcOperationImpl extends AbstractDbcProofContainerImpl implements AbstractDbcOperation {
+   /**
+    * The cached value of the '{@link #getAllReferences() <em>All References</em>}' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getAllReferences()
+    * @generated
+    * @ordered
+    */
+   protected EList<DbcProofReference> allReferences;
+
    /**
     * The cached value of the '{@link #getProofObligations() <em>Proof Obligations</em>}' reference list.
     * <!-- begin-user-doc -->
@@ -160,6 +172,18 @@ public abstract class AbstractDbcOperationImpl extends AbstractDbcProofContainer
    @Override
    protected EClass eStaticClass() {
       return DbcmodelPackage.Literals.ABSTRACT_DBC_OPERATION;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EList<DbcProofReference> getAllReferences() {
+      if (allReferences == null) {
+         allReferences = new EObjectResolvingEList<DbcProofReference>(DbcProofReference.class, this, DbcmodelPackage.ABSTRACT_DBC_OPERATION__ALL_REFERENCES);
+      }
+      return allReferences;
    }
 
    /**
@@ -300,6 +324,8 @@ public abstract class AbstractDbcOperationImpl extends AbstractDbcProofContainer
    @Override
    public Object eGet(int featureID, boolean resolve, boolean coreType) {
       switch (featureID) {
+         case DbcmodelPackage.ABSTRACT_DBC_OPERATION__ALL_REFERENCES:
+            return getAllReferences();
          case DbcmodelPackage.ABSTRACT_DBC_OPERATION__PROOF_OBLIGATIONS:
             return getProofObligations();
          case DbcmodelPackage.ABSTRACT_DBC_OPERATION__ALL_PROOFS:
@@ -381,6 +407,8 @@ public abstract class AbstractDbcOperationImpl extends AbstractDbcProofContainer
    @Override
    public boolean eIsSet(int featureID) {
       switch (featureID) {
+         case DbcmodelPackage.ABSTRACT_DBC_OPERATION__ALL_REFERENCES:
+            return allReferences != null && !allReferences.isEmpty();
          case DbcmodelPackage.ABSTRACT_DBC_OPERATION__PROOF_OBLIGATIONS:
             return proofObligations != null && !proofObligations.isEmpty();
          case DbcmodelPackage.ABSTRACT_DBC_OPERATION__ALL_PROOFS:
@@ -406,6 +434,7 @@ public abstract class AbstractDbcOperationImpl extends AbstractDbcProofContainer
    public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass) {
       if (baseClass == IDbCProofReferencable.class) {
          switch (derivedFeatureID) {
+            case DbcmodelPackage.ABSTRACT_DBC_OPERATION__ALL_REFERENCES: return DbcmodelPackage.IDB_CPROOF_REFERENCABLE__ALL_REFERENCES;
             default: return -1;
          }
       }
@@ -428,6 +457,7 @@ public abstract class AbstractDbcOperationImpl extends AbstractDbcProofContainer
    public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
       if (baseClass == IDbCProofReferencable.class) {
          switch (baseFeatureID) {
+            case DbcmodelPackage.IDB_CPROOF_REFERENCABLE__ALL_REFERENCES: return DbcmodelPackage.ABSTRACT_DBC_OPERATION__ALL_REFERENCES;
             default: return -1;
          }
       }

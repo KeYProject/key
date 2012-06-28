@@ -12,12 +12,14 @@ import javax.swing.text.html.HTMLEditorKit;
 
 public class ClickableMessageBox extends JTextPane{
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+
+	private static final long serialVersionUID = 7588093268080119674L;
 
 	public static interface ClickableMessageBoxListener{
+
+        
+
+
 		public void eventMessageClicked(Object object);
 	}
 	

@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
@@ -21,6 +22,41 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
    private List<ISEDDebugNode> children = new LinkedList<ISEDDebugNode>();
    
    /**
+    * The contained variables.
+    */
+   private List<IVariable> variables = new LinkedList<IVariable>();
+   
+   /**
+    * The name of this debug node.
+    */
+   private String name;
+   
+   /**
+    * The human readable path condition to this node.
+    */
+   private String pathCondition;
+   
+   /**
+    * The source name.
+    */
+   private String sourceName;
+
+   /**
+    * The line number.
+    */
+   private int lineNumber = -1;
+
+   /**
+    * The index of the start character.
+    */
+   private int charStart = -1;
+   
+   /**
+    * The index of the end character.
+    */
+   private int charEnd = -1;
+   
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this statement is contained.
     * @param parent The parent in that this node is contained as child.
@@ -30,6 +66,46 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
                              ISEDDebugNode parent, 
                              ISEDThread thread) {
       super(target, parent, thread);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getName() throws DebugException {
+      return name;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getSourceName() {
+      return sourceName;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getLineNumber() throws DebugException {
+      return lineNumber;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharStart() throws DebugException {
+      return charStart;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getCharEnd() throws DebugException {
+      return charEnd;
    }
 
    /**
@@ -84,68 +160,43 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
    }
    
    /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
+    * Sets the name of this node.
+    * @param name the name to set.
     */
-   @Override
    public void setName(String name) {
-      super.setName(name);
+      this.name = name;
    }
 
    /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
+    * Sets the line number.
+    * @param lineNumber The line number or {@code -1} if it is unknown.
     */
-   @Override
    public void setLineNumber(int lineNumber) {
-      super.setLineNumber(lineNumber);
+      this.lineNumber = lineNumber;
    }
 
    /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
+    * Sets the index of the start character.
+    * @param charStart The index or {@code -1} if it is unknown.
     */
-   @Override
    public void setCharStart(int charStart) {
-      super.setCharStart(charStart);
+      this.charStart = charStart;
    }
 
    /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
+    * Sets the index of the end character.
+    * @param charEnd The index or {@code -1} if it is unknown.
     */
-   @Override
    public void setCharEnd(int charEnd) {
-      super.setCharEnd(charEnd);
+      this.charEnd = charEnd;
    }
    
    /**
-    * <p>
-    * {@inheritDoc}
-    * </p>
-    * <p>
-    * Changed visibility to public.
-    * </p>
+    * Sets the source name.
+    * @param sourceName The source name to set.
     */
-   @Override
    public void setSourceName(String sourceName) {
-      super.setSourceName(sourceName);
+      this.sourceName = sourceName;
    }
 
    /**
@@ -159,5 +210,37 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
    @Override
    public void setId(String id) {
       super.setId(id);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addVariable(IVariable variable) {
+      variables.add(variable);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IVariable[] getVariables() throws DebugException {
+      return variables.toArray(new IVariable[variables.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getPathCondition() throws DebugException {
+      return pathCondition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setPathCondition(String pathCondition) {
+      this.pathCondition = pathCondition;
    }
 }

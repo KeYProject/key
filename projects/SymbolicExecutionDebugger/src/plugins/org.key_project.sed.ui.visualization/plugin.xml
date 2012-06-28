@@ -100,8 +100,14 @@
       <extension
           point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
           <propertyTabs contributorId="symbolicExecutionTreeDiagram.PropertyContributor">
-              <propertyTab label="Debug" category="Graphiti"
-                  id="org.key_project.sed.ui.visualization.debug.tab">
+              <propertyTab label="Node" category="Graphiti"
+                  id="org.key_project.sed.ui.visualization.node.tab">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.node.tab"
+                    category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.source.tab"
+                    label="Source">
               </propertyTab>
           </propertyTabs>
       </extension>
@@ -109,10 +115,16 @@
       <extension
           point="org.eclipse.ui.views.properties.tabbed.propertySections">
           <propertySections contributorId="symbolicExecutionTreeDiagram.PropertyContributor">
-              <propertySection tab="org.key_project.sed.ui.visualization.debug.tab"           
-               class="org.key_project.sed.ui.visualization.execution_tree.property.SEDDebugNodePropertySection"
-               filter="org.key_project.sed.ui.visualization.execution_tree.property.SEDDebugNodeTreeFilter"
-               id="org.key_project.sed.ui.visualization.debug.tab.SEDDebugNodePropertySection">
+              <propertySection tab="org.key_project.sed.ui.visualization.node.tab"           
+               class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiDebugNodePropertySection"
+               filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiDebugNodeTreeFilter"
+               id="org.key_project.sed.ui.visualization.node.tab.SEDDebugNodePropertySection">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourcePropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourceTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourcePropertySection"
+                    tab="org.key_project.sed.ui.visualization.source.tab">
               </propertySection>
           </propertySections>
       </extension>    
@@ -157,9 +169,9 @@
         <view
               id="org.key_project.sed.ui.graphiti.view.ExecutionTreeThumbNailView"
               minimized="false"
-              ratio="0.80"
-              relationship="bottom"
-              relative="org.key_project.sed.ui.graphiti.view.ExecutionTreeView"
+              ratio="0.8"
+              relationship="right"
+              relative="org.eclipse.ui.views.PropertySheet"
               visible="true">
         </view>
         <viewShortcut

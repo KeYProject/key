@@ -101,8 +101,8 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
@@ -185,9 +185,9 @@ public class KeyConnection extends MemoryConnection {
    private MainWindow main;
    
    /**
-    * Maps all {@link ProgramMethod}s to their data source instance.
+    * Maps all {@link IProgramMethod}s to their data source instance.
     */
-   private Map<ProgramMethod, IDSOperation> operationsMapping;
+   private Map<IProgramMethod, IDSOperation> operationsMapping;
 
    /**
     * Maps all {@link OperationContract}s to their data source instance.
@@ -265,7 +265,7 @@ public class KeyConnection extends MemoryConnection {
       try {
          Assert.isNotNull(connectionSettings);
          // Initialize instance variables
-         operationsMapping = new HashMap<ProgramMethod, IDSOperation>();
+         operationsMapping = new HashMap<IProgramMethod, IDSOperation>();
          operationContractsMapping = new HashMap<OperationContract, IDSOperationContract>();
          axiomContractsMapping = new HashMap<Contract, IDSAxiomContract>();
          invariantsMapping = new HashMap<ClassInvariant, IDSInvariant>();
@@ -718,7 +718,7 @@ public class KeyConnection extends MemoryConnection {
     * @param method The method.
     * @return The signature.
     */
-   protected String getSignature(ProgramMethod method) {
+   protected String getSignature(IProgramMethod method) {
       StringBuffer sb = new StringBuffer();
       sb.append(method.getFullName());
       sb.append(PARAMETER_START);
@@ -732,7 +732,7 @@ public class KeyConnection extends MemoryConnection {
     * @param method The method.
     * @return The signature parameters.
     */
-   protected String getSignatureParameters(ProgramMethod method) {
+   protected String getSignatureParameters(IProgramMethod method) {
       StringBuffer sb = new StringBuffer();
       ImmutableArray<ParameterDeclaration> parameters = method.getParameters();
       boolean firstParameter = true;
@@ -830,7 +830,7 @@ public class KeyConnection extends MemoryConnection {
       MemoryInterface result = new KeyInterface(this, type);
       result.setName(interfaceName);
       // Add methods
-      ImmutableList<ProgramMethod> methods = services.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
+      ImmutableList<IProgramMethod> methods = services.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
       fillInterfaceWithMethods(services, result, methods, type);
       // Add attributes
       result.setStatic(ct.isStatic());
@@ -895,7 +895,7 @@ public class KeyConnection extends MemoryConnection {
     * @return {@code true} include, {@code false} do not include
     */
    protected boolean shouldIncludeClassAxiom(Services services, KeYJavaType type, ClassAxiom classAxiom) {
-      ImmutableSet<ObserverFunction> targets = services.getSpecificationRepository().getContractTargets(type);
+      ImmutableSet<IObserverFunction> targets = services.getSpecificationRepository().getContractTargets(type);
       return classAxiom instanceof RepresentsAxiom && // Filter other axiom types out
              ((classAxiom.getTarget() != null && classAxiom.getTarget().getType() != null) || // Allow also represents axioms without accessible clause.
              CollectionUtil.contains(targets, classAxiom.getTarget())); // Make sure that everything that has an accessible clause is available.
@@ -916,11 +916,11 @@ public class KeyConnection extends MemoryConnection {
       MemoryEnum result = new KeyEnum(this, type);
       result.setName(className);
       // Add methods (must be done before constructor adding to collect implicit defined constructors)
-      ImmutableList<ProgramMethod> methods = services.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
-      List<ProgramMethod> implicitConstructors = new LinkedList<ProgramMethod>(); 
+      ImmutableList<IProgramMethod> methods = services.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
+      List<IProgramMethod> implicitConstructors = new LinkedList<IProgramMethod>(); 
       fillEnumWithMethodsAndConstructors(services, result, methods, implicitConstructors, type);
       // Add constructors with use of implicit constructor definitions to get the specifications
-      ImmutableList<ProgramMethod> constructors = services.getJavaInfo().getConstructors(type);
+      ImmutableList<IProgramMethod> constructors = services.getJavaInfo().getConstructors(type);
       fillEnumWithMethodsAndConstructors(services, result, constructors, implicitConstructors, type);
       // Add attributes
       result.setStatic(ct.isStatic());
@@ -1017,13 +1017,13 @@ public class KeyConnection extends MemoryConnection {
     */
    protected void fillEnumWithMethodsAndConstructors(Services services,
                                                      IDSEnum toFill, 
-                                                     ImmutableList<ProgramMethod> methodsAndConstructors,
-                                                     List<ProgramMethod> implicitConstructors,
+                                                     ImmutableList<IProgramMethod> methodsAndConstructors,
+                                                     List<IProgramMethod> implicitConstructors,
                                                      KeYJavaType type) throws DSException {
-      for (ProgramMethod methodOrConstructor : methodsAndConstructors) {
+      for (IProgramMethod methodOrConstructor : methodsAndConstructors) {
          if (!methodOrConstructor.isImplicit()) {
             if (methodOrConstructor.isConstructor()) {
-               ProgramMethod implicitConstructor = getImplicitConstructor(implicitConstructors, methodOrConstructor);
+               IProgramMethod implicitConstructor = getImplicitConstructor(implicitConstructors, methodOrConstructor);
                Assert.isNotNull(implicitConstructor, "Can't find implicit constructor for: " + methodOrConstructor.getFullName());
                IDSConstructor constructor = createConstructor(services, methodOrConstructor, implicitConstructor, type, toFill);
                toFill.getConstructors().add(constructor);
@@ -1056,11 +1056,11 @@ public class KeyConnection extends MemoryConnection {
       MemoryClass result = new KeyClass(this, type);
       result.setName(className);
       // Add methods (must be done before constructor adding to collect implicit defined constructors)
-      ImmutableList<ProgramMethod> methods = services.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
-      List<ProgramMethod> implicitConstructors = new LinkedList<ProgramMethod>(); 
+      ImmutableList<IProgramMethod> methods = services.getJavaInfo().getAllProgramMethodsLocallyDeclared(type);
+      List<IProgramMethod> implicitConstructors = new LinkedList<IProgramMethod>(); 
       fillClassWithMethodsAndConstructors(services, result, methods, implicitConstructors, type);
       // Add constructors with use of implicit constructor definitions to get the specifications
-      ImmutableList<ProgramMethod> constructors = services.getJavaInfo().getConstructors(type);
+      ImmutableList<IProgramMethod> constructors = services.getJavaInfo().getConstructors(type);
       fillClassWithMethodsAndConstructors(services, result, constructors, implicitConstructors, type);
       // Add attributes
       result.setAnonymous(isAnonymous(ct));
@@ -1163,7 +1163,7 @@ public class KeyConnection extends MemoryConnection {
     * @throws DSException Occurred exception
     */   
    protected IDSOperationContract createOperationContract(Services services, 
-                                                          ProgramMethod pm,
+                                                          IProgramMethod pm,
                                                           FunctionalOperationContract operationContract,
                                                           List<String> obligations,
                                                           KeYJavaType kjt,
@@ -1309,8 +1309,8 @@ public class KeyConnection extends MemoryConnection {
     * @throws DSException Occurred Exception
     */
    protected IDSConstructor createConstructor(Services services, 
-                                              ProgramMethod explicitConstructor,
-                                              ProgramMethod implicitConstructor, 
+                                              IProgramMethod explicitConstructor,
+                                              IProgramMethod implicitConstructor, 
                                               KeYJavaType type,
                                               IDSType parent) throws DSException {
       MemoryConstructor result = new KeyConstructor(this, type, implicitConstructor);
@@ -1348,7 +1348,7 @@ public class KeyConnection extends MemoryConnection {
    protected void fillOperationContractsAndObligations(IDSOperation toFill, 
                                                        Services services, 
                                                        KeYJavaType type, 
-                                                       ProgramMethod pm) throws DSException {
+                                                       IProgramMethod pm) throws DSException {
       // Get all possible proofs
       ImmutableSet<FunctionalOperationContract> operationContracts = services.getSpecificationRepository().getOperationContracts(type, pm);
       // Separate between proofs for contracts and for operation itself
@@ -1372,7 +1372,7 @@ public class KeyConnection extends MemoryConnection {
     * @return The created {@link IDSMethod}.
     * @throws DSException Occurred Exception
     */
-   protected IDSMethod createMethod(Services services, ProgramMethod method, KeYJavaType kjt, IDSType parent) throws DSException {
+   protected IDSMethod createMethod(Services services, IProgramMethod method, KeYJavaType kjt, IDSType parent) throws DSException {
       MemoryMethod result = new KeyMethod(this, kjt, method);
       result.setParent(parent);
       result.setSignature(getSignature(method));
@@ -1414,9 +1414,9 @@ public class KeyConnection extends MemoryConnection {
     */
    protected void fillInterfaceWithMethods(Services services,
                                            IDSInterface toFill, 
-                                           ImmutableList<ProgramMethod> methodsAndConstructors,
+                                           ImmutableList<IProgramMethod> methodsAndConstructors,
                                            KeYJavaType type) throws DSException {
-      for (ProgramMethod methodOrConstructor : methodsAndConstructors) {
+      for (IProgramMethod methodOrConstructor : methodsAndConstructors) {
          if (!methodOrConstructor.isImplicit()) {
             Assert.isTrue(!methodOrConstructor.isConstructor());
             IDSMethod dsMethod = createMethod(services, methodOrConstructor, type, toFill);
@@ -1435,13 +1435,13 @@ public class KeyConnection extends MemoryConnection {
     */
    protected void fillClassWithMethodsAndConstructors(Services services,
                                                       IDSClass toFill, 
-                                                      ImmutableList<ProgramMethod> methodsAndConstructors,
-                                                      List<ProgramMethod> implicitConstructors,
+                                                      ImmutableList<IProgramMethod> methodsAndConstructors,
+                                                      List<IProgramMethod> implicitConstructors,
                                                       KeYJavaType type) throws DSException {
-      for (ProgramMethod methodOrConstructor : methodsAndConstructors) {
+      for (IProgramMethod methodOrConstructor : methodsAndConstructors) {
          if (!methodOrConstructor.isImplicit()) {
             if (methodOrConstructor.isConstructor()) {
-               ProgramMethod implicitConstructor = getImplicitConstructor(implicitConstructors, methodOrConstructor);
+               IProgramMethod implicitConstructor = getImplicitConstructor(implicitConstructors, methodOrConstructor);
                Assert.isNotNull(implicitConstructor, "Can't find implicit constructor for: " + methodOrConstructor.getFullName());
                IDSConstructor constructor = createConstructor(services, methodOrConstructor, implicitConstructor, type, toFill);
                toFill.getConstructors().add(constructor);
@@ -1466,12 +1466,12 @@ public class KeyConnection extends MemoryConnection {
     * @param toSearch The explicit constructor definition to search.
     * @return The found implicit constructor or {@code null} if it is not available.
     */
-   protected ProgramMethod getImplicitConstructor(List<ProgramMethod> toSearchIn, 
-                                                  ProgramMethod toSearch) {
-      ProgramMethod result = null;
-      Iterator<ProgramMethod> iter = toSearchIn.iterator();
+   protected IProgramMethod getImplicitConstructor(List<IProgramMethod> toSearchIn, 
+                                                   IProgramMethod toSearch) {
+      IProgramMethod result = null;
+      Iterator<IProgramMethod> iter = toSearchIn.iterator();
       while (result == null && iter.hasNext()) {
-         ProgramMethod next = iter.next();
+         IProgramMethod next = iter.next();
          // Make sure that the method/constructor is in the same container (e.g. class)
          if (ObjectUtil.equals(toSearch.getContainerType(), next.getContainerType())) {
             // Make sure that the next entry is an implicit constructor
@@ -1631,13 +1631,9 @@ public class KeyConnection extends MemoryConnection {
          main.getMediator().removeGUIListener(mainGuiListener);
          try {
             final MainWindow oldMain = main;
-            final InitConfig oldInitConfig = initConfig;
             Runnable run = new Runnable() {
                @Override
                public void run() {
-                  if (oldInitConfig != null) {
-                     KeYUtil.removeFromProofList(oldMain, oldInitConfig.getProofEnv());
-                  }
                   if (closeKeYMain && KeYUtil.isProofListEmpty(oldMain) && oldMain.getExitMainAction() != null) {
                      oldMain.getExitMainAction().exitMainWithoutInteraction();
                   }
@@ -1670,11 +1666,11 @@ public class KeyConnection extends MemoryConnection {
    }
    
    /**
-    * Returns the {@link IDSOperation} instance for the given {@link ProgramMethod} from KeY.
-    * @param pm The given {@link ProgramMethod}.
+    * Returns the {@link IDSOperation} instance for the given {@link IProgramMethod} from KeY.
+    * @param pm The given {@link IProgramMethod}.
     * @return The mapped {@link IDSOperation} or {@code null} if no data source instance exists.
     */
-   public IDSOperation getOperation(ProgramMethod pm) {
+   public IDSOperation getOperation(IProgramMethod pm) {
       return operationsMapping.get(pm);
    }
 
@@ -1750,7 +1746,7 @@ public class KeyConnection extends MemoryConnection {
    /**
     * Opens the proof.
     * @param type The {@link KeYJavaType} to use or {@code null} if not required.
-    * @param pm The {@link ProgramMethod} to use or {@code null} if not required.
+    * @param pm The {@link IProgramMethod} to use or {@code null} if not required.
     * @param oc The {@link Contract} to use or {@code null} if not required.
     * @param obligation The obligation to proof.
     * @return The opened {@link OpenedProof} or {@code null} if no one was opened.
@@ -1758,7 +1754,7 @@ public class KeyConnection extends MemoryConnection {
     * @throws DSCanceledException Occurred Exception
     */
    public OpenedProof openProof(KeYJavaType type,
-                                ProgramMethod pm,
+                                IProgramMethod pm,
                                 Contract oc,
                                 String obligation) throws DSException, DSCanceledException {
       OpenedProof proofResult = createProofInput(type, pm, oc, obligation);
@@ -1779,14 +1775,14 @@ public class KeyConnection extends MemoryConnection {
     * but the controls to define the target are removed.
     * </p>
     * @param type The {@link KeYJavaType} to use or {@code null} if not required.
-    * @param pm The {@link ProgramMethod} to use or {@code null} if not required.
+    * @param pm The {@link IProgramMethod} to use or {@code null} if not required.
     * @param oc The {@link Contract} to use or {@code null} if not required.
     * @param poString The obligation to proof.
     * @return The created {@link OpenedProof} that contains for example the {@link ProofOblInput}.
     * @throws DSException Occurred Exception
     */
    public OpenedProof createProofInput(KeYJavaType type,
-                                       ProgramMethod pm,
+                                       IProgramMethod pm,
                                        Contract oc,
                                        String poString) throws DSException {
       ProofOblInput input = oc.createProofObl(initConfig, oc);
@@ -1807,7 +1803,7 @@ public class KeyConnection extends MemoryConnection {
    public Proof openProof(ProofOblInput po) {
       try {
          if (po != null) {
-            Proof proof = init.startProver(initConfig, po);
+            Proof proof = init.startProver(initConfig, po, 0);
             return proof;
          }
          else {

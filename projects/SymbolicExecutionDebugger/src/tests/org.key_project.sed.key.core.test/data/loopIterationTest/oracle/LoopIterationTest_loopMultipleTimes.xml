@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_570ca0fa-1be7-4000-ab02-36017c3f995d" name="LoopIterationTest[LoopIterationTest::loopMultipleTimes()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_5dd71e46-3a81-45b4-8acc-ebf40931d338" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_24d8383b-3882-4aeb-a102-943ace6a638d" name="self.loopMultipleTimes();" pathCondition="true" lineNumber="-1" charStart="49" charEnd="66">
+            <sedStatement xml:id="_7fc582b8-4c5d-43ca-9b7b-654f319bf823" name="doLoop();" pathCondition="true" lineNumber="-1" charStart="74" charEnd="83">
+               <sedMethodCall xml:id="_a12523c9-960a-4c8f-9b1f-c6b51fbe7954" name="self.doLoop();" pathCondition="true" lineNumber="-1" charStart="118" charEnd="124">
+                  <sedStatement xml:id="_aca1be2a-f869-4ca8-87a4-f3d9320e067f" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="132" charEnd="142">
+                     <sedLoopNode xml:id="_7adfecaa-c1e3-4c78-9b5b-b7feb03eb839" name="while ( i&lt;3 ) {   i+=innerLoop(); }" pathCondition="true" lineNumber="-1" charStart="146" charEnd="187">
+                        <sedLoopCondition xml:id="_055b25f6-7639-4be6-9dea-4f8b5ed8498c" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="152" charEnd="157">
+                           <sedStatement xml:id="_b5db07ea-ad32-43cf-9c65-eca49382e13e" name="i+=innerLoop();" pathCondition="true" lineNumber="-1" charStart="165" charEnd="182">
+                              <sedMethodCall xml:id="_16539999-41a6-411d-9ec4-bc99135e9580" name="self.innerLoop();" pathCondition="true" lineNumber="-1" charStart="208" charEnd="217">
+                                 <sedStatement xml:id="_0fb477ad-ec15-4138-97f3-2c82c408247d" name="return 1;" pathCondition="true" lineNumber="-1" charStart="225" charEnd="234">
+                                    <sedMethodReturn xml:id="_c1b014d3-53ac-42e3-b450-e3d465f059b6" name="&lt;return &apos;1&apos; as result of self.innerLoop();&gt;" pathCondition="true" lineNumber="-1" charStart="208" charEnd="217">
+                                       <sedLoopCondition xml:id="_0d4355b6-dcde-4a9c-b015-947376298de5" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="152" charEnd="157">
+                                          <sedStatement xml:id="_72bab42c-0563-4292-80ac-40344eda01c3" name="i+=innerLoop();" pathCondition="true" lineNumber="-1" charStart="165" charEnd="182">
+                                             <sedMethodCall xml:id="_076056a0-4e0f-415d-b42c-33a93f0b6392" name="self.innerLoop();" pathCondition="true" lineNumber="-1" charStart="208" charEnd="217">
+                                                <sedStatement xml:id="_bde52687-c121-406f-9d8e-97c01446595c" name="return 1;" pathCondition="true" lineNumber="-1" charStart="225" charEnd="234">
+                                                   <sedMethodReturn xml:id="_c1204fb9-fc1a-4e3b-a5e8-a84ae749750a" name="&lt;return &apos;1&apos; as result of self.innerLoop();&gt;" pathCondition="true" lineNumber="-1" charStart="208" charEnd="217">
+                                                      <sedLoopCondition xml:id="_d2f6118e-e2d3-47ec-9aad-5ea413fb4d29" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="152" charEnd="157">
+                                                         <sedStatement xml:id="_eea158f0-ee56-407c-a13b-14931530e4a2" name="i+=innerLoop();" pathCondition="true" lineNumber="-1" charStart="165" charEnd="182">
+                                                            <sedMethodCall xml:id="_bb7bd0ae-7981-4ff8-9070-324e2cd56174" name="self.innerLoop();" pathCondition="true" lineNumber="-1" charStart="208" charEnd="217">
+                                                               <sedStatement xml:id="_8f1f6c89-f687-4e96-9399-5f6261c21b88" name="return 1;" pathCondition="true" lineNumber="-1" charStart="225" charEnd="234">
+                                                                  <sedMethodReturn xml:id="_8e1bba1c-c137-4422-aa09-730c80d30ed8" name="&lt;return &apos;1&apos; as result of self.innerLoop();&gt;" pathCondition="true" lineNumber="-1" charStart="208" charEnd="217">
+                                                                     <sedLoopCondition xml:id="_2e484b63-71b3-4477-a969-7da2e11d9ba0" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="152" charEnd="157">
+                                                                        <sedMethodReturn xml:id="_7ae4f5a4-a50c-4a95-bb52-295767ac63ec" name="&lt;return of self.doLoop();&gt;" pathCondition="true" lineNumber="-1" charStart="118" charEnd="124">
+                                                                           <sedStatement xml:id="_c577b3e1-a4f1-4511-a9fc-cd46337baaef" name="doLoop();" pathCondition="true" lineNumber="-1" charStart="87" charEnd="96">
+                                                                              <sedMethodCall xml:id="_efa34970-40d2-43c1-8bcc-852e4eb1001d" name="self.doLoop();" pathCondition="true" lineNumber="-1" charStart="118" charEnd="124">
+                                                                                 <sedStatement xml:id="_ad2b473b-bf49-494d-af81-d55115f8eb62" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="132" charEnd="142">
+                                                                                    <sedLoopNode xml:id="_2cc18bf0-5f06-45f4-bbc0-dc487a126114" name="while ( i_1&lt;3 ) {   i_1+=innerLoop(); }" pathCondition="true" lineNumber="-1" charStart="146" charEnd="187">
+                                                                                       <sedLoopCondition xml:id="_790f7702-8a34-4230-90ee-be9268355a15" name="i_1&lt;3" pathCondition="true" lineNumber="-1" charStart="152" charEnd="157">
+                                                                                          <sedStatement xml:id="_b7bae111-47d8-489e-abe6-f63f795f4ff3" name="i_1+=innerLoop();" pathCondition="true" lineNumber="-1" charStart="165" charEnd="182">
+                                                                                             <sedMethodCall xml:id="_1a21daf6-80c4-4809-b1a0-e98e0de0de54" name="self.innerLoop();" pathCondition="true" lineNumber="-1" charStart="208" charEnd="217">
+                                                                                                <sedStatement xml:id="_a6ddec63-3cf5-4f5f-a4f0-0e363ae7a8d9" name="return 1;" pathCondition="true" lineNumber="-1" charStart="225" charEnd="234">
+                                                                                                   <sedMethodReturn xml:id="_2ab095a4-2a32-491d-9bff-d61652c73a6c" name="&lt;return &apos;1&apos; as result of self.innerLoop();&gt;" pathCondition="true" lineNumber="-1" charStart="208" charEnd="217">
+                                                                                                      <sedLoopCondition xml:id="_ee455c29-4e36-44c1-8d78-5e739b083fc1" name="i_1&lt;3" pathCondition="true" lineNumber="-1" charStart="152" charEnd="157">
+                                                                                                         <sedStatement xml:id="_8eedc40c-802e-42b1-a4b0-0a8c63d60eaa" name="i_1+=innerLoop();" pathCondition="true" lineNumber="-1" charStart="165" charEnd="182">
+                                                                                                            <sedMethodCall xml:id="_3a22d4aa-e73e-48cd-b1b3-4b77c4670c44" name="self.innerLoop();" pathCondition="true" lineNumber="-1" charStart="208" charEnd="217">
+                                                                                                               <sedStatement xml:id="_1ec4882c-0c95-45f6-9cfe-a4c5bc8e89a6" name="return 1;" pathCondition="true" lineNumber="-1" charStart="225" charEnd="234">
+                                                                                                                  <sedMethodReturn xml:id="_3e243114-7f14-4c8a-bd2d-0eeaa3beea71" name="&lt;return &apos;1&apos; as result of self.innerLoop();&gt;" pathCondition="true" lineNumber="-1" charStart="208" charEnd="217">
+                                                                                                                     <sedLoopCondition xml:id="_8cce4949-9667-4ba8-a8e3-2a6f80a63a03" name="i_1&lt;3" pathCondition="true" lineNumber="-1" charStart="152" charEnd="157">
+                                                                                                                        <sedStatement xml:id="_78d8f048-e6fe-435a-9e9a-0c7c1bf92dc5" name="i_1+=innerLoop();" pathCondition="true" lineNumber="-1" charStart="165" charEnd="182">
+                                                                                                                           <sedMethodCall xml:id="_ce3ff690-41b7-4b66-8ede-1f5ebbfe36da" name="self.innerLoop();" pathCondition="true" lineNumber="-1" charStart="208" charEnd="217">
+                                                                                                                              <sedStatement xml:id="_54a43d84-0fee-4784-aba5-f527289ed4ed" name="return 1;" pathCondition="true" lineNumber="-1" charStart="225" charEnd="234">
+                                                                                                                                 <sedMethodReturn xml:id="_f24794c8-da59-47bf-a78f-778a880bb2d4" name="&lt;return &apos;1&apos; as result of self.innerLoop();&gt;" pathCondition="true" lineNumber="-1" charStart="208" charEnd="217">
+                                                                                                                                    <sedLoopCondition xml:id="_b159dfce-7cf2-4100-aa71-87563cd21399" name="i_1&lt;3" pathCondition="true" lineNumber="-1" charStart="152" charEnd="157">
+                                                                                                                                       <sedMethodReturn xml:id="_717c4ba2-9916-4c3a-b782-c2726922acc1" name="&lt;return of self.doLoop();&gt;" pathCondition="true" lineNumber="-1" charStart="118" charEnd="124">
+                                                                                                                                          <sedMethodReturn xml:id="_94dc914f-e652-4ef9-ad96-bbb31e5cbbca" name="&lt;return of self.loopMultipleTimes();&gt;" pathCondition="true" lineNumber="-1" charStart="49" charEnd="66">
+                                                                                                                                             <sedTermination xml:id="_b34e5678-eeb9-4cb1-b3b1-9fea59f75380" name="&lt;end&gt;" pathCondition="true">
+                                                                                                                                             </sedTermination>
+                                                                                                                                          </sedMethodReturn>
+                                                                                                                                       </sedMethodReturn>
+                                                                                                                                    </sedLoopCondition>
+                                                                                                                                 </sedMethodReturn>
+                                                                                                                              </sedStatement>
+                                                                                                                           </sedMethodCall>
+                                                                                                                        </sedStatement>
+                                                                                                                     </sedLoopCondition>
+                                                                                                                  </sedMethodReturn>
+                                                                                                               </sedStatement>
+                                                                                                            </sedMethodCall>
+                                                                                                         </sedStatement>
+                                                                                                      </sedLoopCondition>
+                                                                                                   </sedMethodReturn>
+                                                                                                </sedStatement>
+                                                                                             </sedMethodCall>
+                                                                                          </sedStatement>
+                                                                                       </sedLoopCondition>
+                                                                                    </sedLoopNode>
+                                                                                 </sedStatement>
+                                                                              </sedMethodCall>
+                                                                           </sedStatement>
+                                                                        </sedMethodReturn>
+                                                                     </sedLoopCondition>
+                                                                  </sedMethodReturn>
+                                                               </sedStatement>
+                                                            </sedMethodCall>
+                                                         </sedStatement>
+                                                      </sedLoopCondition>
+                                                   </sedMethodReturn>
+                                                </sedStatement>
+                                             </sedMethodCall>
+                                          </sedStatement>
+                                       </sedLoopCondition>
+                                    </sedMethodReturn>
+                                 </sedStatement>
+                              </sedMethodCall>
+                           </sedStatement>
+                        </sedLoopCondition>
+                     </sedLoopNode>
+                  </sedStatement>
+               </sedMethodCall>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

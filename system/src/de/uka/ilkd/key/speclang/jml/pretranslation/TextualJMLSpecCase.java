@@ -9,33 +9,25 @@
 //
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import java.util.Iterator;
+import java.util.*;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.PositionedString;
-
-
 
 /**
  * A JML specification case (i.e., more or less an operation contract) in 
  * textual form.
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
-
+   
     private final Behavior behavior;
     private PositionedString workingSpace = null;
-    private ImmutableList<PositionedString> requires =
-            ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> measuredBy =
             ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> assignable =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> assignable_backup =
-            ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> accessible =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> ensures =
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> signals =
             ImmutableSLList.<PositionedString>nil();
@@ -46,12 +38,25 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private ImmutableList<PositionedString> depends =
             ImmutableSLList.<PositionedString>nil();
 
+    private Map<String, ImmutableList<PositionedString>>
+      assignables = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+
+    private Map<String, ImmutableList<PositionedString>>
+      requires = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+
+    private Map<String, ImmutableList<PositionedString>>
+      ensures = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
     public TextualJMLSpecCase(ImmutableList<String> mods,
                               Behavior behavior) {
         super(mods);
         assert behavior != null;
         this.behavior = behavior;
+        for(Name hName : HeapLDT.VALID_HEAP_NAMES) {
+          assignables.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+          requires.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+          ensures.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+        }
     }
 
 
@@ -59,16 +64,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         this.name = n.text;
     }
 
-
     public void addRequires(PositionedString ps) {
-        requires = requires.append(ps);
+        addGeneric(requires, ps);
     }
 
 
     public void addRequires(ImmutableList<PositionedString> l) {
-        requires = requires.append(l);
+        for(PositionedString ps : l) {
+           addRequires(ps);
+        }
     }
-
 
     public void addMeasuredBy(PositionedString ps) {
         measuredBy = measuredBy.append(ps);
@@ -81,23 +86,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public void addAssignable(PositionedString ps) {
-        assignable = assignable.append(ps);
+        addGeneric(assignables, ps);
     }
-
-
-    public void addAssignable(ImmutableList<PositionedString> l) {
-        assignable = assignable.append(l);
-    }
-
-    public void addAssignableBackup(PositionedString ps) {
-        assignable_backup = assignable_backup.append(ps);
-    }
-
-
-    public void addAssignableBackup(ImmutableList<PositionedString> l) {
-        assignable_backup = assignable_backup.append(l);
-    }
-
 
     public void addAccessible(PositionedString ps) {
         accessible = accessible.append(ps);
@@ -110,12 +100,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public void addEnsures(PositionedString ps) {
-        ensures = ensures.append(ps);
+        addGeneric(ensures, ps);
     }
 
 
     public void addEnsures(ImmutableList<PositionedString> l) {
-        ensures = ensures.append(l);
+        for(PositionedString ps : l) {
+           addEnsures(ps);
+        }
     }
 
 
@@ -160,9 +152,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public ImmutableList<PositionedString> getRequires() {
-        return requires;
+        return requires.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
 
+    public ImmutableList<PositionedString> getRequires(String hName) {
+        return requires.get(hName);
+    }
 
     public ImmutableList<PositionedString> getMeasuredBy() {
         return measuredBy;
@@ -170,11 +165,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public ImmutableList<PositionedString> getAssignable() {
-        return assignable;
+        return assignables.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
 
-    public ImmutableList<PositionedString> getAssignableBackup() {
-        return assignable_backup;
+    public ImmutableList<PositionedString> getAssignable(String hName) {
+        return assignables.get(hName);
     }
 
     public ImmutableList<PositionedString> getAccessible() {
@@ -183,7 +178,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public ImmutableList<PositionedString> getEnsures() {
-        return ensures;
+        return ensures.get(HeapLDT.BASE_HEAP_NAME.toString());
+    }
+
+    public ImmutableList<PositionedString> getEnsures(String hName) {
+        return ensures.get(hName);
     }
 
 
@@ -223,25 +222,27 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         Iterator<PositionedString> it;
 
         sb.append(behavior).append("\n");
-        it = requires.iterator();
-        while (it.hasNext()) {
-            sb.append("requires: ").append(it.next()).append("\n");
+        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+          it = requires.get(h.toString()).iterator();
+          while(it.hasNext()) {
+            sb.append("requires<"+h+">: " + it.next() + "\n");
+          }
         }
-        it = assignable.iterator();
-        while (it.hasNext()) {
-            sb.append("assignable: ").append(it.next()).append("\n");
-        }
-        it = assignable_backup.iterator();
-        while (it.hasNext()) {
-            sb.append("assignable_backup: ").append(it.next()).append("\n");
+        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+          it = assignables.get(h.toString()).iterator();
+          while(it.hasNext()) {
+            sb.append("assignable<"+h+">: " + it.next() + "\n");
+          }
         }
         it = accessible.iterator();
         while (it.hasNext()) {
             sb.append("accessible: " + it.next() + "\n");
         }
-        it = ensures.iterator();
-        while (it.hasNext()) {
-            sb.append("ensures: ").append(it.next()).append("\n");
+        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+          it = ensures.get(h.toString()).iterator();
+          while(it.hasNext()) {
+            sb.append("ensures<"+h+">: " + it.next() + "\n");
+          }
         }
         it = signals.iterator();
         while (it.hasNext()) {
@@ -272,8 +273,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return mods.equals(sc.mods)
                && behavior.equals(sc.behavior)
                && requires.equals(sc.requires)
-               && assignable.equals(sc.assignable)
-               && assignable_backup.equals(sc.assignable_backup)
+               && assignables.equals(sc.assignables)
                && accessible.equals(sc.accessible)
                && ensures.equals(sc.ensures)
                && signals.equals(sc.signals)
@@ -288,8 +288,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return mods.hashCode()
                + behavior.hashCode()
                + requires.hashCode()
-               + assignable.hashCode()
-               + assignable_backup.hashCode()
+               + assignables.hashCode()
                + accessible.hashCode()
                + ensures.hashCode()
                + signals.hashCode()

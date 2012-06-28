@@ -21,4 +21,10 @@ public interface IExecutionStateNode<S extends SourceElement> extends IExecution
     * @return The {@link PositionInfo} of {@link #getActiveStatement()}.
     */
    public PositionInfo getActivePositionInfo();
+   
+   /**
+    * Returns the variable value pairs of the current state.
+    * @return The variable value pairs.
+    */
+   public IExecutionVariable[] getVariables();
 }
