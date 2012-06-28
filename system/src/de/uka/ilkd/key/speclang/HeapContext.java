@@ -42,7 +42,7 @@ public class HeapContext {
   public static Map<LocationVariable,LocationVariable> getBeforeAtPreVars(List<LocationVariable> heaps, Services services, String contextName) {
     Map<LocationVariable,LocationVariable> result = new LinkedHashMap<LocationVariable,LocationVariable>();
     for(LocationVariable heap : heaps) {
-       final LocationVariable atPreVar = TermBuilder.DF.heapAtPreVar(services, heap.name()+contextName, true);
+       final LocationVariable atPreVar = TermBuilder.DF.heapAtPreVar(services, heap.name()+contextName, heap.sort(), true);
        result.put(heap, atPreVar);
     }
     return result;

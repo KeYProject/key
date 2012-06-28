@@ -269,7 +269,7 @@ public final class DLSpecFactory {
 	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	//heapAtPre variable may be omitted
 	if(heapAtPreVar == null) {
-	    heapAtPreVar = TB.heapAtPreVar(services, heapLDT.getHeap() + "AtPre", false);
+	    heapAtPreVar = TB.heapAtPreVar(services, heapLDT.getHeap() + "AtPre", heapLDT.getHeap().sort(), false);
 	}
         Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
         atPreVars.put(heapLDT.getHeap(), heapAtPreVar);

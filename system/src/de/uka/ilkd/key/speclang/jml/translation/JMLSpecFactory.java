@@ -204,7 +204,7 @@ public class JMLSpecFactory {
         progVar.atPreVars = new LinkedHashMap<LocationVariable,LocationVariable>();
         progVar.atPres = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-           LocationVariable lv = TB.heapAtPreVar(services, h+"AtPre", false);
+           LocationVariable lv = TB.heapAtPreVar(services, h+"AtPre", h.sort(), false);
            progVar.atPreVars.put(h, lv);
            progVar.atPres.put(h, TB.var(lv));
         }     
@@ -938,7 +938,7 @@ public class JMLSpecFactory {
 
         Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-          atPres.put(heap, TB.var(TB.heapAtPreVar(services, heap+"AtPre", false)));        
+          atPres.put(heap, TB.var(TB.heapAtPreVar(services, heap+"AtPre", heap.sort(), false)));        
         }
 
         //translateToTerm invariant
