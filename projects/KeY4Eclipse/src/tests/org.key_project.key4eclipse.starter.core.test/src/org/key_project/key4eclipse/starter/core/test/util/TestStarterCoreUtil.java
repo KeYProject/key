@@ -20,7 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -80,7 +80,7 @@ public final class TestStarterCoreUtil {
                   // Load location
                   InitConfig initConfig = KeYUtil.internalLoad(location, classPaths, bootClassPath, true);
                   // Get method to proof in KeY
-                  ProgramMethod pm = KeYUtil.getProgramMethod(method, initConfig.getServices().getJavaInfo());
+                  IProgramMethod pm = KeYUtil.getProgramMethod(method, initConfig.getServices().getJavaInfo());
                   Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
                   // Get contract to proof
                   Services services = initConfig.getServices();

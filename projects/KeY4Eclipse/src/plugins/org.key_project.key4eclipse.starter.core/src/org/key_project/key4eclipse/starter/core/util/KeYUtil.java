@@ -45,7 +45,7 @@ import de.uka.ilkd.key.gui.notification.NotificationEventID;
 import de.uka.ilkd.key.gui.notification.NotificationTask;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -353,7 +353,7 @@ public final class KeYUtil {
                         // Load location
                         InitConfig initConfig = internalLoad(location, classPaths, bootClassPath, true);
                         // Get method to proof in KeY
-                        ProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
+                        IProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
                         Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
                         // Start proof by showing the proof management dialog
                         ProofManagementDialog.showInstance(MainWindow.getInstance().getMediator(), initConfig, pm.getContainerType(), pm);
@@ -421,8 +421,8 @@ public final class KeYUtil {
      * @return The found method representation in KeY.
      * @throws ProofInputException Occurred Exception.
      */
-    public static ProgramMethod getProgramMethod(IMethod method, 
-                                                 JavaInfo javaInfo) throws ProofInputException {
+    public static IProgramMethod getProgramMethod(IMethod method, 
+                                                  JavaInfo javaInfo) throws ProofInputException {
         try {
             // Determine container type
             IType containerType = method.getDeclaringType();
@@ -434,7 +434,7 @@ public final class KeYUtil {
             // Determine name
             String methodName = method.getElementName();
             // Ask javaInfo
-            ProgramMethod result;
+            IProgramMethod result;
             if (method.isConstructor()) {
                result = javaInfo.getConstructor(containerKJT, signature);
             }

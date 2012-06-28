@@ -59,7 +59,7 @@ import org.key_project.util.jdt.JDTUtil;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
@@ -330,7 +330,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
                }
                if (initConfig != null) {
                    // Get method to proof in KeY
-                   ProgramMethod pm = KeYUtil.getProgramMethod(method, initConfig.getServices().getJavaInfo());
+                   IProgramMethod pm = KeYUtil.getProgramMethod(method, initConfig.getServices().getJavaInfo());
                    if (pm != null) {
                        KeYJavaType type = pm.getContainerType();
                        ImmutableSet<FunctionalOperationContract> operationContracts = initConfig.getServices().getSpecificationRepository().getOperationContracts(type, pm);
