@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
 
 import junit.framework.TestCase;
 
@@ -507,34 +508,38 @@ public class TestUtilsUtil {
    }
 
    /**
-    * Returns the {@link ProofEnvironment} in the proof list at
+    * Returns the {@link Proof} in the proof list at
     * the given index.
-    * @param index The index.
+    * @param envIndex The index of the {@link ProofEnvironment}.
+    * @param proofIndex The index of the {@link Proof} in the {@link ProofEnvironment}.
     * @return The found {@link ProofEnvironment}.
     */
-   public static ProofEnvironment keyGetProofEnv(int index) {
+   public static Proof keyGetProof(int envIndex, int proofIndex) {
        SwingBotJFrame frame = TestUtilsUtil.keyGetMainWindow();
        SwingBotJTree tree = frame.bot().jTree(TaskTreeModel.class);
-       return keyGetProofEnv(tree, index);
+       return keyGetProof(tree, envIndex, proofIndex);
    }
    
    /**
     * Returns the {@link ProofEnvironment} in the proof list at
     * the given index.
     * @param tree The {@link SwingBotJTree} to search in.
-    * @param index The index.
+    * @param envIndex The index of the {@link ProofEnvironment}.
+    * @param proofIndex The index of the {@link Proof} in the {@link ProofEnvironment}.
     * @return The found {@link ProofEnvironment}.
     */
-   public static ProofEnvironment keyGetProofEnv(SwingBotJTree tree, int index) {
+   public static Proof keyGetProof(SwingBotJTree tree, int envIndex, int proofIndex) {
        TestCase.assertNotNull(tree);
-       TestCase.assertTrue(index >= 0);
+       TestCase.assertTrue(envIndex >= 0);
+       TestCase.assertTrue(proofIndex >= 0);
        TreeModel model = tree.getModel();
        TestCase.assertNotNull(model);
-       TestCase.assertTrue(index < model.getChildCount(model.getRoot()));
-       Object child = model.getChild(model.getRoot(), index);
+       TestCase.assertTrue(envIndex < model.getChildCount(model.getRoot()));
+       Object child = model.getChild(model.getRoot(), envIndex);
        TestCase.assertTrue(child instanceof EnvNode);
-       ProofEnvironment result = ((EnvNode)child).getProofEnv();
-       return result;
+       TreeNode proofNode = ((EnvNode)child).getChildAt(proofIndex);
+       TestCase.assertTrue(child instanceof TaskTreeNode);
+       return ((TaskTreeNode)proofNode).proof();
    }
    
    /**

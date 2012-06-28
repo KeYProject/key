@@ -71,7 +71,7 @@ public class SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest extends AbstractKeY
     * @param value The value to set.
     */
    protected static void setMaximalNumberOfSetNodesPerBranchOnRun(SWTWorkbenchBot bot, int value) {
-      SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Debug", "KeY");
+      SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY");
       preferenceShell.bot().text(1).setText(value + "");
       preferenceShell.bot().button("OK").click();
       assertEquals(value, KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());

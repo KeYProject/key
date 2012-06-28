@@ -1,7 +1,6 @@
 package org.key_project.sed.ui.property;
 
 import org.eclipse.jface.viewers.IFilter;
-import org.key_project.sed.core.model.ISEDDebugNode;
 
 /**
  * {@link IFilter} implementation used to define if a {@link SEDDebugNodePropertySection}
@@ -14,6 +13,6 @@ public class SEDDebugNodeTreeFilter implements IFilter {
     */
    @Override
    public boolean select(Object toTest) {
-      return toTest instanceof ISEDDebugNode;
+      return SEDDebugNodePropertySection.getDebugNode(toTest) != null;
    }
 }

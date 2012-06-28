@@ -635,7 +635,7 @@ public class Recoder2KeY implements JavaReader {
         
         recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(
                 new StringReader("public class " +
-                        JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS + " {}"));
+                        JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS + " { public static void " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_METHOD + "() {}  }"));
         rcuList.add(rcu);
 
         return rcuList;

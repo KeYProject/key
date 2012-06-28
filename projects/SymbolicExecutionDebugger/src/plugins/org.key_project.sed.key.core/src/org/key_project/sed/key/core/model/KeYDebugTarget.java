@@ -6,10 +6,9 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
-import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
+import org.key_project.sed.key.core.launch.KeYLaunchSettings;
 import org.key_project.sed.key.core.util.KeYSEDPreferences;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.core.util.LogUtil;
@@ -17,7 +16,6 @@ import org.key_project.sed.key.core.util.LogUtil;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -28,8 +26,8 @@ import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepReturnSymbolicExecutionTreeNodesStopCondition;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -42,6 +40,11 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * The used model identifier.
     */
    public static final String MODEL_IDENTIFIER = "org.key_project.sed.key.core";
+   
+   /**
+    * The {@link KeYLaunchSettings} to use.
+    */
+   private KeYLaunchSettings launchSettings;
    
    /**
     * The only contained child thread.
@@ -62,19 +65,12 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
          handleAutoModeStopped(e);
       }
    };
-   
+
    /**
-    * If this is {@code true} an {@link ISEDMethodReturn} will contain the return value,
-    * but the performance will suffer.
-    * If it is {@code false} only the name of the returned method is shown in an {@link ISEDMethodReturn}.
+    * The {@link SymbolicExecutionEnvironment} which provides all relevant
+    * information for symbolic execution.
     */
-   private boolean showMethodReturnValuesInDebugNodes;
-   
-   /**
-    * The {@link SymbolicExecutionTreeBuilder} which is used to extract
-    * the symbolic execution tree from KeY's proof tree.
-    */
-   private SymbolicExecutionTreeBuilder builder;
+   private SymbolicExecutionEnvironment<?> environment;
 
    /**
     * Maps an {@link IExecutionNode} to its representation in the debug model.
@@ -86,30 +82,31 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param launch The parent {@link ILaunch}.
     * @param mediator the used {@link KeYMediator} during proof.
     * @param proof The {@link Proof} in KeY to treat.
-    * @param showMethodReturnValuesInDebugNodes
+    * @param launchSettings The {@link KeYLaunchSettings} to use.
     * @throws DebugException Occurred Exception
     */
    public KeYDebugTarget(ILaunch launch,
-                         KeYMediator mediator,
-                         Proof proof, 
-                         boolean showMethodReturnValuesInDebugNodes) throws DebugException {
+                         SymbolicExecutionEnvironment<?> environment,
+                         KeYLaunchSettings launchSettings) throws DebugException {
       super(launch);
       // Update references
-      Assert.isNotNull(proof);
-      this.builder = new SymbolicExecutionTreeBuilder(mediator, proof);
-      this.showMethodReturnValuesInDebugNodes = showMethodReturnValuesInDebugNodes; 
+      Assert.isNotNull(environment);
+      Assert.isNotNull(environment.getBuilder());
+      Assert.isNotNull(environment.getUi());
+      Assert.isNotNull(launchSettings);
+      this.launchSettings = launchSettings; 
+      this.environment = environment;
       // Update initial model
       setModelIdentifier(MODEL_IDENTIFIER);
+      Proof proof = environment.getBuilder().getProof();
       setName(proof.name() != null ? proof.name().toString() : "Unnamed");
-      thread = new KeYThread(this, builder.getStartNode());
+      thread = new KeYThread(this, environment.getBuilder().getStartNode());
       registerDebugNode(thread);
       addSymbolicThread(thread);
       // Observe frozen state of KeY Main Frame
-      MainWindow.getInstance().getMediator().addAutoModeListener(autoModeListener);
-      // Set goal chooser to use
-      builder.getProof().getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
-      // Set initial stop condition to use
-      builder.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(new ExecutedSymbolicExecutionTreeNodesStopCondition(KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun()));
+      environment.getBuilder().getMediator().addAutoModeListener(autoModeListener);
+      // Initialize proof to use the symbolic execution strategy
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());
    }
 
    /**
@@ -118,8 +115,8 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    @Override
    public boolean canResume() {
       return super.canResume() && 
-             !MainWindow.getInstance().frozen && // Only one proof completion per time is possible
-             KeYUtil.isProofInUI(builder.getProof()); // Otherwise Auto Mode is not available.
+             !environment.getBuilder().getMediator().autoMode() && // Only one proof completion per time is possible
+             environment.getUi().isAutoModeSupported(environment.getBuilder().getProof()); // Otherwise Auto Mode is not available.
    }
    
    /**
@@ -151,7 +148,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
          super.resume();
          // Run auto mode
          runAutoMode(KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), 
-                     keyNode != null ? SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()) : builder.getProof().openEnabledGoals(),
+                     keyNode != null ? SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()) : environment.getBuilder().getProof().openEnabledGoals(),
                      false,
                      false);
       }
@@ -170,7 +167,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                               boolean stepReturn) {
       // Set strategy to use
       StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, true);
-      builder.getProof().setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(builder.getProof(), strategyProperties));
+      environment.getBuilder().getProof().setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(environment.getBuilder().getProof(), strategyProperties));
       // Update stop condition
       CompoundStopCondition stopCondition = new CompoundStopCondition();
       stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));
@@ -180,9 +177,9 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       if (stepReturn) {
          stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
       }
-      builder.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
+      environment.getBuilder().getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      KeYUtil.runProofInAutomaticModeWithoutResultDialog(builder.getProof(), goals);
+      environment.getUi().startAutoMode(environment.getBuilder().getProof(), goals);
    }
 
    /**
@@ -191,8 +188,8 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    @Override
    public boolean canSuspend() {
       return super.canSuspend() && 
-             MainWindow.getInstance().frozen && // Only if the auto mode is in progress
-             MainWindow.getInstance().getMediator().getProof() == builder.getProof(); // And the auto mode handles this proof
+             environment.getBuilder().getMediator().autoMode() && // Only if the auto mode is in progress
+             environment.getBuilder().getMediator().getProof() == environment.getBuilder().getProof(); // And the auto mode handles this proof
    }
    
    /**
@@ -210,7 +207,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    @Override
    public void suspend() throws DebugException {
       if (canSuspend()) {
-         MainWindow.getInstance().getMediator().stopAutoMode();
+         environment.getUi().stopAutoMode();
       }
    }
    
@@ -232,7 +229,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     */
    protected void updateExecutionTree(SymbolicExecutionTreeBuilder builder) {
       // Update the symbolic execution tree, debug model is updated lazily via getters
-      builder.analyse();
+      environment.getBuilder().analyse();
    }
 
    /**
@@ -241,18 +238,17 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    @Override
    public void terminate() throws DebugException {
       // Remove auto mode listener
-      MainWindow main = MainWindow.getInstance(); 
-      main.getMediator().removeAutoModeListener(autoModeListener);
+      environment.getBuilder().getMediator().removeAutoModeListener(autoModeListener);
       // Suspend first to stop the automatic mode
       if (!isSuspended()) {
          suspend();
-         KeYUtil.waitWhileMainWindowIsFrozen(main);
+         environment.getUi().waitWhileAutoMode();
       }
       // Remove proof from user interface
-      KeYUtil.removeFromProofList(main, builder.getProof().env());
+      environment.getUi().removeProof(environment.getProof());
       // Clear cache
-      builder.dispose();
-      builder = null;
+      environment.getBuilder().dispose();
+      environment = null;
       executionToDebugMapping.clear();
       // Inform UI that the process is terminated
       super.terminate();
@@ -264,7 +260,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    @Override
    public void disconnect() throws DebugException {
       // Remove auto mode listener
-      MainWindow.getInstance().getMediator().removeAutoModeListener(autoModeListener);
+      environment.getBuilder().getMediator().removeAutoModeListener(autoModeListener);
       // Inform UI that the process is disconnected
       super.disconnect();
    }
@@ -275,7 +271,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     */
    protected void handleAutoModeStarted(ProofEvent e) {
       try {
-         if (e.getSource() == builder.getProof()) {
+         if (e.getSource() == environment.getBuilder().getProof()) {
             // Inform UI that the process is resumed
             super.resume();
          }
@@ -291,8 +287,8 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     */
    protected void handleAutoModeStopped(ProofEvent e) {
       try {
-         if (e.getSource() == builder.getProof()) {
-            updateExecutionTree(builder);
+         if (e.getSource() == environment.getBuilder().getProof()) {
+            updateExecutionTree(environment.getBuilder());
          }
       }
       catch (Exception exception) {
@@ -328,13 +324,21 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
    public IKeYSEDDebugNode<?> getDebugNode(IExecutionNode executionNode) {
       return executionToDebugMapping.get(executionNode);
    }
+   
+   /**
+    * Returns the used {@link KeYLaunchSettings}.
+    * @return The used {@link KeYLaunchSettings}.
+    */
+   public KeYLaunchSettings getLaunchSettings() {
+      return launchSettings;
+   }
 
    /**
     * Checks if method return values are shown in {@link KeYMethodCall}s.
     * @return {@code true} include return value in node names, {@code false} do not show return values in node names.
     */
    public boolean isShowMethodReturnValuesInDebugNodes() {
-      return showMethodReturnValuesInDebugNodes;
+      return launchSettings.isShowMethodReturnValues();
    }
 
    /**

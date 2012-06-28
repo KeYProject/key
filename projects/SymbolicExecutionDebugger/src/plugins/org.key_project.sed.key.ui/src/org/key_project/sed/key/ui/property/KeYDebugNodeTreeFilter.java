@@ -1,7 +1,6 @@
 package org.key_project.sed.key.ui.property;
 
 import org.eclipse.jface.viewers.IFilter;
-import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 
 /**
  * {@link IFilter} implementation used to define if a {@link KeYDebugNodePropertySection}
@@ -14,6 +13,6 @@ public class KeYDebugNodeTreeFilter implements IFilter {
     */
    @Override
    public boolean select(Object toTest) {
-      return toTest instanceof IKeYSEDDebugNode<?>;
+      return KeYDebugNodePropertySection.getDebugNode(toTest) != null;
    }
 }

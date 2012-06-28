@@ -42,6 +42,15 @@ public class KeYDebugNodePropertySection extends AbstractPropertySection {
     */
    protected IKeYSEDDebugNode<?> getDebugNode() {
       Object object = SWTUtil.getFirstElement(getSelection());
+      return getDebugNode(object);
+   }
+   
+   /**
+    * Converts the given {@link Object} into an {@link IKeYSEDDebugNode} if possible.
+    * @param object The given {@link Object}.
+    * @return The {@link IKeYSEDDebugNode} or {@code null} if conversion is not possible.
+    */
+   public static IKeYSEDDebugNode<?> getDebugNode(Object object) {
       return object instanceof IKeYSEDDebugNode<?> ? (IKeYSEDDebugNode<?>)object : null;
    }
 }

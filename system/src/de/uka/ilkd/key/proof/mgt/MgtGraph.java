@@ -58,7 +58,7 @@
 //        String specRank = "{rank = same";
 //
 //	for (Object o: nodes.keySet()) {
-//	    if (o instanceof ProgramMethod) continue; // these are part of class
+//	    if (o instanceof IProgramMethod) continue; // these are part of class
 //	
 //	    gv.addln(node(o)+nodes.get(o).printAttrs());
 //
@@ -203,9 +203,9 @@
 //    private String port(Object o) {
 //        if (o instanceof KeYJavaType)
 //	    return ((KeYJavaType)o).getName()+":"+((KeYJavaType)o).hashCode();
-//	else if (o instanceof ProgramMethod)
-//	    return ((ProgramMethod)o).getContainerType().getName()+":"+
-//	        ((ProgramMethod)o).hashCode();
+//	else if (o instanceof IProgramMethod)
+//	    return ((IProgramMethod)o).getContainerType().getName()+":"+
+//	        ((IProgramMethod)o).hashCode();
 //        else return node(o);
 //    }
 //    

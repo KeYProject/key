@@ -37,3 +37,14 @@ tags
 /netbeans/eclipse/nbproject/private/
 /netbeans/eclipse/dist/
 *.class
+
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.toc
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.aux
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.bbl
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.blg
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.len
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.log
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.nav
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.out
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.pdf
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.snm

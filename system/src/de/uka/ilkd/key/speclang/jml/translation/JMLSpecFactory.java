@@ -14,7 +14,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementContainer;
@@ -32,14 +36,34 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.ClassAxiom;
+import de.uka.ilkd.key.speclang.ClassAxiomImpl;
+import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.ClassInvariantImpl;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractFactory;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.InitiallyClause;
+import de.uka.ilkd.key.speclang.InitiallyClauseImpl;
+import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopInvariantImpl;
+import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
-import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassAxiom;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLDepends;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLInitially;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 import de.uka.ilkd.key.util.Pair;
@@ -62,7 +86,7 @@ public class JMLSpecFactory {
      * Used to check that there is only one represents clause per type and
      * field.
      */
-    private Set<Pair<KeYJavaType, ObserverFunction>> modelFields;
+    private Set<Pair<KeYJavaType, IObserverFunction>> modelFields;
 
 
     //-------------------------------------------------------------------------
@@ -72,7 +96,7 @@ public class JMLSpecFactory {
         assert services != null;
         this.services = services;
         cf = new ContractFactory(services);
-        modelFields = new HashSet<Pair<KeYJavaType, ObserverFunction>>();
+        modelFields = new HashSet<Pair<KeYJavaType, IObserverFunction>>();
     }
 
 
@@ -114,7 +138,7 @@ public class JMLSpecFactory {
     }
 
 
-    private String getContractName(ProgramMethod programMethod,
+    private String getContractName(IProgramMethod programMethod,
                                    Behavior behavior) {
         return "JML " + behavior.toString() + "operation contract";
     }
@@ -194,7 +218,7 @@ public class JMLSpecFactory {
      * and the map for atPre-Functions
      */
 
-    private ProgramVariableCollection createProgramVaribales(ProgramMethod pm) {
+    private ProgramVariableCollection createProgramVaribales(IProgramMethod pm) {
         ProgramVariableCollection progVar = new ProgramVariableCollection();
         progVar.selfVar = TB.selfVar(services, pm, pm.getContainerType(), false);
         progVar.paramVars = TB.paramVars(services, pm, false);
@@ -212,7 +236,7 @@ public class JMLSpecFactory {
     }
 
 
-    private ContractClauses translateJMLClauses(ProgramMethod pm,
+    private ContractClauses translateJMLClauses(IProgramMethod pm,
                                                 TextualJMLSpecCase textualSpecCase,
                                                 ProgramVariableCollection progVars,
                                                 Behavior originalBehavior)
@@ -275,7 +299,7 @@ public class JMLSpecFactory {
 
 
     private ImmutableList<ImmutableList<Term>> translateIndependetClauses(
-            ProgramMethod pm,
+            IProgramMethod pm,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             ImmutableList<PositionedString> originalClauses)
@@ -303,7 +327,7 @@ public class JMLSpecFactory {
      * A & B will be used as a lemma for C and so on. This mimics the Isabelle-style of proving.
      */
     private Term translateAndClauses(
-            ProgramMethod pm,
+            IProgramMethod pm,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar,
@@ -328,7 +352,7 @@ public class JMLSpecFactory {
     }
 
 
-    private Term translateOrClauses(ProgramMethod pm,
+    private Term translateOrClauses(IProgramMethod pm,
                                     ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars,
                                     ImmutableList<PositionedString> originalClauses)
@@ -347,7 +371,7 @@ public class JMLSpecFactory {
 
 
     private Term translateUnionClauses(
-            ProgramMethod pm,
+            IProgramMethod pm,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             ImmutableList<PositionedString> originalClauses)
@@ -379,7 +403,7 @@ public class JMLSpecFactory {
     }
     
     private ImmutableList<Term> translateListUnionClauses(
-            ProgramMethod pm,
+            IProgramMethod pm,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             ImmutableList<PositionedString> originalClauses)
@@ -398,7 +422,7 @@ public class JMLSpecFactory {
 
 
     private Term translateSignals(
-            ProgramMethod pm,
+            IProgramMethod pm,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar,
@@ -418,7 +442,7 @@ public class JMLSpecFactory {
     }
 
 
-    private Term translateSignalsOnly(ProgramMethod pm,
+    private Term translateSignalsOnly(IProgramMethod pm,
                                       ProgramVariable excVar,
                                       Behavior originalBehavior,
                                       ImmutableList<PositionedString> originalClauses)
@@ -428,7 +452,7 @@ public class JMLSpecFactory {
     }
 
 
-    private Term translateEnsures(ProgramMethod pm,
+    private Term translateEnsures(IProgramMethod pm,
                                   ProgramVariable selfVar,
                                   ImmutableList<ProgramVariable> paramVars,
                                   ProgramVariable resultVar,
@@ -448,7 +472,7 @@ public class JMLSpecFactory {
     }
 
 
-    private Term translateAccessible(ProgramMethod pm,
+    private Term translateAccessible(IProgramMethod pm,
                                      ProgramVariable selfVar,
                                      ImmutableList<ProgramVariable> paramVars,
                                      ImmutableList<PositionedString> originalClauses)
@@ -461,7 +485,7 @@ public class JMLSpecFactory {
     }
 
 
-    private Term translateAssignable(ProgramMethod pm,
+    private Term translateAssignable(IProgramMethod pm,
                                      ProgramVariable selfVar,
                                      ImmutableList<ProgramVariable> paramVars,
                                      ImmutableList<PositionedString> originalClauses)
@@ -475,7 +499,7 @@ public class JMLSpecFactory {
         }
     }
     
-    private boolean translateStrictlyPure(ProgramMethod pm,
+    private boolean translateStrictlyPure(IProgramMethod pm,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             ImmutableList<PositionedString> assignableClauses)
@@ -500,7 +524,7 @@ public class JMLSpecFactory {
 
 
 
-    private Term translateMeasuredBy(ProgramMethod pm,
+    private Term translateMeasuredBy(IProgramMethod pm,
                                      ProgramVariable selfVar,
                                      ImmutableList<ProgramVariable> paramVars,
                                      ImmutableList<PositionedString> originalMeasuredBy)
@@ -525,7 +549,7 @@ public class JMLSpecFactory {
     }
 
 
-    private String generateName(ProgramMethod pm,
+    private String generateName(IProgramMethod pm,
                                 TextualJMLSpecCase textualSpecCase,
                                 Behavior originalBehavior) {
         String customName = textualSpecCase.getName();
@@ -560,7 +584,7 @@ public class JMLSpecFactory {
      * Generate functional operation contracts.
      * 
      * @param name  base name of the contract (does not have to be unique)
-     * @param pm    the ProgramMethod to which the contract belongs
+     * @param pm    the IProgramMethod to which the contract belongs
      * @param progVars  pre-generated collection of variables for the receiver
      *          object, operation parameters, operation result, thrown
      *          exception and the pre-heap
@@ -571,7 +595,7 @@ public class JMLSpecFactory {
      */
     private ImmutableSet<Contract> createFunctionalOperationContracts(
             String name,
-            ProgramMethod pm,
+            IProgramMethod pm,
             ProgramVariableCollection progVars,
             ContractClauses clauses,
             Map<LocationVariable,Term> posts) {
@@ -618,7 +642,7 @@ public class JMLSpecFactory {
     /**
      * Generate dependency operation contract out of the JML accessible clause.
      * 
-     * @param pm    the ProgramMethod to which the contract belongs
+     * @param pm    the IProgramMethod to which the contract belongs
      * @param progVars  collection of variables for the receiver object,
      *          operation parameters, operation result, thrown exception
      *          and the pre-heap
@@ -626,7 +650,7 @@ public class JMLSpecFactory {
      * @return      operation contracts including a new dependency contract
      */
     private ImmutableSet<Contract> createDependencyOperationContract(
-            ProgramMethod pm,
+            IProgramMethod pm,
             ProgramVariableCollection progVars,
             ContractClauses clauses) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
@@ -753,11 +777,11 @@ public class JMLSpecFactory {
                 isStatic ? null : TB.selfVar(services, kjt, false);
 
         //translateToTerm expression
-        final Pair<ObserverFunction, Term> rep =
+        final Pair<IObserverFunction, Term> rep =
                 JMLTranslator.translate(originalRep, kjt, selfVar, null, null,
                                         null, null, Pair.class, services);
         // represents clauses must be unique per type
-        for (Pair<KeYJavaType, ObserverFunction> p : modelFields) {
+        for (Pair<KeYJavaType, IObserverFunction> p : modelFields) {
             if (p.first.equals(kjt) && p.second.equals(rep.first)) {
                 throw new SLTranslationException(
                         "JML represents clauses must occur uniquely per type and target.",
@@ -765,7 +789,7 @@ public class JMLSpecFactory {
                         originalRep.pos);
             }
         }
-        modelFields.add(new Pair<KeYJavaType, ObserverFunction>(kjt, rep.first));
+        modelFields.add(new Pair<KeYJavaType, IObserverFunction>(kjt, rep.first));
         Term repFormula = TB.convertToFormula(rep.second, services);
         //create class axiom
         return new RepresentsAxiom("JML represents clause for "
@@ -789,11 +813,11 @@ public class JMLSpecFactory {
 
         //translateToTerm expression
         final PositionedString clause = textualRep.getRepresents();
-        final Pair<ObserverFunction, Term> rep =
+        final Pair<IObserverFunction, Term> rep =
                 JMLTranslator.translate(clause, kjt, selfVar, null, null, null,
                                         null, Pair.class, services);
         //check whether there already is a represents clause
-        if (!modelFields.add(new Pair<KeYJavaType, ObserverFunction>(kjt,
+        if (!modelFields.add(new Pair<KeYJavaType, IObserverFunction>(kjt,
                                                                      rep.first))) {
             throw new SLWarningException("JML represents clauses must occur uniquely per type and target."
                                          + "\nAll but one are ignored.",
@@ -858,7 +882,7 @@ public class JMLSpecFactory {
         ProgramVariable selfVar = TB.selfVar(services, kjt, false);
 
         //translateToTerm expression
-        Triple<ObserverFunction, Term, Term> dep =
+        Triple<IObserverFunction, Term, Term> dep =
                 JMLTranslator.translate(originalDep, kjt, selfVar, null, null,
                                         null, null, Triple.class, services);
         assert dep.first.arity() <= 2;
@@ -876,7 +900,7 @@ public class JMLSpecFactory {
     /**
      * Creates operation contracts out of the passed JML specification.
      */
-    public ImmutableSet<Contract> createJMLOperationContracts(ProgramMethod pm,
+    public ImmutableSet<Contract> createJMLOperationContracts(IProgramMethod pm,
                                                               TextualJMLSpecCase textualSpecCase)
             throws SLTranslationException {
         assert pm != null;
@@ -906,7 +930,7 @@ public class JMLSpecFactory {
 
 
     public LoopInvariant createJMLLoopInvariant(
-            ProgramMethod pm,
+            IProgramMethod pm,
             LoopStatement loop,
             Map<String,ImmutableList<PositionedString>> originalInvariants,
             Map<String,ImmutableList<PositionedString>> originalAssignables,
@@ -1006,7 +1030,7 @@ public class JMLSpecFactory {
 
 
     public LoopInvariant createJMLLoopInvariant(
-            ProgramMethod pm,
+            IProgramMethod pm,
             LoopStatement loop,
             TextualJMLLoopSpec textualLoopSpec)
             throws SLTranslationException {
@@ -1027,7 +1051,7 @@ public class JMLSpecFactory {
      */
     public FunctionalOperationContract initiallyClauseToContract(
             InitiallyClause ini,
-            ProgramMethod pm)
+            IProgramMethod pm)
             throws SLTranslationException {
         //if (! pm.isConstructor()) throw new SLTranslationException("Initially clauses only apply to constructors, not to method "+pm);
         final ImmutableList<String> mods = ImmutableSLList.<String>nil().append(
@@ -1050,7 +1074,7 @@ public class JMLSpecFactory {
     }
 
 
-    private ImmutableList<PositionedString> createPrecond(ProgramMethod pm,
+    private ImmutableList<PositionedString> createPrecond(IProgramMethod pm,
                                                           PositionedString originalSpec) {
         ImmutableList<PositionedString> res =
                 ImmutableSLList.<PositionedString>nil();

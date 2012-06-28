@@ -74,9 +74,14 @@ public final class KeySEDUtil {
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT = "org.key_project.sed.key.core.launch.sed.key.attribute.existingContract";
 
     /**
-     * The key of the attribute "existingContract" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     * The key of the attribute "show method return values in debug nodes" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
      */
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES = "org.key_project.sed.key.core.launch.sed.key.attribute.showMethodReturnValuesInDebugNodes";
+
+    /**
+     * The key of the attribute "show KeY's main window" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW = "org.key_project.sed.key.core.launch.sed.key.attribute.showKeYMainWindow";
 
     /**
      * The launch mode supported by the Symbolic Execution Debugger based on KeY.
@@ -193,6 +198,16 @@ public final class KeySEDUtil {
      */
     public static boolean isShowMethodReturnValuesInDebugNodes(ILaunchConfiguration configuration) throws CoreException {
         return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, KeYSEDPreferences.isShowMethodReturnValuesInDebugNode()) : KeYSEDPreferences.isShowMethodReturnValuesInDebugNode();
+    }
+    
+    /**
+     * Checks if KeY's main window should be shown or not.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} show KeY's main window, {@code false} hide KeY's main window
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isShowKeYMainWindow(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, KeYSEDPreferences.isShowKeYMainWindow()) : KeYSEDPreferences.isShowKeYMainWindow();
     }
     
     /**

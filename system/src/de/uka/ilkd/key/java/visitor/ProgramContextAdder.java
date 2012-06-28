@@ -197,7 +197,6 @@ public class ProgramContextAdder {
 	return new MethodFrame(old.getProgramVariable(),
 			       old.getExecutionContext(),
 			       body,
-                               old.getProgramMethod(), 
                                PositionInfo.UNDEFINED);
     }
 

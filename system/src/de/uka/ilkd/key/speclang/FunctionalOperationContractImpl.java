@@ -31,7 +31,15 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -50,7 +58,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     final String baseName;
     final String name;
     final KeYJavaType kjt;    
-    final ProgramMethod pm;
+    final IProgramMethod pm;
     final Modality modality;
     final Map<LocationVariable,Term> originalPres;
     final Term originalMby;    
@@ -80,7 +88,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     FunctionalOperationContractImpl(String baseName,
 	                          String name,
                                   KeYJavaType kjt,	                          
-                                  ProgramMethod pm,
+                                  IProgramMethod pm,
             		          Modality modality,
             		          Map<LocationVariable,Term> pres,
             		          Term mby,
@@ -132,11 +140,12 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         this.transaction            = transaction;
 	this.toBeSaved	            = toBeSaved;
     }
+  
     
     /**
      * Creates an operation contract.
      * @param baseName base name of the contract (does not have to be unique)
-     * @param pm the ProgramMethod to which the contract belongs
+     * @param pm the IProgramMethod to which the contract belongs
      * @param modality the modality of the contract
      * @param pre the precondition of the contract
      * @param mby the measured_by clause of the contract 
@@ -150,7 +159,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
      */
     FunctionalOperationContractImpl(String baseName,
                                  KeYJavaType kjt,	    
-                                 ProgramMethod pm,
+                                 IProgramMethod pm,
             		         Modality modality,
             		         Map<LocationVariable,Term> pres,
             		         Term mby,            		         
@@ -189,7 +198,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
      * Creates an operation contract.
      * 
      * @param baseName base name of the contract (does not have to be unique)
-     * @param pm 	the ProgramMethod to which the contract belongs
+     * @param pm 	the IProgramMethod to which the contract belongs
      * @param modality the modality of the contract
      * @param pre 	the precondition of the contract
      * @param mby 	the measured_by clause of the contract 
@@ -199,7 +208,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
      * 			operation parameters, operation result, thrown exception
      * 			and the pre-heap
      */
-//    FunctionalOperationContractImpl(String baseName, ProgramMethod pm,
+//    FunctionalOperationContractImpl(String baseName, IProgramMethod pm,
 //	    Modality modality, Term pre, Term mby, Term post, Term mod, boolean hasMod, Term modBackup,
 //	    ProgramVariableCollection progVars, boolean toBeSaved) {
 //	this(baseName, null, pm.getContainerType(), pm, modality, pre, mby,
@@ -355,7 +364,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     
     
     @Override
-    public ProgramMethod getTarget() {
+    public IProgramMethod getTarget() {
         return pm;
     }
     
@@ -885,12 +894,12 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 
     @Override
     public Contract setTarget(KeYJavaType newKJT,
-                              ObserverFunction newPM) {
-        assert newPM instanceof ProgramMethod;
+                              IObserverFunction newPM) {
+        assert newPM instanceof IProgramMethod;
         return new FunctionalOperationContractImpl(baseName,
                                                    null,
                                                    newKJT,
-                                                   (ProgramMethod) newPM,
+                                                   (IProgramMethod) newPM,
                                                    modality,
                                                    originalPres,
                                                    originalMby,

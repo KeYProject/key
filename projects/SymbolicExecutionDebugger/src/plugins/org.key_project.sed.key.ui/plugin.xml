@@ -137,6 +137,19 @@
                   id="org.key_project.sed.ui.key.tab"
                   label="KeY">
             </propertyTab>
+            <propertyTab
+                  category="Debug"
+                  id="org.key_project.sed.ui.main.tab"
+                  image="icons/logo16.gif"
+                  label="Main">
+            </propertyTab>
+            <propertyTab
+                  afterTab="org.key_project.sed.ui.main.tab"
+                  category="Debug"
+                  id="org.key_project.sed.ui.customization.tab"
+                  image="icons/keyCustomization.gif"
+                  label="Customization">
+            </propertyTab>
          </propertyTabs>
       </extension>
       <extension
@@ -148,6 +161,18 @@
                   filter="org.key_project.sed.key.ui.property.KeYDebugNodeTreeFilter"
                   id="org.key_project.sed.key.ui.property.KeYDebugNodePropertySection"
                   tab="org.key_project.sed.ui.key.tab">
+            </propertySection>
+            <propertySection
+                  class="org.key_project.sed.key.ui.property.MainKeYDebugTargetPropertySection"
+                  filter="org.key_project.sed.key.ui.property.KeYDebugTargetTreeFilter"
+                  id="org.key_project.sed.key.ui.property.KeYDebugTargetPropertySection"
+                  tab="org.key_project.sed.ui.main.tab">
+            </propertySection>
+            <propertySection
+                  class="org.key_project.sed.key.ui.property.CustomizationKeYDebugTargetPropertySection"
+                  filter="org.key_project.sed.key.ui.property.KeYDebugTargetTreeFilter"
+                  id="org.key_project.sed.key.ui.property.CustomizationKeYDebugTargetPropertySection"
+                  tab="org.key_project.sed.ui.customization.tab">
             </propertySection>
          </propertySections>
       </extension>

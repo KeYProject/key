@@ -24,8 +24,20 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermCreationException;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -193,7 +205,7 @@ final class JMLTranslator {
                                new JMLTranslationMethod() {
 
             @Override
-            public Triple<ObserverFunction, Term, Term> translate(
+            public Triple<IObserverFunction, Term, Term> translate(
                     SLTranslationExceptionManager excManager,
                                     Object... params)
                     throws SLTranslationException {
@@ -207,12 +219,12 @@ final class JMLTranslator {
                 LocationVariable heap =
                         services.getTypeConverter().getHeapLDT().getHeap();
                 if (!lhs.isTerm()
-                    || !(lhs.getTerm().op() instanceof ObserverFunction)
+                    || !(lhs.getTerm().op() instanceof IObserverFunction)
                     || lhs.getTerm().sub(0).op() != heap) {
                     throw excManager.createException("Depends clause with unexpected lhs: " + lhs);
                 }
-                return new Triple<ObserverFunction, Term, Term>(
-                        (ObserverFunction) lhs.getTerm().op(),
+                return new Triple<IObserverFunction, Term, Term>(
+                        (IObserverFunction) lhs.getTerm().op(),
                         rhs,
                         mby == null ? null : mby.getTerm());
             }
@@ -241,8 +253,8 @@ final class JMLTranslator {
                 SLExpression lhs = (SLExpression) params[0];
                 Term t = (Term) params[1];
 
-                return new Pair<ObserverFunction, Term>(
-                        (ObserverFunction) lhs.getTerm().op(),
+                return new Pair<IObserverFunction, Term>(
+                        (IObserverFunction) lhs.getTerm().op(),
                         t);
             }
         });
@@ -489,7 +501,7 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class);
                 final Services services = (Services)params[0];
-                Function inv = services.getJavaInfo().getInv();
+                IObserverFunction inv = services.getJavaInfo().getInv();
                 Term obj = ((SLExpression) params[1]).getTerm();
                 return new SLExpression(TB.func(inv, TB.getBaseHeap(services), obj));
             }

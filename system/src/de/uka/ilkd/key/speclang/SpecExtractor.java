@@ -13,7 +13,7 @@ package de.uka.ilkd.key.speclang;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 /**
@@ -24,10 +24,10 @@ public interface SpecExtractor {
     /**
      * Returns the operation contracts for the passed operation.
      */
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm)
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm)
         throws SLTranslationException;
 
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm, boolean addInvariant)
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm, boolean addInvariant)
         throws SLTranslationException;
     
     /**
@@ -39,7 +39,7 @@ public interface SpecExtractor {
     /**
      * Returns the loop invariant for the passed loop (if any).
      */
-    public LoopInvariant extractLoopInvariant(ProgramMethod pm, 
+    public LoopInvariant extractLoopInvariant(IProgramMethod pm, 
                                               LoopStatement loop)
         throws SLTranslationException;
     

@@ -13,6 +13,7 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.ui.util.LogUtil;
+import org.key_project.sed.ui.util.SEDImages;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.StringUtil;
 
@@ -26,6 +27,11 @@ public class NodeTabComposite extends Composite {
     * Shows the value of {@link ISEDDebugNode#getName()}.
     */
    private Text nameText;
+   
+   /**
+    * Shows the value of {@link ISEDDebugNode#getNodeType()}.
+    */
+   private CLabel typeCLabel;
    
    /**
     * Shows the value of {@link ISEDDebugNode#getPathCondition()}.
@@ -59,12 +65,26 @@ public class NodeTabComposite extends Composite {
       data.top = new FormAttachment(nameText, 0, SWT.CENTER);
       nameLabel.setLayoutData(data);
 
+      typeCLabel = factory.createCLabel(composite, StringUtil.EMPTY_STRING);
+      data = new FormData();
+      data.left = new FormAttachment(0, AbstractPropertySection.STANDARD_LABEL_WIDTH);
+      data.right = new FormAttachment(100, 0);
+      data.top = new FormAttachment(nameText, 0, ITabbedPropertyConstants.VSPACE);
+      typeCLabel.setLayoutData(data);
+
+      CLabel typeLabel = factory.createCLabel(composite, "Type:");
+      data = new FormData();
+      data.left = new FormAttachment(0, 0);
+      data.right = new FormAttachment(typeCLabel, -ITabbedPropertyConstants.HSPACE);
+      data.top = new FormAttachment(typeCLabel, 0, SWT.CENTER);
+      typeLabel.setLayoutData(data);
+
       pathText = factory.createText(composite, StringUtil.EMPTY_STRING);
       pathText.setEditable(false);
       data = new FormData();
       data.left = new FormAttachment(0, AbstractPropertySection.STANDARD_LABEL_WIDTH);
       data.right = new FormAttachment(100, 0);
-      data.top = new FormAttachment(nameText, 0, ITabbedPropertyConstants.VSPACE);
+      data.top = new FormAttachment(typeCLabel, 0, ITabbedPropertyConstants.VSPACE);
       pathText.setLayoutData(data);
       
       CLabel pathLabel = factory.createCLabel(composite, "Path:");
@@ -81,20 +101,22 @@ public class NodeTabComposite extends Composite {
     */
    public void updateContent(ISEDDebugNode node) {
       String name = null;
+      String type = null;
       String path = null;
       try {
          if (node != null) {
             name = node.getName();
+            type = node.getNodeType();
             path = node.getPathCondition();
          }
-         SWTUtil.setText(nameText, name);
-         SWTUtil.setText(pathText, path);
       }
       catch (DebugException e) {
          name = e.getMessage();
          LogUtil.getLogger().logError(e);
-         SWTUtil.setText(nameText, name);
-         SWTUtil.setText(pathText, name);
       }
+      SWTUtil.setText(nameText, name);
+      typeCLabel.setText(type);
+      typeCLabel.setImage(SEDImages.getNodeImage(node));
+      SWTUtil.setText(pathText, path);
    }
 }

@@ -12,13 +12,19 @@
 package de.uka.ilkd.key.java.statement;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -39,8 +45,6 @@ public class MethodFrame extends JavaStatement implements
     
     private final IExecutionContext execContext;
     
-    private final ProgramMethod method;
-
     private final ImmutableArray<ProgramPrefix> prefixElementArray;
     
     private PosInProgram firstActiveChildPos = null;
@@ -57,8 +61,7 @@ public class MethodFrame extends JavaStatement implements
         this.resultVar   = resultVar;
         this.body        = body;
         this.execContext = execContext;
-        this.method      = null;
-        
+     
         prefixElementArray = computePrefix(body);
 	Debug.assertTrue(execContext != null, 
 			 "methodframe: executioncontext missing");
@@ -69,20 +72,17 @@ public class MethodFrame extends JavaStatement implements
     /**
      *      Labeled statement.
      *      @param resultVar the ProgramVariable the return value is assigned to
-     *      @param body a Statement containing the method body of
+    * @param body a Statement containing the method body of
      *      the called method
-     *      @param method the corresponding ProgramMethod object
      */
     public MethodFrame(IProgramVariable resultVar, 
 		       IExecutionContext execContext,
 		       StatementBlock body,
-                       ProgramMethod method, 
                        PositionInfo pos) {
         super(pos);
         this.resultVar   = resultVar;
         this.body        = body;
         this.execContext = execContext;
-        this.method      = method;
      
         prefixElementArray = computePrefix(body);
 	Debug.assertTrue(execContext != null, 
@@ -156,8 +156,8 @@ public class MethodFrame extends JavaStatement implements
      *      Get method.
      *      @return the method
      */
-    public ProgramMethod getProgramMethod() {
-        return method;
+    public IProgramMethod getProgramMethod() {
+        return getExecutionContext().getMethodContext();
     }
 
 

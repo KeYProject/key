@@ -3,9 +3,19 @@ package org.key_project.sed.ui.util;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.key_project.sed.core.model.ISEDBranchCondition;
+import org.key_project.sed.core.model.ISEDBranchNode;
+import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDLoopCondition;
+import org.key_project.sed.core.model.ISEDLoopNode;
+import org.key_project.sed.core.model.ISEDMethodCall;
+import org.key_project.sed.core.model.ISEDMethodReturn;
+import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.ui.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 
@@ -19,6 +29,7 @@ import org.key_project.util.eclipse.BundleUtil;
  * </p>
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public final class SEDImages {
     /**
      * The key for the image that is used for method calls.
@@ -166,6 +177,41 @@ public final class SEDImages {
                registry.remove(LOOP_CONDITION);
             }
          });
+       }
+    }
+    
+    /**
+     * Returns the type icon of the given {@link ISEDDebugNode}.
+     * @param element The {@link ISEDDebugNode} to get type icon for.
+     * @return The type icon.
+     */
+    public static Image getNodeImage(ISEDDebugNode element) {
+       if (element instanceof ISEDMethodCall) {
+          return getImage(SEDImages.METHOD_CALL);
+       }
+       else if (element instanceof ISEDMethodReturn) {
+          return getImage(SEDImages.METHOD_RETURN);
+       }
+       else if (element instanceof ISEDExceptionalTermination) {
+          return getImage(SEDImages.EXCEPTIONAL_TERMINATION);
+       }
+       else if (element instanceof ISEDTermination) {
+          return getImage(SEDImages.TERMINATION);
+       }
+       else if (element instanceof ISEDBranchCondition) {
+          return getImage(SEDImages.BRANCH_CONDITION);
+       }
+       else if (element instanceof ISEDBranchNode) {
+          return getImage(SEDImages.BRANCH_NODE);
+       }
+       else if (element instanceof ISEDLoopNode) {
+          return getImage(SEDImages.LOOP_NODE);
+       }
+       else if (element instanceof ISEDLoopCondition) {
+          return getImage(SEDImages.LOOP_CONDITION);
+       }
+       else {
+          return DebugUIPlugin.getDefaultLabelProvider().getImage(element);
        }
     }
 }

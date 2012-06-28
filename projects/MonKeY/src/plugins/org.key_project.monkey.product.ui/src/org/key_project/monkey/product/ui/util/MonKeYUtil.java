@@ -22,7 +22,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.Contract;
 
@@ -90,8 +90,8 @@ public final class MonKeYUtil {
       monitor.beginTask("Analysing types", kjtsarr.length);
       for (KeYJavaType type : kjtsarr) {
           SWTUtil.checkCanceled(monitor);
-          ImmutableSet<ObserverFunction> targets = services.getSpecificationRepository().getContractTargets(type);
-          for (ObserverFunction target : targets) {
+          ImmutableSet<IObserverFunction> targets = services.getSpecificationRepository().getContractTargets(type);
+          for (IObserverFunction target : targets) {
               ImmutableSet<Contract> contracts = services.getSpecificationRepository().getContracts(type, target);
               for (Contract contract : contracts) {
                   proofs.add(new MonKeYProof(type.getFullName(), ClassTree.getDisplayName(services, contract.getTarget()), contract.getDisplayName(), init, contract));

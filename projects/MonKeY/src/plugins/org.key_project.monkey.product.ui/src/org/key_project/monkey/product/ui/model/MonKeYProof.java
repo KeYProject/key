@@ -183,7 +183,7 @@ public class MonKeYProof extends Bean {
                        Assert.isNotNull(main);
                        ProblemInitializer init = main.getUserInterface().createProblemInitializer();
                        Assert.isNotNull(init);
-                       Proof proof = init.startProver(initConfig, input);
+                       Proof proof = init.startProver(initConfig, input, 0);
                        Assert.isNotNull(proof);
                        setResult(proof);
                    }
@@ -326,7 +326,7 @@ public class MonKeYProof extends Bean {
      */
     public void removeProofEnvFromKeY() {
        if (proof != null) {
-          KeYUtil.removeFromProofList(MainWindow.getInstance(), proof.env());
+          KeYUtil.removeFromProofList(MainWindow.getInstance(), proof);
        }
     }
 }

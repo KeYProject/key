@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.proof.mgt;
 
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.Contract;
 
 
@@ -28,8 +28,8 @@ public class RuleJustificationBySpec implements RuleJustification {
      * Contracts for stubs are considered axioms; other contracts not.
      */
     public boolean isAxiomJustification() {
-        return spec.getTarget() instanceof ProgramMethod
-               && ((ProgramMethod)spec.getTarget()).getBody() == null;
+        return spec.getTarget() instanceof IProgramMethod
+               && ((IProgramMethod)spec.getTarget()).getBody() == null;
     }
     
     

@@ -13,6 +13,8 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * <p>
@@ -678,7 +680,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
       }
       assertTrue(maximalNumberOfExecutedSetNodes >= 1);
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName);
+      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName);
       // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
       ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
       env.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);

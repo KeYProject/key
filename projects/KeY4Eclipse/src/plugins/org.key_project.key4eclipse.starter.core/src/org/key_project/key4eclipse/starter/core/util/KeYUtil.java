@@ -45,16 +45,13 @@ import de.uka.ilkd.key.gui.notification.NotificationEventID;
 import de.uka.ilkd.key.gui.notification.NotificationTask;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
@@ -356,7 +353,7 @@ public final class KeYUtil {
                         // Load location
                         InitConfig initConfig = internalLoad(location, classPaths, bootClassPath, true);
                         // Get method to proof in KeY
-                        ProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
+                        IProgramMethod pm = getProgramMethod(method, initConfig.getServices().getJavaInfo());
                         Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
                         // Start proof by showing the proof management dialog
                         ProofManagementDialog.showInstance(MainWindow.getInstance().getMediator(), initConfig, pm.getContainerType(), pm);
@@ -401,11 +398,7 @@ public final class KeYUtil {
                     InitConfig initConfig = getInitConfig(location);
                     if (initConfig == null) {
                         // Load local file
-                        ProblemLoader loader = new ProblemLoader(location, main.getMediator());
-                        main.getRecentFiles().addRecentFile(location.getAbsolutePath());
-                        EnvInput envInput = loader.createEnvInput(location, classPaths, bootClassPath);
-                        ProblemInitializer init = main.getUserInterface().createProblemInitializer();
-                        initConfig = init.prepare(envInput);
+                        initConfig = main.getUserInterface().load(location, classPaths, bootClassPath);
                     }
                     setResult(initConfig);
                 }
@@ -428,8 +421,8 @@ public final class KeYUtil {
      * @return The found method representation in KeY.
      * @throws ProofInputException Occurred Exception.
      */
-    public static ProgramMethod getProgramMethod(IMethod method, 
-                                                 JavaInfo javaInfo) throws ProofInputException {
+    public static IProgramMethod getProgramMethod(IMethod method, 
+                                                  JavaInfo javaInfo) throws ProofInputException {
         try {
             // Determine container type
             IType containerType = method.getDeclaringType();
@@ -441,7 +434,7 @@ public final class KeYUtil {
             // Determine name
             String methodName = method.getElementName();
             // Ask javaInfo
-            ProgramMethod result;
+            IProgramMethod result;
             if (method.isConstructor()) {
                result = javaInfo.getConstructor(containerKJT, signature);
             }
@@ -532,26 +525,8 @@ public final class KeYUtil {
      * @param main The {@link MainWindow} to handle.
      * @param env The {@link ProofEnvironment} to remove.
      */
-    public static void removeFromProofList(MainWindow main, ProofEnvironment env) {
-       TaskTreeModel model = main.getProofList().getModel();
-       EnvNode envNode = null;
-       for (int i = 0; i < model.getChildCount(model.getRoot()); i++) {
-          Object child = model.getChild(model.getRoot(), i);
-          if (child instanceof EnvNode) {
-             EnvNode envChild = (EnvNode)child;
-             if (env != null ? env.equals(envChild.getProofEnv()) : envChild.getProofEnv() == null) {
-                envNode = envChild;
-             }
-          }
-       }
-       if (envNode != null) {
-          for (int i = 0; i < envNode.getChildCount(); i++) {
-             Object child = envNode.getChildAt(i);
-             if (child instanceof TaskTreeNode) {
-                main.getProofList().removeTaskWithoutInteraction((TaskTreeNode)child);
-             }
-          }
-       }
+    public static void removeFromProofList(MainWindow main, Proof proof) {
+       main.getProofList().removeProof(proof);
     }
     
     /**
