@@ -26,6 +26,7 @@ import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
@@ -396,7 +397,7 @@ public class SymbolicExecutionTreeBuilder {
          NodeInfo info = node.getNodeInfo();
          SourceElement statement = info.getActiveStatement();
          // Update call stack
-         SymbolicExecutionUtil.temporaryUpdateCallStack(methodCallStack, node, statement);
+         SymbolicExecutionUtil.updateCallStack(methodCallStack, node, statement);
          // Check if the node is already contained in the symbolic execution tree
          AbstractExecutionNode executionNode = keyNodeMapping.get(node);
          if (executionNode == null) {
@@ -453,7 +454,7 @@ public class SymbolicExecutionTreeBuilder {
          }
          else if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
             // Find the Node in the proof tree of KeY for that this Node is the return
-            Node callNode = SymbolicExecutionUtil.temporaryFindMethodCallNode(methodCallStack, node, node.getAppliedRuleApp());
+            Node callNode = findMethodCallNode(node, node.getAppliedRuleApp());
             if (callNode != null) {
                // Find the call Node representation in SED, if not available ignore it.
                IExecutionNode callSEDNode = keyNodeMapping.get(callNode);
@@ -479,6 +480,24 @@ public class SymbolicExecutionTreeBuilder {
          }
       }
       return result;
+   }
+
+   /**
+    * Finds the {@link Node} in the proof tree of KeY which has called the
+    * method that is now executed or returned in the {@link Node}.
+    * @param currentNode The {@link Node} for that the method call {@link Node} is needed.
+    * @return The found call {@link Node} or {@code null} if no one was found.
+    */
+   protected Node findMethodCallNode(Node currentNode, RuleApp ruleApp) {
+      // Compute the stack frame size before the method is called
+      final int returnStackSize = SymbolicExecutionUtil.computeStackSize(currentNode, ruleApp) - 1;
+      // Return the method from the call stack
+      if (returnStackSize >= 0) {
+         return methodCallStack.get(returnStackSize);
+      }
+      else {
+         return null;
+      }
    }
 
    /**

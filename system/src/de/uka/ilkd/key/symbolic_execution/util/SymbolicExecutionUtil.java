@@ -841,34 +841,13 @@ public final class SymbolicExecutionUtil {
       IExecutionContext context = JavaTools.getInnermostExecutionContext(block, node.proof().getServices());
       return context != null && context.getMethodContext() != null && context.getMethodContext().isImplicit();
    }
-
-   // TODO: Remove temporary methods when the current method is part of an ExecutionContext.
-
-   /**
-    * Finds the {@link Node} in the proof tree of KeY which has called the
-    * method that is now executed or returned in the {@link Node}.
-    * @param methodCallStack The method call stack to search in.
-    * @param currentNode The {@link Node} for that the method call {@link Node} is needed.
-    * @return The found call {@link Node} or {@code null} if no one was found.
-    */
-   public static Node temporaryFindMethodCallNode(LinkedList<Node> methodCallStack, Node currentNode, RuleApp ruleApp) {
-      // Compute the stack frame size before the method is called
-      final int returnStackSize = SymbolicExecutionUtil.computeStackSize(currentNode, ruleApp) - 1;
-      // Return the method from the call stack
-      if (returnStackSize >= 0) {
-         return methodCallStack.get(returnStackSize);
-      }
-      else {
-         return null;
-      }
-   }
    
    /**
     * Creates the call stack for the given {@link Node}.
     * @param node The {@link Node} to create call stack for.
     * @return The created call stack.
     */
-   public static LinkedList<Node> temporaryCreateMethodCallStack(Node node) {
+   public static LinkedList<Node> createMethodCallStack(Node node) {
       // List parents
       Deque<Node> parents = new LinkedList<Node>();
       while (node != null) {
@@ -878,7 +857,7 @@ public final class SymbolicExecutionUtil {
       // Create method call stack
       LinkedList<Node> methodCallStack = new LinkedList<Node>();
       for (Node parent : parents) {
-         temporaryUpdateCallStack(methodCallStack, parent, parent.getNodeInfo().getActiveStatement());
+         updateCallStack(methodCallStack, parent, parent.getNodeInfo().getActiveStatement());
       }
       return methodCallStack;
    }
@@ -890,7 +869,7 @@ public final class SymbolicExecutionUtil {
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param statement The statement ({@link SourceElement}).
     */
-   public static void temporaryUpdateCallStack(LinkedList<Node> methodCallStack, Node node, SourceElement statement) {
+   public static void updateCallStack(LinkedList<Node> methodCallStack, Node node, SourceElement statement) {
       if (isMethodCallNode(node, node.getAppliedRuleApp(), statement, true)) {
          // Remove outdated methods from call stack
          int currentLevel = computeStackSize(node, node.getAppliedRuleApp());
