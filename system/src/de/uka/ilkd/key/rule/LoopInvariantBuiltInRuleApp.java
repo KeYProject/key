@@ -51,6 +51,13 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         this.heapContext = heapContext;
     }
     
+    /**
+     * Replaces the function symbol "index" by the actual loop index variable.
+     * The index function symbol is a placeholder which stems from translating the \index keyword from JML.
+     * It is used to refer to a runtime-generated variable.
+     * If the loop guard has the form (i < x), index is instantiated with i,
+     * otherwise <code>rawInv</code> is returned.
+     */
     private LoopInvariant instantiateIndex(LoopInvariant rawInv){
     	if (rawInv == null) return null;
     	Map<LocationVariable,Term> invs = rawInv.getInternalInvariants();
