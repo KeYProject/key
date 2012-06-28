@@ -75,10 +75,12 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     */
    @Override
    public String getFormatedBranchCondition() throws ProofInputException {
-      if (branchCondition == null) {
-         lazyComputeBranchCondition();
+      synchronized (this) {
+         if (branchCondition == null) {
+            lazyComputeBranchCondition();
+         }
+         return formatedBranchCondition;
       }
-      return formatedBranchCondition;
    }
 
    /**
@@ -86,10 +88,12 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     */
    @Override
    public Term getBranchCondition() throws ProofInputException {
-      if (branchCondition == null) {
-         lazyComputeBranchCondition();
+      synchronized (this) {
+         if (branchCondition == null) {
+            lazyComputeBranchCondition();
+         }
+         return branchCondition;
       }
-      return branchCondition;
    }
 
    /**
@@ -161,10 +165,12 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     */
    @Override
    public Term getPathCondition() throws ProofInputException {
-      if (pathCondition == null) {
-         lazyComputePathCondition();
+      synchronized (this) {
+         if (pathCondition == null) {
+            lazyComputePathCondition();
+         }
+         return pathCondition;
       }
-      return pathCondition;
    }
 
    /**
@@ -172,10 +178,12 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     */
    @Override
    public String getFormatedPathCondition() throws ProofInputException {
-      if (pathCondition == null) {
-         lazyComputePathCondition();
+      synchronized (this) {
+         if (pathCondition == null) {
+            lazyComputePathCondition();
+         }
+         return formatedPathCondition;
       }
-      return formatedPathCondition;
    }
 
    /**

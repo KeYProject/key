@@ -79,24 +79,26 @@ public class KeYValue extends AbstractSEDValue {
     */
    @Override
    public KeYVariable[] getVariables() throws DebugException {
-      try {
-         if (variables == null) {
-            IExecutionVariable[] executionVariables = executionVariable.getChildVariables();
-            if (executionVariables != null) {
-               variables = new KeYVariable[executionVariables.length];
-               for (int i = 0; i < executionVariables.length; i++) {
-                  variables[i] = new KeYVariable(getDebugTarget(), executionVariables[i]);
+      synchronized (this) {
+         try {
+            if (variables == null) {
+               IExecutionVariable[] executionVariables = executionVariable.getChildVariables();
+               if (executionVariables != null) {
+                  variables = new KeYVariable[executionVariables.length];
+                  for (int i = 0; i < executionVariables.length; i++) {
+                     variables[i] = new KeYVariable(getDebugTarget(), executionVariables[i]);
+                  }
+               }
+               else {
+                  variables = new KeYVariable[0];
                }
             }
-            else {
-               variables = new KeYVariable[0];
-            }
+            return variables;
          }
-         return variables;
-      }
-      catch (Exception e) {
-         LogUtil.getLogger().logError(e);
-         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute child variables.", e));
+         catch (Exception e) {
+            LogUtil.getLogger().logError(e);
+            throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute child variables.", e));
+         }
       }
    }
 

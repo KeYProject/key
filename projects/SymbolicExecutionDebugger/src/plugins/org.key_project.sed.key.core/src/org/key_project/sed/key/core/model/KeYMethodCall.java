@@ -189,10 +189,12 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     */
    @Override
    public KeYVariable[] getVariables() throws DebugException {
-      if (variables == null) {
-         variables = KeYModelUtil.createVariables(this, executionNode);
+      synchronized (this) {
+         if (variables == null) {
+            variables = KeYModelUtil.createVariables(this, executionNode);
+         }
+         return variables;
       }
-      return variables;
    }
 
    /**
