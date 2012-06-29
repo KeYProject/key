@@ -146,12 +146,10 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     */
    @Override
    public Term getValue() throws ProofInputException {
-      synchronized (this) {
-         if (value == null) {
-            lazyComputeValue();
-         }
-         return value;
+      if (value == null) {
+         lazyComputeValue();
       }
+      return value;
    }
 
    /**
@@ -159,12 +157,10 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     */
    @Override
    public String getValueString() throws ProofInputException {
-      synchronized (this) {
-         if (value == null) {
-            lazyComputeValue();
-         }
-         return valueString;
+      if (value == null) {
+         lazyComputeValue();
       }
+      return valueString;
    }
    
    /**
@@ -253,12 +249,10 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     */
    @Override
    public String getTypeString() throws ProofInputException {
-      synchronized (this) {
-         if (value == null) {
-            lazyComputeValue();
-         }
-         return typeString;
+      if (value == null) {
+         lazyComputeValue();
       }
+      return typeString;
    }
    
    /**

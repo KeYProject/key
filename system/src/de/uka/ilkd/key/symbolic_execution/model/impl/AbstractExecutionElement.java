@@ -85,12 +85,10 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
     */
    @Override
    public String getName() {
-      synchronized (this) {
-         if (name == null) {
-            name = lazyComputeName();
-         }
-         return name;
+      if (name == null) {
+         name = lazyComputeName();
       }
+      return name;
    }
 
    /**

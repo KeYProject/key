@@ -77,12 +77,10 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
     */
    @Override
    public Sort getExceptionSort() {
-      synchronized (this) {
-         if (exceptionSort == null) {
-            exceptionSort = lazyComputeExceptionSort();
-         }
-         return exceptionSort;
+      if (exceptionSort == null) {
+         exceptionSort = lazyComputeExceptionSort();
       }
+      return exceptionSort;
    }
    
    /**

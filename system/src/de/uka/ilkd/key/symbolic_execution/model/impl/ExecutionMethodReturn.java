@@ -78,12 +78,10 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     */
    @Override
    public String getNameIncludingReturnValue() throws ProofInputException {
-      synchronized (this) {
-         if (nameIncludingReturnValue == null) {
-            nameIncludingReturnValue = lazyComputeNameIncludingReturnValue();
-         }
-         return nameIncludingReturnValue;
+      if (nameIncludingReturnValue == null) {
+         nameIncludingReturnValue = lazyComputeNameIncludingReturnValue();
       }
+      return nameIncludingReturnValue;
    }
 
    /**
@@ -101,12 +99,10 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     */
    @Override
    public String getFormatedReturnValue() throws ProofInputException {
-      synchronized (this) {
-         if (returnValue == null) {
-            lazyComputeReturnValue();
-         }
-         return formatedReturnValue;
+      if (returnValue == null) {
+         lazyComputeReturnValue();
       }
+      return formatedReturnValue;
    }
 
    /**
@@ -115,12 +111,10 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
    @Override
    // TODO: Return value can be unknown in SET, e.g. quotient in TryCatchFinally test
    public Term getReturnValue() throws ProofInputException {
-      synchronized (this) {
-         if (returnValue == null) {
-            lazyComputeReturnValue();
-         }
-         return returnValue;
+      if (returnValue == null) {
+         lazyComputeReturnValue();
       }
+      return returnValue;
    }
    
    /**
