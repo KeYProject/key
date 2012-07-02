@@ -5,8 +5,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -77,12 +82,27 @@ public class ExecutionNodeReader {
    public IExecutionNode read(InputStream in) throws ParserConfigurationException, SAXException, IOException {
       if (in != null) {
          try {
+            // Parse XML file
             SAXParserFactory factory = SAXParserFactory.newInstance();
             factory.setNamespaceAware(true);
             SAXParser saxParser = factory.newSAXParser();
             SEDSAXHandler handler = new SEDSAXHandler();
             saxParser.parse(in, handler);
-            return handler.getRoot();
+            // Get root 
+            IExecutionNode root = handler.getRoot();
+            // Construct call stacks
+            Set<Entry<AbstractKeYlessExecutionNode, List<String>>> entries = handler.getCallStackPathEntries().entrySet();
+            for (Entry<AbstractKeYlessExecutionNode, List<String>> entry : entries) {
+               for (String path : entry.getValue()) {
+                  IExecutionNode stackEntry = findNode(root, path);
+                  if (stackEntry == null) {
+                     throw new SAXException("Can't find call stack entry \"" + path + "\" in parsed symbolic execution tree.");
+                  }
+                  entry.getKey().addCallStackEntry(stackEntry);
+               }
+            }
+            // Return result
+            return root;
          }
          finally {
             in.close();
@@ -92,7 +112,39 @@ public class ExecutionNodeReader {
          return null;
       }
    }
-   
+
+   /**
+    * Searches the {@link IExecutionNode} starting at the given root
+    * which is defined by the path.
+    * @param root The {@link IExecutionNode} to start search.
+    * @param path The path.
+    * @return The found {@link IExecutionNode}.
+    * @throws SAXException If it was not possible to find the node.
+    */
+   protected IExecutionNode findNode(IExecutionNode root, String path) throws SAXException {
+      if (path != null && !path.isEmpty()) {
+         StringTokenizer tokenizer = new StringTokenizer(path, ExecutionNodeWriter.PATH_SEPARATOR + "");
+         while (tokenizer.hasMoreTokens()) {
+            String next = tokenizer.nextToken();
+            try {
+               int childIndex = Integer.parseInt(next);
+               if (childIndex < 0) {
+                  throw new SAXException("Path segment \"" + next + "\" of path \"" + path + "\" is a negative integer.");
+               }
+               IExecutionNode[] children = root.getChildren();
+               if (childIndex >= children.length) {
+                  throw new SAXException("Path segment \"" + next + "\" of path \"" + path + "\" is outside of the child array range.");
+               }
+               root = children[childIndex];
+            }
+            catch (NumberFormatException e) {
+               throw new SAXException("Path segment \"" + next + "\" of path \"" + path + "\" is no valid integer.", e);
+            }
+         }
+      }
+      return root;
+   }
+
    /**
     * {@link DefaultHandler} implementation used in {@link ExecutionNodeReader#read(InputStream)}.
     * @author Martin Hentschel
@@ -116,6 +168,11 @@ public class ExecutionNodeReader {
       private Deque<KeYlessVariable> parentVariableStack = new LinkedList<KeYlessVariable>();
       
       /**
+       * Maps an {@link AbstractKeYlessExecutionNode} to the path entries of its call stack.
+       */
+      private Map<AbstractKeYlessExecutionNode, List<String>> callStackPathEntries = new HashMap<ExecutionNodeReader.AbstractKeYlessExecutionNode, List<String>>();
+      
+      /**
        * {@inheritDoc}
        */
       @Override
@@ -137,6 +194,14 @@ public class ExecutionNodeReader {
             }
             parentVariableStack.addFirst(variable);
          }
+         else if (isCallStackEntry(uri, localName, qName)) {
+            List<String> callStackEntries = callStackPathEntries.get(parent);
+            if (callStackEntries == null) {
+               callStackEntries = new LinkedList<String>();
+               callStackPathEntries.put(parent, callStackEntries);
+            }
+            callStackEntries.add(getPathInTree(attributes));
+         }
          else {
             AbstractKeYlessExecutionNode child = createExecutionNode(parent, uri, localName, qName, attributes);
             if (root == null) {
@@ -157,6 +222,9 @@ public class ExecutionNodeReader {
          if (isVariable(uri, localName, qName)) {
             parentVariableStack.removeFirst();
          }
+         else if (isCallStackEntry(uri, localName, qName)) {
+            // Nothing to do.
+         }
          else {
             parentNodeStack.removeFirst();
          }
@@ -168,6 +236,14 @@ public class ExecutionNodeReader {
        */
       public IExecutionNode getRoot() {
          return root;
+      }
+
+      /**
+       * Returns the mapping of an {@link AbstractKeYlessExecutionNode} to its call stack entries.
+       * @return The mapping of an {@link AbstractKeYlessExecutionNode} to its call stack entries.
+       */
+      public Map<AbstractKeYlessExecutionNode, List<String>> getCallStackPathEntries() {
+         return callStackPathEntries;
       }
    }
    
@@ -181,7 +257,18 @@ public class ExecutionNodeReader {
    protected boolean isVariable(String uri, String localName, String qName) {
       return ExecutionNodeWriter.TAG_VARIABLE.equals(qName);
    }
-   
+
+   /**
+    * Checks if the currently parsed tag represents an entry of {@link IExecutionNode#getCallStack()}.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @return {@code true} represents call stack entry, {@code false} is something else.
+    */
+   protected boolean isCallStackEntry(String uri, String localName, String qName) {
+      return ExecutionNodeWriter.TAG_CALL_STACK_ENTRY.equals(qName);
+   }
+
    /**
     * Creates a new {@link IExecutionVariable} with the given content.
     * @param parentVariable The parent {@link IExecutionVariable}.
@@ -191,11 +278,11 @@ public class ExecutionNodeReader {
     * @param attributes The attributes.
     * @return The created {@link IExecutionVariable}.
     */
-   public KeYlessVariable createVariable(IExecutionVariable parentVariable,
-                                         String uri, 
-                                         String localName, 
-                                         String qName, 
-                                         Attributes attributes) {
+   protected KeYlessVariable createVariable(IExecutionVariable parentVariable,
+                                            String uri, 
+                                            String localName, 
+                                            String qName, 
+                                            Attributes attributes) {
       return new KeYlessVariable(parentVariable, 
                                  isArrayIndex(attributes), 
                                  getArrayIndex(attributes), 
@@ -245,6 +332,15 @@ public class ExecutionNodeReader {
       else {
          throw new SAXException("Unknown tag \"" + qName + "\".");
       }
+   }
+
+   /**
+    * Returns the path in tree value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getPathInTree(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_PATH_IN_TREE);
    }
 
    /**
@@ -440,6 +536,11 @@ public class ExecutionNodeReader {
       private boolean pathConditionChanged;
       
       /**
+       * The call stack.
+       */
+      private List<IExecutionNode> callStack = new LinkedList<IExecutionNode>();
+      
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
@@ -502,6 +603,22 @@ public class ExecutionNodeReader {
       @Override
       public boolean isPathConditionChanged() {
          return pathConditionChanged;
+      }
+      
+      /**
+       * Adds the given entry to the call stack.
+       * @param entry The entry to add to the call stack.
+       */
+      public void addCallStackEntry(IExecutionNode entry) {
+         callStack.add(entry);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionNode[] getCallStack() {
+         return callStack.isEmpty() ? null : callStack.toArray(new IExecutionNode[callStack.size()]);
       }
    }
    

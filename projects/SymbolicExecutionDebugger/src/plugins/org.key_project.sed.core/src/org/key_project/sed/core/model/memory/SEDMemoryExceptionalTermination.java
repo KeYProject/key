@@ -30,6 +30,11 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
     * The human readable path condition to this node.
     */
    private String pathCondition;
+
+   /**
+    * The method call stack.
+    */
+   private ISEDDebugNode[] callStack;
    
    /**
     * Constructor.
@@ -137,5 +142,21 @@ public class SEDMemoryExceptionalTermination extends AbstractSEDExceptionalTermi
    @Override
    public void setPathCondition(String pathCondition) {
       this.pathCondition = pathCondition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDDebugNode[] getCallStack() throws DebugException {
+      return callStack;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setCallStack(ISEDDebugNode[] callStack) {
+      this.callStack = callStack;
    }
 }

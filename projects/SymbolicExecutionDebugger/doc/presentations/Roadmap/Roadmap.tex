@@ -65,9 +65,10 @@
                Execution Path Hiding & Yes & \textcolor{darkred}{No} \\ % Old: Set Root, Expand, Collapse, Isolate, Show all
                Execution options & Run, Into, Over & \textcolor{darkgreen}{Run, Into, Over, Return, Pause} \\
                Break-/Watchpoints & Yes & \textcolor{darkred}{No} \\
-               PC of SET nodes & Yes & Yes \\
+               Path condition of SET nodes & Yes & Yes \\
                Code highlighting & Yes & Yes \\
                Proof reference & No & \textcolor{darkgreen}{Yes (node with sequent)} \\
+               Call stack of SET nodes & No & \textcolor{darkgreen}{Yes (node with sequent)} \\
                \hline
             \end{tabular}
       \end{table}
@@ -108,8 +109,7 @@
                   \item Features mentioned on previous slides: Current Features (Old vs New)
                   \item Currently not implemented functionality
                         \begin{itemize}
-                           \item Properties tab with method call-hierarchy
-                           \item Tests for properties tab
+                           \item Tests for properties tabs
                            \item Optional merging of branch conditions
                         \end{itemize}
                \end{itemize}         

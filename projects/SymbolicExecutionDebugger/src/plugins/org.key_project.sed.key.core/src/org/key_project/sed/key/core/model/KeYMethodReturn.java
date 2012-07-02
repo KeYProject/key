@@ -46,6 +46,11 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    private KeYVariable[] variables;
 
    /**
+    * The method call stack.
+    */
+   private IKeYSEDDebugNode<?>[] callStack;
+
+   /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
@@ -301,5 +306,18 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    @Override
    public void suspend() throws DebugException {
       getDebugTarget().suspend(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+      synchronized (this) {
+         if (callStack == null) {
+            callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
+         }
+         return callStack;
+      }
    }
 }

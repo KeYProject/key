@@ -29,6 +29,11 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
    private IKeYSEDDebugNode<?>[] children;
 
    /**
+    * The method call stack.
+    */
+   private IKeYSEDDebugNode<?>[] callStack;
+
+   /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
@@ -103,6 +108,19 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
       }
       catch (ProofInputException e) {
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute path condition.", e));
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+      synchronized (this) {
+         if (callStack == null) {
+            callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
+         }
+         return callStack;
       }
    }
 }

@@ -102,19 +102,21 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     * @param target The given {@link ISEDDebugTarget} which provides the oracle data.
     * @param expectedModelPathInBundle The path in the bundle under that the created oracle file will be later available. It is used to create sub directories in temp directory.
     * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
     * @throws IOException Occurred Exception.
     * @throws DebugException Occurred Exception.
     */
    protected static void createOracleFile(ISEDDebugTarget target, 
                                           String expectedModelPathInBundle, 
-                                          boolean saveVariables) throws IOException, DebugException {
+                                          boolean saveVariables,
+                                          boolean saveCallStack) throws IOException, DebugException {
       if (oracleDirectory != null && oracleDirectory.isDirectory()) {
          // Create sub folder structure
          File oracleFile = new File(oracleDirectory, expectedModelPathInBundle);
          oracleFile.getParentFile().mkdirs();
          // Create oracle file
          SEDXMLWriter writer = new SEDXMLWriter();
-         writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile), saveVariables);
+         writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile), saveVariables, saveCallStack);
          // Print message to the user.
          printOracleDirectory();
       }
@@ -186,6 +188,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     * @param target The {@link ISEDDebugTarget} to test.
     * @param expectedModelPathInBundle The expected path to the oracle file.
     * @param includeVariables Include variables?
+    * @param includeCallStack Include call stack?
     * @throws DebugException Occurred Exception.
     * @throws IOException Occurred Exception.
     * @throws ParserConfigurationException Occurred Exception.
@@ -193,11 +196,12 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     */
    protected static void assertDebugTargetViaOracle(ISEDDebugTarget target,
                                                     String expectedModelPathInBundle,
-                                                    boolean includeVariables) throws DebugException, IOException, ParserConfigurationException, SAXException {
-      createOracleFile(target, expectedModelPathInBundle, includeVariables);
+                                                    boolean includeVariables,
+                                                    boolean includeCallStack) throws DebugException, IOException, ParserConfigurationException, SAXException {
+      createOracleFile(target, expectedModelPathInBundle, includeVariables, includeCallStack);
       if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
          ISEDDebugTarget expectedDebugTarget = TestSEDKeyCoreUtil.createExpectedModel(expectedModelPathInBundle);
-         TestSedCoreUtil.compareDebugTarget(expectedDebugTarget, target, false, includeVariables);
+         TestSedCoreUtil.compareDebugTarget(expectedDebugTarget, target, false, includeVariables, includeCallStack);
       }
    }
    
@@ -216,7 +220,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
                                     String expectedModelPathInBundle,
                                     int modelIndex,
                                     String expectedModelFileExtension) throws DebugException, IOException, ParserConfigurationException, SAXException {
-      assertDebugTargetViaOracle(target, expectedModelPathInBundle + modelIndex + expectedModelFileExtension, false);
+      assertDebugTargetViaOracle(target, expectedModelPathInBundle + modelIndex + expectedModelFileExtension, false, false);
    }
    
    /**

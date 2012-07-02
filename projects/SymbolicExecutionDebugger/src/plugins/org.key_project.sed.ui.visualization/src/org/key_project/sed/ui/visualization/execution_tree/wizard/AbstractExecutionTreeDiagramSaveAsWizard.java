@@ -109,7 +109,7 @@ public abstract class AbstractExecutionTreeDiagramSaveAsWizard extends BasicNewR
          ISEDDebugTarget[] targets = getDebugTargetsToSave();
          // Create model file
          SEDXMLWriter writer = new SEDXMLWriter();
-         String modelContent = writer.toXML(targets, "UTF-8", false);
+         String modelContent = writer.toXML(targets, "UTF-8", false, false);
          getModelPage().setInitialContents(new ByteArrayInputStream(modelContent.getBytes(Charset.forName("UTF-8"))));
          IFile domainFile = getModelPage().createNewFile();
          if (domainFile != null) {

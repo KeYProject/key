@@ -2,6 +2,7 @@ package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -343,6 +344,8 @@ public class SymbolicExecutionTreeBuilder {
                      }
                      list.add(condition);
                      keyNodeBranchConditionMapping.put(childNode, condition);
+                     // Set call stack on new created node
+                     condition.setCallStack(createCallStack(childNode, childNode.getAppliedRuleApp(), childNode.getNodeInfo().getActiveStatement()));
                   }
                }
             }
@@ -397,7 +400,7 @@ public class SymbolicExecutionTreeBuilder {
          NodeInfo info = node.getNodeInfo();
          SourceElement statement = info.getActiveStatement();
          // Update call stack
-         SymbolicExecutionUtil.updateCallStack(methodCallStack, node, statement);
+         updateCallStack(node, statement);
          // Check if the node is already contained in the symbolic execution tree
          AbstractExecutionNode executionNode = keyNodeMapping.get(node);
          if (executionNode == null) {
@@ -409,6 +412,8 @@ public class SymbolicExecutionTreeBuilder {
                addChild(parentToAddTo, executionNode);
                keyNodeMapping.put(node, executionNode);
                parentToAddTo = executionNode;
+               // Set call stack on new created node
+               executionNode.setCallStack(createCallStack(node, node.getAppliedRuleApp(), statement));
             }
          }
          else {
@@ -424,12 +429,33 @@ public class SymbolicExecutionTreeBuilder {
                   condition = new ExecutionLoopCondition(mediator, node);
                   addChild(parentToAddTo, condition);
                   keyNodeLoopConditionMapping.put(node, condition);
+                  // Set call stack on new created node
+                  condition.setCallStack(createCallStack(node, node.getAppliedRuleApp(), statement));
                }
                parentToAddTo = condition;
             }
          }
       }
       return parentToAddTo;
+   }
+   
+   /**
+    * Updates the call stack ({@link #methodCallStack}) if the given {@link Node}
+    * in KeY's proof tree is a method call.
+    * @param node The current {@link Node}.
+    * @param statement The statement ({@link SourceElement}).
+    */
+   protected void updateCallStack(Node node, 
+                                  SourceElement statement) {
+      if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement, true)) {
+         // Remove outdated methods from call stack
+         int currentLevel = SymbolicExecutionUtil.computeStackSize(node, node.getAppliedRuleApp());
+         while (methodCallStack.size() > currentLevel) {
+            methodCallStack.removeLast();
+         }
+         // Add new node to call stack.
+         methodCallStack.addLast(node);
+      }
    }
 
    /**
@@ -452,7 +478,7 @@ public class SymbolicExecutionTreeBuilder {
          if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
             result = new ExecutionMethodCall(mediator, node);
          }
-         else if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
+         else if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp())) {
             // Find the Node in the proof tree of KeY for that this Node is the return
             Node callNode = findMethodCallNode(node, node.getAppliedRuleApp());
             if (callNode != null) {
@@ -464,7 +490,7 @@ public class SymbolicExecutionTreeBuilder {
                }
             }
          }
-         else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
+         else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
             result = new ExecutionTermination(mediator, node, exceptionVariable);
          }
          else if (SymbolicExecutionUtil.isBranchNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
@@ -480,6 +506,28 @@ public class SymbolicExecutionTreeBuilder {
          }
       }
       return result;
+   }
+   
+   /**
+    * Computes the method call stack of the given {@link Node}.
+    * @param node The {@link Node}.
+    * @param ruleApp The applied {@link RuleApp} on the given {@link Node}.
+    * @param statement The active statement of the given {@link Node}.
+    * @return The computed method call stack.
+    */
+   protected IExecutionNode[] createCallStack(Node node, RuleApp ruleApp, SourceElement statement) {
+      // Compute number of call stack size
+      int size = SymbolicExecutionUtil.computeStackSize(node, ruleApp);
+      // Add call stack entries
+      IExecutionNode[] callStack = new IExecutionNode[size];
+      Iterator<Node> stackIter = methodCallStack.iterator();
+      for (int i = 0; i < size; i++) {
+         Node stackEntry = stackIter.next();
+         IExecutionNode executionNode = getExecutionNode(stackEntry);
+         assert executionNode != null : "Can't find execution node for KeY's proof node \"" + stackEntry + "\".";
+         callStack[i] = executionNode;
+      }
+      return callStack;
    }
 
    /**
@@ -557,5 +605,21 @@ public class SymbolicExecutionTreeBuilder {
    protected void addChild(AbstractExecutionNode parent, AbstractExecutionNode child) {
       child.setParent(parent);
       parent.addChild(child);
+   }
+
+   /**
+    * Searches the {@link IExecutionNode} which represents the given {@link Node} of KeY's proof tree.
+    * @param proofNode The {@link Node} in KeY's proof tree.
+    * @return The {@link IExecutionNode} representation or {@code null} if no one is available.
+    */
+   public IExecutionNode getExecutionNode(Node proofNode) {
+      IExecutionNode result = keyNodeMapping.get(proofNode);
+      if (result == null) {
+         result = keyNodeBranchConditionMapping.get(proofNode);
+      }
+      if (result == null) {
+         result = keyNodeLoopConditionMapping.get(proofNode);
+      }
+      return result;
    }
 }

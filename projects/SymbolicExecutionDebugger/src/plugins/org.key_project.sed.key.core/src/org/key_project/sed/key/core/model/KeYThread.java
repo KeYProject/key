@@ -28,6 +28,11 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    private IKeYSEDDebugNode<?>[] children;
 
    /**
+    * The method call stack.
+    */
+   private IKeYSEDDebugNode<?>[] callStack;
+
+   /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param executionNode The {@link IExecutionStartNode} to represent by this debug node.
@@ -146,5 +151,18 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
    @Override
    public void stepReturn() throws DebugException {
       getDebugTarget().stepReturn(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+      synchronized (this) {
+         if (callStack == null) {
+            callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
+         }
+         return callStack;
+      }
    }
 }

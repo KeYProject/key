@@ -13,6 +13,6 @@ public class SEDDebugNodeTreeFilter implements IFilter {
     */
    @Override
    public boolean select(Object toTest) {
-      return SEDDebugNodePropertySection.getDebugNode(toTest) != null;
+      return AbstractSEDDebugNodePropertySection.getDebugNode(toTest) != null;
    }
 }

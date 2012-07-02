@@ -221,7 +221,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                // Do resume and test created tree
                String expectedModelPathInBundle = showMethodReturnValuesInDebugNodes ? "data/simpleIf/oracle/SimpleIf.xml" : "data/simpleIf/oracle_noMethodReturnValues/SimpleIf.xml";
                resume(bot, item, target);
-               assertDebugTargetViaOracle(target, expectedModelPathInBundle, false);
+               assertDebugTargetViaOracle(target, expectedModelPathInBundle, false, false);
             }
          };
          doKeYDebugTargetTest(projectName,

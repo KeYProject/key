@@ -48,6 +48,26 @@ public final class JavaUtil {
    }
    
    /**
+    * Returns the index of the element to search in the given array.
+    * @param array The array to search in.
+    * @param toSearch The element to search.
+    * @return The index of the element or {@code -1} if it was not found.
+    */
+   public static <T> int indexOf(T[] array, T toSearch) {
+      int index = -1;
+      if (array != null) {
+         int i = 0;
+         while (i < array.length && index < 0) {
+            if (array[i] != null ? array[i].equals(toSearch) : toSearch == null) {
+               index = i;
+            }
+            i++;
+         }
+      }
+      return index;
+   }
+   
+   /**
     * Creates a line which consists of the given text.
     * @param text The text to repeate.
     * @param repetitions The number of repetitions.

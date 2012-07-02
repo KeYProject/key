@@ -26,6 +26,11 @@ public abstract class AbstractExecutionNode extends AbstractExecutionElement imp
    private List<IExecutionNode> children = new LinkedList<IExecutionNode>();
    
    /**
+    * The contained call stack.
+    */
+   private IExecutionNode[] callStack;
+   
+   /**
     * Constructor.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
@@ -114,5 +119,21 @@ public abstract class AbstractExecutionNode extends AbstractExecutionElement imp
       }
       // Check if a path condition was found.
       return result != null ? result :  TermBuilder.DF.tt().toString();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IExecutionNode[] getCallStack() {
+      return callStack;
+   }
+   
+   /**
+    * Sets the call stack.
+    * @param callStack The call stack.
+    */
+   public void setCallStack(IExecutionNode[] callStack) {
+      this.callStack = callStack;
    }
 }

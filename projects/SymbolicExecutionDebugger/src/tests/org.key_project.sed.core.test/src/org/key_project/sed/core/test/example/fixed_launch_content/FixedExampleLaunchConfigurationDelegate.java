@@ -7,6 +7,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchNode;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
@@ -140,16 +141,19 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        SEDMemoryBranchNode branch = new SEDMemoryBranchNode(target, call, thread);
        branch.setName("if (result >= 0)");
        branch.setPathCondition("pc12");
+       branch.setCallStack(new ISEDDebugNode[] {call});
        call.addChild(branch);
        
        SEDMemoryBranchCondition bnegative = new SEDMemoryBranchCondition(target, branch, thread);
        bnegative.setName("result < 0");
        bnegative.setPathCondition("pc13");
+       bnegative.setCallStack(new ISEDDebugNode[] {call});
        branch.addChild(bnegative);
        
        SEDMemoryMethodReturn returnNegative = new SEDMemoryMethodReturn(target, bnegative, thread);
        returnNegative.setName("return -1");
        returnNegative.setPathCondition("pc14");
+       returnNegative.setCallStack(new ISEDDebugNode[] {call});
        bnegative.addChild(returnNegative);
        
        SEDMemoryTermination terminationNegative = new SEDMemoryTermination(target, returnNegative, thread);
@@ -160,11 +164,13 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        SEDMemoryBranchCondition bpositive = new SEDMemoryBranchCondition(target, branch, thread);
        bpositive.setName("result >= 0");
        bpositive.setPathCondition("pc16");
+       bpositive.setCallStack(new ISEDDebugNode[] {call});
        branch.addChild(bpositive);
        
        SEDMemoryMethodReturn returnPositive = new SEDMemoryMethodReturn(target, bpositive, thread);
        returnPositive.setName("return 1");
        returnPositive.setPathCondition("pc17");
+       returnPositive.setCallStack(new ISEDDebugNode[] {call});
        bpositive.addChild(returnPositive);
        
        SEDMemoryVariable returnPositiveVar1 = new SEDMemoryVariable(target);

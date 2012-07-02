@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
-import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -757,11 +756,9 @@ public final class SymbolicExecutionUtil {
     * Checks if the given node should be represented as termination.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
-    * @param statement The statement ({@link SourceElement}).
-    * @param posInfo The {@link PositionInfo}.
     * @return {@code true} represent node as termination, {@code false} represent node as something else. 
     */
-   public static boolean isTerminationNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+   public static boolean isTerminationNode(Node node, RuleApp ruleApp) {
       return "emptyModality".equals(MiscTools.getRuleDisplayName(ruleApp));
    }
    
@@ -769,11 +766,9 @@ public final class SymbolicExecutionUtil {
     * Checks if the given node should be represented as method return.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
-    * @param statement The statement ({@link SourceElement}).
-    * @param posInfo The {@link PositionInfo}.
     * @return {@code true} represent node as method return, {@code false} represent node as something else. 
     */
-   public static boolean isMethodReturnNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+   public static boolean isMethodReturnNode(Node node, RuleApp ruleApp) {
       return "methodCallEmpty".equals(MiscTools.getRuleDisplayName(ruleApp));
    }
 
@@ -801,7 +796,7 @@ public final class SymbolicExecutionUtil {
       if (node != null) {
          SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
          PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
-         if (isMethodReturnNode(node, ruleApp, statement, posInfo)) {
+         if (isMethodReturnNode(node, ruleApp)) {
             return !isInImplicitMethod(node, ruleApp);
          }
          else if (isLoopNode(node, ruleApp, statement, posInfo)) { 
@@ -810,7 +805,7 @@ public final class SymbolicExecutionUtil {
          else if (isBranchNode(node, ruleApp, statement, posInfo) ||
                   isMethodCallNode(node, ruleApp, statement) ||
                   isStatementNode(node, ruleApp, statement, posInfo) ||
-                  isTerminationNode(node, ruleApp, statement, posInfo)) {
+                  isTerminationNode(node, ruleApp)) {
             return true;
          }
          else if (hasLoopCondition(node, ruleApp, statement)) {
@@ -840,45 +835,6 @@ public final class SymbolicExecutionUtil {
       JavaBlock block = term.javaBlock();
       IExecutionContext context = JavaTools.getInnermostExecutionContext(block, node.proof().getServices());
       return context != null && context.getMethodContext() != null && context.getMethodContext().isImplicit();
-   }
-   
-   /**
-    * Creates the call stack for the given {@link Node}.
-    * @param node The {@link Node} to create call stack for.
-    * @return The created call stack.
-    */
-   public static LinkedList<Node> createMethodCallStack(Node node) {
-      // List parents
-      Deque<Node> parents = new LinkedList<Node>();
-      while (node != null) {
-         parents.addFirst(node);
-         node = node.parent();
-      }
-      // Create method call stack
-      LinkedList<Node> methodCallStack = new LinkedList<Node>();
-      for (Node parent : parents) {
-         updateCallStack(methodCallStack, parent, parent.getNodeInfo().getActiveStatement());
-      }
-      return methodCallStack;
-   }
-   
-   /**
-    * Updates the call stack ({@link #methodCallStack}) if the given {@link Node}
-    * in KeY's proof tree is a method call.
-    * @param methodCallStack The method call stack to update.
-    * @param node The current {@link Node} in the proof tree of KeY.
-    * @param statement The statement ({@link SourceElement}).
-    */
-   public static void updateCallStack(LinkedList<Node> methodCallStack, Node node, SourceElement statement) {
-      if (isMethodCallNode(node, node.getAppliedRuleApp(), statement, true)) {
-         // Remove outdated methods from call stack
-         int currentLevel = computeStackSize(node, node.getAppliedRuleApp());
-         while (methodCallStack.size() > currentLevel) {
-            methodCallStack.removeLast();
-         }
-         // Add new node to call stack.
-         methodCallStack.addLast(node);
-      }
    }
    
    /**

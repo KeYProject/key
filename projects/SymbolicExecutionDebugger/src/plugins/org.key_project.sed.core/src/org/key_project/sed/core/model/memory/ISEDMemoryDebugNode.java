@@ -51,4 +51,10 @@ public interface ISEDMemoryDebugNode extends ISEDDebugNode {
     * @return The index of the child {@link ISEDDebugNode} or {@code -1} if it is no child.
     */
    public int indexOfChild(ISEDDebugNode child);
+   
+   /**
+    * Sets the call stack.
+    * @param callStack The call stack to use.
+    */
+   public void setCallStack(ISEDDebugNode[] callStack);
 }

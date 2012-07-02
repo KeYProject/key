@@ -56,6 +56,11 @@ public class SEDMemoryLoopNode extends AbstractSEDLoopNode implements ISEDMemory
     * The index of the end character.
     */
    private int charEnd = -1;
+
+   /**
+    * The method call stack.
+    */
+   private ISEDDebugNode[] callStack;
    
    /**
     * Constructor.
@@ -243,5 +248,21 @@ public class SEDMemoryLoopNode extends AbstractSEDLoopNode implements ISEDMemory
    @Override
    public void setPathCondition(String pathCondition) {
       this.pathCondition = pathCondition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDDebugNode[] getCallStack() throws DebugException {
+      return callStack;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setCallStack(ISEDDebugNode[] callStack) {
+      this.callStack = callStack;
    }
 }

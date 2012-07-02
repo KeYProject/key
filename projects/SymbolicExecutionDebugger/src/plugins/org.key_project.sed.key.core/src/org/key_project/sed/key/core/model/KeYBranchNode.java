@@ -7,8 +7,8 @@ import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDBranchNode;
 import org.key_project.sed.key.core.util.KeYModelUtil;
-import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.sed.key.core.util.KeYModelUtil.SourceLocation;
+import org.key_project.sed.key.core.util.LogUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
@@ -44,6 +44,11 @@ public class KeYBranchNode extends AbstractSEDBranchNode implements IKeYSEDDebug
     * The contained KeY variables.
     */
    private KeYVariable[] variables;
+
+   /**
+    * The method call stack.
+    */
+   private IKeYSEDDebugNode<?>[] callStack;
 
    /**
     * Constructor.
@@ -277,5 +282,18 @@ public class KeYBranchNode extends AbstractSEDBranchNode implements IKeYSEDDebug
    @Override
    public void suspend() throws DebugException {
       getDebugTarget().suspend(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+      synchronized (this) {
+         if (callStack == null) {
+            callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
+         }
+         return callStack;
+      }
    }
 }

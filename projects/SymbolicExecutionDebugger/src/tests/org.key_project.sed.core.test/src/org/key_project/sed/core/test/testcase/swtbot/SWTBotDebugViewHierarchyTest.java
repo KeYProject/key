@@ -152,7 +152,7 @@ public class SWTBotDebugViewHierarchyTest extends TestCase {
     * Waits until the user interface is ready.
     */
    protected void waitForUserInterface() {
-      TestUtilsUtil.sleep(10);
+      TestUtilsUtil.sleep(100);
       TestUtilsUtil.waitForJobs();
    }
 }

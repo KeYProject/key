@@ -55,6 +55,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "loopMultipleTimes", 
              "examples/_testcase/set/loopIterationTest/oracle/LoopIterationTest_loopMultipleTimes.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -67,6 +68,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "LoopIterationTest", 
              "mainWorks", 
              "examples/_testcase/set/loopIterationTest/oracle/LoopIterationTest_mainWorks.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -81,6 +83,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/loopIterationTest/oracle/LoopIterationTest_main.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -94,6 +97,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/variablesArrayTest/oracle/VariablesArrayTest.xml",
              true,
+             false,
              ALL_IN_ONE_RUN);
    }
    
@@ -107,6 +111,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/variablesInstanceVariableTest/oracle/VariablesInstanceVariableTest.xml",
              true,
+             false,
              ALL_IN_ONE_RUN);
    }
    
@@ -120,6 +125,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/variablesLocalTest/oracle/VariablesLocalTest.xml",
              true,
+             false,
              ALL_IN_ONE_RUN);
    }
    
@@ -133,6 +139,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/variablesStaticTest/oracle/VariablesStaticTest.xml",
              true,
+             false,
              ALL_IN_ONE_RUN);
    }
    
@@ -145,6 +152,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "ComplexFlatSteps", 
              "doSomething", 
              "examples/_testcase/set/complexFlatSteps/oracle/ComplexFlatSteps.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -159,6 +167,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "min", 
              "examples/_testcase/set/complexIf/oracle/ComplexIf.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -171,6 +180,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "DoWhileFalseTest", 
              "main", 
              "examples/_testcase/set/doWhileFalseTest/oracle/DoWhileFalseTest.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -185,6 +195,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/doWhileTest/oracle/DoWhileTest.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -197,6 +208,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "ElseIfDifferentVariables", 
              "main", 
              "examples/_testcase/set/elseIfDifferentVariables/oracle/ElseIfDifferentVariables.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -211,6 +223,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "elseIf", 
              "examples/_testcase/set/elseIfTest/oracle/ElseIfTest.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -223,6 +236,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "FixedRecursiveMethodCallTest", 
              "decreaseValue", 
              "examples/_testcase/set/fixedRecursiveMethodCallTest/oracle/FixedRecursiveMethodCallTest.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -237,6 +251,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/forEachTest/oracle/ForEachTest.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -249,6 +264,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "ForFalseTest", 
              "main", 
              "examples/_testcase/set/forFalseTest/oracle/ForFalseTest.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -263,6 +279,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/forTest/oracle/ForTest.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -275,6 +292,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "FunctionalDoWhileTest", 
              "main", 
              "examples/_testcase/set/functionalDoWhileTest/oracle/FunctionalDoWhileTest.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -289,6 +307,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/functionalForTest/oracle/FunctionalForTest.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -301,6 +320,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "FunctionalIf", 
              "min", 
              "examples/_testcase/set/functionalIf/oracle/FunctionalIf.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -315,6 +335,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/functionalWhileTest/oracle/FunctionalWhileTest.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -327,6 +348,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "MethodCallOnObject", 
              "main", 
              "examples/_testcase/set/methodCallOnObject/oracle/MethodCallOnObject.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -341,6 +363,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/methodCallOnObjectWithException/oracle/MethodCallOnObjectWithException.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -353,6 +376,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "MethodCallParallelTest", 
              "main", 
              "examples/_testcase/set/methodCallParallelTest/oracle/MethodCallParallelTest.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -367,6 +391,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/methodFormatTest/oracle/MethodFormatTest.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -380,6 +405,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/methodHierarchyCallTest/oracle/MethodHierarchyCallTest.xml",
              false,
+             true,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -393,6 +419,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/methodHierarchyCallWithExceptionTest/oracle/MethodHierarchyCallWithExceptionTest.xml",
              false,
+             true,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -405,6 +432,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "NestedDoWhileTest", 
              "main", 
              "examples/_testcase/set/nestedDoWhileTest/oracle/NestedDoWhileTest.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -419,6 +447,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/nestedForTest/oracle/NestedForTest.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -431,6 +460,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "NestedWhileTest", 
              "mainNested", 
              "examples/_testcase/set/nestedWhileTest/oracle/NestedWhileTest.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -451,6 +481,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "fibonacci10", 
              "examples/_testcase/set/recursiveFibonacci/oracle/RecursiveFibonacci.xml",
              false,
+             false,
              ALL_IN_ONE_RUN);
    }
    
@@ -463,6 +494,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "SimpleIf", 
              "min", 
              "examples/_testcase/set/simpleIf/oracle/SimpleIf.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -477,6 +509,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/simpleNullPointerSplitTest/oracle/SimpleNullPointerSplitTest.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -489,6 +522,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "StatementKindTest", 
              "main", 
              "examples/_testcase/set/statementKindTest/oracle/StatementKindTest.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -503,6 +537,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "doSomething", 
              "examples/_testcase/set/statements/oracle/FlatSteps.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -515,6 +550,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "StaticMethodCall", 
              "main", 
              "examples/_testcase/set/staticMethodCall/oracle/StaticMethodCall.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -529,6 +565,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "switchCase", 
              "examples/_testcase/set/switchCaseTest/oracle/SwitchCaseTest.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -541,6 +578,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "ThrowTest", 
              "main", 
              "examples/_testcase/set/throwTest/oracle/ThrowTest.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -555,6 +593,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/throwVariableTest/oracle/ThrowVariableTest.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -567,6 +606,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "TryCatchFinally", 
              "tryCatchFinally", 
              "examples/_testcase/set/tryCatchFinally/oracle/TryCatchFinally.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -581,6 +621,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "main", 
              "examples/_testcase/set/whileFalseTest/oracle/WhileFalseTest.xml",
              false,
+             false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
    
@@ -593,6 +634,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "WhileTest", 
              "main", 
              "examples/_testcase/set/whileTest/oracle/WhileTest.xml",
+             false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN);
    }
@@ -614,6 +656,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * @param methodFullName The method to test.
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
     * @param includeVariables Include variables?
+    * @param includeCallStack Include call stack?
     * @param maximalNumberOfExecutedSetNodesPerRun The number of executed set nodes per auto mode run. The whole test is executed for each defined value.
     * @throws ProofInputException Occurred Exception
     * @throws IOException Occurred Exception
@@ -626,6 +669,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                          final String methodFullName,
                          String oraclePathInBaseDirFile,
                          boolean includeVariables,
+                         boolean includeCallStack,
                          int[] maximalNumberOfExecutedSetNodesPerRun) throws ProofInputException, IOException, ParserConfigurationException, SAXException {
       assertNotNull(maximalNumberOfExecutedSetNodesPerRun);
       for (int i = 0; i < maximalNumberOfExecutedSetNodesPerRun.length; i++) {
@@ -635,6 +679,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 methodFullName, 
                 oraclePathInBaseDirFile, 
                 includeVariables, 
+                includeCallStack,
                 maximalNumberOfExecutedSetNodesPerRun[i]);
       }
    }
@@ -656,6 +701,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * @param methodFullName The method to test.
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
     * @param includeVariables Include variables?
+    * @param includeCallStack Include call stack?
     * @param maximalNumberOfExecutedSetNodes The number of executed set nodes per auto mode run.
     * @throws ProofInputException Occurred Exception
     * @throws IOException Occurred Exception
@@ -668,6 +714,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                          final String methodFullName,
                          String oraclePathInBaseDirFile,
                          boolean includeVariables,
+                         boolean includeCallStack,
                          int maximalNumberOfExecutedSetNodes) throws ProofInputException, IOException, ParserConfigurationException, SAXException {
       // Make sure that parameter are valid.
       assertNotNull(javaPathInBaseDir);
@@ -698,12 +745,12 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
          }
       } while(stopCondition.wasSetNodeExecuted());
       // Create new oracle file if required in a temporary directory
-      createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeVariables);
+      createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeVariables, includeCallStack);
       // Read oracle file
       ExecutionNodeReader reader = new ExecutionNodeReader();
       IExecutionNode oracleRoot = reader.read(oracleFile);
       assertNotNull(oracleRoot);
       // Make sure that the created symbolic execution tree matches the expected one.
-      assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, false);
+      assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false);
    }
 }

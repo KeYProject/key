@@ -70,4 +70,10 @@ public interface IExecutionNode extends IExecutionElement {
     * @return The human readable path condition as string.
     */
    public String getFormatedPathCondition() throws ProofInputException;
+   
+   /**
+    * Returns the method call stack.
+    * @return The method call stack. 
+    */
+   public IExecutionNode[] getCallStack();
 }

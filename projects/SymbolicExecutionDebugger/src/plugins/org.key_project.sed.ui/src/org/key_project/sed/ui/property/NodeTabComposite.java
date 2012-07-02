@@ -22,7 +22,7 @@ import org.key_project.util.java.StringUtil;
  * and in {@code GraphitiDebugNodePropertySection}.
  * @author Martin Hentschel
  */
-public class NodeTabComposite extends Composite {
+public class NodeTabComposite extends AbstractSEDDebugNodeTabComposite {
    /**
     * Shows the value of {@link ISEDDebugNode#getName()}.
     */
@@ -96,9 +96,9 @@ public class NodeTabComposite extends Composite {
    }
 
    /**
-    * Updates the shown content.
-    * @param node The {@link ISEDDebugNode} which provides the new content.
+    * {@inheritDoc}
     */
+   @Override
    public void updateContent(ISEDDebugNode node) {
       String name = null;
       String type = null;

@@ -80,6 +80,12 @@
               <propertyTab
                     afterTab="org.key_project.sed.ui.node.tab"
                     category="Debug"
+                    id="org.key_project.sed.ui.callStack.tab"
+                    label="Call Stack">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.callStack.tab"
+                    category="Debug"
                     id="org.key_project.sed.ui.source.tab"
                     label="Source">
               </propertyTab>
@@ -93,6 +99,12 @@
                class="org.key_project.sed.ui.property.SEDDebugNodePropertySection"
                filter="org.key_project.sed.ui.property.SEDDebugNodeTreeFilter"
                id="org.key_project.sed.ui.node.tab.SEDDebugNodePropertySection">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.property.CallStackPropertySection"
+                    filter="org.key_project.sed.ui.property.SEDDebugNodeTreeFilter"
+                    id="org.key_project.sed.ui.property.CallStackPropertySection"
+                    tab="org.key_project.sed.ui.callStack.tab">
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.property.SourcePropertySection"
