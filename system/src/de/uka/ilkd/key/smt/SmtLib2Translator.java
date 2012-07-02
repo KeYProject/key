@@ -16,7 +16,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-
+/**
+ * The translation for the SMT2-format. It nearly the same as for the SMT1-format. 
+ */
 public class SmtLib2Translator extends AbstractSMTTranslator {
 
 

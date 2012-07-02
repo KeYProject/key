@@ -10,16 +10,18 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 
+/**
+ * A simple textpane that supports lines that can be clicked by the users in order to trigger events.
+ * It can especially be used for messages that contain detailed information that should not be showed all
+ * time, but that should be accessed by clicking on a short messages summarizing the most important 
+ * information.
+ */
 public class ClickableMessageBox extends JTextPane{
 	
 
 	private static final long serialVersionUID = 7588093268080119674L;
 
 	public static interface ClickableMessageBoxListener{
-
-        
-
-
 		public void eventMessageClicked(Object object);
 	}
 	

@@ -317,7 +317,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
        private String[] translateToCommand(Term term)
                         throws IllegalFormulaException, IOException {
 
-                SMTTranslator trans = getType().getTranslator(services);
+                SMTTranslator trans = getType().createTranslator(services);
                 // instantiateTaclets(trans);
 
                 problemString = indent(trans.translateProblem(term, services,
