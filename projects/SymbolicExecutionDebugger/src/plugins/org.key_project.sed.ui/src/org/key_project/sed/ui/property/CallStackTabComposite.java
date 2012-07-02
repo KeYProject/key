@@ -40,6 +40,11 @@ public class CallStackTabComposite extends AbstractSEDDebugNodeTabComposite {
    private TreeModelViewer viewer;
    
    /**
+    * The used {@link PresentationContext} in {@link #viewer}.
+    */
+   private PresentationContext viewerContext;
+   
+   /**
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param style The style to use.
@@ -59,7 +64,8 @@ public class CallStackTabComposite extends AbstractSEDDebugNodeTabComposite {
       data.top = new FormAttachment(0, ITabbedPropertyConstants.VSPACE);
       viewerGroup.setLayoutData(data);
       
-      viewer = new TreeModelViewer(viewerGroup, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL, new PresentationContext(ISEDConstants.ID_CALL_STACK));
+      viewerContext = new PresentationContext(ISEDConstants.ID_CALL_STACK);
+      viewer = new TreeModelViewer(viewerGroup, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL, viewerContext);
       viewer.addDoubleClickListener(new IDoubleClickListener() {
          @Override
          public void doubleClick(DoubleClickEvent event) {
@@ -93,6 +99,7 @@ public class CallStackTabComposite extends AbstractSEDDebugNodeTabComposite {
       catch (DebugException e) {
          LogUtil.getLogger().logError(e);
       }
+      viewerContext.setProperty(ISEDConstants.PRESENTATION_CONTEXT_PROPERTY_INPUT, node);
       viewer.setInput(node);
       viewerGroup.setText(nodeText);
    }

@@ -89,8 +89,14 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
       }
       else if (ISEDConstants.ID_CALL_STACK.equals(context.getId())) {
          if (parent instanceof ISEDDebugNode) {
-            ISEDDebugNode[] callStack = ((ISEDDebugNode)parent).getCallStack();
-            return callStack != null ? callStack : EMPTY; 
+            Object root = context.getProperty(ISEDConstants.PRESENTATION_CONTEXT_PROPERTY_INPUT);
+            if (root == null || root == parent) { // Return only children if it is the viewers input because otherwise the stack elements are expandable.
+               ISEDDebugNode[] callStack = ((ISEDDebugNode)parent).getCallStack();
+               return callStack != null ? callStack : EMPTY; 
+            }
+            else {
+               return EMPTY;
+            }
          }
          else {
             return EMPTY;
