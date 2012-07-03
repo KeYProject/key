@@ -270,14 +270,14 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param e The event.
     */
    protected void handleAutoModeStarted(ProofEvent e) {
-      try {
-         if (e.getSource() == environment.getBuilder().getProof()) {
+      if (e.getSource() == environment.getBuilder().getProof()) {
+         try {
             // Inform UI that the process is resumed
             super.resume();
          }
-      }
-      catch (DebugException exception) {
-         LogUtil.getLogger().logError(exception);
+         catch (DebugException exception) {
+            LogUtil.getLogger().logError(exception);
+         }
       }
    }
 
@@ -286,22 +286,22 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @param e The event.
     */
    protected void handleAutoModeStopped(ProofEvent e) {
-      try {
-         if (e.getSource() == environment.getBuilder().getProof()) {
+      if (e.getSource() == environment.getBuilder().getProof()) {
+         try {
             updateExecutionTree(environment.getBuilder());
          }
-      }
-      catch (Exception exception) {
-         LogUtil.getLogger().logError(exception);
-         LogUtil.getLogger().openErrorDialog(null, exception);
-      }
-      finally {
-         try {
-            super.suspend();
+         catch (Exception exception) {
+            LogUtil.getLogger().logError(exception);
+            LogUtil.getLogger().openErrorDialog(null, exception);
          }
-         catch (DebugException e1) {
-            LogUtil.getLogger().logError(e1);
-            LogUtil.getLogger().openErrorDialog(null, e1);
+         finally {
+            try {
+               super.suspend();
+            }
+            catch (DebugException e1) {
+               LogUtil.getLogger().logError(e1);
+               LogUtil.getLogger().openErrorDialog(null, e1);
+            }
          }
       }
    }
