@@ -28,4 +28,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.ui.visualization.test.suite,
- org.key_project.sed.ui.visualization.test.suite.swtbot
+ org.key_project.sed.ui.visualization.test.suite.swtbot,
+ org.key_project.sed.ui.visualization.test.util

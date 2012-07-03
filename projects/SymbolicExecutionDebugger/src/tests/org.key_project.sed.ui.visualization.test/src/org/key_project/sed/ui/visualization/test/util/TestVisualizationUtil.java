@@ -83,4 +83,13 @@ public final class TestVisualizationUtil {
    public static SWTBotView getSymbolicExecutionTreeView(SWTWorkbenchBot bot) {
       return bot.viewById(ExecutionTreeView.VIEW_ID);
    }
+
+   /**
+    * Sets the focus to the symbolic execution tree view.
+    */
+   public static void setFocusToSymbolicExecutionTreeView() {
+      SWTWorkbenchBot bot = new SWTWorkbenchBot();
+      SWTBotView setView = TestVisualizationUtil.getSymbolicExecutionTreeView(bot);
+      setView.setFocus();
+   }
 }

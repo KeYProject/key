@@ -1,8 +1,7 @@
-package org.key_project.sed.ui.visualization.test.testcase.swtbot;
+package org.key_project.sed.key.ui.test.testcase.swtbot;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.eclipse.gef.finder.SWTGefBot;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
@@ -11,9 +10,8 @@ import org.eclipse.ui.IPageLayout;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
-import org.key_project.sed.ui.test.testcase.swtbot.AbstractSWTBotPropertyTabTest;
+import org.key_project.sed.key.ui.test.Activator;
 import org.key_project.sed.ui.test.util.SWTBotTabbedPropertyList;
-import org.key_project.sed.ui.visualization.test.Activator;
 import org.key_project.sed.ui.visualization.test.util.TestVisualizationUtil;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -22,7 +20,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * Provides the basic functionality to test property tabs in Graphiti editors and views.
  * @author Martin Hentschel
  */
-public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropertyTabTest {
+public class AbstractSWTBotGraphitiKeYPropertyTabTest extends AbstractSWTBotKeYPropertyTabTest {
    /**
     * {@inheritDoc}
     */
@@ -56,6 +54,15 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
    @Override
    protected void selectMethodReturn(SWTBotTree debugTree) {
       super.selectMethodReturn(debugTree);
+      TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected void selectLaunch(SWTBotTree debugTree) {
+      super.selectLaunch(debugTree);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
    }
    
@@ -102,7 +109,7 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
    }
    
    /**
-    * Defines the test steps to execute via {@link AbstractSWTBotGraphitiPropertyTabTest#doInDiagramEditorTest(IEditorTestSteps)}.
+    * Defines the test steps to execute via {@link AbstractSWTBotGraphitiKeYPropertyTabTest#doInDiagramEditorTest(IEditorTestSteps)}.
     * @author Martin Hentschel
     */
    protected static interface IEditorTestSteps {

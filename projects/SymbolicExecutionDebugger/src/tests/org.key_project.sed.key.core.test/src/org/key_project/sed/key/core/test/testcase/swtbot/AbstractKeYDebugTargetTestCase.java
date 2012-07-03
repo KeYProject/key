@@ -442,6 +442,43 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
                                        Boolean showKeYMainWindow,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
+      doKeYDebugTargetTest(projectName,
+                           Activator.PLUGIN_ID, 
+                           pathInBundle, 
+                           closeExecutionTreeViews, 
+                           selector, 
+                           showMethodReturnValues, 
+                           showVariablesOfSelectedDebugNode, 
+                           showKeYMainWindow, 
+                           timeoutFactor, 
+                           executor);
+   }
+   
+   /**
+    * Performs a test on a {@link KeYDebugTarget}. This methods setups
+    * the environment an the real test is done in the given {@link IKeYDebugTargetTestExecutor}.
+    * @param projectName The project name.
+    * @param plugin The plug-in which contains the test data.
+    * @param pathInBundle The path to the test files in bundle.
+    * @param closeExecutionTreeViews Close the views which visualizes the symbolic execution tree? Will increase the test perforamnce.
+    * @param selector The {@link IMethodSelector} to select the {@link IMethod} to debug.
+    * @param showMethodReturnValues Show method return values?
+    * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
+    * @param showKeYMainWindow Show KeY's main window?
+    * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
+    * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doKeYDebugTargetTest(String projectName,
+                                       String plugin,
+                                       String pathInBundle,
+                                       boolean closeExecutionTreeViews,
+                                       IMethodSelector selector,
+                                       Boolean showMethodReturnValues,
+                                       Boolean showVariablesOfSelectedDebugNode,
+                                       Boolean showKeYMainWindow,
+                                       int timeoutFactor,
+                                       IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       // Get current settings to restore them in finally block
@@ -461,7 +498,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          }
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
-         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, pathInBundle, project.getProject().getFolder("src"));
+         BundleUtil.extractFromBundleToWorkspace(plugin, pathInBundle, project.getProject().getFolder("src"));
          // Get method
          assertNotNull(selector);
          IMethod method = selector.getMethod(project);
