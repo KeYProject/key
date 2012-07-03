@@ -125,7 +125,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
                                           IDebugTarget target,
                                           boolean closeEditor) throws CoreException, BadLocationException {
       // Select statement in debug tree
-      SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, pathToStatementInTree);
+      SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, pathToStatementInTree);
       // Get statement that should be selected in opened editor.
       ISEDStatement statement = (ISEDStatement)TestUtilsUtil.getTreeItemData(item);
       // Make sure that an editor is opened

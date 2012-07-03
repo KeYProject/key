@@ -1,5 +1,7 @@
 package org.key_project.sed.core.test.util;
 
+import java.util.Arrays;
+
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IResource;
@@ -40,6 +42,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -217,6 +220,15 @@ public final class TestSedCoreUtil {
       if (run.getException() != null) {
          throw run.getException();
       }
+   }
+
+   /**
+    * Returns the {@link SWTBotView} for the properties view.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @return The {@link SWTBotView}.
+    */
+   public static SWTBotView getPropertiesView(SWTWorkbenchBot bot) {
+      return bot.viewById(IPageLayout.ID_PROP_SHEET);
    }
 
    /**
@@ -1320,5 +1332,32 @@ public final class TestSedCoreUtil {
                                             boolean compareVariables,
                                             boolean compareCallStack) throws DebugException {
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
+   }
+   
+   /**
+    * Waits until the user interface is ready.
+    */
+   public static void waitForDebugTreeInterface() {
+      TestUtilsUtil.sleep(100);
+      TestUtilsUtil.waitForJobs();
+   }
+   
+   /**
+    * Method to select an item in the debug tree.
+    * @param debugTree The debug tree.
+    * @param indexPathToItem The indices on parents to select.
+    * @return The selected {@link SWTBotTreeItem}.
+    */
+   public static SWTBotTreeItem selectInDebugTree(SWTBotTree debugTree, int... indexPathToItem) {
+      TestCase.assertNotNull(indexPathToItem);
+      TestCase.assertTrue(indexPathToItem.length >= 1);
+      SWTBotTreeItem item = null;
+      for (int i = 1; i < indexPathToItem.length + 1; i++) {
+         int[] subPath = Arrays.copyOf(indexPathToItem, i);
+         item = TestUtilsUtil.selectInTree(debugTree, subPath);
+         item.expand();
+         TestUtilsUtil.waitForJobs();
+      }
+      return item;
    }
 }

@@ -91,6 +91,9 @@ public class FixedExampleLaunchConfigurationDelegate extends LaunchConfiguration
        SEDMemoryStatement s1 = new SEDMemoryStatement(target, thread, thread);
        s1.setName("int x = 1;");
        s1.setPathCondition("pc2");
+       s1.setLineNumber(-1);
+       s1.setCharStart(3);
+       s1.setCharEnd(5);
        thread.addChild(s1);
        
        SEDMemoryLoopNode ln = new SEDMemoryLoopNode(target, s1, thread);

@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="ASCII"?>
+<pi:Diagram xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:al="http://eclipse.org/graphiti/mm/algorithms" xmlns:pi="http://eclipse.org/graphiti/mm/pictograms" visible="true" gridUnit="10" diagramTypeId="symbolicExecutionTreeDiagram" name="FlatSteps.set_diagram" snapToGrid="true" showGuides="true">
+  <properties key="independentObject" value="_0f52bcb2-75f0-4925-8bff-0b4dd5af1cde"/>
+  <properties key="domainModelFile" value="platform:/resource/AbstractSWTBotGraphitiPropertyTabTest_doInDiagramEditorTest/FlatSteps.set"/>
+  <graphicsAlgorithm xsi:type="al:Rectangle" background="//@colors.1" foreground="//@colors.0" lineWidth="1" transparency="0.0" width="1000" height="1000"/>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_88a5b9ef-fa3d-48ec-9af5-d871f626aee7"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="95" y="10" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.0"/>
+    <children visible="true">
+      <properties key="independentObject" value="_88a5b9ef-fa3d-48ec-9af5-d871f626aee7"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.thread" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_88a5b9ef-fa3d-48ec-9af5-d871f626aee7"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.0" value="&lt;start>"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_f1e1ab30-a3b8-48d6-b65d-bf9db9a30d0f"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="200" height="20" x="30" y="50" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.1" incomingConnections="//@connections.0"/>
+    <children visible="true">
+      <properties key="independentObject" value="_f1e1ab30-a3b8-48d6-b65d-bf9db9a30d0f"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.methodCall" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_f1e1ab30-a3b8-48d6-b65d-bf9db9a30d0f"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="169" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.0" value="self_0.doSomething(_asdf,_a,_b);"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_7b979ac1-c6dd-4a92-8afe-c001c58fd999"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="80" height="20" x="90" y="90" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.2" incomingConnections="//@connections.1"/>
+    <children visible="true">
+      <properties key="independentObject" value="_7b979ac1-c6dd-4a92-8afe-c001c58fd999"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.statement" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_7b979ac1-c6dd-4a92-8afe-c001c58fd999"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="49" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.0" value="int x = 1;"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_46d7b266-21bc-42af-bc72-0ef5b2e3fe2e"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="80" height="20" x="90" y="130" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.3" incomingConnections="//@connections.2"/>
+    <children visible="true">
+      <properties key="independentObject" value="_46d7b266-21bc-42af-bc72-0ef5b2e3fe2e"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.statement" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_46d7b266-21bc-42af-bc72-0ef5b2e3fe2e"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="49" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.0" value="int y = 2;"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_a52f2fcc-2484-497c-9cb0-ba5764bfd35b"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="80" height="20" x="90" y="170" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.4" incomingConnections="//@connections.3"/>
+    <children visible="true">
+      <properties key="independentObject" value="_a52f2fcc-2484-497c-9cb0-ba5764bfd35b"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.statement" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_a52f2fcc-2484-497c-9cb0-ba5764bfd35b"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="49" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.0" value="int z = 3;"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_b42e187c-a61d-472d-bc88-5bd4422f874e"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="260" height="20" y="210" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" outgoingConnections="//@connections.5" incomingConnections="//@connections.4"/>
+    <children visible="true">
+      <properties key="independentObject" value="_b42e187c-a61d-472d-bc88-5bd4422f874e"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.methodReturn" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_b42e187c-a61d-472d-bc88-5bd4422f874e"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="229" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.0" value="&lt;return of self_0.doSomething(_asdf,_a,_b);>"/>
+    </children>
+  </children>
+  <children xsi:type="pi:ContainerShape" visible="true" active="true">
+    <properties key="independentObject" value="_4074abb5-8e31-43d3-8fd9-150a8408a9c6"/>
+    <graphicsAlgorithm xsi:type="al:RoundedRectangle" lineWidth="1" transparency="0.0" width="70" height="20" x="95" y="250" style="//@styles.0" cornerHeight="20" cornerWidth="20"/>
+    <anchors xsi:type="pi:ChopboxAnchor" incomingConnections="//@connections.5"/>
+    <children visible="true">
+      <properties key="independentObject" value="_4074abb5-8e31-43d3-8fd9-150a8408a9c6"/>
+      <graphicsAlgorithm xsi:type="al:Image" lineWidth="1" transparency="0.0" width="16" height="20" x="5" id="org.key_project.sed.ui.visualization.termination" stretchH="false" stretchV="false" proportional="false"/>
+    </children>
+    <children visible="true">
+      <properties key="independentObject" value="_4074abb5-8e31-43d3-8fd9-150a8408a9c6"/>
+      <graphicsAlgorithm xsi:type="al:Text" lineWidth="1" transparency="0.0" width="39" height="20" x="26" style="//@styles.0/@styles.0" font="//@fonts.0" value="&lt;end>"/>
+    </children>
+  </children>
+  <styles foreground="//@colors.2" lineWidth="2" id="debugNode">
+    <styles foreground="//@colors.3" id="debugNodeText"/>
+    <styles foreground="//@colors.3" id="parentConnection"/>
+    <renderingStyle>
+      <adaptedGradientColoredAreas definedStyleId="blue-white-gloss" gradientType="0">
+        <adaptedGradientColoredAreas styleAdaption="0">
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="0">
+              <color red="248" green="251" blue="254"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="1">
+              <color red="248" green="251" blue="254"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="1">
+              <color red="237" green="245" blue="252"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="2">
+              <color red="237" green="245" blue="252"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="2">
+              <color red="222" green="237" blue="250"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="3">
+              <color red="222" green="237" blue="250"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="3">
+              <color red="212" green="231" blue="248"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="2">
+              <color red="250" green="251" blue="252"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="2">
+              <color red="226" green="229" blue="233"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="0">
+              <color red="226" green="229" blue="233"/>
+            </end>
+          </gradientColor>
+        </adaptedGradientColoredAreas>
+        <adaptedGradientColoredAreas styleAdaption="1">
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="0">
+              <color red="238" green="246" blue="253"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="1">
+              <color red="238" green="246" blue="253"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="1">
+              <color red="208" green="230" blue="249"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="2">
+              <color red="208" green="230" blue="249"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="2">
+              <color red="172" green="210" blue="244"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="3">
+              <color red="172" green="210" blue="244"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="3">
+              <color red="129" green="185" blue="234"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="2">
+              <color red="170" green="208" blue="242"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="2">
+              <color red="154" green="191" blue="224"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="0">
+              <color red="154" green="191" blue="224"/>
+            </end>
+          </gradientColor>
+        </adaptedGradientColoredAreas>
+        <adaptedGradientColoredAreas styleAdaption="2">
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="0">
+              <color red="245" green="249" blue="254"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="1">
+              <color red="245" green="249" blue="254"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="1">
+              <color red="226" green="239" blue="252"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="2">
+              <color red="226" green="239" blue="252"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="2">
+              <color red="203" green="227" blue="249"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="3">
+              <color red="203" green="227" blue="249"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="3">
+              <color red="187" green="218" blue="247"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="2">
+              <color red="197" green="224" blue="247"/>
+            </end>
+          </gradientColor>
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="2">
+              <color red="178" green="205" blue="229"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="0">
+              <color red="178" green="205" blue="229"/>
+            </end>
+          </gradientColor>
+        </adaptedGradientColoredAreas>
+        <adaptedGradientColoredAreas styleAdaption="3">
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="0">
+              <color red="153" green="204"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="0">
+              <color red="51" green="153" blue="102"/>
+            </end>
+          </gradientColor>
+        </adaptedGradientColoredAreas>
+        <adaptedGradientColoredAreas styleAdaption="4">
+          <gradientColor>
+            <start locationType="LOCATION_TYPE_ABSOLUTE_START" locationValue="0">
+              <color red="255" green="204"/>
+            </start>
+            <end locationType="LOCATION_TYPE_ABSOLUTE_END" locationValue="0">
+              <color red="255" green="102"/>
+            </end>
+          </gradientColor>
+        </adaptedGradientColoredAreas>
+      </adaptedGradientColoredAreas>
+    </renderingStyle>
+  </styles>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.0/@anchors.0" end="//@children.1/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.1/@anchors.0" end="//@children.2/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.2/@anchors.0" end="//@children.3/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.3/@anchors.0" end="//@children.4/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.4/@anchors.0" end="//@children.5/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <connections xsi:type="pi:FreeFormConnection" visible="true" active="true" start="//@children.5/@anchors.0" end="//@children.6/@anchors.0">
+    <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1"/>
+    <connectionDecorators visible="true" locationRelative="true" location="1.0">
+      <graphicsAlgorithm xsi:type="al:Polyline" lineWidth="1" filled="false" transparency="0.0" style="//@styles.0/@styles.1">
+        <points x="-10" y="5"/>
+        <points/>
+        <points x="-10" y="-5"/>
+      </graphicsAlgorithm>
+    </connectionDecorators>
+  </connections>
+  <colors red="227" green="238" blue="249"/>
+  <colors red="255" green="255" blue="255"/>
+  <colors red="67" green="106" blue="149"/>
+  <colors/>
+  <fonts name="Arial" size="8"/>
+</pi:Diagram>

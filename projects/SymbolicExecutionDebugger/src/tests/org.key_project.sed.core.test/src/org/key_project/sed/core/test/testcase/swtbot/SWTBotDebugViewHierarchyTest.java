@@ -43,23 +43,23 @@ public class SWTBotDebugViewHierarchyTest extends TestCase {
          TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
-         waitForUserInterface(); // Give the user interface the chance to update the tree
+         TestSedCoreUtil.waitForDebugTreeInterface(); // Give the user interface the chance to update the tree
          // Make sure that the correct items are shown
          TestSedCoreUtil.assertCompactFixedExample(debugTree);
          // Change to normal view
          SEDPreferenceUtil.toggleShowCompactExecutionTreePreference();
-         waitForUserInterface(); // Give the user interface the chance to update the tree
+         TestSedCoreUtil.waitForDebugTreeInterface(); // Give the user interface the chance to update the tree
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
-         waitForUserInterface(); // Give the user interface the chance to update the tree
+         TestSedCoreUtil.waitForDebugTreeInterface(); // Give the user interface the chance to update the tree
          // Make sure that the correct items are shown
          TestSedCoreUtil.assertFixedExample(debugTree);
          // Change to compact view
          SEDPreferenceUtil.toggleShowCompactExecutionTreePreference();
-         waitForUserInterface(); // Give the user interface the chance to update the tree
+         TestSedCoreUtil.waitForDebugTreeInterface(); // Give the user interface the chance to update the tree
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
-         waitForUserInterface(); // Give the user interface the chance to update the tree
+         TestSedCoreUtil.waitForDebugTreeInterface(); // Give the user interface the chance to update the tree
          // Make sure that the correct items are shown
          TestSedCoreUtil.assertCompactFixedExample(debugTree);
       }
@@ -98,7 +98,7 @@ public class SWTBotDebugViewHierarchyTest extends TestCase {
          TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
-         waitForUserInterface(); // Give the user interface the chance to update the tree
+         TestSedCoreUtil.waitForDebugTreeInterface(); // Give the user interface the chance to update the tree
          // Make sure that the correct items are shown
          TestSedCoreUtil.assertCompactFixedExample(debugTree);
       }
@@ -136,7 +136,7 @@ public class SWTBotDebugViewHierarchyTest extends TestCase {
          TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
-         waitForUserInterface(); // Give the user interface the chance to update the tree
+         TestSedCoreUtil.waitForDebugTreeInterface(); // Give the user interface the chance to update the tree
          // Make sure that the correct items are shown
          TestSedCoreUtil.assertFixedExample(debugTree);
       }
@@ -146,13 +146,5 @@ public class SWTBotDebugViewHierarchyTest extends TestCase {
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
       }
-   }
-   
-   /**
-    * Waits until the user interface is ready.
-    */
-   protected void waitForUserInterface() {
-      TestUtilsUtil.sleep(100);
-      TestUtilsUtil.waitForJobs();
    }
 }

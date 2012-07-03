@@ -14,8 +14,8 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
-import org.key_project.sed.key.core.test.util.TestSEDKeyCoreUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -39,7 +39,7 @@ public class SWTBotKeYModelThreadSaveChildAccessTest extends AbstractKeYDebugTar
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
             // Get debug target TreeItem
-            SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+            SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
             // Resume
             resume(bot, item, target);
             // Start with threads

@@ -1,7 +1,6 @@
 package org.key_project.sed.key.core.test.util;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -16,8 +15,6 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
@@ -32,7 +29,6 @@ import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.jdt.JDTUtil;
-import org.key_project.util.test.util.TestUtilsUtil;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
@@ -178,24 +174,5 @@ public final class TestSEDKeyCoreUtil {
                                                            JDTUtil.getQualifiedMethodLabel(method).replaceAll(" ", StringUtil.EMPTY_STRING),
                                                            "-2147483648", 
                                                            "normal_behavior");
-   }
-   
-   /**
-    * Method to select an item in the debug tree.
-    * @param debugTree The debug tree.
-    * @param indexPathToItem The indices on parents to select.
-    * @return The selected {@link SWTBotTreeItem}.
-    */
-   public static SWTBotTreeItem selectInDebugTree(SWTBotTree debugTree, int... indexPathToItem) {
-      TestCase.assertNotNull(indexPathToItem);
-      TestCase.assertTrue(indexPathToItem.length >= 1);
-      SWTBotTreeItem item = null;
-      for (int i = 1; i < indexPathToItem.length + 1; i++) {
-         int[] subPath = Arrays.copyOf(indexPathToItem, i);
-         item = TestUtilsUtil.selectInTree(debugTree, subPath);
-         item.expand();
-         TestUtilsUtil.waitForJobs();
-      }
-      return item;
    }
 }

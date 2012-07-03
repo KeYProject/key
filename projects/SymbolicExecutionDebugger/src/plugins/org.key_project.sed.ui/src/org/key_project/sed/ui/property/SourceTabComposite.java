@@ -153,27 +153,29 @@ public class SourceTabComposite extends Composite {
 
       final int LABEL_WIDTH = 110;
       
-      CLabel sourceCLabel = factory.createCLabel(composite, sourceText);
-      sourceCLabel.setImage(sourceIcon);
-      FormData data = new FormData();
-      data.left = new FormAttachment(0, LABEL_WIDTH);
-      data.right = new FormAttachment(100, 0);
-      data.top = new FormAttachment(0, ITabbedPropertyConstants.VSPACE);
-      sourceCLabel.setLayoutData(data);
+      Control lastControl = null;
+      if (sourceText != null || sourceIcon != null) {
+         CLabel sourceCLabel = factory.createCLabel(composite, sourceText);
+         sourceCLabel.setImage(sourceIcon);
+         FormData data = new FormData();
+         data.left = new FormAttachment(0, LABEL_WIDTH);
+         data.right = new FormAttachment(100, 0);
+         data.top = new FormAttachment(0, ITabbedPropertyConstants.VSPACE);
+         sourceCLabel.setLayoutData(data);
+         lastControl = sourceCLabel;
 
-      CLabel sourceLabel = factory.createCLabel(composite, "Source:");
-      data = new FormData();
-      data.left = new FormAttachment(0, 0);
-      data.right = new FormAttachment(sourceCLabel, -ITabbedPropertyConstants.HSPACE);
-      data.top = new FormAttachment(sourceCLabel, 0, SWT.CENTER);
-      sourceLabel.setLayoutData(data);
+         CLabel sourceLabel = factory.createCLabel(composite, "Source:");
+         data = new FormData();
+         data.left = new FormAttachment(0, 0);
+         data.right = new FormAttachment(sourceCLabel, -ITabbedPropertyConstants.HSPACE);
+         data.top = new FormAttachment(sourceCLabel, 0, SWT.CENTER);
+         sourceLabel.setLayoutData(data);
+      }
       
-      Control lastControl = sourceCLabel;
-
       if (workspacePath != null) {
          Text workspacePathText = factory.createText(composite, workspacePath);
          workspacePathText.setEditable(false);
-         data = new FormData();
+         FormData data = new FormData();
          data.left = new FormAttachment(0, LABEL_WIDTH);
          data.right = new FormAttachment(100, 0);
          data.top = new FormAttachment(lastControl, 0, ITabbedPropertyConstants.VSPACE);
@@ -191,7 +193,7 @@ public class SourceTabComposite extends Composite {
       if (localPath != null) {
          Text localPathText = factory.createText(composite, localPath);
          localPathText.setEditable(false);
-         data = new FormData();
+         FormData data = new FormData();
          data.left = new FormAttachment(0, LABEL_WIDTH);
          data.right = new FormAttachment(100, 0);
          data.top = new FormAttachment(lastControl, 0, ITabbedPropertyConstants.VSPACE);
@@ -209,7 +211,7 @@ public class SourceTabComposite extends Composite {
       if (lineNumber >= 0) {
          Text lineNumberText = factory.createText(composite, lineNumber + StringUtil.EMPTY_STRING);
          lineNumberText.setEditable(false);
-         data = new FormData();
+         FormData data = new FormData();
          data.left = new FormAttachment(0, LABEL_WIDTH);
          data.right = new FormAttachment(25, 0);
          data.top = new FormAttachment(lastControl, 0, ITabbedPropertyConstants.VSPACE);
@@ -227,7 +229,7 @@ public class SourceTabComposite extends Composite {
       if (startChar >= 0) {
          Text charStartText = factory.createText(composite, startChar + StringUtil.EMPTY_STRING);
          charStartText.setEditable(false);
-         data = new FormData();
+         FormData data = new FormData();
          data.left = new FormAttachment(0, LABEL_WIDTH);
          data.right = new FormAttachment(25, 0);
          data.top = new FormAttachment(lastControl, 0, ITabbedPropertyConstants.VSPACE);
@@ -245,7 +247,7 @@ public class SourceTabComposite extends Composite {
       if (endChar >= 0) {
          Text charEndText = factory.createText(composite, endChar + StringUtil.EMPTY_STRING);
          charEndText.setEditable(false);
-         data = new FormData();
+         FormData data = new FormData();
          data.left = new FormAttachment(0, LABEL_WIDTH);
          data.right = new FormAttachment(25, 0);
          data.top = new FormAttachment(lastControl, 0, ITabbedPropertyConstants.VSPACE);
