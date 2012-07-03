@@ -28,6 +28,7 @@ import org.key_project.key4eclipse.starter.core.test.util.TestStarterCoreUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLWriter;
+import org.key_project.sed.core.test.util.DebugTargetResumeSuspendListener;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.test.Activator;
@@ -253,7 +254,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     * @param target The {@link ISEDDebugTarget} to use.
     */
    protected static void stepInto(SWTWorkbenchBot bot, 
-                                  SWTBotTreeItem launchTreeItem, 
+                                  final SWTBotTreeItem launchTreeItem, 
                                   ISEDDebugTarget target) {
       assertNotNull(bot);
       assertNotNull(launchTreeItem);
@@ -263,12 +264,14 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          IStep leafStep = (IStep)leafData;
          assertTrue(leafStep.canStepInto());
          launchTreeItem.select();
-         SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Into"); 
-         menuItem.click();
-         TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
-         assertFalse(leafStep.canStepInto());
-         TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
-         assertTrue(leafStep.canStepInto());
+         // Click on "Step Into" and wait until step was executed.
+         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+            @Override
+            public void run() {
+               SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Into"); 
+               menuItem.click();
+            }
+         });
       }
    }
    
@@ -302,7 +305,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     * @param target The {@link ISEDDebugTarget} to use.
     */
    protected static void stepOver(SWTWorkbenchBot bot, 
-                                  SWTBotTreeItem launchTreeItem, 
+                                  final SWTBotTreeItem launchTreeItem, 
                                   ISEDDebugTarget target) {
       assertNotNull(bot);
       assertNotNull(launchTreeItem);
@@ -312,12 +315,14 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          IStep leafStep = (IStep)leafData;
          assertTrue(leafStep.canStepOver());
          launchTreeItem.select();
-         SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Over"); 
-         menuItem.click();
-         TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
-         assertFalse(leafStep.canStepOver());
-         TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
-         assertTrue(leafStep.canStepOver());
+         // Click on "Step Over" and wait until step was executed.
+         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+            @Override
+            public void run() {
+               SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Over"); 
+               menuItem.click();
+            }
+         });
       }
    }
    
@@ -351,7 +356,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     * @param target The {@link ISEDDebugTarget} to use.
     */
    protected static void stepReturn(SWTWorkbenchBot bot, 
-                                    SWTBotTreeItem launchTreeItem, 
+                                    final SWTBotTreeItem launchTreeItem, 
                                     ISEDDebugTarget target) {
       assertNotNull(bot);
       assertNotNull(launchTreeItem);
@@ -361,12 +366,14 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          IStep leafStep = (IStep)leafData;
          assertTrue(leafStep.canStepReturn());
          launchTreeItem.select();
-         SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Return"); 
-         menuItem.click();
-         TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
-         assertFalse(leafStep.canStepReturn());
-         TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
-         assertTrue(leafStep.canStepReturn());
+         // Click on "Step Return" and wait until step was executed.
+         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+            @Override
+            public void run() {
+               SWTBotMenu menuItem = launchTreeItem.contextMenu("Step Return"); 
+               menuItem.click();
+            }
+         });
       }
    }
    
@@ -400,7 +407,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     * @param target The {@link ISEDDebugTarget} to use.
     */
    protected static void resume(SWTWorkbenchBot bot, 
-                                SWTBotTreeItem launchTreeItem, 
+                                final SWTBotTreeItem launchTreeItem, 
                                 ISEDDebugTarget target) {
       assertNotNull(bot);
       assertNotNull(launchTreeItem);
@@ -410,12 +417,14 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          ISuspendResume leafStep = (ISuspendResume)leafData;
          assertTrue(leafStep.canResume());
          launchTreeItem.select();
-         SWTBotMenu menuItem = launchTreeItem.contextMenu("Resume"); 
-         menuItem.click();
-         TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
-         assertFalse(leafStep.canResume());
-         TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
-         assertTrue(leafStep.canResume());
+         // Click on "Resume" and wait until step was executed.
+         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+            @Override
+            public void run() {
+               SWTBotMenu menuItem = launchTreeItem.contextMenu("Resume"); 
+               menuItem.click();
+            }
+         });
       }
    }
    

@@ -15,6 +15,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
@@ -24,6 +25,7 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.test.util.DebugTargetResumeSuspendListener;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.launch.KeYSourceLookupDirector;
 import org.key_project.sed.key.core.launch.KeYSourceLookupParticipant;
@@ -81,11 +83,15 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
          ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
-         // Resume launch
-         SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
-         item.contextMenu("Resume").click();
-         TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
-         TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
+         // Click on "Resume" and wait until step was executed.
+         final SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
+         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+            @Override
+            public void run() {
+               SWTBotMenu menuItem = item.contextMenu("Resume"); 
+               menuItem.click();
+            }
+         });
          // Test the execution tree
          TestSEDKeyCoreUtil.assertFlatStepsExample(target);
          // Make sure that no editor is opened
@@ -174,11 +180,15 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          debugTree = debugView.bot().tree();
          ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          ILaunch launch = target.getLaunch();
-         // Resume launch
-         SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
-         item.contextMenu("Resume").click();
-         TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
-         TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
+         // Click on "Resume" and wait until step was executed.
+         final SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
+         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+            @Override
+            public void run() {
+               SWTBotMenu menuItem = item.contextMenu("Resume"); 
+               menuItem.click();
+            }
+         });
          // Test the execution tree
          TestSEDKeyCoreUtil.assertFlatStepsExample(target);
          // Get stack frame for lookup
