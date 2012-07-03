@@ -12,13 +12,13 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Before;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
@@ -64,7 +64,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       // Get current settings to restore them in finally block
-      SWTBotPerspective defaultPerspective = bot.activePerspective();
+      IPerspectiveDescriptor defaultPerspective = TestUtilsUtil.getActivePerspective();
       SWTBotTree debugTree = null;
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       try {
@@ -104,10 +104,10 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
       finally {
          // Restore timeout
          SWTBotPreferences.TIMEOUT = originalTimeout;
-         // Restore perspective
-         defaultPerspective.activate();
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
+         // Restore perspective
+         TestUtilsUtil.openPerspective(defaultPerspective);
          // Make sure that all editors are closed
          bot.closeAllEditors();
       }
@@ -160,7 +160,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       // Get current settings to restore them in finally block
-      SWTBotPerspective defaultPerspective = bot.activePerspective();
+      IPerspectiveDescriptor defaultPerspective = TestUtilsUtil.getActivePerspective();
       SWTBotTree debugTree = null;
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       try {
@@ -216,10 +216,10 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
       finally {
          // Restore timeout
          SWTBotPreferences.TIMEOUT = originalTimeout;
-         // Restore perspective
-         defaultPerspective.activate();
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
+         // Restore perspective
+         TestUtilsUtil.openPerspective(defaultPerspective);
       }
    }
 }

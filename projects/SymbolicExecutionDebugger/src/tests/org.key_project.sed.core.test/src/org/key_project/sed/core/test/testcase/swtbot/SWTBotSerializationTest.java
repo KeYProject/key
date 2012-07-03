@@ -12,10 +12,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.waits.Conditions;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLReader;
@@ -109,7 +109,7 @@ public class SWTBotSerializationTest extends TestCase {
                                           boolean saveCallStack) throws Exception {
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      SWTBotPerspective defaultPerspective = bot.activePerspective();
+      IPerspectiveDescriptor defaultPerspective = TestUtilsUtil.getActivePerspective();
       // Disable compact view
       boolean originalCompactView = SEDPreferenceUtil.isShowCompactExecutionTree();
       SEDPreferenceUtil.setShowCompactExecutionTree(true);
@@ -297,13 +297,13 @@ public class SWTBotSerializationTest extends TestCase {
          }
       }
       finally {
-         defaultPerspective.activate();
          SEDPreferenceUtil.setShowCompactExecutionTree(originalCompactView);
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
          if (tempFile != null) {
             tempFile.delete();
          }
+         TestUtilsUtil.openPerspective(defaultPerspective);
       }
    }
 }

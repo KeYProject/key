@@ -3,9 +3,9 @@ package org.key_project.sed.ui.test.testcase.swtbot;
 import junit.framework.TestCase;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
@@ -29,7 +29,7 @@ public class AbstractSWTBotPropertyTabTest extends TestCase {
       assertNotNull(steps);
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      SWTBotPerspective defaultPerspective = bot.activePerspective();
+      IPerspectiveDescriptor defaultPerspective = TestUtilsUtil.getActivePerspective();
       SWTBotTree debugTree = null;
       try {
          TestUtilsUtil.closeWelcomeView(bot);
@@ -59,9 +59,9 @@ public class AbstractSWTBotPropertyTabTest extends TestCase {
          steps.assertMethodReturn(debugTree, propertiesView, tabs);
       }
       finally {
-         defaultPerspective.activate();
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
+         TestUtilsUtil.openPerspective(defaultPerspective);
       }
    }
 

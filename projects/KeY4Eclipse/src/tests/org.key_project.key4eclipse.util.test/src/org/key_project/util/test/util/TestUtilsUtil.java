@@ -49,6 +49,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
@@ -957,5 +958,40 @@ public class TestUtilsUtil {
             }
          }
       }
+   }
+
+   /**
+    * Returns the active perspective of the active {@link IWorkbenchPage}.
+    * @return The active perspective.
+    */
+   public static IPerspectiveDescriptor getActivePerspective() {
+      IRunnableWithResult<IPerspectiveDescriptor> run = new AbstractRunnableWithResult<IPerspectiveDescriptor>() {
+         @Override
+         public void run() {
+            IWorkbenchPage page = WorkbenchUtil.getActivePage();
+            if (page != null) {
+               setResult(page.getPerspective());
+            }
+         }
+      };
+      Display.getDefault().syncExec(run);
+      return run.getResult();
+   }
+
+   /**
+    * Opens the given perspective in the active {@link IWorkbenchPage}.
+    * @param perspectiveDescriptor The perspective to open.
+    */
+   public static void openPerspective(final IPerspectiveDescriptor perspectiveDescriptor) {
+      TestCase.assertNotNull(perspectiveDescriptor);
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            IWorkbenchPage page = WorkbenchUtil.getActivePage();
+            if (page != null) {
+               page.setPerspective(perspectiveDescriptor);
+            }
+         }
+      });
    }
 }
