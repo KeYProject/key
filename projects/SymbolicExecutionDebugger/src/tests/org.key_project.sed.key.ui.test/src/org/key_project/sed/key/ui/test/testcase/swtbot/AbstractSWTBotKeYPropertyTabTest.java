@@ -58,6 +58,7 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
       doKeYDebugTargetTest(projectName, 
                            Activator.PLUGIN_ID,
                            "data/statements", 
+                           false,
                            false, 
                            createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"), 
                            Boolean.FALSE, 

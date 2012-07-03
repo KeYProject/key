@@ -22,6 +22,7 @@ import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Before;
 import org.key_project.key4eclipse.starter.core.test.util.TestStarterCoreUtil;
@@ -433,6 +434,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     * the environment an the real test is done in the given {@link IKeYDebugTargetTestExecutor}.
     * @param projectName The project name.
     * @param pathInBundle The path to the test files in bundle.
+    * @param closePropertiesView Close properties sheet page?
     * @param closeExecutionTreeViews Close the views which visualizes the symbolic execution tree? Will increase the test perforamnce.
     * @param selector The {@link IMethodSelector} to select the {@link IMethod} to debug.
     * @param showMethodReturnValues Show method return values?
@@ -444,6 +446,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     */
    protected void doKeYDebugTargetTest(String projectName,
                                        String pathInBundle,
+                                       boolean closePropertiesView,
                                        boolean closeExecutionTreeViews,
                                        IMethodSelector selector,
                                        Boolean showMethodReturnValues,
@@ -454,6 +457,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
       doKeYDebugTargetTest(projectName,
                            Activator.PLUGIN_ID, 
                            pathInBundle, 
+                           closePropertiesView,
                            closeExecutionTreeViews, 
                            selector, 
                            showMethodReturnValues, 
@@ -469,6 +473,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     * @param projectName The project name.
     * @param plugin The plug-in which contains the test data.
     * @param pathInBundle The path to the test files in bundle.
+    * @param closePropertiesView Close properties sheet page?
     * @param closeExecutionTreeViews Close the views which visualizes the symbolic execution tree? Will increase the test perforamnce.
     * @param selector The {@link IMethodSelector} to select the {@link IMethod} to debug.
     * @param showMethodReturnValues Show method return values?
@@ -481,6 +486,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
    protected void doKeYDebugTargetTest(String projectName,
                                        String plugin,
                                        String pathInBundle,
+                                       boolean closePropertiesView,
                                        boolean closeExecutionTreeViews,
                                        IMethodSelector selector,
                                        Boolean showMethodReturnValues,
@@ -497,6 +503,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
       String originalRuntimeExceptions = null;
       boolean restoreExecutionTreeView = false;
       boolean restoreThumbinalExecutionTreeView = false;
+      boolean restorePropertiesView = false;
       List<? extends SWTBotEditor> oldEditors = bot.editors();
       try {
          // Open symbolic debug perspective
@@ -504,6 +511,9 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          if (closeExecutionTreeViews) {
             restoreExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeView.VIEW_ID);
             restoreThumbinalExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeThumbNailView.VIEW_ID);
+         }
+         if (closePropertiesView) {
+            restorePropertiesView = TestUtilsUtil.closeView(IPageLayout.ID_PROP_SHEET);
          }
          // Create test project
          IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
@@ -553,6 +563,9 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
             }
          }
          // Restore closed views if required
+         if (restorePropertiesView) {
+            TestUtilsUtil.openView(IPageLayout.ID_PROP_SHEET);
+         }
          if (restoreExecutionTreeView) {
             TestUtilsUtil.openView(ExecutionTreeView.VIEW_ID);
          }

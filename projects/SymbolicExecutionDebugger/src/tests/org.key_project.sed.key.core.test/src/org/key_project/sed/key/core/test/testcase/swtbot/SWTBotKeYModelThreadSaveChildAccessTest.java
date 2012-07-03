@@ -74,6 +74,7 @@ public class SWTBotKeYModelThreadSaveChildAccessTest extends AbstractKeYDebugTar
       };
       doKeYDebugTargetTest("SWTBotKeYModelThreadSaveChildAccessTest_testChildAccessOfElseIfTest",
                            "data/elseIfTest/test",
+                           true,
                            true, // Must be true because otherwise instantiates the sed visualization all children!
                            createMethodSelector("ElseIfTest", "elseIf", "I"),
                            Boolean.FALSE,

@@ -83,6 +83,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          doKeYDebugTargetTest(projectName,
                               "data/simpleIf/test",
                               true,
+                              true,
                               createMethodSelector("SimpleIf", "min", "I", "I"),
                               Boolean.FALSE,
                               null,
@@ -158,7 +159,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          };
          doKeYDebugTargetTest(projectName,
                               "data/simpleIf/test",
-                              false,
+                              true,
+                              true,
                               createMethodSelector("SimpleIf", "min", "I", "I"),
                               Boolean.FALSE,
                               Boolean.FALSE,
@@ -225,7 +227,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
          };
          doKeYDebugTargetTest(projectName,
                               "data/simpleIf/test",
-                              false,
+                              true,
+                              true,
                               createMethodSelector("SimpleIf", "min", "I", "I"),
                               null,
                               Boolean.FALSE,
