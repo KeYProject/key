@@ -23,7 +23,11 @@ public final class StrategyProperties extends Properties {
     private static final long serialVersionUID = 8651946636880456925L;
     public final static String STOPMODE_OPTIONS_KEY = "STOPMODE_OPTIONS_KEY";
     public final static String STOPMODE_DEFAULT = "STOPMODE_DEFAULT";
-    public final static String STOPMODE_NONCLOSE = "STOPMODE_NONCLOSE";    
+    public final static String STOPMODE_NONCLOSE = "STOPMODE_NONCLOSE";
+    
+    public final static String RETREAT_MODE_OPTIONS_KEY = "RETREAT_MODE_OPTIONS_KEY";
+    public final static String RETREAT_MODE_NONE = "RETREAT_MODE_NONE";
+    public final static String RETREAT_MODE_RETREAT = "RETREAT_MODE_RETREAT";
 
     public final static String SPLITTING_OPTIONS_KEY = "SPLITTING_OPTIONS_KEY";
     public final static String SPLITTING_NORMAL = "SPLITTING_NORMAL";
@@ -87,7 +91,8 @@ public final class StrategyProperties extends Properties {
 
     //String identities.
     private static final String[] stringPool = {
-    	STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT, STOPMODE_NONCLOSE,    
+    	STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT, STOPMODE_NONCLOSE,
+    	RETREAT_MODE_OPTIONS_KEY, RETREAT_MODE_NONE, RETREAT_MODE_RETREAT,
     	SPLITTING_OPTIONS_KEY, SPLITTING_NORMAL, SPLITTING_OFF, SPLITTING_DELAYED,
     	LOOP_OPTIONS_KEY, LOOP_EXPAND, LOOP_EXPAND_BOUNDED, LOOP_INVARIANT, LOOP_NONE,
     	METHOD_OPTIONS_KEY, METHOD_EXPAND, METHOD_CONTRACT, METHOD_NONE,
@@ -116,6 +121,7 @@ public final class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             defaultMap.setProperty(USER_TACLETS_OPTIONS_KEY(i), USER_TACLETS_OFF);
         defaultMap.setProperty(STOPMODE_OPTIONS_KEY, STOPMODE_DEFAULT);
+        defaultMap.setProperty(RETREAT_MODE_OPTIONS_KEY, RETREAT_MODE_NONE);
         defaultMap.setProperty(VBT_PHASE, VBT_SYM_EX);
         defaultMap.setProperty(AUTO_INDUCTION_OPTIONS_KEY, AUTO_INDUCTION_OFF); //chrisg        
     }
@@ -132,6 +138,7 @@ public final class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             put(USER_TACLETS_OPTIONS_KEY(i), defaultMap.get(USER_TACLETS_OPTIONS_KEY(i)));
         put(STOPMODE_OPTIONS_KEY, defaultMap.get(STOPMODE_OPTIONS_KEY));
+        put(RETREAT_MODE_OPTIONS_KEY, defaultMap.get(RETREAT_MODE_OPTIONS_KEY));
         put(VBT_PHASE, defaultMap.getProperty(VBT_PHASE));
         put(AUTO_INDUCTION_OPTIONS_KEY, defaultMap.getProperty(AUTO_INDUCTION_OPTIONS_KEY));
     }
@@ -160,6 +167,7 @@ public final class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             sp.put(USER_TACLETS_OPTIONS_KEY(i), readSingleOption(p,USER_TACLETS_OPTIONS_KEY(i)));
         sp.put(STOPMODE_OPTIONS_KEY, readSingleOption(p,STOPMODE_OPTIONS_KEY));
+        sp.put(RETREAT_MODE_OPTIONS_KEY, readSingleOption(p,RETREAT_MODE_OPTIONS_KEY));
         sp.put(VBT_PHASE, readSingleOption(p,VBT_PHASE));
         sp.put(AUTO_INDUCTION_OPTIONS_KEY, readSingleOption(p,AUTO_INDUCTION_OPTIONS_KEY));
         return sp;
@@ -186,6 +194,7 @@ public final class StrategyProperties extends Properties {
         for (int i = 1; i <= USER_TACLETS_NUM; ++i)
             p.put("[StrategyProperty]"+USER_TACLETS_OPTIONS_KEY(i), get(USER_TACLETS_OPTIONS_KEY(i)));
         p.put("[StrategyProperty]"+STOPMODE_OPTIONS_KEY, get(STOPMODE_OPTIONS_KEY));
+        p.put("[StrategyProperty]"+RETREAT_MODE_OPTIONS_KEY, get(RETREAT_MODE_OPTIONS_KEY));
         p.put("[StrategyProperty]"+VBT_PHASE, get(VBT_PHASE));
         p.put("[StrategyProperty]"+AUTO_INDUCTION_OPTIONS_KEY, get(AUTO_INDUCTION_OPTIONS_KEY));
     }

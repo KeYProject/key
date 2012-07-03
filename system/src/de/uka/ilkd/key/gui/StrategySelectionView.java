@@ -71,7 +71,8 @@ public final class StrategySelectionView extends JPanel {
     ButtonGroup queryAxiomGroup = new ButtonGroup();
     ButtonGroup nonLinArithGroup = new ButtonGroup();
     ButtonGroup quantifierGroup = new ButtonGroup();
-    ButtonGroup stopModeGroup = new ButtonGroup();    
+    ButtonGroup stopModeGroup = new ButtonGroup();
+    ButtonGroup retreatModeGroup = new ButtonGroup();
     ButtonGroup autoInductionGroup = new ButtonGroup();     
     ButtonGroup[] userTacletsGroup = new ButtonGroup[StrategyProperties.USER_TACLETS_NUM];
     {
@@ -86,6 +87,8 @@ public final class StrategySelectionView extends JPanel {
     JRadioButtonHashMap rdBut14;
     JRadioButtonHashMap rdBut17;
     JRadioButtonHashMap rdBut18;
+    private JRadioButtonHashMap noRetreat;
+    private JRadioButtonHashMap retreat;
     private JRadioButtonHashMap splittingNormal;
     private JRadioButtonHashMap splittingOff;
     private JRadioButtonHashMap splittingDelayed;
@@ -209,6 +212,30 @@ public final class StrategySelectionView extends JPanel {
                                 "closable goal is encountered.</html>");
         stopModeGroup.add(rdBut18);
         addJavaDLOption ( rdBut18, javaDLOptionsLayout, 4, yCoord, 2 );        
+       
+        
+        ++yCoord;
+        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
+        ////////////////////////////////////////////////////////////////////////
+        ++yCoord;
+        
+        addJavaDLOption ( new JLabel ( "Treatment of new unclosable goals" ),
+                    javaDLOptionsLayout, 1, yCoord, 7 );
+        
+        ++yCoord;
+
+        noRetreat = new JRadioButtonHashMap("None", StrategyProperties.RETREAT_MODE_NONE, true, false);
+        noRetreat.setToolTipText( "<html>Do not retreat after automatic proof.</html>");
+        retreatModeGroup.add(noRetreat);
+        addJavaDLOption ( noRetreat, javaDLOptionsLayout, 2, yCoord, 2 );        
+
+        retreat = new JRadioButtonHashMap(
+                "AutoPrune", StrategyProperties.RETREAT_MODE_RETREAT, false, false);
+        retreat.setToolTipText( "<html>If new goals don't get closed, retreat back<br>" +
+                        "to the goals where the automatic proof<br>" +
+                        "was started.</html>");
+        retreatModeGroup.add(retreat);
+        addJavaDLOption ( retreat, javaDLOptionsLayout, 4, yCoord, 2 );        
        
         
         ++yCoord;
@@ -664,7 +691,7 @@ public final class StrategySelectionView extends JPanel {
         });
         
         JButton go = new JButton(mainWindow.getAutoModeAction());
-
+        
         JPanel timeout = createTimeoutSpinner();
 
         JPanel goPanel = new JPanel ();
@@ -683,18 +710,18 @@ public final class StrategySelectionView extends JPanel {
         gbcpanel5.insets = new Insets (4, 4, 4, 4);
         goLayout.setConstraints(go, gbcpanel5);
         goPanel.add(go);
-
-        gbcpanel5.gridx = 1;
-        gbcpanel5.gridy = 1;
+        
+        gbcpanel5.gridx = 2;
+        gbcpanel5.gridy = 0;
         gbcpanel5.gridwidth = 1;
         gbcpanel5.gridheight = 1;
         gbcpanel5.fill = GridBagConstraints.NONE;
         gbcpanel5.weightx = 1;
         gbcpanel5.weighty = 0;
         gbcpanel5.anchor = GridBagConstraints.WEST;
-        gbcpanel5.insets = new Insets (0, 0, 0, 0);
+        gbcpanel5.insets = new Insets (0, 0, 0, 0);        
         
-        gbcpanel5.gridx = 2;
+        gbcpanel5.gridx = 3;
         gbcpanel5.gridy = 0;
         gbcpanel5.gridwidth = 1;
         gbcpanel5.gridheight = 1;
@@ -742,6 +769,8 @@ public final class StrategySelectionView extends JPanel {
         rdBut14.addActionListener(optListener);
         rdBut17.addActionListener(optListener);
         rdBut18.addActionListener(optListener);
+        retreat.addActionListener(optListener);
+        noRetreat.addActionListener(optListener);
         depOn.addActionListener(optListener);
         depOff.addActionListener(optListener);
         queryOn.addActionListener(optListener);
@@ -1017,7 +1046,11 @@ public final class StrategySelectionView extends JPanel {
             String stopmodeOptions = p.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY);
             JRadioButton bStopModeActive = getStrategyOptionButton(stopmodeOptions, 
                     StrategyProperties.STOPMODE_OPTIONS_KEY);
-            bStopModeActive.setSelected(true);  
+            bStopModeActive.setSelected(true);            
+            String retreatModeOptions = p.getProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY);
+            JRadioButton bRetreatModeActive = getStrategyOptionButton(retreatModeOptions, 
+                    StrategyProperties.RETREAT_MODE_OPTIONS_KEY);
+            bRetreatModeActive.setSelected(true);            
             String autoInductionOptions = p.getProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY); 
             JRadioButton bAutoInductionOptions = getStrategyOptionButton(autoInductionOptions, 
                     StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY);
@@ -1132,6 +1165,8 @@ public final class StrategySelectionView extends JPanel {
                        quantifierGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.STOPMODE_OPTIONS_KEY, 
                        stopModeGroup.getSelection().getActionCommand());
+        p.setProperty( StrategyProperties.RETREAT_MODE_OPTIONS_KEY, 
+                retreatModeGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, 
                        autoInductionGroup.getSelection().getActionCommand());
         
