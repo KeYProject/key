@@ -303,7 +303,7 @@ public class ExecutionNodeReader {
     */
    protected AbstractKeYlessExecutionNode createExecutionNode(IExecutionNode parent, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       if (ExecutionNodeWriter.TAG_BRANCH_CONDITION.equals(qName)) {
-         return new KeYlessBranchCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getBranchCondition(attributes));
+         return new KeYlessBranchCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getBranchCondition(attributes), isMergedBranchCondition(attributes));
       }
       else if (ExecutionNodeWriter.TAG_BRANCH_NODE.equals(qName)) {
          return new KeYlessBranchNode(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
@@ -431,6 +431,15 @@ public class ExecutionNodeReader {
     */
    protected boolean isPathConditionChanged(Attributes attributes) {
       return Boolean.valueOf(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_PATH_CONDITION_CHANGED));
+   }
+
+   /**
+    * Returns the merged branch condition value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isMergedBranchCondition(Attributes attributes) {
+      return Boolean.valueOf(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_MERGED_BRANCH_CONDITION));
    }
    
    /**
@@ -634,20 +643,28 @@ public class ExecutionNodeReader {
       private String formatedBranchCondition;
       
       /**
+       * Merged branch condition?
+       */
+      private boolean mergedBranchCondition;
+      
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param formatedBranchCondition The formated branch condition.
+       * @param mergedBranchCondition Merged branch condition?
        */
       public KeYlessBranchCondition(IExecutionNode parent, 
                                     String name, 
                                     String formatedPathCondition, 
                                     boolean pathConditionChanged,
-                                    String formatedBranchCondition) {
+                                    String formatedBranchCondition,
+                                    boolean mergedBranchCondition) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.formatedBranchCondition = formatedBranchCondition;
+         this.mergedBranchCondition = mergedBranchCondition;
       }
 
       /**
@@ -679,7 +696,7 @@ public class ExecutionNodeReader {
        */
       @Override
       public boolean isMergedBranchCondition() {
-         return false;
+         return mergedBranchCondition;
       }
 
       /**

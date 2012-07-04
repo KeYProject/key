@@ -57,7 +57,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
-             false);
+             true);
    }
    
    /**

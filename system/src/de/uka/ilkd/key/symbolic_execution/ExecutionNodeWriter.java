@@ -102,6 +102,11 @@ public class ExecutionNodeWriter {
     * A path which refers to an {@link IExecutionNode} starting from the root.
     */
    public static final String ATTRIBUTE_PATH_IN_TREE = "path";
+
+   /**
+    * Attribute naem to store {@link IExecutionBranchCondition#isMergedBranchCondition()}.
+    */
+   public static final String ATTRIBUTE_MERGED_BRANCH_CONDITION = "mergedBranchCondition";
    
    /**
     * The default enconding.
@@ -297,6 +302,7 @@ public class ExecutionNodeWriter {
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       attributeValues.put(ATTRIBUTE_BRANCH_CONDITION, node.getFormatedBranchCondition());
+      attributeValues.put(ATTRIBUTE_MERGED_BRANCH_CONDITION, node.isMergedBranchCondition() + "");
       appendStartTag(level, TAG_BRANCH_CONDITION, attributeValues, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
