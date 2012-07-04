@@ -29,9 +29,10 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import de.uka.ilkd.key.gui.smt.ClickableMessageBox.ClickableMessageBoxListener;
 import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
 import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
+import de.uka.ilkd.key.gui.utilities.ClickableMessageBox;
+import de.uka.ilkd.key.gui.utilities.ClickableMessageBox.ClickableMessageBoxListener;
 
 
 

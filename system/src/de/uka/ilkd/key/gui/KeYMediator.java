@@ -916,7 +916,8 @@ public class KeYMediator {
                             null,
                             "",
                     new InspectorForDecisionPredicates(getProof().getServices(),invokedNode,   
-                            DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT), true);    
+                            DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT,
+                            DelayedCutProcessor.getApplicationChecks()), true);    
             
             if (result == null) {
                 return false;

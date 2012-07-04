@@ -6,7 +6,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 
-
+/**
+ * Stores the communication between KeY and an external solver: Contains a list that stores the messages 
+ * that has been sent from the solver to KeY and vice versa.
+ * 
+ * Further, it also contains the final result of the solver. 
+ */
 public class SolverCommunication {
 	public static SolverCommunication EMPTY = new SolverCommunication();
 			
@@ -20,7 +25,11 @@ public class SolverCommunication {
 	
 	private List<Throwable> exceptions = Collections.synchronizedList(new LinkedList<Throwable> ());
 	
+	/**
+	 * The message type depends on the channel which was used for sending the message.
+	 */
 	public enum MessageType {Input,Output,Error};
+	
 	
 	public static class Message{
 		private final String content;
@@ -42,8 +51,12 @@ public class SolverCommunication {
 	}
 	
 
-	
+	/**
+	 * Returns all messages that were sent between KeY and the solver.
+	 */
 	public Iterable<String> getMessages() {
+		// return an new iterable object in order to guarantee that the list of messgages 
+		// cannot be changed.
 		return new Iterable<String>() {
 			
 			@Override
@@ -76,6 +89,9 @@ public class SolverCommunication {
 		return finalResult;
 	}
 	
+	/**
+	 * Returns the current state of the communication. The states are defined by the solver classes.
+	 */
 	public int getState() {
 		return state;
 	}

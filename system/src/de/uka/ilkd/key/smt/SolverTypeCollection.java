@@ -13,6 +13,9 @@ package de.uka.ilkd.key.smt;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+/**
+ * Stores a set of solver types. This class can be used in order to encapsulate multiple solvers.
+ */
 public class SolverTypeCollection implements Iterable<SolverType> {
     public final static SolverTypeCollection EMPTY_COLLECTION = new SolverTypeCollection();
 
@@ -69,47 +72,47 @@ public class SolverTypeCollection implements Iterable<SolverType> {
         }
         return hashCode;
     }
-    
-    public LinkedList<SolverType> getTypes() {
-	return types;
-    }
 
-    public boolean isUsable() {
-	int usableCount = 0;
-	for (SolverType type : types) {
-	    if (type.isInstalled(false)) {
-		usableCount++;
-	    }
+	public LinkedList<SolverType> getTypes() {
+		return types;
 	}
 
-	return usableCount >= minUsableSolver;
-    }
-
-    public String name() {
-	return name;
-    }
-
-    public String toString() {
-	String s = "";
-
-	int i = 0;
-	for (SolverType type : types) {
-	    if (type.isInstalled(false)) {
-		if (i > 0) {
-		    s += ", ";
+	public boolean isUsable() {
+		int usableCount = 0;
+		for (SolverType type : types) {
+			if (type.isInstalled(false)) {
+				usableCount++;
+			}
 		}
-		s += type.getName();
-		i++;
-	    }
-	}
-	if (s.isEmpty()) {
-	    return "No solver available.";
-	}
-	return s;
-    }
 
-    @Override
-    public Iterator<SolverType> iterator() {
-	return types.iterator();
-    }
+		return usableCount >= minUsableSolver;
+	}
+
+	public String name() {
+		return name;
+	}
+
+	public String toString() {
+		String s = "";
+
+		int i = 0;
+		for (SolverType type : types) {
+			if (type.isInstalled(false)) {
+				if (i > 0) {
+					s += ", ";
+				}
+				s += type.getName();
+				i++;
+			}
+		}
+		if (s.isEmpty()) {
+			return "No solver available.";
+		}
+		return s;
+	}
+
+	@Override
+	public Iterator<SolverType> iterator() {
+		return types.iterator();
+	}
 }

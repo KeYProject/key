@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
@@ -23,10 +22,18 @@ import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
 import de.uka.ilkd.key.proof.delayedcut.NodeGoalPair;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
+
+
+/** The JoinProcessor is responsible for executing the joining. Let N1 and N2 be the nodes which should be 
+ * joined and let N be the node where the branches of N1 and N2 join. Further let F be the given decision
+ * formula. Then the following steps are applied:
+ * 1. Based on the formulas contained in n1 and n2 and the given decision formula F, a further Formula F'
+ * created which is used for the second step.
+ * 2. Based on F' the delayed-cut mechanism is applied on N.
+ * 3. The created update in F' is simplified. 
+ */
 
 public class JoinProcessor implements Runnable{
     private boolean used = false;
