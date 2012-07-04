@@ -51,7 +51,12 @@ public class KeYVariable extends AbstractSEDVariable {
     */
    @Override
    public String getName() throws DebugException {
-      return executionVariable.getName();
+      try {
+         return executionVariable.getName();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute name.", e));
+      }
    }
 
    /**

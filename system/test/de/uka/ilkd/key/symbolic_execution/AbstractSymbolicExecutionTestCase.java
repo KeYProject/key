@@ -233,8 +233,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param toSearchIn The node to search in.
     * @param childToSearch The node to search.
     * @return The found node.
+    * @throws ProofInputException Occurred Exception.
     */
-   protected static IExecutionNode searchExecutionNode(IExecutionNode toSearchIn, IExecutionNode childToSearch) {
+   protected static IExecutionNode searchExecutionNode(IExecutionNode toSearchIn, IExecutionNode childToSearch) throws ProofInputException {
       // Make sure that parameters are valid
       assertNotNull(toSearchIn);
       assertNotNull(childToSearch);
@@ -264,8 +265,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param parentToSearchIn The parent to search in its children.
     * @param directChildToSearch The child to search.
     * @return The found child.
+    * @throws ProofInputException Occurred Exception.
     */
-   protected static IExecutionNode searchDirectChildNode(IExecutionNode parentToSearchIn, IExecutionNode directChildToSearch) {
+   protected static IExecutionNode searchDirectChildNode(IExecutionNode parentToSearchIn, IExecutionNode directChildToSearch) throws ProofInputException {
       // Make sure that parameters are valid
       assertNotNull(parentToSearchIn);
       assertNotNull(directChildToSearch);
@@ -585,11 +587,16 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param containerTypeName The name of the type which contains the method.
     * @param methodFullName The method name to search.
+    * @param mergeBranchConditions Merge branch conditions?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProofInputException Occurred Exception.
     * @throws FileNotFoundException Occurred Exception.
     */
-   protected static SymbolicExecutionEnvironment<CustomConsoleUserInterface> createSymbolicExecutionEnvironment(File baseDir, String javaPathInBaseDir, String containerTypeName, String methodFullName) throws ProofInputException, FileNotFoundException {
+   protected static SymbolicExecutionEnvironment<CustomConsoleUserInterface> createSymbolicExecutionEnvironment(File baseDir, 
+                                                                                                                String javaPathInBaseDir, 
+                                                                                                                String containerTypeName, 
+                                                                                                                String methodFullName,
+                                                                                                                boolean mergeBranchConditions) throws ProofInputException, FileNotFoundException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
@@ -609,7 +616,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
       // Create symbolic execution tree which contains only the start node at beginning
-      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof);
+      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, mergeBranchConditions);
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<CustomConsoleUserInterface>(ui, initConfig, builder);

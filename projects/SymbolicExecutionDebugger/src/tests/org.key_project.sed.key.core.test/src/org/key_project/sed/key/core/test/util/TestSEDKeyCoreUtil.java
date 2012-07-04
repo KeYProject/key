@@ -51,12 +51,14 @@ public final class TestSEDKeyCoreUtil {
     * @param showMethodReturnValues Show method return values? Use {@code null} to use default value.
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node? Use {@code null} to use default value.
     * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
+    * @param mergeBranchConditions Merge branch conditions?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IMethod method,
                                 final Boolean showMethodReturnValues,
                                 final Boolean showVariablesOfSelectedDebugNode,
-                                final Boolean showKeYMainWindow) throws Exception {
+                                final Boolean showKeYMainWindow,
+                                final Boolean mergeBranchConditions) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -71,6 +73,9 @@ public final class TestSEDKeyCoreUtil {
                }
                if (showKeYMainWindow != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindow);
+               }
+               if (mergeBranchConditions != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
                }
                config = wc.doSave();
                DebugUITools.launch(config, KeySEDUtil.MODE);

@@ -66,14 +66,15 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           }
           // Instantiate proof
           boolean showKeYMainWindow = KeySEDUtil.isShowKeYMainWindow(configuration);
-          SymbolicExecutionEnvironment<?> environment = instantiateProof(configuration, method, useExistingContract, existingContract, showKeYMainWindow);
+          boolean mergeBranchConditions = KeySEDUtil.isMergeBranchConditions(configuration);
+          SymbolicExecutionEnvironment<?> environment = instantiateProof(configuration, method, useExistingContract, existingContract, showKeYMainWindow, mergeBranchConditions);
           if (environment == null) {
               throw new CoreException(LogUtil.getLogger().createErrorStatus("Symbolic execution environment was not instantiated."));
           }
           // Add debug target to ILaunch
           boolean showMethodReturnValues = KeySEDUtil.isShowMethodReturnValuesInDebugNodes(configuration);
           boolean showVariablesOfSelectedDebugNode = KeySEDUtil.isShowVariablesOfSelectedDebugNode(configuration);
-          KeYLaunchSettings settings = new KeYLaunchSettings(method, useExistingContract, existingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
+          KeYLaunchSettings settings = new KeYLaunchSettings(method, useExistingContract, existingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
           KeYDebugTarget target = new KeYDebugTarget(launch, environment, settings);
           launch.addDebugTarget(target);
        }
@@ -91,14 +92,17 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
      * @param method The {@link IMethod} to debug.
      * @param useExistingContract Use existing contracts?
      * @param existingContract The existing contract to use.
+     * @param showKeYMainWindow Show KeY's main window?
+     * @param mergeBranchConditions Merge branch conditions?
      * @return The instantiated {@link SymbolicExecutionEnvironment} which contains all relevant information for symbolic execution.
      * @throws Exception Occurred Exception
      */
     protected SymbolicExecutionEnvironment<?> instantiateProof(ILaunchConfiguration configuration,
-                                     IMethod method,
-                                     boolean useExistingContract,
-                                     String existingContract,
-                                     boolean showKeYMainWindow) throws Exception {
+                                                               IMethod method,
+                                                               boolean useExistingContract,
+                                                               String existingContract,
+                                                               boolean showKeYMainWindow,
+                                                               boolean mergeBranchConditions) throws Exception {
         // make sure that the method has a resource
         Assert.isNotNull(method.getResource(), "Method \"" + method + "\" is not part of a workspace resource.");
         // Make sure that the location is contained in a Java project
@@ -115,10 +119,10 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
         Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
         // Instantiate proof in KeY's main window.
         if (showKeYMainWindow) {
-           return instantiateProofInUserInterface(configuration.getName(), method, useExistingContract, existingContract, location, bootClassPath, classPaths);
+           return instantiateProofInUserInterface(configuration.getName(), method, useExistingContract, existingContract, location, bootClassPath, classPaths, mergeBranchConditions);
         }
         else {
-           return instantiateProofWithoutUserInterface(configuration.getName(), method, useExistingContract, existingContract, location, bootClassPath, classPaths);
+           return instantiateProofWithoutUserInterface(configuration.getName(), method, useExistingContract, existingContract, location, bootClassPath, classPaths, mergeBranchConditions);
         }
     }
     
@@ -128,7 +132,8 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                                                    String existingContract,
                                                                                    File location, 
                                                                                    File bootClassPath, 
-                                                                                   List<File> classPaths) throws Exception {
+                                                                                   List<File> classPaths,
+                                                                                   boolean mergeBranchConditions) throws Exception {
        UserInterface ui = new CustomConsoleUserInterface(false);
        // Load location
        InitConfig initConfig = ui.load(location, classPaths, bootClassPath);
@@ -137,7 +142,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
        // Create proof
        Proof proof = ui.createProof(initConfig, input);
        // Create symbolic execution tree builder
-       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof);
+       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, mergeBranchConditions);
        // Create environment used for symbolic execution
        return new SymbolicExecutionEnvironment<UserInterface>(ui, initConfig, builder);
     }
@@ -148,7 +153,8 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                                               final String existingContract,
                                                                               final File location, 
                                                                               final File bootClassPath, 
-                                                                              final List<File> classPaths) throws Exception {
+                                                                              final List<File> classPaths,
+                                                                              final boolean mergeBranchConditions) throws Exception {
        // Open main window to avoid repaint bugs
        KeYUtil.openMainWindow();
        // Load location and open proof management dialog
@@ -167,7 +173,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                    // Create proof
                    Proof proof = MainWindow.getInstance().getUserInterface().createProof(initConfig, input);
                    // Create symbolic execution tree builder
-                   SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(main.getMediator(), proof);
+                   SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(main.getMediator(), proof, mergeBranchConditions);
                    // Create environment used for symbolic execution
                    setResult(new SymbolicExecutionEnvironment<UserInterface>(main.getUserInterface(), initConfig, builder));
                }

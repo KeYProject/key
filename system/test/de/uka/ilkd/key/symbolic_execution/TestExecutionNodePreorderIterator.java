@@ -8,6 +8,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
@@ -23,7 +24,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
    /**
     * Tests a tree of {@link IExecutionNode}s with three levels after root.
     */
-   public void testNodesThreeLevel() {
+   public void testNodesThreeLevel() throws ProofInputException {
       // Create tree to test
       UserInterface ui = new CustomConsoleUserInterface(false);
       KeYMediator mediator = new KeYMediator(ui);
@@ -70,7 +71,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
    /**
     * Tests a tree of {@link IExecutionNode}s with two levels after root.
     */
-   public void testNodesTwoLevel() {
+   public void testNodesTwoLevel() throws ProofInputException {
       // Create tree to test
       UserInterface ui = new CustomConsoleUserInterface(false);
       KeYMediator mediator = new KeYMediator(ui);
@@ -109,7 +110,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
    /**
     * Tests a tree of {@link IExecutionNode}s with one level after root.
     */
-   public void testNodesOneLevel() {
+   public void testNodesOneLevel() throws ProofInputException {
       // Create tree to test
       UserInterface ui = new CustomConsoleUserInterface(false);
       KeYMediator mediator = new KeYMediator(ui);
@@ -140,7 +141,7 @@ public class TestExecutionNodePreorderIterator extends TestCase {
    /**
     * Tests only a root {@link IExecutionNode}.
     */
-   public void testEmptyRoot() {
+   public void testEmptyRoot() throws ProofInputException {
       // Create tree to test
       UserInterface ui = new CustomConsoleUserInterface(false);
       KeYMediator mediator = new KeYMediator(ui);
@@ -158,9 +159,10 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     * expected trees.
     * @param element The {@link IExecutionNode} to iterate over.
     * @param expectedRoots The expected values.
+    * @throws ProofInputException Occurred Exception. 
     */
    protected void assertRoot(IExecutionNode element, 
-                             ExpectedNode[] expectedRoots) {
+                             ExpectedNode[] expectedRoots) throws ProofInputException {
       ExecutionNodePreorderIterator iter = new ExecutionNodePreorderIterator(element);
       assertExpectedNodes(iter, expectedRoots, false);
       assertFalse(iter.hasNext());
@@ -172,10 +174,11 @@ public class TestExecutionNodePreorderIterator extends TestCase {
     * @param iter The {@link ExecutionNodePreorderIterator} to test.
     * @param expectedRoots The expected model.
     * @param iterateOverSubtree Start new sub tree iteration at the current node?
+    * @throws ProofInputException Occurred Exception.
     */
    protected void assertExpectedNodes(ExecutionNodePreorderIterator iter, 
                                       ExpectedNode[] expectedRoots,
-                                      boolean iterateOverSubtree) {
+                                      boolean iterateOverSubtree) throws ProofInputException {
       if (expectedRoots != null) {
          assertNotNull(iter);
          for (ExpectedNode node : expectedRoots) {

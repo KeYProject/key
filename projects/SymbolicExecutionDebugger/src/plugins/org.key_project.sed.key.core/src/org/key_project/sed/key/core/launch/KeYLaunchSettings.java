@@ -45,6 +45,11 @@ public class KeYLaunchSettings {
     * Show KeY's main window?
     */
    private boolean showKeYMainWindow;
+   
+   /**
+    * Merge branch conditions?
+    */
+   private boolean mergeBranchConditions;
 
    /**
     * Constructor.
@@ -54,19 +59,22 @@ public class KeYLaunchSettings {
     * @param showMethodReturnValues Show method return values of {@link ISEDMethodReturn} instances?
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
+    * @param mergeBranchConditions Merge branch conditions?
     */
    public KeYLaunchSettings(IMethod method, 
                             boolean useExistingContract, 
                             String existingContract, 
                             boolean showMethodReturnValues,
                             boolean showVariablesOfSelectedDebugNode,
-                            boolean showKeYMainWindow) {
+                            boolean showKeYMainWindow,
+                            boolean mergeBranchConditions) {
       this.method = method;
       this.useExistingContract = useExistingContract;
       this.existingContract = existingContract;
       this.showMethodReturnValues = showMethodReturnValues;
       this.showVariablesOfSelectedDebugNode = showVariablesOfSelectedDebugNode;
       this.showKeYMainWindow = showKeYMainWindow;
+      this.mergeBranchConditions = mergeBranchConditions;
    }
 
    /**
@@ -115,5 +123,13 @@ public class KeYLaunchSettings {
     */
    public boolean isShowVariablesOfSelectedDebugNode() {
       return showVariablesOfSelectedDebugNode;
+   }
+
+   /**
+    * Checks if branch conditions are merged.
+    * @return Merge branch conditions?
+    */
+   public boolean isMergeBranchConditions() {
+      return mergeBranchConditions;
    }
 }

@@ -63,7 +63,11 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -952,5 +956,62 @@ public final class SymbolicExecutionUtil {
       else {
          return null;
       }
+   }
+   
+   /**
+    * Computes the branch condition of the given {@link Node}.
+    * @param node The {@link Node} to compute its branch condition.
+    * @return The computed branch condition.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public static Term computeBranchCondition(Node node) throws ProofInputException {
+      // Get applied taclet on parent proof node
+      Node parent = node.parent();
+      assert parent.getAppliedRuleApp() instanceof TacletApp; // Splits of built in rules are currently not supported.
+      TacletApp app = (TacletApp)parent.getAppliedRuleApp();
+      // Find goal template which has created the represented proof node
+      int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
+      TacletGoalTemplate goalTemplate = app.taclet().goalTemplates().take(childIndex).head();
+      // Apply instantiations of schema variables to sequent of goal template
+      Services services = node.proof().getServices();
+      SVInstantiations instantiations = app.instantiations();
+      ImmutableList<Term> antecedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().antecedent());
+      ImmutableList<Term> succedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().succedent());
+      // Construct branch condition from created antecedent and succedent terms as new implication 
+      Term left = TermBuilder.DF.and(antecedents);
+      Term right = TermBuilder.DF.or(succedents);
+      Term implication = TermBuilder.DF.imp(left, right);
+      Term result;
+      // Check if an update context is available
+      if (!instantiations.getUpdateContext().isEmpty()) {
+         // Append update context because otherwise the formula is evaluated in wrong state
+         result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), implication);
+         // Simplify branch condition
+         result = SymbolicExecutionUtil.simplify(node.proof(), result);
+      }
+      else {
+         // No update context, just use the implication as branch condition
+         result = implication;
+      }
+      return result;
+   }
+
+   /**
+    * Applies the schema variable instantiations on the given {@link Semisequent}.
+    * @param services The {@link Services} to use.
+    * @param svInst The schema variable instantiations.
+    * @param semisequent The {@link Semisequent} to apply instantiations on.
+    * @return The list of created {@link Term}s in which schema variables are replaced with the instantiation.
+    */
+   private static ImmutableList<Term> listSemisequentTerms(Services services, 
+                                                           SVInstantiations svInst, 
+                                                           Semisequent semisequent) {
+      ImmutableList<Term> terms = ImmutableSLList.nil();
+      for (SequentFormula sf : semisequent) {
+         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, svInst);
+         sf.formula().execPostOrder(visitor);
+         terms = terms.append(visitor.getTerm());
+      }
+      return terms;
    }
 }

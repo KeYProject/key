@@ -33,6 +33,11 @@ public class KeYSEDPreferences {
     * Preference key to define if KeY's main window should be shown or not.
     */
    public static final String SHOW_KEY_MAIN_WINDOW = "org.key_project.sed.key.core.preference.showKeYMainWindow";
+
+   /**
+    * Preference key to define that branch conditions are merged or not.
+    */
+   public static final String MERGE_BRANCH_CONDITIONS = "org.key_project.sed.key.core.preference.mergeBranchConditions";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -168,5 +173,37 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultShowVariablesOfSelectedDebugNode(boolean defaultValue) {
       getStore().setDefault(SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, defaultValue);
+   }
+   
+   /**
+    * Checks if branch conditions are merged or not.
+    * @return Merge branch conditions?
+    */
+   public static boolean isMergeBranchConditions() {
+      return getStore().getBoolean(MERGE_BRANCH_CONDITIONS);
+   }
+   
+   /**
+    * Checks if branch conditions are merged or not by default.
+    * @return Merge branch conditions by default?
+    */
+   public static boolean isDefaultMergeBranchConditions() {
+      return getStore().getDefaultBoolean(MERGE_BRANCH_CONDITIONS);
+   }
+   
+   /**
+    * Sets if branch conditions are merged or not.
+    * @param value Merge branch conditions?
+    */
+   public static void setMergeBranchConditions(boolean value) {
+      getStore().setValue(MERGE_BRANCH_CONDITIONS, value);
+   }
+   
+   /**
+    * Sets if branch conditions are merged or not by default.
+    * @param defaultValue Merge branch conditions by default?
+    */
+   public static void setDefaultMergeBranchConditions(boolean defaultValue) {
+      getStore().setDefault(MERGE_BRANCH_CONDITIONS, defaultValue);
    }
 }

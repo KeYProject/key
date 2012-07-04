@@ -89,6 +89,11 @@ public final class KeySEDUtil {
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW = "org.key_project.sed.key.core.launch.sed.key.attribute.showKeYMainWindow";
 
     /**
+     * The key of the attribute "merge branch conditions" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS = "org.key_project.sed.key.core.launch.sed.key.attribute.mergeBranchConditions";
+
+    /**
      * The launch mode supported by the Symbolic Execution Debugger based on KeY.
      */
     public static final String MODE = "debug";
@@ -223,6 +228,16 @@ public final class KeySEDUtil {
      */
     public static boolean isShowKeYMainWindow(ILaunchConfiguration configuration) throws CoreException {
         return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, KeYSEDPreferences.isShowKeYMainWindow()) : KeYSEDPreferences.isShowKeYMainWindow();
+    }
+    
+    /**
+     * Checks if branch conditions are merged.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} merge branch conditions, {@code false} do not merge branch conditions.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isMergeBranchConditions(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, KeYSEDPreferences.isMergeBranchConditions()) : KeYSEDPreferences.isMergeBranchConditions();
     }
     
     /**

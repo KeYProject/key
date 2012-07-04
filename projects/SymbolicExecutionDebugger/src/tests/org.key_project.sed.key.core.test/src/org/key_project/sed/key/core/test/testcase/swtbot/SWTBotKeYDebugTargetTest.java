@@ -36,6 +36,34 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
+   public void testElseIf_mergeBranchConditions() throws Exception {
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions",
+                                   "data/elseIfTest/test",
+                                   false,
+                                   createMethodSelector("ElseIfTest", "elseIf", "I"),
+                                   "data/elseIfTest/oracleMergeBranchConditions/ElseIfTest.xml",
+                                   false,
+                                   true);
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testSwitchCase_mergeBranchConditions() throws Exception {
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testSwitchCase_mergeBranchConditions",
+                                   "data/switchCaseTest/test",
+                                   false,
+                                   createMethodSelector("SwitchCaseTest", "switchCase", "I"),
+                                   "data/switchCaseTest/oracleMergeBranchConditions/SwitchCaseTest.xml",
+                                   false,
+                                   true);
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
    public void testLoopIteration_LoopWithMethod() throws Exception {
       assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testLoopIteration_LoopWithMethod",
                                    "data/loopIterationTest/test",
@@ -83,6 +111,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      true,
                      false,
                      false,
+                     false,
                      false);
    }
    
@@ -99,6 +128,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      8,
                      true,
+                     false,
                      false,
                      false,
                      false);
@@ -119,6 +149,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      true,
                      false,
                      false,
+                     false,
                      false);
    }
    
@@ -135,6 +166,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false,
                      8,
                      true,
+                     false,
                      false,
                      false,
                      false);
@@ -536,7 +568,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                    false,
                                    createMethodSelector("MethodHierarchyCallWithExceptionTest", "main"),
                                    "data/methodHierarchyCallWithExceptionTest/oracle/MethodHierarchyCallWithExceptionTest.xml",
-                                   true);
+                                   true,
+                                   false);
    }
    
    /**
@@ -549,7 +582,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                    false,
                                    createMethodSelector("MethodHierarchyCallTest", "main"),
                                    "data/methodHierarchyCallTest/oracle/MethodHierarchyCallTest.xml",
-                                   true);
+                                   true,
+                                   false);
    }
    
    /**
@@ -580,7 +614,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      false, 
                      false, 
                      false,
-                     true);
+                     true,
+                     false);
    }
    
    /**
@@ -595,6 +630,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                      "data/recursiveFibonacci/oracle/RecursiveFibonacci.xml",
                      false,
                      30,
+                     false,
                      false,
                      false,
                      false,
@@ -684,6 +720,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE, 
                            Boolean.FALSE, 
                            Boolean.FALSE,
+                           Boolean.FALSE,
                            6, 
                            executor);
    }
@@ -716,6 +753,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * @param selector {@link IMethodSelector} to select an {@link IMethod} to launch.
     * @param expectedModelPathInBundle Path to the oracle file in the bundle which defines the expected {@link ISEDDebugTarget} model.
     * @param includeCallStack Include call stack?
+    * @param mergeBranchConditions Merge branch conditions?
     * @throws Exception Occurred Exception.
     */
    protected void assertSEDModelRunAndStepInto(String projectName,
@@ -723,9 +761,10 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                                boolean clearProofListInKeYBeforeResume,
                                                IMethodSelector selector,
                                                String expectedModelPathInBundle,
-                                               boolean includeCallStack) throws Exception {
-      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, false, false);
-      assertSEDModel(projectName + "stepInto", pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, true, false);
+                                               boolean includeCallStack,
+                                               boolean mergeBranchConditions) throws Exception {
+      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, false, false, mergeBranchConditions);
+      assertSEDModel(projectName + "stepInto", pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, true, false, mergeBranchConditions);
    }
    
    /**
@@ -781,7 +820,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                  String expectedModelPathInBundle,
                                  boolean showMethodReturnValues,
                                  boolean stepIntoInsteadOfRun) throws Exception {
-      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 10, false, false, stepIntoInsteadOfRun, false);
+      assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, showMethodReturnValues, 10, false, false, stepIntoInsteadOfRun, false, false);
    }
    
    /**
@@ -805,6 +844,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * @param includeCallstack Include call stack?
     * @param stepIntoInsteadOfRun Use step into functionality instead of the run functionality to create the tree?
     * @param showKeYMainWindow Show KeY's main window?
+    * @param mergeBranchConditions Merge branch conditions?
     * @throws Exception Occurred Exception.
     */
    protected void assertSEDModel(String projectName,
@@ -817,7 +857,8 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                  final boolean includeVariables,
                                  final boolean includeCallstack,
                                  final boolean stepIntoInsteadOfRun,
-                                 final boolean showKeYMainWindow) throws Exception {
+                                 final boolean showKeYMainWindow,
+                                 final boolean mergeBranchConditions) throws Exception {
       IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
          @Override
          public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
@@ -915,6 +956,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.valueOf(showMethodReturnValues), 
                            Boolean.valueOf(includeVariables),
                            Boolean.valueOf(showKeYMainWindow),
+                           Boolean.valueOf(mergeBranchConditions),
                            timeoutFactor, 
                            executor);
    }
@@ -1028,6 +1070,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
+                           Boolean.FALSE,
                            8, 
                            executor);
    }
@@ -1123,6 +1166,7 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                            Boolean.FALSE,
                            Boolean.FALSE,
                            Boolean.TRUE,
+                           Boolean.FALSE,
                            8, 
                            executor);
    }

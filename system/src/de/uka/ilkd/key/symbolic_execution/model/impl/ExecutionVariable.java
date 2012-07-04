@@ -115,7 +115,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * {@inheritDoc}
     */
    @Override
-   protected String lazyComputeName() {
+   protected String lazyComputeName() throws ProofInputException {
       IProgramVariable pv = getProgramVariable();
       if (pv != null) {
          if (pv.name() instanceof ProgramElementName) {

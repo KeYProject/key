@@ -112,7 +112,12 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     */
    @Override
    public String getName() throws DebugException {
-      return executionNode.getName();
+      try {
+         return executionNode.getName();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute name.", e));
+      }
    }
 
    /**

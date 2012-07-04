@@ -95,7 +95,12 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
     */
    @Override
    public String getName() throws DebugException {
-      return executionNode.getName();
+      try {
+         return executionNode.getName();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute name.", e));
+      }
    }
 
    /**

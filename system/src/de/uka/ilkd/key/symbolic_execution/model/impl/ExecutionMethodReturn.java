@@ -84,7 +84,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     * {@inheritDoc}
     */
    @Override
-   protected String lazyComputeName() {
+   protected String lazyComputeName() throws ProofInputException {
       return createMethodReturnName(null, getMethodCall().getName());
    }
 

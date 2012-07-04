@@ -157,17 +157,26 @@ public class SymbolicExecutionTreeBuilder {
     * Contains the exception variable which is used to check if the executed program in proof terminates normally.
     */
    private IProgramVariable exceptionVariable;
+   
+   /**
+    * {@code true} merge branch conditions which means that a branch condition never contains another branch condition
+    * or {@code false} allow that branch conditions contains branch conditions.
+    */
+   private boolean mergeBranchConditions = false;
 
    /**
     * Constructor.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proof The {@link Proof} to extract the symbolic execution tree from.
     */
-   public SymbolicExecutionTreeBuilder(KeYMediator mediator, Proof proof) {
+   public SymbolicExecutionTreeBuilder(KeYMediator mediator, 
+                                       Proof proof,
+                                       boolean mergeBranchConditions) {
       assert mediator != null;
       assert proof != null;
       this.mediator = mediator;
       this.proof = proof;
+      this.mergeBranchConditions = mergeBranchConditions;
       this.exceptionVariable = extractExceptionVariable(proof);
       this.startNode = new ExecutionStartNode(mediator, proof.root());
       this.keyNodeMapping.put(proof.root(), this.startNode);
@@ -365,8 +374,29 @@ public class SymbolicExecutionTreeBuilder {
       public void completeTree() {
           for (Entry<AbstractExecutionNode, List<ExecutionBranchCondition>> entry : branchConditionsStack) {
              for (ExecutionBranchCondition condition : entry.getValue()) {
-                if (!JavaUtil.isEmpty(condition.getChildren())) {
-                   addChild(entry.getKey(), condition);
+                AbstractExecutionNode[] conditionsChildren = condition.getChildren(); 
+                if (!JavaUtil.isEmpty(conditionsChildren)) {
+                   if (mergeBranchConditions) {
+                      // Merge branch conditions if possible
+                      boolean addingToParentRequired = false;
+                      for (AbstractExecutionNode child : conditionsChildren) {
+                         if (child instanceof ExecutionBranchCondition) {
+                            ExecutionBranchCondition bcChild = (ExecutionBranchCondition)child;
+                            bcChild.addMergedProofNode(condition.getProofNode());
+                            addChild(entry.getKey(), child); // Move child one up in hierarchy
+                         }
+                         else {
+                            addingToParentRequired = true; // Adding of current branch condition is required because non branch condition children are available
+                         }
+                      }
+                      if (addingToParentRequired) {
+                         addChild(entry.getKey(), condition);
+                      }
+                   }
+                   else {
+                      // Add all branch conditions without merging
+                      addChild(entry.getKey(), condition);
+                   }
                 }
                 else {
                    keyNodeBranchConditionMapping.remove(condition.getProofNode());

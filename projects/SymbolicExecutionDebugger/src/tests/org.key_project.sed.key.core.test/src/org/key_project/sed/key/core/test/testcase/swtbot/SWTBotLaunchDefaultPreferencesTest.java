@@ -24,6 +24,79 @@ import de.uka.ilkd.key.gui.MainWindow;
  */
 public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTestCase {
    /**
+    * Tests the launch where branch conditions are merged.
+    */
+   @Test
+   public void testMergeBranchCondtions() throws Exception {
+      doTestShowVariableValues("SWTBotLaunchDefaultPreferencesTest_testMergeBranchCondtions", true);
+   }
+
+   /**
+    * Tests the launch where branch conditions are not merged.
+    */
+   @Test
+   public void testDoNotMergeBranchCondtions() throws Exception {
+      doTestShowVariableValues("SWTBotLaunchDefaultPreferencesTest_testDoNotMergeBranchCondtions", false);
+   }
+   
+   /**
+    * Does the test steps of {@link #testMergeBranchCondtions()}
+    * and {@link #testDoNotMergeBranchCondtions()}.
+    * @param projectName The project name to use.
+    * @param mergeBranchConditions Merge branch conditions?
+    * @throws Exception Occurred Exception
+    */
+   protected void doTestMergeBranchConditions(String projectName, 
+                                              final boolean mergeBranchConditions) throws Exception {
+      boolean originalMergeBranchConditions = KeYSEDPreferences.isMergeBranchConditions();
+      try {
+         // Set preference
+         SWTWorkbenchBot bot = new SWTWorkbenchBot();
+         SWTBotShell preferenceShell = TestUtilsUtil.openPreferencePage(bot, "Run/Debug", "Symbolic Execution Debugger (SED)", "KeY Launch Defaults");
+         if (mergeBranchConditions) {
+            preferenceShell.bot().checkBox("Merge branch conditions").select();
+         }
+         else {
+            preferenceShell.bot().checkBox("Merge branch conditions").deselect();
+         }
+         preferenceShell.bot().button("OK").click();
+         assertEquals(mergeBranchConditions, KeYSEDPreferences.isMergeBranchConditions());
+         // Launch something
+         IKeYDebugTargetTestExecutor executor = new IKeYDebugTargetTestExecutor() {
+            @Override
+            public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               // Get debug target TreeItem
+               SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, 0, 0, 0); // Select thread
+               // Do run
+               resume(bot, item, target);
+               if (mergeBranchConditions) {
+                  assertDebugTargetViaOracle(target, "data/switchCaseTest/oracleMergeBranchConditions/SwitchCaseTest.xml", false, false);
+               }
+               else {
+                  assertDebugTargetViaOracle(target, "data/switchCaseTest/oracle/SwitchCaseTest.xml", false, false);
+               }
+            }
+         };
+         doKeYDebugTargetTest(projectName,
+                              "data/switchCaseTest/test",
+                              true,
+                              true,
+                              createMethodSelector("SwitchCaseTest", "switchCase", "I"),
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              Boolean.FALSE,
+                              null,
+                              8,
+                              executor);
+      }
+      finally {
+         // Restore original value
+         KeYSEDPreferences.setMergeBranchConditions(originalMergeBranchConditions);
+         assertEquals(originalMergeBranchConditions, KeYSEDPreferences.isMergeBranchConditions());
+      }
+   }
+   
+   /**
     * Tests the launch where variable values are shown.
     */
    @Test
@@ -87,6 +160,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               createMethodSelector("SimpleIf", "min", "I", "I"),
                               Boolean.FALSE,
                               null,
+                              Boolean.FALSE,
                               Boolean.FALSE,
                               8,
                               executor);
@@ -165,6 +239,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               Boolean.FALSE,
                               Boolean.FALSE,
                               null,
+                              Boolean.FALSE,
                               8,
                               executor);
       }
@@ -231,6 +306,7 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
                               true,
                               createMethodSelector("SimpleIf", "min", "I", "I"),
                               null,
+                              Boolean.FALSE,
                               Boolean.FALSE,
                               Boolean.FALSE,
                               8,

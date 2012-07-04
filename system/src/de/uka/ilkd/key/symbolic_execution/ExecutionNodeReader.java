@@ -673,6 +673,30 @@ public class ExecutionNodeReader {
       public String getFormatedBranchCondition() {
          return formatedBranchCondition;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isMergedBranchCondition() {
+         return false;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Node[] getMergedProofNodes() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term[] getMergedBranchCondtions() throws ProofInputException {
+         return null;
+      }
    }
 
    /**

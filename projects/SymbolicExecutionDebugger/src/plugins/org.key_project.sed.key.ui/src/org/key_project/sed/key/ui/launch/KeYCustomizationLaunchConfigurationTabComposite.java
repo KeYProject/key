@@ -38,6 +38,11 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
    private Button showKeYMainWindowButton;
    
    /**
+    * Defines to merge branch conditions.
+    */
+   private Button mergeBranchConditionsButton;
+   
+   /**
     * Constructor.
     * @param parent The parent {@link Composite}.
     * @param style The style.
@@ -76,6 +81,14 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
             updateLaunchConfigurationDialog();
          }
       });
+      mergeBranchConditionsButton = widgetFactory.createButton(symbolicExecutionTreeGroup, "&Merge branch conditions", SWT.CHECK);
+      mergeBranchConditionsButton.setEnabled(isEditable());
+      mergeBranchConditionsButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateLaunchConfigurationDialog();
+         }
+      });
       // KeY
       Group keyGroup = widgetFactory.createGroup(composite, "KeY");
       keyGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -107,6 +120,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
          showMethodReturnValuesInDebugNodesButton.setSelection(KeySEDUtil.isShowMethodReturnValuesInDebugNodes(configuration));
          showVariablesOfSelectedDebugNodeButton.setSelection(KeySEDUtil.isShowVariablesOfSelectedDebugNode(configuration));
          showKeYMainWindowButton.setSelection(KeySEDUtil.isShowKeYMainWindow(configuration));
+         mergeBranchConditionsButton.setSelection(KeySEDUtil.isMergeBranchConditions(configuration));
       } 
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);
@@ -121,6 +135,7 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       showMethodReturnValuesInDebugNodesButton.setSelection(launchSettings.isShowMethodReturnValues());
       showVariablesOfSelectedDebugNodeButton.setSelection(launchSettings.isShowVariablesOfSelectedDebugNode());
       showKeYMainWindowButton.setSelection(launchSettings.isShowKeYMainWindow());
+      mergeBranchConditionsButton.setSelection(launchSettings.isMergeBranchConditions());
    }
 
    /**
@@ -131,5 +146,6 @@ public class KeYCustomizationLaunchConfigurationTabComposite extends AbstractTab
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValuesInDebugNodesButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNodeButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindowButton.getSelection());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditionsButton.getSelection());
    }
 }

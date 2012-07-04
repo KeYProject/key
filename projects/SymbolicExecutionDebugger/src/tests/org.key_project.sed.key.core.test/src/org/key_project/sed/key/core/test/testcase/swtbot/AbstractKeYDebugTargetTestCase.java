@@ -440,6 +440,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     * @param showMethodReturnValues Show method return values?
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
+    * @param mergeBranchConditions Merge branch conditions?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -452,6 +453,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
                                        Boolean showMethodReturnValues,
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
+                                       Boolean mergeBranchConditions,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       doKeYDebugTargetTest(projectName,
@@ -463,6 +465,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
                            showMethodReturnValues, 
                            showVariablesOfSelectedDebugNode, 
                            showKeYMainWindow, 
+                           mergeBranchConditions,
                            timeoutFactor, 
                            executor);
    }
@@ -479,6 +482,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     * @param showMethodReturnValues Show method return values?
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
+    * @param mergeBranchConditions Merge branch conditions?
     * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
     * @param executor The {@link IKeYDebugTargetTestExecutor} which does the real test steps.
     * @throws Exception Occurred Exception.
@@ -492,6 +496,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
                                        Boolean showMethodReturnValues,
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
+                                       Boolean mergeBranchConditions,
                                        int timeoutFactor,
                                        IKeYDebugTargetTestExecutor executor) throws Exception {
       // Create bot
@@ -535,7 +540,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          KeYUtil.setChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          assertEquals(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, KeYUtil.getChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow);
+         TestSEDKeyCoreUtil.launchKeY(method, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
