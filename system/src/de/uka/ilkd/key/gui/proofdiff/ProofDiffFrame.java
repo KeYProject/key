@@ -112,7 +112,7 @@ public class ProofDiffFrame extends JFrame {
             textArea.setFont(myFont);
             //            textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
             textArea.setEditable(false);
-            //            textArea.setText("<pre><b>Hello!</b> World</pre>");
+            textArea.setText(getHelpText());
             JScrollPane scroll = new JScrollPane(textArea);
             cp.add(scroll, BorderLayout.CENTER);
         }
@@ -121,13 +121,13 @@ public class ProofDiffFrame extends JFrame {
             {
                 this.from = new JTextField("", 5);
                 from.setToolTipText("Set the parent node to compare. May be empty for the direct predecessor");
-                bottom.add(new JLabel("Older node:"));
+                bottom.add(new JLabel("Parent node:"));
                 bottom.add(from);
             }
             {
                 this.to = new JTextField("", 5);
                 to.setToolTipText("Set the child node to compare. Must not be empty");
-                bottom.add(new JLabel("Newer node:"));
+                bottom.add(new JLabel("Proof node:"));
                 bottom.add(to);
             }
             {
@@ -217,7 +217,9 @@ public class ProofDiffFrame extends JFrame {
             return;
         }
 
-        LinkedList<Diff> diffs = new diff_match_patch().diff_main(sFrom, sTo, false);
+        diff_match_patch differ = new diff_match_patch();
+        differ.Diff_Timeout = 0.0f;
+        LinkedList<Diff> diffs = differ.diff_main(sFrom, sTo, false);
 
         StringBuilder sb = new StringBuilder();
         sb.append("<pre>");
@@ -238,8 +240,8 @@ public class ProofDiffFrame extends JFrame {
                 if(onlySpaces(diff.text)) {
                     sb.append(diff.text);
                 } else {
-                    sb.append("<font style='background-color: #80ff80;'>").
-                    append(toHtml(diff.text)).append("</font>");
+                    sb.append("<span style='background-color: #80ff80;'>").
+                    append(toHtml(diff.text)).append("</span>");
                 }
                 break;
             }
@@ -348,6 +350,26 @@ public class ProofDiffFrame extends JFrame {
         }
 
         return null;
+    }
+
+    private String getHelpText() {
+        return "<h1>Visual diff between sequences of Proof Nodes</h1>" +
+                "<p>This window can be used to select one or two sequents of an " +
+                "ongoing or closed proof. All actions refer to the currently selected proof.</p>" +
+                "<p>The textarea shows the <i>in-place diff</i> between two pretty printed " +
+                "sequences. Parts in <span style='background-color: #ff8080;text-decoration: " +
+                "line-through;'>striked-out red</span> are only present in the parent sequent and" +
+                "parts in <span style='background-color: #80ff80;'>green</span> are added in the " +
+                "second proof node.</p>" +
+                "<h3>One node mode</h3>" +
+                "<p>If you keep the left field (parent node) empty, the difference between the" +
+                "proof node and its direct predecessor is displayed in the text area.</p>" +
+                "<h3>Two node mode</h3>" +
+                "<p>If you specify two nodes, the difference between the declared sequents " +
+                "are displayed.</p>" +
+                "<h3>'Show selected node'</h3>" +
+                "<p>Use this button to use the currently selected proof node of the proof " +
+                "component as displayed proof node.";
     }
 
     public static void main(String[] args) {
