@@ -71,17 +71,17 @@ public class ProofDiffFrame extends JFrame {
      * The text area display the diff'ed text.
      */
     private JEditorPane textArea;
-    
+
     /**
      * The textfield holding the lower comparison number.
      */
     private JTextField from;
-    
+
     /**
      * The textfield holding the upper comparison number.
      */
     private JTextField to;
-    
+
     /**
      * The main window. This is how we access the {@link Proof} object.
      */
@@ -110,9 +110,9 @@ public class ProofDiffFrame extends JFrame {
             textArea.setContentType("text/html");
             Font myFont = UIManager.getFont(Config.KEY_FONT_CURRENT_GOAL_VIEW);
             textArea.setFont(myFont);
-//            textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
+            //            textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
             textArea.setEditable(false);
-            textArea.setText("<pre><b>Hello!</b> World</pre>");
+            //            textArea.setText("<pre><b>Hello!</b> World</pre>");
             JScrollPane scroll = new JScrollPane(textArea);
             cp.add(scroll, BorderLayout.CENTER);
         }
@@ -120,16 +120,19 @@ public class ProofDiffFrame extends JFrame {
             JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             {
                 this.from = new JTextField("", 5);
+                from.setToolTipText("Set the parent node to compare. May be empty for the direct predecessor");
                 bottom.add(new JLabel("Older node:"));
                 bottom.add(from);
             }
             {
                 this.to = new JTextField("", 5);
+                to.setToolTipText("Set the child node to compare. Must not be empty");
                 bottom.add(new JLabel("Newer node:"));
                 bottom.add(to);
             }
             {
                 JButton go =  new JButton("Show diff");
+                go.setToolTipText("Show difference between the two nodes specified here.");
                 go.addActionListener(new ActionListener() {
                     @Override public void actionPerformed(ActionEvent e) {
                         showDiff();
@@ -137,6 +140,17 @@ public class ProofDiffFrame extends JFrame {
                 });
                 bottom.add(go);
                 getRootPane().setDefaultButton(go);
+            }
+            {
+                JButton last = new JButton("Show selected node");
+                last.setToolTipText("Show difference introduced by the rule application leading to the selected node");
+                last.addActionListener(new ActionListener() {
+                    @Override public void actionPerformed(ActionEvent e) {
+                        setSelectedNode();
+                        showDiff();
+                    }
+                });
+                bottom.add(last);
             }
             {
                 JButton close = new JButton("Close");
@@ -148,8 +162,23 @@ public class ProofDiffFrame extends JFrame {
                 bottom.add(close);
             }
             cp.add(bottom, BorderLayout.SOUTH);
-            setSize(500, 600);
+            setSize(700, 600);
         }
+    }
+
+    /**
+     * Sets the to field to the selected node.
+     * Clears the fom field.
+     */
+    private void setSelectedNode() {
+
+        Node node = mainWindow.getMediator().getSelectedNode();
+        if(node == null) {
+            throw new IllegalArgumentException("There is no selected proof node!");
+        }
+
+        from.setText("");
+        to.setText(Integer.toString(node.serialNr()));
     }
 
     /**
@@ -161,9 +190,28 @@ public class ProofDiffFrame extends JFrame {
     private void showDiff() {
         String sFrom;
         String sTo;
+
         try {
-            sFrom = getProofNodeText(from.getText());
-            sTo = getProofNodeText(to.getText());
+            int toNo;
+            String toText = to.getText();
+            if(toText.length() == 0) {
+                throw new IllegalArgumentException("At least the second proof node must be specified");
+            } else {
+                toNo = Integer.parseInt(to.getText());
+                sTo = getProofNodeText(toNo);
+            }
+
+            String fromText = from.getText();
+            if(fromText.length() == 0) {
+                sFrom = getProofNodeText(getParent(toNo));
+            } else {
+                int fromNo = Integer.parseInt(fromText);
+                sFrom = getProofNodeText(fromNo);
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "This is not a number: " + e.getMessage(), 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         } catch (IllegalArgumentException e) {
             JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -179,12 +227,20 @@ public class ProofDiffFrame extends JFrame {
                 sb.append(toHtml(diff.text));
                 break;
             case DELETE:
-                sb.append("<span style='background-color: #ff8080;text-decoration: line-through;'>").
+                if(onlySpaces(diff.text)) {
+                    sb.append(diff.text);
+                } else {
+                    sb.append("<span style='background-color: #ff8080;text-decoration: line-through;'>").
                     append(toHtml(diff.text)).append("</span>");
+                }
                 break;
             case INSERT:
-                sb.append("<font style='background-color: #80ff80;'>").
+                if(onlySpaces(diff.text)) {
+                    sb.append(diff.text);
+                } else {
+                    sb.append("<font style='background-color: #80ff80;'>").
                     append(toHtml(diff.text)).append("</font>");
+                }
                 break;
             }
         }
@@ -193,6 +249,34 @@ public class ProofDiffFrame extends JFrame {
         String string = sb.toString();
 
         textArea.setText(string);
+    }
+
+    private boolean onlySpaces(CharSequence text) {
+        for (int i = 0; i < text.length(); i++) {
+            if(!Character.isWhitespace(text.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private int getParent(int no) {
+        Proof proof = mainWindow.getMediator().getProof();
+        if(proof == null) {
+            throw new IllegalArgumentException("There is no open proof!");
+        }
+
+        Node node = findNode(proof.root(), no);
+        if(node == null) {
+            throw new IllegalArgumentException(no + " is not a node in the proof");
+        }
+
+        Node parent = node.parent();
+        if(parent == null) {
+            throw new IllegalArgumentException(no + " has no parent node");
+        }
+
+        return parent.serialNr();
     }
 
     /**
@@ -220,7 +304,7 @@ public class ProofDiffFrame extends JFrame {
      * @throws IllegalArgumentException
      *             if the number string is bad or there is no proof.
      */
-    private String getProofNodeText(String nodeNumber) {
+    private String getProofNodeText(int nodeNumber) {
 
         Proof proof = mainWindow.getMediator().getProof();
 
@@ -228,14 +312,7 @@ public class ProofDiffFrame extends JFrame {
             throw new IllegalArgumentException("There is no open proof!");
         }
 
-        int number;
-        try {
-            number = Integer.parseInt(nodeNumber);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(nodeNumber + " is not a number");
-        }
-
-        Node node = findNode(proof.root(), number);
+        Node node = findNode(proof.root(), nodeNumber);
 
         if(node == null) {
             throw new IllegalArgumentException(nodeNumber + " does not denote a valid node");
