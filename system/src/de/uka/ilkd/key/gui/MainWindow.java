@@ -38,6 +38,7 @@ import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
@@ -732,6 +733,7 @@ public final class MainWindow extends JFrame  {
         }
         view.add(new ToolTipOptionsAction(this));
         
+        view.add(new ProofDiffFrame.Action(this));
         return view;
     }
 
