@@ -5,6 +5,11 @@ import java.io.InputStreamReader;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Little helper class that helps to check for the version of a solver. Mainly it provides 
+ * a method that starts the solver using certain parameters in order to obtain the version of that
+ * solver.
+ */
 public class VersionChecker {
 	public static final VersionChecker INSTANCE = new VersionChecker();
 	

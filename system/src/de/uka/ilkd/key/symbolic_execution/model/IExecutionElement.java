@@ -5,6 +5,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 
 /**
  * Defines the basic methods and properties each element in the 
@@ -45,8 +46,9 @@ public interface IExecutionElement {
    /**
     * Returns a human readable name which describes this element.
     * @return The human readable name which describes this element.
+    * @throws ProofInputException Occurred Exception.
     */
-   public String getName();
+   public String getName() throws ProofInputException;
    
    /**
     * Returns a human readable element type name.

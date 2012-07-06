@@ -46,6 +46,11 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    private KeYVariable[] variables;
 
    /**
+    * The method call stack.
+    */
+   private IKeYSEDDebugNode<?>[] callStack;
+
+   /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
@@ -82,14 +87,16 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
     */
    @Override
    public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
-      IExecutionNode[] executionChildren = executionNode.getChildren();
-      if (children == null) {
-         children = KeYModelUtil.createChildren(this, executionChildren);
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         IExecutionNode[] executionChildren = executionNode.getChildren();
+         if (children == null) {
+            children = KeYModelUtil.createChildren(this, executionChildren);
+         }
+         else if (children.length != executionChildren.length) { // Assumption: Only new children are added, they are never replaced or removed
+            children = KeYModelUtil.updateChildren(this, children, executionChildren);
+         }
+         return children;
       }
-      else if (children.length != executionChildren.length) { // Assumption: Only new children are added, they are never replaced or removed
-         children = KeYModelUtil.updateChildren(this, children, executionChildren);
-      }
-      return children;
    }
 
    /**
@@ -192,10 +199,20 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
     */
    @Override
    public KeYVariable[] getVariables() throws DebugException {
-      if (variables == null) {
-         variables = KeYModelUtil.createVariables(this, executionNode);
+      synchronized (this) {
+         if (variables == null) {
+            variables = KeYModelUtil.createVariables(this, executionNode);
+         }
+         return variables;
       }
-      return variables;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean hasVariables() throws DebugException {
+      return super.hasVariables() && getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
    }
 
    /**
@@ -289,5 +306,18 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    @Override
    public void suspend() throws DebugException {
       getDebugTarget().suspend(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+      synchronized (this) {
+         if (callStack == null) {
+            callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
+         }
+         return callStack;
+      }
    }
 }

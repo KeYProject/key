@@ -17,7 +17,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.util.Debug;
 
-
+/**
+ * Translates a number into a string representation.
+ */
 public final class NumberTranslation {
 
     private NumberTranslation() {}

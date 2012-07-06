@@ -29,6 +29,11 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
     * The human readable path condition to this node.
     */
    private String pathCondition;
+
+   /**
+    * The method call stack.
+    */
+   private ISEDDebugNode[] callStack;
    
    /**
     * Constructor.
@@ -145,5 +150,21 @@ public class SEDMemoryThread extends AbstractSEDThread implements ISEDMemoryDebu
    @Override
    public void setPathCondition(String pathCondition) {
       this.pathCondition = pathCondition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDDebugNode[] getCallStack() throws DebugException {
+      return callStack;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setCallStack(ISEDDebugNode[] callStack) {
+      this.callStack = callStack;
    }
 }

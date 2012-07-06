@@ -19,6 +19,7 @@ import org.eclipse.graphiti.notification.INotificationService;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.ui.job.AbstractExecutionTreeDiagramEditorJob;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDNotificationService;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.SaveAsExecutionTreeDiagramWizard;

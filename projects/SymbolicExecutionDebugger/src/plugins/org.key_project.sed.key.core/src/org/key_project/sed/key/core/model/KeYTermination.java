@@ -29,6 +29,11 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
    private IKeYSEDDebugNode<?>[] children;
 
    /**
+    * The method call stack.
+    */
+   private IKeYSEDDebugNode<?>[] callStack;
+
+   /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
@@ -65,14 +70,16 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
     */
    @Override
    public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
-      IExecutionNode[] executionChildren = executionNode.getChildren();
-      if (children == null) {
-         children = KeYModelUtil.createChildren(this, executionChildren);
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         IExecutionNode[] executionChildren = executionNode.getChildren();
+         if (children == null) {
+            children = KeYModelUtil.createChildren(this, executionChildren);
+         }
+         else if (children.length != executionChildren.length) { // Assumption: Only new children are added, they are never replaced or removed
+            children = KeYModelUtil.updateChildren(this, children, executionChildren);
+         }
+         return children;
       }
-      else if (children.length != executionChildren.length) { // Assumption: Only new children are added, they are never replaced or removed
-         children = KeYModelUtil.updateChildren(this, children, executionChildren);
-      }
-      return children;
    }
 
    /**
@@ -88,7 +95,12 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
     */
    @Override
    public String getName() throws DebugException {
-      return executionNode.getName();
+      try {
+         return executionNode.getName();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute name.", e));
+      }
    }
 
    /**
@@ -101,6 +113,19 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYSEDDeb
       }
       catch (ProofInputException e) {
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute path condition.", e));
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+      synchronized (this) {
+         if (callStack == null) {
+            callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
+         }
+         return callStack;
       }
    }
 }

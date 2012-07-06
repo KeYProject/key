@@ -10,7 +10,6 @@ import javax.swing.SwingUtilities;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
-import de.uka.ilkd.key.gui.utilities.InspectorForFormulas;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.join.JoinProcessor;
@@ -34,8 +33,8 @@ public class JoinMenuItem extends JMenuItem {
             @Override
             public void actionPerformed(ActionEvent e) {
                  mediator.stopInterface(true);
-                 JoinDialog dialog = new JoinDialog(new InspectorForFormulas(proof.getServices()),
-                         partner, proof,PredicateEstimator.STD_ESTIMATOR);
+                 JoinDialog dialog = new JoinDialog(partner, 
+                		 		proof,PredicateEstimator.STD_ESTIMATOR,proof.getServices());
                  dialog.setVisible(true);
                  if(dialog.okayButtonHasBeenPressed()){
                 	 start(dialog.getSelectedPartner(),proof,mediator);                   

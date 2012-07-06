@@ -4,9 +4,9 @@ import junit.framework.TestCase;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
@@ -32,7 +32,7 @@ public class SWTBotSEDIteratorTest extends TestCase {
    public void testNext() throws Exception {
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      SWTBotPerspective defaultPerspective = bot.activePerspective();
+      IPerspectiveDescriptor defaultPerspective = TestUtilsUtil.getActivePerspective();
       // Disable compact view
       boolean originalCompactView = SEDPreferenceUtil.isShowCompactExecutionTree();
       SEDPreferenceUtil.setShowCompactExecutionTree(false);
@@ -54,10 +54,10 @@ public class SWTBotSEDIteratorTest extends TestCase {
          assertFalse(iterator.hasNext());
       }
       finally {
-         defaultPerspective.activate();
          SEDPreferenceUtil.setShowCompactExecutionTree(originalCompactView);
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
+         TestUtilsUtil.openPerspective(defaultPerspective);
       }
    }
 

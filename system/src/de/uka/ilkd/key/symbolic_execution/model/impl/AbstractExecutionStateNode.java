@@ -49,10 +49,12 @@ public abstract class AbstractExecutionStateNode<S extends SourceElement> extend
     */
    @Override
    public IExecutionVariable[] getVariables() {
-      if (variables == null) {
-         variables = lazyComputeVariables();
+      synchronized (this) {
+         if (variables == null) {
+            variables = lazyComputeVariables();
+         }
+         return variables;
       }
-      return variables;
    }
 
    /**

@@ -4,8 +4,12 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -16,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IValue;
 import org.eclipse.debug.core.model.IVariable;
+import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
@@ -91,11 +96,29 @@ public class SEDXMLReader {
    public List<ISEDDebugTarget> read(InputStream in) throws ParserConfigurationException, SAXException, IOException {
       if (in != null) {
          try {
+            // Parse XML document
             SAXParserFactory factory = SAXParserFactory.newInstance();
             factory.setNamespaceAware(true);
             SAXParser saxParser = factory.newSAXParser();
             SEDSAXHandler handler = new SEDSAXHandler();
             saxParser.parse(in, handler);
+            // Create call stacks
+            Set<Entry<ISEDMemoryDebugNode, List<String>>> entries = handler.getCallStackEntriesMap().entrySet();
+            for (Entry<ISEDMemoryDebugNode, List<String>> entry : entries) {
+               List<ISEDDebugNode> callStack = new LinkedList<ISEDDebugNode>();
+               for (String nodeRefId : entry.getValue()) {
+                  ISEDDebugElement element = handler.getElementById(nodeRefId);
+                  if (element == null) {
+                     throw new SAXException("Referenced node with ID \"" + nodeRefId + "\" is not available in model.");
+                  }
+                  if (!(element instanceof ISEDDebugNode)) {
+                     throw new SAXException("Referenced node with ID \"" + nodeRefId + "\" refers to wrong model object \"" + element + "\".");
+                  }
+                  callStack.add((ISEDDebugNode)element);
+               }
+               entry.getKey().setCallStack(callStack.toArray(new ISEDDebugNode[callStack.size()]));
+            }
+            // Return result
             return handler.getResult();
          }
          finally {
@@ -139,70 +162,94 @@ public class SEDXMLReader {
        * and emptied by {@link #endElement(String, String, String)}.
        */
       private Deque<IDebugElement> variablesValueStack = new LinkedList<IDebugElement>();
+      
+      /**
+       * Maps {@link ISEDMemoryDebugNode} to the IDs of their calls tacks.
+       */
+      private Map<ISEDMemoryDebugNode, List<String>> callStackEntriesMap = new HashMap<ISEDMemoryDebugNode, List<String>>();
 
+      /**
+       * Maps the element ID ({@link ISEDDebugElement#getId()}) to the its {@link ISEDDebugElement} instance.
+       */
+      private Map<String, ISEDDebugElement> elementIdMapping = new HashMap<String, ISEDDebugElement>();
+      
       /**
        * {@inheritDoc}
        */
       @Override
       public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
          ISEDMemoryDebugNode parent = parentStack.peekFirst();
-         Object obj = createElement(target, parent != null ? parent : thread, thread, uri, localName, qName, attributes);
-         if (obj instanceof SEDMemoryDebugTarget) {
-            target = (SEDMemoryDebugTarget)obj;
-            result.add(target);
+         if (isCallStackEntry(uri, localName, qName)) {
+            List<String> callStack = callStackEntriesMap.get(parent);
+            if (callStack == null) {
+               callStack = new LinkedList<String>();
+               callStackEntriesMap.put(parent, callStack);
+            }
+            callStack.add(getNodeIdRef(attributes));
          }
-         else if (obj instanceof IVariable) {
-            IVariable variable = (IVariable)obj;
-            if (variablesValueStack.isEmpty()) {
-               if (parent instanceof ISEDMemoryStackFrameCompatibleDebugNode) {
-                  ((ISEDMemoryStackFrameCompatibleDebugNode)parent).addVariable(variable);
+         else {
+            Object obj = createElement(target, parent != null ? parent : thread, thread, uri, localName, qName, attributes);
+            if (obj instanceof ISEDDebugElement) {
+               ISEDDebugElement element = (ISEDDebugElement)obj;
+               elementIdMapping.put(element.getId(), element);
+            }
+            if (obj instanceof SEDMemoryDebugTarget) {
+               target = (SEDMemoryDebugTarget)obj;
+               result.add(target);
+            }
+            else if (obj instanceof IVariable) {
+               IVariable variable = (IVariable)obj;
+               if (variablesValueStack.isEmpty()) {
+                  if (parent instanceof ISEDMemoryStackFrameCompatibleDebugNode) {
+                     ((ISEDMemoryStackFrameCompatibleDebugNode)parent).addVariable(variable);
+                  }
+                  else {
+                     throw new SAXException("Can't add variable to parent.");
+                  }
                }
                else {
-                  throw new SAXException("Can't add variable to parent.");
+                  IDebugElement parentVariableOrValue = variablesValueStack.peekFirst();
+                  if (parentVariableOrValue instanceof SEDMemoryValue) {
+                     ((SEDMemoryValue)parentVariableOrValue).addVariable(variable);
+                  }
+                  else {
+                     throw new SAXException("Can't add variable to parent.");
+                  }
                }
+               variablesValueStack.addFirst(variable);
             }
-            else {
+            else if (obj instanceof IValue) {
+               IValue value = (IValue)obj;
                IDebugElement parentVariableOrValue = variablesValueStack.peekFirst();
-               if (parentVariableOrValue instanceof SEDMemoryValue) {
-                  ((SEDMemoryValue)parentVariableOrValue).addVariable(variable);
+               if (parentVariableOrValue instanceof SEDMemoryVariable) {
+                  ((SEDMemoryVariable)parentVariableOrValue).setValue(value);
                }
                else {
-                  throw new SAXException("Can't add variable to parent.");
+                  throw new SAXException("Can't add value to parent.");
+               }
+               variablesValueStack.addFirst(value);
+            }
+            else if (obj instanceof SEDMemoryThread) {
+               thread = (SEDMemoryThread)obj;
+               if (target != null) {
+                  target.addSymbolicThread(thread);
+               }
+               else {
+                  throw new SAXException("Model is in inconsistent state.");
                }
             }
-            variablesValueStack.addFirst(variable);
-         }
-         else if (obj instanceof IValue) {
-            IValue value = (IValue)obj;
-            IDebugElement parentVariableOrValue = variablesValueStack.peekFirst();
-            if (parentVariableOrValue instanceof SEDMemoryVariable) {
-               ((SEDMemoryVariable)parentVariableOrValue).setValue(value);
-            }
-            else {
-               throw new SAXException("Can't add value to parent.");
-            }
-            variablesValueStack.addFirst(value);
-         }
-         else if (obj instanceof SEDMemoryThread) {
-            thread = (SEDMemoryThread)obj;
-            if (target != null) {
-               target.addSymbolicThread(thread);
-            }
-            else {
-               throw new SAXException("Model is in inconsistent state.");
-            }
-         }
-         else if (obj instanceof ISEDMemoryDebugNode) {
-            ISEDMemoryDebugNode child = (ISEDMemoryDebugNode)obj; 
-            parentStack.addFirst(child);
-            if (parent != null) {
-               parent.addChild(child);
-            }
-            else if (thread != null) {
-               thread.addChild(child);
-            }
-            else {
-               throw new SAXException("Model is in inconsistent state.");
+            else if (obj instanceof ISEDMemoryDebugNode) {
+               ISEDMemoryDebugNode child = (ISEDMemoryDebugNode)obj; 
+               parentStack.addFirst(child);
+               if (parent != null) {
+                  parent.addChild(child);
+               }
+               else if (thread != null) {
+                  thread.addChild(child);
+               }
+               else {
+                  throw new SAXException("Model is in inconsistent state.");
+               }
             }
          }
       }
@@ -214,6 +261,9 @@ public class SEDXMLReader {
       public void endElement(String uri, String localName, String qName) throws SAXException {
          if (isVariable(uri, localName, qName) || isValue(uri, localName, qName)) {
             variablesValueStack.removeFirst();
+         }
+         else if (isCallStackEntry(uri, localName, qName)) {
+            // Nothing to do
          }
          else {
             if (!parentStack.isEmpty()) {
@@ -241,6 +291,34 @@ public class SEDXMLReader {
       public List<ISEDDebugTarget> getResult() {
          return result;
       }
+
+      /**
+       * Returns the mapping of {@link ISEDDebugNode}s to their call stacks.
+       * @return The mapping of {@link ISEDDebugNode}s to their call stacks.
+       */
+      public Map<ISEDMemoryDebugNode, List<String>> getCallStackEntriesMap() {
+         return callStackEntriesMap;
+      }
+
+      /**
+       * Returns the instantiated {@link ISEDDebugElement} with the give ID.
+       * @param id The ID.
+       * @return The instantiated {@link ISEDDebugElement} or {@code null} if not available.
+       */
+      public ISEDDebugElement getElementById(String id) {
+         return elementIdMapping.get(id);
+      }
+   }
+   
+   /**
+    * Checks if the given tag name represents a call stack entry.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @return {@code true} represents a call stack entry, {@code false} represents something else.
+    */
+   protected boolean isCallStackEntry(String uri, String localName, String qName) {
+      return SEDXMLWriter.TAG_CALL_STACK_ENTRY.equals(qName);
    }
    
    /**
@@ -566,6 +644,15 @@ public class SEDXMLReader {
     */   
    protected String getId(Attributes attributes) {
       return attributes.getValue(SEDXMLWriter.ATTRIBUTE_ID);
+   }
+   
+   /**
+    * Returns the node id reference value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getNodeIdRef(Attributes attributes) {
+      return attributes.getValue(SEDXMLWriter.ATTRIBUTE_NODE_ID_REF);
    }
    
    /**

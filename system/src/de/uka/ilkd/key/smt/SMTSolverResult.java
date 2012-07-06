@@ -10,7 +10,9 @@
 
 package de.uka.ilkd.key.smt;
 
-
+/**
+ * Encapsulates the result of a single solver. 
+ */
 public class SMTSolverResult {
     
     /** In the context of proving nodes/sequents these values mean the following:

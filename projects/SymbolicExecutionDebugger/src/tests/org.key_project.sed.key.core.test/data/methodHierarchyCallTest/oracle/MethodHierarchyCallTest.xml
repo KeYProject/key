@@ -1,20 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_c4ef8f7c-e140-4a17-bf33-affe8e5221ab" name="MethodHierarchyCallTest[MethodHierarchyCallTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_ed4ec935-552f-4038-8344-dbdfacc07084" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_a94c1fd2-cfdc-4aa4-86d1-78c19f472f93" name="self.main();" pathCondition="true" lineNumber="-1" charStart="54" charEnd="58">
-            <sedStatement xml:id="_8ff4fc8b-9904-41fd-a6ac-0923bd98b685" name="return a();" pathCondition="true" lineNumber="-1" charStart="66" charEnd="77">
-               <sedMethodCall xml:id="_b1045b93-85ef-4aeb-844c-0ce31e7ded24" name="self.a();" pathCondition="true" lineNumber="-1" charStart="98" charEnd="99">
-                  <sedStatement xml:id="_bee44355-b4a1-43f8-932c-8258b90e388b" name="return b();" pathCondition="true" lineNumber="-1" charStart="107" charEnd="118">
-                     <sedMethodCall xml:id="_524fc6aa-32e5-4cd6-865c-a534f6e87993" name="self.b();" pathCondition="true" lineNumber="-1" charStart="139" charEnd="140">
-                        <sedStatement xml:id="_9e8663f7-c0c1-4698-8a3f-541db07c2a94" name="return c();" pathCondition="true" lineNumber="-1" charStart="148" charEnd="159">
-                           <sedMethodCall xml:id="_c1746e09-5b3c-4c3d-8b9a-c3056cff3e1c" name="self.c();" pathCondition="true" lineNumber="-1" charStart="180" charEnd="181">
-                              <sedStatement xml:id="_30c1a41d-c3ba-4b4b-a58d-c70343f0e264" name="return 42;" pathCondition="true" lineNumber="-1" charStart="189" charEnd="199">
-                                 <sedMethodReturn xml:id="_201301db-823d-4a9c-8ec7-8a5906280c91" name="&lt;return &apos;42&apos; as result of self.c();&gt;" pathCondition="true" lineNumber="-1" charStart="180" charEnd="181">
-                                    <sedMethodReturn xml:id="_9d565154-ed7b-4838-944d-8532567e51fa" name="&lt;return &apos;42&apos; as result of self.b();&gt;" pathCondition="true" lineNumber="-1" charStart="139" charEnd="140">
-                                       <sedMethodReturn xml:id="_39dbd81f-9904-476a-a0a5-2de782cf4c58" name="&lt;return &apos;42&apos; as result of self.a();&gt;" pathCondition="true" lineNumber="-1" charStart="98" charEnd="99">
-                                          <sedMethodReturn xml:id="_8835bf3d-eb41-4ea7-ba3f-0e54d624a0e3" name="&lt;return &apos;42&apos; as result of self.main();&gt;" pathCondition="true" lineNumber="-1" charStart="54" charEnd="58">
-                                             <sedTermination xml:id="_775ae1ce-57e6-4b48-9265-6ce18a2b51bd" name="&lt;end&gt;" pathCondition="true">
+   <sedTarget xml:id="_16388a63-48ec-427d-84aa-483342ad9558" name="MethodHierarchyCallTest[MethodHierarchyCallTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_c3488717-42d0-4468-ba09-41f530456b72" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_4eb8f6d1-cd26-4e2e-a363-d018503d94e4" name="self.main();" pathCondition="true" lineNumber="-1" charStart="54" charEnd="58">
+            <sedStatement xml:id="_bedd902f-e860-4812-8bab-97ad9899d5f1" name="return a();" pathCondition="true" lineNumber="-1" charStart="66" charEnd="77">
+               <sedCallStackEntry nodeIdRef="_4eb8f6d1-cd26-4e2e-a363-d018503d94e4"/>
+               <sedMethodCall xml:id="_b0cdcfef-ddd5-4baf-8360-801c2b4dbe24" name="self.a();" pathCondition="true" lineNumber="-1" charStart="98" charEnd="99">
+                  <sedCallStackEntry nodeIdRef="_4eb8f6d1-cd26-4e2e-a363-d018503d94e4"/>
+                  <sedStatement xml:id="_0e908838-59ee-4662-825f-5978dbf77449" name="return b();" pathCondition="true" lineNumber="-1" charStart="107" charEnd="118">
+                     <sedCallStackEntry nodeIdRef="_4eb8f6d1-cd26-4e2e-a363-d018503d94e4"/>
+                     <sedCallStackEntry nodeIdRef="_b0cdcfef-ddd5-4baf-8360-801c2b4dbe24"/>
+                     <sedMethodCall xml:id="_49091ddd-11ee-4d97-b561-76ef8cdb11a3" name="self.b();" pathCondition="true" lineNumber="-1" charStart="139" charEnd="140">
+                        <sedCallStackEntry nodeIdRef="_4eb8f6d1-cd26-4e2e-a363-d018503d94e4"/>
+                        <sedCallStackEntry nodeIdRef="_b0cdcfef-ddd5-4baf-8360-801c2b4dbe24"/>
+                        <sedStatement xml:id="_160831ea-f0cd-4f51-937c-63942e0303fb" name="return c();" pathCondition="true" lineNumber="-1" charStart="148" charEnd="159">
+                           <sedCallStackEntry nodeIdRef="_4eb8f6d1-cd26-4e2e-a363-d018503d94e4"/>
+                           <sedCallStackEntry nodeIdRef="_b0cdcfef-ddd5-4baf-8360-801c2b4dbe24"/>
+                           <sedCallStackEntry nodeIdRef="_49091ddd-11ee-4d97-b561-76ef8cdb11a3"/>
+                           <sedMethodCall xml:id="_29483948-9787-457e-9e67-1ea7c42e323d" name="self.c();" pathCondition="true" lineNumber="-1" charStart="180" charEnd="181">
+                              <sedCallStackEntry nodeIdRef="_4eb8f6d1-cd26-4e2e-a363-d018503d94e4"/>
+                              <sedCallStackEntry nodeIdRef="_b0cdcfef-ddd5-4baf-8360-801c2b4dbe24"/>
+                              <sedCallStackEntry nodeIdRef="_49091ddd-11ee-4d97-b561-76ef8cdb11a3"/>
+                              <sedStatement xml:id="_11178c97-295f-4b02-9bdf-a127bb5be360" name="return 42;" pathCondition="true" lineNumber="-1" charStart="189" charEnd="199">
+                                 <sedCallStackEntry nodeIdRef="_4eb8f6d1-cd26-4e2e-a363-d018503d94e4"/>
+                                 <sedCallStackEntry nodeIdRef="_b0cdcfef-ddd5-4baf-8360-801c2b4dbe24"/>
+                                 <sedCallStackEntry nodeIdRef="_49091ddd-11ee-4d97-b561-76ef8cdb11a3"/>
+                                 <sedCallStackEntry nodeIdRef="_29483948-9787-457e-9e67-1ea7c42e323d"/>
+                                 <sedMethodReturn xml:id="_856cc7a7-760d-4c15-8c2b-77569bf3ca32" name="&lt;return of self.c();&gt;" pathCondition="true" lineNumber="-1" charStart="180" charEnd="181">
+                                    <sedCallStackEntry nodeIdRef="_4eb8f6d1-cd26-4e2e-a363-d018503d94e4"/>
+                                    <sedCallStackEntry nodeIdRef="_b0cdcfef-ddd5-4baf-8360-801c2b4dbe24"/>
+                                    <sedCallStackEntry nodeIdRef="_49091ddd-11ee-4d97-b561-76ef8cdb11a3"/>
+                                    <sedCallStackEntry nodeIdRef="_29483948-9787-457e-9e67-1ea7c42e323d"/>
+                                    <sedMethodReturn xml:id="_4ca0afa2-07ea-4cf9-8276-0ac5a8fb5960" name="&lt;return of self.b();&gt;" pathCondition="true" lineNumber="-1" charStart="139" charEnd="140">
+                                       <sedCallStackEntry nodeIdRef="_4eb8f6d1-cd26-4e2e-a363-d018503d94e4"/>
+                                       <sedCallStackEntry nodeIdRef="_b0cdcfef-ddd5-4baf-8360-801c2b4dbe24"/>
+                                       <sedCallStackEntry nodeIdRef="_49091ddd-11ee-4d97-b561-76ef8cdb11a3"/>
+                                       <sedMethodReturn xml:id="_96a2faf1-6549-46da-89a6-aa178251dcf0" name="&lt;return of self.a();&gt;" pathCondition="true" lineNumber="-1" charStart="98" charEnd="99">
+                                          <sedCallStackEntry nodeIdRef="_4eb8f6d1-cd26-4e2e-a363-d018503d94e4"/>
+                                          <sedCallStackEntry nodeIdRef="_b0cdcfef-ddd5-4baf-8360-801c2b4dbe24"/>
+                                          <sedMethodReturn xml:id="_0b59110b-5802-411c-a7cf-ce5e30909670" name="&lt;return of self.main();&gt;" pathCondition="true" lineNumber="-1" charStart="54" charEnd="58">
+                                             <sedCallStackEntry nodeIdRef="_4eb8f6d1-cd26-4e2e-a363-d018503d94e4"/>
+                                             <sedTermination xml:id="_14b0f101-5b2b-4b73-9da4-679ee825f19b" name="&lt;end&gt;" pathCondition="true">
                                              </sedTermination>
                                           </sedMethodReturn>
                                        </sedMethodReturn>

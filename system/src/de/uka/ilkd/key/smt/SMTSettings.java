@@ -88,11 +88,14 @@ public interface SMTSettings {
      * @return Returns the logic used by solvers using SMT-Lib-Format
      */
     public String getLogic();
-    
+   
     public long getMaximumInteger();
     
     public long getMinimumInteger();
     
+    /**
+     * Returns true if and only if the version should be checked each time a solver is started.
+     */
     public boolean checkForSupport();
   
 

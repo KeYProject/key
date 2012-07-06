@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -139,17 +140,21 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param node The node to save as oracle file.
     * @param oraclePathInBaseDirFile The path in example directory.
     * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
     * @throws IOException Occurred Exception
     * @throws ProofInputException Occurred Exception
     */
-   protected static void createOracleFile(IExecutionNode node, String oraclePathInBaseDirFile, boolean saveVariables) throws IOException, ProofInputException {
+   protected static void createOracleFile(IExecutionNode node, 
+                                          String oraclePathInBaseDirFile, 
+                                          boolean saveVariables,
+                                          boolean saveCallStack) throws IOException, ProofInputException {
       if (tempNewOracleDirectory != null && tempNewOracleDirectory.isDirectory()) {
          // Create sub folder structure
          File oracleFile = new File(tempNewOracleDirectory, oraclePathInBaseDirFile);
          oracleFile.getParentFile().mkdirs();
          // Create oracle file
          ExecutionNodeWriter writer = new ExecutionNodeWriter();
-         writer.write(node, ExecutionNodeWriter.DEFAULT_ENCODING, oracleFile, saveVariables);
+         writer.write(node, ExecutionNodeWriter.DEFAULT_ENCODING, oracleFile, saveVariables, saveCallStack);
          // Print message to the user.
          printOracleDirectory();
       }
@@ -178,12 +183,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param expected The expected {@link IExecutionNode}.
     * @param current The current {@link IExecutionNode}.
     * @param compareVariables Compare variables?
+    * @param compareCallStack Compare call stack?
     * @param compareChildOrder Is the order of children relevant?
     * @throws ProofInputException Occurred Exception.
     */
    public static void assertExecutionNodes(IExecutionNode expected, 
                                            IExecutionNode current,
                                            boolean compareVariables,
+                                           boolean compareCallStack,
                                            boolean compareChildOrder) throws ProofInputException {
       if (compareChildOrder) {
          // Order of children must be the same.
@@ -192,7 +199,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          while (expectedIter.hasNext() && currentIter.hasNext()) {
             IExecutionNode expectedNext = expectedIter.next();
             IExecutionNode currentNext = currentIter.next();
-            assertExecutionNode(expectedNext, currentNext, true, compareVariables);
+            assertExecutionNode(expectedNext, currentNext, true, compareVariables, compareCallStack);
          }
          assertFalse(expectedIter.hasNext());
          assertFalse(currentIter.hasNext());
@@ -207,7 +214,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
             if (!currentVisitedNodes.add(currentNext)) {
                fail("Node " + currentNext + " visited twice.");
             }
-            assertExecutionNode(expectedNext, currentNext, true, compareVariables);
+            assertExecutionNode(expectedNext, currentNext, true, compareVariables, compareCallStack);
          }
          // Make sure that each current node was visited
          ExecutionNodePreorderIterator currentIter = new ExecutionNodePreorderIterator(current);
@@ -226,8 +233,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param toSearchIn The node to search in.
     * @param childToSearch The node to search.
     * @return The found node.
+    * @throws ProofInputException Occurred Exception.
     */
-   protected static IExecutionNode searchExecutionNode(IExecutionNode toSearchIn, IExecutionNode childToSearch) {
+   protected static IExecutionNode searchExecutionNode(IExecutionNode toSearchIn, IExecutionNode childToSearch) throws ProofInputException {
       // Make sure that parameters are valid
       assertNotNull(toSearchIn);
       assertNotNull(childToSearch);
@@ -257,8 +265,9 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param parentToSearchIn The parent to search in its children.
     * @param directChildToSearch The child to search.
     * @return The found child.
+    * @throws ProofInputException Occurred Exception.
     */
-   protected static IExecutionNode searchDirectChildNode(IExecutionNode parentToSearchIn, IExecutionNode directChildToSearch) {
+   protected static IExecutionNode searchDirectChildNode(IExecutionNode parentToSearchIn, IExecutionNode directChildToSearch) throws ProofInputException {
       // Make sure that parameters are valid
       assertNotNull(parentToSearchIn);
       assertNotNull(directChildToSearch);
@@ -285,12 +294,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param compareParent Compare also the parent node?
     * @param compareChildren Compare direct children?
     * @param compareVariables Compare variables?
+    * @param compareCallStack Compare call stack?
     * @throws ProofInputException Occurred Exception.
     */
    protected static void assertExecutionNode(IExecutionNode expected, 
                                              IExecutionNode current, 
                                              boolean compareParent,
-                                             boolean compareVariables) throws ProofInputException {
+                                             boolean compareVariables,
+                                             boolean compareCallStack) throws ProofInputException {
       // Compare nodes
       assertNotNull(expected);
       assertNotNull(current);
@@ -300,6 +311,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       if (expected instanceof IExecutionBranchCondition) {
          assertTrue("Expected IExecutionBranchCondition but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchCondition);
          assertEquals(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition());
+         assertEquals(((IExecutionBranchCondition)expected).isMergedBranchCondition(), ((IExecutionBranchCondition)current).isMergedBranchCondition());
       }
       else if (expected instanceof IExecutionStartNode) {
          assertTrue("Expected IExecutionStartNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStartNode);
@@ -336,9 +348,24 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       else {
          fail("Unknown execution node \"" + expected + "\".");
       }
+      // Optionally compare call stack
+      if (compareCallStack) {
+         IExecutionNode[] expectedStack = expected.getCallStack();
+         IExecutionNode[] currentStack = current.getCallStack();
+         if (expectedStack != null) {
+            assertNotNull("Call stack of \"" + current + "\" should not be null.", currentStack);
+            assertEquals("Node: " + expected, expectedStack.length, currentStack.length);
+            for (int i = 0; i < expectedStack.length; i++) {
+               assertExecutionNode(expectedStack[i], currentStack[i], false, false, false);
+            }
+         }
+         else{
+            assertTrue("Call stack of \"" + current + "\" is \"" + Arrays.toString(currentStack) + "\" but should be null or empty.", currentStack == null || currentStack.length == 0);
+         }
+      }
       // Optionally compare parent
       if (compareParent) {
-         assertExecutionNode(expected, current, false, compareVariables);
+         assertExecutionNode(expected, current, false, compareVariables, compareCallStack);
       }
    }
 
@@ -516,7 +543,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                 String oracleFileExtension, 
                                                 File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
       if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
-         createOracleFile(builder.getStartNode(), oraclePathInBaseDirFile + "_" + oracleIndex + oracleFileExtension, false);
+         createOracleFile(builder.getStartNode(), oraclePathInBaseDirFile + "_" + oracleIndex + oracleFileExtension, false, false);
       }
       else {
          // Read oracle file
@@ -525,7 +552,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          IExecutionNode oracleRoot = reader.read(oracleFile);
          assertNotNull(oracleRoot);
          // Make sure that the created symbolic execution tree matches the expected one.
-         assertExecutionNodes(oracleRoot, builder.getStartNode(), false, false);
+         assertExecutionNodes(oracleRoot, builder.getStartNode(), false, false, false);
       }
    }
    
@@ -561,11 +588,16 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param containerTypeName The name of the type which contains the method.
     * @param methodFullName The method name to search.
+    * @param mergeBranchConditions Merge branch conditions?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProofInputException Occurred Exception.
     * @throws FileNotFoundException Occurred Exception.
     */
-   protected static SymbolicExecutionEnvironment<CustomConsoleUserInterface> createSymbolicExecutionEnvironment(File baseDir, String javaPathInBaseDir, String containerTypeName, String methodFullName) throws ProofInputException, FileNotFoundException {
+   protected static SymbolicExecutionEnvironment<CustomConsoleUserInterface> createSymbolicExecutionEnvironment(File baseDir, 
+                                                                                                                String javaPathInBaseDir, 
+                                                                                                                String containerTypeName, 
+                                                                                                                String methodFullName,
+                                                                                                                boolean mergeBranchConditions) throws ProofInputException, FileNotFoundException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
@@ -585,7 +617,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
       // Create symbolic execution tree which contains only the start node at beginning
-      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof);
+      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, mergeBranchConditions);
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<CustomConsoleUserInterface>(ui, initConfig, builder);

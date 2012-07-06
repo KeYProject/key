@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -96,6 +97,16 @@ public class ExecutionNodeWriter {
     * Attribute name to store {@link IExecutionNode#isPathConditionChanged()}.
     */
    public static final String ATTRIBUTE_PATH_CONDITION_CHANGED = "pathConditionChanged";
+
+   /**
+    * A path which refers to an {@link IExecutionNode} starting from the root.
+    */
+   public static final String ATTRIBUTE_PATH_IN_TREE = "path";
+
+   /**
+    * Attribute naem to store {@link IExecutionBranchCondition#isMergedBranchCondition()}.
+    */
+   public static final String ATTRIBUTE_MERGED_BRANCH_CONDITION = "mergedBranchCondition";
    
    /**
     * The default enconding.
@@ -153,16 +164,31 @@ public class ExecutionNodeWriter {
    public static final String TAG_VARIABLE = "variable";
 
    /**
+    * Tag name to store one entry of {@link IExecutionNode#getCallStack()}.
+    */
+   public static final String TAG_CALL_STACK_ENTRY = "callStackEntry";
+
+   /**
+    * Character to separate path entries in attributes {@value #ATTRIBUTE_PATH_IN_TREE}.
+    */
+   public static final char PATH_SEPARATOR = '/';
+
+   /**
     * Writes the given {@link IExecutionNode} as XML file.
     * @param node The {@link IExecutionNode} to save.
     * @param encoding The encoding to use.
     * @param file The {@link File} to save to.
-    * @param saveVariables Save variables? 
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save method call stack?
     * @throws IOException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   public void write(IExecutionNode node, String encoding, File file, boolean saveVariables) throws IOException, ProofInputException {
-      write(node, encoding, new FileOutputStream(file), saveVariables);
+   public void write(IExecutionNode node, 
+                     String encoding, 
+                     File file, 
+                     boolean saveVariables,
+                     boolean saveCallStack) throws IOException, ProofInputException {
+      write(node, encoding, new FileOutputStream(file), saveVariables, saveCallStack);
    }
    
    /**
@@ -171,14 +197,19 @@ public class ExecutionNodeWriter {
     * @param encoding The encoding to use.
     * @param out The {@link OutputStream} to save to. The {@link OutputStream} will be closed by this method.
     * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
     * @throws IOException Occurred Exception.
     * @throws ProofInputException Occurred Exception.
     */
-   public void write(IExecutionNode node, String encoding, OutputStream out, boolean saveVariables) throws IOException, ProofInputException {
+   public void write(IExecutionNode node, 
+                     String encoding, 
+                     OutputStream out, 
+                     boolean saveVariables,
+                     boolean saveCallStack) throws IOException, ProofInputException {
       if (out != null) {
          try {
             Charset charset = encoding != null ? Charset.forName(encoding) : Charset.defaultCharset();
-            String xml = toXML(node, charset.displayName(), saveVariables);
+            String xml = toXML(node, charset.displayName(), saveVariables, saveCallStack);
             out.write(xml.getBytes(charset));
          }
          finally {
@@ -192,13 +223,17 @@ public class ExecutionNodeWriter {
     * @param node The {@link IExecutionNode} to convert.
     * @param encoding The encoding to use.
     * @param saveVariables Save variables? 
-    * @return The craeted XML content.
+    * @param saveCallStack Save method call stack?
+    * @return The created XML content.
     * @throws ProofInputException Occurred Exception.
     */
-   public String toXML(IExecutionNode node, String encoding, boolean saveVariables) throws ProofInputException {
+   public String toXML(IExecutionNode node, 
+                       String encoding, 
+                       boolean saveVariables,
+                       boolean saveCallStack) throws ProofInputException {
       StringBuffer sb = new StringBuffer();
       appendXmlHeader(encoding, sb);
-      appendExecutionNode(0, node, saveVariables, sb);
+      appendExecutionNode(0, node, saveVariables, saveCallStack, sb);
       return sb.toString();
    }
    
@@ -207,36 +242,41 @@ public class ExecutionNodeWriter {
     * @param level The current child level.
     * @param node The {@link IExecutionNode} to convert.
     * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendExecutionNode(int level, IExecutionNode node, boolean saveVariables, StringBuffer sb) throws ProofInputException {
+   protected void appendExecutionNode(int level, 
+                                      IExecutionNode node, 
+                                      boolean saveVariables, 
+                                      boolean saveCallStack,
+                                      StringBuffer sb) throws ProofInputException {
       if (node instanceof IExecutionBranchCondition) {
-         appendExecutionBranchCondition(level, (IExecutionBranchCondition)node, saveVariables, sb);
+         appendExecutionBranchCondition(level, (IExecutionBranchCondition)node, saveVariables, saveCallStack, sb);
       }
       else if (node instanceof IExecutionStartNode) {
-         appendExecutionStartNode(level, (IExecutionStartNode)node, saveVariables, sb);
+         appendExecutionStartNode(level, (IExecutionStartNode)node, saveVariables, saveCallStack, sb);
       }
       else if (node instanceof IExecutionBranchNode) {
-         appendExecutionBranchNode(level, (IExecutionBranchNode)node, saveVariables, sb);
+         appendExecutionBranchNode(level, (IExecutionBranchNode)node, saveVariables, saveCallStack, sb);
       }
       else if (node instanceof IExecutionLoopCondition) {
-         appendExecutionLoopCondition(level, (IExecutionLoopCondition)node, saveVariables, sb);
+         appendExecutionLoopCondition(level, (IExecutionLoopCondition)node, saveVariables, saveCallStack, sb);
       }
       else if (node instanceof IExecutionLoopNode) {
-         appendExecutionLoopNode(level, (IExecutionLoopNode)node, saveVariables, sb);
+         appendExecutionLoopNode(level, (IExecutionLoopNode)node, saveVariables, saveCallStack, sb);
       }
       else if (node instanceof IExecutionMethodCall) {
-         appendExecutionMethodCall(level, (IExecutionMethodCall)node, saveVariables, sb);
+         appendExecutionMethodCall(level, (IExecutionMethodCall)node, saveVariables, saveCallStack, sb);
       }
       else if (node instanceof IExecutionMethodReturn) {
-         appendExecutionMethodReturn(level, (IExecutionMethodReturn)node, saveVariables, sb);
+         appendExecutionMethodReturn(level, (IExecutionMethodReturn)node, saveVariables, saveCallStack, sb);
       }
       else if (node instanceof IExecutionStatement) {
-         appendExecutionStatement(level, (IExecutionStatement)node, saveVariables, sb);
+         appendExecutionStatement(level, (IExecutionStatement)node, saveVariables, saveCallStack, sb);
       }
       else if (node instanceof IExecutionTermination) {
-         appendExecutionTermination(level, (IExecutionTermination)node, saveVariables, sb);
+         appendExecutionTermination(level, (IExecutionTermination)node, saveVariables, saveCallStack, sb);
       }
       else {
          throw new IllegalArgumentException("Not supported node \"" + node + "\".");
@@ -248,17 +288,24 @@ public class ExecutionNodeWriter {
     * @param level The current child level.
     * @param node The {@link IExecutionBranchCondition} to convert.
     * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendExecutionBranchCondition(int level, IExecutionBranchCondition node, boolean saveVariables, StringBuffer sb) throws ProofInputException {
+   protected void appendExecutionBranchCondition(int level, 
+                                                 IExecutionBranchCondition node, 
+                                                 boolean saveVariables, 
+                                                 boolean saveCallStack, 
+                                                 StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       attributeValues.put(ATTRIBUTE_BRANCH_CONDITION, node.getFormatedBranchCondition());
+      attributeValues.put(ATTRIBUTE_MERGED_BRANCH_CONDITION, node.isMergedBranchCondition() + "");
       appendStartTag(level, TAG_BRANCH_CONDITION, attributeValues, sb);
-      appendChildren(level + 1, node, saveVariables, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
       appendEndTag(level, TAG_BRANCH_CONDITION, sb);
    }
 
@@ -267,16 +314,22 @@ public class ExecutionNodeWriter {
     * @param level The current child level.
     * @param node The {@link IExecutionStartNode} to convert.
     * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendExecutionStartNode(int level, IExecutionStartNode node, boolean saveVariables, StringBuffer sb) throws ProofInputException {
+   protected void appendExecutionStartNode(int level, 
+                                           IExecutionStartNode node, 
+                                           boolean saveVariables, 
+                                           boolean saveCallStack,
+                                           StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_START_NODE, attributeValues, sb);
-      appendChildren(level + 1, node, saveVariables, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
       appendEndTag(level, TAG_START_NODE, sb);
    }
 
@@ -285,17 +338,23 @@ public class ExecutionNodeWriter {
     * @param level The current child level.
     * @param node The {@link IExecutionLoopCondition} to convert.
     * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendExecutionBranchNode(int level, IExecutionBranchNode node, boolean saveVariables, StringBuffer sb) throws ProofInputException {
+   protected void appendExecutionBranchNode(int level, 
+                                            IExecutionBranchNode node, 
+                                            boolean saveVariables, 
+                                            boolean saveCallStack, 
+                                            StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_BRANCH_NODE, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
-      appendChildren(level + 1, node, saveVariables, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
       appendEndTag(level, TAG_BRANCH_NODE, sb);
    }
 
@@ -304,17 +363,23 @@ public class ExecutionNodeWriter {
     * @param level The current child level.
     * @param node The {@link IExecutionLoopCondition} to convert.
     * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendExecutionLoopCondition(int level, IExecutionLoopCondition node, boolean saveVariables, StringBuffer sb) throws ProofInputException {
+   protected void appendExecutionLoopCondition(int level, 
+                                               IExecutionLoopCondition node, 
+                                               boolean saveVariables, 
+                                               boolean saveCallStack, 
+                                               StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_LOOP_CONDITION, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
-      appendChildren(level + 1, node, saveVariables, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
       appendEndTag(level, TAG_LOOP_CONDITION, sb);
    }
 
@@ -323,17 +388,23 @@ public class ExecutionNodeWriter {
     * @param level The current child level.
     * @param node The {@link IExecutionLoopNode} to convert.
     * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendExecutionLoopNode(int level, IExecutionLoopNode node, boolean saveVariables, StringBuffer sb) throws ProofInputException {
+   protected void appendExecutionLoopNode(int level, 
+                                          IExecutionLoopNode node, 
+                                          boolean saveVariables, 
+                                          boolean saveCallStack,
+                                          StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_LOOP_NODE, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
-      appendChildren(level + 1, node, saveVariables, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
       appendEndTag(level, TAG_LOOP_NODE, sb);
    }
 
@@ -342,17 +413,23 @@ public class ExecutionNodeWriter {
     * @param level The current child level.
     * @param node The {@link IExecutionMethodCall} to convert.
     * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendExecutionMethodCall(int level, IExecutionMethodCall node, boolean saveVariables, StringBuffer sb) throws ProofInputException {
+   protected void appendExecutionMethodCall(int level, 
+                                            IExecutionMethodCall node, 
+                                            boolean saveVariables, 
+                                            boolean saveCallStack,
+                                            StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_METHOD_CALL, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
-      appendChildren(level + 1, node, saveVariables, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
       appendEndTag(level, TAG_METHOD_CALL, sb);
    }
 
@@ -361,10 +438,15 @@ public class ExecutionNodeWriter {
     * @param level The current child level.
     * @param node The {@link IExecutionMethodReturn} to convert.
     * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendExecutionMethodReturn(int level, IExecutionMethodReturn node, boolean saveVariables, StringBuffer sb) throws ProofInputException {
+   protected void appendExecutionMethodReturn(int level, 
+                                              IExecutionMethodReturn node, 
+                                              boolean saveVariables,
+                                              boolean saveCallStack, 
+                                              StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
@@ -372,7 +454,8 @@ public class ExecutionNodeWriter {
       attributeValues.put(ATTRIBUTE_NAME_INCLUDING_RETURN_VALUE, node.getNameIncludingReturnValue());
       appendStartTag(level, TAG_METHOD_RETURN, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
-      appendChildren(level + 1, node, saveVariables, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
       appendEndTag(level, TAG_METHOD_RETURN, sb);
    }
 
@@ -381,17 +464,23 @@ public class ExecutionNodeWriter {
     * @param level The current child level.
     * @param node The {@link IExecutionStatement} to convert.
     * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendExecutionStatement(int level, IExecutionStatement node, boolean saveVariables, StringBuffer sb) throws ProofInputException {
+   protected void appendExecutionStatement(int level, 
+                                           IExecutionStatement node, 
+                                           boolean saveVariables, 
+                                           boolean saveCallStack, 
+                                           StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       appendStartTag(level, TAG_STATEMENT, attributeValues, sb);
       appendVariables(level + 1, node, saveVariables, sb);
-      appendChildren(level + 1, node, saveVariables, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
       appendEndTag(level, TAG_STATEMENT, sb);
    }
 
@@ -400,17 +489,23 @@ public class ExecutionNodeWriter {
     * @param level The current child level.
     * @param node The {@link IExecutionTermination} to convert.
     * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendExecutionTermination(int level, IExecutionTermination node, boolean saveVariables, StringBuffer sb) throws ProofInputException {
+   protected void appendExecutionTermination(int level, 
+                                             IExecutionTermination node, 
+                                             boolean saveVariables,
+                                             boolean saveCallStack,
+                                             StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, node.getName());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       attributeValues.put(ATTRIBUTE_EXCEPTIONAL_TERMINATION, Boolean.valueOf(node.isExceptionalTermination()).toString());
       appendStartTag(level, TAG_TERMINATION, attributeValues, sb);
-      appendChildren(level + 1, node, saveVariables, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
       appendEndTag(level, TAG_TERMINATION, sb);
    }
 
@@ -459,14 +554,86 @@ public class ExecutionNodeWriter {
     * @param childLevel The level of the children.
     * @param parent The parent {@link IExecutionNode} which provides the children.
     * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
     * @param sb The {@link StringBuffer} to append to.
     * @throws ProofInputException Occurred Exception.
     */
-   protected void appendChildren(int childLevel, IExecutionNode parent, boolean saveVariables, StringBuffer sb) throws ProofInputException {
+   protected void appendChildren(int childLevel, 
+                                 IExecutionNode parent, 
+                                 boolean saveVariables, 
+                                 boolean saveCallStack,
+                                 StringBuffer sb) throws ProofInputException {
       IExecutionNode[] children = parent.getChildren();
       for (IExecutionNode child : children) {
-         appendExecutionNode(childLevel, child, saveVariables, sb);
+         appendExecutionNode(childLevel, child, saveVariables, saveCallStack, sb);
       }
+   }
+
+   /**
+    * Appends the call stack entries if required to the given {@link StringBuffer}.
+    * @param level The level of the children.
+    * @param node The {@link IExecutionNode} which provides the call stack.
+    * @param saveCallStack Defines if the call stack should be saved or not.
+    * @param sb The {@link StringBuffer} to append to.
+    */
+   protected void appendCallStack(int level, IExecutionNode node, boolean saveCallStack, StringBuffer sb) {
+      if (saveCallStack) {
+         IExecutionNode[] callStack = node.getCallStack();
+         if (callStack != null) {
+            for (IExecutionNode stackNode : callStack) {
+               Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+               attributeValues.put(ATTRIBUTE_PATH_IN_TREE, computePath(stackNode));
+               appendEmptyTag(level, TAG_CALL_STACK_ENTRY, attributeValues, sb);
+            }
+         }
+      }
+   }
+
+   /**
+    * Computes the path from the root of the symbolic execution tree to the given {@link IExecutionNode}.
+    * @param node The {@link IExecutionNode} to compute path to.
+    * @return The computed path.
+    */
+   protected String computePath(IExecutionNode node) {
+      StringBuffer sb = new StringBuffer();
+      boolean afterFirst = false;
+      while (node != null) {
+         IExecutionNode parent = node.getParent();
+         if (parent != null) {
+            if (afterFirst) {
+               sb.insert(0, PATH_SEPARATOR);
+            }
+            else {
+               afterFirst = true;
+            }
+            int index = JavaUtil.indexOf(parent.getChildren(), node);
+            assert index >= 0 : "Node \"" + node + "\" is not contained in parents children \"" + Arrays.toString(parent.getChildren()) + "\".";
+            sb.insert(0, index);
+         }
+         else {
+            sb.insert(0, PATH_SEPARATOR);
+         }
+         node = parent;
+      }
+      return sb.toString();
+   }
+
+   /**
+    * Appends an empty tag to the given {@link StringBuffer}.
+    * @param level The level.
+    * @param tagName The tag name.
+    * @param attributeValues The attributes.
+    * @param sb The {@link StringBuffer} to append to.
+    */
+   protected void appendEmptyTag(int level, String tagName, Map<String, String> attributeValues, StringBuffer sb) {
+      appendWhiteSpace(level, sb);
+      sb.append("<");
+      sb.append(tagName);
+      for (Entry<String, String> entry : attributeValues.entrySet()) {
+         appendAttribute(entry.getKey(), entry.getValue(), sb);
+      }
+      sb.append("/>");
+      appendNewLine(sb);
    }
 
    /**
@@ -485,7 +652,6 @@ public class ExecutionNodeWriter {
       }
       sb.append(">");
       appendNewLine(sb);
-
    }
 
    /**

@@ -365,7 +365,7 @@ public abstract class AbstractEditorInViewView<E extends IEditorPart, C extends 
     * Returns the contained {@link IEditorPart}.
     * @return The {@link IEditorPart} or {@code null} if it was not instantiated yet.
     */
-   protected E getEditorPart() {
+   public E getEditorPart() {
       return editorPart;
    }
 

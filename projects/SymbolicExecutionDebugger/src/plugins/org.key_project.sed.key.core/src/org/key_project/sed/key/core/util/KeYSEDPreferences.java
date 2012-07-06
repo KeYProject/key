@@ -25,9 +25,19 @@ public class KeYSEDPreferences {
    public static final String SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES = "org.key_project.sed.key.core.preference.showMethodReturnValuesInDebugNodes";
 
    /**
+    * Preference key to enable or disables the variables of selected debug nodes.
+    */
+   public static final String SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE = "org.key_project.sed.key.core.preference.showVariablesOfSelectedDebugNode";
+
+   /**
     * Preference key to define if KeY's main window should be shown or not.
     */
    public static final String SHOW_KEY_MAIN_WINDOW = "org.key_project.sed.key.core.preference.showKeYMainWindow";
+
+   /**
+    * Preference key to define that branch conditions are merged or not.
+    */
+   public static final String MERGE_BRANCH_CONDITIONS = "org.key_project.sed.key.core.preference.mergeBranchConditions";
    
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -131,5 +141,69 @@ public class KeYSEDPreferences {
     */
    public static void setDefaultShowKeYMainWindow(boolean defaultValue) {
       getStore().setDefault(SHOW_KEY_MAIN_WINDOW, defaultValue);
+   }
+   
+   /**
+    * Checks if variables should be shown of selected debug node.
+    * @return Show or hide KeY's main window.
+    */
+   public static boolean isShowVariablesOfSelectedDebugNode() {
+      return getStore().getBoolean(SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE);
+   }
+   
+   /**
+    * Checks if variables should be shown of selected debug node by default.
+    * @return Show or hide KeY's main window.
+    */
+   public static boolean isDefaultShowVariablesOfSelectedDebugNode() {
+      return getStore().getDefaultBoolean(SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE);
+   }
+   
+   /**
+    * Sets if variables should be shown of selected debug node.
+    * @param value Show or hide KeY's main window.
+    */
+   public static void setShowVariablesOfSelectedDebugNode(boolean value) {
+      getStore().setValue(SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, value);
+   }
+   
+   /**
+    * Sets if variables should be shown of selected debug node by default.
+    * @param defaultValue Show or hide KeY's main window.
+    */
+   public static void setDefaultShowVariablesOfSelectedDebugNode(boolean defaultValue) {
+      getStore().setDefault(SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, defaultValue);
+   }
+   
+   /**
+    * Checks if branch conditions are merged or not.
+    * @return Merge branch conditions?
+    */
+   public static boolean isMergeBranchConditions() {
+      return getStore().getBoolean(MERGE_BRANCH_CONDITIONS);
+   }
+   
+   /**
+    * Checks if branch conditions are merged or not by default.
+    * @return Merge branch conditions by default?
+    */
+   public static boolean isDefaultMergeBranchConditions() {
+      return getStore().getDefaultBoolean(MERGE_BRANCH_CONDITIONS);
+   }
+   
+   /**
+    * Sets if branch conditions are merged or not.
+    * @param value Merge branch conditions?
+    */
+   public static void setMergeBranchConditions(boolean value) {
+      getStore().setValue(MERGE_BRANCH_CONDITIONS, value);
+   }
+   
+   /**
+    * Sets if branch conditions are merged or not by default.
+    * @param defaultValue Merge branch conditions by default?
+    */
+   public static void setDefaultMergeBranchConditions(boolean defaultValue) {
+      getStore().setDefault(MERGE_BRANCH_CONDITIONS, defaultValue);
    }
 }

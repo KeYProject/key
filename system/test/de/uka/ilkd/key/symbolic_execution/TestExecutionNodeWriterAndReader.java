@@ -31,49 +31,67 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
  */
 public class TestExecutionNodeWriterAndReader extends TestCase {
    /**
+    * Tests the reading and writing process without variables and without call stack.
+    */
+   public void testWritingAndReading_withoutVariables_and_withoutCallStack() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+      doTestWritingAndReading(false, false);
+   }
+   
+   /**
+    * Tests the reading and writing process without call stack.
+    */
+   public void testWritingAndReading_withoutCallStack() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+      doTestWritingAndReading(true, false);
+   }
+   
+   /**
     * Tests the reading and writing process without variables.
     */
    public void testWritingAndReading_withoutVariables() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
-      doTestWritingAndReading(false);
+      doTestWritingAndReading(false, true);
    }
 
    /**
     * Tests the reading and writing process.
     */
    public void testWritingAndReading() throws ProofInputException, ParserConfigurationException, SAXException, IOException {
-      doTestWritingAndReading(true);
+      doTestWritingAndReading(true, true);
    }
    
    /**
-    * Executes the test steps of {@link #testWritingAndReading()} and
-    * {@link #testWritingAndReading_withoutVariables()}.
+    * Executes the test steps of {@link #testWritingAndReading()},
+    * {@link #testWritingAndReading_withoutVariables()},
+    * {@link #testWritingAndReading_withoutCallStack()} and
+    * {@link #testWritingAndReading_withoutVariables_and_withoutCallStack()}.
     * @param saveVariabes Save variables?
+    * @param saveCallStack Save call stack?
     */
-   protected void doTestWritingAndReading(boolean saveVariabes) throws ProofInputException, ParserConfigurationException, SAXException, IOException {
+   protected void doTestWritingAndReading(boolean saveVariabes, 
+                                          boolean saveCallStack) throws ProofInputException, ParserConfigurationException, SAXException, IOException {
       // Create model
       IExecutionNode expectedNode = createModel();
       // Serialize model to XML string
       ExecutionNodeWriter writer = new ExecutionNodeWriter();
-      String xml = writer.toXML(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, saveVariabes);
+      String xml = writer.toXML(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, saveVariabes, saveCallStack);
       // Read from XML string
       ExecutionNodeReader reader = new ExecutionNodeReader();
       IExecutionNode currentNode = reader.read(new ByteArrayInputStream(xml.getBytes(Charset.forName(ExecutionNodeWriter.DEFAULT_ENCODING))));
-      TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, true);
+      TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, saveCallStack, true);
       // Serialize model to output stream
       ByteArrayOutputStream out = new ByteArrayOutputStream();
-      writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, out, saveVariabes);
+      writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, out, saveVariabes, saveCallStack);
       // Read from input stream
       currentNode = reader.read(new ByteArrayInputStream(out.toByteArray()));
-      TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, true);
+      TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, saveCallStack, true);
       // Serialize model to temporary file
       File tempFile = File.createTempFile("TestExecutionNodeWriterAndReader", "testWritingAndReading");
       try {
          tempFile.delete();
-         writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, tempFile, saveVariabes);
+         writer.write(expectedNode, ExecutionNodeWriter.DEFAULT_ENCODING, tempFile, saveVariabes, saveCallStack);
          assertTrue(tempFile.isFile());
          // Read from tempoary file
          currentNode = reader.read(tempFile);
-         TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, true);
+         TestSymbolicExecutionTreeBuilder.assertExecutionNodes(expectedNode, currentNode, saveVariabes, saveCallStack, true);
       }
       finally {
          tempFile.delete();
@@ -86,13 +104,18 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
     */
    protected IExecutionNode createModel() {
       KeYlessStartNode root = new KeYlessStartNode("start", "pc1", true);
-      KeYlessBranchCondition bc = new KeYlessBranchCondition(root, "bc", "pc2", false, "condition of bc");
+      root.addCallStackEntry(root);
+      KeYlessBranchCondition bc = new KeYlessBranchCondition(root, "bc", "pc2", false, "condition of bc", true);
+      bc.addCallStackEntry(root);
+      bc.addCallStackEntry(bc);
       root.addChild(bc);
       KeYlessTermination ttrue = new KeYlessTermination(root, "t true", "pc3", true, false);
       root.addChild(ttrue);
       KeYlessTermination tfalse = new KeYlessTermination(root, "t false", "pc4", false, true);
       root.addChild(tfalse);
       KeYlessBranchNode bn = new KeYlessBranchNode(root, "bn", "pc5", true);
+      bn.addCallStackEntry(root);
+      bn.addCallStackEntry(bc);
       root.addChild(bn);
       KeYlessVariable bnVar1 = new KeYlessVariable(null, true, 2, "myType", "myValue", "bnVar1");
       bn.addVariable(bnVar1);
@@ -103,8 +126,10 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       KeYlessLoopCondition lc = new KeYlessLoopCondition(ln, "lc", "pc7", false);
       ln.addChild(lc);
       KeYlessMethodCall mc = new KeYlessMethodCall(ln, "mc", "pc8", false);
+      mc.addCallStackEntry(mc);
       ln.addChild(mc);
       KeYlessMethodReturn mr = new KeYlessMethodReturn(mc, "mr", "pc9", true, "mc with return value");
+      mc.addCallStackEntry(mc);
       mc.addChild(mr);
       KeYlessStatement s = new KeYlessStatement(root, "s", "pc10", true);
       root.addChild(s);

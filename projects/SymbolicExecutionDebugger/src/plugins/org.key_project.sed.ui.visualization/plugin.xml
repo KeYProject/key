@@ -106,6 +106,12 @@
               <propertyTab
                     afterTab="org.key_project.sed.ui.visualization.node.tab"
                     category="Graphiti"
+                    id="org.key_project.sed.ui.visualization.callStack.tab"
+                    label="Call Stack">
+              </propertyTab>
+              <propertyTab
+                    afterTab="org.key_project.sed.ui.visualization.callStack.tab"
+                    category="Graphiti"
                     id="org.key_project.sed.ui.visualization.source.tab"
                     label="Source">
               </propertyTab>
@@ -119,6 +125,12 @@
                class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiDebugNodePropertySection"
                filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiDebugNodeTreeFilter"
                id="org.key_project.sed.ui.visualization.node.tab.SEDDebugNodePropertySection">
+              </propertySection>
+              <propertySection
+                    class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiCallStackPropertySection"
+                    filter="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiReadonlyDebugNodeTreeFilter"
+                    id="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiCallStackPropertySection"
+                    tab="org.key_project.sed.ui.visualization.callStack.tab">
               </propertySection>
               <propertySection
                     class="org.key_project.sed.ui.visualization.execution_tree.property.GraphitiSourcePropertySection"

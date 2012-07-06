@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
-import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,7 +63,11 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -757,11 +760,9 @@ public final class SymbolicExecutionUtil {
     * Checks if the given node should be represented as termination.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
-    * @param statement The statement ({@link SourceElement}).
-    * @param posInfo The {@link PositionInfo}.
     * @return {@code true} represent node as termination, {@code false} represent node as something else. 
     */
-   public static boolean isTerminationNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+   public static boolean isTerminationNode(Node node, RuleApp ruleApp) {
       return "emptyModality".equals(MiscTools.getRuleDisplayName(ruleApp));
    }
    
@@ -769,11 +770,9 @@ public final class SymbolicExecutionUtil {
     * Checks if the given node should be represented as method return.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
-    * @param statement The statement ({@link SourceElement}).
-    * @param posInfo The {@link PositionInfo}.
     * @return {@code true} represent node as method return, {@code false} represent node as something else. 
     */
-   public static boolean isMethodReturnNode(Node node, RuleApp ruleApp, SourceElement statement, PositionInfo posInfo) {
+   public static boolean isMethodReturnNode(Node node, RuleApp ruleApp) {
       return "methodCallEmpty".equals(MiscTools.getRuleDisplayName(ruleApp));
    }
 
@@ -801,7 +800,7 @@ public final class SymbolicExecutionUtil {
       if (node != null) {
          SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
          PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
-         if (isMethodReturnNode(node, ruleApp, statement, posInfo)) {
+         if (isMethodReturnNode(node, ruleApp)) {
             return !isInImplicitMethod(node, ruleApp);
          }
          else if (isLoopNode(node, ruleApp, statement, posInfo)) { 
@@ -810,7 +809,7 @@ public final class SymbolicExecutionUtil {
          else if (isBranchNode(node, ruleApp, statement, posInfo) ||
                   isMethodCallNode(node, ruleApp, statement) ||
                   isStatementNode(node, ruleApp, statement, posInfo) ||
-                  isTerminationNode(node, ruleApp, statement, posInfo)) {
+                  isTerminationNode(node, ruleApp)) {
             return true;
          }
          else if (hasLoopCondition(node, ruleApp, statement)) {
@@ -840,66 +839,6 @@ public final class SymbolicExecutionUtil {
       JavaBlock block = term.javaBlock();
       IExecutionContext context = JavaTools.getInnermostExecutionContext(block, node.proof().getServices());
       return context != null && context.getMethodContext() != null && context.getMethodContext().isImplicit();
-   }
-
-   // TODO: Remove temporary methods when the current method is part of an ExecutionContext.
-
-   /**
-    * Finds the {@link Node} in the proof tree of KeY which has called the
-    * method that is now executed or returned in the {@link Node}.
-    * @param methodCallStack The method call stack to search in.
-    * @param currentNode The {@link Node} for that the method call {@link Node} is needed.
-    * @return The found call {@link Node} or {@code null} if no one was found.
-    */
-   public static Node temporaryFindMethodCallNode(LinkedList<Node> methodCallStack, Node currentNode, RuleApp ruleApp) {
-      // Compute the stack frame size before the method is called
-      final int returnStackSize = SymbolicExecutionUtil.computeStackSize(currentNode, ruleApp) - 1;
-      // Return the method from the call stack
-      if (returnStackSize >= 0) {
-         return methodCallStack.get(returnStackSize);
-      }
-      else {
-         return null;
-      }
-   }
-   
-   /**
-    * Creates the call stack for the given {@link Node}.
-    * @param node The {@link Node} to create call stack for.
-    * @return The created call stack.
-    */
-   public static LinkedList<Node> temporaryCreateMethodCallStack(Node node) {
-      // List parents
-      Deque<Node> parents = new LinkedList<Node>();
-      while (node != null) {
-         parents.addFirst(node);
-         node = node.parent();
-      }
-      // Create method call stack
-      LinkedList<Node> methodCallStack = new LinkedList<Node>();
-      for (Node parent : parents) {
-         temporaryUpdateCallStack(methodCallStack, parent, parent.getNodeInfo().getActiveStatement());
-      }
-      return methodCallStack;
-   }
-   
-   /**
-    * Updates the call stack ({@link #methodCallStack}) if the given {@link Node}
-    * in KeY's proof tree is a method call.
-    * @param methodCallStack The method call stack to update.
-    * @param node The current {@link Node} in the proof tree of KeY.
-    * @param statement The statement ({@link SourceElement}).
-    */
-   public static void temporaryUpdateCallStack(LinkedList<Node> methodCallStack, Node node, SourceElement statement) {
-      if (isMethodCallNode(node, node.getAppliedRuleApp(), statement, true)) {
-         // Remove outdated methods from call stack
-         int currentLevel = computeStackSize(node, node.getAppliedRuleApp());
-         while (methodCallStack.size() > currentLevel) {
-            methodCallStack.removeLast();
-         }
-         // Add new node to call stack.
-         methodCallStack.addLast(node);
-      }
    }
    
    /**
@@ -1017,5 +956,62 @@ public final class SymbolicExecutionUtil {
       else {
          return null;
       }
+   }
+   
+   /**
+    * Computes the branch condition of the given {@link Node}.
+    * @param node The {@link Node} to compute its branch condition.
+    * @return The computed branch condition.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public static Term computeBranchCondition(Node node) throws ProofInputException {
+      // Get applied taclet on parent proof node
+      Node parent = node.parent();
+      assert parent.getAppliedRuleApp() instanceof TacletApp; // Splits of built in rules are currently not supported.
+      TacletApp app = (TacletApp)parent.getAppliedRuleApp();
+      // Find goal template which has created the represented proof node
+      int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
+      TacletGoalTemplate goalTemplate = app.taclet().goalTemplates().take(childIndex).head();
+      // Apply instantiations of schema variables to sequent of goal template
+      Services services = node.proof().getServices();
+      SVInstantiations instantiations = app.instantiations();
+      ImmutableList<Term> antecedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().antecedent());
+      ImmutableList<Term> succedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().succedent());
+      // Construct branch condition from created antecedent and succedent terms as new implication 
+      Term left = TermBuilder.DF.and(antecedents);
+      Term right = TermBuilder.DF.or(succedents);
+      Term implication = TermBuilder.DF.imp(left, right);
+      Term result;
+      // Check if an update context is available
+      if (!instantiations.getUpdateContext().isEmpty()) {
+         // Append update context because otherwise the formula is evaluated in wrong state
+         result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), implication);
+         // Simplify branch condition
+         result = SymbolicExecutionUtil.simplify(node.proof(), result);
+      }
+      else {
+         // No update context, just use the implication as branch condition
+         result = implication;
+      }
+      return result;
+   }
+
+   /**
+    * Applies the schema variable instantiations on the given {@link Semisequent}.
+    * @param services The {@link Services} to use.
+    * @param svInst The schema variable instantiations.
+    * @param semisequent The {@link Semisequent} to apply instantiations on.
+    * @return The list of created {@link Term}s in which schema variables are replaced with the instantiation.
+    */
+   private static ImmutableList<Term> listSemisequentTerms(Services services, 
+                                                           SVInstantiations svInst, 
+                                                           Semisequent semisequent) {
+      ImmutableList<Term> terms = ImmutableSLList.nil();
+      for (SequentFormula sf : semisequent) {
+         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, svInst);
+         sf.formula().execPostOrder(visitor);
+         terms = terms.append(visitor.getTerm());
+      }
+      return terms;
    }
 }

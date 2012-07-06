@@ -1,53 +1,69 @@
 package de.uka.ilkd.key.gui.join;
 
+import java.awt.Color;
 import java.awt.Dimension;
-import java.util.LinkedList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputListener;
+import de.uka.ilkd.key.gui.utilities.ClickableMessageBox;
+import de.uka.ilkd.key.gui.utilities.ClickableMessageBox.ClickableMessageBoxListener;
 import de.uka.ilkd.key.gui.utilities.InspectorForFormulas;
 import de.uka.ilkd.key.gui.utilities.StdDialog;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
+import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
+import de.uka.ilkd.key.proof.delayedcut.DelayedCutProcessor;
+import de.uka.ilkd.key.proof.join.LateApplicationCheck;
 import de.uka.ilkd.key.proof.join.PredicateEstimator;
 import de.uka.ilkd.key.proof.join.PredicateEstimator.Result;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
 
 public class JoinDialog extends StdDialog{
-
+	private static final Color GREEN = new Color(0, 128, 0);
 
     private static final long serialVersionUID = 1L;
     private final     ContentPanel content;
-    public JoinDialog(CheckedUserInputInspector inspector,List<ProspectivePartner> partnerList, Proof proof,
-            PredicateEstimator estimator) {
+    public JoinDialog(List<ProspectivePartner> partnerList, Proof proof,
+            PredicateEstimator estimator, Services services) {
         super("Joining",  5, false);
-        content = new ContentPanel(inspector, partnerList, proof,estimator,new CheckedUserInputListener(){
+        content = new ContentPanel(partnerList, proof,estimator,new CheckedUserInputListener(){
 
             @Override
-            public void userInputChanged(String input, boolean valid) {
+            public void userInputChanged(String input, boolean valid, String reason) {
                 getOkayButton().setEnabled(valid);
                 
             }
         
-            });
+            },services);
         this.setContent(content);
         
     }
+    
+    private static final String INFO = "It is not possible to join both goals, " +
+    		"because new symbols have been introduced\n on the branches which belong to the goals: " +
+    		"Up to now the treatment of new symbols\nis not supported by the joining mechanism.\n\n";
     
     
     private static class ContentPanel extends Box{
@@ -59,7 +75,9 @@ public class JoinDialog extends StdDialog{
         private CheckedUserInput predicateInput;
         private JLabel        joinHeadline;
         private JLabel        infoPredicate;
-        private final CheckedUserInputInspector inspector;
+        private ClickableMessageBox    infoBox;
+    	private JScrollPane infoBoxPane=null;
+
         private final Proof proof;
         private final PredicateEstimator estimator;
      
@@ -67,10 +85,29 @@ public class JoinDialog extends StdDialog{
         
         private static class ContentItem{
             final ProspectivePartner partner;
+            final CheckedUserInputInspector inspector;
+            final boolean applicable;
             
-            public ContentItem(ProspectivePartner partner) {
+            public ContentItem(ProspectivePartner partner, Services services,
+            					boolean applicable) {
                 super();
                 this.partner = partner;
+                this.inspector = new InspectorForDecisionPredicates(services,
+                													partner.getCommonParent(),
+                													DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT,
+                													DelayedCutProcessor.getApplicationChecks());
+                this.applicable = applicable;
+            }
+            
+            public CheckedUserInputInspector getInspector() {
+				return inspector;
+			}
+            
+    
+            
+            
+            public boolean isApplicable(){
+            	return applicable;
             }
 
             Sequent getSequent(){
@@ -83,7 +120,7 @@ public class JoinDialog extends StdDialog{
             }
             
             public String getPredicateInfo(){
-                return "Decision Predicate (true for Goal " + partner.getNode(0).serialNr() + ", false for Goal " + partner.getNode(1).serialNr()+")";
+                return "Decision Formula (true for Goal " + partner.getNode(0).serialNr() + ", false for Goal " + partner.getNode(1).serialNr()+")";
             }
             
             public String getPredicate(Proof proof){
@@ -105,44 +142,66 @@ public class JoinDialog extends StdDialog{
         }
         
         
-        public ContentPanel(CheckedUserInputInspector inspector,List<ProspectivePartner> partnerList,final Proof proof,
+        public ContentPanel(List<ProspectivePartner> partnerList,final Proof proof,
                 PredicateEstimator estimator,
-                CheckedUserInputListener listener) {
+               final  CheckedUserInputListener listener,Services services) {
             super(BoxLayout.Y_AXIS);
-            this.inspector = inspector;
+    
             this.proof = proof;
             this.estimator = estimator;
             create();
-            getPredicateInput().addListener(listener);
+         
             getPredicateInput().addListener(new CheckedUserInputListener() {
                 
                 @Override
-                public void userInputChanged(String input, boolean valid) {
+                public void userInputChanged(String input, boolean valid, String reason) {
                     if(valid){
                         getSelectedPartner().setCommonPredicate(InspectorForFormulas.translate(proof.getServices(), input));
+                        if(getSelectedItem().isApplicable()){
+                        	listener.userInputChanged(input, true, reason);
+                        }else{
+                        	listener.userInputChanged(input,false, reason);
+                        }
+                    }else{
+                    	listener.userInputChanged(input, false, reason);
                     }
+                    refreshInfoBox(reason);
                 }
             });
        
           
             if(!partnerList.isEmpty()){
-                fill(partnerList);
+                fill(partnerList,services);
             }
        
         }    
 
-        private void fill(List<ProspectivePartner> partnerList){
-            getHeadline().setText("Join Goal " +partnerList.get(0).getNode(0).serialNr());
-            getSequentViewer1().setSequent(partnerList.get(0).getNode(0).sequent(), proof.getServices());
+        private void fill(List<ProspectivePartner> partnerList, Services services){
+        	Node node = partnerList.get(0).getNode(0);
+            getHeadline().setText("<html><b>Join Goal " +node.serialNr()+"</b></html>");
+            getSequentViewer1().setSequent(node.sequent(), proof.getServices());
+            
+           
             
             DefaultListModel model = new DefaultListModel();
             for(final ProspectivePartner partner : partnerList){
-                model.addElement(new ContentItem(partner));
+               
                 Result result = estimator.estimate(partner, proof);
                 partner.setCommonPredicate(result.getPredicate());
                 partner.setCommonParent(result.getCommonParent());
-  
+          
+                
+                ApplicationCheck check = new ApplicationCheck.NoNewSymbolsCheck();
+                
+                boolean applicable = true;
+                applicable = LateApplicationCheck.INSTANCE.check(partner.getNode(0),
+                									result.getCommonParent(), check).isEmpty() && applicable;
+                applicable = LateApplicationCheck.INSTANCE.check(partner.getNode(1),
+                					 result.getCommonParent(), check).isEmpty() && applicable;
+                
+                model.addElement(new ContentItem(partner,services,applicable));
              }
+    
             
             getChoiceList().setModel(model);
             getChoiceList().setSelectedIndex(0);
@@ -157,13 +216,23 @@ public class JoinDialog extends StdDialog{
             ContentItem item = (ContentItem) choiceList.getModel().getElementAt(index);
             getSequentViewer2().setSequent(item.getSequent(),proof.getServices());
    
+            
             getPredicateInput().setInput(item.getPredicate(proof));
+            getPredicateInput().setInspector(item.getInspector());
             getInfoPredicate().setText(item.getPredicateInfo());
+
         }
    
+        private Box createLeftAlignedComponent(JComponent comp){
+        	   
+            Box box = Box.createHorizontalBox();
+            box.add(comp);
+            box.add(Box.createHorizontalGlue());
+            return box;
+        }
         
         private void create(){
-       
+    
             
             Box box = Box.createHorizontalBox();
           
@@ -178,56 +247,89 @@ public class JoinDialog extends StdDialog{
             
             
             box = Box.createHorizontalBox();
-            box.add(new JScrollPane(getSequentViewer1()));
-       
-            this.add(box);
-            this.add(Box.createVerticalStrut(5));
-            
-            box = Box.createHorizontalBox();
-         
-            JLabel label = new JLabel("with");
-            label.setAlignmentX(LEFT_ALIGNMENT);
-            label.setFont(this.getFont());
-            box.add(label);
-            box.add(Box.createHorizontalGlue());
-            this.add(box);
-            this.add(Box.createVerticalStrut(5));
-           
-            box = Box.createHorizontalBox();
-         
-            box.add(new JScrollPane(getChoiceList()));
-            box.add(Box.createHorizontalStrut(5));
-            
             Box vertBox = Box.createVerticalBox();
-            vertBox.add(new JScrollPane(getSequentViewer2()));
-            vertBox.add(Box.createVerticalStrut(5));
+            vertBox.add(createLeftAlignedComponent(getHeadline()));
+            vertBox.add(new JScrollPane(getSequentViewer1()));
+            box.add(vertBox);
+       
+
+            vertBox = Box.createVerticalBox();
+            JLabel label = new JLabel("<html><b>with</b></html>");
+            
+      
+            label.setFont(this.getFont());
+            vertBox.add(createLeftAlignedComponent(label));
             
             Box horzBox = Box.createHorizontalBox();
-            
-            label = new JLabel("Decision Predicate");
-            label.setAlignmentX(LEFT_ALIGNMENT);
-            label.setFont(this.getFont());
-            horzBox.add(getInfoPredicate());
-            horzBox.add(Box.createHorizontalGlue());
+            horzBox.add(new JScrollPane(getChoiceList()));
+            horzBox.add(Box.createHorizontalStrut(5));
+            horzBox.add(new JScrollPane(getSequentViewer2()));
             vertBox.add(horzBox);
-            vertBox.add(getPredicateInput());
-         //   vertBox.add(getInfoPredicate());
-            
             box.add(vertBox);
-            
-            
+  
             this.add(box);
-            //this.add(Box.createVerticalStrut(5));
             
-            //box = Box.createHorizontalBox();
-            
-            //box.add(getPredicateInput());
-     
-            //this.add(box);
             this.add(Box.createVerticalStrut(5));
+           
+            this.add(createLeftAlignedComponent(getInfoPredicate()));
+            this.add(getPredicateInput());
+            this.add(Box.createVerticalStrut(5));
+            this.add(getInfoBoxPane());
+            this.add(Box.createVerticalStrut(5));
+         
+
            
             
              
+        }
+        
+        private void refreshInfoBox(String reason){
+        	ContentItem item = getSelectedItem();
+        	getInfoBox().clear();
+        	if(!item.isApplicable()){
+             	getInfoBox().add(INFO, "Goal "+ item.partner.getNode(0).serialNr()+ " and "+
+             						   "Goal "+item.partner.getNode(1).serialNr()+ " cannot be joined.",Color.RED);
+             	
+        	}else if(reason != null){
+        		String [] segments = reason.split("#");
+        		getInfoBox().add(segments.length>1 ? segments[1] : null,segments[0],Color.RED);
+        	}else{
+        		getInfoBox().add(null, "Join is applicable.",GREEN);
+        	}
+   
+        }
+        
+        private JComponent getInfoBoxPane(){
+        
+        	if(infoBoxPane == null){
+       
+        		infoBoxPane = new JScrollPane(getInfoBox());
+         		infoBoxPane.setBorder(BorderFactory.createTitledBorder("Details"));
+         		int height = getInfoBox().getFontMetrics(getInfoBox().getFont()).getHeight()*4;
+         		infoBoxPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
+        		infoBoxPane.setPreferredSize(new Dimension(0, height));
+        	}
+        	return infoBoxPane;
+        }
+        
+        private ClickableMessageBox getInfoBox(){
+        	if(infoBox == null){
+        		infoBox = new ClickableMessageBox();
+        	
+        	
+        		infoBox.setBackground(this.getBackground());
+        	
+        		infoBox.add(new ClickableMessageBoxListener() {
+					
+					@Override
+					public void eventMessageClicked(Object object) {
+						JOptionPane.showMessageDialog(infoBox, object.toString(),"Problem Description",
+								JOptionPane.INFORMATION_MESSAGE);
+					}
+				});
+        		
+        	}
+        	return infoBox;
         }
         
            
@@ -241,7 +343,7 @@ public class JoinDialog extends StdDialog{
         
         private CheckedUserInput getPredicateInput() {
             if(predicateInput == null){
-                predicateInput = new CheckedUserInput(inspector,false);
+                predicateInput = new CheckedUserInput(false);
             }
             return predicateInput;
         }
@@ -258,6 +360,7 @@ public class JoinDialog extends StdDialog{
                          
                          
                              selectionChanged(choiceList.getSelectedIndex());
+                             
                        
                              
                      }
@@ -294,8 +397,12 @@ public class JoinDialog extends StdDialog{
         }
 
         public ProspectivePartner getSelectedPartner() {
-            int index = getChoiceList().getSelectedIndex();
-            return ((ContentItem)getChoiceList().getModel().getElementAt(index)).partner;
+            return getSelectedItem().partner;
+        }
+        
+        public ContentItem getSelectedItem(){
+        	int index = getChoiceList().getSelectedIndex();
+        	return ((ContentItem)getChoiceList().getModel().getElementAt(index));
         }
     
     }
@@ -305,18 +412,7 @@ public class JoinDialog extends StdDialog{
         return content.getSelectedPartner();
     }
     
-    
-    public static void main(String [] args){
-         JoinDialog dialog = new JoinDialog(new CheckedUserInputInspector() {
-            
-            @Override
-            public String check(String toBeChecked) {
-                
-                return toBeChecked.equals("test") ? null : "type test";
-            }
-        },new LinkedList<ProspectivePartner>(),null,null);
-         dialog.setVisible(true);
-    }
+
     
 
 }

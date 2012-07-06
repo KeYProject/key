@@ -32,6 +32,11 @@ public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition impleme
    private String pathCondition;
 
    /**
+    * The method call stack.
+    */
+   private ISEDDebugNode[] callStack;
+
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this branch condition is contained.
     * @param parent The parent in that this node is contained as child.
@@ -137,5 +142,21 @@ public class SEDMemoryBranchCondition extends AbstractSEDBranchCondition impleme
    @Override
    public void setPathCondition(String pathCondition) {
       this.pathCondition = pathCondition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDDebugNode[] getCallStack() throws DebugException {
+      return callStack;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setCallStack(ISEDDebugNode[] callStack) {
+      this.callStack = callStack;
    }
 }

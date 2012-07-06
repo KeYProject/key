@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_99e67547-5fee-43ca-b0a7-1427267f6e7e" name="ElseIfTest[ElseIfTest::elseIf(int)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_043b304c-9fde-4a99-92ff-5c81312a56b7" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_c9cf062a-d46b-4721-b198-50df5501dae2" name="self.elseIf(_x);" pathCondition="true" lineNumber="-1" charStart="90" charEnd="96">
+            <sedStatement xml:id="_ea289e46-ee61-48e5-b257-c5958a258373" name="int a;" pathCondition="true" lineNumber="-1" charStart="109" charEnd="115">
+               <sedBranchNode xml:id="_47c685b2-2efb-4824-b793-5c13683b4d5a" name="if (_x==0) {   a=1; }else if (_x==1||_x==2||_x==3) {if (_x==1||_x==2) {       a=-1;     }     a=_x*_x;   }else if (_x==4) {return 42;     }else  {       a=_x;     }" pathCondition="true" lineNumber="-1" charStart="119" charEnd="325">
+                  <sedBranchCondition xml:id="_fb2f539e-8b2f-42fc-ba81-12c99f70584d" name="x = 0 TRUE" pathCondition="x = 0">
+                     <sedStatement xml:id="_c4fefd17-e48b-483f-9e1c-21dfe4ddf846" name="a=1;" pathCondition="x = 0" lineNumber="-1" charStart="137" charEnd="143">
+                        <sedStatement xml:id="_2c1ae5b6-e46c-42e2-b842-5289b206d1c2" name="return a;" pathCondition="x = 0" lineNumber="-1" charStart="329" charEnd="338">
+                           <sedMethodReturn xml:id="_238eeba0-6a55-4d19-af42-6a228e36fdac" name="&lt;return of self.elseIf(_x);&gt;" pathCondition="x = 0" lineNumber="-1" charStart="90" charEnd="96">
+                              <sedTermination xml:id="_ba5bef2f-31d2-4cdb-9b49-e60cab05dddd" name="&lt;end&gt;" pathCondition="x = 0">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedBranchCondition>
+                  <sedBranchCondition xml:id="_57e80199-176b-4467-9493-94175301c15a" name="x = 0 FALSE" pathCondition="!x = 0">
+                     <sedBranchNode xml:id="_5af42e4b-5d04-4409-8b83-25415fd91d31" name="if (_x==1||_x==2||_x==3) {if (_x==1||_x==2) {     a=-1;   }   a=_x*_x; }else if (_x==4) {return 42;   }else  {     a=_x;   }" pathCondition="!x = 0" lineNumber="-1" charStart="119" charEnd="325">
+                        <sedBranchCondition xml:id="_5d11a240-448f-45c4-b38c-a9f72af1dc9a" name="x = 1 TRUE" pathCondition="!x = 0 &amp; x = 1">
+                           <sedBranchNode xml:id="_ff0ac556-e6ce-4f74-b187-a1478b32ff86" name="if (_x==1||_x==2) {   a=-1; }" pathCondition="!x = 0 &amp; x = 1" lineNumber="-1" charStart="195" charEnd="237">
+                              <sedStatement xml:id="_5991f900-b407-4a57-af89-cf2ab0710a4d" name="a=-1;" pathCondition="!x = 0 &amp; x = 1" lineNumber="-1" charStart="224" charEnd="231">
+                                 <sedStatement xml:id="_23368a15-6a0a-49dc-9e4b-aac905d14797" name="a=_x*_x;" pathCondition="!x = 0 &amp; x = 1" lineNumber="-1" charStart="242" charEnd="252">
+                                    <sedStatement xml:id="_030d5ccc-d0b4-4f5a-867b-f2d333e9d4f7" name="return a;" pathCondition="!x = 0 &amp; x = 1" lineNumber="-1" charStart="329" charEnd="338">
+                                       <sedMethodReturn xml:id="_6726599a-c445-4301-9473-92471135331f" name="&lt;return of self.elseIf(_x);&gt;" pathCondition="!x = 0 &amp; x = 1" lineNumber="-1" charStart="90" charEnd="96">
+                                          <sedTermination xml:id="_bee18877-ffea-4235-97f0-7909258797be" name="&lt;end&gt;" pathCondition="!x = 0 &amp; x = 1">
+                                          </sedTermination>
+                                       </sedMethodReturn>
+                                    </sedStatement>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedBranchNode>
+                        </sedBranchCondition>
+                        <sedBranchCondition xml:id="_3b6b326b-0857-4248-9c83-e6782d6d48f5" name="x = 2 &amp; !x = 1" pathCondition="!x = 0 &amp; (x = 2 &amp; !x = 1)">
+                           <sedBranchNode xml:id="_d15114e1-62de-4fde-95c3-f7e6f0b6820d" name="if (_x==1||_x==2) {   a=-1; }" pathCondition="!x = 0 &amp; (x = 2 &amp; !x = 1)" lineNumber="-1" charStart="195" charEnd="237">
+                              <sedStatement xml:id="_3e5c6d4a-1197-46b4-8ade-ba992a86f492" name="a=-1;" pathCondition="!x = 0 &amp; (x = 2 &amp; !x = 1)" lineNumber="-1" charStart="224" charEnd="231">
+                                 <sedStatement xml:id="_a1069be3-5ac6-4283-a7ba-089042162f00" name="a=_x*_x;" pathCondition="!x = 0 &amp; (x = 2 &amp; !x = 1)" lineNumber="-1" charStart="242" charEnd="252">
+                                    <sedStatement xml:id="_6673ef52-34b0-47f6-a9d5-e1816ce1df01" name="return a;" pathCondition="!x = 0 &amp; (x = 2 &amp; !x = 1)" lineNumber="-1" charStart="329" charEnd="338">
+                                       <sedMethodReturn xml:id="_6ef11afa-629c-400d-b6a3-a73e4439398a" name="&lt;return of self.elseIf(_x);&gt;" pathCondition="!x = 0 &amp; (x = 2 &amp; !x = 1)" lineNumber="-1" charStart="90" charEnd="96">
+                                          <sedTermination xml:id="_17fa6ed2-0c22-444c-94d1-7b59c3df2f17" name="&lt;end&gt;" pathCondition="!x = 0 &amp; (x = 2 &amp; !x = 1)">
+                                          </sedTermination>
+                                       </sedMethodReturn>
+                                    </sedStatement>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedBranchNode>
+                        </sedBranchCondition>
+                        <sedBranchCondition xml:id="_f82641cd-9318-46b6-8ec7-8c3847839bf4" name="x = 3 &amp; !x = 2 &amp; !x = 1" pathCondition="!x = 0 &amp; (x = 3 &amp; !x = 2 &amp; !x = 1)">
+                           <sedBranchNode xml:id="_20c81266-6f3f-4523-b46e-64618f15adc7" name="if (_x==1||_x==2) {   a=-1; }" pathCondition="!x = 0 &amp; (x = 3 &amp; !x = 2 &amp; !x = 1)" lineNumber="-1" charStart="195" charEnd="237">
+                              <sedStatement xml:id="_813417f2-f336-47ff-a085-6976de7863d6" name="a=_x*_x;" pathCondition="!x = 0 &amp; (x = 3 &amp; !x = 2 &amp; !x = 1)" lineNumber="-1" charStart="242" charEnd="252">
+                                 <sedStatement xml:id="_2b921437-a1fb-4c50-84c7-d090a04aa421" name="return a;" pathCondition="!x = 0 &amp; (x = 3 &amp; !x = 2 &amp; !x = 1)" lineNumber="-1" charStart="329" charEnd="338">
+                                    <sedMethodReturn xml:id="_9b9fb395-a648-41bc-b037-8f620c47fc90" name="&lt;return of self.elseIf(_x);&gt;" pathCondition="!x = 0 &amp; (x = 3 &amp; !x = 2 &amp; !x = 1)" lineNumber="-1" charStart="90" charEnd="96">
+                                       <sedTermination xml:id="_7fc687b7-b010-4ff3-b1c6-368df806006b" name="&lt;end&gt;" pathCondition="!x = 0 &amp; (x = 3 &amp; !x = 2 &amp; !x = 1)">
+                                       </sedTermination>
+                                    </sedMethodReturn>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedBranchNode>
+                        </sedBranchCondition>
+                        <sedBranchCondition xml:id="_f3df43d3-09d2-4a1f-9a5f-0ded3aa7593a" name="!x = 3 &amp; !x = 2 &amp; !x = 1" pathCondition="!x = 0 &amp; (!x = 3 &amp; !x = 2 &amp; !x = 1)">
+                           <sedBranchNode xml:id="_5ff0e1fa-b381-48b5-8de0-a0c0bc4b9c66" name="if (_x==4) {return 42; }else  {   a=_x; }" pathCondition="!x = 0 &amp; (!x = 3 &amp; !x = 2 &amp; !x = 1)" lineNumber="-1" charStart="119" charEnd="325">
+                              <sedBranchCondition xml:id="_bfa52639-a2ed-4a73-91e0-c0dfac9df694" name="x = 4 TRUE" pathCondition="!x = 0 &amp; (!x = 3 &amp; !x = 2 &amp; !x = 1) &amp; x = 4">
+                                 <sedStatement xml:id="_e9cce10c-6e49-401c-b0f5-ef7be3e28761" name="return 42;" pathCondition="!x = 0 &amp; (!x = 3 &amp; !x = 2 &amp; !x = 1) &amp; x = 4" lineNumber="-1" charStart="284" charEnd="294">
+                                    <sedMethodReturn xml:id="_45dab3c2-c04b-45fb-9a4f-9535a7e10d73" name="&lt;return of self.elseIf(_x);&gt;" pathCondition="!x = 0 &amp; (!x = 3 &amp; !x = 2 &amp; !x = 1) &amp; x = 4" lineNumber="-1" charStart="90" charEnd="96">
+                                       <sedTermination xml:id="_f8cc1680-3d90-40b1-a496-f97fa89c9404" name="&lt;end&gt;" pathCondition="!x = 0 &amp; (!x = 3 &amp; !x = 2 &amp; !x = 1) &amp; x = 4">
+                                       </sedTermination>
+                                    </sedMethodReturn>
+                                 </sedStatement>
+                              </sedBranchCondition>
+                              <sedBranchCondition xml:id="_56319efb-12f4-4b5d-9e4a-8c6e6991601b" name="x = 4 FALSE" pathCondition="!x = 0 &amp; (!x = 3 &amp; !x = 2 &amp; !x = 1) &amp; !x = 4">
+                                 <sedStatement xml:id="_6310c23d-6731-4ac7-b8dd-262b569c2542" name="a=_x;" pathCondition="!x = 0 &amp; (!x = 3 &amp; !x = 2 &amp; !x = 1) &amp; !x = 4" lineNumber="-1" charStart="314" charEnd="320">
+                                    <sedStatement xml:id="_2aa10ab6-878c-46c4-988e-6bf8391a09ee" name="return a;" pathCondition="!x = 0 &amp; (!x = 3 &amp; !x = 2 &amp; !x = 1) &amp; !x = 4" lineNumber="-1" charStart="329" charEnd="338">
+                                       <sedMethodReturn xml:id="_a1550946-c3c8-4ae1-964a-c93d550af657" name="&lt;return of self.elseIf(_x);&gt;" pathCondition="!x = 0 &amp; (!x = 3 &amp; !x = 2 &amp; !x = 1) &amp; !x = 4" lineNumber="-1" charStart="90" charEnd="96">
+                                          <sedTermination xml:id="_8fd2ce5a-2290-4b0b-a4a0-d9b1d8a905cd" name="&lt;end&gt;" pathCondition="!x = 0 &amp; (!x = 3 &amp; !x = 2 &amp; !x = 1) &amp; !x = 4">
+                                          </sedTermination>
+                                       </sedMethodReturn>
+                                    </sedStatement>
+                                 </sedStatement>
+                              </sedBranchCondition>
+                           </sedBranchNode>
+                        </sedBranchCondition>
+                     </sedBranchNode>
+                  </sedBranchCondition>
+               </sedBranchNode>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

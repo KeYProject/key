@@ -3,9 +3,9 @@ package org.key_project.sed.core.test.testcase.swtbot;
 import junit.framework.TestCase;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
@@ -26,7 +26,7 @@ public class SWTBotDebugViewHierarchyTest extends TestCase {
    public void testSwitchingBetweenCompactAndNormalHierarchy() throws Exception {
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      SWTBotPerspective defaultPerspective = bot.activePerspective();
+      IPerspectiveDescriptor defaultPerspective = TestUtilsUtil.getActivePerspective();
       // Disable compact view
       boolean originalCompactView = SEDPreferenceUtil.isShowCompactExecutionTree();
       SEDPreferenceUtil.setShowCompactExecutionTree(true);
@@ -43,31 +43,31 @@ public class SWTBotDebugViewHierarchyTest extends TestCase {
          TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
-         waitForUserInterface(); // Give the user interface the chance to update the tree
+         TestSedCoreUtil.waitForDebugTreeInterface(); // Give the user interface the chance to update the tree
          // Make sure that the correct items are shown
          TestSedCoreUtil.assertCompactFixedExample(debugTree);
          // Change to normal view
          SEDPreferenceUtil.toggleShowCompactExecutionTreePreference();
-         waitForUserInterface(); // Give the user interface the chance to update the tree
+         TestSedCoreUtil.waitForDebugTreeInterface(); // Give the user interface the chance to update the tree
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
-         waitForUserInterface(); // Give the user interface the chance to update the tree
+         TestSedCoreUtil.waitForDebugTreeInterface(); // Give the user interface the chance to update the tree
          // Make sure that the correct items are shown
          TestSedCoreUtil.assertFixedExample(debugTree);
          // Change to compact view
          SEDPreferenceUtil.toggleShowCompactExecutionTreePreference();
-         waitForUserInterface(); // Give the user interface the chance to update the tree
+         TestSedCoreUtil.waitForDebugTreeInterface(); // Give the user interface the chance to update the tree
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
-         waitForUserInterface(); // Give the user interface the chance to update the tree
+         TestSedCoreUtil.waitForDebugTreeInterface(); // Give the user interface the chance to update the tree
          // Make sure that the correct items are shown
          TestSedCoreUtil.assertCompactFixedExample(debugTree);
       }
       finally {
-         defaultPerspective.activate();
          SEDPreferenceUtil.setShowCompactExecutionTree(originalCompactView);
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
+         TestUtilsUtil.openPerspective(defaultPerspective);
       }
    }
    
@@ -81,7 +81,7 @@ public class SWTBotDebugViewHierarchyTest extends TestCase {
    public void testCompactHierarchy() throws Exception {
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      SWTBotPerspective defaultPerspective = bot.activePerspective();
+      IPerspectiveDescriptor defaultPerspective = TestUtilsUtil.getActivePerspective();
       // Disable compact view
       boolean originalCompactView = SEDPreferenceUtil.isShowCompactExecutionTree();
       SEDPreferenceUtil.setShowCompactExecutionTree(true);
@@ -98,15 +98,15 @@ public class SWTBotDebugViewHierarchyTest extends TestCase {
          TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
-         waitForUserInterface(); // Give the user interface the chance to update the tree
+         TestSedCoreUtil.waitForDebugTreeInterface(); // Give the user interface the chance to update the tree
          // Make sure that the correct items are shown
          TestSedCoreUtil.assertCompactFixedExample(debugTree);
       }
       finally {
-         defaultPerspective.activate();
          SEDPreferenceUtil.setShowCompactExecutionTree(originalCompactView);
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
+         TestUtilsUtil.openPerspective(defaultPerspective);
       }
    }
    
@@ -119,7 +119,7 @@ public class SWTBotDebugViewHierarchyTest extends TestCase {
    public void testHierarchy() throws Exception {
       // Close welcome view
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
-      SWTBotPerspective defaultPerspective = bot.activePerspective();
+      IPerspectiveDescriptor defaultPerspective = TestUtilsUtil.getActivePerspective();
       // Disable compact view
       boolean originalCompactView = SEDPreferenceUtil.isShowCompactExecutionTree();
       SEDPreferenceUtil.setShowCompactExecutionTree(false);
@@ -136,23 +136,15 @@ public class SWTBotDebugViewHierarchyTest extends TestCase {
          TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Expand all tree items
          TestUtilsUtil.expandAll(debugTree);
-         waitForUserInterface(); // Give the user interface the chance to update the tree
+         TestSedCoreUtil.waitForDebugTreeInterface(); // Give the user interface the chance to update the tree
          // Make sure that the correct items are shown
          TestSedCoreUtil.assertFixedExample(debugTree);
       }
       finally {
-         defaultPerspective.activate();
          SEDPreferenceUtil.setShowCompactExecutionTree(originalCompactView);
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
+         TestUtilsUtil.openPerspective(defaultPerspective);
       }
-   }
-   
-   /**
-    * Waits until the user interface is ready.
-    */
-   protected void waitForUserInterface() {
-      TestUtilsUtil.sleep(10);
-      TestUtilsUtil.waitForJobs();
    }
 }

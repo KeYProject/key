@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -17,6 +18,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.model.KeYBranchCondition;
@@ -433,6 +435,30 @@ public final class KeYModelUtil {
       }
       else {
          return new KeYVariable[0];
+      }
+   }
+
+   /**
+    * Converts the given call stack of {@link IExecutionNode} into 
+    * a call stack of {@link ISEDDebugNode}s.
+    * @param debugTarget The {@link KeYDebugTarget} which maps {@link IExecutionNode}s to {@link ISEDDebugNode}s.
+    * @param callStack The call stack to convert.
+    * @return The converted call stack.
+    */
+   public static IKeYSEDDebugNode<?>[] createCallStack(KeYDebugTarget debugTarget, IExecutionNode[] callStack) {
+      if (debugTarget != null && callStack != null) {
+         IKeYSEDDebugNode<?>[] result = new IKeYSEDDebugNode<?>[callStack.length];
+         int i = 0;
+         for (IExecutionNode executionNode : callStack) {
+            IKeYSEDDebugNode<?> debugNode = debugTarget.getDebugNode(executionNode);
+            Assert.isNotNull(debugNode, "Can't find debug node for execution node \"" + executionNode + "\".");
+            result[i] = debugNode;
+            i++;
+         }
+         return result;
+      }
+      else {
+         return new IKeYSEDDebugNode<?>[0];
       }
    }
 }

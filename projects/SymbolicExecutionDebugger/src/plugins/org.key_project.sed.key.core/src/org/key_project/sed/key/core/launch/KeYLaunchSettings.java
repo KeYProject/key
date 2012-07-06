@@ -37,9 +37,19 @@ public class KeYLaunchSettings {
    private boolean showMethodReturnValues;
    
    /**
+    * Show variables of selected debug node?
+    */
+   private boolean showVariablesOfSelectedDebugNode;
+   
+   /**
     * Show KeY's main window?
     */
    private boolean showKeYMainWindow;
+   
+   /**
+    * Merge branch conditions?
+    */
+   private boolean mergeBranchConditions;
 
    /**
     * Constructor.
@@ -47,18 +57,24 @@ public class KeYLaunchSettings {
     * @param useExistingContract Use an existing contract or generate default contract?
     * @param existingContract The ID of the existing contract to use.
     * @param showMethodReturnValues Show method return values of {@link ISEDMethodReturn} instances?
+    * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
+    * @param mergeBranchConditions Merge branch conditions?
     */
    public KeYLaunchSettings(IMethod method, 
                             boolean useExistingContract, 
                             String existingContract, 
                             boolean showMethodReturnValues,
-                            boolean showKeYMainWindow) {
+                            boolean showVariablesOfSelectedDebugNode,
+                            boolean showKeYMainWindow,
+                            boolean mergeBranchConditions) {
       this.method = method;
       this.useExistingContract = useExistingContract;
       this.existingContract = existingContract;
       this.showMethodReturnValues = showMethodReturnValues;
+      this.showVariablesOfSelectedDebugNode = showVariablesOfSelectedDebugNode;
       this.showKeYMainWindow = showKeYMainWindow;
+      this.mergeBranchConditions = mergeBranchConditions;
    }
 
    /**
@@ -99,5 +115,21 @@ public class KeYLaunchSettings {
     */
    public boolean isShowKeYMainWindow() {
       return showKeYMainWindow;
+   }
+
+   /**
+    * Checks if variables of selected debug node should be shown.
+    * @return Show variables of selected debug node?
+    */
+   public boolean isShowVariablesOfSelectedDebugNode() {
+      return showVariablesOfSelectedDebugNode;
+   }
+
+   /**
+    * Checks if branch conditions are merged.
+    * @return Merge branch conditions?
+    */
+   public boolean isMergeBranchConditions() {
+      return mergeBranchConditions;
    }
 }

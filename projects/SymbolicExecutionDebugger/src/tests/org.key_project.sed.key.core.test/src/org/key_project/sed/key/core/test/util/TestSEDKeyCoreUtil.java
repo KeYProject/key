@@ -1,7 +1,6 @@
 package org.key_project.sed.key.core.test.util;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -16,8 +15,6 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
@@ -32,7 +29,6 @@ import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.jdt.JDTUtil;
-import org.key_project.util.test.util.TestUtilsUtil;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
@@ -53,10 +49,16 @@ public final class TestSEDKeyCoreUtil {
     * based on KeY.
     * @param method The {@link IMethod} to debug.
     * @param showMethodReturnValues Show method return values? Use {@code null} to use default value.
+    * @param showVariablesOfSelectedDebugNode Show variables of selected debug node? Use {@code null} to use default value.
+    * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
+    * @param mergeBranchConditions Merge branch conditions?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IMethod method,
-                                final Boolean showMethodReturnValues) throws Exception {
+                                final Boolean showMethodReturnValues,
+                                final Boolean showVariablesOfSelectedDebugNode,
+                                final Boolean showKeYMainWindow,
+                                final Boolean mergeBranchConditions) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
@@ -65,6 +67,15 @@ public final class TestSEDKeyCoreUtil {
                ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
                if (showMethodReturnValues != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
+               }
+               if (showVariablesOfSelectedDebugNode != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNode);
+               }
+               if (showKeYMainWindow != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindow);
+               }
+               if (mergeBranchConditions != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
                }
                config = wc.doSave();
                DebugUITools.launch(config, KeySEDUtil.MODE);
@@ -139,7 +150,7 @@ public final class TestSEDKeyCoreUtil {
     * @throws DebugException Occurred Exception.
     */
    public static void assertInitialTarget(ISEDDebugTarget target, String targetName) throws DebugException {
-      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName), target, false, false);
+      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName), target, false, false, false);
    }
    
    /**
@@ -152,7 +163,7 @@ public final class TestSEDKeyCoreUtil {
     * @throws ParserConfigurationException Occurred Exception.
     */
    public static void assertFlatStepsExample(ISEDDebugTarget target) throws DebugException, ParserConfigurationException, SAXException, IOException {
-      TestSedCoreUtil.compareDebugTarget(createExpectedModel("data/statements/oracle/FlatSteps.xml"), target, false, false);
+      TestSedCoreUtil.compareDebugTarget(createExpectedModel("data/statements/oracle/FlatSteps.xml"), target, false, false, false);
    }
    
    /**
@@ -168,24 +179,5 @@ public final class TestSEDKeyCoreUtil {
                                                            JDTUtil.getQualifiedMethodLabel(method).replaceAll(" ", StringUtil.EMPTY_STRING),
                                                            "-2147483648", 
                                                            "normal_behavior");
-   }
-   
-   /**
-    * Method to select an item in the debug tree.
-    * @param debugTree The debug tree.
-    * @param indexPathToItem The indices on parents to select.
-    * @return The selected {@link SWTBotTreeItem}.
-    */
-   public static SWTBotTreeItem selectInDebugTree(SWTBotTree debugTree, int... indexPathToItem) {
-      TestCase.assertNotNull(indexPathToItem);
-      TestCase.assertTrue(indexPathToItem.length >= 1);
-      SWTBotTreeItem item = null;
-      for (int i = 1; i < indexPathToItem.length + 1; i++) {
-         int[] subPath = Arrays.copyOf(indexPathToItem, i);
-         item = TestUtilsUtil.selectInTree(debugTree, subPath);
-         item.expand();
-         TestUtilsUtil.waitForJobs();
-      }
-      return item;
    }
 }

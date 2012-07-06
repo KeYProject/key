@@ -10,6 +10,7 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdate;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.util.ISEDConstants;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 import org.key_project.util.java.ArrayUtil;
 
@@ -60,7 +61,13 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
    protected Object[] getAllChildren(Object parent, IPresentationContext context) throws CoreException {
       if (IDebugUIConstants.ID_VARIABLE_VIEW.equals(context.getId())) {
          if (parent instanceof IStackFrame) {
-            return ((IStackFrame)parent).getVariables();
+            IStackFrame frame = ((IStackFrame)parent);
+            if (frame.hasVariables()) {
+               return frame.getVariables();
+            }
+            else {
+               return EMPTY;
+            }
          }
          else {
             return EMPTY;
@@ -68,7 +75,28 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
       }
       else if (IDebugUIConstants.ID_REGISTER_VIEW.equals(context.getId())) {
          if (parent instanceof IStackFrame) {
-            return ((IStackFrame)parent).getRegisterGroups();
+            IStackFrame frame = ((IStackFrame)parent);
+            if (frame.hasRegisterGroups()) {
+               return frame.getRegisterGroups();
+            }
+            else {
+               return EMPTY;
+            }
+         }
+         else {
+            return EMPTY;
+         }
+      }
+      else if (ISEDConstants.ID_CALL_STACK.equals(context.getId())) {
+         if (parent instanceof ISEDDebugNode) {
+            Object root = context.getProperty(ISEDConstants.PRESENTATION_CONTEXT_PROPERTY_INPUT);
+            if (root == null || root == parent) { // Return only children if it is the viewers input because otherwise the stack elements are expandable.
+               ISEDDebugNode[] callStack = ((ISEDDebugNode)parent).getCallStack();
+               return callStack != null ? callStack : EMPTY; 
+            }
+            else {
+               return EMPTY;
+            }
          }
          else {
             return EMPTY;
@@ -214,7 +242,8 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
    protected boolean supportsContextId(String id) {
       return IDebugUIConstants.ID_DEBUG_VIEW.equals(id) ||
              IDebugUIConstants.ID_VARIABLE_VIEW.equals(id) ||
-             IDebugUIConstants.ID_REGISTER_VIEW.equals(id);
+             IDebugUIConstants.ID_REGISTER_VIEW.equals(id) ||
+             ISEDConstants.ID_CALL_STACK.equals(id);
    }
    
    /**

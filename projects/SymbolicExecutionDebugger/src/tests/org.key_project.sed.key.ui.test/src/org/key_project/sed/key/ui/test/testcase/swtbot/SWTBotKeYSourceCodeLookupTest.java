@@ -12,18 +12,20 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotPerspective;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Before;
 import org.junit.Test;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.test.util.DebugTargetResumeSuspendListener;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.launch.KeYSourceLookupDirector;
 import org.key_project.sed.key.core.launch.KeYSourceLookupParticipant;
@@ -62,7 +64,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       // Get current settings to restore them in finally block
-      SWTBotPerspective defaultPerspective = bot.activePerspective();
+      IPerspectiveDescriptor defaultPerspective = TestUtilsUtil.getActivePerspective();
       SWTBotTree debugTree = null;
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       try {
@@ -76,16 +78,20 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 8;
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, true);
+         TestSEDKeyCoreUtil.launchKeY(method, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
          ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
-         // Resume launch
-         SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
-         item.contextMenu("Resume").click();
-         TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
-         TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
+         // Click on "Resume" and wait until step was executed.
+         final SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
+         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+            @Override
+            public void run() {
+               SWTBotMenu menuItem = item.contextMenu("Resume"); 
+               menuItem.click();
+            }
+         });
          // Test the execution tree
          TestSEDKeyCoreUtil.assertFlatStepsExample(target);
          // Make sure that no editor is opened
@@ -98,10 +104,10 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
       finally {
          // Restore timeout
          SWTBotPreferences.TIMEOUT = originalTimeout;
-         // Restore perspective
-         defaultPerspective.activate();
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
+         // Restore perspective
+         TestUtilsUtil.openPerspective(defaultPerspective);
          // Make sure that all editors are closed
          bot.closeAllEditors();
       }
@@ -125,7 +131,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
                                           IDebugTarget target,
                                           boolean closeEditor) throws CoreException, BadLocationException {
       // Select statement in debug tree
-      SWTBotTreeItem item = TestSEDKeyCoreUtil.selectInDebugTree(debugTree, pathToStatementInTree);
+      SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugTree, pathToStatementInTree);
       // Get statement that should be selected in opened editor.
       ISEDStatement statement = (ISEDStatement)TestUtilsUtil.getTreeItemData(item);
       // Make sure that an editor is opened
@@ -154,7 +160,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       // Get current settings to restore them in finally block
-      SWTBotPerspective defaultPerspective = bot.activePerspective();
+      IPerspectiveDescriptor defaultPerspective = TestUtilsUtil.getActivePerspective();
       SWTBotTree debugTree = null;
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       try {
@@ -168,17 +174,21 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 8;
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, true);
+         TestSEDKeyCoreUtil.launchKeY(method, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE, Boolean.FALSE);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
          ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          ILaunch launch = target.getLaunch();
-         // Resume launch
-         SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
-         item.contextMenu("Resume").click();
-         TestSedCoreUtil.waitUntilDebugTargetCanSuspend(bot, target); // Wait until the target is resumed.
-         TestSedCoreUtil.waitUntilDebugTargetCanResume(bot, target); // wait until the target is suspended.
+         // Click on "Resume" and wait until step was executed.
+         final SWTBotTreeItem item = TestUtilsUtil.selectInTree(debugTree, 0, 0); // Select first debug target
+         DebugTargetResumeSuspendListener.run(bot, target, new Runnable() {
+            @Override
+            public void run() {
+               SWTBotMenu menuItem = item.contextMenu("Resume"); 
+               menuItem.click();
+            }
+         });
          // Test the execution tree
          TestSEDKeyCoreUtil.assertFlatStepsExample(target);
          // Get stack frame for lookup
@@ -206,10 +216,10 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
       finally {
          // Restore timeout
          SWTBotPreferences.TIMEOUT = originalTimeout;
-         // Restore perspective
-         defaultPerspective.activate();
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);
+         // Restore perspective
+         TestUtilsUtil.openPerspective(defaultPerspective);
       }
    }
 }
