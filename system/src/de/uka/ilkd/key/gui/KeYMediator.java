@@ -303,7 +303,9 @@ public class KeYMediator {
     }
 
 
-    /** the proof the mediator handles with */
+    /** the proof the mediator handles with 
+     * @see #getSelectedProof()
+     */
     public Proof getProof() {
 	return keySelectionModel.getSelectedProof();
     }
@@ -634,6 +636,7 @@ public class KeYMediator {
   
     /** returns the current selected proof 
      * @return the current selected proof 
+     * @see #getProof()
      */
     public Proof getSelectedProof() {
  	return keySelectionModel.getSelectedProof();
