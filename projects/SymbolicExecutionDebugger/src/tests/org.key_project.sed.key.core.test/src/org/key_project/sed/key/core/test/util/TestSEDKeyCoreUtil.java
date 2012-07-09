@@ -48,6 +48,8 @@ public final class TestSEDKeyCoreUtil {
     * Launches the {@link IMethod} in the symbolic execution debugger
     * based on KeY.
     * @param method The {@link IMethod} to debug.
+    * @param useExistingContract Use existing contract? Use {@code null} to use default value.
+    * @param preconditionOrExistingContract Optional precondition or the ID of the existing contract to use Use {@code null} to use default value.
     * @param showMethodReturnValues Show method return values? Use {@code null} to use default value.
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node? Use {@code null} to use default value.
     * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
@@ -55,6 +57,8 @@ public final class TestSEDKeyCoreUtil {
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IMethod method,
+                                final Boolean useExistingContract,
+                                final String preconditionOrExistingContract,
                                 final Boolean showMethodReturnValues,
                                 final Boolean showVariablesOfSelectedDebugNode,
                                 final Boolean showKeYMainWindow,
@@ -65,6 +69,22 @@ public final class TestSEDKeyCoreUtil {
             try {
                ILaunchConfiguration config = getKeYLaunchConfiguration(method);
                ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
+               if (useExistingContract != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContract);
+                  if (preconditionOrExistingContract != null) {
+                     if (useExistingContract) {
+                        wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT, preconditionOrExistingContract);
+                     }
+                     else {
+                        wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+                     }
+                  }
+               }
+               else {
+                  if (preconditionOrExistingContract != null) {
+                     wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+                  }
+               }
                if (showMethodReturnValues != null) {
                   wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
                }

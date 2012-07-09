@@ -609,7 +609,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       Services services = initConfig.getServices();
       IProgramMethod pm = searchProgramMethod(services, containerTypeName, methodFullName);
       // Create default contract for method to test
-      FunctionalOperationContract contract = SymbolicExecutionUtil.createDefaultContract(services, pm);
+      FunctionalOperationContract contract = SymbolicExecutionUtil.createDefaultContract(services, pm, null);
       // Start proof
       ProofOblInput input = new SymbolicExecutionFunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract);
       Proof proof = ui.createProof(initConfig, input);

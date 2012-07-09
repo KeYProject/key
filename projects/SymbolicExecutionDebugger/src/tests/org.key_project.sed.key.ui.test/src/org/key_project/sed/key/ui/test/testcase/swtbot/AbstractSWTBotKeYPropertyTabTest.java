@@ -61,6 +61,8 @@ public class AbstractSWTBotKeYPropertyTabTest extends AbstractKeYDebugTargetTest
                            false,
                            false, 
                            createMethodSelector("FlatSteps", "doSomething", "I", "QString;", "Z"), 
+                           null,
+                           null,
                            Boolean.FALSE, 
                            Boolean.FALSE, 
                            Boolean.FALSE, 

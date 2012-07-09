@@ -153,20 +153,24 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Creates a new default contract for the given {@link IProgramMethod}
-    * which only ensures that the own invariants ({@code this.<inv>}) hold.
+    * Creates a new default contract for the given {@link IProgramMethod}.
+    * If a precondition is defined in JML syntax it is added to the generated
+    * contract. If no one is defined the generated contract requires nothing.
     * @param services The {@link Services} to use.
     * @param pm The {@link IProgramMethod} to create a default contract for.
+    * @param precondition An optional precondition to use.
     * @return The created {@link Contract}.
     * @throws SLTranslationException Occurred Exception.
     */
-   public static FunctionalOperationContract createDefaultContract(Services services, IProgramMethod pm) throws SLTranslationException {
+   public static FunctionalOperationContract createDefaultContract(Services services, 
+                                                                   IProgramMethod pm,
+                                                                   String precondition) throws SLTranslationException {
       // Create TextualJMLSpecCase
       ImmutableList<String> mods = ImmutableSLList.nil();
       mods = mods.append("public");
       TextualJMLSpecCase textualSpecCase = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
-      if (!pm.isStatic()) {
-         textualSpecCase.addRequires(new PositionedString("this.<inv>")); // Assume own invariants
+      if (precondition != null && !precondition.isEmpty()) {
+         textualSpecCase.addRequires(new PositionedString(precondition));
       }
       // Create contract
       JMLSpecFactory factory = new JMLSpecFactory(services);

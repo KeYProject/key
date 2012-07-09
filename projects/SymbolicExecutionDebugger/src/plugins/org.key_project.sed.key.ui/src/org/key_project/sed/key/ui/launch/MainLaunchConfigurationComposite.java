@@ -1,5 +1,7 @@
 package org.key_project.sed.key.ui.launch;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
@@ -15,14 +17,18 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.debug.ui.launchConfigurations.JavaMainTab;
+import org.eclipse.jdt.internal.debug.ui.contentassist.IJavaDebugContentAssistContext;
+import org.eclipse.jdt.internal.debug.ui.contentassist.TypeContext;
 import org.eclipse.jdt.internal.debug.ui.launcher.AbstractJavaMainTab;
 import org.eclipse.jdt.internal.debug.ui.launcher.DebugTypeSelectionDialog;
 import org.eclipse.jdt.ui.JavaElementLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -33,6 +39,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
@@ -115,10 +122,31 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
    private Button browseContractButton;
    
    /**
-    * The last defined existing contract.
+    * Edits the custom precondition.
     */
-   private String lastDefinedExistingContract;
-
+   private JavaSnippetSourceViewer preconditionViewer;
+   
+   /**
+    * Contains the controls to define an existing contract.
+    */
+   private Composite existingContractComposite;
+   
+   /**
+    * Shows the controls to define a precondition.
+    */
+   private Composite preconditionComposite;
+   
+   /**
+    * Shows {@link #preconditionComposite} if {@link #useGeneratedContractButton}
+    * is selected or {@link #existingContractComposite} if {@link #useExistingContractButton} is selected.
+    */
+   private Composite contractComposite;
+   
+   /**
+    * {@link StackLayout} used in {@link #contractComposite}.
+    */
+   private StackLayout contractCompositeLayout;
+   
    /**
     * Constructor.
     * @param parent The parent {@link Composite}.
@@ -193,6 +221,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
           @Override
           public void modifyText(ModifyEvent e) {
               updateLaunchConfigurationDialog();
+              updatePreconditionViewerComposite();
           }
       });
       if (isEditable()) {
@@ -206,7 +235,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
       }
       // Verification
       Group verificationGroup = widgetFactory.createGroup(composite, "Verification");
-      verificationGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      verificationGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
       verificationGroup.setLayout(new GridLayout(1, false));
       Composite usedContractComposite = widgetFactory.createPlainComposite(verificationGroup, SWT.NONE);
       usedContractComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -218,7 +247,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
           public void widgetSelected(SelectionEvent e) {
               if (useGeneratedContractButton.getSelection()) {
                   updateLaunchConfigurationDialog();
-                  updateExistingContractState();
+                  updateShownContractComposite();
               }
           }
       });
@@ -229,15 +258,21 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
           public void widgetSelected(SelectionEvent e) {
               if (useExistingContractButton.getSelection()) {
                   updateLaunchConfigurationDialog();
-                  updateExistingContractState();
+                  updateShownContractComposite();
               }
           }
       });
-      Composite existingContractComposite = widgetFactory.createPlainComposite(verificationGroup, SWT.NONE);
-      existingContractComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      
+      contractCompositeLayout = new StackLayout();
+      contractComposite = widgetFactory.createPlainComposite(verificationGroup, SWT.NONE);
+      contractComposite.setLayout(contractCompositeLayout);
+      contractComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+      
+      existingContractComposite = widgetFactory.createPlainComposite(contractComposite, SWT.NONE);
       existingContractComposite.setLayout(new GridLayout(isEditable() ? 3 : 2, false));
       widgetFactory.createLabel(existingContractComposite, "Contr&act");
       existingContractText = widgetFactory.createText(existingContractComposite, null);
+      existingContractText.setEditable(isEditable());
       existingContractText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       existingContractText.addModifyListener(new ModifyListener() {
           @Override
@@ -254,24 +289,52 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
              }
          });
       }
+      
+      preconditionComposite = widgetFactory.createPlainComposite(contractComposite, SWT.NONE);
+      GridLayout preconditionCompositeLayout = new GridLayout(2, false);
+      preconditionComposite.setLayout(preconditionCompositeLayout);
+      Label preconditionLabel = widgetFactory.createLabel(preconditionComposite, "Prec&ondition");
+      preconditionLabel.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, false, false));
+      int preconditionViewerCompositeStyle = SWT.BORDER;
+      if (isEditable()) {
+         preconditionViewerCompositeStyle |= SWT.V_SCROLL | SWT.H_SCROLL;
+      }
+      preconditionViewer = new JavaSnippetSourceViewer(preconditionComposite, preconditionViewerCompositeStyle);
+      preconditionViewer.setEditable(isEditable());
+      preconditionViewer.addPropertyChangeListener(JavaSnippetSourceViewer.PROP_TEXT, new PropertyChangeListener() {
+         @Override
+         public void propertyChange(PropertyChangeEvent e) {
+            updateLaunchConfigurationDialog();
+         }
+      });
+      if (isEditable() && preconditionViewer.getDecoractionImage() != null) {
+         preconditionCompositeLayout.horizontalSpacing += preconditionViewer.getDecoractionImage().getImageData().width;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      preconditionViewer.dispose();
+      super.dispose();
    }
 
    /**
     * Updates the shown operation contract.
     */
-   protected void updateExistingContractState() {
+   protected void updateShownContractComposite() {
+      // Update shown text and top control of stack layout
        boolean useExistingContract = useExistingContractButton.getSelection();
-       existingContractText.setEditable(useExistingContract && isEditable());
-       if (browseContractButton != null) {
-          browseContractButton.setEnabled(useExistingContract && isEditable());
-       }
        if (useExistingContract) {
-           SWTUtil.setText(existingContractText, lastDefinedExistingContract);
+           contractCompositeLayout.topControl = existingContractComposite;
        }
        else {
-           lastDefinedExistingContract = existingContractText.getText();
-           existingContractText.setText(StringUtil.EMPTY_STRING);
+           contractCompositeLayout.topControl = preconditionComposite;
        }
+       // Layout ui
+       contractComposite.layout();
    }
 
    /**
@@ -588,6 +651,34 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
       }
       return message;
    }
+
+   /**
+    * Updates the precondition viewer composite by setting the
+    * correct context for content assistant.
+    */
+   protected void updatePreconditionViewerComposite() {
+      IJavaDebugContentAssistContext context = null;
+      if (getType() == null) {
+         context = new TypeContext(null, -1);
+      }
+      else {
+         int position= -1;
+         IMethod method = getMethod();
+         if (method != null) {
+            try {
+               Block body = JDTUtil.getMethodBody(method);
+               if (body != null) {
+                  position = body.getStartPosition() + 1; // Go inside the method body directly after {
+               }
+            }
+            catch (JavaModelException e) {
+               LogUtil.getLogger().logError(e);
+            }
+         }
+         context = new TypeContext(getType(), position);
+      }
+      preconditionViewer.setContentAssistContext(context);
+   }
    
    /**
     * {@inheritDoc}
@@ -602,8 +693,9 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
          useGeneratedContractButton.setSelection(!useExistingContract);
          useExistingContractButton.setSelection(useExistingContract);
          existingContractText.setText(KeySEDUtil.getExistingContractValue(configuration));
-         lastDefinedExistingContract = existingContractText.getText();
-         updateExistingContractState();
+         preconditionViewer.setText(KeySEDUtil.getPrecondition(configuration));
+         updateShownContractComposite();
+         updatePreconditionViewerComposite();
       } 
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);
@@ -624,8 +716,9 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
          useGeneratedContractButton.setSelection(!useExistingContract);
          useExistingContractButton.setSelection(useExistingContract);
          existingContractText.setText(settings.getExistingContract());
-         lastDefinedExistingContract = existingContractText.getText();
-         updateExistingContractState();
+         preconditionViewer.setText(settings.getPrecondition());
+         updateShownContractComposite();
+         updatePreconditionViewerComposite();
       }
       catch (JavaModelException e) {
          LogUtil.getLogger().logError(e);
@@ -642,5 +735,6 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD, methodText.getText());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContractButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT, existingContractText.getText());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionViewer.getText());
    }
 }

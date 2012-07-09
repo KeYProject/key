@@ -2,26 +2,28 @@ package org.key_project.util.test.testcase;
 
 import java.beans.PropertyChangeEvent;
 
-import org.key_project.util.bean.Bean;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Shell;
+import org.key_project.util.eclipse.swt.BeanComposite;
 
 /**
- * Tests for {@link Bean}.
+ * Tests for {@link BeanComposite}.
  * @author Martin Hentschel
  */
-public class BeanTest extends AbstractIBeanTest {
+public class BeanCompositeTest extends AbstractIBeanTest {
    /**
     * {@inheritDoc}
     */
    @Override
    protected ITestBean createTestBean() {
-      return new TestBean();
+      return new TestBeanViewPart();
    }
    
    /**
     * The used example bean.
     * @author Martin Hentschel
     */
-   private static class TestBean extends Bean implements ITestBean {       
+   private static class TestBeanViewPart extends BeanComposite implements ITestBean {
       /**
        * An object value.
        */
@@ -50,7 +52,14 @@ public class BeanTest extends AbstractIBeanTest {
       /**
        * An boolean array.
        */
-      private boolean[] booleanArray = new boolean[2];
+      private boolean[] booleanArray = new boolean[2];       
+      
+      /**
+       * Constructor.
+       */
+      public TestBeanViewPart() {
+         super(new Shell(), SWT.NONE);
+      }
 
       /**
        * {@inheritDoc}
