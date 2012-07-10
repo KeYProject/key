@@ -519,6 +519,7 @@ public class InteractiveProver {
         private ImmutableList<Goal> goals;
         private ImmutableList<Node> nodesForRetreat;
         private boolean retreatMode;
+        private boolean cancelled;
 
         public AutoModeWorker(ImmutableList<Goal> goals) {
             this.goals = goals;
@@ -535,6 +536,7 @@ public class InteractiveProver {
                 for(Goal g : goals) {
                     this.nodesForRetreat = this.nodesForRetreat.prepend(g.node());
                 }
+                cancelled = false;
             }
         }        
         
@@ -547,9 +549,31 @@ public class InteractiveProver {
                     .getActiveStrategyProperties().getProperty(
                             StrategyProperties.STOPMODE_OPTIONS_KEY)
                             .equals(StrategyProperties.STOPMODE_NONCLOSE);
-            // Schleife für retreatMode (cancelled && isError vermutlich)
-            return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(), getTimeout(), stopMode );                    
-        }  // Ausgabefeld (result) anpassen
+            /**
+             * In retreatMode, the proof on the node of each previous
+             * goal is pruned, unless it was closed in the automatic proof.
+             * Other than in standard mode, in retreatMode this is done for
+             * each goal (sequentially), even if we get stuck in a goal before. 
+             */
+            if(retreatMode) {
+                assert !this.goals.isEmpty();
+                ApplyStrategyInfo result = null;
+                for(Goal g : this.goals) {
+                    ImmutableList<Goal> gList = ImmutableSLList.<Goal>nil().prepend(g);
+                    Node n = g.node();
+                    result = applyStrategy.subStart ( result, proof,
+                            gList, mediator ().getMaxAutomaticSteps(), getTimeout(), stopMode );
+                    Proof automaticProof = result.getProof();                    
+                    if(!n.isClosed())
+                        automaticProof.pruneProof(n);
+                    if(result.isError() || cancelled)
+                        break;
+                }
+                result = applyStrategy.end(result);
+                return result;
+            } else
+                return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(), getTimeout(), stopMode );                    
+        }
         
         /**
          * Called by the "Stop" button, interrupts the worker thread 
@@ -557,7 +581,7 @@ public class InteractiveProver {
          * method handles InterruptedExceptions cleanly.
          */
         public void stop () {
-           // cancelled = true;
+           cancelled = true;
            interrupt();
         }
 
@@ -567,14 +591,14 @@ public class InteractiveProver {
              * In retreatMode, the proof on the node of each previous
              * goal is pruned, unless it was closed in the automatic proof.
              */
-            if(retreatMode) {
+            /*if(retreatMode) {
                 Proof automaticProof = result.getProof();
                 for(Node n : this.nodesForRetreat) {
                     
                     if(!n.isClosed())
                         automaticProof.pruneProof(n);
                 }
-            }             
+            }*/            
             
             mediator().setInteractive( true );            
             mediator().startInterface( true );
