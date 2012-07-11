@@ -28,12 +28,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
-import de.uka.ilkd.key.symbolic_execution.po.SymbolicExecutionFunctionalOperationContractPO;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -234,9 +235,16 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
            throw new CoreException(LogUtil.getLogger().createErrorStatus("Unable to find a contract to prove."));
        }
        // Instantiate proof
-       ProofOblInput input;
+       AbstractOperationPO input;
        if (contract instanceof FunctionalOperationContract) {
-           input = new SymbolicExecutionFunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract);
+           input = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract, true);
+//           input = new MethodPartPO(initConfig, 
+//                                    contract.getName(), 
+//                                    pm, 
+//                                    precondition, 
+//                                    new Position(10, 0), 
+//                                    new Position(11, 100),
+//                                    true);
        }
        else {
            throw new CoreException(LogUtil.getLogger().createErrorStatus("Contract of class \"" + contract.getClass().getCanonicalName() + "\" are not supported."));
