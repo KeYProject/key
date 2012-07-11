@@ -318,7 +318,12 @@ public class ApplyStrategy {
         fireTaskStarted ();
     }
     
-    public ApplyStrategyInfo subStart(ApplyStrategyInfo result, Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout, boolean stopAtFirstNonCloseableGoal) {
+    /* This is the iterative case, where proofs are done separately on multiple branches,
+     * sequentially though. So each gets accumulated with the one done before. After the
+     * accumulation, the method finalize should be called.
+     */
+    public ApplyStrategyInfo iterate(ApplyStrategyInfo result, Proof proof, ImmutableList<Goal> goals,
+            int maxSteps, long timeout, boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
 
         this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal; 
@@ -334,15 +339,17 @@ public class ApplyStrategy {
                 }
             }            
         };
-        initStrategy(proof, goals, maxSteps, timeout, treeListener);
+        beginStrategy(proof, goals, maxSteps, timeout, treeListener);
         return addStrategy(result, doStrategy(treeListener));
     }
     
-    public ApplyStrategyInfo end(ApplyStrategyInfo result) {
-        return getStrategy(result);
+    // In order to finish the proof and display the result.
+    public ApplyStrategyInfo finalize(ApplyStrategyInfo result) {
+        return finishStrategy(result);
     }
     
-    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout, boolean stopAtFirstNonCloseableGoal) {
+    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps,
+            long timeout, boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
 
         this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal; 
@@ -358,14 +365,17 @@ public class ApplyStrategy {
                 }
             }            
         };
-        initStrategy(proof, goals, maxSteps, timeout, treeListener);
+        beginStrategy(proof, goals, maxSteps, timeout, treeListener);
         ApplyStrategyInfo result = doStrategy(treeListener);
-        return getStrategy(result);
+        return finishStrategy(result);
     }
-    private void initStrategy(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout, ProofTreeListener treeListener) {
+    
+    private void beginStrategy(Proof proof, ImmutableList<Goal> goals, int maxSteps,
+            long timeout, ProofTreeListener treeListener) {
         proof.addProofTreeListener(treeListener);
         init(proof, goals, maxSteps, timeout);
-    }    
+    }
+    
     private ApplyStrategyInfo doStrategy(ProofTreeListener treeListener) {
         assert proof != null;
         
@@ -380,8 +390,9 @@ public class ApplyStrategy {
             setAutoModeActive(false);
         }        
         return result;
-    }    
-    private ApplyStrategyInfo getStrategy(ApplyStrategyInfo result) {
+    }
+    
+    private ApplyStrategyInfo finishStrategy(ApplyStrategyInfo result) {
         if (result != null) {
             if (proof != null) {
                 /* Maybe the proof was removed from the proof list and #clear()
@@ -389,7 +400,7 @@ public class ApplyStrategy {
                  * this statement is executed after MainWindow#frozen is set to false.
                  */
                 proof.addAutoModeTime(result.getTime());
-            }            
+            }
             fireTaskFinished (new DefaultTaskFinishedInfo(this, result, 
                     proof, result.getTime(), 
                     result.getAppliedRuleApps(), result.getClosedGoals()));
@@ -397,10 +408,10 @@ public class ApplyStrategy {
         return result;
     }
     
+    // Used to combine multiple iteratively called proofs and integrate their results in final result
     private ApplyStrategyInfo addStrategy(ApplyStrategyInfo result, ApplyStrategyInfo subResult) {
         if(result == null)
-            return getStrategy(subResult);
-        // This is to integrate results of sub-proofs
+            return finishStrategy(subResult);
         String msg = subResult.reason();
         Proof prf = subResult.getProof();
         Throwable err = subResult.getException();
@@ -411,7 +422,7 @@ public class ApplyStrategy {
         int appl = result.getAppliedRuleApps() + subResult.getAppliedRuleApps();
         int clsd = result.getClosedGoals() + subResult.getClosedGoals();
         result = new ApplyStrategyInfo(msg,prf,err,go,tme,appl,clsd);
-        return getStrategy(result);
+        return finishStrategy(result);
     }
 
     public synchronized void addProverTaskObserver(ProverTaskListener observer) {

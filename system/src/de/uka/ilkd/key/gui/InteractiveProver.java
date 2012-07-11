@@ -561,18 +561,19 @@ public class InteractiveProver {
                 for(Goal g : this.goals) {
                     ImmutableList<Goal> gList = ImmutableSLList.<Goal>nil().prepend(g);
                     Node n = g.node();
-                    result = applyStrategy.subStart ( result, proof,
+                    result = applyStrategy.iterate ( result, proof,
                             gList, mediator ().getMaxAutomaticSteps(), getTimeout(), stopMode );
-                    Proof automaticProof = result.getProof();                    
+                    Proof automaticProof = result.getProof();
                     if(!n.isClosed())
                         automaticProof.pruneProof(n);
                     if(result.isError() || cancelled)
                         break;
                 }
-                result = applyStrategy.end(result);
+                result = applyStrategy.finalize(result);
                 return result;
             } else
-                return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(), getTimeout(), stopMode );                    
+                return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(),
+                        getTimeout(), stopMode );
         }
         
         /**
@@ -586,19 +587,7 @@ public class InteractiveProver {
         }
 
         public void finished() {
-            final ApplyStrategyInfo result = (ApplyStrategyInfo) get ();
-            /**
-             * In retreatMode, the proof on the node of each previous
-             * goal is pruned, unless it was closed in the automatic proof.
-             */
-            /*if(retreatMode) {
-                Proof automaticProof = result.getProof();
-                for(Node n : this.nodesForRetreat) {
-                    
-                    if(!n.isClosed())
-                        automaticProof.pruneProof(n);
-                }
-            }*/            
+            final ApplyStrategyInfo result = (ApplyStrategyInfo) get ();            
             
             mediator().setInteractive( true );            
             mediator().startInterface( true );
