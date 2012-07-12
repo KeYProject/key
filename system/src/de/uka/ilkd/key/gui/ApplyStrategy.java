@@ -184,6 +184,8 @@ public class ApplyStrategy {
     private boolean stopAtFirstNonCloseableGoal;
 
     protected int closedGoals;
+    
+    private boolean cancelled;
 
 
     // Please create this object beforehand and re-use it.
@@ -257,6 +259,7 @@ public class ApplyStrategy {
                         (Goal) null, System.currentTimeMillis()-time, countApplied, closedGoals);
             }
         } catch (InterruptedException e) {
+            cancelled = true;
             return new ApplyStrategyInfo("Interrupted.", proof, null, 
                     goalChooser.getNextGoal(), System.currentTimeMillis()-time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
@@ -312,7 +315,8 @@ public class ApplyStrategy {
         maxApplications = maxSteps;
         this.timeout    = timeout;
         countApplied    = 0; 
-        closedGoals     = 0;        
+        closedGoals     = 0;
+        cancelled       = false;
         goalChooser.init ( newProof, goals );
         setAutoModeActive(true);        
         fireTaskStarted ();
@@ -322,31 +326,7 @@ public class ApplyStrategy {
      * sequentially though. So each gets accumulated with the one done before. After the
      * accumulation, the method finalize should be called.
      */
-    public ApplyStrategyInfo iterate(ApplyStrategyInfo result, Proof proof, ImmutableList<Goal> goals,
-            int maxSteps, long timeout, boolean stopAtFirstNonCloseableGoal) {
-        assert proof != null;
-
-        this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal; 
-
-        ProofTreeListener treeListener = new ProofTreeAdapter() {            
-            @Override
-            public void proofGoalsAdded(ProofTreeEvent e) {
-                ImmutableList<Goal> newGoals = e.getGoals();
-                // Check for a closed goal ...
-                if (newGoals.size() == 0){
-                    // No new goals have been generated ...
-                    closedGoals++;
-                }
-            }            
-        };
-        beginStrategy(proof, goals, maxSteps, timeout, treeListener);
-        return addStrategy(result, doStrategy(treeListener));
-    }
     
-    // In order to finish the proof and display the result.
-    public ApplyStrategyInfo finalize(ApplyStrategyInfo result) {
-        return finishStrategy(result);
-    }
     
     public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps,
             long timeout, boolean stopAtFirstNonCloseableGoal) {
@@ -354,6 +334,47 @@ public class ApplyStrategy {
 
         this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal; 
 
+        ProofTreeListener treeListener =
+                prepareStrategy(proof, goals, maxSteps, timeout);
+        ApplyStrategyInfo result = executeStrategy(treeListener);
+        finishStrategy(result);
+        return result;
+    }
+    
+    public ApplyStrategyInfo startRetreat(Proof proof,
+                                          ImmutableList<Goal> goals,
+                                          int maxSteps,
+                                          long timeout,
+                                          boolean stopAtFirstNonCloseableGoal) {
+        assert proof != null;
+        assert !goals.isEmpty();
+
+        ApplyStrategyInfo result = null;
+        for (Goal g : goals) {
+            ImmutableList<Goal> gList = ImmutableSLList.<Goal>nil().prepend(g);
+            Node n = g.node();
+
+            this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal;
+
+            ProofTreeListener treeListener =
+                    prepareStrategy(proof, gList, maxSteps, timeout);
+            ApplyStrategyInfo subResult = executeStrategy(treeListener);
+            result = joinStrategyInfos(result, subResult);
+
+            Proof automaticProof = result.getProof();
+            if (!n.isClosed()) {
+                automaticProof.pruneProof(n);
+            }
+            if (result.isError() || cancelled) {
+                break;
+            }
+        }
+        finishStrategy(result);
+        return result;
+    }
+    
+    private ProofTreeListener prepareStrategy(Proof proof, ImmutableList<Goal> goals, int maxSteps,
+            long timeout) {
         ProofTreeListener treeListener = new ProofTreeAdapter() {            
             @Override
             public void proofGoalsAdded(ProofTreeEvent e) {
@@ -365,18 +386,12 @@ public class ApplyStrategy {
                 }
             }            
         };
-        beginStrategy(proof, goals, maxSteps, timeout, treeListener);
-        ApplyStrategyInfo result = doStrategy(treeListener);
-        return finishStrategy(result);
-    }
-    
-    private void beginStrategy(Proof proof, ImmutableList<Goal> goals, int maxSteps,
-            long timeout, ProofTreeListener treeListener) {
         proof.addProofTreeListener(treeListener);
         init(proof, goals, maxSteps, timeout);
+        return treeListener;
     }
     
-    private ApplyStrategyInfo doStrategy(ProofTreeListener treeListener) {
+    private ApplyStrategyInfo executeStrategy(ProofTreeListener treeListener) {
         assert proof != null;
         
         ProofListener pl = new ProofListener();
@@ -392,26 +407,26 @@ public class ApplyStrategy {
         return result;
     }
     
-    private ApplyStrategyInfo finishStrategy(ApplyStrategyInfo result) {
-        if (result != null) {
-            if (proof != null) {
-                /* Maybe the proof was removed from the proof list and #clear()
-                 * has set the proof reference to null. It is possible because
-                 * this statement is executed after MainWindow#frozen is set to false.
-                 */
-                proof.addAutoModeTime(result.getTime());
-            }
-            fireTaskFinished (new DefaultTaskFinishedInfo(this, result, 
-                    proof, result.getTime(), 
-                    result.getAppliedRuleApps(), result.getClosedGoals()));
+    private void finishStrategy(ApplyStrategyInfo result) {
+//        if (result != null) {
+        assert result != null; // CS
+        if (proof != null) {
+            /* Maybe the proof was removed from the proof list and #clear()
+                * has set the proof reference to null. It is possible because
+                * this statement is executed after MainWindow#frozen is set to false.
+                */
+            proof.addAutoModeTime(result.getTime());
         }
-        return result;
+        fireTaskFinished (new DefaultTaskFinishedInfo(this, result, 
+                proof, result.getTime(), 
+                result.getAppliedRuleApps(), result.getClosedGoals()));
+//        }
     }
     
     // Used to combine multiple iteratively called proofs and integrate their results in final result
-    private ApplyStrategyInfo addStrategy(ApplyStrategyInfo result, ApplyStrategyInfo subResult) {
+    private ApplyStrategyInfo joinStrategyInfos(ApplyStrategyInfo result, ApplyStrategyInfo subResult) {
         if(result == null)
-            return finishStrategy(subResult);
+            return subResult;
         String msg = subResult.reason();
         Proof prf = subResult.getProof();
         Throwable err = subResult.getException();
@@ -422,7 +437,7 @@ public class ApplyStrategy {
         int appl = result.getAppliedRuleApps() + subResult.getAppliedRuleApps();
         int clsd = result.getClosedGoals() + subResult.getClosedGoals();
         result = new ApplyStrategyInfo(msg,prf,err,go,tme,appl,clsd);
-        return finishStrategy(result);
+        return result;
     }
 
     public synchronized void addProverTaskObserver(ProverTaskListener observer) {

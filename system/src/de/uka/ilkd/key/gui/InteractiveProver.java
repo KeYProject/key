@@ -519,7 +519,6 @@ public class InteractiveProver {
         private ImmutableList<Goal> goals;
         private ImmutableList<Node> nodesForRetreat;
         private boolean retreatMode;
-        private boolean cancelled;
 
         public AutoModeWorker(ImmutableList<Goal> goals) {
             this.goals = goals;
@@ -536,7 +535,6 @@ public class InteractiveProver {
                 for(Goal g : goals) {
                     this.nodesForRetreat = this.nodesForRetreat.prepend(g.node());
                 }
-                cancelled = false;
             }
         }        
         
@@ -556,21 +554,8 @@ public class InteractiveProver {
              * each goal (sequentially), even if we get stuck in a goal before. 
              */
             if(retreatMode) {
-                assert !this.goals.isEmpty();
-                ApplyStrategyInfo result = null;
-                for(Goal g : this.goals) {
-                    ImmutableList<Goal> gList = ImmutableSLList.<Goal>nil().prepend(g);
-                    Node n = g.node();
-                    result = applyStrategy.iterate ( result, proof,
-                            gList, mediator ().getMaxAutomaticSteps(), getTimeout(), stopMode );
-                    Proof automaticProof = result.getProof();
-                    if(!n.isClosed())
-                        automaticProof.pruneProof(n);
-                    if(result.isError() || cancelled)
-                        break;
-                }
-                result = applyStrategy.finalize(result);
-                return result;
+                return applyStrategy.startRetreat ( proof, goals, mediator ().getMaxAutomaticSteps(),
+                        getTimeout(), stopMode );
             } else
                 return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(),
                         getTimeout(), stopMode );
@@ -582,7 +567,6 @@ public class InteractiveProver {
          * method handles InterruptedExceptions cleanly.
          */
         public void stop () {
-           cancelled = true;
            interrupt();
         }
 
