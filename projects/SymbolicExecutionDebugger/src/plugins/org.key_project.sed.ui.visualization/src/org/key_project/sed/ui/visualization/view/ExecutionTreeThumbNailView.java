@@ -12,6 +12,11 @@ import org.eclipse.ui.IViewPart;
  */
 public class ExecutionTreeThumbNailView extends AbstractViewBasedThumbNailView {
    /**
+    * The ID of this view.
+    */
+   public static final String VIEW_ID = "org.key_project.sed.ui.graphiti.view.ExecutionTreeThumbNailView";
+
+   /**
     * Listens for visibility changes of the editor in the base view.
     */
    private PropertyChangeListener editorVisibleListener = new PropertyChangeListener() {

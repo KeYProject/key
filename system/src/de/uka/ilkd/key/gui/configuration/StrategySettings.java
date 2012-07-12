@@ -13,8 +13,13 @@ package de.uka.ilkd.key.gui.configuration;
 import java.util.LinkedList;
 import java.util.Properties;
 
+import de.uka.ilkd.key.gui.ApplyStrategy;
+import de.uka.ilkd.key.gui.ApplyStrategy.AppliedRuleStopCondition;
+import de.uka.ilkd.key.gui.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.strategy.SimpleJavaCardDLOptions;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
@@ -39,6 +44,21 @@ public class StrategySettings implements Settings {
     private long timeout = -1;
     
     private StrategyProperties strategyProperties = new StrategyProperties();
+    
+    /**
+     * An optional customized {@link IStopCondition} which is used in an
+     * {@link ApplyStrategy} instance to determine after each applied rule
+     * if more rules should be applied or not.
+     */
+    private IStopCondition customApplyStrategyStopCondition;
+    
+    /**
+     * An optional customized {@link IGoalChooser} which is used in an
+     * {@link ApplyStrategy} instance to select the next {@link Goal} to
+     * apply a rule on. If no one is defined the default one of the
+     * {@link ApplyStrategy}, which is defined by the user interface, is used.
+     */
+    private IGoalChooser customApplyStrategyGoalChooser;
     
     /** returns the maximal amount of heuristics steps before a user
      * interaction is required 
@@ -199,5 +219,71 @@ public class StrategySettings implements Settings {
             this.timeout = timeout;
             fireSettingsChanged();
         }
+    }
+
+    /**
+     * <p>
+     * Returns the {@link IStopCondition} to use in an {@link ApplyStrategy}
+     * instance to determine after each applied rule if more rules
+     * should be applied or not.
+     * </p>
+     * <p>
+     * By default is an {@link AppliedRuleStopCondition} used which stops
+     * the auto mode if the given maximal number of rule applications or a
+     * defined timeout is reached. If a customized implementation is defined
+     * for the current proof via {@link #setCustomApplyStrategyStopCondition(IStopCondition)}
+     * this instance is returned instead.
+     * </p>
+     * @return The {@link IStopCondition} to use in an {@link ApplyStrategy} instance.
+     */
+    public IStopCondition getApplyStrategyStopCondition() {
+        if (customApplyStrategyStopCondition != null) {
+            return customApplyStrategyStopCondition;
+        }
+        else {
+            return new AppliedRuleStopCondition();
+        }
+    }
+
+    /**
+     * Returns a customized {@link IStopCondition} which is used in an
+     * {@link ApplyStrategy} to determine after each applied rule if more rules
+     * should be applied or not.
+     * @return The customized {@link IStopCondition} or {@code null} if the default one should be used.
+     */
+    public IStopCondition getCustomApplyStrategyStopCondition() {
+        return customApplyStrategyStopCondition;
+    }
+
+    /**
+     * Defines the {@link IStopCondition} which is used in an
+     * {@link ApplyStrategy} to determine after each applied rule if more rules
+     * should be applied or not.
+     * @param customApplyStrategyStopCondition The customized {@link IStopCondition} to use or {@code null} to use the default one.
+     */
+    public void setCustomApplyStrategyStopCondition(IStopCondition customApplyStrategyStopCondition) {
+        this.customApplyStrategyStopCondition = customApplyStrategyStopCondition;
+    }
+
+    /**
+     * Returns the customized {@link IGoalChooser} which is used in an
+     * {@link ApplyStrategy} instance to select the next {@link Goal} to
+     * apply a rule on. If no one is defined the default one of the
+     * {@link ApplyStrategy}, which is defined by the user interface, is used.
+     * @return The customized {@link IGoalChooser} to use or {@code null} to use the default one of the {@link ApplyStrategy}.
+     */
+    public IGoalChooser getCustomApplyStrategyGoalChooser() {
+        return customApplyStrategyGoalChooser;
+    }
+
+    /**
+     * Sets the customized {@link IGoalChooser} which is used in an
+     * {@link ApplyStrategy} instance to select the next {@link Goal} to
+     * apply a rule on. If no one is defined the default one of the
+     * {@link ApplyStrategy}, which is defined by the user interface, is used.
+     * @param customGoalChooser The customized {@link IGoalChooser} to use or {@code null} to use the default one of the {@link ApplyStrategy}.
+     */
+    public void setCustomApplyStrategyGoalChooser(IGoalChooser customGoalChooser) {
+        this.customApplyStrategyGoalChooser = customGoalChooser;
     }
 }

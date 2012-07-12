@@ -21,6 +21,7 @@ import org.eclipse.gmf.runtime.diagram.ui.editparts.ITreeBranchEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
 import org.eclipse.gmf.runtime.draw2d.ui.figures.PolylineConnectionEx;
 import org.eclipse.gmf.runtime.notation.View;
+import org.eclipse.swt.graphics.Color;
 
 import de.hentschel.visualdbc.dbcmodel.diagram.edit.policies.DbcProofReferenceItemSemanticEditPolicy;
 
@@ -75,7 +76,21 @@ public class DbcProofReferenceEditPart extends ConnectionNodeEditPart implements
     * @generated
     */
    public class DbcProofReferenceFigure extends PolylineConnectionEx {
+      /**
+       * @generated NOT
+       */
+      private boolean globalVisible = true; // Required for automaitc proof reference hiding
 
+      /**
+       * @generated NOT
+       */
+      private Color originalForegroundColor;
+
+      /**
+       * @generated NOT
+       */
+      private int originalLineWidth;
+      
       /**
        * @generated
        */
@@ -99,6 +114,76 @@ public class DbcProofReferenceEditPart extends ConnectionNodeEditPart implements
          return df;
       }
 
+      /**
+       * @generated NOT
+       */
+      @Override
+      public boolean isVisible() {
+         return isGlobalVisible() && super.isVisible();
+      }
+
+      /**
+       * @generated NOT
+       */
+      public boolean isGlobalVisible() {
+         return globalVisible;
+      }
+
+      /**
+       * @generated NOT
+       */
+      public void setGlobalVisible(boolean globalVisible) {
+         this.globalVisible = globalVisible;
+      }
+
+      /**
+       * @generated NOT
+       */
+      public void highlight(Color highlightForegroundColor, int lineWidth) {
+         if (originalForegroundColor == null) {
+            this.originalForegroundColor = getForegroundColor();
+            this.originalLineWidth = getLineWidth();
+         }
+         super.setForegroundColor(highlightForegroundColor);
+         super.setLineWidth(lineWidth);
+      }
+      
+      /**
+       * @generated NOT
+       */
+      public void disableHighlighting() {
+         if (originalForegroundColor != null) {
+            super.setForegroundColor(originalForegroundColor);
+            super.setLineWidth(originalLineWidth);
+            originalForegroundColor = null;
+         }
+      }
+
+      /**
+       * @generated NOT
+       */
+      @Override
+      public void setForegroundColor(Color fg) {
+         if (originalForegroundColor == null) {
+            super.setForegroundColor(fg);
+         }
+         else {
+            originalForegroundColor = fg;
+         }
+      }
+
+      /**
+       * @generated NOT
+       */
+      @Override
+      public void setLineWidth(int w) {
+         if (originalForegroundColor == null) {
+            super.setLineWidth(w);
+         }
+         else {
+            originalLineWidth = w;
+         }
+      }
    }
 
 }

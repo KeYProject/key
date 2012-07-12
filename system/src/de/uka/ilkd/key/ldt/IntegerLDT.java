@@ -127,6 +127,7 @@ public final class IntegerLDT extends LDT {
     private final Function inInt;
     private final Function inLong;
     private final Function inChar;
+    private final Function index;
     private final Term one;
     private final Term zero;
 
@@ -228,6 +229,7 @@ public final class IntegerLDT extends LDT {
         inInt               = addFunction(services, "inInt");
         inLong              = addFunction(services, "inLong");
         inChar              = addFunction(services, "inChar");
+        index				= addFunction(services, "index");
 
         //cache often used constants       
         zero = translateLiteral(new IntLiteral(0), services);
@@ -333,6 +335,14 @@ public final class IntegerLDT extends LDT {
     public Function getLessOrEquals() {
         return lessOrEquals;
     }    
+    
+    /** Placeholder  for the loop index variable in an enhanced for loop over arrays.
+     * Follows the proposal by David Cok to adapt JML to Java5.
+     * @return
+     */
+    public Function getIndex(){
+    	return index;
+    }
     
     
     public Function getInBounds(Type t) {

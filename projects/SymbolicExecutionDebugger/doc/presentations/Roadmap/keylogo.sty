@@ -1,0 +1,44 @@
+%%
+%% This is file `keylogo.sty',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% keylogo.dtx  (with options: `stylefile')
+%% 
+%% IMPORTANT NOTICE:
+%% 
+%% For the copyright see the source file.
+%% 
+%% Any modified versions of this file must be renamed
+%% with new filenames distinct from keylogo.sty.
+%% 
+%% For distribution of the original source see the terms
+%% for copying and modification in the file keylogo.dtx.
+%% 
+%% This generated file may be distributed as long as the
+%% original source files, as listed above, are part of the
+%% same distribution. (The sources need not necessarily be
+%% in the same archive or directory.)
+\def\keylogofileversion{1.3}
+\def\keylogofiledate{1999/09/21}
+\ProvidesPackage{keylogo}
+         [\keylogofiledate \keylogofileversion KeY project logo macros
+         by M. Giese]
+\RequirePackage{graphicx, xspace}
+\def\kl@place@sized@file#1#2#3{%
+  \mbox{\lower#1\hbox{\includegraphics[height=#2]{#3}}}}
+\def\kl@place@logo@file#1{%
+  {\setbox0=\hbox{K}\kl@place@sized@file{0.292\ht0}{1.292\ht0}{#1}}%
+  \kern-.45ex}
+\newcommand{\KeYLogoColor}{\kl@place@logo@file{key-color.pdf}\xspace}
+\newcommand{\KeYLogoBlack}{\kl@place@logo@file{key-mono.eps}\xspace}
+\def\kl@place@hole@file#1{%
+  {\setbox0=\hbox{K}%
+   \kl@place@sized@file{0.292\ht0}{1.208\ht0}{#1}}}
+\newcommand{\KeYHole}{\kl@place@hole@file{ekey-mono.eps}\xspace}
+\newcommand{\KeYHoleEye}{\kl@place@hole@file{ekey-eye.eps}\xspace}
+\newcommand{\KeY}{Ke\kern-0.1emY\xspace}
+\endinput
+%%
+%% End of file `keylogo.sty'.

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_417d612b-1974-4bbc-8b48-27a1fc6192cc" name="StepOverOnTwoBranches[StepOverOnTwoBranches::main(int)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_bdd20942-e916-43b6-ba07-1b7b4e03fd7e" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_0d3bd4fe-3bd4-4811-99f4-5f1fe4ccc035" name="self.main(_a);" pathCondition="true" lineNumber="-1" charStart="52" charEnd="56">
+            <sedBranchNode xml:id="_81ebb9ff-e24a-442b-b907-9e3d242c2fd8" name="if (_a==0) {int i = 2;int j = 3;int x = valueLonger(i);int y = value(j);int z = valueLonger(x)+valueLonger(y);int zz = value(-3)+value(-4);return value(z+zz); }else  {int i = 2;int j = 3;int x = value(i);int y = valueLonger(j);int z = value(x)+value(y);int zz = valueLonger(-3)+valueLonger(-4);return valueLonger(z+zz); }" pathCondition="true" lineNumber="-1" charStart="69" charEnd="497">
+               <sedBranchCondition xml:id="_5b569b1f-8c90-49dd-bfd0-6b41660bd326" name="a = 0 TRUE" pathCondition="a = 0">
+                  <sedStatement xml:id="_14836aa7-7b13-4204-9edb-13a96c943d07" name="int i = 2;" pathCondition="a = 0" lineNumber="-1" charStart="87" charEnd="97">
+                     <sedStatement xml:id="_fa2456ad-7ba4-418f-99e5-6a5a3d141c85" name="int j = 3;" pathCondition="a = 0" lineNumber="-1" charStart="102" charEnd="112">
+                        <sedStatement xml:id="_95139cf7-1823-42f2-a3cc-8c74009e38fb" name="int x = valueLonger(i_1);" pathCondition="a = 0" lineNumber="-1" charStart="117" charEnd="140">
+                           <sedMethodCall xml:id="_1a06490a-1fa0-4ac1-b759-32b02457a6e0" name="self.valueLonger(i_2);" pathCondition="a = 0" lineNumber="-1" charStart="568" charEnd="579">
+                              <sedStatement xml:id="_9fa53c39-3435-44ad-8637-0793fd8f8471" name="int j = i_2;" pathCondition="a = 0" lineNumber="-1" charStart="592" charEnd="602">
+                                 <sedStatement xml:id="_fc163bcc-0e10-4b9d-941f-5844c6b56a73" name="i_2=j_1;" pathCondition="a = 0" lineNumber="-1" charStart="606" charEnd="612">
+                                    <sedStatement xml:id="_b58dfdbd-913c-49c9-84c0-250fc854dd81" name="return j_1;" pathCondition="a = 0" lineNumber="-1" charStart="616" charEnd="625">
+                                       <sedMethodReturn xml:id="_a5ae59ac-b4a4-43a4-bc8f-51acd8121ad6" name="&lt;return of self.valueLonger(i_2);&gt;" pathCondition="a = 0" lineNumber="-1" charStart="568" charEnd="579">
+                                          <sedStatement xml:id="_a75c9047-bf5c-4555-995a-11e6d9ac75b9" name="int y = value(j);" pathCondition="a = 0" lineNumber="-1" charStart="145" charEnd="162">
+                                          </sedStatement>
+                                       </sedMethodReturn>
+                                    </sedStatement>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedMethodCall>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedStatement>
+               </sedBranchCondition>
+               <sedBranchCondition xml:id="_86bf291e-83f4-4122-9dc2-cda047cf9d08" name="a = 0 FALSE" pathCondition="!a = 0">
+                  <sedStatement xml:id="_15195120-ac60-4b7b-9c7b-846fee85ba6c" name="int i = 2;" pathCondition="!a = 0" lineNumber="-1" charStart="297" charEnd="307">
+                     <sedStatement xml:id="_dd768fb3-61da-480b-b2ce-262c02aa66ce" name="int j = 3;" pathCondition="!a = 0" lineNumber="-1" charStart="312" charEnd="322">
+                        <sedStatement xml:id="_290a2d36-c6c2-44f2-ae88-9d4dc45d3d69" name="int x = value(i);" pathCondition="!a = 0" lineNumber="-1" charStart="327" charEnd="344">
+                        </sedStatement>
+                     </sedStatement>
+                  </sedStatement>
+               </sedBranchCondition>
+            </sedBranchNode>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

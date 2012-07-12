@@ -162,7 +162,11 @@ public class ProofSettings {
 	    }            
 	    FileOutputStream out = 
 		new FileOutputStream(PROVER_CONFIG_FILE);
-	    settingsToStream(settings,out);
+	    try { 
+	        settingsToStream(settings,out);
+	    } finally {
+	        out.close();
+	    }
 	} catch (IOException e){
 	    System.err.println("Warning: could not save proof-settings.");
 	    System.err.println(e);
@@ -215,7 +219,11 @@ public class ProofSettings {
     public void loadSettings(){
 	try {
 	    FileInputStream in = new FileInputStream(PROVER_CONFIG_FILE);
-	    loadSettingsFromStream(in);
+	    try { 
+	        loadSettingsFromStream(in);
+	    } finally {
+	        in.close();
+	    }
 	} catch (IOException e){
             System.err.println
 		("Warning: no proof-settings could be loaded, using defaults");

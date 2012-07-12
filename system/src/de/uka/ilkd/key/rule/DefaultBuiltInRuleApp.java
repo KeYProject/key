@@ -10,7 +10,10 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.List;
+
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -41,7 +44,6 @@ public class DefaultBuiltInRuleApp extends AbstractBuiltInRuleApp  {
     public DefaultBuiltInRuleApp tryToInstantiate(Goal goal) {
         return this;
     }
-
 
     @Override
     public DefaultBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {

@@ -752,14 +752,14 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 		    (new MethodFrame((IProgramVariable)changeList.get(0), 
 				     (IExecutionContext)changeList.get(1),
 				     (StatementBlock)changeList.get(2),
-                                     x.getProgramMethod(), PositionInfo.UNDEFINED));
+                                     PositionInfo.UNDEFINED));
 
 	    } else if (x.getChildCount() == 2) {
 		addChild
 		    (new MethodFrame(null, 
 				     (IExecutionContext)changeList.get(0),
 				     (StatementBlock)changeList.get(1),
-                                     x.getProgramMethod(), PositionInfo.UNDEFINED));
+                                     PositionInfo.UNDEFINED));
 	    } else {
 		throw new IllegalStateException
 		    ("Methodframe has not allowed number of children.");

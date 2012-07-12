@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.gui.ApplyStrategy;
-import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -171,7 +171,10 @@ public class ProofStarter {
         proof.setActiveStrategy(profile.getDefaultStrategyFactory().create(proof, strategyProperties));
         
         if (proof.getSettings().getGeneralSettings().oneStepSimplification()) {
-        	OneStepSimplifier.INSTANCE.refresh(proof);
+           OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof);
+           if (simplifier != null) {
+              simplifier.refresh(proof);
+           }
         }
         
         profile.setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);        
@@ -193,7 +196,6 @@ public class ProofStarter {
 
         return result;
     }
-
 
     public void init(ProofAggregate proofAggregate) {
     	this.proof = proofAggregate.getFirstProof();

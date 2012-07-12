@@ -18,8 +18,14 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.Taclet;
@@ -35,14 +41,14 @@ public final class RepresentsAxiom extends ClassAxiom {
     
     
     private final String name;
-    private final ObserverFunction target;
+    private final IObserverFunction target;
     private final KeYJavaType kjt;
     private final VisibilityModifier visibility;
     private final Term originalRep;
     private final ProgramVariable originalSelfVar;
     
     public RepresentsAxiom(String name,
-	    		   ObserverFunction target, 
+	    		   IObserverFunction target, 
 	                   KeYJavaType kjt,
 	                   VisibilityModifier visibility,
 	                   Term rep,
@@ -53,7 +59,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     
     public RepresentsAxiom(String name,
             String displayName,
-            ObserverFunction target, 
+            IObserverFunction target, 
                 KeYJavaType kjt,
                 VisibilityModifier visibility,
                 Term rep,
@@ -106,7 +112,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
     
     
-    public ObserverFunction getTarget() {
+    public IObserverFunction getTarget() {
 	return target;
     }    
     
@@ -122,7 +128,7 @@ public final class RepresentsAxiom extends ClassAxiom {
 
     
     public ImmutableSet<Taclet> getTaclets(
-            ImmutableSet<Pair<Sort, ObserverFunction>> toLimit,
+            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
         LocationVariable heap =
                 services.getTypeConverter().getHeapLDT().getHeap();
@@ -133,14 +139,14 @@ public final class RepresentsAxiom extends ClassAxiom {
         Name tacletName = MiscTools.toValidTacletName(name);
         TacletGenerator TG = TacletGenerator.getInstance();
         if (isFunctional()) {
-            return TG.generateFuncionalRepresentsTaclets(tacletName,
-                                                         originalRep,
-                                                         kjt,
-                                                         target,
-                                                         heap,
-                                                         self,
-                                                         toLimit,
-                                                         services);
+            return TG.generateFunctionalRepresentsTaclets(tacletName,
+                                                          originalRep,
+                                                          kjt,
+                                                          target,
+                                                          heap,
+                                                          self,
+                                                          toLimit,
+                                                          services);
         } else {
             Taclet taclet =
                     TG.generateRelationalRepresentsTaclet(tacletName,
@@ -155,7 +161,7 @@ public final class RepresentsAxiom extends ClassAxiom {
     }
     
     
-    public ImmutableSet<Pair<Sort, ObserverFunction>> getUsedObservers(
+    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
 	    						Services services) {
 	if(!isFunctional()) {
 	    return DefaultImmutableSet.nil();

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_2fb58816-e72a-4200-ba4c-ce92e5f5fd24" name="ManyStatements[ManyStatements::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_39794e6f-f9e9-404b-b872-709bbcc57866" name="&lt;start&gt;" pathCondition="true">
+      </sedThread>
+   </sedTarget>
+</launch>

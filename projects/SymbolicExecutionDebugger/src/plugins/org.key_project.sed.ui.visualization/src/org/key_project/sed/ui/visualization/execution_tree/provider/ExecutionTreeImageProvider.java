@@ -21,6 +21,10 @@ public class ExecutionTreeImageProvider extends AbstractImageProvider {
     * Path to the folder which contains the provided images.
     */
    private static final String ROOT_FOLDER_FOR_IMG = "icons/";
+   /**
+    * Path to the folder which contains the provided images.
+    */
+   private static final String ROOT_FOLDER_FOR_IMG_DEBUG_UI = "icons/org.eclipse.debug.ui/";
 
    /**
     * {@inheritDoc}
@@ -37,5 +41,12 @@ public class ExecutionTreeImageProvider extends AbstractImageProvider {
        addImageFilePath(IExecutionTreeImageConstants.IMG_STATEMENT, ROOT_FOLDER_FOR_IMG + "statement.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_TERMINATION, ROOT_FOLDER_FOR_IMG + "termination.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_THREAD, ROOT_FOLDER_FOR_IMG + "thread.gif");
+
+       addImageFilePath(IExecutionTreeImageConstants.IMG_RESUME, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "resume_co.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_SUSPEND, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "suspend_co.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_STEP_INTO, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "stepinto_co.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_STEP_OVER, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "stepover_co.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_STEP_RETURN, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "stepreturn_co.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_TERMINATE, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "terminate_co.gif");
    }
 }

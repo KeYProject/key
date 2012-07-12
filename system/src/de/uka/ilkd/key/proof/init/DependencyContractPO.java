@@ -10,11 +10,14 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.collection.*;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
@@ -26,6 +29,8 @@ public final class DependencyContractPO extends AbstractPO
                                         implements ContractPO {
     
     private Term mbyAtPre;    
+    
+    private DependencyContract contract;
            
     
     //-------------------------------------------------------------------------
@@ -34,8 +39,9 @@ public final class DependencyContractPO extends AbstractPO
     
     public DependencyContractPO(InitConfig initConfig, 
 	    			DependencyContract contract) {
-    	super(initConfig, contract.getName(), contract);
+    	super(initConfig, contract.getName());
     	assert !(contract instanceof FunctionalOperationContract);
+      this.contract = contract;
     }
     
     
@@ -95,8 +101,8 @@ public final class DependencyContractPO extends AbstractPO
             mbyAtPreDef = TB.tt();
         }        
              
-        return TB.and(new Term[]{TB.wellFormedHeap(services), 
-        			 TB.wellFormed(services, anonHeap),
+        return TB.and(new Term[]{TB.wellFormed(TB.getBaseHeap(services), services), 
+        			 TB.wellFormed(anonHeap, services),
         	       		 selfNotNull,
         	       		 selfCreated,
         	       		 selfExactType,
@@ -112,10 +118,10 @@ public final class DependencyContractPO extends AbstractPO
     
     @Override
     public void readProblem() throws ProofInputException {
-	ObserverFunction target = contract.getTarget();
-	if(target instanceof ProgramMethod) {
+	IObserverFunction target = contract.getTarget();
+	if(target instanceof IProgramMethod) {
 	    target = javaInfo.getToplevelPM(contract.getKJT(), 
-		    			    (ProgramMethod)target);
+		    			    (IProgramMethod)target);
 	    // FIXME: for some reason the above method call returns null now and then, the following line (hopefully) is a work-around
 	    if (target == null) target = contract.getTarget();
 	}
@@ -144,13 +150,13 @@ public final class DependencyContractPO extends AbstractPO
 			                     contract.getKJT(), 
 					     paramVars,
 					     anonHeap),
-			        contract.getPre(selfVar, paramVars, null, services));
+			        contract.getPre(heapLDT.getHeap(), selfVar, paramVars, null, services));
 	final Term dep = getContract().getDep(selfVar, paramVars, services);
 	
 	//prepare update
 	final Term changedHeap 
 		= TB.anon(services, 
-			  TB.heap(services), 
+			  TB.getBaseHeap(services), 
 			  TB.setMinus(services, 
 				      TB.allLocs(services), 
 				      dep), 
@@ -162,7 +168,7 @@ public final class DependencyContractPO extends AbstractPO
 	//prepare target term
 	final Term[] subs
 		= new Term[paramVars.size() + (target.isStatic() ? 1 : 2)];
-	subs[0] = TB.heap(services);
+	subs[0] = TB.getBaseHeap(services);
 	int offset = 1;
 	if(!target.isStatic()) {
 	    subs[1] = TB.var(selfVar);
@@ -200,7 +206,7 @@ public final class DependencyContractPO extends AbstractPO
     
     @Override
     public DependencyContract getContract() {
-        return (DependencyContract)contract;
+        return contract;
     }
     
     

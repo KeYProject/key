@@ -13,8 +13,8 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Pair;
@@ -37,7 +37,7 @@ public abstract class ClassAxiom implements SpecificationElement {
     /**
      * Returns the axiomatised function symbol. 
      */
-    public abstract ObserverFunction getTarget();
+    public abstract IObserverFunction getTarget();
  
     
     /**
@@ -45,7 +45,7 @@ public abstract class ClassAxiom implements SpecificationElement {
      * o.obs in the axiom, where kjt is the type of o (excluding the
      * defining occurrence of the axiom target). 
      */
-    public abstract ImmutableSet<Pair<Sort, ObserverFunction>> getUsedObservers(
+    public abstract ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
 	    						Services services);
     
     /**
@@ -53,7 +53,7 @@ public abstract class ClassAxiom implements SpecificationElement {
      * the passed observers are replaced by their "limited" counterparts.
      */
     public abstract ImmutableSet<Taclet> getTaclets(
-	    		ImmutableSet<Pair<Sort, ObserverFunction>> toLimit,
+	    		ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
 	    		Services services);    
 
     @Override

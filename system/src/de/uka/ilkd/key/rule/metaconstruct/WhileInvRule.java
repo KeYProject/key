@@ -89,7 +89,7 @@ public class WhileInvRule extends AbstractTermTransformer {
                 
         inv = term.sub(1);
         post = term.sub(0).sub(0);
-                        
+
         javaInfo = services.getJavaInfo();
         tf = TermFactory.DEFAULT ;
         typeConv = services.getTypeConverter();

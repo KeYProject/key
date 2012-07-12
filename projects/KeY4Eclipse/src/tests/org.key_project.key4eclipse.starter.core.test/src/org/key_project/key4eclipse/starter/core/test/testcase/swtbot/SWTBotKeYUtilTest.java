@@ -64,7 +64,7 @@ public class SWTBotKeYUtilTest extends TestCase {
           TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null));
           assertNotNull(MainWindow.getInstance());
           assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-          Proof firstProof = TestUtilsUtil.keyGetProofEnv(0).getProofs().iterator().next().getFirstProof();
+          Proof firstProof = TestUtilsUtil.keyGetProof(0, 0);
           assertNotNull(firstProof);
           assertTrue(KeYUtil.isProofInUI(firstProof));
           // Load second java project
@@ -75,18 +75,18 @@ public class SWTBotKeYUtilTest extends TestCase {
           TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("banking.LoggingPayCard", "charge(int)", "0", null), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
           assertNotNull(MainWindow.getInstance());
           assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
-          Proof secondProof = TestUtilsUtil.keyGetProofEnv(1).getProofs().iterator().next().getFirstProof();
+          Proof secondProof = TestUtilsUtil.keyGetProof(1, 0);
           assertNotNull(secondProof);
           assertTrue(KeYUtil.isProofInUI(firstProof));
           assertTrue(KeYUtil.isProofInUI(secondProof));
           // Remove first proof
-          KeYUtil.removeFromProofList(MainWindow.getInstance(), firstProof.env());
+          KeYUtil.removeFromProofList(MainWindow.getInstance(), firstProof);
           TestCase.assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
           TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
           assertFalse(KeYUtil.isProofInUI(firstProof));
           assertTrue(KeYUtil.isProofInUI(secondProof));
           // Remove first proof again
-          KeYUtil.removeFromProofList(MainWindow.getInstance(), secondProof.env());
+          KeYUtil.removeFromProofList(MainWindow.getInstance(), secondProof);
           TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
           assertFalse(KeYUtil.isProofInUI(firstProof));
           assertFalse(KeYUtil.isProofInUI(secondProof));
@@ -383,11 +383,11 @@ public class SWTBotKeYUtilTest extends TestCase {
         assertNotNull(MainWindow.getInstance());
         assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
         // Remove first proof
-        KeYUtil.removeFromProofList(MainWindow.getInstance(), TestUtilsUtil.keyGetProofEnv(0));
+        KeYUtil.removeFromProofList(MainWindow.getInstance(), TestUtilsUtil.keyGetProof(0, 0));
         TestCase.assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
         TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"), TestKeY4EclipseUtil.createOperationContractId("MCDemo", "inc(int)", "0", "normal_behavior"));
         // Remove first proof again
-        KeYUtil.removeFromProofList(MainWindow.getInstance(), TestUtilsUtil.keyGetProofEnv(0));
+        KeYUtil.removeFromProofList(MainWindow.getInstance(), TestUtilsUtil.keyGetProof(0, 0));
         TestCase.assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
         // Close main window
         TestUtilsUtil.keyCloseMainWindow();

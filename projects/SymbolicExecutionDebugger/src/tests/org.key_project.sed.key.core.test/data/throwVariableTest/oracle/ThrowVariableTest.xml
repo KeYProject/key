@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_eaf9ea56-d9ad-4d77-9d12-694ed7b4f114" name="ThrowVariableTest[ThrowVariableTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_d4e0e352-3625-4f33-95b2-6b00c6fca080" name="KeY Default Thread">
-         <sedMethodCall xml:id="_0c73773e-5ee4-4512-b743-538090dbb6ec" name="self.main();" lineNumber="-1" charStart="49" charEnd="53">
-            <sedStatement xml:id="_c5987d41-a89d-477a-b3fd-944b48cf8eae" name="IllegalArgumentException e = new IllegalArgumentException ();" lineNumber="-1" charStart="61" charEnd="121">
-               <sedStatement xml:id="_8d9ab4d3-ec4e-4e07-89fe-77619b826c46" name="throw e;" lineNumber="-1" charStart="125" charEnd="133">
-                  <sedExceptionalTermination xml:id="_98e836bc-c545-41be-baee-bf7df7a54bff" name="&lt;uncaught java.lang.IllegalArgumentException&gt;">
+   <sedTarget xml:id="_d34e48a2-9498-4a3e-bf61-b9ca0585194a" name="ThrowVariableTest[ThrowVariableTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_ebc838ce-fe62-4cd3-9e93-8070b4bc3f5b" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_208b29d5-6379-4af0-8c35-7132f963382f" name="self.main();" pathCondition="true" lineNumber="-1" charStart="49" charEnd="53">
+            <sedStatement xml:id="_5c1e75a7-5ac3-46e7-a670-bcb4b157e74f" name="IllegalArgumentException e = new IllegalArgumentException ();" pathCondition="true" lineNumber="-1" charStart="61" charEnd="121">
+               <sedStatement xml:id="_7b781cd8-ea23-4223-b23c-50a6aed7e336" name="throw e;" pathCondition="true" lineNumber="-1" charStart="125" charEnd="133">
+                  <sedExceptionalTermination xml:id="_3f2a9ee8-814c-44c5-97ac-7fdd884c3072" name="&lt;uncaught java.lang.IllegalArgumentException&gt;" pathCondition="true">
                   </sedExceptionalTermination>
                </sedStatement>
             </sedStatement>

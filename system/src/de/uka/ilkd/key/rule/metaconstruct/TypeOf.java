@@ -21,46 +21,46 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class TypeOf extends ProgramTransformer {
     
-     /** creates a typeof ProgramTransformer 
-     * @param pe the instance of expression contained by 
-     * the meta construct 
-     */
-    public TypeOf(ProgramElement pe) {
-	super("#typeof", pe); 
-	
-    }
+	/** creates a typeof ProgramTransformer 
+	 * @param pe the instance of expression contained by 
+	 * the meta construct 
+	 */
+	public TypeOf(ProgramElement pe) {
+		super("#typeof", pe); 
 
-    /** performs the program transformation needed for symbolic
-     * program transformation 
-     * @return the transformated program
-     */
-    public ProgramElement transform(ProgramElement pe,
-					    Services services,
-					    SVInstantiations insts) {
-
-	ExecutionContext ec = null;
-	
-        if (insts.getContextInstantiation() != null) {
-	    ec = insts.getContextInstantiation().activeStatementContext();
 	}
-        KeYJavaType kjt=null;
-        if(pe instanceof Expression){
-            kjt = services.getTypeConverter().getKeYJavaType((Expression)pe, ec);
-        } else {
-            kjt = ((TypeRef) pe).getKeYJavaType();
-        }
-        
-        assert kjt != null;
-        
-	if (!(kjt.getJavaType() instanceof PrimitiveType)) {
-	    if (kjt.getJavaType() instanceof ArrayType) {
-		return new TypeRef(kjt, ((ArrayType)kjt.
-					 getJavaType()).getDimension());
-	    }
-	}
-        
-	
 
-	return new TypeRef(kjt);
-    }
+	/** performs the program transformation needed for symbolic
+	 * program transformation 
+	 * @return the transformated program
+	 */
+	public ProgramElement transform(ProgramElement pe,
+			Services services,
+			SVInstantiations insts) {
+
+		ExecutionContext ec = null;
+
+		if (insts.getContextInstantiation() != null) {
+			ec = insts.getContextInstantiation().activeStatementContext();
+		}
+		KeYJavaType kjt=null;
+		if(pe instanceof Expression){
+			kjt = services.getTypeConverter().getKeYJavaType((Expression)pe, ec);
+		} else {
+			kjt = ((TypeRef) pe).getKeYJavaType();
+		}
+
+		assert kjt != null;
+
+		if (!(kjt.getJavaType() instanceof PrimitiveType)) {
+			if (kjt.getJavaType() instanceof ArrayType) {
+				return new TypeRef(kjt, ((ArrayType)kjt.
+						getJavaType()).getDimension());
+			}
+		}
+
+
+
+		return new TypeRef(kjt);
+	}
 }

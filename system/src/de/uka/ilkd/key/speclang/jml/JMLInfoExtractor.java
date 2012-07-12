@@ -10,13 +10,19 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
-import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.declaration.Modifier;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -77,7 +83,7 @@ public final class JMLInfoExtractor {
     
 
     
-    private static boolean hasJMLModifier(ProgramMethod pm, String mod) {
+    private static boolean hasJMLModifier(IProgramMethod pm, String mod) {
         ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
         final MethodDeclaration method = pm.getMethodDeclaration();
         
@@ -238,7 +244,7 @@ public final class JMLInfoExtractor {
      * Returns true iff the <code>pos</code>-th parameter of the given method
      * is declared "nullable" (implicitly or explicitly). 
      */
-    public static boolean parameterIsNullable(ProgramMethod pm, int pos) {
+    public static boolean parameterIsNullable(IProgramMethod pm, int pos) {
         MethodDeclaration md = pm.getMethodDeclaration();
         ParameterDeclaration pd = md.getParameterDeclarationAt(pos);
 
@@ -251,7 +257,7 @@ public final class JMLInfoExtractor {
      * is declared "nullable" (implicitly or explicitly). 
      * Warning: weird things may happen if the parameter doesn't belong to the method.
      */
-    public static boolean parameterIsNullable(ProgramMethod pm,
+    public static boolean parameterIsNullable(IProgramMethod pm,
             ParameterDeclaration pd) {
 	assert pm.getMethodDeclaration().getParameters().contains(pd): "parameter "+pd+" does not belong to method declaration "+pm;
 	ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
@@ -274,7 +280,7 @@ public final class JMLInfoExtractor {
     }
     
     
-    public static boolean resultIsNullable(ProgramMethod pm) {
+    public static boolean resultIsNullable(IProgramMethod pm) {
         MethodDeclaration md = pm.getMethodDeclaration();
         
         ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
@@ -304,7 +310,7 @@ public final class JMLInfoExtractor {
     /**
      * Returns true iff the given method is specified "pure".
      */
-    public static boolean isPure(ProgramMethod pm) {
+    public static boolean isPure(IProgramMethod pm) {
         return hasJMLModifier(pm, "pure") 
                || isPureByDefault(pm.getContainerType());
     }
@@ -313,7 +319,7 @@ public final class JMLInfoExtractor {
     /**
      * Returns true iff the given method is specified "helper".
      */
-    public static boolean isHelper(ProgramMethod pm) {
+    public static boolean isHelper(IProgramMethod pm) {
 	return hasJMLModifier(pm, "helper");
     }
 
@@ -321,7 +327,7 @@ public final class JMLInfoExtractor {
      * Returns true iff the given method is specified "strictly_pure"
      * or the containing type is specified so.
      */
-    public static boolean isStrictlyPure(ProgramMethod pm) {
+    public static boolean isStrictlyPure(IProgramMethod pm) {
         return hasJMLModifier(pm, "strictly_pure") 
                 || isStrictlyPureByDefault(pm.getContainerType());
     }

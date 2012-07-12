@@ -28,7 +28,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 /**
  * manages the possible application of rules (RuleApps) 
  */
-public class RuleAppIndex  {
+public final class RuleAppIndex  {
 
     private Goal                goal;
 

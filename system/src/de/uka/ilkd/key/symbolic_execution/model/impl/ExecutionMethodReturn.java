@@ -3,10 +3,10 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -27,14 +27,13 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
-import de.uka.ilkd.key.symbolic_execution.util.IFilter;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.ProofStarter;
 
 /**
  * The default implementation of {@link IExecutionMethodReturn}.
@@ -63,11 +62,12 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
    
    /**
     * Constructor.
+    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param methodCall The {@link IExecutionMethodCall} which is now returned.
     */
-   public ExecutionMethodReturn(Node proofNode, IExecutionMethodCall methodCall) {
-      super(proofNode);
+   public ExecutionMethodReturn(KeYMediator mediator, Node proofNode, IExecutionMethodCall methodCall) {
+      super(mediator, proofNode);
       assert methodCall != null;
       this.methodCall = methodCall;
    }
@@ -84,7 +84,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     * {@inheritDoc}
     */
    @Override
-   protected String lazyComputeName() {
+   protected String lazyComputeName() throws ProofInputException {
       return createMethodReturnName(null, getMethodCall().getName());
    }
 
@@ -147,14 +147,17 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
          Node methodReturnNode = findMethodReturnNode(getProofNode());
          if (methodReturnNode != null) {
             // Start site proof to extract the value of the result variable.
-            SiteProofVariableValueInput sequentToProve = createExtractVariableValueSequent(mbs.getBodySourceAsTypeReference(),  
-                                                                                           mbs.getDesignatedContext(), 
-                                                                                           methodReturnNode, 
-                                                                                           resultVar);
-            ApplyStrategy.ApplyStrategyInfo info = startSiteProof(sequentToProve.getSequentToProve());
-            returnValue = extractOperatorValue(info, sequentToProve.getOperator());
+            de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVariableValueInput sequentToProve = SymbolicExecutionUtil.createExtractReturnVariableValueSequent(getServices(),
+                                                                                                                                                                                     mbs.getBodySourceAsTypeReference(),
+                                                                                                                                                                                     mbs.getProgramMethod(getServices()),
+                                                                                                                                                                                     mbs.getDesignatedContext(), 
+                                                                                                                                                                                     methodReturnNode, 
+                                                                                                                                                                                     resultVar);
+            ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequentToProve.getSequentToProve());
+            returnValue = SymbolicExecutionUtil.extractOperatorValue(info, sequentToProve.getOperator());
+            assert returnValue != null;
             // Format return vale
-            StringBuffer sb = ProofSaver.printTerm(returnValue, info.getProof().getServices(), true);
+            StringBuffer sb = ProofSaver.printTerm(returnValue, getServices(), true);
             formatedReturnValue = sb.toString();
          }
       }
@@ -189,26 +192,6 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
              (!JavaUtil.isTrimmedEmpty(methodName) ? " of " + methodName : "") +
              INTERNAL_NODE_NAME_END;
    }
-   
-   /**
-    * Creates a {@link Sequent} which can be used in site proofs to
-    * extract the value of the given {@link IProgramVariable} from the
-    * sequent of the given {@link Node}.
-    * @param contextObjectType The type of the current object (this reference).
-    * @param contextObject The current object (this reference).
-    * @param node The original {@link Node} which provides the sequent to extract from.
-    * @param variable The {@link IProgramVariable} of the value which is interested.
-    * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
-    */
-   protected SiteProofVariableValueInput createExtractVariableValueSequent(TypeReference contextObjectType,
-                                                                           ReferencePrefix contextObject,
-                                                                           Node node,
-                                                                           IProgramVariable variable) {
-      // Create execution context in that the method was called.
-      IExecutionContext context = new ExecutionContext(contextObjectType, contextObject);
-      // Create sequent
-      return createExtractVariableValueSequent(context, node, variable);
-   }
 
    /**
     * Creates a {@link Sequent} which can be used in site proofs to
@@ -238,7 +221,7 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
       Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = MiscTools.goBelowUpdates2(originalModifiedFormula).first;
+      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Combine method frame, formula with value predicate and the updates which provides the values
       Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, modalityTerm);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
@@ -299,56 +282,18 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
     * @param sequentToProve The {@link Sequent} to prove.
     * @return The proof result represented as {@link ApplyStrategyInfo} instance.
     * @throws ProofInputException Occurred Exception
+    * {@inheritDoc}
     */
-   protected ApplyStrategyInfo startSiteProof(Sequent sequentToProve) throws ProofInputException {
-      // Make sure that valid parameters are given
-      assert sequentToProve != null;
-      // Create ProofStarter
-      ProofStarter starter = new ProofStarter();
-      // Configure ProofStarter
-      starter.init(sequentToProve, getProof().env());
-      starter.setMaxRuleApplications(1000);
-      StrategyProperties sp = getProof().getSettings().getStrategySettings().getActiveStrategyProperties(); // Is a clone that can be modified
-      sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_OFF); // Logical Splitting: Off
-      sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE); // Method Treatement: Off
-      sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF); // Dependency Contracts: Off
-      sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF); // Query Treatment: Off
-      sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS); // Arithmetic Treatment: DefOps
-      sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY, StrategyProperties.QUANTIFIERS_NONE); // Quantifier treatment: All except Free 
-      starter.setStrategy(sp);
-      // Execute proof in the current thread
-      return starter.start();
+   @Override
+   protected IExecutionVariable[] lazyComputeVariables() {
+      return SymbolicExecutionUtil.createExecutionVariables(this);
    }
    
    /**
-    * Extracts the value for the formula with the given {@link Operator}
-    * from the site proof result ({@link ApplyStrategyInfo}).
-    * @param info The site proof result.
-    * @param operator The {@link Operator} for the formula which should be extracted.
-    * @return The value of the formula with the given {@link Operator}.
-    * @throws ProofInputException Occurred Exception.
+    * {@inheritDoc}
     */
-   protected Term extractOperatorValue(ApplyStrategyInfo info, final Operator operator) throws ProofInputException {
-      // Make sure that valid parameters are given
-      assert info != null;
-      if (info.getProof().openGoals().size() != 1) {
-         throw new ProofInputException("Assumption that return value extraction has one goal does not hold because " + info.getProof().openGoals().size() + " goals are available.");
-      }
-      // Get node of open goal
-      Node goalNode = info.getProof().openGoals().head().node();
-      // Search formula with the given operator in sequent
-      SequentFormula sf = JavaUtil.search(goalNode.sequent(), new IFilter<SequentFormula>() {
-         @Override
-         public boolean select(SequentFormula element) {
-            return JavaUtil.equals(element.formula().op(), operator);
-         }
-      });
-      if (sf != null) {
-         // Extract value
-         return sf.formula().sub(0);
-      }
-      else {
-         return null;
-      }
+   @Override
+   public String getElementType() {
+      return "Method Return";
    }
 }

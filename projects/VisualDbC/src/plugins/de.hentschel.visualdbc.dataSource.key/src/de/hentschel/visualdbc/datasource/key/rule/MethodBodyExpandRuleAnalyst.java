@@ -22,7 +22,7 @@ import de.hentschel.visualdbc.datasource.model.IDSProvableReference;
 import de.hentschel.visualdbc.datasource.model.memory.MemoryProvableReference;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 
@@ -54,7 +54,7 @@ public class MethodBodyExpandRuleAnalyst implements IRuleAnalyst {
       Assert.isTrue(info.getActiveStatement() instanceof MethodBodyStatement);
       MethodBodyStatement mbs = (MethodBodyStatement)info.getActiveStatement();
       // Get referenced program method.
-      ProgramMethod pm = mbs.getProgramMethod(services);
+      IProgramMethod pm = mbs.getProgramMethod(services);
       // Get data source instance
       IDSOperation operation = connection.getOperation(pm);
       if (operation != null) {

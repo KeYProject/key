@@ -2,13 +2,13 @@
 
 resolve_symlink  ()
 { 
-   TARGET=`ls -l $1| awk '/\ ->\ /{print $NF}'`
+   TARGET=`ls -l "$1"| awk '/\ ->\ /{print $NF}'`
 
    if [ -n "$TARGET" ] ; then
       RESULT="$TARGET"
       case "$RESULT" in
          /*) break ;;				# absolute symlink
-         *)  RESULT=`dirname $0`/"$RESULT" ;;	# relative symlink
+         *)  RESULT=`dirname "$0"`/"$RESULT" ;;	# relative symlink
       esac
    else
       RESULT=$1
@@ -38,6 +38,7 @@ else
 fi
 echo "Using JDK installation from:      $JAVA_HOME"
 
+# !!! JAVA_OPTIONS need to be separated by ${IFS_NEW} !!!
 
 # For debugging reasons disable JIT (otherwise strace doesn't work)
 JAVA_OPTIONS=
@@ -52,9 +53,9 @@ JAVA_OPTIONS=
 
 if [ -z "$KEY_HOME" ] ; then
    KEY_HOME=`resolve_symlink "$0"`	# resolve symlink name
-   KEY_HOME=`dirname $KEY_HOME`		# strip executable filename
+   KEY_HOME=`dirname "$KEY_HOME"`		# strip executable filename
    KEY_HOME=`cd "$KEY_HOME";pwd`	# and now expand the path to full
-   KEY_HOME=`dirname $KEY_HOME`		# strip bin/ sirectory
+   KEY_HOME=`dirname "$KEY_HOME"`		# strip bin/ sirectory
 fi
 echo "Using KeY installation from:      $KEY_HOME"
 
@@ -76,7 +77,7 @@ keyclasspath="$KEY_HOME/system/binary/"
 
 for i in $key_ext_jars ; do
     current_jar="$KEY_LIB/$i"
-    if [ ! -f $current_jar ]
+    if [ ! -f "$current_jar" ]
     then
        echo Cannot find $current_jar. 
        echo Copy or link the file into the
@@ -87,7 +88,7 @@ for i in $key_ext_jars ; do
     fi
 done
 
-if [ x$ASPECTJRTPATH != x ]
+if [ "x$ASPECTJRTPATH" != x ]
 then
   echo "Using AspectJ runtime from:       $ASPECTJRTPATH"
   keyclasspath=$keyclasspath:$ASPECTJRTPATH
@@ -96,6 +97,7 @@ fi
 #
 # KeY-specific command line options
 #
+
 
 keysysprops=""
 while [ $# -ne 0 ]; do
@@ -116,9 +118,7 @@ while [ $# -ne 0 ]; do
             shift
             continue;;
 
-        *)  keyarg="${keyarg}${1} "
-            shift
-            continue;;
+        *)  break;;
     esac
 done	
 
@@ -134,6 +134,7 @@ PATH=${PATH}:$KEY_LIB
 export PATH
 
 
+
 #
 # This command actually runs KeY
 #
@@ -147,4 +148,4 @@ $JAVA $JAVA_OPTIONS $keysysprops \
 -Dkey.simplify.logdir=$KEY_SIMPLIFY_LOG_DIR \
 -Dkey.ics.logdir=$KEY_ICS_LOG_DIR \
 -Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
--classpath $keyclasspath de.uka.ilkd.key.gui.Main $keyarg
+-classpath $keyclasspath de.uka.ilkd.key.gui.Main "$@"

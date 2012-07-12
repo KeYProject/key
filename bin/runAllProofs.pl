@@ -27,14 +27,16 @@ my $absolute_bin_path = &getcwd."/".$bin_path;
 #
 # Command line
 my %option = ();
-GetOptions(\%option, 'help|h', 'delete|d', 'reload|l', 'storefailed|s=s', 'file|f=s');
+GetOptions(\%option, 'help|h', 'silent|z', 'delete|d', 'reload|l', 'stopfail|t', 'storefailed|s=s', 'file|f=s');
 
 if ($option{'help'}) {
   print "Runs all proofs listed in the file \'$automaticjavadl_txt\'.\n";
   print "\'$automaticjavadl_txt\' can be found in the directory \'$bin_path/$path_to_examples$path_to_automated\'.\n\n";
   print "Use '-h' or '--help' to get this text (very necessary this line).\n";
+  print "Use '-z' or '--silent' to reduce verbosity (only final results are displayed).\n";
   print "Use '-l' or '--reload' to save proofs and reload them directly afterwards. (Test cases for proof loading.)\n";
   print "Use '-d' or '--delete' to delete all files created automatically by a run of this script.\n";
+  print "Use '-t' or '--stopfail' to stop immediately upon a failure.\n";
   print "Use '-s <filename>' or '--storefailed <filename>' to store the file names of failures in file <filename>.\n";
   print "Use '-f <filename>' or '--file <filename>' to load the problems from <filename>.\n";
 #  print "[DEFUNCT] Use '-m email\@address.com' to send the report as an email to the specified address.\n";
@@ -64,7 +66,7 @@ if (not $option{'file'}) {
 } else {
   $testFile = $option{'file'};
 }
-print "Reading from $testFile.\n\n";
+if (not $option{'silent'}) {print "Reading from $testFile.\n\n";}
 
 my @automatic_JAVADL;
 open (AUTOMATIC, $testFile) or
@@ -86,13 +88,14 @@ my %erroneous;
 #
 chdir $path_to_examples;
 foreach my $dotkey (@automatic_JAVADL) {
-
+if (! ($option{'stopfail'} && 
+		($failures + $errors + scalar(@reloadFailed) > 0))) {
    # ignore empty lines and comments
    next if $dotkey =~ /^\s*#/;
    next if $dotkey =~ /^\s*$/;
  
    (my $provable, $dotkey) = &fileline($dotkey);
-   print "Now running $dotkey ...\n";
+   if (not $option{silent}) {print "Now running $dotkey ...\n";}
 
    &prepare_file($dotkey);
 
@@ -117,10 +120,11 @@ foreach my $dotkey (@automatic_JAVADL) {
 
    &reloadFile($dotkey) if ($reloadTests and $provable);
     
-   print "\nStatus: $counter examples tested. $failures failures and $errors errors occurred.\n";
-   print "Reload-Tests: " . 
+   if (not $option{silent}) {print "\nStatus: $counter examples tested. $failures failures and $errors errors occurred.\n";}
+   if (not $option{silent}) {print "Reload-Tests: " . 
        (($reloadTests and $provable) ? (scalar(@reloadFailed) . " failures") : "disabled") 
-       . "\n\n";
+       . "\n\n";}
+}
 }
 chdir "../";
 
@@ -140,6 +144,9 @@ if($option{'storefailed'}) {
 }
 
 if($failures + $errors + scalar(@reloadFailed) > 0) {
+    if($option{'stopfail'}) {
+        print "Tests stopped after first failure.\n";
+    }
     exit -1;
 } else {
     exit 0;
@@ -288,11 +295,11 @@ sub processReturn {
 
 sub reloadFile {
     my $file = $_[0];
-    print "Try to reload proof result $file:\n";
+    if (not $option{'silent'}) {print "Try to reload proof result $file:\n";}
 
     my $dk = &getcwd . "/$file";
     unless(-r $dk) {
-	print "$dk cannot be read!";
+	if (not $option{'silent'}) {print "$dk cannot be read!";}
 	push @reloadFailed, $file;
 	return;
     }
@@ -303,7 +310,8 @@ sub reloadFile {
 #    print "\nReturn value: $result\n";
 
     if($result != 0) {
-	print "\nCould not reload saved file $file\n";
+	if (not $option{'silent'}) {
+		print "\nCould not reload saved file $file\n";}
 	push @reloadFailed, $file;
     }
 }
@@ -315,7 +323,7 @@ sub cleanDirectories {
 	# $_ holds filename and $File::Find::name the full path
 	# print $_ . "\n";
 	if(/auto\.key$/ || /auto(\.[0-9]+)?\.proof$/) {
-	    print "Remove file $File::Find::name\n";
+	    if (not $option{'silent'}){print "Remove file $File::Find::name\n";}
 	    unlink($_) or die "Cannot remove $_ in " . `pwd` . ": $!"; 
 	}
     }

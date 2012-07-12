@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.tryCatchFinally(_input);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
+         <statement name="result_1=1/_input;" pathCondition="true" pathConditionChanged="false">
+            <branchCondition name="input = 0 TRUE" pathCondition="input = 0" pathConditionChanged="true" branchCondition="input = 0">
+               <statement name="result_1=2;" pathCondition="input = 0" pathConditionChanged="false">
+                  <statement name="result_1=result_1*2;" pathCondition="input = 0" pathConditionChanged="false">
+                     <statement name="return result_1;" pathCondition="input = 0" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of self.tryCatchFinally(_input);&gt;" pathCondition="input = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;4&apos; as result of self.tryCatchFinally(_input);&gt;">
+                           <termination name="&lt;end&gt;" pathCondition="input = 0" pathConditionChanged="false" exceptionalTermination="false">
+                           </termination>
+                        </methodReturn>
+                     </statement>
+                  </statement>
+               </statement>
+            </branchCondition>
+            <branchCondition name="input = 0 FALSE" pathCondition="!input = 0" pathConditionChanged="true" branchCondition="!input = 0">
+               <statement name="result_1=result_1*2;" pathCondition="!input = 0" pathConditionChanged="false">
+                  <statement name="return result_1;" pathCondition="!input = 0" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of self.tryCatchFinally(_input);&gt;" pathCondition="!input = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;quotient_0 * 2&apos; as result of self.tryCatchFinally(_input);&gt;">
+                        <termination name="&lt;end&gt;" pathCondition="!input = 0" pathConditionChanged="false" exceptionalTermination="false">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </statement>
+            </branchCondition>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>

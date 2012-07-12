@@ -10,7 +10,9 @@ import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserMode;
 
-
+/**
+ * Inspects whether a given string can be translated into a formula. 
+ */
 public class InspectorForFormulas implements CheckedUserInputInspector{
 
     private final Services services;

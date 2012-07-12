@@ -33,7 +33,7 @@ public final class ProgVarReplacer {
     /**
      * map specifying the replacements to be done
      */
-    private final Map map;
+    private final Map<ProgramVariable, ProgramVariable> map;
     
     
     /**
@@ -46,7 +46,7 @@ public final class ProgVarReplacer {
      * creates a ProgVarReplacer that replaces program variables as specified
      * by the map parameter
      */
-    public ProgVarReplacer(Map map, Services services) {
+    public ProgVarReplacer(Map<ProgramVariable, ProgramVariable> map, Services services) {
         this.map = map;
         this.services = services;
     }
@@ -106,7 +106,7 @@ public final class ProgVarReplacer {
     	ImmutableSet<ProgramVariable> result = vars;
 
     	for (final ProgramVariable var : vars) {
-	    ProgramVariable newVar = (ProgramVariable)map.get(var);
+	    ProgramVariable newVar = map.get(var);
 	    if(newVar != null) {
 	    	result = result.remove(var);
 	    	result = result.add(newVar);

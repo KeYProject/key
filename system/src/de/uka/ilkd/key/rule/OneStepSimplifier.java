@@ -37,6 +37,7 @@ import de.uka.ilkd.key.util.LRUCache;
 public final class OneStepSimplifier implements BuiltInRule, 	
 						KeYSelectionListener {
     
+    // TODO: Remove the singleton instance or make the rule state less to allow parallelization of site proofs started via a ProofStarter which is currently not possible thanks to ConcurrentModificationExceptions (This use case happens for instance in the symbolic execution debugger) 
     public static final OneStepSimplifier INSTANCE 
                                             = new OneStepSimplifier();
     
@@ -68,7 +69,7 @@ public final class OneStepSimplifier implements BuiltInRule,
     //constructors
     //------------------------------------------------------------------------- 
     
-    private OneStepSimplifier() {
+    public OneStepSimplifier() { // Visibility must be public because it is no longer a singleton in general. Side proofs use own OneStepSimplifier instances for parallelization. This is required thanks to the internal state of this rule.
     }
     
     

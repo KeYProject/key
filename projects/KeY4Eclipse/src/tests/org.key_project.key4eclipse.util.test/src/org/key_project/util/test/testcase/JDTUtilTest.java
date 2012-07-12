@@ -19,7 +19,9 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.core.dom.Block;
 import org.junit.Test;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -33,6 +35,49 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * @author Martin Hentschel
  */
 public class JDTUtilTest extends TestCase {
+   /**
+    * Tests {@link JDTUtil#getMethodBody(IMethod)}.
+    */
+   @Test
+   public void testGetMethodBody() throws CoreException, InterruptedException {
+      // Create projects with test content
+      IJavaProject javaProject = TestUtilsUtil.createJavaProject("JDTUtilTest_testGetMethodBody");
+      IFolder srcFolder = javaProject.getProject().getFolder("src");
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/methodBodyTest", srcFolder);
+      TestUtilsUtil.waitForBuild();
+      // Get type
+      IType type = javaProject.findType("MethodBodyTest");
+      // Test null
+      assertNull(JDTUtil.getMethodBody(null));
+      // Test methods
+      assertMethodBody(type, "emptyVoid", new String[] {}, "{ }");
+      assertMethodBody(type, "emptyVoidSingleLined", new String[] {}, "{ }");
+      assertMethodBody(type, "doSomething", new String[] {}, "{ int x=32; }");
+      assertMethodBody(type, "returnInt", new String[] {}, "{ return 42; }");
+      assertMethodBody(type, "containsIf", new String[] {"I"}, "{ if (x >= 0) { return x; } else return x * -1; }");
+   }
+   
+   /**
+    * Executes a test step of {@link #testGetMethodBody()}.
+    * @param type The {@link IType} to search a method in.
+    * @param name The method name.
+    * @param parameterTypeSignatures The method parameter types.
+    * @param expectedBlock The expected block.
+    * @throws JavaModelException Occurred Exception.
+    */
+   protected void assertMethodBody(IType type, 
+                                   String name, 
+                                   String[] parameterTypeSignatures, 
+                                   String expectedBlock) throws JavaModelException {
+      IMethod method = type.getMethod(name, parameterTypeSignatures);
+      assertNotNull(method);
+      Block block = JDTUtil.getMethodBody(method);
+      assertNotNull(block);
+      assertTrue("Expected \"" + expectedBlock + "\" but is \"" + block.toString() + "\".", StringUtil.equalIgnoreWhiteSpace(expectedBlock, block.toString()));
+      assertTrue(block.getStartPosition() >= method.getSourceRange().getOffset());
+      assertTrue(block.getStartPosition() + block.getLength() <= method.getSourceRange().getOffset() + method.getSourceRange().getLength());
+   }
+   
     /**
      * Tests {@link JDTUtil#getQualifiedParameterType(IType, org.eclipse.jdt.core.ILocalVariable)}.
      */

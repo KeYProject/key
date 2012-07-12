@@ -4,8 +4,10 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
@@ -15,7 +17,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -35,11 +36,12 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
    
    /**
     * Constructor.
+    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param exceptionVariable Contains the exception variable which is used to check if the executed program in proof terminates normally.
     */
-   public ExecutionTermination(Node proofNode, IProgramVariable exceptionVariable) {
-      super(proofNode);
+   public ExecutionTermination(KeYMediator mediator, Node proofNode, IProgramVariable exceptionVariable) {
+      super(mediator, proofNode);
       this.exceptionVariable = exceptionVariable;
    }
 
@@ -92,7 +94,7 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
          // Search final value of the exceptional variable which is used to check if the verified program terminates normally
          ImmutableArray<Term> value = null;
          for (SequentFormula f : getProofNode().sequent().succedent()) {
-            Pair<ImmutableList<Term>,Term> updates = MiscTools.goBelowUpdates2(f.formula());
+            Pair<ImmutableList<Term>,Term> updates = TermBuilder.DF.goBelowUpdates2(f.formula());
             Iterator<Term> iter = updates.first.iterator();
             while (value == null && iter.hasNext()) {
                value = extractValueFromUpdate(iter.next(), exceptionVariable);
@@ -129,5 +131,13 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
          }
       }
       return result;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getElementType() {
+      return isExceptionalTermination() ? "Exceptional Termination" : "Termination";
    }
 }

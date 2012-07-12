@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -59,7 +60,7 @@ public class ConsoleUserInterface extends AbstractUserInterface {
         }
     }
 
-    @Override
+   @Override
     public void progressStarted(Object sender) {
         // TODO Implement ProblemInitializerListener.progressStarted
         if(verbose) {
@@ -201,5 +202,37 @@ public class ConsoleUserInterface extends AbstractUserInterface {
             true, 
             this);
       return pi;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYMediator getMediator() {
+     return mediator;
+   }
+
+   /**
+    * Checks if the verbose is active or not.
+    * @return {@code true} verbose is active, {@code false} verbose is deactivated.
+    */
+   public boolean isVerbose() {
+      return verbose;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isAutoModeSupported(Proof proof) {
+      return true; // All proofs are supported.
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeProof(Proof proof) {
+      // Nothing to do.
    }
 }

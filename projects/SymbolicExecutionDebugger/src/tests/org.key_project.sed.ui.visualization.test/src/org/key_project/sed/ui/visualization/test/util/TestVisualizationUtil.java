@@ -15,11 +15,14 @@ import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
+import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
+import org.key_project.sed.ui.visualization.view.ExecutionTreeView;
 
 /**
  * Provides static methods that make testing easier.
@@ -45,7 +48,7 @@ public final class TestVisualizationUtil {
       TestCase.assertNotNull(modelFile);
       // Create model file
       SEDXMLWriter writer = new SEDXMLWriter();
-      String modelContent = writer.toXML(new ISEDDebugTarget[0], "UTF-8");
+      String modelContent = writer.toXML(new ISEDDebugTarget[0], "UTF-8", false, false);
       if (!modelFile.exists()) {
          modelFile.create(new ByteArrayInputStream(modelContent.getBytes(Charset.forName("UTF-8"))), true, null);
       }
@@ -70,5 +73,23 @@ public final class TestVisualizationUtil {
       });
       diagram.eResource().save(Collections.EMPTY_MAP);
       return diagram;
+   }
+
+   /**
+    * Returns the {@link SWTBotView} for the Symbolic Execution Tree view.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @return The {@link SWTBotView}.
+    */
+   public static SWTBotView getSymbolicExecutionTreeView(SWTWorkbenchBot bot) {
+      return bot.viewById(ExecutionTreeView.VIEW_ID);
+   }
+
+   /**
+    * Sets the focus to the symbolic execution tree view.
+    */
+   public static void setFocusToSymbolicExecutionTreeView() {
+      SWTWorkbenchBot bot = new SWTWorkbenchBot();
+      SWTBotView setView = TestVisualizationUtil.getSymbolicExecutionTreeView(bot);
+      setView.setFocus();
    }
 }

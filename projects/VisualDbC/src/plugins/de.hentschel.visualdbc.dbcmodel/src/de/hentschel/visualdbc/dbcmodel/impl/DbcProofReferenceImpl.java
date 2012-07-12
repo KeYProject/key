@@ -23,6 +23,7 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 
+import de.hentschel.visualdbc.dbcmodel.DbcProof;
 import de.hentschel.visualdbc.dbcmodel.DbcProofReference;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 import de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable;
@@ -36,6 +37,7 @@ import de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable;
  * <ul>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcProofReferenceImpl#getTarget <em>Target</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcProofReferenceImpl#getKind <em>Kind</em>}</li>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcProofReferenceImpl#getSource <em>Source</em>}</li>
  * </ul>
  * </p>
  *
@@ -71,6 +73,16 @@ public class DbcProofReferenceImpl extends EObjectImpl implements DbcProofRefere
     * @ordered
     */
    protected String kind = KIND_EDEFAULT;
+
+   /**
+    * The cached value of the '{@link #getSource() <em>Source</em>}' reference.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getSource()
+    * @generated
+    * @ordered
+    */
+   protected DbcProof source;
 
    /**
     * <!-- begin-user-doc -->
@@ -120,9 +132,17 @@ public class DbcProofReferenceImpl extends EObjectImpl implements DbcProofRefere
    /**
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
-    * @generated
+    * @generated NOT
     */
    public void setTarget(IDbCProofReferencable newTarget) {
+      // Update references in proof referencable
+      if (target != null) {
+         target.getAllReferences().remove(this);
+      }
+      if (newTarget != null) {
+         newTarget.getAllReferences().add(this);
+      }
+      // Inform listers
       IDbCProofReferencable oldTarget = target;
       target = newTarget;
       if (eNotificationRequired())
@@ -155,6 +175,44 @@ public class DbcProofReferenceImpl extends EObjectImpl implements DbcProofRefere
     * <!-- end-user-doc -->
     * @generated
     */
+   public DbcProof getSource() {
+      if (source != null && source.eIsProxy()) {
+         InternalEObject oldSource = (InternalEObject)source;
+         source = (DbcProof)eResolveProxy(oldSource);
+         if (source != oldSource) {
+            if (eNotificationRequired())
+               eNotify(new ENotificationImpl(this, Notification.RESOLVE, DbcmodelPackage.DBC_PROOF_REFERENCE__SOURCE, oldSource, source));
+         }
+      }
+      return source;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public DbcProof basicGetSource() {
+      return source;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public void setSource(DbcProof newSource) {
+      DbcProof oldSource = source;
+      source = newSource;
+      if (eNotificationRequired())
+         eNotify(new ENotificationImpl(this, Notification.SET, DbcmodelPackage.DBC_PROOF_REFERENCE__SOURCE, oldSource, source));
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    @Override
    public Object eGet(int featureID, boolean resolve, boolean coreType) {
       switch (featureID) {
@@ -163,6 +221,9 @@ public class DbcProofReferenceImpl extends EObjectImpl implements DbcProofRefere
             return basicGetTarget();
          case DbcmodelPackage.DBC_PROOF_REFERENCE__KIND:
             return getKind();
+         case DbcmodelPackage.DBC_PROOF_REFERENCE__SOURCE:
+            if (resolve) return getSource();
+            return basicGetSource();
       }
       return super.eGet(featureID, resolve, coreType);
    }
@@ -180,6 +241,9 @@ public class DbcProofReferenceImpl extends EObjectImpl implements DbcProofRefere
             return;
          case DbcmodelPackage.DBC_PROOF_REFERENCE__KIND:
             setKind((String)newValue);
+            return;
+         case DbcmodelPackage.DBC_PROOF_REFERENCE__SOURCE:
+            setSource((DbcProof)newValue);
             return;
       }
       super.eSet(featureID, newValue);
@@ -199,6 +263,9 @@ public class DbcProofReferenceImpl extends EObjectImpl implements DbcProofRefere
          case DbcmodelPackage.DBC_PROOF_REFERENCE__KIND:
             setKind(KIND_EDEFAULT);
             return;
+         case DbcmodelPackage.DBC_PROOF_REFERENCE__SOURCE:
+            setSource((DbcProof)null);
+            return;
       }
       super.eUnset(featureID);
    }
@@ -215,6 +282,8 @@ public class DbcProofReferenceImpl extends EObjectImpl implements DbcProofRefere
             return target != null;
          case DbcmodelPackage.DBC_PROOF_REFERENCE__KIND:
             return KIND_EDEFAULT == null ? kind != null : !KIND_EDEFAULT.equals(kind);
+         case DbcmodelPackage.DBC_PROOF_REFERENCE__SOURCE:
+            return source != null;
       }
       return super.eIsSet(featureID);
    }

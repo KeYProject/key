@@ -11,18 +11,27 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.debug.ui.IDebugView;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IViewPart;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.LaunchUtil;
+import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
+import org.key_project.util.java.thread.AbstractRunnableWithResult;
+import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -65,9 +74,29 @@ public final class KeySEDUtil {
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT = "org.key_project.sed.key.core.launch.sed.key.attribute.existingContract";
 
     /**
-     * The key of the attribute "existingContract" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     * The key of the attribute "precondition" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION = "org.key_project.sed.key.core.launch.sed.key.attribute.precondition";
+
+    /**
+     * The key of the attribute "show method return values in debug nodes" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
      */
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES = "org.key_project.sed.key.core.launch.sed.key.attribute.showMethodReturnValuesInDebugNodes";
+
+    /**
+     * The key of the attribute "show variables of selected debug node" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE = "org.key_project.sed.key.core.launch.sed.key.attribute.showVariablesOfSelectedDebugNode";
+
+    /**
+     * The key of the attribute "show KeY's main window" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW = "org.key_project.sed.key.core.launch.sed.key.attribute.showKeYMainWindow";
+
+    /**
+     * The key of the attribute "merge branch conditions" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS = "org.key_project.sed.key.core.launch.sed.key.attribute.mergeBranchConditions";
 
     /**
      * The launch mode supported by the Symbolic Execution Debugger based on KeY.
@@ -137,6 +166,16 @@ public final class KeySEDUtil {
     }
     
     /**
+     * Returns the precondition attribute value from the given {@link ILaunchConfiguration}.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return The precondition attribute value.
+     * @throws CoreException Occurred Exception.
+     */
+    public static String getPrecondition(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, StringUtil.EMPTY_STRING) : StringUtil.EMPTY_STRING;
+    }
+    
+    /**
      * Returns the type attribute value from the given {@link ILaunchConfiguration}.
      * @param configuration The {@link ILaunchConfiguration} to read from.
      * @return The type attribute value.
@@ -183,7 +222,37 @@ public final class KeySEDUtil {
      * @throws CoreException Occurred Exception.
      */
     public static boolean isShowMethodReturnValuesInDebugNodes(ILaunchConfiguration configuration) throws CoreException {
-        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, true) : true;
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, KeYSEDPreferences.isShowMethodReturnValuesInDebugNode()) : KeYSEDPreferences.isShowMethodReturnValuesInDebugNode();
+    }
+    
+    /**
+     * Checks if variables of the selected debug node should be shown.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} show variables of selected debug node, {@code false} do not show variables of selected debug node.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isShowVariablesOfSelectedDebugNode(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, KeYSEDPreferences.isShowVariablesOfSelectedDebugNode()) : KeYSEDPreferences.isShowVariablesOfSelectedDebugNode();
+    }
+    
+    /**
+     * Checks if KeY's main window should be shown or not.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} show KeY's main window, {@code false} hide KeY's main window
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isShowKeYMainWindow(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, KeYSEDPreferences.isShowKeYMainWindow()) : KeYSEDPreferences.isShowKeYMainWindow();
+    }
+    
+    /**
+     * Checks if branch conditions are merged.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} merge branch conditions, {@code false} do not merge branch conditions.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isMergeBranchConditions(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, KeYSEDPreferences.isMergeBranchConditions()) : KeYSEDPreferences.isMergeBranchConditions();
     }
     
     /**
@@ -332,5 +401,24 @@ public final class KeySEDUtil {
       else {
          System.out.println("Node is null");
       }
+   }
+   
+   /**
+    * Returns the selected element of view "Debug".
+    * @return The selected element of view "Debug" or {@code null} if no one is selected or if the view is not available.
+    */
+   public static Object getSelectedDebugElement() {
+      IRunnableWithResult<Object> run = new AbstractRunnableWithResult<Object>() {
+         @Override
+         public void run() {
+            IViewPart view = WorkbenchUtil.findView(IDebugUIConstants.ID_DEBUG_VIEW);
+            if (view instanceof IDebugView) {
+               ISelection selection = ((IDebugView)view).getViewer().getSelection();
+               setResult(SWTUtil.getFirstElement(selection));
+            }
+         }
+      };
+      Display.getDefault().syncExec(run);
+      return run.getResult();
    }
 }

@@ -103,6 +103,7 @@ import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
+import de.uka.ilkd.key.util.MiscTools;
 
 
 /**
@@ -127,11 +128,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private final StrategyProperties strategyProperties;
+    private OneStepSimplifier oneStepSimplifierRuleInstance;
     
     protected JavaCardDLStrategy(Proof p_proof,
                                  StrategyProperties strategyProperties) {
         
         super ( p_proof );
+        
+        this.oneStepSimplifierRuleInstance = 
+              MiscTools.findOneStepSimplifier(p_proof);
         
         this.strategyProperties =
             (StrategyProperties)strategyProperties.clone ();
@@ -256,10 +261,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return ConditionalFeature.createConditional(filter, cost);        
     }
 
-    
     private Feature oneStepSimplificationFeature(Feature cost) {
 	SetRuleFilter filter = new SetRuleFilter();
-	filter.addRuleToSet(OneStepSimplifier.INSTANCE);
+	filter.addRuleToSet(oneStepSimplifierRuleInstance);
+
         return ConditionalFeature.createConditional(filter, cost);        
     }
     
@@ -297,7 +302,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "simplify_boolean", -200 );
         
         bindRuleSet ( d, "concrete", -10000 );        
-        bindRuleSet ( d, "simplify", -2000 );        
+        bindRuleSet ( d, "simplify", -3000 );        
         bindRuleSet ( d, "simplify_enlarging", -1800 );        
         bindRuleSet ( d, "simplify_expression", -100 );
         bindRuleSet ( d, "executeIntegerAssignment", -100 );

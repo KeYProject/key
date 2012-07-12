@@ -31,6 +31,8 @@ import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.jdt.JDTUtil;
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+
 /**
  * Provides static methods that makes testing easier.
  * @author Martin Hentschel
@@ -46,18 +48,55 @@ public final class TestSEDKeyCoreUtil {
     * Launches the {@link IMethod} in the symbolic execution debugger
     * based on KeY.
     * @param method The {@link IMethod} to debug.
-    * @param showMethodReturnValues Show method return values?
+    * @param useExistingContract Use existing contract? Use {@code null} to use default value.
+    * @param preconditionOrExistingContract Optional precondition or the ID of the existing contract to use Use {@code null} to use default value.
+    * @param showMethodReturnValues Show method return values? Use {@code null} to use default value.
+    * @param showVariablesOfSelectedDebugNode Show variables of selected debug node? Use {@code null} to use default value.
+    * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
+    * @param mergeBranchConditions Merge branch conditions?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IMethod method,
-                                final boolean showMethodReturnValues) throws Exception {
+                                final Boolean useExistingContract,
+                                final String preconditionOrExistingContract,
+                                final Boolean showMethodReturnValues,
+                                final Boolean showVariablesOfSelectedDebugNode,
+                                final Boolean showKeYMainWindow,
+                                final Boolean mergeBranchConditions) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
             try {
                ILaunchConfiguration config = getKeYLaunchConfiguration(method);
                ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
-               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
+               if (useExistingContract != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContract);
+                  if (preconditionOrExistingContract != null) {
+                     if (useExistingContract) {
+                        wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT, preconditionOrExistingContract);
+                     }
+                     else {
+                        wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+                     }
+                  }
+               }
+               else {
+                  if (preconditionOrExistingContract != null) {
+                     wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+                  }
+               }
+               if (showMethodReturnValues != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
+               }
+               if (showVariablesOfSelectedDebugNode != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNode);
+               }
+               if (showKeYMainWindow != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindow);
+               }
+               if (mergeBranchConditions != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
+               }
                config = wc.doSave();
                DebugUITools.launch(config, KeySEDUtil.MODE);
             }
@@ -118,7 +157,7 @@ public final class TestSEDKeyCoreUtil {
       target.setName(targetName);
       // Add thread
       SEDMemoryThread thread = new SEDMemoryThread(target);
-      thread.setName(KeYDebugTarget.DEFAULT_THREAD_NAME);
+      thread.setName(IExecutionStartNode.DEFAULT_START_NODE_NAME);
       target.addSymbolicThread(thread);
       return target;
    }
@@ -131,7 +170,7 @@ public final class TestSEDKeyCoreUtil {
     * @throws DebugException Occurred Exception.
     */
    public static void assertInitialTarget(ISEDDebugTarget target, String targetName) throws DebugException {
-      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName), target, false);
+      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName), target, false, false, false);
    }
    
    /**
@@ -144,7 +183,7 @@ public final class TestSEDKeyCoreUtil {
     * @throws ParserConfigurationException Occurred Exception.
     */
    public static void assertFlatStepsExample(ISEDDebugTarget target) throws DebugException, ParserConfigurationException, SAXException, IOException {
-      TestSedCoreUtil.compareDebugTarget(createExpectedModel("data/statements/oracle/FlatSteps.xml"), target, false);
+      TestSedCoreUtil.compareDebugTarget(createExpectedModel("data/statements/oracle/FlatSteps.xml"), target, false, false, false);
    }
    
    /**

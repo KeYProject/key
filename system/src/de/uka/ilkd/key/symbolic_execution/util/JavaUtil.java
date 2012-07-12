@@ -2,6 +2,7 @@ package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 /**
  * Provides static utitlity methods for Java in general like
@@ -13,6 +14,116 @@ public final class JavaUtil {
     * Forbid instances.
     */
    private JavaUtil() {
+   }
+   
+   /**
+    * Returns the index of the element to search in the given iterator.
+    * @param iter The iterator to search in.
+    * @param toSearch The element to search.
+    * @return The index of the element or {@code -1} if it was not found.
+    */
+   public static <T> int indexOf(Iterator<T> iter, T toSearch) {
+      if (iter != null) {
+         int i = 0;
+         boolean found = false;
+         while (!found && iter.hasNext()) {
+            T next = iter.next();
+            if (next != null ? next.equals(toSearch) : toSearch == null) {
+               found = true;
+            }
+            else {
+               i++;
+            }
+         }
+         if (found) {
+            return i;
+         }
+         else {
+            return -1;
+         }
+      }
+      else {
+         return -1;
+      }
+   }
+   
+   /**
+    * Returns the index of the element to search in the given array.
+    * @param array The array to search in.
+    * @param toSearch The element to search.
+    * @return The index of the element or {@code -1} if it was not found.
+    */
+   public static <T> int indexOf(T[] array, T toSearch) {
+      int index = -1;
+      if (array != null) {
+         int i = 0;
+         while (i < array.length && index < 0) {
+            if (array[i] != null ? array[i].equals(toSearch) : toSearch == null) {
+               index = i;
+            }
+            i++;
+         }
+      }
+      return index;
+   }
+   
+   /**
+    * Creates a line which consists of the given text.
+    * @param text The text to repeate.
+    * @param repetitions The number of repetitions.
+    * @return The created line.
+    */
+   public static String createLine(String text, int repetitions) {
+      StringBuffer sb = new StringBuffer();
+      for (int i = 0; i < repetitions; i++) {
+         sb.append(text);
+      }
+      return sb.toString();
+   }
+   
+   /**
+    * <p>
+    * Encodes the given text in a way that it contains no XML elements
+    * and can be used for instance as plain text or attribute value.
+    * </p>
+    * <p>
+    * The following signs are replaced:
+    * <pre>
+    * " => &quot;quot;
+    * & => &quot;amp;
+    * ' => &quot;apos;
+    * < => &quot;lt;
+    * > => &quot;gt;
+    * </pre>
+    * </p>
+    * @param text The text to encode.
+    * @return The encoded text.
+    */
+   public static String encodeText(String text) {
+      if (text != null) {
+         char[] signs = text.toCharArray();
+         StringBuffer sb = new StringBuffer();
+         for (char sign : signs) {
+            switch (sign) {
+               case '"' : sb.append("&quot;");
+                          break;
+               case '&' : sb.append("&amp;");
+                          break;
+               case '\'' : sb.append("&apos;");
+                           break;
+               case '<' : sb.append("&lt;");
+                          break;
+               case '>' : sb.append("&gt;");
+                          break;
+               default : sb.append(sign);
+                         break;
+            }
+         }
+         return sb.toString();
+      }
+      else {
+         return null;
+      }
    }
    
    /**
@@ -93,6 +204,33 @@ public final class JavaUtil {
          }
       }
       return result;
-   }   
+   }
    
+   /**
+    * Checks the equality of the given {@link String}s ignoring whitespace.
+    * @param first The first {@link String}.
+    * @param second The second {@link String}.
+    * @return {@code true} equal ignoring whitespace, {@code false} different.
+    */
+   public static boolean equalIgnoreWhiteSpace(String first, String second) {
+      if (first != null) {
+         if (second != null) {
+            StringTokenizer firstTokenizer = new StringTokenizer(first);
+            StringTokenizer secondTokenizer = new StringTokenizer(second);
+            boolean equal = true;
+            while (equal && firstTokenizer.hasMoreTokens() && secondTokenizer.hasMoreTokens()) {
+               String firstNext = firstTokenizer.nextToken();
+               String secondNext = secondTokenizer.nextToken();
+               equal = firstNext.equals(secondNext);
+            }
+            return equal && !firstTokenizer.hasMoreElements() && !secondTokenizer.hasMoreElements();
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return second == null;
+      }
+   }
 }

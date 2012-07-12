@@ -13,7 +13,12 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -25,7 +30,15 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.IExecutionContext;
+import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.reference.SuperReference;
+import de.uka.ilkd.key.java.reference.ThisReference;
+import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Else;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
@@ -34,7 +47,12 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -50,7 +68,7 @@ public class MethodCall extends ProgramTransformer {
     private final SchemaVariable resultVar;
     
     protected MethodReference methRef;
-    private ProgramMethod pm;
+    private IProgramMethod pm;
     protected ReferencePrefix newContext;
     protected ProgramVariable pvar;
     private IExecutionContext execContextSV;
@@ -138,8 +156,8 @@ public class MethodCall extends ProgramTransformer {
 	}			    
     }
 
-    protected ProgramMethod getMethod(KeYJavaType prefixType, MethodReference mr, Services services) {
-	ProgramMethod result;
+    protected IProgramMethod getMethod(KeYJavaType prefixType, MethodReference mr, Services services) {
+	IProgramMethod result;
  	if (execContext != null){
 	    result = mr.method(services, prefixType, execContext);
 	    if (result == null) {
@@ -157,7 +175,7 @@ public class MethodCall extends ProgramTransformer {
     }
 
 
-    private ProgramMethod getSuperMethod(ExecutionContext ex,
+    private IProgramMethod getSuperMethod(ExecutionContext ex,
 					 MethodReference mr,
                                          Services services) {
 	return mr.method(services, getSuperType(ex, services), ex);
@@ -248,13 +266,13 @@ public class MethodCall extends ProgramTransformer {
 	if (pm.isStatic()) {	// Static invocation mode
 	    Debug.out("method-call: invocation of static method detected");
             newContext = null;
-	    ProgramMethod staticMethod = getMethod(staticPrefixType, methRef, services);	                
+	    IProgramMethod staticMethod = getMethod(staticPrefixType, methRef, services);	                
             result = new MethodBodyStatement(staticMethod, newContext,
 					     pvar, arguments); 
 	} else if (refPrefix instanceof SuperReference) {
 	    Debug.out("method-call: super invocation of method detected." + 
 		      "Requires static resolving.");
-	    ProgramMethod superMethod = getSuperMethod(execContext,
+	    IProgramMethod superMethod = getSuperMethod(execContext,
 						       methRef, services);
 	    result = new MethodBodyStatement
 		(superMethod, execContext.getRuntimeInstance(), pvar,
@@ -298,7 +316,7 @@ public class MethodCall extends ProgramTransformer {
 
 
     private Statement makeMbs(KeYJavaType t, Services services) {
-	ProgramMethod meth = getMethod(t, methRef, services);
+	IProgramMethod meth = getMethod(t, methRef, services);
 	return new MethodBodyStatement(meth, newContext,
 				       pvar, arguments);
     }

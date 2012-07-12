@@ -17,14 +17,16 @@
  */
 package de.hentschel.visualdbc.dbcmodel.impl;
 
-import de.hentschel.visualdbc.dbcmodel.DbcInvariant;
-import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
-
 import org.eclipse.emf.common.notify.Notification;
-
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import org.eclipse.emf.ecore.util.EObjectResolvingEList;
+
+import de.hentschel.visualdbc.dbcmodel.DbcInvariant;
+import de.hentschel.visualdbc.dbcmodel.DbcProofReference;
+import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
+import de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable;
 
 /**
  * <!-- begin-user-doc -->
@@ -33,6 +35,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcInvariantImpl#getAllReferences <em>All References</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcInvariantImpl#getCondition <em>Condition</em>}</li>
  * </ul>
  * </p>
@@ -40,6 +43,16 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * @generated
  */
 public class DbcInvariantImpl extends AbstractDbcSpecificationImpl implements DbcInvariant {
+   /**
+    * The cached value of the '{@link #getAllReferences() <em>All References</em>}' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getAllReferences()
+    * @generated
+    * @ordered
+    */
+   protected EList<DbcProofReference> allReferences;
+
    /**
     * The default value of the '{@link #getCondition() <em>Condition</em>}' attribute.
     * <!-- begin-user-doc -->
@@ -84,6 +97,18 @@ public class DbcInvariantImpl extends AbstractDbcSpecificationImpl implements Db
     * <!-- end-user-doc -->
     * @generated
     */
+   public EList<DbcProofReference> getAllReferences() {
+      if (allReferences == null) {
+         allReferences = new EObjectResolvingEList<DbcProofReference>(DbcProofReference.class, this, DbcmodelPackage.DBC_INVARIANT__ALL_REFERENCES);
+      }
+      return allReferences;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    public String getCondition() {
       return condition;
    }
@@ -108,6 +133,8 @@ public class DbcInvariantImpl extends AbstractDbcSpecificationImpl implements Db
    @Override
    public Object eGet(int featureID, boolean resolve, boolean coreType) {
       switch (featureID) {
+         case DbcmodelPackage.DBC_INVARIANT__ALL_REFERENCES:
+            return getAllReferences();
          case DbcmodelPackage.DBC_INVARIANT__CONDITION:
             return getCondition();
       }
@@ -152,10 +179,44 @@ public class DbcInvariantImpl extends AbstractDbcSpecificationImpl implements Db
    @Override
    public boolean eIsSet(int featureID) {
       switch (featureID) {
+         case DbcmodelPackage.DBC_INVARIANT__ALL_REFERENCES:
+            return allReferences != null && !allReferences.isEmpty();
          case DbcmodelPackage.DBC_INVARIANT__CONDITION:
             return CONDITION_EDEFAULT == null ? condition != null : !CONDITION_EDEFAULT.equals(condition);
       }
       return super.eIsSet(featureID);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   @Override
+   public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass) {
+      if (baseClass == IDbCProofReferencable.class) {
+         switch (derivedFeatureID) {
+            case DbcmodelPackage.DBC_INVARIANT__ALL_REFERENCES: return DbcmodelPackage.IDB_CPROOF_REFERENCABLE__ALL_REFERENCES;
+            default: return -1;
+         }
+      }
+      return super.eBaseStructuralFeatureID(derivedFeatureID, baseClass);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   @Override
+   public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
+      if (baseClass == IDbCProofReferencable.class) {
+         switch (baseFeatureID) {
+            case DbcmodelPackage.IDB_CPROOF_REFERENCABLE__ALL_REFERENCES: return DbcmodelPackage.DBC_INVARIANT__ALL_REFERENCES;
+            default: return -1;
+         }
+      }
+      return super.eDerivedStructuralFeatureID(baseFeatureID, baseClass);
    }
 
    /**

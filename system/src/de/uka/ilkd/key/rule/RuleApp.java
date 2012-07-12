@@ -18,6 +18,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.speclang.HeapContext;
 
 public interface RuleApp {
 
@@ -40,7 +41,7 @@ public interface RuleApp {
      */
     ImmutableList<Goal> execute(Goal goal, Services services);
 
-    /** returns true if all variables are instantiated 
+    /** returns true if all variables are instantiated
      * @return true if all variables are instantiated 
      */
     boolean complete();

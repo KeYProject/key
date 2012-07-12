@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.ILocalVariable;
@@ -22,6 +23,11 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 import org.eclipse.jdt.internal.ui.viewsupport.JavaElementLabelComposer;
 import org.eclipse.jdt.ui.JavaElementLabels;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -456,5 +462,95 @@ public class JDTUtil {
        else {
            return null;
        }
+   }
+   
+   /**
+    * Parses the given {@link ICompilationUnit} in the specified range into an AST. 
+    * @param compilationUnit The {@link ICompilationUnit} to parse.
+    * @param offset The start index in the text to parse.
+    * @param length The length of the text to parse.
+    * @return The {@link ASTNode} which is the root of the AST.
+    */
+   public static ASTNode parse(ICompilationUnit compilationUnit, int offset, int length) {
+      ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL); // Hopefully always the newest AST level (e.g. AST.JLS4)
+      parser.setSource(compilationUnit);
+      parser.setSourceRange(offset, length);
+      return parser.createAST(null);
+   }
+   
+   /**
+    * Returns the {@link Block} which represents the method body
+    * of the given {@link IMethod} in an {@link ASTParser}.
+    * @param method The {@link IMethod} to lookup its body.
+    * @return The found {@link Block} or {@code null} if not available.
+    * @throws JavaModelException Occurred Exception.
+    */
+   public static Block getMethodBody(IMethod method) throws JavaModelException {
+      if (method != null) {
+         int methodStart = method.getSourceRange().getOffset();
+         int methodLength = method.getSourceRange().getLength();
+         ASTNode node = JDTUtil.parse(method.getCompilationUnit(), methodStart, methodLength);
+         MethodBodySearcher searcher = new MethodBodySearcher(methodStart, methodLength);
+         node.accept(searcher);
+         return searcher.getResult();
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Utility class used by {@link JDTUtil#getMethodBody(IMethod)}
+    * to compute the result.
+    * @author Martin Hentschel
+    */
+   private static class MethodBodySearcher extends ASTVisitor {
+      /**
+       * The result.
+       */
+      private Block result;
+      
+      /**
+       * The start index of the method.
+       */
+      private int methodStart;
+      
+      /**
+       * The end index of the method.
+       */
+      private int methodEnd;
+      
+      /**
+       * Constructor.
+       * @param methodStart The start index of the method.
+       * @param methodLength The end index of the method.
+       */
+      public MethodBodySearcher(int methodStart, int methodLength) {
+         this.methodStart = methodStart;
+         this.methodEnd = methodStart + methodLength;
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean visit(Block node) {
+         if (node.getStartPosition() >= methodStart &&
+             node.getStartPosition() + node.getLength() <= methodEnd) {
+            result = node;
+            return false;
+         }
+         else {
+            return true;
+         }
+      }
+
+      /**
+       * Returns the result.
+       * @return The result.
+       */
+      public Block getResult() {
+         return result;
+      }
    }
 }

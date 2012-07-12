@@ -619,14 +619,15 @@ public class Recoder2KeY implements JavaReader {
         	try {
                     currentDataLocation = walker.getCurrentDataLocation();
                     is = new BufferedInputStream(walker.openCurrent());
-                    ClassFile cf = parser.parseClassFile(is);
+                    ClassFile cf;
+                    try {
+                        cf = parser.parseClassFile(is);
+                    } finally {
+                        is.close();
+                    }
                     manager.addClassFile(cf, currentDataLocation);
                 } catch(Exception ex) {
                     throw new ConvertException("Error while loading: " + walker.getCurrentDataLocation(), ex);
-                } finally {
-                    if (is != null) {
-                	is.close();
-                    }
                 }
             }
         }
@@ -634,7 +635,7 @@ public class Recoder2KeY implements JavaReader {
         
         recoder.java.CompilationUnit rcu = pf.parseCompilationUnit(
                 new StringReader("public class " +
-                        JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS + " {}"));
+                        JavaInfo.DEFAULT_EXECUTION_CONTEXT_CLASS + " { public static void " + JavaInfo.DEFAULT_EXECUTION_CONTEXT_METHOD + "() {}  }"));
         rcuList.add(rcu);
 
         return rcuList;

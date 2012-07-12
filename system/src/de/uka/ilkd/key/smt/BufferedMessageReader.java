@@ -80,6 +80,9 @@ public class BufferedMessageReader {
 		return result;
 	}
 	
+	/**
+	 * Returns the currently message buffer encoded by a string.
+	 */
 	public StringBuffer getMessageBuffer() {
 		return messageBuffer;
 	}

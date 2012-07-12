@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.min(_i,_j);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int result;" pathCondition="true" pathConditionChanged="false">
+         <branchNode name="if (_i&lt;_j) {   result_1=_i; }else  {   result_1=_j; }" pathCondition="true" pathConditionChanged="false">
+            <branchCondition name="j &gt;= 1 + i TRUE" pathCondition="!j &lt;= i" pathConditionChanged="true" branchCondition="j &gt;= 1 + i">
+               <statement name="result_1=_i;" pathCondition="!j &lt;= i" pathConditionChanged="false">
+                  <statement name="return result_1;" pathCondition="!j &lt;= i" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of self.min(_i,_j);&gt;" pathCondition="!j &lt;= i" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;i&apos; as result of self.min(_i,_j);&gt;">
+                        <termination name="&lt;end&gt;" pathCondition="!j &lt;= i" pathConditionChanged="false" exceptionalTermination="false">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </statement>
+            </branchCondition>
+            <branchCondition name="j &gt;= 1 + i FALSE" pathCondition="!j &gt;= 1 + i" pathConditionChanged="true" branchCondition="!j &gt;= 1 + i">
+               <statement name="result_1=_j;" pathCondition="!j &gt;= 1 + i" pathConditionChanged="false">
+                  <statement name="return result_1;" pathCondition="!j &gt;= 1 + i" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of self.min(_i,_j);&gt;" pathCondition="!j &gt;= 1 + i" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;j&apos; as result of self.min(_i,_j);&gt;">
+                        <termination name="&lt;end&gt;" pathCondition="!j &gt;= 1 + i" pathConditionChanged="false" exceptionalTermination="false">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </statement>
+            </branchCondition>
+         </branchNode>
+      </statement>
+   </methodCall>
+</startNode>

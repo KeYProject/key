@@ -1,6 +1,7 @@
 package org.key_project.sed.core.provider;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.IThread;
 import org.eclipse.debug.internal.ui.model.elements.ElementContentProvider;
@@ -48,15 +49,30 @@ public class SEDDebugTargetContentProvider extends ElementContentProvider {
     * Returns the available children.
     * @param parent The parent element for that the children are needed.
     * @return The children. 
-    * @throws CoreException Occurred Exception.
+    * @throws DebugException Occurred Exception.
     */
-   protected Object[] getChildren(Object parent) throws CoreException {
+   public Object[] getAllChildren(Object parent) throws DebugException {
       if (parent instanceof ISEDDebugTarget) {
          Object[] children = ((ISEDDebugTarget)parent).getSymbolicThreads();
-         return children != null ? children : new Object[0];
+         return children != null ? children : EMPTY;
       }
       else {
-         return new Object[0];
+         return EMPTY;
+      }
+   }
+   
+   /**
+    * Returns the parent element of the given one.
+    * @param element The given element.
+    * @return The parent element.
+    * @throws DebugException Occurred Exception.
+    */
+   public Object getParent(Object element) throws DebugException {
+      if (element instanceof ISEDDebugTarget) {
+         return ((ISEDDebugTarget)element).getLaunch();
+      }
+      else {
+         return null;
       }
    }
 
@@ -65,7 +81,7 @@ public class SEDDebugTargetContentProvider extends ElementContentProvider {
     */
    @Override
    protected Object[] getChildren(Object parent, int index, int length, IPresentationContext context, IViewerUpdate monitor) throws CoreException {
-      return getElements(getChildren(parent), index, length);
+      return getElements(getAllChildren(parent), index, length);
    }
 
    /**
@@ -73,7 +89,7 @@ public class SEDDebugTargetContentProvider extends ElementContentProvider {
     */
    @Override
    protected int getChildCount(Object element, IPresentationContext context, IViewerUpdate monitor) throws CoreException {
-      return getChildren(element).length;
+      return getAllChildren(element).length;
    }
 
    /**

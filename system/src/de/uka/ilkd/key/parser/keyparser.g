@@ -139,7 +139,7 @@ options {
 
     // if this is used then we can capture parts of the input for later use
     private DeclPicker capturer = null;
-    private ProgramMethod pm = null;
+    private IProgramMethod pm = null;
 
     private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil(); 
     private ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
@@ -831,7 +831,7 @@ options {
             }
             result = TermBuilder.DF.select(getServices(), 
                                            sv.sort(), 
-                                           TermBuilder.DF.heap(getServices()), 
+                                           TermBuilder.DF.getBaseHeap(getServices()), 
                                            prefix, 
                                            tf.createTerm(attribute));
         } else {
@@ -1170,9 +1170,9 @@ options {
         kjt = getTypeByClassName(className.toString());
         if (kjt != null) { 
            if (LA(n+1) == DOT && LA(n+3) == LPAREN) {
-               Iterator<ProgramMethod> it = javaInfo.getAllProgramMethods(kjt).iterator();
+               Iterator<IProgramMethod> it = javaInfo.getAllProgramMethods(kjt).iterator();
                while(it.hasNext()) {
-                 final ProgramMethod pm = it.next();
+                 final IProgramMethod pm = it.next();
                  final String name = kjt.getFullName()+"::"+LT(n+2).getText();                 
                  if(pm != null && pm.isStatic() && pm.name().toString().equals(name) ) {
                    result = true;
@@ -1319,7 +1319,7 @@ options {
     /**
      * returns the ProgramMethod parsed in the jml_specifications section.
      */
-    public ProgramMethod getProgramMethod(){
+    public IProgramMethod getProgramMethod(){
         return pm;
     }
 
@@ -1484,6 +1484,9 @@ choice_option[String cat]{
         }
     ;
 
+/* TODO: Why is the result of one_sort_decl stored in the local variables?
+ * It does not seem to be employed at all ?! (MU)
+ */
 sort_decls 
 {
   ImmutableList<Sort> lsorts = ImmutableSLList.<Sort>nil();
@@ -3239,7 +3242,7 @@ funcpredvarterm returns [Term a = null]
                 
         {  
             if(varfuncid.equals("inReachableState") && args == null) {
-	        a = TermBuilder.DF.wellFormedHeap(getServices());
+	        a = TermBuilder.DF.wellFormed(getServices().getTypeConverter().getHeapLDT().getHeap(), getServices());
 	    } else if(varfuncid.equals("skip") && args == null) {
 	        a = tf.createTerm(UpdateJunctor.SKIP);
 	    } else {

@@ -7,6 +7,7 @@ import org.key_project.util.test.testcase.AbstractRunnableWithProgressAndResultT
 import org.key_project.util.test.testcase.AbstractRunnableWithResultTest;
 import org.key_project.util.test.testcase.AbstractViewBasedViewTest;
 import org.key_project.util.test.testcase.ArrayUtilTest;
+import org.key_project.util.test.testcase.BeanCompositeTest;
 import org.key_project.util.test.testcase.BeanTest;
 import org.key_project.util.test.testcase.BundleUtilTest;
 import org.key_project.util.test.testcase.CollectionUtilTest;
@@ -34,6 +35,7 @@ import org.key_project.util.test.testcase.XMLUtilTest;
     AbstractRunnableWithResultTest.class,
     AbstractViewBasedViewTest.class,
     ArrayUtilTest.class,
+    BeanCompositeTest.class,
     BeanTest.class,
     BundleUtilTest.class,
     CollectionUtilTest.class,

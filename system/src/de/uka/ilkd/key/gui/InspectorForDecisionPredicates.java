@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.gui;
 
 import java.io.StringReader;
+import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput.CheckedUserInputInspector;
 import de.uka.ilkd.key.java.Services;
@@ -12,6 +14,7 @@ import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.KeYParser;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.delayedcut.ApplicationCheck;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 
 public class InspectorForDecisionPredicates implements CheckedUserInputInspector{
@@ -19,14 +22,17 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
     private final Services services;
     private final Node node;
     private final int  cutMode;
+    private final List<ApplicationCheck> additionalChecks = new LinkedList<ApplicationCheck>();
     
     
     
-    public InspectorForDecisionPredicates(Services services, Node node, int cutMode) {
+    public InspectorForDecisionPredicates(Services services, Node node, int cutMode,
+    		List<ApplicationCheck> additionalChecks) {
         super();
         this.services = services;
         this.node = node;
         this.cutMode = cutMode;
+        this.additionalChecks.addAll(additionalChecks);
     }
 
 
@@ -37,6 +43,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
             return CheckedUserInputInspector.NO_USER_INPUT;
         }
         Term term = translate(services,toBeChecked);
+        
         Semisequent semisequent = cutMode == DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT ? 
                 node.sequent().antecedent() : node.sequent().succedent();
         String position = cutMode == DelayedCut.DECISION_PREDICATE_IN_ANTECEDENT ? "antecedent":"succedent";   
@@ -47,12 +54,18 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
             }
         }
         
-       if(term == null){
-           return NO_USER_INPUT;
-       }
+     //  if(term == null){
+    //       return NO_USER_INPUT;
+     //  }
        
-       if(term.sort() != Sort.FORMULA){
+       if(term== null || term.sort() != Sort.FORMULA){
            return "Not a formula.";
+       }
+       for(ApplicationCheck check : additionalChecks){
+    	   String result = check.check(node, term);
+    	   if(result != null){
+    		   return result;
+    	   }
        }
        return null;
 

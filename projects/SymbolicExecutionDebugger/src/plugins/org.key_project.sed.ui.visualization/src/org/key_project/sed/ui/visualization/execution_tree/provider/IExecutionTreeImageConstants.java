@@ -78,4 +78,34 @@ public interface IExecutionTreeImageConstants {
     * Key of the image for {@link ISEDThread}s.
     */
    public static final String IMG_THREAD = PREFIX + "thread";
+
+   /**
+    * Key of the image for resume action.
+    */
+   public static final String IMG_RESUME = PREFIX + "resume";
+
+   /**
+    * Key of the image for suspend action.
+    */
+   public static final String IMG_SUSPEND = PREFIX + "suspend";
+
+   /**
+    * Key of the image for step into action.
+    */
+   public static final String IMG_STEP_INTO = PREFIX + "stepInto";
+
+   /**
+    * Key of the image for step over action.
+    */
+   public static final String IMG_STEP_OVER = PREFIX + "stepOver";
+
+   /**
+    * Key of the image for step return action.
+    */
+   public static final String IMG_STEP_RETURN = PREFIX + "stepReturn";
+
+   /**
+    * Key of the image for terminate action.
+    */
+   public static final String IMG_TERMINATE = PREFIX + "terminate";
 }

@@ -464,7 +464,8 @@ public abstract class Notation {
 		    // logger.debug("Instantiation of " + t+ " [" + t.op() +
                         // "]" + " known.");
 		    if (o instanceof ImmutableList) {
-			final Iterator<Object> it = ((ImmutableList<Object>) o)
+            @SuppressWarnings("unchecked")
+            final Iterator<Object> it = ((ImmutableList<Object>) o)
 				.iterator();
 			sp.getLayouter().print("{");
 			while (it.hasNext()) {
