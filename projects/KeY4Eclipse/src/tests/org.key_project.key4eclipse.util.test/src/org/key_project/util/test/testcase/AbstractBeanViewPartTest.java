@@ -19,7 +19,7 @@ public class AbstractBeanViewPartTest extends AbstractIBeanTest {
    }
    
    /**
-    * The uesed example bean.
+    * The used example bean.
     * @author Martin Hentschel
     */
    private static class TestBeanViewPart extends AbstractBeanViewPart implements ITestBean {       

@@ -28,12 +28,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
-import de.uka.ilkd.key.symbolic_execution.po.SymbolicExecutionFunctionalOperationContractPO;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -64,17 +65,18 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           if (useExistingContract && StringUtil.isTrimmedEmpty(existingContract)) {
               throw new CoreException(LogUtil.getLogger().createErrorStatus("No existing contract defined. Please update the launch configuration \"" + configuration.getName() + "\"."));
           }
+          final String precondition = KeySEDUtil.getPrecondition(configuration);
           // Instantiate proof
           boolean showKeYMainWindow = KeySEDUtil.isShowKeYMainWindow(configuration);
           boolean mergeBranchConditions = KeySEDUtil.isMergeBranchConditions(configuration);
-          SymbolicExecutionEnvironment<?> environment = instantiateProof(configuration, method, useExistingContract, existingContract, showKeYMainWindow, mergeBranchConditions);
+          SymbolicExecutionEnvironment<?> environment = instantiateProof(configuration, method, useExistingContract, existingContract, precondition, showKeYMainWindow, mergeBranchConditions);
           if (environment == null) {
               throw new CoreException(LogUtil.getLogger().createErrorStatus("Symbolic execution environment was not instantiated."));
           }
           // Add debug target to ILaunch
           boolean showMethodReturnValues = KeySEDUtil.isShowMethodReturnValuesInDebugNodes(configuration);
           boolean showVariablesOfSelectedDebugNode = KeySEDUtil.isShowVariablesOfSelectedDebugNode(configuration);
-          KeYLaunchSettings settings = new KeYLaunchSettings(method, useExistingContract, existingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
+          KeYLaunchSettings settings = new KeYLaunchSettings(method, useExistingContract, existingContract, precondition, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
           KeYDebugTarget target = new KeYDebugTarget(launch, environment, settings);
           launch.addDebugTarget(target);
        }
@@ -101,6 +103,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                                IMethod method,
                                                                boolean useExistingContract,
                                                                String existingContract,
+                                                               String precondition,
                                                                boolean showKeYMainWindow,
                                                                boolean mergeBranchConditions) throws Exception {
         // make sure that the method has a resource
@@ -119,10 +122,10 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
         Assert.isNotNull(location, "The resource \"" + method.getResource() + "\" is not local.");
         // Instantiate proof in KeY's main window.
         if (showKeYMainWindow) {
-           return instantiateProofInUserInterface(configuration.getName(), method, useExistingContract, existingContract, location, bootClassPath, classPaths, mergeBranchConditions);
+           return instantiateProofInUserInterface(configuration.getName(), method, useExistingContract, existingContract, precondition, location, bootClassPath, classPaths, mergeBranchConditions);
         }
         else {
-           return instantiateProofWithoutUserInterface(configuration.getName(), method, useExistingContract, existingContract, location, bootClassPath, classPaths, mergeBranchConditions);
+           return instantiateProofWithoutUserInterface(configuration.getName(), method, useExistingContract, existingContract, precondition, location, bootClassPath, classPaths, mergeBranchConditions);
         }
     }
     
@@ -130,6 +133,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                                                    IMethod method,
                                                                                    boolean useExistingContract,
                                                                                    String existingContract,
+                                                                                   String precondition,
                                                                                    File location, 
                                                                                    File bootClassPath, 
                                                                                    List<File> classPaths,
@@ -138,7 +142,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
        // Load location
        InitConfig initConfig = ui.load(location, classPaths, bootClassPath);
        // Create proof input
-       ProofOblInput input = createProofInput(launchConfigurationName, initConfig, method, useExistingContract, existingContract);
+       ProofOblInput input = createProofInput(launchConfigurationName, initConfig, method, useExistingContract, existingContract, precondition);
        // Create proof
        Proof proof = ui.createProof(initConfig, input);
        // Create symbolic execution tree builder
@@ -151,6 +155,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                                               final IMethod method,
                                                                               final boolean useExistingContract,
                                                                               final String existingContract,
+                                                                              final String precondition,
                                                                               final File location, 
                                                                               final File bootClassPath, 
                                                                               final List<File> classPaths,
@@ -169,7 +174,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                    // Load location
                    InitConfig initConfig = KeYUtil.internalLoad(location, classPaths, bootClassPath, true);
                    // Create proof input
-                   ProofOblInput input = createProofInput(launchConfigurationName, initConfig, method, useExistingContract, existingContract);
+                   ProofOblInput input = createProofInput(launchConfigurationName, initConfig, method, useExistingContract, existingContract, precondition);
                    // Create proof
                    Proof proof = MainWindow.getInstance().getUserInterface().createProof(initConfig, input);
                    // Create symbolic execution tree builder
@@ -198,6 +203,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
      * @param method The {@link IMethod} to start proof for.
      * @param useExistingContract Use an existing contract or generate default one?
      * @param existingContract The ID of the existing contract to use.
+     * @param precondition The precondition to use.
      * @return The created {@link ProofOblInput}.
      * @throws Exception Occurred Exception if it was not possible to instantiate a {@link ProofOblInput}.
      */
@@ -205,7 +211,8 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                              InitConfig initConfig, 
                                              IMethod method, 
                                              boolean useExistingContract, 
-                                             String existingContract) throws Exception {
+                                             String existingContract,
+                                             String precondition) throws Exception {
        // Get method to proof in KeY
        IProgramMethod pm = KeYUtil.getProgramMethod(method, initConfig.getServices().getJavaInfo());
        Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
@@ -221,16 +228,23 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
        }
        else {
            Services services = initConfig.getServices();
-           contract = SymbolicExecutionUtil.createDefaultContract(services, pm);
+           contract = SymbolicExecutionUtil.createDefaultContract(services, pm, precondition);
        }
        // Make sure that a contract is defined
        if (contract == null) {
            throw new CoreException(LogUtil.getLogger().createErrorStatus("Unable to find a contract to prove."));
        }
        // Instantiate proof
-       ProofOblInput input;
+       AbstractOperationPO input;
        if (contract instanceof FunctionalOperationContract) {
-           input = new SymbolicExecutionFunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract);
+           input = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract, true);
+//           input = new MethodPartPO(initConfig, 
+//                                    contract.getName(), 
+//                                    pm, 
+//                                    precondition, 
+//                                    new Position(10, 0), 
+//                                    new Position(11, 100),
+//                                    true);
        }
        else {
            throw new CoreException(LogUtil.getLogger().createErrorStatus("Contract of class \"" + contract.getClass().getCanonicalName() + "\" are not supported."));

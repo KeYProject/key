@@ -30,6 +30,11 @@ public class KeYLaunchSettings {
    private String existingContract;
    
    /**
+    * The precondition.
+    */
+   private String precondition;
+   
+   /**
     * If this is {@code true} an {@link ISEDMethodReturn} will contain the return value,
     * but the performance will suffer.
     * If it is {@code false} only the name of the returned method is shown in an {@link ISEDMethodReturn}.
@@ -56,6 +61,7 @@ public class KeYLaunchSettings {
     * @param method The {@link IMethod} to debug.
     * @param useExistingContract Use an existing contract or generate default contract?
     * @param existingContract The ID of the existing contract to use.
+    * @param precondition The precondition.
     * @param showMethodReturnValues Show method return values of {@link ISEDMethodReturn} instances?
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
@@ -64,6 +70,7 @@ public class KeYLaunchSettings {
    public KeYLaunchSettings(IMethod method, 
                             boolean useExistingContract, 
                             String existingContract, 
+                            String precondition,
                             boolean showMethodReturnValues,
                             boolean showVariablesOfSelectedDebugNode,
                             boolean showKeYMainWindow,
@@ -71,6 +78,7 @@ public class KeYLaunchSettings {
       this.method = method;
       this.useExistingContract = useExistingContract;
       this.existingContract = existingContract;
+      this.precondition = precondition;
       this.showMethodReturnValues = showMethodReturnValues;
       this.showVariablesOfSelectedDebugNode = showVariablesOfSelectedDebugNode;
       this.showKeYMainWindow = showKeYMainWindow;
@@ -131,5 +139,13 @@ public class KeYLaunchSettings {
     */
    public boolean isMergeBranchConditions() {
       return mergeBranchConditions;
+   }
+
+   /**
+    * Returns the precondition.
+    * @return The precondition.
+    */
+   public String getPrecondition() {
+      return precondition;
    }
 }

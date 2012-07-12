@@ -1705,4 +1705,17 @@ public final class TermBuilder {
     public Term values(Services services){
     	return func(services.getTypeConverter().getSeqLDT().getValues());
     }
+
+    /**
+      * Returns the {@link Sort}s of the given {@link Term}s.
+      * @param terms The given {@link Term}s.
+      * @return The {@link Term} {@link Sort}s.
+      */
+    public ImmutableList<Sort> getSorts(Iterable<Term> terms) {
+       ImmutableList<Sort> result = ImmutableSLList.<Sort>nil();
+       for (Term t : terms) {
+          result = result.append(t.sort());
+       }
+       return result;
+    }
 }

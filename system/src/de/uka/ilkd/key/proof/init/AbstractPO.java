@@ -56,22 +56,19 @@ public abstract class AbstractPO implements ProofOblInput {
     private ProofAggregate proofAggregate;
     protected Term[] poTerms;
     protected String[] poNames;
-    protected Contract contract;
 
 
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
     public AbstractPO(InitConfig initConfig,
-                      String name,
-                      Contract contract) {
+                      String name) {
         this.initConfig = initConfig;
         this.services = initConfig.getServices();
         this.javaInfo = initConfig.getServices().getJavaInfo();
         this.heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         this.specRepos = initConfig.getServices().getSpecificationRepository();
         this.name = name;
-        this.contract = contract;
         taclets = DefaultImmutableSet.nil();
     }
 

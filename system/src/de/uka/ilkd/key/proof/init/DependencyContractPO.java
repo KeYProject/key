@@ -29,6 +29,8 @@ public final class DependencyContractPO extends AbstractPO
                                         implements ContractPO {
     
     private Term mbyAtPre;    
+    
+    private DependencyContract contract;
            
     
     //-------------------------------------------------------------------------
@@ -37,8 +39,9 @@ public final class DependencyContractPO extends AbstractPO
     
     public DependencyContractPO(InitConfig initConfig, 
 	    			DependencyContract contract) {
-    	super(initConfig, contract.getName(), contract);
+    	super(initConfig, contract.getName());
     	assert !(contract instanceof FunctionalOperationContract);
+      this.contract = contract;
     }
     
     
@@ -203,7 +206,7 @@ public final class DependencyContractPO extends AbstractPO
     
     @Override
     public DependencyContract getContract() {
-        return (DependencyContract)contract;
+        return contract;
     }
     
     

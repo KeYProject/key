@@ -246,13 +246,9 @@ public class TaskTree extends JPanel {
      */
     class TaskTreeMouseListener extends MouseAdapter {
 
-	public void mouseClicked(MouseEvent e) {
-	    if (e.getClickCount() == 1 
-		&& e.getModifiers() != 
-                   (InputEvent.CTRL_MASK+InputEvent.BUTTON1_MASK)) {
- 		problemChosen();
- 	    }
-	}
+    	public void mouseClicked(MouseEvent e) {
+    		problemChosen();
+    	}
     }
 
 

@@ -20,10 +20,12 @@ import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -40,7 +42,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.po.SymbolicExecutionFunctionalOperationContractPO;
+import de.uka.ilkd.key.symbolic_execution.po.MethodPartPO;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
@@ -526,6 +528,64 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
    }
    
    /**
+    * Executes an "step into" global on all goals on the given {@link SymbolicExecutionTreeBuilder}.
+    * @param ui The {@link CustomConsoleUserInterface} to use.
+    * @param builder The {@link SymbolicExecutionGoalChooser} to do step on.
+    * @param oraclePathInBaseDirFile The oracle path.
+    * @param oracleIndex The index of the current step.
+    * @param oracleFileExtension The oracle file extension
+    * @param baseDir The base directory for oracles.
+    * @throws IOException Occurred Exception
+    * @throws ProofInputException Occurred Exception
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    */
+   protected static void resume(CustomConsoleUserInterface ui, 
+                                SymbolicExecutionTreeBuilder builder, 
+                                String oraclePathInBaseDirFile, 
+                                File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+      // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
+      Proof proof = builder.getProof();
+      ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
+      proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
+      // Run proof
+      ui.startAndWaitForProof(proof);
+      // Update symbolic execution tree 
+      builder.analyse();
+      // Test result
+      assertSetTreeAfterStep(builder, oraclePathInBaseDirFile, baseDir);
+   }
+   
+   /**
+    * Makes sure that after a step the correct set tree is created.
+    * @param builder The {@link SymbolicExecutionTreeBuilder} to test.
+    * @param oraclePathInBaseDirFile The oracle path.
+    * @param oracleIndex The index of the current step.
+    * @param oracleFileExtension The oracle file extension
+    * @param baseDir The base directory for oracles.
+    * @throws IOException Occurred Exception
+    * @throws ProofInputException Occurred Exception
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    */
+   protected static void assertSetTreeAfterStep(SymbolicExecutionTreeBuilder builder, 
+                                                String oraclePathInBaseDirFile, 
+                                                File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+      if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
+         createOracleFile(builder.getStartNode(), oraclePathInBaseDirFile, false, false);
+      }
+      else {
+         // Read oracle file
+         File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
+         ExecutionNodeReader reader = new ExecutionNodeReader();
+         IExecutionNode oracleRoot = reader.read(oracleFile);
+         assertNotNull(oracleRoot);
+         // Make sure that the created symbolic execution tree matches the expected one.
+         assertExecutionNodes(oracleRoot, builder.getStartNode(), false, false, false);
+      }
+   }
+   
+   /**
     * Makes sure that after a step the correct set tree is created.
     * @param builder The {@link SymbolicExecutionTreeBuilder} to test.
     * @param oraclePathInBaseDirFile The oracle path.
@@ -542,18 +602,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                 int oracleIndex, 
                                                 String oracleFileExtension, 
                                                 File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
-      if (CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
-         createOracleFile(builder.getStartNode(), oraclePathInBaseDirFile + "_" + oracleIndex + oracleFileExtension, false, false);
-      }
-      else {
-         // Read oracle file
-         File oracleFile = new File(baseDir, oraclePathInBaseDirFile + "_" + oracleIndex + oracleFileExtension);
-         ExecutionNodeReader reader = new ExecutionNodeReader();
-         IExecutionNode oracleRoot = reader.read(oracleFile);
-         assertNotNull(oracleRoot);
-         // Make sure that the created symbolic execution tree matches the expected one.
-         assertExecutionNodes(oracleRoot, builder.getStartNode(), false, false, false);
-      }
+      assertSetTreeAfterStep(builder, oraclePathInBaseDirFile + "_" + oracleIndex + oracleFileExtension, baseDir);
    }
    
    /**
@@ -609,9 +658,56 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       Services services = initConfig.getServices();
       IProgramMethod pm = searchProgramMethod(services, containerTypeName, methodFullName);
       // Create default contract for method to test
-      FunctionalOperationContract contract = SymbolicExecutionUtil.createDefaultContract(services, pm);
+      FunctionalOperationContract contract = SymbolicExecutionUtil.createDefaultContract(services, pm, null);
       // Start proof
-      ProofOblInput input = new SymbolicExecutionFunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract);
+      ProofOblInput input = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract, true);
+      Proof proof = ui.createProof(initConfig, input);
+      assertNotNull(proof);
+      // Set strategy and goal chooser to use for auto mode
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
+      // Create symbolic execution tree which contains only the start node at beginning
+      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, mergeBranchConditions);
+      builder.analyse();
+      assertNotNull(builder.getStartNode());
+      return new SymbolicExecutionEnvironment<CustomConsoleUserInterface>(ui, initConfig, builder);
+   }
+   
+   /**
+    * Creates a {@link SymbolicExecutionEnvironment} which consists
+    * of loading a file to load, finding the method to proof, instantiation
+    * of proof and creation with configuration of {@link SymbolicExecutionTreeBuilder}.
+    * @param baseDir The base directory which contains test and oracle file.
+    * @param javaPathInBaseDir The path to the java file inside the base directory.
+    * @param containerTypeName The name of the type which contains the method.
+    * @param methodFullName The method name to search.
+    * @param precondition An optional precondition to use.
+    * @param startPosition The start position.
+    * @param endPosition The end position.
+    * @param mergeBranchConditions Merge branch conditions?
+    * @return The created {@link SymbolicExecutionEnvironment}.
+    * @throws ProofInputException Occurred Exception.
+    * @throws FileNotFoundException Occurred Exception.
+    */
+   protected static SymbolicExecutionEnvironment<CustomConsoleUserInterface> createSymbolicExecutionEnvironment(File baseDir, 
+                                                                                                                String javaPathInBaseDir, 
+                                                                                                                String containerTypeName, 
+                                                                                                                String methodFullName,
+                                                                                                                String precondition,
+                                                                                                                Position startPosition,
+                                                                                                                Position endPosition,
+                                                                                                                boolean mergeBranchConditions) throws ProofInputException, FileNotFoundException {
+      // Make sure that required files exists
+      File javaFile = new File(baseDir, javaPathInBaseDir);
+      assertTrue(javaFile.exists());
+      // Create user interface
+      CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
+      // Load java file
+      InitConfig initConfig = ui.load(javaFile, null, null);
+      // Search method to proof
+      Services services = initConfig.getServices();
+      IProgramMethod pm = searchProgramMethod(services, containerTypeName, methodFullName);
+      // Start proof
+      ProofOblInput input = new MethodPartPO(initConfig, methodFullName, pm, precondition, startPosition, endPosition, true);
       Proof proof = ui.createProof(initConfig, input);
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
