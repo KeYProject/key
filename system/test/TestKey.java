@@ -92,6 +92,7 @@ public class TestKey extends TestCase {
        de.uka.ilkd.key.symbolic_execution.TestExecutionNodePreorderIterator.class,
        de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
        de.uka.ilkd.key.symbolic_execution.TestSymbolicExecutionTreeBuilder.class,
+       de.uka.ilkd.key.symbolic_execution.po.TestMethodPartPO.class,
        de.uka.ilkd.key.symbolic_execution.strategy.TestStepOverSymbolicExecutionTreeNodesStopCondition.class,
        de.uka.ilkd.key.symbolic_execution.strategy.TestStepReturnSymbolicExecutionTreeNodesStopCondition.class,
        de.uka.ilkd.key.symbolic_execution.util.TestDefaultEntry.class,

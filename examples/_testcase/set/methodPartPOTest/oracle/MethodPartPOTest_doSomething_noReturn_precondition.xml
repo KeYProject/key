@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <statement name="x=1*asdf;" pathCondition="true" pathConditionChanged="false">
+      <statement name="int y = 2+CONSTANT+field;" pathCondition="true" pathConditionChanged="false">
+         <statement name="int doubleValue = doubleValue(x);" pathCondition="true" pathConditionChanged="false">
+            <methodCall name="self.doubleValue(value);" pathCondition="true" pathConditionChanged="false">
+               <statement name="int result;" pathCondition="true" pathConditionChanged="false">
+                  <statement name="result_1=value+value;" pathCondition="true" pathConditionChanged="false">
+                     <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
+                        <methodReturn name="&lt;return of self.doubleValue(value);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;4&apos; as result of self.doubleValue(value);&gt;">
+                           <statement name="int z = x+y+doubleValue;" pathCondition="true" pathConditionChanged="false">
+                              <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                              </termination>
+                           </statement>
+                        </methodReturn>
+                     </statement>
+                  </statement>
+               </statement>
+            </methodCall>
+         </statement>
+      </statement>
+   </statement>
+</startNode>

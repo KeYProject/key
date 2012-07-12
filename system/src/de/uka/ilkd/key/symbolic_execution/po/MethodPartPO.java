@@ -204,8 +204,7 @@ public class MethodPartPO extends AbstractOperationPO {
             // Statement found
             toFill.add(s);
          }
-         else if (s.getStartPosition().compareTo(startPosition) < 0 &&
-                  s.getEndPosition().compareTo(endPosition) > 0) {
+         else {
             // Continue search in children
             if (s instanceof StatementContainer) {
                collectStatementsToExecute(toFill, (StatementContainer)s);
@@ -376,7 +375,8 @@ public class MethodPartPO extends AbstractOperationPO {
     */
    @Override
    public int hashCode() {
-      return pm.hashCode() + precondition.hashCode();
+      return pm.hashCode() + 
+             (precondition != null ? precondition.hashCode() : 0);
    }
 
    /**
