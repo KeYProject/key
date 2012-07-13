@@ -261,7 +261,7 @@ public final class KeYModelUtil {
     * @throws DebugException Occurred Exception.
     */
    public static SourceLocation updateLocationFromAST(IStackFrame frame,
-                                                         SourceLocation sourceLocation) throws DebugException {
+                                                      SourceLocation sourceLocation) throws DebugException {
       try {
          SourceLocation result = sourceLocation;
          if (sourceLocation != null && sourceLocation.getCharEnd() >= 0) {

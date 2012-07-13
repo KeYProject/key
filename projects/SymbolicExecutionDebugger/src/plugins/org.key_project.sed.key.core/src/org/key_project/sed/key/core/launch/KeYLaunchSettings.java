@@ -6,6 +6,8 @@ import org.eclipse.jdt.core.IMethod;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 
+import de.uka.ilkd.key.java.Position;
+
 /**
  * Contains the settings used in an {@link ILaunch} which contains a
  * {@link KeYDebugTarget} as unmodifiable backup of the initial
@@ -55,6 +57,21 @@ public class KeYLaunchSettings {
     * Merge branch conditions?
     */
    private boolean mergeBranchConditions;
+   
+   /**
+    * {@code true} execute method range, {@code false} execute complete method body.
+    */
+   private boolean executeMethodRange;
+   
+   /**
+    * The start of the method range to execute.
+    */
+   private Position methodRangeStart;
+   
+   /**
+    * The end of the method range to execute.
+    */
+   private Position methodRangeEnd;
 
    /**
     * Constructor.
@@ -66,6 +83,9 @@ public class KeYLaunchSettings {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param executeMethodRange {@code true} execute method range, {@code false} execute complete method body.
+    * @param methodRangeStart The start of the method range to execute.
+    * @param methodRangeEnd The end of the method range to execute.
     */
    public KeYLaunchSettings(IMethod method, 
                             boolean useExistingContract, 
@@ -74,7 +94,10 @@ public class KeYLaunchSettings {
                             boolean showMethodReturnValues,
                             boolean showVariablesOfSelectedDebugNode,
                             boolean showKeYMainWindow,
-                            boolean mergeBranchConditions) {
+                            boolean mergeBranchConditions,
+                            boolean executeMethodRange,
+                            Position methodRangeStart,
+                            Position methodRangeEnd) {
       this.method = method;
       this.useExistingContract = useExistingContract;
       this.existingContract = existingContract;
@@ -83,6 +106,9 @@ public class KeYLaunchSettings {
       this.showVariablesOfSelectedDebugNode = showVariablesOfSelectedDebugNode;
       this.showKeYMainWindow = showKeYMainWindow;
       this.mergeBranchConditions = mergeBranchConditions;
+      this.executeMethodRange = executeMethodRange;
+      this.methodRangeStart = methodRangeStart;
+      this.methodRangeEnd = methodRangeEnd;
    }
 
    /**
@@ -147,5 +173,29 @@ public class KeYLaunchSettings {
     */
    public String getPrecondition() {
       return precondition;
+   }
+
+   /**
+    * Checks if a method range or the complete method is executed.
+    * @return {@code true} execute method range, {@code false} execute complete method body.
+    */
+   public boolean isExecuteMethodRange() {
+      return executeMethodRange;
+   }
+
+   /**
+    * Returns the start of the method range to execute.
+    * @return The start of the method range to execute.
+    */
+   public Position getMethodRangeStart() {
+      return methodRangeStart;
+   }
+
+   /**
+    * Returns the end of the method range to execute.
+    * @return The end of the method range to execute.
+    */
+   public Position getMethodRangeEnd() {
+      return methodRangeEnd;
    }
 }

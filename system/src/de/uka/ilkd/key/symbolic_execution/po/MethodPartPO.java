@@ -38,7 +38,25 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * <p>
  * This proof obligation executes selected statements of the body
  * of a given {@link IProgramMethod}. The statements are selected by its
- * source location. All statements in the given source range are executed.
+ * source location. All statements which ends in the given source range
+ * ]{@code startPosition}, {@code endPosition}] are executed.
+ * </p>
+ * <p>
+ * To select statements by its end position is required, because KeY's recorder
+ * includes also leading space and leading comments into a statements position. 
+ * Another drawback is that the end position of the previous statement is 
+ * exactly the start position of the following statement.
+ * </p>
+ * <p>
+ * Imagine the following snippet:
+ * <code><pre>
+ * int x = 1; // from 3/59 to 4/16
+ * int y = 2; // from 4/16 to 5/16
+ * int z = 3; // from 5/16 to 6/16
+ * </pre></code>
+ * To execute only the last two statements a user would select intuitively
+ * the source range 5/0 to 6/16 (the text without leading white space) which
+ * matches exactly the used selection definition.
  * </p>
  * <p>
  * The generated {@link Sequent} has the following form:
@@ -199,9 +217,9 @@ public class MethodPartPO extends AbstractOperationPO {
    protected void collectStatementsToExecute(List<Statement> toFill, StatementContainer container) {
       for (int i = 0; i < container.getChildCount(); i++) {
          Statement s = container.getStatementAt(i);
-         if (s.getStartPosition().compareTo(startPosition) >= 0 &&
+         if (s.getEndPosition().compareTo(startPosition) > 0 &&
              s.getEndPosition().compareTo(endPosition) <= 0) {
-            // Statement found
+            // Statement found which ends in the interval ]startPosition, endPosition]
             toFill.add(s);
          }
          else {

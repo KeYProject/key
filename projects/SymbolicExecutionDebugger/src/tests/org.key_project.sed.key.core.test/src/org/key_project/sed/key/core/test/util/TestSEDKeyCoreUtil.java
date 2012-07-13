@@ -119,12 +119,12 @@ public final class TestSEDKeyCoreUtil {
     * @throws CoreException Occurred Exception.
     */
    public static ILaunchConfiguration getKeYLaunchConfiguration(IMethod method) throws CoreException {
-      List<ILaunchConfiguration> configs = KeySEDUtil.searchLaunchConfigurations(method);
+      List<ILaunchConfiguration> configs = KeySEDUtil.searchLaunchConfigurations(method, null, null);
       if (!configs.isEmpty()) {
          return configs.get(0);
       }
       else {
-         return KeySEDUtil.createConfiguration(method);
+         return KeySEDUtil.createConfiguration(method, null, null);
       }
    }
 

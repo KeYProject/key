@@ -15,9 +15,12 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.ui.util.LogUtil;
 import org.key_project.sed.ui.util.LaunchUIUtil;
+
+import de.uka.ilkd.key.java.Position;
 
 /**
  * {@link ILaunchShortcut} implementation for Symbolic Executiong Debugger
@@ -35,7 +38,7 @@ public class KeYLaunchShortcut implements ILaunchShortcut {
             if (selection instanceof IStructuredSelection && !selection.isEmpty()) {
                 Object element = ((IStructuredSelection)selection).getFirstElement();
                 if (element instanceof IMethod) {
-                    launch((IMethod)element, mode);
+                    launch((IMethod)element, mode, null, null);
                 }
             }
         }
@@ -56,9 +59,22 @@ public class KeYLaunchShortcut implements ILaunchShortcut {
                 if (javaEditor.getSelectionProvider() != null) {
                     ISelection selection = javaEditor.getSelectionProvider().getSelection();
                     if (selection instanceof ITextSelection) {
-                        IJavaElement element = SelectionConverter.resolveEnclosingElement(javaEditor, (ITextSelection)selection);
+                        ITextSelection textSelection = (ITextSelection)selection;
+                        IJavaElement element = SelectionConverter.resolveEnclosingElement(javaEditor, textSelection);
                         if (element instanceof IMethod) {
-                            launch((IMethod)element, mode);
+                            IMethod method = (IMethod)element;
+                            // Check if a range in the method is selected or if the complete method should be executed (only its name or part of it is selected)
+                            if (textSelection.getOffset() >= method.getNameRange().getOffset() &&
+                                textSelection.getOffset() + textSelection.getLength() <= method.getNameRange().getOffset() + method.getNameRange().getLength()) {
+                                // Execute only method
+                                launch(method, mode, null, null);
+                            }
+                            else {
+                                // Compute positions of selected code
+                                Position methodStartPosition = KeYUtil.getCursorPositionForOffset(method, textSelection.getOffset());
+                                Position methodEndPosition = KeYUtil.getCursorPositionForOffset(method, textSelection.getOffset() + textSelection.getLength());
+                                launch(method, mode, methodStartPosition, methodEndPosition);
+                            }
                         }
                     }
                 }
@@ -74,13 +90,18 @@ public class KeYLaunchShortcut implements ILaunchShortcut {
      * Launches the given {@link IMethod}.
      * @param method The {@link IMethod} to launch.
      * @param mode The mode to use.
+     * @param methodStartPosition An optional start position to execute only parts of the method.
+     * @param methodEndPosition An optional end position to execute only parts of the method.
      * @throws CoreException Occurred Exception.
      */
-    protected void launch(IMethod method, String mode) throws CoreException {
+    protected void launch(IMethod method, 
+                          String mode,
+                          Position methodStartPosition,
+                          Position methodEndPosition) throws CoreException {
         try {
-            ILaunchConfiguration config = findLaunchConfiguration(method);
+            ILaunchConfiguration config = findLaunchConfiguration(method, methodStartPosition, methodEndPosition);
             if (config == null) {
-                config = KeySEDUtil.createConfiguration(method);
+                config = KeySEDUtil.createConfiguration(method, methodStartPosition, methodEndPosition);
             }
             if (config != null) {
                 DebugUITools.launch(config, mode);
@@ -96,12 +117,16 @@ public class KeYLaunchShortcut implements ILaunchShortcut {
      * given {@link IMethod}. If multiple {@link ILaunchConfiguration} exists
      * the user is asked to select one.
      * @param method The {@link IMethod} for that an {@link ILaunchConfiguration} is needed.
+     * @param methodStartPosition An optional start position to execute only parts of the method.
+     * @param methodEndPosition An optional end position to execute only parts of the method.
      * @return The found {@link ILaunchConfiguration} or {@code null} if no one was found.
      * @throws CoreException Occurred Exception.
      * @throws OperationCanceledException When the user has canceled the select dialog.
      */
-    protected ILaunchConfiguration findLaunchConfiguration(IMethod method) throws CoreException {
-        List<ILaunchConfiguration> candidateConfigs = KeySEDUtil.searchLaunchConfigurations(method);
+    protected ILaunchConfiguration findLaunchConfiguration(IMethod method,
+                                                           Position methodStartPosition,
+                                                           Position methodEndPosition) throws CoreException {
+        List<ILaunchConfiguration> candidateConfigs = KeySEDUtil.searchLaunchConfigurations(method, methodStartPosition, methodEndPosition);
         int candidateCount = candidateConfigs.size();
         if (candidateCount == 1) {
             return (ILaunchConfiguration)candidateConfigs.get(0);

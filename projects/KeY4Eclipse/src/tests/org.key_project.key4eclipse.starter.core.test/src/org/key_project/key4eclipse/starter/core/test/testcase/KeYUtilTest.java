@@ -1,16 +1,193 @@
 package org.key_project.key4eclipse.starter.core.test.testcase;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
 
+import org.eclipse.core.filebuffers.FileBuffers;
+import org.eclipse.core.filebuffers.ITextFileBuffer;
+import org.eclipse.core.filebuffers.ITextFileBufferManager;
+import org.eclipse.core.filebuffers.LocationKind;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.junit.Test;
+import org.key_project.key4eclipse.starter.core.test.Activator;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil.IRunnableWithDocument;
+import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.jdt.JDTUtil;
+import org.key_project.util.test.util.TestUtilsUtil;
+
+import de.uka.ilkd.key.java.Position;
 
 /**
  * Tests for {@link KeYUtil}
  * @author Martin Hentschel
  */
 public class KeYUtilTest extends TestCase {
+   /**
+    * Tests {@link KeYUtil#changeCursorPositionTabWidth(IDocument, Position, int, int)}
+    */
+   @Test
+   public void testChangeCursorPositionTabWidth() throws CoreException, InterruptedException, BadLocationException {
+      // Create test project and content
+      IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testChangeCursorPositionTabWidth");
+      IFolder src = project.getProject().getFolder("src");
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", src);
+      TestUtilsUtil.waitForBuild();
+      IMethod method = TestUtilsUtil.getJdtMethod(project, "MCDemo", "init", "I");
+      // Open document
+      DocumentGetterRunnableWithDocument saver = new DocumentGetterRunnableWithDocument();
+      KeYUtil.runOnDocument(method, saver);
+      IDocument document = saver.getDocument();
+      // Test null
+      assertSame(Position.UNDEFINED, KeYUtil.changeCursorPositionTabWidth(null, null, JDTUtil.getTabWidth(method), KeYUtil.RECORDER_TAB_SIZE));
+      assertSame(Position.UNDEFINED, KeYUtil.changeCursorPositionTabWidth(null, new Position(2, 1), JDTUtil.getTabWidth(method), KeYUtil.RECORDER_TAB_SIZE));
+      assertSame(Position.UNDEFINED, KeYUtil.changeCursorPositionTabWidth(document, null, JDTUtil.getTabWidth(method), KeYUtil.RECORDER_TAB_SIZE));
+      // Get position
+      Position position = KeYUtil.getCursorPositionForOffset(method, method.getSourceRange().getOffset());
+      assertNotNull(position);
+      assertEquals("17 : 5", position.toString());
+      Position converted = KeYUtil.changeCursorPositionTabWidth(document, position, JDTUtil.getTabWidth(method), KeYUtil.RECORDER_TAB_SIZE);
+      assertNotNull(converted);
+      assertEquals("17 : 9", converted.toString());
+   }
+   
+   /**
+    * Tests {@link KeYUtil#getCursorPositionForOffset(IJavaElement, int)}
+    */
+   @Test
+   public void testGetCursorPositionForOffset() throws CoreException, InterruptedException {
+      // Create test project and content
+      IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testGetCursorPositionForOffset");
+      IFolder src = project.getProject().getFolder("src");
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", src);
+      TestUtilsUtil.waitForBuild();
+      IMethod method = TestUtilsUtil.getJdtMethod(project, "MCDemo", "init", "I");
+      // Test null
+      assertSame(Position.UNDEFINED, KeYUtil.getCursorPositionForOffset(null, 10));
+      // Test invalid offset
+      try {
+         KeYUtil.getCursorPositionForOffset(method, -4);
+         fail("Invalid offset should not be possible.");
+      }
+      catch (Exception e) {
+      }
+      // Test valid offsets
+      Position position = KeYUtil.getCursorPositionForOffset(method, method.getSourceRange().getOffset());
+      assertNotNull(position);
+      assertEquals("17 : 5", position.toString());
+      position = KeYUtil.getCursorPositionForOffset(method, method.getSourceRange().getOffset() + method.getSourceRange().getLength());
+      assertNotNull(position);
+      assertEquals("24 : 6", position.toString());
+   }
+   
+   /**
+    * Tests {@link KeYUtil#runOnDocument(org.eclipse.jdt.core.IJavaElement, IRunnableWithDocument)}.
+    */
+   @Test
+   public void testRunOnDocument_IJavaElement() throws CoreException, IOException, InterruptedException {
+      // Create test project and content
+      IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testRunOnDocument_IJavaElement");
+      IFolder src = project.getProject().getFolder("src");
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", src);
+      TestUtilsUtil.waitForBuild();
+      IMethod method = TestUtilsUtil.getJdtMethod(project, "MCDemo", "init", "I");
+      // Test null
+      assertFalse(KeYUtil.runOnDocument((IJavaElement)null, new DocumentGetterRunnableWithDocument()));
+      assertFalse(KeYUtil.runOnDocument(method, null));
+      assertFalse(KeYUtil.runOnDocument((IJavaElement)null, null));
+      // Test path to valid file which is not opened
+      DocumentGetterRunnableWithDocument saver = new DocumentGetterRunnableWithDocument();
+      assertTrue(KeYUtil.runOnDocument(method, saver));
+      assertNotNull(saver.getDocument());
+      assertEquals(IOUtil.readFrom(((IFile)method.getResource()).getContents()), saver.getDocument().get());
+   }
+   
+   /**
+    * Tests {@link KeYUtil#runOnDocument(IPath, org.key_project.key4eclipse.starter.core.util.KeYUtil.IRunnableWithDocument)}.
+    */
+   @Test
+   public void testRunOnDocument_IPath() throws CoreException, IOException {
+      // Create test project and content
+      IProject project = TestUtilsUtil.createProject("KeYUtilTest_testRunOnDocument_Ipath");
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", project);
+      IFile file = project.getFile("MCDemo.java");
+      assertTrue(file.exists());
+      // Get buffer manager
+      ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
+      assertNotNull(bufferManager);
+      // Test null
+      assertFalse(KeYUtil.runOnDocument((IPath)null, new DocumentGetterRunnableWithDocument()));
+      assertFalse(KeYUtil.runOnDocument(file.getFullPath(), null));
+      assertFalse(KeYUtil.runOnDocument((IPath)null, null));
+      assertNull(bufferManager.getTextFileBuffer(file.getFullPath(), LocationKind.IFILE));
+      // Test path to valid file which is not opened
+      DocumentGetterRunnableWithDocument saver = new DocumentGetterRunnableWithDocument();
+      assertTrue(KeYUtil.runOnDocument(file.getFullPath(), saver));
+      assertNotNull(saver.getDocument());
+      assertEquals(IOUtil.readFrom(file.getContents()), saver.getDocument().get());
+      assertNull(bufferManager.getTextFileBuffer(file.getFullPath(), LocationKind.IFILE));
+      // Test path to not existing file
+      saver = new DocumentGetterRunnableWithDocument();
+      assertTrue(KeYUtil.runOnDocument(project.getFile("NotExistingFile.txt").getFullPath(), saver));
+      assertNotNull(saver.getDocument());
+      assertTrue(saver.getDocument().get().isEmpty());
+      assertNull(bufferManager.getTextFileBuffer(file.getFullPath(), LocationKind.IFILE));
+      // Test path to valid file which is already opened
+      try {
+         bufferManager.connect(file.getFullPath(), LocationKind.IFILE, null);
+         ITextFileBuffer textFileBuffer = bufferManager.getTextFileBuffer(file.getFullPath(), LocationKind.IFILE);
+         assertNotNull(textFileBuffer);
+         saver = new DocumentGetterRunnableWithDocument();
+         assertTrue(KeYUtil.runOnDocument(file.getFullPath(), saver));
+         assertNotNull(saver.getDocument());
+         assertEquals(IOUtil.readFrom(file.getContents()), saver.getDocument().get());
+         assertSame(textFileBuffer, bufferManager.getTextFileBuffer(file.getFullPath(), LocationKind.IFILE));
+         assertSame(textFileBuffer, bufferManager.getTextFileBuffer(saver.getDocument()));
+      }
+      finally {
+         bufferManager.disconnect(file.getFullPath(), LocationKind.IFILE, null);
+      }
+   }
+   
+   /**
+    * Utility class to collect the executed {@link IDocument}.
+    * @author Martin Hentschel
+    */
+   public static class DocumentGetterRunnableWithDocument implements IRunnableWithDocument {
+      /**
+       * The executed {@link IDocument}.
+       */
+      private IDocument document;
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void run(IDocument document) {
+         this.document = document;
+      }
+
+      /**
+       * Returns the executed {@link IDocument}.
+       * @return The executed {@link IDocument}.
+       */
+      public IDocument getDocument() {
+         return document;
+      }
+   }
+   
    /**
     * Tests {@link KeYUtil#normalizeRecorderColumn(int, int, int[])} and
     * {@link KeYUtil#normalizeRecorderColumn(int, int[])}.

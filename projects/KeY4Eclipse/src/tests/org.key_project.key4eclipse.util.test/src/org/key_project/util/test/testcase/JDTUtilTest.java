@@ -36,6 +36,22 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class JDTUtilTest extends TestCase {
    /**
+    * Tests {@link JDTUtil#getTabWidth(IJavaElement)}.
+    */
+   @Test
+   public void testGetTabWidth() throws CoreException, InterruptedException {
+      // Create test project and content
+      IJavaProject project = TestUtilsUtil.createJavaProject("JDTUtilTest_testGetTabWidth");
+      IFolder src = project.getProject().getFolder("src");
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MethodTest", src);
+      TestUtilsUtil.waitForBuild();
+      IMethod method = TestUtilsUtil.getJdtMethod(project, "MethodTest", "voidMethod");
+      // Get tab width
+      assertEquals(0, JDTUtil.getTabWidth(null));
+      assertEquals(4, JDTUtil.getTabWidth(method));
+   }
+   
+   /**
     * Tests {@link JDTUtil#getMethodBody(IMethod)}.
     */
    @Test
