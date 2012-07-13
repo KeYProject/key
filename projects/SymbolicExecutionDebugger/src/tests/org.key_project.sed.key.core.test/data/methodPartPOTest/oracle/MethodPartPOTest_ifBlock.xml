@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_889d5f68-65ad-4ac3-ac40-e465a5a601af" name="doSomething from 20 : 13 to 21 : 20" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_5f8e4ec5-8a44-4e19-ab76-1aed60ad75ec" name="&lt;start&gt;" pathCondition="true">
+         <sedStatement xml:id="_80739ce8-1d00-480c-a8bc-98627e3fec27" name="x=x*-1;" pathCondition="true" lineNumber="-1" charStart="330" charEnd="341">
+            <sedStatement xml:id="_29419550-1513-4084-86ba-41c252445dc1" name="x+=2;" pathCondition="true" lineNumber="-1" charStart="346" charEnd="353">
+               <sedTermination xml:id="_7c459bcc-a10c-4437-b9dc-4c47693cd695" name="&lt;end&gt;" pathCondition="true">
+               </sedTermination>
+            </sedStatement>
+         </sedStatement>
+      </sedThread>
+   </sedTarget>
+</launch>
