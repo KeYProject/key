@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_b40bfe7b-09c8-4333-aa0f-0042e45db4b3" name="ComplexFlatSteps[ComplexFlatSteps::doSomething()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_0c7c076c-43eb-4537-84b8-e68d69aa3a72" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_52a9ccce-70b1-4575-95f6-509997efb047" name="self.doSomething();" pathCondition="true" lineNumber="-1" charStart="244" charEnd="255">
-            <sedStatement xml:id="_3687aa6a-e585-4c0a-915e-e118ab22b1ae" name="int x = 1+2;" pathCondition="true" lineNumber="-1" charStart="263" charEnd="277">
-               <sedStatement xml:id="_a532ff06-b414-4f7a-99f2-eb6d370829f7" name="int y = 2*4*9;" pathCondition="true" lineNumber="-1" charStart="281" charEnd="299">
-                  <sedStatement xml:id="_d56cfb4a-9b66-44f6-8497-46195252be81" name="int z = 3*(4/(2-3));" pathCondition="true" lineNumber="-1" charStart="303" charEnd="329">
-                     <sedMethodReturn xml:id="_4dd90208-9723-41b3-8b72-414f773de147" name="&lt;return of self.doSomething();&gt;" pathCondition="true" lineNumber="-1" charStart="244" charEnd="255">
-                        <sedTermination xml:id="_db3c0d5d-bc12-4369-ab71-9a505b9197a4" name="&lt;end&gt;" pathCondition="true">
+   <sedTarget xml:id="_775e4733-46c5-413b-ad30-b97f92eeed18" name="doSomething()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_4aefc6cf-8290-4b83-bdab-6a2a4429d645" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_d7f39ef1-48e3-43d3-ad9c-03b0e937c1f5" name="self.doSomething();" pathCondition="true" lineNumber="-1" charStart="244" charEnd="255">
+            <sedStatement xml:id="_d365989f-707d-42a3-9b73-f95d712888c8" name="int x = 1+2;" pathCondition="true" lineNumber="-1" charStart="263" charEnd="277">
+               <sedStatement xml:id="_68fce2c1-dcfb-4205-a73c-e84db57df2a1" name="int y = 2*4*9;" pathCondition="true" lineNumber="-1" charStart="281" charEnd="299">
+                  <sedStatement xml:id="_f1f44beb-15a2-4b5b-9a64-53ed35b704d8" name="int z = 3*(4/(2-3));" pathCondition="true" lineNumber="-1" charStart="303" charEnd="329">
+                     <sedMethodReturn xml:id="_4e4d0d21-b32c-4570-8e9f-f7bb7ed160fd" name="&lt;return of self.doSomething();&gt;" pathCondition="true" lineNumber="-1" charStart="244" charEnd="255">
+                        <sedTermination xml:id="_a5d3a72e-e255-4a63-ace4-ea803c56c16f" name="&lt;end&gt;" pathCondition="true">
                         </sedTermination>
                      </sedMethodReturn>
                   </sedStatement>

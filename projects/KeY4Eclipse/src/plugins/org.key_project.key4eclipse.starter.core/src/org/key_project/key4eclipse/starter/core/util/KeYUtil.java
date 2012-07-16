@@ -3,10 +3,8 @@ package org.key_project.key4eclipse.starter.core.util;
 import java.awt.Component;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JOptionPane;
@@ -50,7 +48,6 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.NotificationEventID;
 import de.uka.ilkd.key.gui.notification.NotificationTask;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -87,21 +84,6 @@ import de.uka.ilkd.key.util.MiscTools;
  * @author Martin Hentschel
  */
 public final class KeYUtil {
-    /**
-     * Key for the choice option "runtimeExceptions".
-     */
-    public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS = "runtimeExceptions";
-   
-    /**
-     * Value in choice option "runtimeExceptions" to ban exceptions.
-     */
-    public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_BAN = "runtimeExceptions:ban";
-    
-    /**
-     * Value in choice option "runtimeExceptions" to allow exceptions.
-     */
-    public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW = "runtimeExceptions:allow";
-   
     /**
      * The file extension for *.key files.
      */
@@ -618,44 +600,7 @@ public final class KeYUtil {
              main.getNotificationManager().addNotificationTask(task);
           }
        }
-    }
-
-   /**
-    * Returns the default choice value.
-    * <b>Attention: </b> This method returns {@code null} if it is called before
-    * a proof is instantiated the first time. It can be checked via
-    * {@link #isChoiceSettingInitialised()}.
-    * @param key The choice key.
-    * @return The choice value.
-    */
-   public static String getChoiceSetting(String key) {
-      Map<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
-      return settings.get(key);
-   }
-   
-   /**
-    * Sets the default choice value.
-    * <b>Attention: </b> Settings should not be changed before the first proof
-    * is instantiated in KeY. Otherwise the default settings are not loaded.
-    * If default settings are defined can be checked via {@link #isChoiceSettingInitialised()}.
-    * @param key The choice key to modify.
-    * @param value The new choice value to set.
-    */
-   public static void setChoiceSetting(String key, String value) {
-      HashMap<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
-      HashMap<String, String> clone = new HashMap<String, String>();
-      clone.putAll(settings);
-      clone.put(key, value);
-      ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
-   }
-
-   /**
-    * Checks if the choice settings are initialized.
-    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
-    */
-   public static boolean isChoiceSettingInitialised() {
-      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
-   }   
+    }  
    
    /**
     * Checks if the {@link Proof} exists in the user interface.

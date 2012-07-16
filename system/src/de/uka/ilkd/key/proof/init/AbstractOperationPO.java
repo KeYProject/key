@@ -12,6 +12,7 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,10 +128,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
       int nameIndex = 0;
       for (boolean transactionFlag : transactionFlags) {
          // prepare variables, program method, heapAtPre
-         final ImmutableList<ProgramVariable> paramVars = TB.paramVars(services, pm, true);
-         final ProgramVariable selfVar = TB.selfVar(services, pm, getCalleeKeYJavaType(), true);
-         final ProgramVariable resultVar = TB.resultVar(services, pm, true);
-         final ProgramVariable exceptionVar = TB.excVar(services, pm, true);
+         boolean makeNamesUnique = isMakeNamesUnique();
+         final ImmutableList<ProgramVariable> paramVars = TB.paramVars(services, pm, makeNamesUnique);
+         final ProgramVariable selfVar = TB.selfVar(services, pm, getCalleeKeYJavaType(), makeNamesUnique);
+         final ProgramVariable resultVar = TB.resultVar(services, pm, makeNamesUnique);
+         final ProgramVariable exceptionVar = TB.excVar(services, pm, makeNamesUnique);
 
          final List<LocationVariable> modHeaps = HeapContext.getModHeaps(services, transactionFlag);
          final Map<LocationVariable, LocationVariable> atPreVars = HeapContext.getBeforeAtPreVars(modHeaps, services, "AtPre");
@@ -159,10 +161,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
          // create arguments from formal parameters for method call
          ImmutableList<LocationVariable> formalParamVars = ImmutableSLList.<LocationVariable> nil();
          for (ProgramVariable paramVar : paramVars) {
-            ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
-            LocationVariable formalParamVar = new LocationVariable(pen, paramVar.getKeYJavaType());
-            formalParamVars = formalParamVars.append(formalParamVar);
-            register(formalParamVar);
+            if (isCopyOfMethodArgumentsUsed()) {
+               ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
+               LocationVariable formalParamVar = new LocationVariable(pen, paramVar.getKeYJavaType());
+               formalParamVars = formalParamVars.append(formalParamVar);
+               register(formalParamVar);
+            }
+            else {
+               formalParamVars = formalParamVars.append((LocationVariable)paramVar); // The cast is ugly but legal. It is a bigger task to refactor TB.paramVars to return a list of LocationVariabe instead of ProgramVariable.
+            }
          }
 
          // build program block to execute in try clause (must be done before pre condition is created.
@@ -177,7 +184,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
          // Add uninterpreted predicate
          if (isAddUninterpretedPredicate()) {
             postTerm = TB.and(postTerm,
-                              buildUninterpretedPredicate(paramVars, getUninterpretedPredicateName()));
+                              buildUninterpretedPredicate(paramVars, exceptionVar, getUninterpretedPredicateName()));
          }
 
          Term frameTerm = buildFrameClause(modHeaps, heapToAtPre, selfVar, paramVars);
@@ -194,6 +201,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
       // add axioms
       collectClassAxioms(getCalleeKeYJavaType());
+   }
+
+   /**
+    * Checks if self variable, exception variable, result variable
+    * and method call arguments should be renamed to make sure that their
+    * names are unique in the whole KeY application.
+    * @return {@code true} use unique names, {@code false} use original names even if they are not unique in whole KeY application.
+    */
+   protected boolean isMakeNamesUnique() {
+      return true;
    }
 
    /**
@@ -377,12 +394,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * Builds a {@link Term} to use in the postcondition of the generated
     * {@link Sequent} which represents the uninterpreted predicate.
     * @param paramVars The parameters {@link ProgramVariable}s.
+    * @param exceptionVar The exception variable.
     * @param name The name of the uninterpreted predicate.
     * @return The created {@link Term}.
     */
-   protected Term buildUninterpretedPredicate(ImmutableList<ProgramVariable> paramVars, String name) {
+   protected Term buildUninterpretedPredicate(ImmutableList<ProgramVariable> paramVars, 
+                                              ProgramVariable exceptionVar, 
+                                              String name) {
       // Create parameters for predicate SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
       ImmutableList<Term> arguments = TB.var(paramVars); // Method parameters
+      arguments = arguments.prepend(TB.var(exceptionVar)); // Exception variable (As second argument for the predicate)
       arguments = arguments.prepend(TB.getBaseHeap(services)); // Heap (As first argument for the predicate)
       // Create non-rigid predicate with signature: SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
       ImmutableList<Sort> argumentSorts = TB.getSorts(arguments);
@@ -504,9 +525,39 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which contains the initial value.
     * @return The {@link Term} representing the initial updates.
     */
-   protected abstract Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
-                                       ImmutableList<LocationVariable> formalParamVars,
-                                       Map<LocationVariable, LocationVariable> atPreVars);
+   protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
+                              ImmutableList<LocationVariable> formalParamVars,
+                              Map<LocationVariable, LocationVariable> atPreVars) {
+      Term update = null;
+      for(LocationVariable heap : atPreVars.keySet()) {
+         final Term u = TB.elementary(services, atPreVars.get(heap), TB.getBaseHeap(services));
+         if(update == null) {
+            update = u;
+         }else{
+            update = TB.parallel(update, u);
+         }
+       }
+       if (isCopyOfMethodArgumentsUsed()) {
+          Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
+          Iterator<ProgramVariable> paramIt = paramVars.iterator();
+          while (formalParamIt.hasNext()) {
+              Term paramUpdate = TB.elementary(services,
+                                               formalParamIt.next(),
+                                               TB.var(paramIt.next()));
+              update = TB.parallel(update, paramUpdate);
+          }
+       }
+       return update;
+   }
+
+   /**
+    * Checks if a copy of the method call arguments are used instead
+    * of the original method arguments.
+    * @return {@code true} use copy of method call arguments, {@code false} use original method call arguments.
+    */
+   protected boolean isCopyOfMethodArgumentsUsed() {
+      return true;
+   }
 
    /**
     * Returns the name of the {@link Proof} based on the given transaction flag.

@@ -18,18 +18,25 @@ import junit.framework.TestCase;
 
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
@@ -42,7 +49,8 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
-import de.uka.ilkd.key.symbolic_execution.po.MethodPartPO;
+import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
+import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
 import de.uka.ilkd.key.symbolic_execution.strategy.CompoundStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.StepOverSymbolicExecutionTreeNodesStopCondition;
@@ -51,7 +59,6 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
@@ -637,6 +644,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param containerTypeName The name of the type which contains the method.
     * @param methodFullName The method name to search.
+    * @param precondition An optional precondition to use.
     * @param mergeBranchConditions Merge branch conditions?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProofInputException Occurred Exception.
@@ -646,6 +654,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                 String javaPathInBaseDir, 
                                                                                                                 String containerTypeName, 
                                                                                                                 String methodFullName,
+                                                                                                                String precondition,
                                                                                                                 boolean mergeBranchConditions) throws ProofInputException, FileNotFoundException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
@@ -657,10 +666,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Search method to proof
       Services services = initConfig.getServices();
       IProgramMethod pm = searchProgramMethod(services, containerTypeName, methodFullName);
-      // Create default contract for method to test
-      FunctionalOperationContract contract = SymbolicExecutionUtil.createDefaultContract(services, pm, null);
       // Start proof
-      ProofOblInput input = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract, true);
+      ProofOblInput input = new ProgramMethodPO(initConfig, pm.getFullName(), pm, precondition, true);
       Proof proof = ui.createProof(initConfig, input);
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
@@ -707,7 +714,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       Services services = initConfig.getServices();
       IProgramMethod pm = searchProgramMethod(services, containerTypeName, methodFullName);
       // Start proof
-      ProofOblInput input = new MethodPartPO(initConfig, methodFullName, pm, precondition, startPosition, endPosition, true);
+      ProofOblInput input = new ProgramMethodSubsetPO(initConfig, methodFullName, pm, precondition, startPosition, endPosition, true);
       Proof proof = ui.createProof(initConfig, input);
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
@@ -717,5 +724,29 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       builder.analyse();
       assertNotNull(builder.getStartNode());
       return new SymbolicExecutionEnvironment<CustomConsoleUserInterface>(ui, initConfig, builder);
+   }
+   
+   /**
+    * Extracts the content of the try block from the initial {@link Sequent}.
+    * @param proof The {@link Proof} which contains the initial {@link Sequent}:
+    * @return The try content.
+    */
+   protected String getTryContent(Proof proof) {
+      assertNotNull(proof);
+      Node node = proof.root();
+      Sequent sequent = node.sequent();
+      assertEquals(1, sequent.succedent().size());
+      Term succedent = sequent.succedent().get(0).formula();
+      assertEquals(2, succedent.subs().size());
+      Term updateApplication = succedent.subs().get(1);
+      assertEquals(2, updateApplication.subs().size());
+      JavaProgramElement updateContent = updateApplication.subs().get(1).javaBlock().program();
+      assertTrue(updateContent instanceof StatementBlock);
+      ImmutableArray<? extends Statement> updateContentBody = ((StatementBlock)updateContent).getBody();
+      assertEquals(2, updateContentBody.size());
+      assertTrue(updateContentBody.get(1) instanceof Try);
+      Try tryStatement = (Try)updateContentBody.get(1);
+      assertEquals(1, tryStatement.getBranchCount());
+      return ProofSaver.printAnything(tryStatement.getBody(), proof.getServices());
    }
 }

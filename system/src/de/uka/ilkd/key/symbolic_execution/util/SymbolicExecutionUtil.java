@@ -1,16 +1,18 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Position;
@@ -68,13 +70,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
-import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
@@ -89,6 +84,21 @@ import de.uka.ilkd.key.util.ProofStarter;
  * @author Martin Hentschel
  */
 public final class SymbolicExecutionUtil {
+   /**
+    * Key for the choice option "runtimeExceptions".
+    */
+   public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS = "runtimeExceptions";
+  
+   /**
+    * Value in choice option "runtimeExceptions" to ban exceptions.
+    */
+   public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_BAN = "runtimeExceptions:ban";
+   
+   /**
+    * Value in choice option "runtimeExceptions" to allow exceptions.
+    */
+   public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW = "runtimeExceptions:allow";
+
    /**
     * Forbid instances.
     */
@@ -150,32 +160,6 @@ public final class SymbolicExecutionUtil {
          }
       }
       return terms;
-   }
-
-   /**
-    * Creates a new default contract for the given {@link IProgramMethod}.
-    * If a precondition is defined in JML syntax it is added to the generated
-    * contract. If no one is defined the generated contract requires nothing.
-    * @param services The {@link Services} to use.
-    * @param pm The {@link IProgramMethod} to create a default contract for.
-    * @param precondition An optional precondition to use.
-    * @return The created {@link Contract}.
-    * @throws SLTranslationException Occurred Exception.
-    */
-   public static FunctionalOperationContract createDefaultContract(Services services, 
-                                                                   IProgramMethod pm,
-                                                                   String precondition) throws SLTranslationException {
-      // Create TextualJMLSpecCase
-      ImmutableList<String> mods = ImmutableSLList.nil();
-      mods = mods.append("public");
-      TextualJMLSpecCase textualSpecCase = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
-      if (precondition != null && !precondition.isEmpty()) {
-         textualSpecCase.addRequires(new PositionedString(precondition));
-      }
-      // Create contract
-      JMLSpecFactory factory = new JMLSpecFactory(services);
-      ImmutableSet<Contract> contracts = factory.createJMLOperationContracts(pm, textualSpecCase);
-      return (FunctionalOperationContract)contracts.iterator().next();
    }
    
    /**
@@ -1017,5 +1001,42 @@ public final class SymbolicExecutionUtil {
          terms = terms.append(visitor.getTerm());
       }
       return terms;
+   }
+
+   /**
+    * Returns the default choice value.
+    * <b>Attention: </b> This method returns {@code null} if it is called before
+    * a proof is instantiated the first time. It can be checked via
+    * {@link #isChoiceSettingInitialised()}.
+    * @param key The choice key.
+    * @return The choice value.
+    */
+   public static String getChoiceSetting(String key) {
+      Map<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+      return settings.get(key);
+   }
+   
+   /**
+    * Sets the default choice value.
+    * <b>Attention: </b> Settings should not be changed before the first proof
+    * is instantiated in KeY. Otherwise the default settings are not loaded.
+    * If default settings are defined can be checked via {@link #isChoiceSettingInitialised()}.
+    * @param key The choice key to modify.
+    * @param value The new choice value to set.
+    */
+   public static void setChoiceSetting(String key, String value) {
+      HashMap<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+      HashMap<String, String> clone = new HashMap<String, String>();
+      clone.putAll(settings);
+      clone.put(key, value);
+      ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
+   }
+
+   /**
+    * Checks if the choice settings are initialized.
+    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
+    */
+   public static boolean isChoiceSettingInitialised() {
+      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
    }
 }

@@ -1,71 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_91082ee3-e93b-4857-ac6d-46e4885c9da5" name="SwitchCaseTest[SwitchCaseTest::switchCase(int)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_1c0366d3-465b-45fb-b63b-7541adb596e1" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_106ad90e-0d0a-4d41-878b-e76c47a394f5" name="self.switchCase(_x);" pathCondition="true" lineNumber="-1" charStart="45" charEnd="55">
-            <sedStatement xml:id="_b66b2f82-7657-4c32-9d4f-193b029d6a33" name="int a;" pathCondition="true" lineNumber="-1" charStart="68" charEnd="74">
-               <sedBranchNode xml:id="_90d533cc-a381-47ff-9f10-8cbf1c614d0e" name="switch (_x) {case 0:a=1;break ;case 1:case 2:   a=-1;case 3:   a=_x*_x;break ;case 4:return 42;default:   a=_x; }" pathCondition="true" lineNumber="-1" charStart="78" charEnd="280">
-                  <sedBranchCondition xml:id="_70dc58a5-ca34-4b7a-8f1b-05fd44382c1d" name="x = 0 TRUE" pathCondition="x = 0">
-                     <sedStatement xml:id="_4e844afa-9c5b-43d5-8c53-5152e0d7d991" name="a=1;" pathCondition="x = 0" lineNumber="-1" charStart="106" charEnd="112">
-                        <sedStatement xml:id="_9afe4324-65c5-4e79-ac9a-cb0bd985cca9" name="return a;" pathCondition="x = 0" lineNumber="-1" charStart="284" charEnd="293">
-                           <sedMethodReturn xml:id="_2fa32e59-abc0-4f2d-a635-9f4f3395ed0a" name="&lt;return &apos;1&apos; as result of self.switchCase(_x);&gt;" pathCondition="x = 0" lineNumber="-1" charStart="45" charEnd="55">
-                              <sedTermination xml:id="_2c0e418c-5fb4-4a9a-ad39-970baa817705" name="&lt;end&gt;" pathCondition="x = 0">
+   <sedTarget xml:id="_a6f8a5bd-bf43-477c-825b-cefc2473659f" name="switchCase(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_a4cf7503-707f-4efe-8556-52a28ac4b90c" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_7b43e8a5-a38e-42e6-b8b4-636ada3ae4d8" name="self.switchCase(x);" pathCondition="true" lineNumber="-1" charStart="45" charEnd="55">
+            <sedStatement xml:id="_9fb25a19-bd3c-4e82-a65c-6247c9cf3c10" name="int a;" pathCondition="true" lineNumber="-1" charStart="68" charEnd="74">
+               <sedBranchNode xml:id="_d604aec5-8549-470c-9314-f7a38c408adb" name="switch (x) {case 0:a=1;break ;case 1:case 2:   a=-1;case 3:   a=x*x;break ;case 4:return 42;default:   a=x; }" pathCondition="true" lineNumber="-1" charStart="78" charEnd="280">
+                  <sedBranchCondition xml:id="_3c280078-f501-4a0b-8e8e-a1fcab597a56" name="x = 0 TRUE" pathCondition="x = 0">
+                     <sedStatement xml:id="_975d6824-0b1b-4aec-952b-b3fc6d450591" name="a=1;" pathCondition="x = 0" lineNumber="-1" charStart="106" charEnd="112">
+                        <sedStatement xml:id="_7e583bbf-216d-4161-9f21-00f619dbf7b2" name="return a;" pathCondition="x = 0" lineNumber="-1" charStart="284" charEnd="293">
+                           <sedMethodReturn xml:id="_d6db51ff-c408-4ad1-9e83-28d05ff8be32" name="&lt;return &apos;1&apos; as result of self.switchCase(x);&gt;" pathCondition="x = 0" lineNumber="-1" charStart="45" charEnd="55">
+                              <sedTermination xml:id="_71e6151d-5fbd-4c96-9f2d-6d6a658c9361" name="&lt;end&gt;" pathCondition="x = 0">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedStatement>
                      </sedStatement>
                   </sedBranchCondition>
-                  <sedBranchCondition xml:id="_bc72dd95-97f5-4c9f-b23b-98ea3e3775fe" name="x = 0 FALSE" pathCondition="!x = 0">
-                     <sedBranchCondition xml:id="_d6dbd8a0-def6-4023-abbf-04baf7e9c619" name="x = 1 TRUE" pathCondition="!x = 0 &amp; x = 1">
-                        <sedStatement xml:id="_97885afa-2c9a-493a-8273-362215e386db" name="a=-1;" pathCondition="!x = 0 &amp; x = 1" lineNumber="-1" charStart="165" charEnd="172">
-                           <sedStatement xml:id="_0870fc72-2c69-4ebf-94b0-4f15daa89e80" name="a=_x*_x;" pathCondition="!x = 0 &amp; x = 1" lineNumber="-1" charStart="188" charEnd="198">
-                              <sedStatement xml:id="_87aa0501-8940-441b-9fd4-440a37449413" name="return a;" pathCondition="!x = 0 &amp; x = 1" lineNumber="-1" charStart="284" charEnd="293">
-                                 <sedMethodReturn xml:id="_a9b7cce4-c914-4332-b842-0ad4a65a69b0" name="&lt;return &apos;1&apos; as result of self.switchCase(_x);&gt;" pathCondition="!x = 0 &amp; x = 1" lineNumber="-1" charStart="45" charEnd="55">
-                                    <sedTermination xml:id="_5178b82e-f3df-4175-b709-d53836b7bb8b" name="&lt;end&gt;" pathCondition="!x = 0 &amp; x = 1">
+                  <sedBranchCondition xml:id="_3e96ba2d-5a6a-4b9e-bb3e-d5b6686ec5a9" name="x = 0 FALSE" pathCondition="!x = 0">
+                     <sedBranchCondition xml:id="_be59f550-67ba-478d-b426-467f86607521" name="x = 1 TRUE" pathCondition="!x = 0 &amp; x = 1">
+                        <sedStatement xml:id="_b2df4bfe-d6b8-4711-a929-74472aef25a4" name="a=-1;" pathCondition="!x = 0 &amp; x = 1" lineNumber="-1" charStart="165" charEnd="172">
+                           <sedStatement xml:id="_cf324268-6959-4da6-9ddc-e7447db69467" name="a=x*x;" pathCondition="!x = 0 &amp; x = 1" lineNumber="-1" charStart="188" charEnd="198">
+                              <sedStatement xml:id="_6b2a85d2-0c83-4c6f-8037-989ecd6b940f" name="return a;" pathCondition="!x = 0 &amp; x = 1" lineNumber="-1" charStart="284" charEnd="293">
+                                 <sedMethodReturn xml:id="_7d382193-9f6f-4ec4-b342-0bb643349f0b" name="&lt;return &apos;1&apos; as result of self.switchCase(x);&gt;" pathCondition="!x = 0 &amp; x = 1" lineNumber="-1" charStart="45" charEnd="55">
+                                    <sedTermination xml:id="_74acccfe-701b-4663-a813-4f631cbc6a6b" name="&lt;end&gt;" pathCondition="!x = 0 &amp; x = 1">
                                     </sedTermination>
                                  </sedMethodReturn>
                               </sedStatement>
                            </sedStatement>
                         </sedStatement>
                      </sedBranchCondition>
-                     <sedBranchCondition xml:id="_515925ff-38bc-4059-a340-14ca5e258dd8" name="x = 1 FALSE" pathCondition="!x = 0 &amp; !x = 1">
-                        <sedBranchCondition xml:id="_eda53273-a31e-473c-b1c6-e5ba7bdbbf48" name="x = 2 TRUE" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2">
-                           <sedStatement xml:id="_e5654fa2-b0ba-4be2-b22e-f21795579f22" name="a=-1;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" lineNumber="-1" charStart="165" charEnd="172">
-                              <sedStatement xml:id="_8dc74cfa-309b-44e2-bc69-43374631cc70" name="a=_x*_x;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" lineNumber="-1" charStart="188" charEnd="198">
-                                 <sedStatement xml:id="_1126fe02-dda5-4f48-b835-08f1e2044ae0" name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" lineNumber="-1" charStart="284" charEnd="293">
-                                    <sedMethodReturn xml:id="_1a4676f0-2e1e-4083-8557-db2ff1f14151" name="&lt;return &apos;4&apos; as result of self.switchCase(_x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" lineNumber="-1" charStart="45" charEnd="55">
-                                       <sedTermination xml:id="_aa9d5091-e0ed-4880-8d11-f240b3721c55" name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2">
+                     <sedBranchCondition xml:id="_8ca0fa1c-d1f2-4fa5-ac6e-b75edabac51f" name="x = 1 FALSE" pathCondition="!x = 0 &amp; !x = 1">
+                        <sedBranchCondition xml:id="_e33e1d8f-21d0-41c0-ad51-76245918c9d4" name="x = 2 TRUE" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2">
+                           <sedStatement xml:id="_30984ee0-3e58-45da-a8a9-75ae71840248" name="a=-1;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" lineNumber="-1" charStart="165" charEnd="172">
+                              <sedStatement xml:id="_6c912a90-4f94-4830-a974-150dd286e04a" name="a=x*x;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" lineNumber="-1" charStart="188" charEnd="198">
+                                 <sedStatement xml:id="_e5a1670d-9c37-4a36-8012-858a6b1439e3" name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" lineNumber="-1" charStart="284" charEnd="293">
+                                    <sedMethodReturn xml:id="_7df32706-b063-4aed-8d23-a97dc24057d6" name="&lt;return &apos;4&apos; as result of self.switchCase(x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" lineNumber="-1" charStart="45" charEnd="55">
+                                       <sedTermination xml:id="_5e49883e-29b9-4a8a-8872-80687dd6986e" name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2">
                                        </sedTermination>
                                     </sedMethodReturn>
                                  </sedStatement>
                               </sedStatement>
                            </sedStatement>
                         </sedBranchCondition>
-                        <sedBranchCondition xml:id="_84906ad4-6ecf-4cf0-acf4-1e56f146e009" name="x = 2 FALSE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2">
-                           <sedBranchCondition xml:id="_8163c662-4876-4c55-b623-57af249f109e" name="x = 3 TRUE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3">
-                              <sedStatement xml:id="_0da55ec6-d05b-443a-b633-caf660d61364" name="a=_x*_x;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" lineNumber="-1" charStart="188" charEnd="198">
-                                 <sedStatement xml:id="_a7b17602-1eaf-4a8a-b8ea-545046375360" name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" lineNumber="-1" charStart="284" charEnd="293">
-                                    <sedMethodReturn xml:id="_dd7aeec2-efc3-4076-ab9f-f307f0945b81" name="&lt;return &apos;9&apos; as result of self.switchCase(_x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" lineNumber="-1" charStart="45" charEnd="55">
-                                       <sedTermination xml:id="_8e0512d9-b7ce-4dab-b98e-fdd9c9ad8179" name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3">
+                        <sedBranchCondition xml:id="_6349392f-6104-4b55-8ee7-6021992e6954" name="x = 2 FALSE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2">
+                           <sedBranchCondition xml:id="_458d5f8a-0047-4d92-be75-66e279fd94d6" name="x = 3 TRUE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3">
+                              <sedStatement xml:id="_0670ea5d-dcfe-476a-b0d1-98e6216059dc" name="a=x*x;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" lineNumber="-1" charStart="188" charEnd="198">
+                                 <sedStatement xml:id="_cbed9175-7d68-45b1-8262-07d43c0e48e5" name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" lineNumber="-1" charStart="284" charEnd="293">
+                                    <sedMethodReturn xml:id="_48d6eb1f-23ec-41c6-85e5-6afc16a51e8e" name="&lt;return &apos;9&apos; as result of self.switchCase(x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" lineNumber="-1" charStart="45" charEnd="55">
+                                       <sedTermination xml:id="_7b4bd5d7-1d0a-491b-964e-8b15bcb206a2" name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3">
                                        </sedTermination>
                                     </sedMethodReturn>
                                  </sedStatement>
                               </sedStatement>
                            </sedBranchCondition>
-                           <sedBranchCondition xml:id="_f780fcbc-5276-464f-b705-9a3962b0ec38" name="x = 3 FALSE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3">
-                              <sedBranchCondition xml:id="_85d55d33-4d56-40b7-8137-5b4b8a6a083a" name="x = 4 TRUE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4">
-                                 <sedStatement xml:id="_b70d71ac-4e01-449f-b049-7afe9218cba6" name="return 42;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4" lineNumber="-1" charStart="242" charEnd="252">
-                                    <sedMethodReturn xml:id="_96d75819-4e37-421c-93e2-b6cab181cc6a" name="&lt;return &apos;42&apos; as result of self.switchCase(_x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4" lineNumber="-1" charStart="45" charEnd="55">
-                                       <sedTermination xml:id="_8f46b44d-7258-4bd4-ab3b-93aa8ce31a07" name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4">
+                           <sedBranchCondition xml:id="_e6413dc4-d4c3-4681-815d-489720c20fb8" name="x = 3 FALSE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3">
+                              <sedBranchCondition xml:id="_c78f26ba-a457-4a92-a469-0e7654dfa30b" name="x = 4 TRUE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4">
+                                 <sedStatement xml:id="_ea00c707-0a53-4c47-af90-f1a99a7d1206" name="return 42;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4" lineNumber="-1" charStart="242" charEnd="252">
+                                    <sedMethodReturn xml:id="_ad60c86e-2e20-4494-869d-2f83d722cb0c" name="&lt;return &apos;42&apos; as result of self.switchCase(x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4" lineNumber="-1" charStart="45" charEnd="55">
+                                       <sedTermination xml:id="_0e7b6031-93c2-4271-9511-6660e4a810cb" name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4">
                                        </sedTermination>
                                     </sedMethodReturn>
                                  </sedStatement>
                               </sedBranchCondition>
-                              <sedBranchCondition xml:id="_f42bd062-f3e2-40b3-a1d5-f14e2efa5641" name="x = 4 FALSE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4">
-                                 <sedStatement xml:id="_bead0642-81f6-49ea-9127-a04b5aabe7c1" name="a=_x;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" lineNumber="-1" charStart="269" charEnd="275">
-                                    <sedStatement xml:id="_580986f6-b34f-4320-a051-3d97ba9c33b4" name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" lineNumber="-1" charStart="284" charEnd="293">
-                                       <sedMethodReturn xml:id="_42cc9a9f-acde-4dac-a42a-bb83b61e45a3" name="&lt;return &apos;x&apos; as result of self.switchCase(_x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" lineNumber="-1" charStart="45" charEnd="55">
-                                          <sedTermination xml:id="_a56e83e3-2d5b-4121-af6a-a313a075ddcd" name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4">
+                              <sedBranchCondition xml:id="_9b5f8002-6a92-4a2a-adfa-22c2636b19f1" name="x = 4 FALSE" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4">
+                                 <sedStatement xml:id="_6dbc6a1b-662c-4919-9515-4ef3a74acf28" name="a=x;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" lineNumber="-1" charStart="269" charEnd="275">
+                                    <sedStatement xml:id="_da333ed6-a83d-49ef-a0c5-a8064a3dffcd" name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" lineNumber="-1" charStart="284" charEnd="293">
+                                       <sedMethodReturn xml:id="_7449f318-93ba-4e26-a83f-c34f15a225e1" name="&lt;return &apos;x&apos; as result of self.switchCase(x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4" lineNumber="-1" charStart="45" charEnd="55">
+                                          <sedTermination xml:id="_2b1c5bfd-f126-49b3-a2d4-34fc26c375bf" name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; !x = 4">
                                           </sedTermination>
                                        </sedMethodReturn>
                                     </sedStatement>

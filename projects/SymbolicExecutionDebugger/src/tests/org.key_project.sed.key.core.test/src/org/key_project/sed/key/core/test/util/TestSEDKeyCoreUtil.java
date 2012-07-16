@@ -15,7 +15,6 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.widgets.Display;
-import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
@@ -25,7 +24,6 @@ import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.util.eclipse.BundleUtil;
-import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.jdt.JDTUtil;
@@ -189,15 +187,11 @@ public final class TestSEDKeyCoreUtil {
    /**
     * Computes the name of a {@link KeYDebugTarget} which debugs
     * the given {@link IMethod} with generated operation contract.
-    * @param method The debuged {@link IMethod}.
+    * @param method The debugged {@link IMethod}.
     * @return The used target name in a {@link KeYDebugTarget} with generated operation contract.
     * @throws JavaModelException Occurred Exception
     */
    public static String computeTargetName(IMethod method) throws JavaModelException {
-      TestCase.assertNotNull(method);
-      return TestKeY4EclipseUtil.createOperationContractId(method.getDeclaringType().getElementName(), 
-                                                           JDTUtil.getQualifiedMethodLabel(method).replaceAll(" ", StringUtil.EMPTY_STRING),
-                                                           "-2147483648", 
-                                                           "normal_behavior");
+      return JDTUtil.getTextLabel(method);
    }
 }

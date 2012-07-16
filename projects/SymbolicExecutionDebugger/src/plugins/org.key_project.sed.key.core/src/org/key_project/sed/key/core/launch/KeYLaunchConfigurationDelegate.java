@@ -1,6 +1,8 @@
 package org.key_project.sed.key.core.launch;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -28,7 +30,7 @@ import org.key_project.util.jdt.JDTUtil;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
@@ -39,9 +41,9 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
-import de.uka.ilkd.key.symbolic_execution.po.MethodPartPO;
+import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
+import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
@@ -213,32 +215,23 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
              end = run.getEnd();
           }
           // Instantiate proof obligation
-          input = new MethodPartPO(initConfig, 
-                                   pm.getFullName() + " from " + settings.getMethodRangeStart() + " to " + settings.getMethodRangeEnd(), 
-                                   pm, 
-                                   settings.getPrecondition(), 
-                                   start, 
-                                   end,
-                                   true);
+          input = new ProgramMethodSubsetPO(initConfig,
+                                            computeProofObligationName(pm, settings.getMethodRangeStart(), settings.getMethodRangeEnd()),
+                                            pm, 
+                                            settings.getPrecondition(), 
+                                            start, 
+                                            end,
+                                            true);
        }
-       else {
+       else if (settings.isUseExistingContract()) {
           // Get contract to proof
           Contract contract = null;
           KeYJavaType type = pm.getContainerType();
-          if (settings.isUseExistingContract()) {
-              ImmutableSet<FunctionalOperationContract> operationContracts = initConfig.getServices().getSpecificationRepository().getOperationContracts(type, pm);
-              contract = KeySEDUtil.findContract(operationContracts, settings.getExistingContract());
-              if (contract == null) {
-                  throw new CoreException(LogUtil.getLogger().createErrorStatus("Can't find contract \"" + settings.getExistingContract() + "\" of method \"" + JDTUtil.getQualifiedMethodLabel(settings.getMethod()) + "\". Please update the launch configuration \"" + launchConfigurationName + "\"."));
-              }
-          }
-          else {
-              Services services = initConfig.getServices();
-              contract = SymbolicExecutionUtil.createDefaultContract(services, pm, settings.getPrecondition());
-          }
+          ImmutableSet<FunctionalOperationContract> operationContracts = initConfig.getServices().getSpecificationRepository().getOperationContracts(type, pm);
+          contract = KeySEDUtil.findContract(operationContracts, settings.getExistingContract());
           // Make sure that a contract is defined
           if (contract == null) {
-              throw new CoreException(LogUtil.getLogger().createErrorStatus("Unable to find a contract to prove."));
+              throw new CoreException(LogUtil.getLogger().createErrorStatus("Can't find contract \"" + settings.getExistingContract() + "\" of method \"" + JDTUtil.getQualifiedMethodLabel(settings.getMethod()) + "\". Please update the launch configuration \"" + launchConfigurationName + "\"."));
           }
           // Instantiate proof obligation
           if (contract instanceof FunctionalOperationContract) {
@@ -248,7 +241,47 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
               throw new CoreException(LogUtil.getLogger().createErrorStatus("Contract of class \"" + contract.getClass().getCanonicalName() + "\" are not supported."));
           }
        }
+       else {
+          input = new ProgramMethodPO(initConfig, 
+                                      computeProofObligationName(pm, null, null), 
+                                      pm, 
+                                      settings.getPrecondition(), 
+                                      true);
+       }
        return input;
+    }
+    
+    /**
+     * Computes the proof obligation name.
+     * @param pm The {@link IProgramMethod} to execute.
+     * @param startPosition An optional start position.
+     * @param endPosition An optional end position.
+     * @return The computed proof obligation name.
+     * @throws IOException Occurred Exception.
+     */
+    protected String computeProofObligationName(IProgramMethod pm,
+                                                Position startPosition,
+                                                Position endPosition) throws IOException {
+       StringWriter sw = new StringWriter();
+       try {
+          // Append method signature
+          PrettyPrinter x = new PrettyPrinter(sw);
+          x.printFullMethodSignature(pm);
+          // Append start position
+          if (startPosition != null) {
+             sw.append(" from ");
+             sw.append(startPosition.toString());
+          }
+          // Append end position
+          if (endPosition != null) {
+             sw.append(" to ");
+             sw.append(endPosition.toString());
+          }
+          return sw.toString();
+       }
+       finally {
+          sw.close();
+       }
     }
     
     /**

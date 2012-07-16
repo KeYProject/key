@@ -2724,6 +2724,12 @@ public class PrettyPrinter {
     }
 
     public void printFullMethodSignature(IProgramMethod x) throws java.io.IOException {
+       printHeader(x);
+       writeFullMethodSignature(x);
+       printFooter(x);
+    }
+    
+    protected void writeFullMethodSignature(IProgramMethod x) throws java.io.IOException {
         write(x.getName().toString());
         write("(");
         boolean afterFirst = false;
@@ -2749,7 +2755,7 @@ public class PrettyPrinter {
     public void printExecutionContext(ExecutionContext x) 
 	throws java.io.IOException {
 	write("source=");
-	printFullMethodSignature(x.getMethodContext());
+	writeFullMethodSignature(x.getMethodContext());
 	write("@");
 	writeElement(x.getTypeReference());
 	if (x.getRuntimeInstance() != null) {

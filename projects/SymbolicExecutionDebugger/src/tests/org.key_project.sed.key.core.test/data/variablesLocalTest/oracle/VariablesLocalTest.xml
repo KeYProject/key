@@ -1,134 +1,134 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_9fbc5ff2-92b1-4ef3-8c6d-97e0c1d680bf" name="VariablesLocalTest[VariablesLocalTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_5770fa85-54ea-4943-a666-987911009617" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_22f4efee-6c94-4c0e-a35b-e5fa971a9842" name="self.main();" pathCondition="true" lineNumber="-1" charStart="49" charEnd="53">
-            <sedVariable xml:id="_7aac1b1d-8f4c-49d7-a485-43a5ce91c0fb" name="exc" referenceTypeName="Null">
-               <sedValue xml:id="_88d8745b-d28f-451e-ab8f-902dbc96915f" referenceTypeName="Null" valueString="null" allocated="true">
+   <sedTarget xml:id="_ae9959a0-ee90-4242-890c-55df6a10e2fa" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_150a2a68-9b3d-421c-b17a-aa48b98f0fde" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_ffae3ee0-7357-4f82-bf8b-960a14d0fd6a" name="self.main();" pathCondition="true" lineNumber="-1" charStart="49" charEnd="53">
+            <sedVariable xml:id="_1800c37a-2e62-4c73-a079-aaa68ea005db" name="exc" referenceTypeName="Null">
+               <sedValue xml:id="_7c6240de-4424-4b8c-9113-73f2893a21ae" referenceTypeName="Null" valueString="null" allocated="true">
                </sedValue>
             </sedVariable>
-            <sedStatement xml:id="_5ee810d6-9767-483d-9fa5-f1e9e12c72f8" name="int a = 2;" pathCondition="true" lineNumber="-1" charStart="61" charEnd="71">
-               <sedVariable xml:id="_30674386-378d-4c95-b590-afd91041b252" name="self" referenceTypeName="VariablesLocalTest">
-                  <sedValue xml:id="_0fcd61ed-1327-424d-a67d-d63e887f45be" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
+            <sedStatement xml:id="_299f5c76-8ce9-4652-b455-27855803cf60" name="int a = 2;" pathCondition="true" lineNumber="-1" charStart="61" charEnd="71">
+               <sedVariable xml:id="_97bf2197-e8b2-4ceb-bdd3-1c9974283565" name="self" referenceTypeName="VariablesLocalTest">
+                  <sedValue xml:id="_6850ef0d-7060-4c3f-918d-2dbca3a8993a" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
                   </sedValue>
                </sedVariable>
-               <sedVariable xml:id="_6cc7343c-263a-4e79-a54d-d38afe303723" name="exc" referenceTypeName="Null">
-                  <sedValue xml:id="_77a31c29-dfd6-42b8-9f23-8bd15255296a" referenceTypeName="Null" valueString="null" allocated="true">
+               <sedVariable xml:id="_11d92921-dc2b-4120-b7e0-fa1f95f45cfa" name="exc" referenceTypeName="Null">
+                  <sedValue xml:id="_f05251bc-a817-4cfc-b8f5-afcd9ae83f19" referenceTypeName="Null" valueString="null" allocated="true">
                   </sedValue>
                </sedVariable>
-               <sedStatement xml:id="_b9468b5d-cf2a-4033-bfca-ed31bdd6ba3a" name="int b = 3;" pathCondition="true" lineNumber="-1" charStart="75" charEnd="85">
-                  <sedVariable xml:id="_5d3488ea-73d8-4690-9f55-f260409a2057" name="self" referenceTypeName="VariablesLocalTest">
-                     <sedValue xml:id="_8bede2a1-3b0a-4534-b5e1-c117d976dfc4" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
+               <sedStatement xml:id="_400a341c-90e4-4d26-84fe-f87c21e48f65" name="int b = 3;" pathCondition="true" lineNumber="-1" charStart="75" charEnd="85">
+                  <sedVariable xml:id="_23606e53-cd48-4625-8c1d-364b295ac79d" name="self" referenceTypeName="VariablesLocalTest">
+                     <sedValue xml:id="_5ed78fb1-7e0a-44a7-874a-6f28fe11e7e3" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
                      </sedValue>
                   </sedVariable>
-                  <sedVariable xml:id="_d88b9563-9f2f-45a7-a173-f4e8b839b8ed" name="exc" referenceTypeName="Null">
-                     <sedValue xml:id="_871d3184-2b4c-4019-b697-76dae407ca16" referenceTypeName="Null" valueString="null" allocated="true">
+                  <sedVariable xml:id="_c332e2f9-8f68-4f09-ab34-c23a7f43f574" name="exc" referenceTypeName="Null">
+                     <sedValue xml:id="_9dec9f8b-1001-402e-891d-3d6c78fe093a" referenceTypeName="Null" valueString="null" allocated="true">
                      </sedValue>
                   </sedVariable>
-                  <sedVariable xml:id="_84cf8b98-15be-4ca2-bab6-6367926320b8" name="a" referenceTypeName="int">
-                     <sedValue xml:id="_1ebd79b4-04b2-414d-bc2a-919bc1c5996e" referenceTypeName="int" valueString="2" allocated="true">
+                  <sedVariable xml:id="_c66a35b3-c4b0-4b7d-beb0-d8dad69f5b4f" name="a" referenceTypeName="int">
+                     <sedValue xml:id="_54d88da3-8dd2-4949-af32-4852c3b85da8" referenceTypeName="int" valueString="2" allocated="true">
                      </sedValue>
                   </sedVariable>
-                  <sedStatement xml:id="_77b491ac-5f78-4fe2-ac3c-5ca91529c20a" name="int sum = sum(a,b);" pathCondition="true" lineNumber="-1" charStart="89" charEnd="109">
-                     <sedVariable xml:id="_72895968-8b92-445a-989e-3120215828fe" name="self" referenceTypeName="VariablesLocalTest">
-                        <sedValue xml:id="_7cafc435-9204-48da-b9db-7552caa1c138" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
+                  <sedStatement xml:id="_c304eafb-936e-4ba9-993c-3cf3b91633d2" name="int sum = sum(a,b);" pathCondition="true" lineNumber="-1" charStart="89" charEnd="109">
+                     <sedVariable xml:id="_bcc336df-2f25-4ec9-9ae3-36e831a44150" name="self" referenceTypeName="VariablesLocalTest">
+                        <sedValue xml:id="_db6bd15d-0b44-4134-ae4a-ab208552ea98" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
                         </sedValue>
                      </sedVariable>
-                     <sedVariable xml:id="_b3987624-0166-48e2-850d-8355c3de525c" name="exc" referenceTypeName="Null">
-                        <sedValue xml:id="_138b8a8c-ad20-431e-9039-902b12e475c5" referenceTypeName="Null" valueString="null" allocated="true">
+                     <sedVariable xml:id="_efe30749-a661-41fa-b3dc-b0e4c2f69bcc" name="exc" referenceTypeName="Null">
+                        <sedValue xml:id="_9667dd2e-accc-41ef-875d-41d8600c8184" referenceTypeName="Null" valueString="null" allocated="true">
                         </sedValue>
                      </sedVariable>
-                     <sedVariable xml:id="_0f6448f3-93f1-4a90-991b-e5d1b48eb7b3" name="a" referenceTypeName="int">
-                        <sedValue xml:id="_8d471047-02c7-46b3-a975-8d01e15e6c16" referenceTypeName="int" valueString="2" allocated="true">
+                     <sedVariable xml:id="_8db9a25c-c821-44a7-9609-383412be3bd3" name="a" referenceTypeName="int">
+                        <sedValue xml:id="_a2c842c4-46ab-41ce-9f3a-81bf99684b9f" referenceTypeName="int" valueString="2" allocated="true">
                         </sedValue>
                      </sedVariable>
-                     <sedVariable xml:id="_94cbcd1d-184a-41d1-9423-f1b0533a0fd0" name="b" referenceTypeName="int">
-                        <sedValue xml:id="_cd57ffeb-279f-4a1f-a798-ee0de514915a" referenceTypeName="int" valueString="3" allocated="true">
+                     <sedVariable xml:id="_af6daaed-f52b-428d-bec7-7e72db486427" name="b" referenceTypeName="int">
+                        <sedValue xml:id="_bf979277-c9df-459d-8be4-392c7b05743c" referenceTypeName="int" valueString="3" allocated="true">
                         </sedValue>
                      </sedVariable>
-                     <sedMethodCall xml:id="_e9761131-9612-41fa-ba43-78cadc6ac073" name="self.sum(a_1,b_1);" pathCondition="true" lineNumber="-1" charStart="145" charEnd="148">
-                        <sedVariable xml:id="_3b3b96d4-f151-41a7-aa87-ab292152954c" name="self" referenceTypeName="VariablesLocalTest">
-                           <sedValue xml:id="_8fa6bcd0-23f0-4587-bada-aa7f0b4e9692" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
+                     <sedMethodCall xml:id="_fa5062d1-bbfd-434f-b32f-7da65775a152" name="self.sum(a_1,b_1);" pathCondition="true" lineNumber="-1" charStart="145" charEnd="148">
+                        <sedVariable xml:id="_ecaf8e82-2f94-44cf-ad8d-bfa71da886b0" name="self" referenceTypeName="VariablesLocalTest">
+                           <sedValue xml:id="_97964756-2408-4c40-9f8b-69ca1f38e2d7" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
                            </sedValue>
                         </sedVariable>
-                        <sedVariable xml:id="_4e8cef6c-4495-4081-8296-10f5b91e09c0" name="exc" referenceTypeName="Null">
-                           <sedValue xml:id="_8f52e20a-9936-4111-9ce9-fe3702fe54db" referenceTypeName="Null" valueString="null" allocated="true">
+                        <sedVariable xml:id="_d36f1605-d1aa-49ce-abae-b4f49d5d64e0" name="exc" referenceTypeName="Null">
+                           <sedValue xml:id="_f1d52bcf-3000-49d2-bba7-c56d780b93e8" referenceTypeName="Null" valueString="null" allocated="true">
                            </sedValue>
                         </sedVariable>
-                        <sedVariable xml:id="_e6716e6f-9a3a-48be-af0c-c89865c9e3c6" name="a_1" referenceTypeName="int">
-                           <sedValue xml:id="_3474d807-243b-4c5f-b2d2-a38cb0aff0db" referenceTypeName="int" valueString="2" allocated="true">
+                        <sedVariable xml:id="_5c507829-1d4b-46f1-8099-7ebac162788b" name="a_1" referenceTypeName="int">
+                           <sedValue xml:id="_a757679f-55ce-46e1-9df0-294bca2a7ea7" referenceTypeName="int" valueString="2" allocated="true">
                            </sedValue>
                         </sedVariable>
-                        <sedVariable xml:id="_9d7eace2-5b81-4de0-ac07-58028bdcf042" name="b_1" referenceTypeName="int">
-                           <sedValue xml:id="_92522535-30d1-4861-8d99-47c5aaa278f9" referenceTypeName="int" valueString="3" allocated="true">
+                        <sedVariable xml:id="_88f9eea5-ce39-4c13-b6e5-d9497abdd2a8" name="b_1" referenceTypeName="int">
+                           <sedValue xml:id="_63010693-810f-4e56-93ad-5c796f43078f" referenceTypeName="int" valueString="3" allocated="true">
                            </sedValue>
                         </sedVariable>
-                        <sedStatement xml:id="_a43a87d7-4c1f-4592-991f-d99a79e63bf4" name="int result = a_1+b_1;" pathCondition="true" lineNumber="-1" charStart="168" charEnd="187">
-                           <sedVariable xml:id="_426557b6-9bda-46db-b2e3-2a958fd17c63" name="self" referenceTypeName="VariablesLocalTest">
-                              <sedValue xml:id="_c305ee04-a59b-4c56-a3f5-1235c878f01b" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
+                        <sedStatement xml:id="_dc580149-e601-4dd8-bddc-b0572c3d625b" name="int result = a_1+b_1;" pathCondition="true" lineNumber="-1" charStart="168" charEnd="187">
+                           <sedVariable xml:id="_479aadf8-354a-4a98-90af-c72df355e929" name="self" referenceTypeName="VariablesLocalTest">
+                              <sedValue xml:id="_ff56b0f7-bb1c-44de-bfde-57b7fc81acab" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
                               </sedValue>
                            </sedVariable>
-                           <sedVariable xml:id="_aa487959-6556-43c3-8c59-46b9ec3dca5d" name="exc" referenceTypeName="Null">
-                              <sedValue xml:id="_dd4603ff-8ebd-42b5-8fe1-83fe3b5bd88e" referenceTypeName="Null" valueString="null" allocated="true">
+                           <sedVariable xml:id="_16785d09-db5a-48da-8a88-f50656215f97" name="exc" referenceTypeName="Null">
+                              <sedValue xml:id="_6e5063d7-e331-477a-be6f-3516ceb4aa28" referenceTypeName="Null" valueString="null" allocated="true">
                               </sedValue>
                            </sedVariable>
-                           <sedVariable xml:id="_fb8fd17f-72d5-4857-9f08-b7e92f7f1090" name="a_1" referenceTypeName="int">
-                              <sedValue xml:id="_5626d388-4dfc-4f67-848d-cc2f236aaa94" referenceTypeName="int" valueString="2" allocated="true">
+                           <sedVariable xml:id="_cc369775-510a-4d9b-8102-8befd333a743" name="a_1" referenceTypeName="int">
+                              <sedValue xml:id="_47b250c4-772f-4ed2-804d-56255c97eaaf" referenceTypeName="int" valueString="2" allocated="true">
                               </sedValue>
                            </sedVariable>
-                           <sedVariable xml:id="_0a992381-e8ae-4dfc-8317-0322ca33a7e1" name="b_1" referenceTypeName="int">
-                              <sedValue xml:id="_6a6febcb-1669-4870-9e0c-3002bd1da390" referenceTypeName="int" valueString="3" allocated="true">
+                           <sedVariable xml:id="_cf525ac8-b61f-4b59-ac75-4426f6cd5ed6" name="b_1" referenceTypeName="int">
+                              <sedValue xml:id="_d54da839-6310-4869-bd9e-ac3053d26dc1" referenceTypeName="int" valueString="3" allocated="true">
                               </sedValue>
                            </sedVariable>
-                           <sedStatement xml:id="_7fc9a4ff-3830-4699-a9ea-ee655c17bee5" name="return result_1;" pathCondition="true" lineNumber="-1" charStart="191" charEnd="205">
-                              <sedVariable xml:id="_c63c23e8-c2d7-4e87-a217-ed103be3132d" name="self" referenceTypeName="VariablesLocalTest">
-                                 <sedValue xml:id="_6e892749-0598-48c3-8f6f-3e7698481e3e" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
+                           <sedStatement xml:id="_41a45b35-85a6-4620-91ef-ff3405705bf9" name="return result_1;" pathCondition="true" lineNumber="-1" charStart="191" charEnd="205">
+                              <sedVariable xml:id="_a9349a88-39b4-4db1-90f1-26cdabbb193e" name="self" referenceTypeName="VariablesLocalTest">
+                                 <sedValue xml:id="_e089ad0b-7fd6-4a5a-8fb7-c88d322dc005" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
                                  </sedValue>
                               </sedVariable>
-                              <sedVariable xml:id="_f478a98d-845a-4f59-a3e3-48358a8a24c9" name="exc" referenceTypeName="Null">
-                                 <sedValue xml:id="_002a0e6d-0169-41a8-820f-0324dd72f3f7" referenceTypeName="Null" valueString="null" allocated="true">
+                              <sedVariable xml:id="_572dedb6-1d8d-4bdb-a667-51c784a44846" name="exc" referenceTypeName="Null">
+                                 <sedValue xml:id="_4e2ae009-ed1b-4f29-852e-ceaec5463409" referenceTypeName="Null" valueString="null" allocated="true">
                                  </sedValue>
                               </sedVariable>
-                              <sedVariable xml:id="_96acc648-62ef-4633-ada1-5ae0e42c208a" name="result_1" referenceTypeName="int">
-                                 <sedValue xml:id="_2a362d8d-1b41-4bd4-bd10-94d1b7fa9e48" referenceTypeName="int" valueString="5" allocated="true">
+                              <sedVariable xml:id="_648b1e0e-41ff-463b-b52f-f86ee76792c2" name="result_1" referenceTypeName="int">
+                                 <sedValue xml:id="_9641cd7c-2926-4557-828f-93d7ab972909" referenceTypeName="int" valueString="5" allocated="true">
                                  </sedValue>
                               </sedVariable>
-                              <sedMethodReturn xml:id="_46af8b10-05ce-4a05-8fcc-bc150fd5e30f" name="&lt;return of self.sum(a_1,b_1);&gt;" pathCondition="true" lineNumber="-1" charStart="145" charEnd="148">
-                                 <sedVariable xml:id="_539e0239-4635-4510-9a6b-225708562fd3" name="self" referenceTypeName="VariablesLocalTest">
-                                    <sedValue xml:id="_7d045385-95a6-41a3-ba51-5e2438d7cf25" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
+                              <sedMethodReturn xml:id="_eea9d54d-045f-4243-8ac4-60fa4ea55088" name="&lt;return of self.sum(a_1,b_1);&gt;" pathCondition="true" lineNumber="-1" charStart="145" charEnd="148">
+                                 <sedVariable xml:id="_5b422506-da2b-4d98-b264-bb4822b5d946" name="self" referenceTypeName="VariablesLocalTest">
+                                    <sedValue xml:id="_379cd8ca-76aa-4bac-b9b3-5f4b1895f3b0" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
                                     </sedValue>
                                  </sedVariable>
-                                 <sedVariable xml:id="_f42c672f-9610-4a04-8831-01935b38353e" name="exc" referenceTypeName="Null">
-                                    <sedValue xml:id="_e9b03664-0610-4425-adae-84d99511e6ea" referenceTypeName="Null" valueString="null" allocated="true">
+                                 <sedVariable xml:id="_1f059a3b-c17a-49ca-8258-c9ac23644975" name="exc" referenceTypeName="Null">
+                                    <sedValue xml:id="_4fcb7b62-ad65-45e3-8eba-5e976d9fb42d" referenceTypeName="Null" valueString="null" allocated="true">
                                     </sedValue>
                                  </sedVariable>
-                                 <sedVariable xml:id="_19125eca-bef7-4065-ac6c-250382d78bac" name="x" referenceTypeName="int">
-                                    <sedValue xml:id="_1c12477f-29b9-477e-8537-e411cb8a8ed9" referenceTypeName="int" valueString="5" allocated="true">
+                                 <sedVariable xml:id="_d841911e-c8f0-492b-9793-440664f94e3a" name="x" referenceTypeName="int">
+                                    <sedValue xml:id="_2ed31312-7331-4151-840f-e9d2f875a068" referenceTypeName="int" valueString="5" allocated="true">
                                     </sedValue>
                                  </sedVariable>
-                                 <sedStatement xml:id="_538869cc-b7fe-41a0-951d-2dea88963dd8" name="return sum;" pathCondition="true" lineNumber="-1" charStart="113" charEnd="124">
-                                    <sedVariable xml:id="_07bcdaef-9be3-4bec-a088-1ae9f1dba1af" name="self" referenceTypeName="VariablesLocalTest">
-                                       <sedValue xml:id="_b17f4e6c-06cc-42e2-8ea8-853dacea3cf3" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
+                                 <sedStatement xml:id="_32949097-56c5-4349-9a8d-c7ccb5a45d09" name="return sum;" pathCondition="true" lineNumber="-1" charStart="113" charEnd="124">
+                                    <sedVariable xml:id="_c1a73b37-60b1-4715-87c1-5d9af1846322" name="self" referenceTypeName="VariablesLocalTest">
+                                       <sedValue xml:id="_ea760006-7a30-4a06-8716-adeb2522cbc8" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
                                        </sedValue>
                                     </sedVariable>
-                                    <sedVariable xml:id="_c16c4322-9ee0-4532-85f8-31a9a5569f6a" name="exc" referenceTypeName="Null">
-                                       <sedValue xml:id="_4ec26a41-a916-4a41-bc41-60c6ac562d10" referenceTypeName="Null" valueString="null" allocated="true">
+                                    <sedVariable xml:id="_4393d9c1-aa9c-4ff9-97ba-8754d8c7e843" name="exc" referenceTypeName="Null">
+                                       <sedValue xml:id="_443b298d-8bbe-4136-9105-0d7fd1cc3810" referenceTypeName="Null" valueString="null" allocated="true">
                                        </sedValue>
                                     </sedVariable>
-                                    <sedVariable xml:id="_c28f9a70-8a51-4bac-b2ba-4cc4babc9bb8" name="sum" referenceTypeName="int">
-                                       <sedValue xml:id="_7c511a44-2202-4557-b791-341409218a9c" referenceTypeName="int" valueString="5" allocated="true">
+                                    <sedVariable xml:id="_7c3e7f0d-89fc-4f78-ba8a-871670d2e41e" name="sum" referenceTypeName="int">
+                                       <sedValue xml:id="_a46e3114-5020-48df-b80c-e4478769f474" referenceTypeName="int" valueString="5" allocated="true">
                                        </sedValue>
                                     </sedVariable>
-                                    <sedMethodReturn xml:id="_56883aac-e8fa-4734-8cec-948265920231" name="&lt;return of self.main();&gt;" pathCondition="true" lineNumber="-1" charStart="49" charEnd="53">
-                                       <sedVariable xml:id="_f2cfedb3-806b-47d3-8084-956ddbf0dc23" name="self" referenceTypeName="VariablesLocalTest">
-                                          <sedValue xml:id="_e6d9083b-451c-48b3-b5bd-6c8cffdde719" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
+                                    <sedMethodReturn xml:id="_8592d7ac-1709-4db0-9b5d-245a4b3c97aa" name="&lt;return of self.main();&gt;" pathCondition="true" lineNumber="-1" charStart="49" charEnd="53">
+                                       <sedVariable xml:id="_5f45bd08-2a55-4b98-a754-e485bb034f84" name="self" referenceTypeName="VariablesLocalTest">
+                                          <sedValue xml:id="_a2b7b293-a919-4910-94c3-a176904c66c6" referenceTypeName="VariablesLocalTest" valueString="self" allocated="true">
                                           </sedValue>
                                        </sedVariable>
-                                       <sedVariable xml:id="_3538487c-d759-4ba1-aac5-cfb84e8ee0e0" name="exc" referenceTypeName="Null">
-                                          <sedValue xml:id="_22425b16-ca34-4122-9332-88a062d72ad0" referenceTypeName="Null" valueString="null" allocated="true">
+                                       <sedVariable xml:id="_2c667b32-8bb5-459f-b6fd-22d108e8d7e1" name="exc" referenceTypeName="Null">
+                                          <sedValue xml:id="_411948d5-9dc6-4776-acaa-6d89744026df" referenceTypeName="Null" valueString="null" allocated="true">
                                           </sedValue>
                                        </sedVariable>
-                                       <sedTermination xml:id="_56ba65d5-33a0-4054-8c2c-38c0191c02c2" name="&lt;end&gt;" pathCondition="true">
+                                       <sedTermination xml:id="_d71bd182-ed81-4d07-9d0d-baedf053abcd" name="&lt;end&gt;" pathCondition="true">
                                        </sedTermination>
                                     </sedMethodReturn>
                                  </sedStatement>

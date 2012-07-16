@@ -43,6 +43,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Provides the functionality to test {@link KeYDebugTarget}s.
@@ -540,15 +541,15 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
          // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!KeYUtil.isChoiceSettingInitialised()) {
+         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
             TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
             KeYUtil.clearProofList(MainWindow.getInstance());
          }
-         originalRuntimeExceptions = KeYUtil.getChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
+         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
          assertNotNull(originalRuntimeExceptions);
          // Set choice settings in KeY.
-         KeYUtil.setChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
-         assertEquals(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, KeYUtil.getChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
+         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
+         assertEquals(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
          // Launch method
          TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions);
          // Find the launched ILaunch in the debug view
@@ -564,7 +565,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          SWTBotPreferences.TIMEOUT = originalTimeout;
          // Restore runtime option
          if (originalRuntimeExceptions != null) {
-            KeYUtil.setChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
+            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
          }
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);

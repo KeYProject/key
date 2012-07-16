@@ -25,13 +25,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
@@ -76,17 +71,7 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * </p>
  * @author Martin Hentschel
  */
-public class MethodPartPO extends AbstractOperationPO {
-   /**
-    * The {@link IProgramMethod} to execute code parts from.
-    */
-   private IProgramMethod pm;
-   
-   /**
-    * The precondition in JML syntax.
-    */
-   private String precondition;
-
+public class ProgramMethodSubsetPO extends ProgramMethodPO {
    /**
     * Contains all undeclared variables used in the method part to execute.
     */
@@ -111,18 +96,15 @@ public class MethodPartPO extends AbstractOperationPO {
     * @param startPosition The start position.
     * @param endPosition The end position.
     */
-   public MethodPartPO(InitConfig initConfig, 
+   public ProgramMethodSubsetPO(InitConfig initConfig, 
                        String name, 
                        IProgramMethod pm, 
                        String precondition,
                        Position startPosition,
                        Position endPosition) {
-      super(initConfig, name);
-      assert pm != null;
+      super(initConfig, name, pm, precondition);
       assert startPosition != null;
       assert endPosition != null;
-      this.pm = pm;
-      this.precondition = precondition;
       this.startPosition = startPosition;
       this.endPosition = endPosition;
    }
@@ -137,45 +119,18 @@ public class MethodPartPO extends AbstractOperationPO {
     * @param endPosition The end position.
     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
     */
-   public MethodPartPO(InitConfig initConfig, 
+   public ProgramMethodSubsetPO(InitConfig initConfig, 
                        String name, 
                        IProgramMethod pm, 
                        String precondition,
                        Position startPosition,
                        Position endPosition,
                        boolean addUninterpretedPredicate) {
-      super(initConfig, name, addUninterpretedPredicate);
-      assert pm != null;
+      super(initConfig, name, pm, precondition, addUninterpretedPredicate);
       assert startPosition != null;
       assert endPosition != null;
-      this.pm = pm;
-      this.precondition = precondition;
       this.startPosition = startPosition;
       this.endPosition = endPosition;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public IProgramMethod getProgramMethod() {
-      return pm;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected boolean isTransactionApplicable() {
-      return false;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected KeYJavaType getCalleeKeYJavaType() {
-      return pm.getContainerType();
    }
    
    /**
@@ -215,7 +170,7 @@ public class MethodPartPO extends AbstractOperationPO {
     * @param container The {@link StatementContainer} to seach in.
     */
    protected void collectStatementsToExecute(List<Statement> toFill, StatementContainer container) {
-      for (int i = 0; i < container.getChildCount(); i++) {
+      for (int i = 0; i < container.getStatementCount(); i++) {
          Statement s = container.getStatementAt(i);
          if (s.getEndPosition().compareTo(startPosition) > 0 &&
              s.getEndPosition().compareTo(endPosition) <= 0) {
@@ -251,106 +206,18 @@ public class MethodPartPO extends AbstractOperationPO {
          return false;
       }
    }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-                                      ImmutableList<ProgramVariable> paramVars) {
-      return TB.tt();
-   }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected Term getPre(List<LocationVariable> modHeaps,
+   protected Term getPre(List<LocationVariable> modHeaps, 
                          ProgramVariable selfVar, 
                          ImmutableList<ProgramVariable> paramVars, 
                          Map<LocationVariable, LocationVariable> atPreVars, 
                          Services services) {
-      try {
-         if (precondition != null && !precondition.isEmpty()) {
-            PositionedString ps = new PositionedString(precondition);
-            ImmutableList<ProgramVariable> paramVarsList = convert(undeclaredVariableCollector.result());
-            KeYJMLParser parser = new KeYJMLParser(ps, 
-                                                   services, 
-                                                   getCalleeKeYJavaType(), 
-                                                   selfVar, 
-                                                   paramVarsList, 
-                                                   null, 
-                                                   null, 
-                                                   null);
-            return parser.parseExpression();
-         }
-         else {
-            return TB.tt();
-         }
-      }
-      catch (SLTranslationException e) {
-         throw new RuntimeException("Can't parse precondition \"" + precondition + "\".", e);
-      }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected Term getPost(List<LocationVariable> modHeaps,
-                          ProgramVariable selfVar, 
-                          ImmutableList<ProgramVariable> paramVars, 
-                          ProgramVariable resultVar, 
-                          ProgramVariable exceptionVar, 
-                          Map<LocationVariable, LocationVariable> atPreVars, 
-                          Services services) {
-      return TB.tt();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected Term buildFrameClause(List<LocationVariable> modHeaps,
-                                   Map<LocationVariable, Map<Term, Term>> heapToAtPre,
-                                   ProgramVariable selfVar, 
-                                   ImmutableList<ProgramVariable> paramVars) {
-      return TB.tt();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected Modality getTerminationMarker() {
-      return Modality.DIA;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
-                              ImmutableList<LocationVariable> formalParamVars,
-                              Map<LocationVariable, LocationVariable> atPreVars) {
-      Term update = null;
-      for(LocationVariable heap : atPreVars.keySet()) {
-         final Term u = TB.elementary(services, atPreVars.get(heap), TB.getBaseHeap(services));
-         if(update == null) {
-            update = u;
-         }else{
-            update = TB.parallel(update, u);
-         }
-       }
-       return update;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected String buildPOName(boolean transactionFlag) {
-      return name;
+      ImmutableList<ProgramVariable> paramVarsList = convert(undeclaredVariableCollector.result());
+      return super.getPre(modHeaps, selfVar, paramVarsList, atPreVars, services);
    }
 
    /**
@@ -370,9 +237,10 @@ public class MethodPartPO extends AbstractOperationPO {
     */
    @Override
    protected Term buildUninterpretedPredicate(ImmutableList<ProgramVariable> paramVars, 
+                                              ProgramVariable exceptionVar,
                                               String name) {
       ImmutableList<ProgramVariable> paramVarsList = convert(undeclaredVariableCollector.result());
-      return super.buildUninterpretedPredicate(paramVarsList, name);
+      return super.buildUninterpretedPredicate(paramVarsList, exceptionVar, name);
    }
    
    /**
@@ -393,8 +261,9 @@ public class MethodPartPO extends AbstractOperationPO {
     */
    @Override
    public int hashCode() {
-      return pm.hashCode() + 
-             (precondition != null ? precondition.hashCode() : 0);
+      return super.hashCode() + 
+             (getStartPosition() != null ? getStartPosition().hashCode() : 0) + 
+             (getEndPosition() != null ? getEndPosition().hashCode() : 0);
    }
 
    /**
@@ -402,21 +271,30 @@ public class MethodPartPO extends AbstractOperationPO {
     */
    @Override
    public boolean equals(Object obj) {
-      if (obj instanceof MethodPartPO) {
-         MethodPartPO other = (MethodPartPO)obj;
-         return JavaUtil.equals(pm, other.getProgramMethod()) &&
-                JavaUtil.equals(precondition, other.getPrecondition());
+      if (obj instanceof ProgramMethodSubsetPO) {
+         ProgramMethodSubsetPO other = (ProgramMethodSubsetPO)obj;
+         return super.equals(obj) &&
+                JavaUtil.equals(getStartPosition(), other.getStartPosition()) &&
+                JavaUtil.equals(getEndPosition(), other.getEndPosition());
       }
       else {
          return false;
       }
    }
-   
+
    /**
-    * Returns the precondition in JML syntax.
-    * @return The precondition in JML syntax.
+    * Returns the start position.
+    * @return The start position.
     */
-   public String getPrecondition() {
-      return precondition;
+   public Position getStartPosition() {
+      return startPosition;
+   }
+
+   /**
+    * Returns the end position.
+    * @return The end position.
+    */
+   public Position getEndPosition() {
+      return endPosition;
    }
 }
