@@ -18,7 +18,6 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
-import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
@@ -28,7 +27,6 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -102,11 +100,8 @@ public class EnhancedForElimination extends ProgramTransformer {
         Statement body = enhancedFor.getBody();
         
         ji = services.getJavaInfo();
-        ExecutionContext ec = null; // TODO: how to get this? do we need it?
+        ExecutionContext ec = ji.getDefaultExecutionContext(); // TODO: how to get a more appropriate one? 
         boolean iterable = ji.isSubtype(expression.getKeYJavaType(services, ec),ji.getTypeByName(ITERABLE));
-//        boolean array = ji.isSubtype(expression.getKeYJavaType(services, ec),ji.getTypeByName("java.lang.Object[]"));
-//        
-//        assert iterable | array : "Enhanced for-loops may only range over arrays or instances of Iterable.";
 
         ProgramElement result = iterable? makeIterableForLoop(lvd, expression, body) : makeArrayForLoop(lvd, expression, body);
         return result;
@@ -209,7 +204,9 @@ public class EnhancedForElimination extends ProgramTransformer {
         While whileGuard = new While(itGuard, block, null, new ExtList());
 
         // block
-        Statement[] statements = ADD_VALUES? new Statement[]{ itinit, valuesInit, whileGuard }: new Statement[]{itinit,whileGuard};
+        Statement[] statements = ADD_VALUES? 
+                new Statement[]{ itinit, valuesInit, whileGuard }:
+                    new Statement[]{itinit,whileGuard};
         StatementBlock outerBlock = new StatementBlock(statements);
         return outerBlock;
 
@@ -233,17 +230,19 @@ public class EnhancedForElimination extends ProgramTransformer {
             LocalVariableDeclaration lvd, Statement body) {
 
         Statement[] statements = ADD_VALUES?
-                new Statement[]{ makeUpdate(itName,lvd), body, makeValuesUpdate(itName, valuesName) }
+                // ATTENTION: in order for the invariant rule to work correctly, the update to values needs to appear at the very end of the loop
+                new Statement[]{ makeUpdate(itName,lvd), body, makeValuesUpdate(valuesName,lvd) }
                 : new Statement[]{ makeUpdate(itName, lvd), body };
         StatementBlock block = new StatementBlock(statements);
         return block;
     }
 
-    private Statement makeValuesUpdate(ProgramElementName itName, ProgramElementName vName){
+    private Statement makeValuesUpdate(ProgramElementName vName, LocalVariableDeclaration lvd){
         KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
         ProgramVariable valuesVar = new LocationVariable(vName, seqType);
-        MethodReference itNext = getItNext(itName);
-        Expression seqSingleton = new SeqSingleton(new ExtList(new Object[]{itNext}));
+        VariableSpecification var = lvd.getVariables().get(0);
+        Expression element = new LocationVariable(var.getProgramElementName(), services.getTypeConverter().getKeYJavaType(var.getType()));
+        Expression seqSingleton = new SeqSingleton(new ExtList(new Object[]{element}));
         Expression seqConcat = new SeqConcat(new ExtList(new Object[]{valuesVar,seqSingleton}));
         Statement assignment = new CopyAssignment(valuesVar, seqConcat);
         return assignment;
