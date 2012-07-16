@@ -24,6 +24,8 @@ import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.ldt.SeqLDT;
@@ -174,12 +176,11 @@ public class EnhancedForElimination extends ProgramTransformer {
     /** Declare index variable and assign zero. */
     private ILoopInit makeForInit(KeYJavaType intType, ProgramVariable itVar) {
         VariableSpecification spec =
-                new VariableSpecification(itVar, intType);
+                new VariableSpecification(itVar, new IntLiteral(0), intType);
         TypeRef intTyperef = new TypeRef(intType);
         LocalVariableDeclaration init =
                 new LocalVariableDeclaration(intTyperef, spec);
-        Assignment setToZero = new CopyAssignment(itVar, new IntLiteral(0));
-        LoopInitializer[] linit = {init,setToZero};
+        LoopInitializer[] linit = {init};
         ILoopInit inits = new LoopInit(linit);
         return inits;
     }
@@ -208,7 +209,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         While whileGuard = new While(itGuard, block, null, new ExtList());
 
         // block
-        Statement[] statements = { itinit, valuesInit, whileGuard };
+        Statement[] statements = ADD_VALUES? new Statement[]{ itinit, valuesInit, whileGuard }: new Statement[]{itinit,whileGuard};
         StatementBlock outerBlock = new StatementBlock(statements);
         return outerBlock;
 
@@ -219,12 +220,9 @@ public class EnhancedForElimination extends ProgramTransformer {
         TypeReference seqRef = new TypeRef(seqType);
         Modifier[] ghost = {new Ghost()};
         LocationVariable values = new LocationVariable(valuesName, seqType);
-        VariableSpecification[] valuesSpec = {new VariableSpecification(values)};
-        Statement valuesInit = new LocalVariableDeclaration(ghost,seqRef,valuesSpec);
         Expression seqEmpty = EmptySeqLiteral.INSTANCE;
-        Statement setValuesEmpty = new CopyAssignment(values, seqEmpty);
-        Statement[] body = ADD_VALUES ? new Statement[]{valuesInit,setValuesEmpty}: new Statement[]{};
-        valuesInit = new StatementBlock(body);
+        VariableSpecification[] valuesSpec = {new VariableSpecification(values,seqEmpty, seqType)};
+        Statement valuesInit = new LocalVariableDeclaration(ghost,seqRef,valuesSpec);
         return valuesInit;
     }
 
@@ -234,34 +232,36 @@ public class EnhancedForElimination extends ProgramTransformer {
     private StatementBlock makeBlock(ProgramElementName itName, ProgramElementName valuesName,
             LocalVariableDeclaration lvd, Statement body) {
 
-        Statement[] statements = { makeUpdate(itName, valuesName, lvd), body };
+        Statement[] statements = ADD_VALUES?
+                new Statement[]{ makeUpdate(itName,lvd), body, makeValuesUpdate(itName, valuesName) }
+                : new Statement[]{ makeUpdate(itName, lvd), body };
         StatementBlock block = new StatementBlock(statements);
         return block;
     }
 
+    private Statement makeValuesUpdate(ProgramElementName itName, ProgramElementName vName){
+        KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+        ProgramVariable valuesVar = new LocationVariable(vName, seqType);
+        MethodReference itNext = getItNext(itName);
+        Expression seqSingleton = new SeqSingleton(new ExtList(new Object[]{itNext}));
+        Expression seqConcat = new SeqConcat(new ExtList(new Object[]{valuesVar,seqSingleton}));
+        Statement assignment = new CopyAssignment(valuesVar, seqConcat);
+        return assignment;
+    }
+    
     /*
      * "<lvd> = <it>.next();"
      */
-    private Statement makeUpdate(ProgramElementName itName, ProgramElementName valuesName,
+    private Statement makeUpdate(ProgramElementName itName,
             LocalVariableDeclaration lvd) {
 
-        //
-        // it.next()
-        KeYJavaType iteratorType =
-                services.getJavaInfo().getTypeByName(ITERATOR);
-        KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-        ProgramElementName nextMeth = new ProgramElementName(NEXT);
-        ProgramVariable itVar = new LocationVariable(itName, iteratorType);
-        ProgramVariable valuesVar = new LocationVariable(valuesName, seqType);
-        MethodReference methodCall =
-                new MethodReference(new ImmutableArray<Expression>(), nextMeth, itVar);
+        MethodReference methodCall = getItNext(itName);
 
         //
         // make local variable decl
         VariableSpecification orgSpec =
                 lvd.getVariableSpecifications().get(0);
         VariableSpecification newSpec =
-                // TODO : use this style elsewhere!
                 new VariableSpecification(orgSpec.getProgramVariable(),
                         methodCall, orgSpec.getType());
         KeYJavaType keytype = (KeYJavaType) orgSpec.getType();
@@ -270,6 +270,18 @@ public class EnhancedForElimination extends ProgramTransformer {
                 new LocalVariableDeclaration(tr, newSpec);
 
         return lvdNew;
+    }
+
+    private MethodReference getItNext(ProgramElementName itName) {
+        //
+        // it.next()
+        KeYJavaType iteratorType =
+                services.getJavaInfo().getTypeByName(ITERATOR);
+        ProgramElementName nextMeth = new ProgramElementName(NEXT);
+        ProgramVariable itVar = new LocationVariable(itName, iteratorType);
+        MethodReference methodCall =
+                new MethodReference(new ImmutableArray<Expression>(), nextMeth, itVar);
+        return methodCall;
     }
 
     /*
