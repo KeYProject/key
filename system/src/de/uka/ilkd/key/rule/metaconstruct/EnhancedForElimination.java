@@ -13,15 +13,20 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
+import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -50,6 +55,7 @@ public class EnhancedForElimination extends ProgramTransformer {
     private static final String ITERATOR = "java.util.Iterator";
     private Services services;
     private JavaInfo ji;
+    private final boolean ADD_VALUES = true;
 
     public EnhancedForElimination(EnhancedFor forStatement) {
         super("enhancedfor-elim", forStatement);
@@ -177,6 +183,8 @@ public class EnhancedForElimination extends ProgramTransformer {
         ILoopInit inits = new LoopInit(linit);
         return inits;
     }
+    
+    // Methods to transform loops over Iterable
 
     /*
      * "{ ; while(<itguard>) <block> } "
@@ -186,30 +194,47 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         VariableNamer varNamer = services.getVariableNamer();
         ProgramElementName itName = varNamer.getTemporaryNameProposal("it");
+        ProgramElementName valuesName = varNamer.getTemporaryNameProposal("values");
 
+        Statement valuesInit = makeValuesInit(valuesName);
+        
         Statement itinit = makeIteratorInit(expression, itName);
 
         Expression itGuard = makeGuard(itName);
 
-        StatementBlock block = makeBlock(itName, lvd, body);
+        StatementBlock block = makeBlock(itName,  valuesName, lvd, body);
 
         // while
         While whileGuard = new While(itGuard, block, null, new ExtList());
 
         // block
-        Statement[] statements = { itinit, whileGuard };
+        Statement[] statements = { itinit, valuesInit, whileGuard };
         StatementBlock outerBlock = new StatementBlock(statements);
         return outerBlock;
 
     }
 
+    private Statement makeValuesInit(ProgramElementName valuesName) {
+        KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+        TypeReference seqRef = new TypeRef(seqType);
+        Modifier[] ghost = {new Ghost()};
+        LocationVariable values = new LocationVariable(valuesName, seqType);
+        VariableSpecification[] valuesSpec = {new VariableSpecification(values)};
+        Statement valuesInit = new LocalVariableDeclaration(ghost,seqRef,valuesSpec);
+        Expression seqEmpty = EmptySeqLiteral.INSTANCE;
+        Statement setValuesEmpty = new CopyAssignment(values, seqEmpty);
+        Statement[] body = ADD_VALUES ? new Statement[]{valuesInit,setValuesEmpty}: new Statement[]{};
+        valuesInit = new StatementBlock(body);
+        return valuesInit;
+    }
+
     /*
      * "; <body>"
      */
-    private StatementBlock makeBlock(ProgramElementName itName,
+    private StatementBlock makeBlock(ProgramElementName itName, ProgramElementName valuesName,
             LocalVariableDeclaration lvd, Statement body) {
 
-        Statement[] statements = { makeUpdate(itName, lvd), body };
+        Statement[] statements = { makeUpdate(itName, valuesName, lvd), body };
         StatementBlock block = new StatementBlock(statements);
         return block;
     }
@@ -217,15 +242,17 @@ public class EnhancedForElimination extends ProgramTransformer {
     /*
      * "<lvd> = <it>.next();"
      */
-    private Statement makeUpdate(ProgramElementName itName,
+    private Statement makeUpdate(ProgramElementName itName, ProgramElementName valuesName,
             LocalVariableDeclaration lvd) {
 
         //
         // it.next()
         KeYJavaType iteratorType =
                 services.getJavaInfo().getTypeByName(ITERATOR);
+        KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
         ProgramElementName nextMeth = new ProgramElementName(NEXT);
         ProgramVariable itVar = new LocationVariable(itName, iteratorType);
+        ProgramVariable valuesVar = new LocationVariable(valuesName, seqType);
         MethodReference methodCall =
                 new MethodReference(new ImmutableArray<Expression>(), nextMeth, itVar);
 
@@ -234,6 +261,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         VariableSpecification orgSpec =
                 lvd.getVariableSpecifications().get(0);
         VariableSpecification newSpec =
+                // TODO : use this style elsewhere!
                 new VariableSpecification(orgSpec.getProgramVariable(),
                         methodCall, orgSpec.getType());
         KeYJavaType keytype = (KeYJavaType) orgSpec.getType();
