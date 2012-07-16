@@ -1012,4 +1012,120 @@ public final class KeYUtil {
          return Position.UNDEFINED;
       }
    }
+   
+   /**
+    * Computes the offset for the given cursor position (line, column)
+    * in the given {@link IDocument}.
+    * @param document The {@link IDocument}.
+    * @param cursorLine The line of the cursor.
+    * @param cursorColumn The column of the cursor.
+    * @param tabWidth The tab width.
+    * @return The computed offset.
+    * @throws BadLocationException Occurred Exception
+    */
+   public static int getOffsetForCursorPosition(IDocument document, 
+                                                int cursorLine, 
+                                                int cursorColumn, 
+                                                int tabWidth) throws BadLocationException {
+      if (document != null) {
+         int lineOffset = document.getLineOffset(cursorLine - 1);
+         int oldColumn = cursorColumn - 1;
+         int oldColumnRecomputed = 0;
+         int i = 0;
+         while (oldColumnRecomputed < oldColumn) {
+            if ('\t' == document.getChar(lineOffset + i)) {
+               oldColumnRecomputed += tabWidth - (tabWidth == 0 ? 0 : oldColumnRecomputed % tabWidth);
+            }
+            else {
+               oldColumnRecomputed++;
+            }
+            i++;
+         }
+         return lineOffset + i;
+      }
+      else {
+         return -1;
+      }
+   }
+   
+   /**
+    * Computes the offset for the given cursor position (line, column)
+    * in the source document of the given {@link IJavaElement}.
+    * @param element The given {@link IJavaElement}.
+    * @param cursorLine The line of the cursor.
+    * @param cursorColumn The column of the cursor.
+    * @return The computed offset.
+    * @throws CoreException Occurred Exception
+    */
+   public static int getOffsetForCursorPosition(IJavaElement element, 
+                                                int cursorLine, 
+                                                int cursorColumn) throws CoreException {
+      int tabWidth = JDTUtil.getTabWidth(element);
+      OffsetForCursorPositionRunnableWithDocument run = new OffsetForCursorPositionRunnableWithDocument(cursorLine, cursorColumn, tabWidth);
+      runOnDocument(element, run);
+      return run.getOffset();
+   }
+   
+   /**
+    * Implementation of {@link IRunnableWithDocument} to compute the offset
+    * of a given cursor position used by {@link KeYUtil#getOffsetForCursorPosition(IJavaElement, int, int)}.
+    * @author Martin Hentschel
+    */
+   private static class OffsetForCursorPositionRunnableWithDocument implements IRunnableWithDocument {
+      /**
+       * The cursor line.
+       */
+      private int cursorLine;
+      
+      /**
+       * The cursor column.
+       */
+      private int cursorColumn;
+      
+      /**
+       * The tab width.
+       */
+      private int tabWidth;
+
+      /**
+       * The computed offset.
+       */
+      private int offset;
+      
+      /**
+       * Constructor.
+       * @param cursorLine The cursor line.
+       * @param cursorColumn The cursor column.
+       * @param tabWidth The tab width.
+       */
+      public OffsetForCursorPositionRunnableWithDocument(int cursorLine, 
+                                                         int cursorColumn, 
+                                                         int tabWidth) {
+         super();
+         this.cursorLine = cursorLine;
+         this.cursorColumn = cursorColumn;
+         this.tabWidth = tabWidth;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void run(IDocument document) throws CoreException {
+         try {
+            offset = getOffsetForCursorPosition(document, cursorLine, cursorColumn, tabWidth);
+         }
+         catch (BadLocationException e) {
+            throw new CoreException(LogUtil.getLogger().createErrorStatus("Can't compute offset for cursor position " + cursorLine + " : " + cursorColumn + " with tab width " + tabWidth + ".", e));
+         }
+      }
+
+      /**
+       * The computed offset.
+       * @return The computed offset.
+       */
+      public int getOffset() {
+         return offset;
+      }
+   }
 }

@@ -13,6 +13,8 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
@@ -35,6 +37,43 @@ import de.uka.ilkd.key.java.Position;
  * @author Martin Hentschel
  */
 public class KeYUtilTest extends TestCase {
+   /**
+    * Tests {@link KeYUtil#getOffsetForCursorPosition(IDocument, int, int, int)} and
+    * {@link KeYUtil#getOffsetForCursorPosition(IJavaElement, int, int)}.
+    */
+   @Test
+   public void testGetOffsetForCursorPosition() throws CoreException, InterruptedException {
+      // Create test project and content
+      IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testGetOffsetForCursorPosition");
+      IFolder src = project.getProject().getFolder("src");
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/MCDemo", src);
+      TestUtilsUtil.waitForBuild();
+      final IMethod method = TestUtilsUtil.getJdtMethod(project, "MCDemo", "init", "I");
+      final int tabWidth = JDTUtil.getTabWidth(method);
+      // Test all possible offsets
+      KeYUtil.runOnDocument(method, new IRunnableWithDocument() {
+         @Override
+         public void run(IDocument document) throws CoreException {
+            try {
+               for (int offset = 0; offset < document.getLength(); offset++) {
+                  Position cursorPosition = KeYUtil.getCursorPositionForOffset(method, offset);
+                  assertNotNull(cursorPosition);
+                  assertNotSame(Position.UNDEFINED, cursorPosition);
+                  // Test KeYUtil#getOffsetForCursorPosition(IDocument, int, int, int)
+                  int cursorOffset = KeYUtil.getOffsetForCursorPosition(document, cursorPosition.getLine(), cursorPosition.getColumn(), tabWidth);
+                  assertEquals(offset, cursorOffset);
+                  // Test KeYUtil#getOffsetForCursorPosition(IJavaElement, int, int)
+                  cursorOffset = KeYUtil.getOffsetForCursorPosition(method, cursorPosition.getLine(), cursorPosition.getColumn());
+                  assertEquals(offset, cursorOffset);
+               }
+            }
+            catch (BadLocationException e) {
+               throw new CoreException(new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Test failed.", e));
+            }
+         }
+      });
+   }
+   
    /**
     * Tests {@link KeYUtil#changeCursorPositionTabWidth(IDocument, Position, int, int)}
     */

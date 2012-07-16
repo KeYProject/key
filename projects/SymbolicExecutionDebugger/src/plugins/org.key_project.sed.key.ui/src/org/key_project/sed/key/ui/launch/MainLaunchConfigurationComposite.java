@@ -892,6 +892,19 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
                if (body != null) {
                   position = body.getStartPosition() + 1; // Go inside the method body directly after {
                }
+               try {
+                  if (isExecuteMethodRange()) {
+                     int offset = KeYUtil.getOffsetForCursorPosition(method, 
+                                                                     getMethodRangeStartLine(), 
+                                                                     getMethodRangeStartColumn());
+                     if (offset >= 0) {
+                        position = offset;
+                     }
+                  }
+               }
+               catch (Exception e) {
+                  // Nothing to do, use method body position
+               }
             }
             catch (JavaModelException e) {
                LogUtil.getLogger().logError(e);
