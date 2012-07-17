@@ -1320,10 +1320,9 @@ final class JMLTranslator {
 			public SLExpression translate(SLTranslationExceptionManager excManager,
 					Object... params) throws SLTranslationException {
 				checkParameters(params, Services.class);
-				throw new SLTranslationException("JML keyword \\values not yet supported.");
-//				final KeYJavaType t = ((Services)params[0]).getJavaInfo()
-//			               .getKeYJavaType(PrimitiveType.JAVA_SEQ);
-//				return new SLExpression(TB.values((Services)params[0]),t);
+				final KeYJavaType t = ((Services)params[0]).getJavaInfo()
+			               .getKeYJavaType(PrimitiveType.JAVA_SEQ);
+				return new SLExpression(TB.values((Services)params[0]),t);
 			}});
     }
 

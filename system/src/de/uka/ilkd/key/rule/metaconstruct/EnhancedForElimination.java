@@ -340,7 +340,6 @@ public class EnhancedForElimination extends ProgramTransformer {
     private void setInvariant (EnhancedFor original, LoopStatement transformed){
         // copy loop invariant to the created while loop
         LoopInvariant li
-        // XXX original is not identical to the original loop!!!!
         = services.getSpecificationRepository().getLoopInvariant(original);
         if (li != null) {
             li = li.setLoop(transformed);
