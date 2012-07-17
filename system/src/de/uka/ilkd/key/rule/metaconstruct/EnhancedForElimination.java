@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -42,12 +43,13 @@ import de.uka.ilkd.key.util.ExtList;
  * This class is used to transform an enh. for loop over an iterable object into
  * a while loop + surrounding statements.
  * 
- * @author mulbrich
+ * @author mulbrich, bruns
  * 
  */
 
 public class EnhancedForElimination extends ProgramTransformer {
 
+    private static final String VALUES = "values";
     private static final String ITERABLE = "java.lang.Iterable";
     private static final String ITERATOR_METH = "iterator";
     private static final String HAS_NEXT = "hasNext";
@@ -55,7 +57,8 @@ public class EnhancedForElimination extends ProgramTransformer {
     private static final String ITERATOR = "java.util.Iterator";
     private Services services;
     private JavaInfo ji;
-    private final boolean ADD_VALUES = true;
+    private EnhancedFor enhancedFor;
+    private final boolean ADD_VALUES = true; // toggle usage of the values ghost field
 
     public EnhancedForElimination(EnhancedFor forStatement) {
         super("enhancedfor-elim", forStatement);
@@ -93,7 +96,7 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         this.services = services;
 
-        EnhancedFor enhancedFor = (EnhancedFor) pe;
+        enhancedFor = (EnhancedFor) pe;
 
         LocalVariableDeclaration lvd = enhancedFor.getVariableDeclaration();
         Expression expression = enhancedFor.getGuardExpression();
@@ -128,6 +131,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         
         // put everything together
         Statement[] complete = {declArrayElemVar,forLoop};
+        setInvariant(enhancedFor, forLoop);
         return new StatementBlock(complete);
     }
 
@@ -190,7 +194,7 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         VariableNamer varNamer = services.getVariableNamer();
         ProgramElementName itName = varNamer.getTemporaryNameProposal("it");
-        ProgramElementName valuesName = varNamer.getTemporaryNameProposal("values");
+        ProgramElementName valuesName = varNamer.getTemporaryNameProposal(VALUES);
 
         Statement valuesInit = makeValuesInit(valuesName);
         
@@ -208,6 +212,7 @@ public class EnhancedForElimination extends ProgramTransformer {
                 new Statement[]{ itinit, valuesInit, whileGuard }:
                     new Statement[]{itinit,whileGuard};
         StatementBlock outerBlock = new StatementBlock(statements);
+        setInvariant(enhancedFor,whileGuard);
         return outerBlock;
 
     }
@@ -237,11 +242,13 @@ public class EnhancedForElimination extends ProgramTransformer {
         return block;
     }
 
+    /** values = \seq_concat(values, \seq_singleton(<it>.next())); */
     private Statement makeValuesUpdate(ProgramElementName vName, LocalVariableDeclaration lvd){
         KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
         ProgramVariable valuesVar = new LocationVariable(vName, seqType);
         VariableSpecification var = lvd.getVariables().get(0);
-        Expression element = new LocationVariable(var.getProgramElementName(), services.getTypeConverter().getKeYJavaType(var.getType()));
+        KeYJavaType keYJavaType = (KeYJavaType) var.getType();
+        Expression element = new LocationVariable(var.getProgramElementName(), keYJavaType);
         Expression seqSingleton = new SeqSingleton(new ExtList(new Object[]{element}));
         Expression seqConcat = new SeqConcat(new ExtList(new Object[]{valuesVar,seqSingleton}));
         Statement assignment = new CopyAssignment(valuesVar, seqConcat);
@@ -326,5 +333,18 @@ public class EnhancedForElimination extends ProgramTransformer {
         LocalVariableDeclaration init =
                 new LocalVariableDeclaration(iteratorTyperef, spec);
         return init;
+    }
+    
+
+    /** Set the invariant from <code>original</code> on <code>transformed</code>. */
+    private void setInvariant (EnhancedFor original, LoopStatement transformed){
+        // copy loop invariant to the created while loop
+        LoopInvariant li
+        // XXX original is not identical to the original loop!!!!
+        = services.getSpecificationRepository().getLoopInvariant(original);
+        if (li != null) {
+            li = li.setLoop(transformed);
+            services.getSpecificationRepository().setLoopInvariant(li);
+        }
     }
 }
