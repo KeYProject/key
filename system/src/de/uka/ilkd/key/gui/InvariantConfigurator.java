@@ -452,12 +452,16 @@ public class InvariantConfigurator {
                 for(Name h : HeapLDT.VALID_HEAP_NAMES ) {
                    String k = h.toString();
                    String title = String.format("Invariant%s - Status: ", k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
-                   JTextArea textArea = createErrorTextField(title, invMsgs.get(k),
-                        invColors.get(k));
+                   String errorMessage = invMsgs == null? "" : invMsgs.get(k);
+                   Color invColor = invColors == null? Color.GREEN : invColors.get(k);
+                   JTextArea textArea = createErrorTextField(title, errorMessage,
+                        invColor);
                    invPane.add(k, textArea);
                    title = String.format("Modifies%s - Status: ", k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
-                   textArea = createErrorTextField(title, modMsgs.get(k),
-                        modColors.get(k));
+                   String errorMessage2 = modMsgs == null? "" : modMsgs.get(k);
+                   Color modColor = modColors == null? Color.GREEN : modColors.get(k);
+                   textArea = createErrorTextField(title, errorMessage2,
+                        modColor);
                    modPane.add(k, textArea);
                 }
                 panel.add(invPane);
