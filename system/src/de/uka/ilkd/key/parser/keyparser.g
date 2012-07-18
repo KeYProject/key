@@ -128,6 +128,8 @@ options {
     private ParserMode parserMode;
 
     private String chooseContract = null;
+    private String proofObligation = null;
+    
     private int savedGuessing = -1;
 
     private int lineOffset=0;
@@ -334,6 +336,10 @@ options {
 
     public String getChooseContract() {
       return chooseContract;
+    }
+    
+    public String getProofObligation() {
+      return proofObligation;
     }
     
     public String getFilename() {
@@ -4276,7 +4282,17 @@ problem returns [ Term a = null ]
 	       if(chooseContract == null) {
 	           chooseContract = "";
 	       }
-           } 
+           }
+           | 
+           PROOFOBLIGATION  (proofObligation=string_literal SEMI)?
+           {
+               if (capturer != null) {
+                    capturer.capture();
+               }
+               if(proofObligation == null) {
+                   proofObligation = "";
+               }
+           }
 	)?
    ;
    

@@ -54,6 +54,7 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -228,30 +229,62 @@ public final class ProblemLoader implements Runnable {
       ProofOblInput po = null;
       try {
          try {
+            // Read environment
             envInput = createEnvInput(file, classPath, bootClassPath);
 
             init = new ProblemInitializer(ui, 
                                           mediator.getProfile(), 
                                           new Services(mediator.getExceptionHandler()), 
                                           true, 
-                                          ui);;
+                                          ui);
 
             InitConfig initConfig = init.prepare(envInput);
+            // Read proof obligation settings
             int proofNum = 0;
             final String chooseContract;
+            final String proofObligation;
             if (envInput instanceof KeYFile) {
-               chooseContract = ((KeYFile) envInput).chooseContract();
+               KeYFile keyFile = (KeYFile)envInput;
+               chooseContract = keyFile.chooseContract();
+               proofObligation = keyFile.getProofObligation();
             }
             else {
                chooseContract = null;
+               proofObligation = null;
             }
-            if (envInput instanceof ProofOblInput && chooseContract == null) {
+            // Instantiate proof obligation
+            if (envInput instanceof ProofOblInput && chooseContract == null && proofObligation == null) {
                po = (ProofOblInput) envInput;
             }
             else if (chooseContract != null && chooseContract.length() > 0) {
+               String baseContractName = null;
+               int ind = -1;
+               for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
+                  ind = chooseContract.indexOf("." + tag);
+                  if (ind > 0) {
+                     break;
+                  }
+                  proofNum++;
+               }
+               if (ind == -1) {
+                  baseContractName = chooseContract;
+                  proofNum = 0;
+               }
+               else {
+                  baseContractName = chooseContract.substring(0, ind);
+               }
+               final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
+               if (contract == null) {
+                  throw new RuntimeException("Contract not found: " + baseContractName);
+               }
+               else {
+                  po = contract.createProofObl(initConfig, contract);
+               }
+            }
+            else if (proofObligation != null && proofObligation.length() > 0) {
                // Load proof obligation settings
                Properties properties = new Properties();
-               properties.load(new ByteArrayInputStream(chooseContract.getBytes()));
+               properties.load(new ByteArrayInputStream(proofObligation.getBytes()));
                String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
                if (poClass == null || poClass.isEmpty()) {
                   throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");

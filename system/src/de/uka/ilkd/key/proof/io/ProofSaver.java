@@ -119,7 +119,7 @@ public class ProofSaver {
           header = makePathsRelative(header);
           ps.print(header);
 
-          //\problem or \chooseContract
+          //\problem or \proofObligation
           ProofOblInput po = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
           if(po instanceof IPersistablePO) {
               Properties properties = new Properties();
@@ -127,7 +127,7 @@ public class ProofSaver {
               StringWriter writer = new StringWriter();
               try {
                  properties.store(writer, "Proof Obligation Settings");
-                 ps.println("\\chooseContract \"" +escapeCharacters(writer.toString()) + "\";\n");
+                 ps.println("\\proofObligation \"" +escapeCharacters(writer.toString()) + "\";\n");
               }
               finally {
                 writer.close();

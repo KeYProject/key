@@ -150,6 +150,7 @@ tokens {
 	RULES = "\\rules";
         PROBLEM = "\\problem";
         CHOOSECONTRACT = "\\chooseContract";
+        PROOFOBLIGATION = "\\proofObligation";
         PROOF = "\\proof";
         CONTRACTS = "\\contracts";
         INVARIANTS = "\\invariants";

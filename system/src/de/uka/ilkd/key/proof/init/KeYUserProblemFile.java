@@ -132,10 +132,15 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
 	    if(problemTerm == null) {
 	       boolean chooseDLContract = problemParser.getChooseContract() != null;
-	       if(chooseDLContract)
+          boolean proofObligation = problemParser.getProofObligation() != null;
+	       if(chooseDLContract) {
   	         searchS = "\\chooseContract";
+	       }
+	       else if (proofObligation) {
+	            searchS = "\\proofObligation";
+	       }
 	       else {
-	         throw new ProofInputException("No \\problem or \\chooseContract in the input file!");
+	         throw new ProofInputException("No \\problem or \\chooseContract or \\proofObligation in the input file!");
 	       }
 	    }
 

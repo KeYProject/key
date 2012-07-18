@@ -252,23 +252,23 @@ public final class DependencyContractPO extends AbstractPO
      * @throws IOException Occurred Exception.
      */
     public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
-       String chooseContract = properties.getProperty("contract");
+       String contractName = properties.getProperty("contract");
        int proofNum = 0;
        String baseContractName = null;
        int ind = -1;
        for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
-          ind = chooseContract.indexOf("." + tag);
+          ind = contractName.indexOf("." + tag);
           if (ind > 0) {
              break;
           }
           proofNum++;
        }
        if (ind == -1) {
-          baseContractName = chooseContract;
+          baseContractName = contractName;
           proofNum = 0;
        }
        else {
-          baseContractName = chooseContract.substring(0, ind);
+          baseContractName = contractName.substring(0, ind);
        }
        final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
        if (contract == null) {
