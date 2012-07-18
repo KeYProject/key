@@ -452,13 +452,13 @@ public class InvariantConfigurator {
                 for(Name h : HeapLDT.VALID_HEAP_NAMES ) {
                    String k = h.toString();
                    String title = String.format("Invariant%s - Status: ", k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
-                   String errorMessage = invMsgs == null? "" : invMsgs.get(k);
+                   String errorMessage = invMsgs == null? "OK" : invMsgs.get(k);
                    Color invColor = invColors == null? Color.GREEN : invColors.get(k);
                    JTextArea textArea = createErrorTextField(title, errorMessage,
                         invColor);
                    invPane.add(k, textArea);
                    title = String.format("Modifies%s - Status: ", k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
-                   String errorMessage2 = modMsgs == null? "" : modMsgs.get(k);
+                   String errorMessage2 = modMsgs == null? "OK" : modMsgs.get(k);
                    Color modColor = modColors == null? Color.GREEN : modColors.get(k);
                    textArea = createErrorTextField(title, errorMessage2,
                         modColor);
@@ -492,15 +492,18 @@ public class InvariantConfigurator {
                 Map<String,Color> varColors = new LinkedHashMap<String,Color>();
                 for(Name h : HeapLDT.VALID_HEAP_NAMES ) {
                    String k = h.toString();
-                   invMsgs.put(k, "OK");
-                   invColors.put(k, Color.GREEN);
-                   modMsgs.put(k, "OK");
-                   modColors.put(k, Color.GREEN);
+                   setOK(invMsgs, invColors, k);
+                   setOK(modMsgs, modColors, k);
                 }
-                varMsgs.put(DEFAULT, "OK");
-                varColors.put(DEFAULT, Color.GREEN);
+                setOK(varMsgs, varColors, DEFAULT);
                 return createErrorPanel(invMsgs, invColors, modMsgs, modColors,
                         varMsgs, varColors);
+            }
+
+            private void setOK(Map<String, String> invMsgs,
+                    Map<String, Color> invColors, String k) {
+                invMsgs.put(k, "OK");
+                invColors.put(k, Color.GREEN);
             }
 
             private JTextArea createErrorTextField(String Title,
