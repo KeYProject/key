@@ -27,13 +27,14 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 
 /**
- * @author Dreiner
+ * @author Dreiner, bruns
  * 
  *         This class creates a Dialog to input a loop Invariant, Variant and
  *         Modifies.
@@ -91,8 +92,10 @@ public class InvariantConfigurator {
 
         class InvariantDialog extends JDialog {
 
-            private static final long serialVersionUID = 1L;
-
+            
+            private static final String INVARIANT_REQUIRED = "Invariant is required!";
+            private static final String VARIANT_REQUIRED = "Variant required!";
+            private static final long serialVersionUID = 4320775749093028498L;
             private StringWriter sw = new StringWriter();
             private DefaultTermParser parser = new DefaultTermParser();
             
@@ -109,9 +112,9 @@ public class InvariantConfigurator {
             private Map<LocationVariable,Term> modifiesTerm = new LinkedHashMap<LocationVariable,Term>();
             private Map<LocationVariable,Term> invariantTerm = new LinkedHashMap<LocationVariable,Term>();
 
-            private final String INVARIANTTITLE = "Invariant%s: ";
-            private final String VARIANTTITLE = "Variant%s: ";
-            private final String MODIFIESTITLE = "Modifies%s: ";
+            private static final String INVARIANTTITLE = "Invariant%s: ";
+            private static final String VARIANTTITLE = "Variant%s: ";
+            private static final String MODIFIESTITLE = "Modifies%s: ";
 
 
             /**
@@ -248,8 +251,6 @@ public class InvariantConfigurator {
                 }
 
                 loopInvTexts[MOD_IDX] = new LinkedHashMap<String,String>();
-
-//services.getTypeConverter().getHeapLDT().getHeap()
 
                 for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                   final Term modifies = loopInv.getModifies(heap, loopInv.getInternalSelfTerm(), atPres, services);
@@ -500,10 +501,15 @@ public class InvariantConfigurator {
                         varMsgs, varColors);
             }
 
-            private void setOK(Map<String, String> invMsgs,
-                    Map<String, Color> invColors, String k) {
-                invMsgs.put(k, "OK");
-                invColors.put(k, Color.GREEN);
+            private void setOK(Map<String, String> msgMap,
+                    Map<String, Color> colors, String setOn) {
+                msgMap.put(setOn, "OK");
+                colors.put(setOn, Color.GREEN);
+            }
+            
+            private void setError(Map<String, String> msgMap, Map<String, Color> colors, String setOn, String errorMsg){
+                msgMap.put(setOn, errorMsg);
+                colors.put(setOn, Color.RED);
             }
 
             private JTextArea createErrorTextField(String Title,
@@ -611,8 +617,7 @@ public class InvariantConfigurator {
                 if (requiresVariant && variantTerm == null) {
                     Map<String,String> varErrors = new LinkedHashMap<String,String>();
                     Map<String,Color> varColors = new LinkedHashMap<String,Color>();
-                    varErrors.put(DEFAULT, "Variant is required!");
-                    varColors.put(DEFAULT, Color.RED);
+                    setError(varErrors,varColors,DEFAULT,VARIANT_REQUIRED);
                     updateErrorPanel(null, null, null, null,
                             varErrors, varColors);
                     requirementsAreMet = false;
@@ -622,8 +627,7 @@ public class InvariantConfigurator {
                     requirementsAreMet = false;
                     Map<String,String> invErrors = new LinkedHashMap<String,String>();
                     Map<String,Color> invColors = new LinkedHashMap<String,Color>();
-                    invErrors.put(DEFAULT, "Invariant is required!");
-                    invColors.put(DEFAULT, Color.RED);
+                    setError(invErrors,invColors,DEFAULT,INVARIANT_REQUIRED);
                     updateErrorPanel(invErrors, invColors, null,
                             null, null, null);
                 }
@@ -649,19 +653,15 @@ public class InvariantConfigurator {
                 for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                   try {
                     invariantTerm.put(heap, parseInvariant(heap));
-                    invErrors.put(heap.toString(), "OK");
-                    invCols.put(heap.toString(), Color.GREEN);
+                    setOK(invErrors,invCols,heap.toString());
                   } catch (Exception e) {
-                    invErrors.put(heap.toString(), e.getMessage());
-                    invCols.put(heap.toString(), Color.RED);
+                      setError(invErrors,invCols,heap.toString(),e.getMessage());
                   }
                   try {
                     modifiesTerm.put(heap, parseModifies(heap));
-                    modErrors.put(heap.toString(), "OK");
-                    modCols.put(heap.toString(), Color.GREEN);
+                    setOK(modErrors,modCols,heap.toString());
                   } catch (Exception e) {
-                    modErrors.put(heap.toString(), e.getMessage());
-                    modCols.put(heap.toString(), Color.RED);
+                      setError(modErrors,modCols,heap.toString(),e.getMessage());
                   }
                 }
                 Map<String,String> varErrors = new LinkedHashMap<String,String>();
@@ -672,17 +672,15 @@ public class InvariantConfigurator {
                     if (invariants.get(i)[VAR_IDX].get(DEFAULT).equals("")) {
                         variantTerm = null;
                         if (requiresVariant) {
-                            throw new Exception("Variant required!");
+                            throw new Exception(VARIANT_REQUIRED);
                         }
                     } else {
                         variantTerm = parseVariant();
-                        varErrors.put(DEFAULT, "OK");
-                        varCols.put(DEFAULT, Color.GREEN);
+                        setOK(varErrors,varCols,DEFAULT);
 
                     }
                 } catch (Exception e) {
-                    varErrors.put(DEFAULT, e.getMessage());
-                    varCols.put(DEFAULT, Color.RED);
+                    setError(varErrors,varCols,DEFAULT,e.getMessage());
                 }
 
                 updateErrorPanel(invErrors, invCols, modErrors, modCols, varErrors,
@@ -762,9 +760,13 @@ public class InvariantConfigurator {
                 // might throw parserException
                 
                 result =  parser.parse(new StringReader(invariants.get(index)[INV_IDX].get(heap.toString())), Sort.ANY, services, services.getNamespaces(),
-                MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
+                getAbbrevMap());
 
                 return result;
+            }
+
+            private AbbrevMap getAbbrevMap() {
+                return MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap();
             }
 
             protected Term parseModifies(LocationVariable heap) throws Exception {
@@ -774,7 +776,7 @@ public class InvariantConfigurator {
                 // antlr
                 result = parser.parse(
                         new StringReader(invariants.get(index)[MOD_IDX].get(heap.toString())), Sort.ANY,
-                        services, services.getNamespaces(), MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
+                        services, services.getNamespaces(), getAbbrevMap());
                 return result;
             }
 
@@ -785,7 +787,7 @@ public class InvariantConfigurator {
                 // antlr
                 result = parser.parse(
                         new StringReader(invariants.get(index)[VAR_IDX].get(DEFAULT)), Sort.ANY,
-                        services, services.getNamespaces(), MainWindow.getInstance().getMediator().getNotationInfo().getAbbrevMap());
+                        services, services.getNamespaces(), getAbbrevMap());
                 return result;
             }
 
@@ -796,7 +798,7 @@ public class InvariantConfigurator {
         InvariantDialog dia = new InvariantDialog();
         dia.dispose();
         if(this.userPressedCancel) {
-            throw new RuleAbortException("User did not provide Invariant. @InvariantConfigurator:683");
+            throw new RuleAbortException("Interactive invariant configuration canceled by user.");
         }
 
         return newInvariant;
