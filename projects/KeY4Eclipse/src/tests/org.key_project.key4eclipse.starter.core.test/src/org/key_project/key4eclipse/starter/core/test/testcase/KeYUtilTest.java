@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.junit.Test;
@@ -25,18 +26,56 @@ import org.key_project.key4eclipse.starter.core.test.Activator;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.IRunnableWithDocument;
 import org.key_project.util.eclipse.BundleUtil;
+import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.jdt.JDTUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * Tests for {@link KeYUtil}
  * @author Martin Hentschel
  */
 public class KeYUtilTest extends TestCase {
+   /**
+    * Tests {@link KeYUtil#getProgramMethod(IMethod, de.uka.ilkd.key.java.JavaInfo)}
+    */
+   @Test
+   public void testGetProgramMethod() throws Exception {
+      // Create test project and content
+      IJavaProject project = TestUtilsUtil.createJavaProject("KeYUtilTest_testGetProgramMethod");
+      IFolder src = project.getProject().getFolder("src");
+      BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/jdtMethodToKeYProgramMethodTest", src);
+      TestUtilsUtil.waitForBuild();
+      // Get JDT method
+      IType type = project.findType("JDTMethodToKeYProgramMethodTest");
+      IMethod doSomething = type.getMethods()[0];
+      assertEquals("doSomething", doSomething.getElementName());
+      IType innerType = project.findType("JDTMethodToKeYProgramMethodTest$InnerClass");
+      IMethod run = innerType.getMethods()[0];
+      assertEquals("run", run.getElementName());
+      // Open project in KeY
+      CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
+      InitConfig initConfig = ui.load(ResourceUtil.getLocation(project.getResource()), null, null);
+      JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
+      // Test conversion of doSomething
+      IProgramMethod pm = KeYUtil.getProgramMethod(doSomething, javaInfo);
+      assertNotNull(pm);
+      assertEquals("doSomething", pm.getFullName());
+      assertEquals("JDTMethodToKeYProgramMethodTest", pm.getContainerType().getFullName());
+      // Test conversion of run
+      pm = KeYUtil.getProgramMethod(run, javaInfo);
+      assertNotNull(pm);
+      assertEquals("run", pm.getFullName());
+      assertEquals("JDTMethodToKeYProgramMethodTest.InnerClass", pm.getContainerType().getFullName());
+   }
+   
    /**
     * Tests {@link KeYUtil#getOffsetForCursorPosition(IDocument, int, int, int)} and
     * {@link KeYUtil#getOffsetForCursorPosition(IJavaElement, int, int)}.

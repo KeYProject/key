@@ -420,6 +420,7 @@ public final class KeYUtil {
             // Determine container type
             IType containerType = method.getDeclaringType();
             String containerTypeName = containerType.getFullyQualifiedName();
+            containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
             KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
             Assert.isNotNull(containerKJT, "Can't find type \"" + containerTypeName + "\" in KeY.\nIt can happen when Java packages are based on links in Eclipse.");
             // Determine parameter types
