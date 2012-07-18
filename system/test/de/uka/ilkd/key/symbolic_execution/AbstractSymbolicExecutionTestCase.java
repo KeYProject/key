@@ -20,6 +20,7 @@ import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Position;
@@ -33,10 +34,14 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
@@ -60,6 +65,7 @@ import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
+import de.uka.ilkd.key.ui.UserInterface;
 
 /**
  * Provides the basic functionality of {@link TestCase}s which tests
@@ -641,6 +647,44 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * of loading a file to load, finding the method to proof, instantiation
     * of proof and creation with configuration of {@link SymbolicExecutionTreeBuilder}.
     * @param baseDir The base directory which contains test and oracle file.
+    * @param baseContractName The name of the contract.
+    * @param methodFullName The method name to search.
+    * @param mergeBranchConditions Merge branch conditions?
+    * @return The created {@link SymbolicExecutionEnvironment}.
+    * @throws ProofInputException Occurred Exception.
+    * @throws FileNotFoundException Occurred Exception.
+    */
+   protected static SymbolicExecutionEnvironment<CustomConsoleUserInterface> createSymbolicExecutionEnvironment(File baseDir, 
+                                                                                                                String javaPathInBaseDir, 
+                                                                                                                String baseContractName,
+                                                                                                                boolean mergeBranchConditions) throws ProofInputException, FileNotFoundException {
+      // Make sure that required files exists
+      File javaFile = new File(baseDir, javaPathInBaseDir);
+      assertTrue(javaFile.exists());
+      // Create user interface
+      CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
+      // Load java file
+      InitConfig initConfig = ui.load(javaFile, null, null);
+      // Start proof
+      final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
+      assertTrue(contract instanceof FunctionalOperationContract);
+      ProofOblInput input = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract, true);
+      Proof proof = ui.createProof(initConfig, input);
+      assertNotNull(proof);
+      // Set strategy and goal chooser to use for auto mode
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
+      // Create symbolic execution tree which contains only the start node at beginning
+      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, mergeBranchConditions);
+      builder.analyse();
+      assertNotNull(builder.getStartNode());
+      return new SymbolicExecutionEnvironment<CustomConsoleUserInterface>(ui, initConfig, builder);
+   }
+   
+   /**
+    * Creates a {@link SymbolicExecutionEnvironment} which consists
+    * of loading a file to load, finding the method to proof, instantiation
+    * of proof and creation with configuration of {@link SymbolicExecutionTreeBuilder}.
+    * @param baseDir The base directory which contains test and oracle file.
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param containerTypeName The name of the type which contains the method.
     * @param methodFullName The method name to search.
@@ -748,5 +792,105 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       Try tryStatement = (Try)updateContentBody.get(1);
       assertEquals(1, tryStatement.getBranchCount());
       return ProofSaver.printAnything(tryStatement.getBody(), proof.getServices());
+   }
+   
+   /**
+    * Makes sure that the save and loading process works.
+    * @param baseDir The base directory which contains test and oracle file.
+    * @param javaPathInBaseDir The path to the java file inside the base directory.
+    * @param oraclePathInBaseDirFile The oracle path.
+    * @param env The already executed {@link SymbolicExecutionEnvironment} which contains the proof to save/load.
+    * @throws IOException Occurred Exception
+    * @throws ProofInputException Occurred Exception
+    * @throws ParserConfigurationException Occurred Exception
+    * @throws SAXException Occurred Exception
+    */
+   protected void assertSaveAndReload(File baseDir, 
+                                      String javaPathInBaseDir, 
+                                      String oraclePathInBaseDirFile, 
+                                      SymbolicExecutionEnvironment<?> env) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+      File javaFile = new File(baseDir, javaPathInBaseDir);
+      assertTrue(javaFile.exists());
+      File tempFile = File.createTempFile("TestProgramMethodSubsetPO", ".proof", javaFile.getParentFile());
+      try {
+         ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(), "TestVersion");
+         assertNull(saver.save());
+         // Load proof
+         env.getUi().loadProblem(tempFile);
+         waitForAutoMode(env.getUi());
+         Proof reloadedProof = env.getUi().getMediator().getProof();
+         assertNotSame(env.getProof(), reloadedProof);
+         // Recreate symbolic execution tree
+         SymbolicExecutionTreeBuilder reloadedBuilder = new SymbolicExecutionTreeBuilder(env.getUi().getMediator(), reloadedProof, false);
+         reloadedBuilder.analyse();
+         assertSetTreeAfterStep(reloadedBuilder, oraclePathInBaseDirFile, baseDir);
+      }
+      finally {
+         if (tempFile != null) {
+            tempFile.delete();
+         }
+      }
+   }
+   
+   /**
+    * Waits until the auto mode has stopped.
+    * @param ui The {@link UserInterface} to wait for.
+    */
+   protected void waitForAutoMode(UserInterface ui) {
+      assertNotNull(ui);
+      AutoModeFinishListener listener = new AutoModeFinishListener();
+      ui.getMediator().addAutoModeListener(listener);
+      try {
+         final int TIMEOUT = 10 * 1000;
+         long startTime = System.currentTimeMillis();
+         while (!listener.hasAutoModeStopped()) {
+            try {
+               Thread.sleep(100);
+               if (System.currentTimeMillis() > startTime + TIMEOUT) {
+                  fail("Timeout during waiting of auto mode completed.");
+               }
+            }
+            catch (InterruptedException e) {
+            }
+         }
+         assertTrue(listener.hasAutoModeStopped());
+      }
+      finally {
+         ui.getMediator().removeAutoModeListener(listener);
+      }
+   }
+   
+   /**
+    * Utility class used by {@link AbstractSymbolicExecutionTestCase#waitForAutoMode(UserInterface)}.
+    * @author Martin Hentschel
+    */
+   private static class AutoModeFinishListener implements AutoModeListener {
+      /**
+       * Done flag.
+       */
+      private boolean done = false;
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void autoModeStarted(ProofEvent e) {
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void autoModeStopped(ProofEvent e) {
+         done = true;
+      }
+
+      /**
+       * Checks if the auto mode has stopped.
+       * @return {@code true} stopped, {@code false} still running or never started.
+       */
+      public boolean hasAutoModeStopped() {
+         return done;
+      }
    }
 }

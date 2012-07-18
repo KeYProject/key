@@ -2,7 +2,6 @@ package org.key_project.sed.key.core.launch;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -30,7 +29,6 @@ import org.key_project.util.jdt.JDTUtil;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
@@ -262,26 +260,20 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
     protected String computeProofObligationName(IProgramMethod pm,
                                                 Position startPosition,
                                                 Position endPosition) throws IOException {
-       StringWriter sw = new StringWriter();
-       try {
-          // Append method signature
-          PrettyPrinter x = new PrettyPrinter(sw);
-          x.printFullMethodSignature(pm);
-          // Append start position
-          if (startPosition != null) {
-             sw.append(" from ");
-             sw.append(startPosition.toString());
-          }
-          // Append end position
-          if (endPosition != null) {
-             sw.append(" to ");
-             sw.append(endPosition.toString());
-          }
-          return sw.toString();
+       StringBuffer sb = new StringBuffer();
+       // Append method signature
+       sb.append(ProgramMethodPO.getProgramMethodSignature(pm, false));
+       // Append start position
+       if (startPosition != null) {
+          sb.append(" from ");
+          sb.append(startPosition.toString());
        }
-       finally {
-          sw.close();
+       // Append end position
+       if (endPosition != null) {
+          sb.append(" to ");
+          sb.append(endPosition.toString());
        }
+       return sb.toString();
     }
     
     /**

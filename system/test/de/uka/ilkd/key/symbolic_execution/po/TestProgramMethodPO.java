@@ -19,6 +19,42 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  */
 public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
    /**
+    * Tests {@code complicatedMethod} without precondition.
+    */
+   public void testComplicatedInnerMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+      doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
+             "TheInnerClass",
+             "complicatedInnerMethod",
+             "examples/_testcase/set/fullqualifiedTypeNamesTest/oracle/TheInnerClass_complicatedInnerMethod.xml",
+             null,
+             "{result=self.complicatedInnerMethod(z,a,b,x,o,ac)@my.packageName.TheClass.TheInnerClass; }");
+   }
+   
+   /**
+    * Tests {@code complicatedMethod} with precondition.
+    */
+   public void testComplicatedMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+      doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
+             "TheClass",
+             "complicatedMethod",
+             "examples/_testcase/set/fullqualifiedTypeNamesTest/oracle/TheClass_complicatedMethod.xml",
+             "a == 2 && b && x != null && \"Hello\" == x",
+             "{result=self.complicatedMethod(i,a,b,x,o,ac,acArray)@my.packageName.TheClass; }");
+   }
+   
+   /**
+    * Tests {@code complicatedMethod} without precondition.
+    */
+   public void testComplicatedMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+      doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
+             "TheClass",
+             "complicatedMethod",
+             "examples/_testcase/set/fullqualifiedTypeNamesTest/oracle/TheClass_complicatedMethod.xml",
+             null,
+             "{result=self.complicatedMethod(i,a,b,x,o,ac,acArray)@my.packageName.TheClass; }");
+   }
+   
+   /**
     * Tests {@code returnMethod} with precondition.
     */
    public void testReturnMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
@@ -91,6 +127,8 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
          assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", JavaUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));
          // Resume
          resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, keyRepDirectory);
+         // Test save and reload of the proof
+         assertSaveAndReload(keyRepDirectory, javaPathInkeyRepDirectory, oraclePathInBaseDirFile, env);
       }
       finally {
          // Restore runtime option

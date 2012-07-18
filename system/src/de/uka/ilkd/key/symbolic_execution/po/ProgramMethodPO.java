@@ -1,11 +1,17 @@
 package de.uka.ilkd.key.symbolic_execution.po;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -260,5 +266,119 @@ public class ProgramMethodPO extends AbstractOperationPO {
     */
    public String getPrecondition() {
       return precondition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void fillSaveProperties(Properties properties) throws IOException {
+       super.fillSaveProperties(properties);
+       properties.setProperty("method", getProgramMethodSignature(getProgramMethod(), true));
+       if (getPrecondition() != null && !getPrecondition().isEmpty()) {
+          properties.setProperty("precondition", getPrecondition());
+       }
+   }
+   
+   /**
+    * Returns a human readable full qualified method signature.
+    * @param pm The {@link IProgramMethod} which provides the signature.
+    * @param includeType Include the container type?
+    * @return The human readable method signature.
+    * @throws IOException Occurred Exception.
+    */
+   public static String getProgramMethodSignature(IProgramMethod pm, boolean includeType) throws IOException {
+      StringWriter sw = new StringWriter();
+      try {
+         PrettyPrinter x = new PrettyPrinter(sw);
+         if (includeType) {
+            KeYJavaType type = pm.getContainerType();
+            sw.append(type.getFullName());
+            sw.append("#");
+         }
+         x.printFullMethodSignature(pm);
+         return sw.toString();
+      }
+      finally {
+         sw.close();
+      }
+   }
+
+   /**
+    * Instantiates a new proof obligation with the given settings.
+    * @param initConfig The already load {@link InitConfig}.
+    * @param properties The settings of the proof obligation to instantiate.
+    * @return The instantiated proof obligation.
+    * @throws IOException Occurred Exception.
+    */
+   public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
+      return new LoadedPOContainer(new ProgramMethodPO(initConfig, 
+                                                       getName(properties), 
+                                                       getProgramMethod(initConfig, properties), 
+                                                       getPrecondition(properties),
+                                                       isAddUninterpretedPredicate(properties)));
+   }
+   
+   /**
+    * Searches the {@link IProgramMethod} defined by the given {@link Properties}.
+    * @param initConfig The already load {@link InitConfig}.
+    * @param properties The settings of the proof obligation to instantiate.
+    * @return The found {@link IProgramMethod}.
+    * @throws IOException Occurred Exception if it was not possible to find the {@link IProgramMethod}.
+    */
+   public static IProgramMethod getProgramMethod(InitConfig initConfig, Properties properties) throws IOException {
+      // Get container class and method signature
+      String value = properties.getProperty("method");
+      if (value == null) {
+         throw new IOException("Property \"method\" is not defined.");
+      }
+      int classMethodSeparator = value.indexOf("#");
+      if (classMethodSeparator < 0) {
+         throw new IOException("Property \"method\" does not contain the class method separator \"#\".");
+      }
+      String className = value.substring(0, classMethodSeparator);
+      String signature = value.substring(classMethodSeparator + 1);
+      JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
+      // Split signature in name and parameter type names
+      int breaketsStart = signature.indexOf("(");
+      if (breaketsStart < 0) {
+         throw new IOException("Method signature \"" + signature +"\" does not contain required character \"(\".");
+      }
+      int breaketsEnd = signature.lastIndexOf(")");
+      if (breaketsEnd < 0) {
+         throw new IOException("Method signature \"" + signature +"\" does not contain required character \")\".");
+      }
+      if (breaketsEnd < breaketsStart) {
+         throw new IOException("Method signature has not valid order of chracters \"(\" and \")\".");
+      }
+      String name = signature.substring(0, breaketsStart);
+      String[] types = signature.substring(breaketsStart + 1, breaketsEnd).split(",");
+      // Find container and parameter types
+      KeYJavaType type = javaInfo.getKeYJavaType(className.trim());
+      if (type == null) {
+         throw new IOException("Can't find type \"" + className + "\".");
+      }
+      ImmutableList<KeYJavaType> parameterTypes = ImmutableSLList.nil();
+      for (int i = 0; i < types.length; i++) {
+         KeYJavaType paramType = javaInfo.getKeYJavaType(types[i].trim());
+         if (paramType == null) {
+            throw new IOException("Can't find type \"" + types[i] + "\".");
+         }
+         parameterTypes = parameterTypes.append(paramType);
+      }
+      IProgramMethod pm = javaInfo.getProgramMethod(type, name.trim(), parameterTypes, type);
+      if (pm == null) {
+         throw new IOException("Can't find program method \"" + value + "\".");
+      }
+      return pm;
+   }
+
+   /**
+    * Returns the optional defined precondition.
+    * @param properties The proof obligation settings to read from.
+    * @return The precondition or {@code null} if not available.
+    */
+   public static String getPrecondition(Properties properties) {
+      return properties.getProperty("precondition");
    }
 }

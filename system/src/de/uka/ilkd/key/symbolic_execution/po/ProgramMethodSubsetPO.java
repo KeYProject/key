@@ -1,9 +1,11 @@
 package de.uka.ilkd.key.symbolic_execution.po;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -296,5 +298,114 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     */
    public Position getEndPosition() {
       return endPosition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void fillSaveProperties(Properties properties) throws IOException {
+       super.fillSaveProperties(properties);
+       if (getStartPosition() != null) {
+          properties.setProperty("startLine", getStartPosition().getLine() + "");
+          properties.setProperty("startColumn", getStartPosition().getColumn() + "");
+       }
+       if (getEndPosition() != null) {
+          properties.setProperty("endLine", getEndPosition().getLine() + "");
+          properties.setProperty("endColumn", getEndPosition().getColumn() + "");
+       }
+   }
+
+   /**
+    * Instantiates a new proof obligation with the given settings.
+    * @param initConfig The already load {@link InitConfig}.
+    * @param properties The settings of the proof obligation to instantiate.
+    * @return The instantiated proof obligation.
+    * @throws IOException Occurred Exception.
+    */
+   public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
+      return new LoadedPOContainer(new ProgramMethodSubsetPO(initConfig,
+                                                             getName(properties), 
+                                                             getProgramMethod(initConfig, properties), 
+                                                             getPrecondition(properties),
+                                                             getStartPosition(properties),
+                                                             getEndPosition(properties),
+                                                             isAddUninterpretedPredicate(properties)));
+   }
+
+   /**
+    * Extracts the start position from the given {@link Properties}.
+    * @param properties The proof obligation settings to read from.
+    * @return The defined start {@link Position}.
+    * @throws IOException Occurred Exception if it was not possible to read the start position.
+    */
+   protected static Position getStartPosition(Properties properties) throws IOException{
+      String line = properties.getProperty("startLine");
+      if (line == null || line.isEmpty()) {
+         throw new IOException("Start line property \"startLine\" is not available or empty.");
+      }
+      String column = properties.getProperty("startColumn");
+      if (column == null || column.isEmpty()) {
+         throw new IOException("Start column property \"startColumn\" is not available or empty.");
+      }
+      int lineValue;
+      try {
+         lineValue = Integer.parseInt(line);
+      }
+      catch (NumberFormatException e) {
+         throw new IOException("Start line \"" + line + "\" is no valid integer.");
+      }
+      if (lineValue < 0) {
+         throw new IOException("Start line \"" + line + "\" is a negative integer.");
+      }
+      int columnValue;
+      try {
+         columnValue = Integer.parseInt(column);
+      }
+      catch (NumberFormatException e) {
+         throw new IOException("Start column \"" + column + "\" is no valid integer.");
+      }
+      if (columnValue < 0) {
+         throw new IOException("Start column \"" + column + "\" is a negative integer.");
+      }
+      return new Position(lineValue, columnValue);
+   }
+   
+   /**
+    * Extracts the end position from the given {@link Properties}.
+    * @param properties The proof obligation settings to read from.
+    * @return The defined end {@link Position}.
+    * @throws IOException Occurred Exception if it was not possible to read the end position.
+    */
+   protected static Position getEndPosition(Properties properties) throws IOException {
+      String line = properties.getProperty("endLine");
+      if (line == null || line.isEmpty()) {
+         throw new IOException("End line property \"endLine\" is not available or empty.");
+      }
+      String column = properties.getProperty("endColumn");
+      if (column == null || column.isEmpty()) {
+         throw new IOException("End column property \"endColumn\" is not available or empty.");
+      }
+      int lineValue;
+      try {
+         lineValue = Integer.parseInt(line);
+      }
+      catch (NumberFormatException e) {
+         throw new IOException("End line \"" + line + "\" is no valid integer.");
+      }
+      if (lineValue < 0) {
+         throw new IOException("End line \"" + line + "\" is a negative integer.");
+      }
+      int columnValue;
+      try {
+         columnValue = Integer.parseInt(column);
+      }
+      catch (NumberFormatException e) {
+         throw new IOException("End column \"" + column + "\" is no valid integer.");
+      }
+      if (columnValue < 0) {
+         throw new IOException("End column \"" + column + "\" is a negative integer.");
+      }
+      return new Position(lineValue, columnValue);
    }
 }

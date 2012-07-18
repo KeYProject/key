@@ -9,6 +9,9 @@
 //
 package de.uka.ilkd.key.proof.init;
 
+import java.io.IOException;
+import java.util.Properties;
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -41,7 +44,7 @@ import de.uka.ilkd.key.util.Pair;
 /**
  * An abstract proof obligation implementing common functionality.
  */
-public abstract class AbstractPO implements ProofOblInput {
+public abstract class AbstractPO implements IPersistablePO {
 
     protected static final TermFactory TF = TermFactory.DEFAULT;
     protected static final TermBuilder TB = TermBuilder.DF;
@@ -299,4 +302,21 @@ public abstract class AbstractPO implements ProofOblInput {
         this.poTerms = poTerms;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void fillSaveProperties(Properties properties) throws IOException {
+        properties.setProperty(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
+        properties.setProperty(IPersistablePO.PROPERTY_NAME, name);
+    }
+    
+    /**
+     * Returns the name value from the given properties.
+     * @param properties The properties to read from.
+     * @return The name value.
+     */
+    public static String getName(Properties properties) {
+       return properties.getProperty(IPersistablePO.PROPERTY_NAME);
+    }
 }

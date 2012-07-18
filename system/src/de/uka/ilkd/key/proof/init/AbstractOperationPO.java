@@ -10,12 +10,14 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -565,4 +567,25 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return The proof name to use.
     */
    protected abstract String buildPOName(boolean transactionFlag);
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void fillSaveProperties(Properties properties) throws IOException {
+       super.fillSaveProperties(properties);
+       if (isAddUninterpretedPredicate()) {
+           properties.setProperty("addUninterpretedPredicate", isAddUninterpretedPredicate() + "");
+       }
+   }
+   
+   /**
+    * Checks if the "addUninterpretedPredicate" value is set in the given {@link Properties}.
+    * @param properties The {@link Properties} to read value from.
+    * @return {@code true} is set, {@code false} is not set.
+    */
+   protected static boolean isAddUninterpretedPredicate(Properties properties) {
+      String value = properties.getProperty("addUninterpretedPredicate"); 
+      return value != null && !value.isEmpty() ? Boolean.valueOf(value) : false;
+   }
 }

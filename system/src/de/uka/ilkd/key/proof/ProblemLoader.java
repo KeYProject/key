@@ -10,32 +10,67 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
+import java.lang.reflect.Method;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Stack;
+import java.util.Vector;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.gui.DefaultTaskFinishedInfo;
+import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.ProofManagementDialog;
+import de.uka.ilkd.key.gui.ProverTaskListener;
+import de.uka.ilkd.key.gui.SwingWorker;
+import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemTermSV;
+import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
+import de.uka.ilkd.key.proof.init.IPersistablePO;
+import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.AbstractContractRuleApp;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.IfFormulaInstDirect;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
@@ -188,98 +223,92 @@ public final class ProblemLoader implements Runnable {
     }
     
    private Object doWork() {
-       String status = "";
-       EnvInput envInput = null;
-       ProofOblInput po = null;
-       try{
-           try{
-               envInput = createEnvInput(file, classPath, bootClassPath);
-               
-               init = new ProblemInitializer(ui, mediator.getProfile(),  
-            		   new Services(mediator.getExceptionHandler()), true, ui);; 
-               
-               InitConfig initConfig = init.prepare(envInput);
-               int proofNum = 0;
-               final String chooseContract;
-               if(envInput instanceof KeYFile) {
-        	   chooseContract = ((KeYFile)envInput).chooseContract();
-               } else {
-        	   chooseContract = null;
-               }
-               if(envInput instanceof ProofOblInput && chooseContract == null) {
-        	   po = (ProofOblInput) envInput;
-               } else if(chooseContract != null 
-        	         && chooseContract.length() > 0) {
-                   String baseContractName = null;
-                   int ind = -1;
-                   for(String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
-                     ind = chooseContract.indexOf("."+tag);
-                     if(ind > 0) {
-                       break;
-                     }
-                     proofNum++;
-                   }
-                   if(ind == -1) {
-                     baseContractName = chooseContract;
-                     proofNum = 0;
-                   }else{
-                     baseContractName = chooseContract.substring(0, ind);
-                   }
-        	   final Contract contract
-        	   	= initConfig.getServices()
-        	                    .getSpecificationRepository()
-        	                    .getContractByName(baseContractName);
-        	   if(contract == null) {
-        	       throw new RuntimeException("Contract not found: " 
-        		                          + baseContractName);
-        	   } else {
-                       po = contract.createProofObl(initConfig, contract);
-                   }
-        	   
-               } else { 
-        	   ProofManagementDialog.showInstance(mediator, initConfig);
-        	   if(ProofManagementDialog.startedProof()) {
-        	       return status;
-        	   } else {
-        	       return "Aborted.";
-        	   }
-               }
+      String status = "";
+      EnvInput envInput = null;
+      ProofOblInput po = null;
+      try {
+         try {
+            envInput = createEnvInput(file, classPath, bootClassPath);
 
-               mediator.setProof(init.startProver(initConfig, po, proofNum));
+            init = new ProblemInitializer(ui, 
+                                          mediator.getProfile(), 
+                                          new Services(mediator.getExceptionHandler()), 
+                                          true, 
+                                          ui);;
 
-               proof = mediator.getSelectedProof();
-               mediator.stopInterface(true); // first stop (above) is not enough
-               
-               currNode = proof.root(); // initialize loader
-               children = currNode.childrenIterator(); // --"--
-               iconfig = proof.env().getInitConfig();
-               if(envInput instanceof KeYUserProblemFile) {
-            	   init.tryReadProof(this, (KeYUserProblemFile)envInput);
+            InitConfig initConfig = init.prepare(envInput);
+            int proofNum = 0;
+            final String chooseContract;
+            if (envInput instanceof KeYFile) {
+               chooseContract = ((KeYFile) envInput).chooseContract();
+            }
+            else {
+               chooseContract = null;
+            }
+            if (envInput instanceof ProofOblInput && chooseContract == null) {
+               po = (ProofOblInput) envInput;
+            }
+            else if (chooseContract != null && chooseContract.length() > 0) {
+               // Load proof obligation settings
+               Properties properties = new Properties();
+               properties.load(new ByteArrayInputStream(chooseContract.getBytes()));
+               String poClass = properties.getProperty(IPersistablePO.PROPERTY_CLASS);
+               if (poClass == null || poClass.isEmpty()) {
+                  throw new IOException("Proof obligation class property \"" + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
                }
-               ui.resetStatus(this);
-	   } catch (ExceptionHandlerException e) {
-//	       e.printStackTrace();
-	       throw e;
-	   } catch (Throwable thr) {
-	       exceptionHandler.reportException(thr);
-               status =  thr.getMessage();
-               System.err.println("2");
-	   }
-       } catch (ExceptionHandlerException ex){
-	       String errorMessage = "Failed to load " 
-		             + (envInput == null 
-		        	 ? "problem/proof" : envInput.name());
-    	   ui.notify(new ExceptionFailureEvent(errorMessage, ex));
-	       ui.reportStatus(this, errorMessage);
-	       status =  ex.toString();
-       }
-       finally {
-           mediator.resetNrGoalsClosedByHeuristics();
-           if (po instanceof KeYUserProblemFile) {
-               ((KeYUserProblemFile) po).close();
-           }
-       }
-       return status;
+               // Try to instantiate proof obligation by calling static method: public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException
+               Class<?> poClassInstance = Class.forName(poClass);
+               Method loadMethod = poClassInstance.getMethod("loadFrom", InitConfig.class, Properties.class);
+               LoadedPOContainer poContainer = (LoadedPOContainer)loadMethod.invoke(null, initConfig, properties);
+               po = poContainer.getProofOblInput();
+               proofNum = poContainer.getProofNum();
+            }
+            else {
+               ProofManagementDialog.showInstance(mediator, initConfig);
+               if (ProofManagementDialog.startedProof()) {
+                  return status;
+               }
+               else {
+                  return "Aborted.";
+               }
+            }
+
+            mediator.setProof(init.startProver(initConfig, po, proofNum));
+
+            proof = mediator.getSelectedProof();
+            mediator.stopInterface(true); // first stop (above) is not enough
+
+            currNode = proof.root(); // initialize loader
+            children = currNode.childrenIterator(); // --"--
+            iconfig = proof.env().getInitConfig();
+            if (envInput instanceof KeYUserProblemFile) {
+               init.tryReadProof(this, (KeYUserProblemFile) envInput);
+            }
+            ui.resetStatus(this);
+         }
+         catch (ExceptionHandlerException e) {
+            // e.printStackTrace();
+            throw e;
+         }
+         catch (Throwable thr) {
+            exceptionHandler.reportException(thr);
+            status = thr.getMessage();
+            System.err.println("2");
+         }
+      }
+      catch (ExceptionHandlerException ex) {
+         String errorMessage = "Failed to load " + (envInput == null ? "problem/proof" : envInput.name());
+         ui.notify(new ExceptionFailureEvent(errorMessage, ex));
+         ui.reportStatus(this, errorMessage);
+         status = ex.toString();
+      }
+      finally {
+         mediator.resetNrGoalsClosedByHeuristics();
+         if (po instanceof KeYUserProblemFile) {
+            ((KeYUserProblemFile) po).close();
+         }
+      }
+      return status;
    }
 
 

@@ -14,17 +14,22 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.Vector;
-
-import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMapEntry;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -32,11 +37,23 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.IPersistablePO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.inst.*;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.IfFormulaInstDirect;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.inst.InstantiationEntry;
+import de.uka.ilkd.key.rule.inst.NameInstantiationEntry;
+import de.uka.ilkd.key.rule.inst.ProgramInstantiation;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.inst.TermInstantiation;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -103,13 +120,18 @@ public class ProofSaver {
           ps.print(header);
 
           //\problem or \chooseContract
-          final ContractPO po = proof.getServices()
-          			     .getSpecificationRepository()
-          			     .getPOForProof(proof);
-          if(po != null) {
-              ps.println("\\chooseContract \"" 
-        	         + proof.name()
-        	         + "\";\n");
+          ProofOblInput po = proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+          if(po instanceof IPersistablePO) {
+              Properties properties = new Properties();
+              ((IPersistablePO)po).fillSaveProperties(properties);
+              StringWriter writer = new StringWriter();
+              try {
+                 properties.store(writer, "Proof Obligation Settings");
+                 ps.println("\\chooseContract \"" +escapeCharacters(writer.toString()) + "\";\n");
+              }
+              finally {
+                writer.close();
+              }
           } else {
               Sequent problemSeq = proof.root().sequent();
               ps.println("\\problem {");
