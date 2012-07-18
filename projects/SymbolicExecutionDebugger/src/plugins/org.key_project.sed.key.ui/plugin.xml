@@ -95,7 +95,57 @@
             categoryId="org.eclipse.debug.ui.category.run"
             id="org.key_project.sed.key.core.launch.sed.key.shortcut.debug">
       </command>
+      <command
+            categoryId="org.eclipse.debug.ui.category.run"
+            description="Save KeY&apos;s proof from which the symbolic execution tree was extracted as *.proof file."
+            id="org.key_project.sed.key.ui.saveProofCommand"
+            name="Save Symbolic Execution Tree as Proof File">
+      </command>
    </extension>
+      <extension
+            point="org.eclipse.ui.commandImages">
+         <image
+               commandId="org.key_project.sed.key.core.launch.sed.key.shortcut.debug"
+               icon="icons/logo16.gif">
+         </image>
+         <image
+               commandId="org.key_project.sed.key.ui.saveProofCommand"
+               icon="icons/saveKeYProof.gif">
+         </image>
+      </extension>
+      <extension
+            point="org.eclipse.ui.handlers">
+         <handler
+               class="org.key_project.sed.key.ui.command.SaveProofHandler"
+               commandId="org.key_project.sed.key.ui.saveProofCommand">
+            <enabledWhen>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <or>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.debug.core.ILaunch">
+                        </instanceof>
+                        <test
+                              forcePluginActivation="true"
+                              property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                        </test>
+                     </and>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.debug.core.model.IDebugElement">
+                        </instanceof>
+                        <test
+                              forcePluginActivation="true"
+                              property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                        </test>
+                     </and>
+                  </or>
+               </iterate>
+            </enabledWhen>
+         </handler>
+      </extension>
    <extension
          point="org.eclipse.ui.bindings">
       <key
@@ -103,6 +153,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+D">
+      </key>
+      <key
+            commandId="org.key_project.sed.key.ui.saveProofCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+P">
       </key>
    </extension>
       <extension
@@ -199,5 +255,61 @@
                   tab="org.key_project.sed.ui.visualization.key.tab">
             </propertySection>
          </propertySections>
+      </extension>
+      <extension
+            point="org.eclipse.ui.menus">
+         <menuContribution
+               allPopups="true"
+               locationURI="popup:org.eclipse.debug.ui.DebugView?after=additions">
+            <command
+                  commandId="org.key_project.sed.key.ui.saveProofCommand"
+                  icon="icons/saveKeYProof.gif"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="true">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.debug.core.ILaunch">
+                           </instanceof>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                           </test>
+                        </and>
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.debug.core.model.IDebugElement">
+                           </instanceof>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                           </test>
+                        </and>
+                     </or>
+                  </iterate>
+               </visibleWhen>
+            </command>
+         </menuContribution>
+      </extension>
+      <extension
+            point="org.eclipse.core.expressions.propertyTesters">
+         <propertyTester
+               class="org.key_project.sed.key.ui.propertyTester.KeYDebugTargetPropertyTester"
+               id="org.key_project.sed.key.ui.launchPropertyTester"
+               namespace="org.key_project.sed.key.ui"
+               properties="isSingleKeyDebugTarget"
+               type="org.eclipse.debug.core.ILaunch">
+         </propertyTester>
+         <propertyTester
+               class="org.key_project.sed.key.ui.propertyTester.KeYDebugTargetPropertyTester"
+               id="org.key_project.sed.key.ui.debugElementPropertyTester"
+               namespace="org.key_project.sed.key.ui"
+               properties="isSingleKeyDebugTarget"
+               type="org.eclipse.debug.core.model.IDebugElement">
+         </propertyTester>
       </extension>
 </plugin>

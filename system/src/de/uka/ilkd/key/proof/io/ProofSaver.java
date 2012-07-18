@@ -13,6 +13,7 @@ package de.uka.ilkd.key.proof.io;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Iterator;
@@ -100,15 +101,17 @@ public class ProofSaver {
    public String writeSettings(ProofSettings ps){
     	return new String ("\\settings {\n\""+escapeCharacters(ps.settingsToString())+"\"\n}\n");
    }
+   
    public String save() throws IOException {
+      return save(new FileOutputStream(filename));
+   }
+   
+   public String save(OutputStream out) throws IOException {
       String errorMsg = null;
-      FileOutputStream fos = null;
       PrintWriter ps = null;
       
       try {
-          
-          fos = new FileOutputStream(filename);
-          ps = new PrintWriter(fos, true);
+          ps = new PrintWriter(out, true);
           printer = createLogicPrinter(proof.getServices(), false);
           
           //settings
@@ -159,7 +162,7 @@ public class ProofSaver {
           e.printStackTrace();
       } finally {
           //try {
-	      if (fos != null) fos.close();
+	      if (out != null) out.close();
 	      if (ps != null) {
 		  ps.flush();
 		  ps.close();

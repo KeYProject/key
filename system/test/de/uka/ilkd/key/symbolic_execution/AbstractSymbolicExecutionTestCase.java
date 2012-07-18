@@ -21,6 +21,7 @@ import org.xml.sax.SAXException;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.Position;
@@ -813,7 +814,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       assertTrue(javaFile.exists());
       File tempFile = File.createTempFile("TestProgramMethodSubsetPO", ".proof", javaFile.getParentFile());
       try {
-         ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(), "TestVersion");
+         ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(), Main.INTERNAL_VERSION);
          assertNull(saver.save());
          // Load proof
          env.getUi().loadProblem(tempFile);
