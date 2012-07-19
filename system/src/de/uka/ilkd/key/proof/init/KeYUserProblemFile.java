@@ -15,9 +15,13 @@ import java.io.FileNotFoundException;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.parser.*;
+import de.uka.ilkd.key.parser.DeclPicker;
+import de.uka.ilkd.key.parser.KeYLexer;
+import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.ParserConfig;
+import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
-import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.IProofFileParser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.KeYFile;
@@ -186,7 +190,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     /** 
      * Reads a saved proof of a .key file.
      */
-    public void readProof(ProblemLoader prl) throws ProofInputException {
+    public void readProof(IProofFileParser prl) throws ProofInputException {
 	if(lastParser == null) {
 	    readProblem();
 	}

@@ -4351,19 +4351,19 @@ preferences returns [String s = null]:
 		RBRACE )?
 	;
 	
-proof [ProblemLoader prl] :
+proof [IProofFileParser prl] :
         ( PROOF proofBody[prl] )?
     ;
 
 
-proofBody [ProblemLoader prl] :
+proofBody [IProofFileParser prl] :
         LBRACE
             ( pseudosexpr[prl] )+ 
         RBRACE
     ;
 
 
-pseudosexpr [ProblemLoader prl] { char eid='0'; String str = ""; } :
+pseudosexpr [IProofFileParser prl] { char eid='0'; String str = ""; } :
         LPAREN (eid=expreid
             (str = string_literal )? 
                { prl.beginExpr(eid,str); } 
