@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_476db164-64cf-4e7c-b892-bae534cb7f85" name="doSomething(int, String, boolean) from 28 : 9 to 28 : 38" modelIdentifier="org.key_project.sed.key.core">
+   <sedTarget xml:id="_476db164-64cf-4e7c-b892-bae534cb7f85" name="doSomething(int, java.lang.String, boolean) from 28 : 9 to 28 : 38" modelIdentifier="org.key_project.sed.key.core">
       <sedThread xml:id="_0c7da0b9-a4d5-40ee-841e-7f27faace4b4" name="&lt;start&gt;" pathCondition="true">
          <sedStatement xml:id="_b46cd5a9-071f-49e0-ad04-b91133f0cecd" name="int y = 2+CONSTANT+field;" pathCondition="true" lineNumber="-1" charStart="421" charEnd="450">
             <sedTermination xml:id="_50c16ba4-3cc8-4266-a1f7-73ba1c5129c5" name="&lt;end&gt;" pathCondition="true">
