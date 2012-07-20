@@ -13,6 +13,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Position;
@@ -480,10 +481,28 @@ public final class SymbolicExecutionUtil {
    public static IExecutionVariable[] createExecutionVariables(IExecutionStateNode<?> node) {
       if (node != null) {
          Node proofNode = node.getProofNode();
-         List<IProgramVariable> variables = collectAllElementaryUpdateTerms(proofNode);
+         List<IProgramVariable> variables = new LinkedList<IProgramVariable>();
+         // Add self variable
          IProgramVariable selfVar = findSelfTerm(proofNode);
          if (selfVar != null) {
-            variables.add(0, selfVar);
+            variables.add(selfVar);
+         }
+         // Add method parameters
+         Node callNode = findMethodCallNode(node.getProofNode());
+         if (callNode != null && callNode.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement) {
+            MethodBodyStatement mbs = (MethodBodyStatement)callNode.getNodeInfo().getActiveStatement();
+            for (Expression e : mbs.getArguments()) {
+               if (e instanceof IProgramVariable) {
+                  variables.add((IProgramVariable)e);
+               }
+            }
+         }
+         // Collect variables from updates
+         List<IProgramVariable> variablesFromUpdates = collectAllElementaryUpdateTerms(proofNode);
+         for (IProgramVariable variable : variablesFromUpdates) {
+            if (!variables.contains(variable)) {
+               variables.add(variable);
+            }
          }
          IExecutionVariable[] result = new IExecutionVariable[variables.size()];
          int i = 0;
@@ -918,6 +937,45 @@ public final class SymbolicExecutionUtil {
          }
       }
       return result;
+   }
+
+   /**
+    * Searches for the given {@link Node} the parent node
+    * which also represents a symbolic execution tree node
+    * (checked via {@link #isSymbolicExecutionTreeNode(Node, RuleApp)}).
+    * @param node The {@link Node} to start search in.
+    * @return The parent {@link Node} of the given {@link Node} which is also a set node or {@code null} if no parent node was found.
+    */
+   public static Node findMethodCallNode(Node node) {
+      if (node != null && node.getAppliedRuleApp() != null) {
+         // Get current program method
+         Term term = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+         term = TermBuilder.DF.goBelowUpdates(term);
+         Services services = node.proof().getServices();
+         MethodFrame mf = JavaTools.getInnermostMethodFrame(term.javaBlock(), services);
+         if (mf != null) {
+            // Find call node
+            Node parent = node.parent();
+            Node result = null;
+            while (parent != null && result == null) {
+               SourceElement activeStatement = parent.getNodeInfo().getActiveStatement();
+               if (activeStatement instanceof MethodBodyStatement && 
+                   ((MethodBodyStatement)activeStatement).getProgramMethod(services) == mf.getProgramMethod()) {
+                  result = parent;
+               }
+               else {
+                  parent = parent.parent();
+               }
+            }
+            return result;
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
+      }
    }
 
    /**
