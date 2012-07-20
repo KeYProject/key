@@ -98,7 +98,7 @@ public class DefaultProblemLoader {
    /**
     * Executes the loading process and tries to instantiate a proof
     * and to re-apply rules on it if possible. 
-    * @return An error message or {@code null} if everything is fine.
+    * @return An error message or {@code ""} (empty string) if everything is fine.
     * @throws ProofInputException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
@@ -114,7 +114,7 @@ public class DefaultProblemLoader {
       }
       // Create proof and apply rules again if possible
       proof = createProof(poContainer);
-      return null; // Everything fine
+      return ""; // Everything fine
    }
 
    /**
