@@ -155,7 +155,6 @@ public class Main {
         } else {
         	GuiUtilities.invokeAndWait(new Runnable() {
         		public void run() {
-        			MainWindow.createInstance();  
         			MainWindow key = MainWindow.getInstance();
         			key.setVisible(true);
         		}

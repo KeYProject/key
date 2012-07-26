@@ -173,7 +173,7 @@ public final class MainWindow extends JFrame  {
     /** for locking of threads waiting for the prover to exit */
     public final Object monitor = new Object();
     
-    public static MainWindow instance = null;    
+    private static MainWindow instance = null;    
     
 //    private ProverTaskListener taskListener;
     
@@ -1602,12 +1602,6 @@ public final class MainWindow extends JFrame  {
         }
     }
     
-
-    public static boolean hasInstance() {
-        return instance != null;
-    }   
-    
-    
     /**
      * returns an instance of Main and creates one if necessary
      * <strong>Do not use</strong> this method to access the mediator as long as
@@ -1624,40 +1618,12 @@ public final class MainWindow extends JFrame  {
      * @throws IllegalStateException 
      */
     public static MainWindow getInstance() throws IllegalStateException {
-        return getInstance(true);
-    }
-
-    /**
-     * returns an instance of Main and creates one if necessary
-     * <strong>Do not use</strong> this method to access the mediator as long as
-     * you do not attempt create a GUI element. In particular be aware that the 
-     * pattern <tt>getInstance(boolean).mediator().getProof()</tt> breaks GUI and prover 
-     * separation and will not work if an alternative GUI is used (e.g. soon for 
-     * the visual debugger). 
-     * 
-     * Further the above pattern is very fragile as the mediator may have changed 
-     * the selected proof. Usually if you want to have access to a proof e.g. in
-     * the strategy hand the proof object over at the creation time of the component.
-     * 
-     * @param visible a boolean indicating if Main shall be made visible
-     * @return the instance of Main
-     * @throws Exception 
-     */
-    public static MainWindow getInstance(final boolean visible) throws IllegalStateException {
-        
-        if(instance == null) {
-            // TODO Come up with a better exception class
-            throw new IllegalStateException("There is no GUI main window. Sorry.");
-        }        
-        return instance;
-    }
-
-    public static void createInstance() {
-	assert instance == null : "Attempt to create a second mainwindow";
-	if(instance == null) {
+	if (instance == null) {
 	    instance = new MainWindow();
 	    instance.initialize();
 	}
+
+	return instance;
     }
     
     
