@@ -79,15 +79,6 @@ public class Main {
             ui.openExamples();
         }
     }
-    
-    /**
-     * Returns the used title. This information is required in other
-     * projects which instantiates the {@link MainWindow} manually.
-     * @return The title of {@link MainWindow} to use.
-     */
-    public static String getMainWindowTitle() {
-       return "KeY " + KeYResourceManager.getManager().getVersion();
-    }
 
     public static UserInterface evaluateOptions(String[] opt) {
         UserInterface ui = null;
@@ -164,7 +155,7 @@ public class Main {
         } else {
         	GuiUtilities.invokeAndWait(new Runnable() {
         		public void run() {
-        			MainWindow.createInstance(getMainWindowTitle());  
+        			MainWindow.createInstance();  
         			MainWindow key = MainWindow.getInstance();
         			key.setVisible(true);
         		}

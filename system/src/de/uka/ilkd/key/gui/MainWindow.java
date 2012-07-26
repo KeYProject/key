@@ -56,6 +56,7 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
+import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
@@ -199,12 +200,9 @@ public final class MainWindow extends JFrame  {
     
     /**
      * initialize the singleton object of this class.
-     * 
-     * @param title
-     *            the frame's title
      */
-    private void initialize(String title) {
-        setTitle(title);
+    private void initialize() {
+        setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
         setLaF();
         setIconImage(IconFactory.keyLogo());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -1654,11 +1652,11 @@ public final class MainWindow extends JFrame  {
         return instance;
     }
 
-    public static void createInstance(String title) {
+    public static void createInstance() {
 	assert instance == null : "Attempt to create a second mainwindow";
 	if(instance == null) {
 	    instance = new MainWindow();
-	    instance.initialize(title);
+	    instance.initialize();
 	}
     }
     
