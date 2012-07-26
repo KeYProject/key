@@ -517,25 +517,9 @@ public class InteractiveProver {
     private class AutoModeWorker extends SwingWorker {
         
         private ImmutableList<Goal> goals;
-        private ImmutableList<Node> nodesForRetreat;
-        private boolean retreatMode;
 
         public AutoModeWorker(ImmutableList<Goal> goals) {
             this.goals = goals;
-            this.retreatMode = proof.getSettings().getStrategySettings()
-            .getActiveStrategyProperties().getProperty(
-                    StrategyProperties.RETREAT_MODE_OPTIONS_KEY)
-                    .equals(StrategyProperties.RETREAT_MODE_RETREAT);
-            /**
-             * Called in case of retreat mode. Then the previous nodes of our goals
-             * are remembered and retreat mode is done after the proof in method finished().
-             */            
-            if(retreatMode) {
-                nodesForRetreat = ImmutableSLList.<Node>nil();
-                for(Goal g : goals) {
-                    this.nodesForRetreat = this.nodesForRetreat.prepend(g.node());
-                }
-            }
         }        
         
         public Object construct() {
@@ -547,6 +531,10 @@ public class InteractiveProver {
                     .getActiveStrategyProperties().getProperty(
                             StrategyProperties.STOPMODE_OPTIONS_KEY)
                             .equals(StrategyProperties.STOPMODE_NONCLOSE);
+            boolean retreatMode = proof.getSettings().getStrategySettings()
+            .getActiveStrategyProperties().getProperty(
+                    StrategyProperties.RETREAT_MODE_OPTIONS_KEY)
+                    .equals(StrategyProperties.RETREAT_MODE_RETREAT);
             /**
              * In retreatMode, the proof on the node of each previous
              * goal is pruned, unless it was closed in the automatic proof.
