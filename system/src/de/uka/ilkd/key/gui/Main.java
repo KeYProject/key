@@ -108,7 +108,7 @@ public class Main {
                     evaluateLemmataOptions(options);
                     // is last option 
                     break; 
-                } else if (opt[index].startsWith("AUTO")) {
+                } else if (opt[index].equals("AUTO") || opt[index].equals("AUTO_LOADONLY")) {
                         uiMode = opt[index];
 				} else if (opt[index].equals("TIMEOUT")) {
                     long timeout = -1;
@@ -148,7 +148,7 @@ public class Main {
         	System.out.println("Not using assertions ...");	   
         }
         
-        if (uiMode.startsWith("AUTO")) {
+        if (uiMode.equals("AUTO") || uiMode.equals("AUTO_LOADONLY")) {
         	BatchMode batch = new BatchMode(fileNameOnStartUp, 
         		uiMode.equals("AUTO_LOADONLY"));            
         	ui = new ConsoleUserInterface(batch, VERBOSE_UI);
