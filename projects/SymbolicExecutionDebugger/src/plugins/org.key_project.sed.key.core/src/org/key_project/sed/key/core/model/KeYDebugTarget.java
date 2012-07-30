@@ -6,6 +6,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
+import org.eclipse.jdt.core.IMethod;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.key.core.launch.KeYLaunchSettings;
@@ -399,5 +400,21 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                   SymbolicExecutionUtil.collectGoalsInSubtree(keyNode.getExecutionNode()),
                   false,
                   true);
+   }
+   
+   /**
+    * Returns the {@link Proof} instance from which the symbolic execution tree was extracted.
+    * @return The {@link Proof} instance from which the symbolic execution tree was extracted.
+    */
+   public Proof getProof() {
+      return environment.getProof();
+   }
+   
+   /**
+    * Returns the {@link IMethod} which is debugged.
+    * @return The debugged {@link IMethod}.
+    */
+   public IMethod getMethod() {
+      return launchSettings.getMethod();
    }
 }

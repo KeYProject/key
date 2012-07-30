@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_fe65c362-732e-4f92-9529-25cbde809306" name="ContractTest[ContractTest::returnValue(int)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_04a42213-77c7-4fb9-94f7-15db7548b783" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_ed191317-7c54-4666-b907-54e172a05e28" name="self.returnValue(_value);" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
-            <sedStatement xml:id="_d5e1309a-8280-48a5-99a6-edc213ddc5f5" name="return _value;" pathCondition="true" lineNumber="-1" charStart="150" charEnd="163">
-               <sedMethodReturn xml:id="_b820fa20-e4ea-48eb-896d-2cd8ac404733" name="&lt;return &apos;value&apos; as result of self.returnValue(_value);&gt;" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
-                  <sedTermination xml:id="_af378702-3d5e-4335-b378-16d76ca6c486" name="&lt;end&gt;" pathCondition="true">
+   <sedTarget xml:id="_4aae8a60-a6a6-4b8a-aba9-e0486c7ece32" name="returnValue(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_f1035b62-9327-4281-b6a1-1c90515ac04e" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_b7eb8972-6b09-440e-9795-f5845095fdbe" name="self.returnValue(value);" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
+            <sedStatement xml:id="_dfe49456-e765-492b-9186-e89e1491899b" name="return value;" pathCondition="true" lineNumber="-1" charStart="150" charEnd="163">
+               <sedMethodReturn xml:id="_9b21d869-9d58-463c-af58-59609b6f5bd5" name="&lt;return &apos;value&apos; as result of self.returnValue(value);&gt;" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
+                  <sedTermination xml:id="_38cc008b-0137-4f7d-b2dc-fcaba5c68fa6" name="&lt;end&gt;" pathCondition="true">
                   </sedTermination>
                </sedMethodReturn>
             </sedStatement>

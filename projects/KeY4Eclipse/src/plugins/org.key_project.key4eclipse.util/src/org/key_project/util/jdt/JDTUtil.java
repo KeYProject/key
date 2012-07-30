@@ -27,6 +27,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.internal.corext.util.CodeFormatterUtil;
 import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 import org.eclipse.jdt.internal.ui.viewsupport.JavaElementLabelComposer;
 import org.eclipse.jdt.ui.JavaElementLabels;
@@ -44,6 +45,15 @@ public class JDTUtil {
     * Forbid instances by this private constructor.
     */
    private JDTUtil() {
+   }
+   
+   /**
+    * Returns the tab width used in the given {@link IJavaElement}.
+    * @param element The {@link IJavaElement} to get its tab width.
+    * @return The tab width.
+    */
+   public static int getTabWidth(IJavaElement element) {
+      return element != null ? CodeFormatterUtil.getTabWidth(element.getJavaProject()) : 0;
    }
    
    /**

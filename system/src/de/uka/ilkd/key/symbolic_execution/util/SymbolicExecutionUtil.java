@@ -1,16 +1,19 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Position;
@@ -68,13 +71,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
-import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
@@ -89,6 +85,21 @@ import de.uka.ilkd.key.util.ProofStarter;
  * @author Martin Hentschel
  */
 public final class SymbolicExecutionUtil {
+   /**
+    * Key for the choice option "runtimeExceptions".
+    */
+   public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS = "runtimeExceptions";
+  
+   /**
+    * Value in choice option "runtimeExceptions" to ban exceptions.
+    */
+   public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_BAN = "runtimeExceptions:ban";
+   
+   /**
+    * Value in choice option "runtimeExceptions" to allow exceptions.
+    */
+   public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW = "runtimeExceptions:allow";
+
    /**
     * Forbid instances.
     */
@@ -150,32 +161,6 @@ public final class SymbolicExecutionUtil {
          }
       }
       return terms;
-   }
-
-   /**
-    * Creates a new default contract for the given {@link IProgramMethod}.
-    * If a precondition is defined in JML syntax it is added to the generated
-    * contract. If no one is defined the generated contract requires nothing.
-    * @param services The {@link Services} to use.
-    * @param pm The {@link IProgramMethod} to create a default contract for.
-    * @param precondition An optional precondition to use.
-    * @return The created {@link Contract}.
-    * @throws SLTranslationException Occurred Exception.
-    */
-   public static FunctionalOperationContract createDefaultContract(Services services, 
-                                                                   IProgramMethod pm,
-                                                                   String precondition) throws SLTranslationException {
-      // Create TextualJMLSpecCase
-      ImmutableList<String> mods = ImmutableSLList.nil();
-      mods = mods.append("public");
-      TextualJMLSpecCase textualSpecCase = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
-      if (precondition != null && !precondition.isEmpty()) {
-         textualSpecCase.addRequires(new PositionedString(precondition));
-      }
-      // Create contract
-      JMLSpecFactory factory = new JMLSpecFactory(services);
-      ImmutableSet<Contract> contracts = factory.createJMLOperationContracts(pm, textualSpecCase);
-      return (FunctionalOperationContract)contracts.iterator().next();
    }
    
    /**
@@ -496,10 +481,28 @@ public final class SymbolicExecutionUtil {
    public static IExecutionVariable[] createExecutionVariables(IExecutionStateNode<?> node) {
       if (node != null) {
          Node proofNode = node.getProofNode();
-         List<IProgramVariable> variables = collectAllElementaryUpdateTerms(proofNode);
+         List<IProgramVariable> variables = new LinkedList<IProgramVariable>();
+         // Add self variable
          IProgramVariable selfVar = findSelfTerm(proofNode);
          if (selfVar != null) {
-            variables.add(0, selfVar);
+            variables.add(selfVar);
+         }
+         // Add method parameters
+         Node callNode = findMethodCallNode(node.getProofNode());
+         if (callNode != null && callNode.getNodeInfo().getActiveStatement() instanceof MethodBodyStatement) {
+            MethodBodyStatement mbs = (MethodBodyStatement)callNode.getNodeInfo().getActiveStatement();
+            for (Expression e : mbs.getArguments()) {
+               if (e instanceof IProgramVariable) {
+                  variables.add((IProgramVariable)e);
+               }
+            }
+         }
+         // Collect variables from updates
+         List<IProgramVariable> variablesFromUpdates = collectAllElementaryUpdateTerms(proofNode);
+         for (IProgramVariable variable : variablesFromUpdates) {
+            if (!variables.contains(variable)) {
+               variables.add(variable);
+            }
          }
          IExecutionVariable[] result = new IExecutionVariable[variables.size()];
          int i = 0;
@@ -943,6 +946,45 @@ public final class SymbolicExecutionUtil {
     * @param node The {@link Node} to start search in.
     * @return The parent {@link Node} of the given {@link Node} which is also a set node or {@code null} if no parent node was found.
     */
+   public static Node findMethodCallNode(Node node) {
+      if (node != null && node.getAppliedRuleApp() != null) {
+         // Get current program method
+         Term term = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+         term = TermBuilder.DF.goBelowUpdates(term);
+         Services services = node.proof().getServices();
+         MethodFrame mf = JavaTools.getInnermostMethodFrame(term.javaBlock(), services);
+         if (mf != null) {
+            // Find call node
+            Node parent = node.parent();
+            Node result = null;
+            while (parent != null && result == null) {
+               SourceElement activeStatement = parent.getNodeInfo().getActiveStatement();
+               if (activeStatement instanceof MethodBodyStatement && 
+                   ((MethodBodyStatement)activeStatement).getProgramMethod(services) == mf.getProgramMethod()) {
+                  result = parent;
+               }
+               else {
+                  parent = parent.parent();
+               }
+            }
+            return result;
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Searches for the given {@link Node} the parent node
+    * which also represents a symbolic execution tree node
+    * (checked via {@link #isSymbolicExecutionTreeNode(Node, RuleApp)}).
+    * @param node The {@link Node} to start search in.
+    * @return The parent {@link Node} of the given {@link Node} which is also a set node or {@code null} if no parent node was found.
+    */
    public static Node findParentSetNode(Node node) {
       if (node != null) {
          Node parent = node.parent();
@@ -1017,5 +1059,42 @@ public final class SymbolicExecutionUtil {
          terms = terms.append(visitor.getTerm());
       }
       return terms;
+   }
+
+   /**
+    * Returns the default choice value.
+    * <b>Attention: </b> This method returns {@code null} if it is called before
+    * a proof is instantiated the first time. It can be checked via
+    * {@link #isChoiceSettingInitialised()}.
+    * @param key The choice key.
+    * @return The choice value.
+    */
+   public static String getChoiceSetting(String key) {
+      Map<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+      return settings.get(key);
+   }
+   
+   /**
+    * Sets the default choice value.
+    * <b>Attention: </b> Settings should not be changed before the first proof
+    * is instantiated in KeY. Otherwise the default settings are not loaded.
+    * If default settings are defined can be checked via {@link #isChoiceSettingInitialised()}.
+    * @param key The choice key to modify.
+    * @param value The new choice value to set.
+    */
+   public static void setChoiceSetting(String key, String value) {
+      HashMap<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
+      HashMap<String, String> clone = new HashMap<String, String>();
+      clone.putAll(settings);
+      clone.put(key, value);
+      ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
+   }
+
+   /**
+    * Checks if the choice settings are initialized.
+    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
+    */
+   public static boolean isChoiceSettingInitialised() {
+      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
    }
 }

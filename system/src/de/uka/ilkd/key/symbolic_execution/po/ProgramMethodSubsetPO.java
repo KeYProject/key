@@ -1,9 +1,11 @@
 package de.uka.ilkd.key.symbolic_execution.po;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -25,20 +27,33 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * <p>
  * This proof obligation executes selected statements of the body
  * of a given {@link IProgramMethod}. The statements are selected by its
- * source location. All statements in the given source range are executed.
+ * source location. All statements which ends in the given source range
+ * ]{@code startPosition}, {@code endPosition}] are executed.
+ * </p>
+ * <p>
+ * To select statements by its end position is required, because KeY's recorder
+ * includes also leading space and leading comments into a statements position. 
+ * Another drawback is that the end position of the previous statement is 
+ * exactly the start position of the following statement.
+ * </p>
+ * <p>
+ * Imagine the following snippet:
+ * <code><pre>
+ * int x = 1; // from 3/59 to 4/16
+ * int y = 2; // from 4/16 to 5/16
+ * int z = 3; // from 5/16 to 6/16
+ * </pre></code>
+ * To execute only the last two statements a user would select intuitively
+ * the source range 5/0 to 6/16 (the text without leading white space) which
+ * matches exactly the used selection definition.
  * </p>
  * <p>
  * The generated {@link Sequent} has the following form:
@@ -58,17 +73,7 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
  * </p>
  * @author Martin Hentschel
  */
-public class MethodPartPO extends AbstractOperationPO {
-   /**
-    * The {@link IProgramMethod} to execute code parts from.
-    */
-   private IProgramMethod pm;
-   
-   /**
-    * The precondition in JML syntax.
-    */
-   private String precondition;
-
+public class ProgramMethodSubsetPO extends ProgramMethodPO {
    /**
     * Contains all undeclared variables used in the method part to execute.
     */
@@ -93,18 +98,15 @@ public class MethodPartPO extends AbstractOperationPO {
     * @param startPosition The start position.
     * @param endPosition The end position.
     */
-   public MethodPartPO(InitConfig initConfig, 
+   public ProgramMethodSubsetPO(InitConfig initConfig, 
                        String name, 
                        IProgramMethod pm, 
                        String precondition,
                        Position startPosition,
                        Position endPosition) {
-      super(initConfig, name);
-      assert pm != null;
+      super(initConfig, name, pm, precondition);
       assert startPosition != null;
       assert endPosition != null;
-      this.pm = pm;
-      this.precondition = precondition;
       this.startPosition = startPosition;
       this.endPosition = endPosition;
    }
@@ -119,45 +121,18 @@ public class MethodPartPO extends AbstractOperationPO {
     * @param endPosition The end position.
     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
     */
-   public MethodPartPO(InitConfig initConfig, 
+   public ProgramMethodSubsetPO(InitConfig initConfig, 
                        String name, 
                        IProgramMethod pm, 
                        String precondition,
                        Position startPosition,
                        Position endPosition,
                        boolean addUninterpretedPredicate) {
-      super(initConfig, name, addUninterpretedPredicate);
-      assert pm != null;
+      super(initConfig, name, pm, precondition, addUninterpretedPredicate);
       assert startPosition != null;
       assert endPosition != null;
-      this.pm = pm;
-      this.precondition = precondition;
       this.startPosition = startPosition;
       this.endPosition = endPosition;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public IProgramMethod getProgramMethod() {
-      return pm;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected boolean isTransactionApplicable() {
-      return false;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected KeYJavaType getCalleeKeYJavaType() {
-      return pm.getContainerType();
    }
    
    /**
@@ -197,11 +172,11 @@ public class MethodPartPO extends AbstractOperationPO {
     * @param container The {@link StatementContainer} to seach in.
     */
    protected void collectStatementsToExecute(List<Statement> toFill, StatementContainer container) {
-      for (int i = 0; i < container.getChildCount(); i++) {
+      for (int i = 0; i < container.getStatementCount(); i++) {
          Statement s = container.getStatementAt(i);
-         if (s.getStartPosition().compareTo(startPosition) >= 0 &&
+         if (s.getEndPosition().compareTo(startPosition) > 0 &&
              s.getEndPosition().compareTo(endPosition) <= 0) {
-            // Statement found
+            // Statement found which ends in the interval ]startPosition, endPosition]
             toFill.add(s);
          }
          else {
@@ -233,106 +208,18 @@ public class MethodPartPO extends AbstractOperationPO {
          return false;
       }
    }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected Term generateMbyAtPreDef(ProgramVariable selfVar,
-                                      ImmutableList<ProgramVariable> paramVars) {
-      return TB.tt();
-   }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected Term getPre(List<LocationVariable> modHeaps,
+   protected Term getPre(List<LocationVariable> modHeaps, 
                          ProgramVariable selfVar, 
                          ImmutableList<ProgramVariable> paramVars, 
                          Map<LocationVariable, LocationVariable> atPreVars, 
                          Services services) {
-      try {
-         if (precondition != null && !precondition.isEmpty()) {
-            PositionedString ps = new PositionedString(precondition);
-            ImmutableList<ProgramVariable> paramVarsList = convert(undeclaredVariableCollector.result());
-            KeYJMLParser parser = new KeYJMLParser(ps, 
-                                                   services, 
-                                                   getCalleeKeYJavaType(), 
-                                                   selfVar, 
-                                                   paramVarsList, 
-                                                   null, 
-                                                   null, 
-                                                   null);
-            return parser.parseExpression();
-         }
-         else {
-            return TB.tt();
-         }
-      }
-      catch (SLTranslationException e) {
-         throw new RuntimeException("Can't parse precondition \"" + precondition + "\".", e);
-      }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected Term getPost(List<LocationVariable> modHeaps,
-                          ProgramVariable selfVar, 
-                          ImmutableList<ProgramVariable> paramVars, 
-                          ProgramVariable resultVar, 
-                          ProgramVariable exceptionVar, 
-                          Map<LocationVariable, LocationVariable> atPreVars, 
-                          Services services) {
-      return TB.tt();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected Term buildFrameClause(List<LocationVariable> modHeaps,
-                                   Map<LocationVariable, Map<Term, Term>> heapToAtPre,
-                                   ProgramVariable selfVar, 
-                                   ImmutableList<ProgramVariable> paramVars) {
-      return TB.tt();
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected Modality getTerminationMarker() {
-      return Modality.DIA;
-   }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
-                              ImmutableList<LocationVariable> formalParamVars,
-                              Map<LocationVariable, LocationVariable> atPreVars) {
-      Term update = null;
-      for(LocationVariable heap : atPreVars.keySet()) {
-         final Term u = TB.elementary(services, atPreVars.get(heap), TB.getBaseHeap(services));
-         if(update == null) {
-            update = u;
-         }else{
-            update = TB.parallel(update, u);
-         }
-       }
-       return update;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected String buildPOName(boolean transactionFlag) {
-      return name;
+      ImmutableList<ProgramVariable> paramVarsList = convert(undeclaredVariableCollector.result());
+      return super.getPre(modHeaps, selfVar, paramVarsList, atPreVars, services);
    }
 
    /**
@@ -352,9 +239,10 @@ public class MethodPartPO extends AbstractOperationPO {
     */
    @Override
    protected Term buildUninterpretedPredicate(ImmutableList<ProgramVariable> paramVars, 
+                                              ProgramVariable exceptionVar,
                                               String name) {
       ImmutableList<ProgramVariable> paramVarsList = convert(undeclaredVariableCollector.result());
-      return super.buildUninterpretedPredicate(paramVarsList, name);
+      return super.buildUninterpretedPredicate(paramVarsList, exceptionVar, name);
    }
    
    /**
@@ -375,8 +263,9 @@ public class MethodPartPO extends AbstractOperationPO {
     */
    @Override
    public int hashCode() {
-      return pm.hashCode() + 
-             (precondition != null ? precondition.hashCode() : 0);
+      return super.hashCode() + 
+             (getStartPosition() != null ? getStartPosition().hashCode() : 0) + 
+             (getEndPosition() != null ? getEndPosition().hashCode() : 0);
    }
 
    /**
@@ -384,21 +273,139 @@ public class MethodPartPO extends AbstractOperationPO {
     */
    @Override
    public boolean equals(Object obj) {
-      if (obj instanceof MethodPartPO) {
-         MethodPartPO other = (MethodPartPO)obj;
-         return JavaUtil.equals(pm, other.getProgramMethod()) &&
-                JavaUtil.equals(precondition, other.getPrecondition());
+      if (obj instanceof ProgramMethodSubsetPO) {
+         ProgramMethodSubsetPO other = (ProgramMethodSubsetPO)obj;
+         return super.equals(obj) &&
+                JavaUtil.equals(getStartPosition(), other.getStartPosition()) &&
+                JavaUtil.equals(getEndPosition(), other.getEndPosition());
       }
       else {
          return false;
       }
    }
+
+   /**
+    * Returns the start position.
+    * @return The start position.
+    */
+   public Position getStartPosition() {
+      return startPosition;
+   }
+
+   /**
+    * Returns the end position.
+    * @return The end position.
+    */
+   public Position getEndPosition() {
+      return endPosition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void fillSaveProperties(Properties properties) throws IOException {
+       super.fillSaveProperties(properties);
+       if (getStartPosition() != null) {
+          properties.setProperty("startLine", getStartPosition().getLine() + "");
+          properties.setProperty("startColumn", getStartPosition().getColumn() + "");
+       }
+       if (getEndPosition() != null) {
+          properties.setProperty("endLine", getEndPosition().getLine() + "");
+          properties.setProperty("endColumn", getEndPosition().getColumn() + "");
+       }
+   }
+
+   /**
+    * Instantiates a new proof obligation with the given settings.
+    * @param initConfig The already load {@link InitConfig}.
+    * @param properties The settings of the proof obligation to instantiate.
+    * @return The instantiated proof obligation.
+    * @throws IOException Occurred Exception.
+    */
+   public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
+      return new LoadedPOContainer(new ProgramMethodSubsetPO(initConfig,
+                                                             getName(properties), 
+                                                             getProgramMethod(initConfig, properties), 
+                                                             getPrecondition(properties),
+                                                             getStartPosition(properties),
+                                                             getEndPosition(properties),
+                                                             isAddUninterpretedPredicate(properties)));
+   }
+
+   /**
+    * Extracts the start position from the given {@link Properties}.
+    * @param properties The proof obligation settings to read from.
+    * @return The defined start {@link Position}.
+    * @throws IOException Occurred Exception if it was not possible to read the start position.
+    */
+   protected static Position getStartPosition(Properties properties) throws IOException{
+      String line = properties.getProperty("startLine");
+      if (line == null || line.isEmpty()) {
+         throw new IOException("Start line property \"startLine\" is not available or empty.");
+      }
+      String column = properties.getProperty("startColumn");
+      if (column == null || column.isEmpty()) {
+         throw new IOException("Start column property \"startColumn\" is not available or empty.");
+      }
+      int lineValue;
+      try {
+         lineValue = Integer.parseInt(line);
+      }
+      catch (NumberFormatException e) {
+         throw new IOException("Start line \"" + line + "\" is no valid integer.");
+      }
+      if (lineValue < 0) {
+         throw new IOException("Start line \"" + line + "\" is a negative integer.");
+      }
+      int columnValue;
+      try {
+         columnValue = Integer.parseInt(column);
+      }
+      catch (NumberFormatException e) {
+         throw new IOException("Start column \"" + column + "\" is no valid integer.");
+      }
+      if (columnValue < 0) {
+         throw new IOException("Start column \"" + column + "\" is a negative integer.");
+      }
+      return new Position(lineValue, columnValue);
+   }
    
    /**
-    * Returns the precondition in JML syntax.
-    * @return The precondition in JML syntax.
+    * Extracts the end position from the given {@link Properties}.
+    * @param properties The proof obligation settings to read from.
+    * @return The defined end {@link Position}.
+    * @throws IOException Occurred Exception if it was not possible to read the end position.
     */
-   public String getPrecondition() {
-      return precondition;
+   protected static Position getEndPosition(Properties properties) throws IOException {
+      String line = properties.getProperty("endLine");
+      if (line == null || line.isEmpty()) {
+         throw new IOException("End line property \"endLine\" is not available or empty.");
+      }
+      String column = properties.getProperty("endColumn");
+      if (column == null || column.isEmpty()) {
+         throw new IOException("End column property \"endColumn\" is not available or empty.");
+      }
+      int lineValue;
+      try {
+         lineValue = Integer.parseInt(line);
+      }
+      catch (NumberFormatException e) {
+         throw new IOException("End line \"" + line + "\" is no valid integer.");
+      }
+      if (lineValue < 0) {
+         throw new IOException("End line \"" + line + "\" is a negative integer.");
+      }
+      int columnValue;
+      try {
+         columnValue = Integer.parseInt(column);
+      }
+      catch (NumberFormatException e) {
+         throw new IOException("End column \"" + column + "\" is no valid integer.");
+      }
+      if (columnValue < 0) {
+         throw new IOException("End column \"" + column + "\" is a negative integer.");
+      }
+      return new Position(lineValue, columnValue);
    }
 }

@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_362053bc-8368-41db-a571-0e6a4faddd7d" name="MethodCallOnObjectWithException[MethodCallOnObjectWithException::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_9e6d4881-f9ed-4499-8391-acfcbd682ab6" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_ca2900cd-cd01-4ee5-82a4-4784656a7d19" name="MethodCallOnObjectWithException.main();" pathCondition="true" lineNumber="-1" charStart="69" charEnd="73">
-            <sedStatement xml:id="_9c660f28-45e2-475b-961f-ad0892600c29" name="MethodCallOnObjectWithException x = new MethodCallOnObjectWithException ();" pathCondition="true" lineNumber="-1" charStart="91" charEnd="165">
-               <sedStatement xml:id="_db7a4626-f0fe-4a50-82d4-8ed2d9318141" name="return x.doSomething();" pathCondition="true" lineNumber="-1" charStart="170" charEnd="193">
-                  <sedMethodCall xml:id="_fa395429-513a-41d7-ba30-13bfac57b7e8" name="x.doSomething();" pathCondition="true" lineNumber="-1" charStart="364" charEnd="375">
-                     <sedStatement xml:id="_fe8ca6f7-f3af-415c-942f-8e76babf9578" name="MethodCallOnObjectWithException x = null;" pathCondition="true" lineNumber="-1" charStart="383" charEnd="424">
-                        <sedStatement xml:id="_73f41403-c9ee-4ee2-8f98-49e386a9f1a8" name="return x_3.return42();" pathCondition="true" lineNumber="-1" charStart="428" charEnd="448">
-                           <sedStatement xml:id="_3873804e-8018-4558-949d-d3de29b1cecb" name="MethodCallOnObjectWithException y = new MethodCallOnObjectWithException ();" pathCondition="true" lineNumber="-1" charStart="239" charEnd="313">
-                              <sedStatement xml:id="_411db769-ee44-4bff-ab07-1342a601f14f" name="return y.return42();" pathCondition="true" lineNumber="-1" charStart="318" charEnd="338">
-                                 <sedMethodCall xml:id="_25d1600c-2d96-48ac-80e2-fdbec80305f3" name="y.return42();" pathCondition="true" lineNumber="-1" charStart="469" charEnd="477">
-                                    <sedStatement xml:id="_1949dd55-54a7-4f49-aa12-e6e8533c01e2" name="return 42;" pathCondition="true" lineNumber="-1" charStart="485" charEnd="495">
-                                       <sedMethodReturn xml:id="_a09df692-e5a7-4a6f-baf3-8d08b4067373" name="&lt;return &apos;42&apos; as result of y.return42();&gt;" pathCondition="true" lineNumber="-1" charStart="469" charEnd="477">
-                                          <sedMethodReturn xml:id="_41b3a1f0-f270-48c0-92b3-9f793e3759ed" name="&lt;return &apos;42&apos; as result of MethodCallOnObjectWithException.main();&gt;" pathCondition="true" lineNumber="-1" charStart="69" charEnd="73">
-                                             <sedTermination xml:id="_3e069318-81c9-467a-b462-3725cf1300f5" name="&lt;end&gt;" pathCondition="true">
+   <sedTarget xml:id="_066fff8e-8d92-427f-8006-45eb1a6898ad" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_a4edf49b-5405-45ea-9d59-95fe9e8f7910" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_a0ad5c92-fad6-41a7-93e5-1b4dbf38149c" name="MethodCallOnObjectWithException.main();" pathCondition="true" lineNumber="-1" charStart="69" charEnd="73">
+            <sedStatement xml:id="_ac647fee-2a23-4e6d-baa5-1052e3d11654" name="MethodCallOnObjectWithException x = new MethodCallOnObjectWithException ();" pathCondition="true" lineNumber="-1" charStart="91" charEnd="165">
+               <sedStatement xml:id="_385b873e-4b65-4f5c-b045-cd1899ea1c80" name="return x.doSomething();" pathCondition="true" lineNumber="-1" charStart="170" charEnd="193">
+                  <sedMethodCall xml:id="_dbf8b93a-f7ef-4975-8787-1a4cfbfeae95" name="x.doSomething();" pathCondition="true" lineNumber="-1" charStart="364" charEnd="375">
+                     <sedStatement xml:id="_1998075e-e563-4875-af80-a2aa2f3587a0" name="MethodCallOnObjectWithException x = null;" pathCondition="true" lineNumber="-1" charStart="383" charEnd="424">
+                        <sedStatement xml:id="_5e776e85-18a7-4fb3-a0b9-c5a1be3d1b9b" name="return x_3.return42();" pathCondition="true" lineNumber="-1" charStart="428" charEnd="448">
+                           <sedStatement xml:id="_2598205f-8dec-41da-beb3-da5dfc525313" name="MethodCallOnObjectWithException y = new MethodCallOnObjectWithException ();" pathCondition="true" lineNumber="-1" charStart="239" charEnd="313">
+                              <sedStatement xml:id="_214516a2-7954-41e0-bfb9-fb170b7c13bf" name="return y.return42();" pathCondition="true" lineNumber="-1" charStart="318" charEnd="338">
+                                 <sedMethodCall xml:id="_548c1c4b-e631-4f0d-8377-b2ba4b28442e" name="y.return42();" pathCondition="true" lineNumber="-1" charStart="469" charEnd="477">
+                                    <sedStatement xml:id="_10417842-f580-42af-b922-ad48edb09630" name="return 42;" pathCondition="true" lineNumber="-1" charStart="485" charEnd="495">
+                                       <sedMethodReturn xml:id="_8214b873-5080-4456-8ead-7445728ad95d" name="&lt;return &apos;42&apos; as result of y.return42();&gt;" pathCondition="true" lineNumber="-1" charStart="469" charEnd="477">
+                                          <sedMethodReturn xml:id="_05ef0581-712f-4f84-9b69-3de607d5a346" name="&lt;return &apos;42&apos; as result of MethodCallOnObjectWithException.main();&gt;" pathCondition="true" lineNumber="-1" charStart="69" charEnd="73">
+                                             <sedTermination xml:id="_b96adce3-113f-4e64-8e97-db1cf98f87b4" name="&lt;end&gt;" pathCondition="true">
                                              </sedTermination>
                                           </sedMethodReturn>
                                        </sedMethodReturn>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.doubleValue(_value);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int first = _value;" pathCondition="true" pathConditionChanged="false">
+         <statement name="int second = _value;" pathCondition="true" pathConditionChanged="false">
+            <statement name="return first+second;" pathCondition="true" pathConditionChanged="false">
+               <methodReturn name="&lt;return of self.doubleValue(_value);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;value * 2&apos; as result of self.doubleValue(_value);&gt;">
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                  </termination>
+               </methodReturn>
+            </statement>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>

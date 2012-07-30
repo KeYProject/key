@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="MethodPOTest.voidMethod(param);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int value = param.x;" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="Normal Execution (param != null)" pathCondition="!param = null" pathConditionChanged="true" branchCondition="!param = null" mergedBranchCondition="false">
+            <methodReturn name="&lt;return of MethodPOTest.voidMethod(param);&gt;" pathCondition="!param = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodPOTest.voidMethod(param);&gt;">
+               <termination name="&lt;end&gt;" pathCondition="!param = null" pathConditionChanged="false" exceptionalTermination="false">
+               </termination>
+            </methodReturn>
+         </branchCondition>
+         <branchCondition name="Null Reference (param = null)" pathCondition="param = null" pathConditionChanged="true" branchCondition="param = null" mergedBranchCondition="false">
+            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="param = null" pathConditionChanged="false" exceptionalTermination="true">
+            </termination>
+         </branchCondition>
+      </statement>
+   </methodCall>
+</startNode>

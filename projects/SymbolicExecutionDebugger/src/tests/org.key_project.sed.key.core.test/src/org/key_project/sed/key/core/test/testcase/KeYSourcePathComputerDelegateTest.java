@@ -55,7 +55,7 @@ public class KeYSourcePathComputerDelegateTest extends TestCase {
          // Get method
          IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
          // Create configuration
-         ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method);
+         ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method, null, null);
          // Compute and test container
          KeYSourcePathComputerDelegate computer = new KeYSourcePathComputerDelegate();
          ISourceContainer[] result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
@@ -105,7 +105,7 @@ public class KeYSourcePathComputerDelegateTest extends TestCase {
          // Get method
          IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
          // Create configuration
-         ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method);
+         ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method, null, null);
          // Compute and test container
          KeYSourcePathComputerDelegate computer = new KeYSourcePathComputerDelegate();
          ISourceContainer[] result = computer.computeSourceContainers(configuration, new NullProgressMonitor());
@@ -175,7 +175,7 @@ public class KeYSourcePathComputerDelegateTest extends TestCase {
       // Get method
       IMethod method = TestUtilsUtil.getJdtMethod(project, "FlatSteps", "doSomething", "I", "QString;", "Z");
       // Create configuration
-      ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method);
+      ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method, null, null);
       // Compute and test container
       KeYSourcePathComputerDelegate computer = new KeYSourcePathComputerDelegate();
       ISourceContainer[] result = computer.computeSourceContainers(configuration, new NullProgressMonitor());

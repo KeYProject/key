@@ -232,6 +232,15 @@ public final class TestSedCoreUtil {
    }
 
    /**
+    * Returns the {@link SWTBotView} for the outline view.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @return The {@link SWTBotView}.
+    */
+   public static SWTBotView getOutlineView(SWTWorkbenchBot bot) {
+      return bot.viewById(IPageLayout.ID_OUTLINE);
+   }
+
+   /**
     * Returns the {@link SWTBotView} for the debug view.
     * @param bot The {@link SWTWorkbenchBot} to use.
     * @return The {@link SWTBotView}.
