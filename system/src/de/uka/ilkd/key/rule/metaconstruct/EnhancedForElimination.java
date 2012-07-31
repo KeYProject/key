@@ -235,8 +235,8 @@ public class EnhancedForElimination extends ProgramTransformer {
             LocalVariableDeclaration lvd, Statement body) {
 
         Statement[] statements = ADD_VALUES?
-                // ATTENTION: in order for the invariant rule to work correctly, the update to values needs to appear at the very end of the loop
-                new Statement[]{ makeUpdate(itName,lvd), body, makeValuesUpdate(valuesName,lvd) }
+                // ATTENTION: in order for the invariant rule to work correctly, the update to values needs to appear at the _second_ entry of the loop
+                new Statement[]{ makeUpdate(itName,lvd), makeValuesUpdate(valuesName,lvd), body }
                 : new Statement[]{ makeUpdate(itName, lvd), body };
         StatementBlock block = new StatementBlock(statements);
         return block;

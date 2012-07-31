@@ -60,7 +60,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
      * The values function symbol is a placeholder which stems from translating the <code>\values</code> keyword from JML.
      * Both are used to refer to a runtime-generated variable.
      * If the loop guard has the form <code>i < x</code>, index is instantiated with <code>i</code>,
-     * if the final statement in the loop body has the form <code>v = xxx</code>,
+     * if the second statement in the loop body has the form <code>v = xxx</code>,
      * where <code>v</code> is a ghost variable of type sequence, values is instantiated with <code>v</code>,
      * otherwise <code>rawInv</code> is returned.
      */
@@ -87,7 +87,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 		Statement body = loop.getBody();
 		skipValues = !(body instanceof StatementBlock);
 		StatementBlock block = skipValues? null: ((StatementBlock)body);
-		Statement last = skipValues? null: block.getStatementAt(block.getStatementCount()-1);
+		Statement last = skipValues? null: block.getStatementAt(1); // get the second statement
 		skipValues = skipValues || !(last instanceof CopyAssignment);
 		CopyAssignment assignment = skipValues? null: ((CopyAssignment) last);
 		ProgramElement lhs = skipValues? null: assignment.getChildAt(0);
