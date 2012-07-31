@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -49,16 +50,18 @@ import de.uka.ilkd.key.util.ExtList;
 
 public class EnhancedForElimination extends ProgramTransformer {
 
+    private static final String IT = "it";
     private static final String VALUES = "values";
     private static final String ITERABLE = "java.lang.Iterable";
     private static final String ITERATOR_METH = "iterator";
     private static final String HAS_NEXT = "hasNext";
     private static final String NEXT = "next";
     private static final String ITERATOR = "java.util.Iterator";
+    // TODO XXX Is this meant to be final as well?
+    private final boolean ADD_VALUES = true; // toggle usage of the values ghost field
     private Services services;
     private JavaInfo ji;
     private EnhancedFor enhancedFor;
-    private final boolean ADD_VALUES = true; // toggle usage of the values ghost field
 
     public EnhancedForElimination(EnhancedFor forStatement) {
         super("enhancedfor-elim", forStatement);
@@ -117,18 +120,17 @@ public class EnhancedForElimination extends ProgramTransformer {
         ProgramElementName itName = varNamer.getTemporaryNameProposal("i");
         KeYJavaType intType = ji.getPrimitiveKeYJavaType("int");
         ProgramVariable itVar = new LocationVariable(itName, intType);
-        
 
         ILoopInit inits = makeForInit(intType, itVar);
         IGuard guard = makeGuard(expression, itVar);
         IForUpdates updates = makeUpdates(itVar);
-        
+
         // there may be only one variable iterated over (see Language Specification Sect. 14.14.2)
         ProgramVariable lvdVar = (ProgramVariable)lvd.getVariables().get(0).getProgramVariable();
         Statement declArrayElemVar = makeElemDecl(lvdVar);
-        
+
         For forLoop = makeLoop(body, itVar, inits, guard, updates, expression,lvdVar);
-        
+
         // put everything together
         Statement[] complete = {declArrayElemVar,forLoop};
         setInvariant(enhancedFor, forLoop);
@@ -183,7 +185,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         ILoopInit inits = new LoopInit(linit);
         return inits;
     }
-    
+
     // Methods to transform loops over Iterable
 
     /*
@@ -192,17 +194,24 @@ public class EnhancedForElimination extends ProgramTransformer {
     private ProgramElement makeIterableForLoop(LocalVariableDeclaration lvd,
             Expression expression, Statement body) {
 
+        // local variable "it"
         VariableNamer varNamer = services.getVariableNamer();
-        ProgramElementName itName = varNamer.getTemporaryNameProposal("it");
+        KeYJavaType iteratorType = services.getJavaInfo().getTypeByName(ITERATOR);
+        ProgramElementName itName = varNamer.getTemporaryNameProposal(IT);
+        ProgramVariable itVar = new LocationVariable(itName, iteratorType);
+
+        // local variable "values"
         ProgramElementName valuesName = varNamer.getTemporaryNameProposal(VALUES);
+        KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+        LocationVariable valuesVar = new LocationVariable(valuesName, seqType);
 
-        Statement valuesInit = makeValuesInit(valuesName);
-        
-        Statement itinit = makeIteratorInit(expression, itName);
+        Statement valuesInit = makeValuesInit(valuesVar);
 
-        Expression itGuard = makeGuard(itName);
+        Statement itinit = makeIteratorInit(expression, itVar);
 
-        StatementBlock block = makeBlock(itName,  valuesName, lvd, body);
+        Expression itGuard = makeGuard(itVar);
+
+        StatementBlock block = makeBlock(itVar, valuesVar, lvd, body);
 
         // while
         While whileGuard = new While(itGuard, block, null, new ExtList());
@@ -217,51 +226,57 @@ public class EnhancedForElimination extends ProgramTransformer {
 
     }
 
-    private Statement makeValuesInit(ProgramElementName valuesName) {
+    /*
+     * "ghost \seq values = \seq_empty"
+     */
+    private Statement makeValuesInit(LocationVariable valuesVar) {
         KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
         TypeReference seqRef = new TypeRef(seqType);
-        Modifier[] ghost = {new Ghost()};
-        LocationVariable values = new LocationVariable(valuesName, seqType);
+        Modifier[] ghost = { new Ghost() };
         Expression seqEmpty = EmptySeqLiteral.INSTANCE;
-        VariableSpecification[] valuesSpec = {new VariableSpecification(values,seqEmpty, seqType)};
-        Statement valuesInit = new LocalVariableDeclaration(ghost,seqRef,valuesSpec);
+        VariableSpecification[] valuesSpec =
+            { new VariableSpecification(valuesVar, seqEmpty, seqType) };
+        Statement valuesInit = new LocalVariableDeclaration(ghost, seqRef, valuesSpec);
         return valuesInit;
     }
 
     /*
      * "; <body>"
      */
-    private StatementBlock makeBlock(ProgramElementName itName, ProgramElementName valuesName,
+    private StatementBlock makeBlock(ProgramVariable itVar, LocationVariable valuesVar,
             LocalVariableDeclaration lvd, Statement body) {
 
         Statement[] statements = ADD_VALUES?
-                // ATTENTION: in order for the invariant rule to work correctly, the update to values needs to appear at the _second_ entry of the loop
-                new Statement[]{ makeUpdate(itName,lvd), makeValuesUpdate(valuesName,lvd), body }
-                : new Statement[]{ makeUpdate(itName, lvd), body };
+                // ATTENTION: in order for the invariant rule to work correctly,
+                // the update to values needs to appear at the _second_ entry of the loop
+                // TODO I do not understand this? Why is the loop entered twice?
+                new Statement[] { makeUpdate(itVar, lvd), makeValuesUpdate(valuesVar, lvd), body } : 
+                new Statement[] { makeUpdate(itVar, lvd), body };
         StatementBlock block = new StatementBlock(statements);
         return block;
     }
 
-    /** values = \seq_concat(values, \seq_singleton(<it>.next())); */
-    private Statement makeValuesUpdate(ProgramElementName vName, LocalVariableDeclaration lvd){
-        KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-        ProgramVariable valuesVar = new LocationVariable(vName, seqType);
+    /*
+     * <values> = \seq_concat(<values>, \seq_singleton(<lvd>)); 
+     */
+    private Statement makeValuesUpdate(LocationVariable valuesVar, LocalVariableDeclaration lvd){
         VariableSpecification var = lvd.getVariables().get(0);
-        KeYJavaType keYJavaType = (KeYJavaType) var.getType();
-        Expression element = new LocationVariable(var.getProgramElementName(), keYJavaType);
-        Expression seqSingleton = new SeqSingleton(new ExtList(new Object[]{element}));
-        Expression seqConcat = new SeqConcat(new ExtList(new Object[]{valuesVar,seqSingleton}));
+        IProgramVariable element = var.getProgramVariable();
+        assert element instanceof ProgramVariable :
+            "Since this is a concrete program, the spec must not be schematic";
+        Expression seqSingleton = new SeqSingleton((ProgramVariable)element);
+        Expression seqConcat = new SeqConcat(valuesVar, seqSingleton);
         Statement assignment = new CopyAssignment(valuesVar, seqConcat);
         return assignment;
     }
-    
+
     /*
-     * "<lvd> = <it>.next();"
+     * "<Type> <lvd> = <it>.next();"
      */
-    private Statement makeUpdate(ProgramElementName itName,
+    private Statement makeUpdate(ProgramVariable itVar,
             LocalVariableDeclaration lvd) {
 
-        MethodReference methodCall = getItNext(itName);
+        MethodReference methodCall = getItNext(itVar);
 
         //
         // make local variable decl
@@ -278,13 +293,11 @@ public class EnhancedForElimination extends ProgramTransformer {
         return lvdNew;
     }
 
-    private MethodReference getItNext(ProgramElementName itName) {
-        //
-        // it.next()
-        KeYJavaType iteratorType =
-                services.getJavaInfo().getTypeByName(ITERATOR);
+    /*
+     * "<it>.next()"
+     */
+    private MethodReference getItNext(ProgramVariable itVar) {
         ProgramElementName nextMeth = new ProgramElementName(NEXT);
-        ProgramVariable itVar = new LocationVariable(itName, iteratorType);
         MethodReference methodCall =
                 new MethodReference(new ImmutableArray<Expression>(), nextMeth, itVar);
         return methodCall;
@@ -293,11 +306,8 @@ public class EnhancedForElimination extends ProgramTransformer {
     /*
      * "<it>.hasNext()"
      */
-    private Expression makeGuard(ProgramElementName itName) {
-        KeYJavaType iteratorType =
-                services.getJavaInfo().getTypeByName(ITERATOR);
+    private Expression makeGuard(ProgramVariable itVar) {
         ProgramElementName hasNextMeth = new ProgramElementName(HAS_NEXT);
-        ProgramVariable itVar = new LocationVariable(itName, iteratorType);
         MethodReference methodCall =
                 new MethodReference(new ImmutableArray<Expression>(), hasNextMeth, itVar);
 
@@ -308,14 +318,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * "Iterator <it> = expression.iterator();"
      */
     private Statement makeIteratorInit(Expression expression,
-            ProgramElementName itName) {
-
-        //
-        // Iterator it;
-
-        KeYJavaType iteratorType =
-                services.getJavaInfo().getTypeByName(ITERATOR);
-        ProgramVariable itVar = new LocationVariable(itName, iteratorType);
+            ProgramVariable itVar) {
 
         //
         // expression.iterator();
@@ -327,20 +330,21 @@ public class EnhancedForElimination extends ProgramTransformer {
         //
         // put together
         VariableSpecification spec =
-                new VariableSpecification(itVar, methodcall,
-                        itVar.getKeYJavaType());
+                new VariableSpecification(itVar, methodcall, itVar.getKeYJavaType());
+        KeYJavaType iteratorType = services.getJavaInfo().getTypeByName(ITERATOR);
         TypeRef iteratorTyperef = new TypeRef(iteratorType);
         LocalVariableDeclaration init =
                 new LocalVariableDeclaration(iteratorTyperef, spec);
         return init;
     }
-    
 
-    /** Set the invariant from <code>original</code> on <code>transformed</code>. */
+    /**
+     * Transfer the invariant from <code>original</code> enhanced loop to the
+     * <code>transformed</code> while or for loop.
+     */
     private void setInvariant (EnhancedFor original, LoopStatement transformed){
-        // copy loop invariant to the created while loop
-        LoopInvariant li
-        = services.getSpecificationRepository().getLoopInvariant(original);
+        LoopInvariant li = 
+                services.getSpecificationRepository().getLoopInvariant(original);
         if (li != null) {
             li = li.setLoop(transformed);
             services.getSpecificationRepository().setLoopInvariant(li);

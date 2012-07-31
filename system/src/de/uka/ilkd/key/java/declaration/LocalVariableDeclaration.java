@@ -111,11 +111,17 @@ public class LocalVariableDeclaration
 	    ImmutableArray<VariableSpecification>(children.collect(VariableSpecification.class));
     }
 
+    /**
+     * This method is identical to {@link #getVariables()}.
+     */
     public ImmutableArray<VariableSpecification> getVariableSpecifications() {
         return varSpecs;
     }
 
-    public ImmutableArray<VariableSpecification>  getVariables() {
+    /**
+     * This method is identical to {@link #getVariableSpecifications()}.
+     */
+    public ImmutableArray<VariableSpecification> getVariables() {
         return varSpecs;
     }
 

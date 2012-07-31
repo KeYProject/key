@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java.expression.operator.adt;
 
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -24,6 +25,10 @@ public class SeqSingleton extends Operator {
 
     public SeqSingleton(ExtList children) {
         super(children);
+    }
+    
+    public SeqSingleton(Expression child) {
+        super(child);
     }
 
 
