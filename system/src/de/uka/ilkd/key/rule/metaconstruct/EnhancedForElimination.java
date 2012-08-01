@@ -103,44 +103,51 @@ public class EnhancedForElimination extends ProgramTransformer {
         Expression expression = enhancedFor.getGuardExpression();
         Statement body = enhancedFor.getBody();
         
-        ji = services.getJavaInfo();
-        ExecutionContext ec = ji.getDefaultExecutionContext(); // TODO: how to get a more appropriate one? 
-        boolean iterable = ji.isSubtype(expression.getKeYJavaType(services, ec),ji.getTypeByName(ITERABLE));
 
-        ProgramElement result = iterable? makeIterableForLoop(lvd, expression, body) : makeArrayForLoop(lvd, expression, body);
+        ProgramElement result = iterable(expression)? makeIterableForLoop(lvd, expression, body) : makeArrayForLoop(lvd, expression, body);
         return result;
+    }
+
+    private boolean iterable(Expression expression) {
+        ji = services.getJavaInfo();
+        final ExecutionContext ec = ji.getDefaultExecutionContext(); // TODO: how to get a more appropriate one? 
+        boolean iterable = ji.isSubtype(expression.getKeYJavaType(services, ec),ji.getTypeByName(ITERABLE));
+        return iterable;
     }
 
     /** Transform an enhanced for-loop over an array to a regular for-loop. */
     private ProgramElement makeArrayForLoop(LocalVariableDeclaration lvd,
             Expression expression, Statement body) {
-        VariableNamer varNamer = services.getVariableNamer();
-        ProgramElementName itName = varNamer.getTemporaryNameProposal("i");
-        KeYJavaType intType = ji.getPrimitiveKeYJavaType("int");
-        ProgramVariable itVar = new LocationVariable(itName, intType);
+        final VariableNamer varNamer = services.getVariableNamer();
+        final ProgramElementName itName = varNamer.getTemporaryNameProposal("i");
+        final KeYJavaType intType = ji.getPrimitiveKeYJavaType("int");
+        final ProgramVariable itVar = new LocationVariable(itName, intType);
 
-        ILoopInit inits = makeForInit(intType, itVar);
-        IGuard guard = makeGuard(expression, itVar);
-        IForUpdates updates = makeUpdates(itVar);
+        final ILoopInit inits = makeForInit(intType, itVar);
+        final IGuard guard = makeGuard(expression, itVar);
+        final IForUpdates updates = makeUpdates(itVar);
 
         // there may be only one variable iterated over (see Language Specification Sect. 14.14.2)
-        ProgramVariable lvdVar = (ProgramVariable)lvd.getVariables().get(0).getProgramVariable();
-        Statement declArrayElemVar = makeElemDecl(lvdVar);
+        final IProgramVariable programVariable = lvd.getVariables().get(0).getProgramVariable();
+        assert programVariable instanceof ProgramVariable :
+            "Since this is a concrete program, the spec must not be schematic";
+        final ProgramVariable lvdVar = (ProgramVariable)programVariable;
+        final Statement declArrayElemVar = makeElemDecl(lvdVar);
 
-        For forLoop = makeLoop(body, itVar, inits, guard, updates, expression,lvdVar);
+        final For forLoop = makeLoop(body, itVar, inits, guard, updates, expression,lvdVar);
 
         // put everything together
-        Statement[] complete = {declArrayElemVar,forLoop};
+        final Statement[] complete = {declArrayElemVar,forLoop};
         setInvariant(enhancedFor, forLoop);
         return new StatementBlock(complete);
     }
 
     /** Declare the iterated element. */
     private Statement makeElemDecl(ProgramVariable lvdVar) {
-        KeYJavaType lvdType = lvdVar.getKeYJavaType();
-        TypeRef lvdTyperef = new TypeRef(lvdType);
-        VariableSpecification lvdSpec = new VariableSpecification(lvdVar, lvdType);
-        Statement declArrayElemVar = new LocalVariableDeclaration(lvdTyperef,lvdSpec);
+        final KeYJavaType lvdType = lvdVar.getKeYJavaType();
+        final TypeRef lvdTyperef = new TypeRef(lvdType);
+        final VariableSpecification lvdSpec = new VariableSpecification(lvdVar, lvdType);
+        final Statement declArrayElemVar = new LocalVariableDeclaration(lvdTyperef,lvdSpec);
         return declArrayElemVar;
     }
 
@@ -148,39 +155,39 @@ public class EnhancedForElimination extends ProgramTransformer {
     private For makeLoop(Statement body, ProgramVariable itVar,
             ILoopInit inits, IGuard guard, IForUpdates updates,
             Expression array, ProgramVariable lvdVar) {
-        Expression[] arrayAccess = {itVar};
-        Expression nextElement = new ArrayReference(new PassiveExpression(array), arrayAccess);
-        VariableReference lhs = new VariableReference(lvdVar);
-        Statement getNextElement = new CopyAssignment(lhs, nextElement);
-        Statement[] newBlock = {getNextElement,body};
+        final Expression[] arrayAccess = {itVar};
+        final Expression nextElement = new ArrayReference(new PassiveExpression(array), arrayAccess);
+        final VariableReference lhs = new VariableReference(lvdVar);
+        final Statement getNextElement = new CopyAssignment(lhs, nextElement);
+        final Statement[] newBlock = {getNextElement,body};
         body = new StatementBlock(newBlock);      
-        For forLoop = new For(inits, guard, updates, body);
+        final For forLoop = new For(inits, guard, updates, body);
         return forLoop;
     }
 
     /** Updates to loop index variable (i++). */
     private IForUpdates makeUpdates(ProgramVariable itVar) {
-        Expression[] update = {new PostIncrement(itVar)};
-        IForUpdates updates = new ForUpdates(new ImmutableArray<Expression>(update));
+        final Expression[] update = {new PostIncrement(itVar)};
+        final IForUpdates updates = new ForUpdates(new ImmutableArray<Expression>(update));
         return updates;
     }
 
     /** For-loop guard (i < a.length). */
     private IGuard makeGuard(Expression expression, ProgramVariable itVar) {
-        Expression lengthExpr = new ArrayLengthReference(new PassiveExpression(expression));
-        IGuard guard = new Guard(new LessThan(itVar,lengthExpr));
+        final Expression lengthExpr = new ArrayLengthReference(new PassiveExpression(expression));
+        final IGuard guard = new Guard(new LessThan(itVar,lengthExpr));
         return guard;
     }
 
     /** Declare index variable and assign zero. */
     private ILoopInit makeForInit(KeYJavaType intType, ProgramVariable itVar) {
-        VariableSpecification spec =
+        final VariableSpecification spec =
                 new VariableSpecification(itVar, new IntLiteral(0), intType);
-        TypeRef intTyperef = new TypeRef(intType);
-        LocalVariableDeclaration init =
+        final TypeRef intTyperef = new TypeRef(intType);
+        final LocalVariableDeclaration init =
                 new LocalVariableDeclaration(intTyperef, spec);
-        LoopInitializer[] linit = {init};
-        ILoopInit inits = new LoopInit(linit);
+        final LoopInitializer[] linit = {init};
+        final ILoopInit inits = new LoopInit(linit);
         return inits;
     }
 
