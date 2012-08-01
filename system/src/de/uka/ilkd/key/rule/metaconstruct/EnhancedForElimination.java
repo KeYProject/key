@@ -57,8 +57,6 @@ public class EnhancedForElimination extends ProgramTransformer {
     private static final String HAS_NEXT = "hasNext";
     private static final String NEXT = "next";
     private static final String ITERATOR = "java.util.Iterator";
-    // TODO XXX Is this meant to be final as well?
-    private final boolean ADD_VALUES = true; // toggle usage of the values ghost field
     private Services services;
     private JavaInfo ji;
     private EnhancedFor enhancedFor;
@@ -217,9 +215,8 @@ public class EnhancedForElimination extends ProgramTransformer {
         While whileGuard = new While(itGuard, block, null, new ExtList());
 
         // block
-        Statement[] statements = ADD_VALUES? 
-                new Statement[]{ itinit, valuesInit, whileGuard }:
-                    new Statement[]{itinit,whileGuard};
+        Statement[] statements = 
+                new Statement[]{ itinit, valuesInit, whileGuard };
         StatementBlock outerBlock = new StatementBlock(statements);
         setInvariant(enhancedFor,whileGuard);
         return outerBlock;
@@ -246,12 +243,10 @@ public class EnhancedForElimination extends ProgramTransformer {
     private StatementBlock makeBlock(ProgramVariable itVar, LocationVariable valuesVar,
             LocalVariableDeclaration lvd, Statement body) {
 
-        Statement[] statements = ADD_VALUES?
+        Statement[] statements = 
                 // ATTENTION: in order for the invariant rule to work correctly,
                 // the update to values needs to appear at the _second_ entry of the loop
-                // TODO I do not understand this? Why is the loop entered twice?
-                new Statement[] { makeUpdate(itVar, lvd), makeValuesUpdate(valuesVar, lvd), body } : 
-                new Statement[] { makeUpdate(itVar, lvd), body };
+                { makeUpdate(itVar, lvd), makeValuesUpdate(valuesVar, lvd), body };
         StatementBlock block = new StatementBlock(statements);
         return block;
     }
