@@ -703,7 +703,7 @@ public final class MainWindow extends JFrame  {
                 // TODO: inform that this requires a restart
                 System.out.println("Info: Look and feel changed for next start of KeY.");
             }});
-        view.add(laf);
+//        view.add(laf); // uncomment this line to include the option in the menu
         
        
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
