@@ -1,11 +1,11 @@
 package org.key_project.util.eclipse;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 
@@ -28,12 +28,12 @@ public class Logger {
    /**
     * The plug-in that provides the eclipse logger.
     */
-   private AbstractUIPlugin plugin;
+   private Plugin plugin;
    
    /**
     * Forbid instances.
     */
-   public Logger(AbstractUIPlugin plugin, String plugInId) {
+   public Logger(Plugin plugin, String plugInId) {
       this.plugInId = plugInId;
       this.plugin = plugin;
    }
@@ -50,7 +50,7 @@ public class Logger {
     * Returns the plug-in that provides the eclipse logger.
     * @return The plug-in that provides the eclipse logger.
     */
-   public AbstractUIPlugin getPlugin() {
+   public Plugin getPlugin() {
       return plugin;
    }
    

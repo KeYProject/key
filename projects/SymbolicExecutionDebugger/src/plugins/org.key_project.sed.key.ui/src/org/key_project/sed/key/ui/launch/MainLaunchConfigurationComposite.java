@@ -1,5 +1,7 @@
 package org.key_project.sed.key.ui.launch;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
@@ -13,16 +15,21 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.debug.ui.launchConfigurations.JavaMainTab;
+import org.eclipse.jdt.internal.debug.ui.contentassist.IJavaDebugContentAssistContext;
+import org.eclipse.jdt.internal.debug.ui.contentassist.TypeContext;
 import org.eclipse.jdt.internal.debug.ui.launcher.AbstractJavaMainTab;
 import org.eclipse.jdt.internal.debug.ui.launcher.DebugTypeSelectionDialog;
 import org.eclipse.jdt.ui.JavaElementLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -33,6 +40,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
@@ -57,6 +65,7 @@ import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -83,6 +92,36 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
     * Defines the method to debug.
     */
    private Text methodText;
+   
+   /**
+    * Defines to execute the complete method body.
+    */
+   private Button executeMethodBodyButton;
+   
+   /**
+    * Defines to execute a selected range within the method body.
+    */
+   private Button executeMethodRangeButton;
+   
+   /**
+    * The start line.
+    */
+   private Text startLineText;
+   
+   /**
+    * The start column.
+    */
+   private Text startColumnText;
+   
+   /**
+    * The end line.
+    */
+   private Text endLineText;
+   
+   /**
+    * The end column.
+    */
+   private Text endColumnText;
    
    /**
     * Defines that a default contract will be generated.
@@ -115,10 +154,31 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
    private Button browseContractButton;
    
    /**
-    * The last defined existing contract.
+    * Edits the custom precondition.
     */
-   private String lastDefinedExistingContract;
-
+   private JavaSnippetSourceViewer preconditionViewer;
+   
+   /**
+    * Contains the controls to define an existing contract.
+    */
+   private Composite existingContractComposite;
+   
+   /**
+    * Shows the controls to define a precondition.
+    */
+   private Composite preconditionComposite;
+   
+   /**
+    * Shows {@link #preconditionComposite} if {@link #useGeneratedContractButton}
+    * is selected or {@link #existingContractComposite} if {@link #useExistingContractButton} is selected.
+    */
+   private Composite contractComposite;
+   
+   /**
+    * {@link StackLayout} used in {@link #contractComposite}.
+    */
+   private StackLayout contractCompositeLayout;
+   
    /**
     * Constructor.
     * @param parent The parent {@link Composite}.
@@ -193,6 +253,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
           @Override
           public void modifyText(ModifyEvent e) {
               updateLaunchConfigurationDialog();
+              updatePreconditionViewerComposite();
           }
       });
       if (isEditable()) {
@@ -204,9 +265,69 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
              }
          });
       }
+      widgetFactory.createLabel(javaGroup, "Range");
+      Composite rangeComposite = widgetFactory.createPlainComposite(javaGroup, SWT.NONE);
+      rangeComposite.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, true, true, 2, 1));
+      rangeComposite.setLayout(new GridLayout(9, false));
+      executeMethodBodyButton = widgetFactory.createButton(rangeComposite, "Complete method bod&y", SWT.RADIO);
+      executeMethodBodyButton.setEnabled(isEditable());
+      executeMethodBodyButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateRangeTextEditableState();
+            updateLaunchConfigurationDialog();
+         }
+      });
+      executeMethodRangeButton = widgetFactory.createButton(rangeComposite, "R&ange from", SWT.RADIO);
+      executeMethodRangeButton.setEnabled(isEditable());
+      executeMethodRangeButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            updateRangeTextEditableState();
+            updateLaunchConfigurationDialog();
+         }
+      });
+      startLineText = widgetFactory.createText(rangeComposite, null);
+      GridData fixedSizeGridData = new GridData(GridData.CENTER, GridData.CENTER, false, false);
+      fixedSizeGridData.widthHint = 50;
+      fixedSizeGridData.grabExcessHorizontalSpace = false;
+      startLineText.setLayoutData(fixedSizeGridData);
+      startLineText.addModifyListener(new ModifyListener() {
+         @Override
+         public void modifyText(ModifyEvent e) {
+             updateLaunchConfigurationDialog();
+         }
+      });
+      widgetFactory.createLabel(rangeComposite, ":");
+      startColumnText = widgetFactory.createText(rangeComposite, null);
+      startColumnText.setLayoutData(fixedSizeGridData);
+      startColumnText.addModifyListener(new ModifyListener() {
+         @Override
+         public void modifyText(ModifyEvent e) {
+             updateLaunchConfigurationDialog();
+         }
+      });
+      widgetFactory.createLabel(rangeComposite, "to");
+      endLineText = widgetFactory.createText(rangeComposite, null);
+      endLineText.setLayoutData(fixedSizeGridData);
+      endLineText.addModifyListener(new ModifyListener() {
+         @Override
+         public void modifyText(ModifyEvent e) {
+             updateLaunchConfigurationDialog();
+         }
+      });
+      widgetFactory.createLabel(rangeComposite, ":");
+      endColumnText = widgetFactory.createText(rangeComposite, null);
+      endColumnText.setLayoutData(fixedSizeGridData);
+      endColumnText.addModifyListener(new ModifyListener() {
+         @Override
+         public void modifyText(ModifyEvent e) {
+             updateLaunchConfigurationDialog();
+         }
+      });
       // Verification
       Group verificationGroup = widgetFactory.createGroup(composite, "Verification");
-      verificationGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      verificationGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
       verificationGroup.setLayout(new GridLayout(1, false));
       Composite usedContractComposite = widgetFactory.createPlainComposite(verificationGroup, SWT.NONE);
       usedContractComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -218,7 +339,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
           public void widgetSelected(SelectionEvent e) {
               if (useGeneratedContractButton.getSelection()) {
                   updateLaunchConfigurationDialog();
-                  updateExistingContractState();
+                  updateShownContractComposite();
               }
           }
       });
@@ -229,15 +350,21 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
           public void widgetSelected(SelectionEvent e) {
               if (useExistingContractButton.getSelection()) {
                   updateLaunchConfigurationDialog();
-                  updateExistingContractState();
+                  updateShownContractComposite();
               }
           }
       });
-      Composite existingContractComposite = widgetFactory.createPlainComposite(verificationGroup, SWT.NONE);
-      existingContractComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      
+      contractCompositeLayout = new StackLayout();
+      contractComposite = widgetFactory.createPlainComposite(verificationGroup, SWT.NONE);
+      contractComposite.setLayout(contractCompositeLayout);
+      contractComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+      
+      existingContractComposite = widgetFactory.createPlainComposite(contractComposite, SWT.NONE);
       existingContractComposite.setLayout(new GridLayout(isEditable() ? 3 : 2, false));
       widgetFactory.createLabel(existingContractComposite, "Contr&act");
       existingContractText = widgetFactory.createText(existingContractComposite, null);
+      existingContractText.setEditable(isEditable());
       existingContractText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       existingContractText.addModifyListener(new ModifyListener() {
           @Override
@@ -254,24 +381,70 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
              }
          });
       }
+      
+      preconditionComposite = widgetFactory.createPlainComposite(contractComposite, SWT.NONE);
+      GridLayout preconditionCompositeLayout = new GridLayout(2, false);
+      preconditionComposite.setLayout(preconditionCompositeLayout);
+      Label preconditionLabel = widgetFactory.createLabel(preconditionComposite, "Prec&ondition");
+      preconditionLabel.setLayoutData(new GridData(GridData.BEGINNING, GridData.BEGINNING, false, false));
+      int preconditionViewerCompositeStyle = SWT.BORDER;
+      if (isEditable()) {
+         preconditionViewerCompositeStyle |= SWT.V_SCROLL | SWT.H_SCROLL;
+      }
+      preconditionViewer = new JavaSnippetSourceViewer(preconditionComposite, preconditionViewerCompositeStyle);
+      preconditionViewer.setEditable(isEditable());
+      preconditionViewer.addPropertyChangeListener(JavaSnippetSourceViewer.PROP_TEXT, new PropertyChangeListener() {
+         @Override
+         public void propertyChange(PropertyChangeEvent e) {
+            updateLaunchConfigurationDialog();
+         }
+      });
+      if (isEditable() && preconditionViewer.getDecoractionImage() != null) {
+         preconditionCompositeLayout.horizontalSpacing += preconditionViewer.getDecoractionImage().getImageData().width;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      preconditionViewer.dispose();
+      super.dispose();
+   }
+
+   /**
+    * Updates the enabled state of the range text fields.
+    */
+   protected void updateRangeTextEditableState() {
+      boolean executeMethodRange = isExecuteMethodRange();
+      startLineText.setEditable(executeMethodRange && isEditable());
+      startColumnText.setEditable(executeMethodRange && isEditable());
+      endLineText.setEditable(executeMethodRange && isEditable());
+      endColumnText.setEditable(executeMethodRange && isEditable());
+      // Update used contract if required
+      if (executeMethodRange && !useGeneratedContractButton.getSelection()) {
+         useGeneratedContractButton.setSelection(true);
+         useExistingContractButton.setSelection(false);
+         updateShownContractComposite();
+      }
+      useExistingContractButton.setEnabled(!executeMethodRange && isEditable());
    }
 
    /**
     * Updates the shown operation contract.
     */
-   protected void updateExistingContractState() {
+   protected void updateShownContractComposite() {
+       // Update shown text and top control of stack layout
        boolean useExistingContract = useExistingContractButton.getSelection();
-       existingContractText.setEditable(useExistingContract && isEditable());
-       if (browseContractButton != null) {
-          browseContractButton.setEnabled(useExistingContract && isEditable());
-       }
        if (useExistingContract) {
-           SWTUtil.setText(existingContractText, lastDefinedExistingContract);
+           contractCompositeLayout.topControl = existingContractComposite;
        }
        else {
-           lastDefinedExistingContract = existingContractText.getText();
-           existingContractText.setText(StringUtil.EMPTY_STRING);
+           contractCompositeLayout.topControl = preconditionComposite;
        }
+       // Layout ui
+       contractComposite.layout();
    }
 
    /**
@@ -572,11 +745,79 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
           }
       }
       // Validate method
+      IMethod method = null;
       if (message == null) {
-          IMethod method = getMethod();
+          method = getMethod();
           if (method == null || !method.exists()) {
               message = "No existing method selected.";
           }
+      }
+      // Validate method range
+      if (message == null && isExecuteMethodRange()) {
+         // Make sure that line and columns of method range are valid integers
+         int startLine = 0;
+         try {
+            startLine = getMethodRangeStartLine();
+         }
+         catch (NumberFormatException e) {
+            message = "Start line of method range \"" + startLineText.getText() + "\" is no valid integer.";
+         }
+         int startColumn = 0;
+         if (message == null) {
+            try {
+               startColumn = getMethodRangeStartColumn();
+            }
+            catch (NumberFormatException e) {
+               message = "Start column of method range \"" + startColumnText.getText() + "\" is no valid integer.";
+            }
+         }
+         int endLine = 0;
+         if (message == null) {
+            try {
+               endLine = getMethodRangeEndLine();
+            }
+            catch (NumberFormatException e) {
+               message = "To line of method range \"" + endLineText.getText() + "\" is no valid integer.";
+            }
+         }
+         int endColumn = 0;
+         if (message == null) {
+            try {
+               endColumn = getMethodRangeEndColumn();
+            }
+            catch (NumberFormatException e) {
+               message = "To column of method range \"" + endColumnText.getText() + "\" is no valid integer.";
+            }
+         }
+         // Make sure that defined start and end are in method's source range
+         if (message == null) {
+            try {
+               ISourceRange methodSourceRange = method.getSourceRange();
+               Position methodStartPosition = KeYUtil.getCursorPositionForOffset(method, methodSourceRange.getOffset());
+               Position methodEndPosition = KeYUtil.getCursorPositionForOffset(method, methodSourceRange.getOffset() + methodSourceRange.getLength());
+               Position startPosition = new KeYUtil.CursorPosition(startLine, startColumn);
+               if (startPosition.compareTo(methodStartPosition) < 0) {
+                  message = "From method range (" + startPosition + ") must be greater or equal to \"" + methodStartPosition + "\".";
+               }
+               if (message == null && startPosition.compareTo(methodEndPosition) > 0) {
+                  message = "From method range (" + startPosition + ") must be lower or equal to \"" + methodEndPosition + "\".";
+               }
+               Position endPosition = new KeYUtil.CursorPosition(endLine, endColumn);
+               if (message == null && endPosition.compareTo(methodEndPosition) > 0) {
+                  message = "To method range (" + endPosition + ") must be lower or equal to \"" + methodEndPosition + "\".";
+               }
+               if (message == null && endPosition.compareTo(methodStartPosition) < 0) {
+                  message = "To method range (" + endPosition + ") must be greater or equal to \"" + methodStartPosition + "\".";
+               }
+               // Make sure that end is after start
+               if (message == null && startPosition.compareTo(endPosition) > 0) {
+                  message = "Method range to (" + startPosition + ") must be greater or equal to method range from (" + endPosition + ").";
+               }
+            }
+            catch (Exception e) {
+               message = e.getMessage();
+            }
+         }
       }
       // Validate contract
       if (message == null) {
@@ -587,6 +828,91 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
           }
       }
       return message;
+   }
+
+   /**
+    * Checks if a method range should be used.
+    * @return {@code true} use method range, {@code false} use complete method body.
+    */
+   protected boolean isExecuteMethodRange() {
+      return executeMethodRangeButton.getSelection();
+   }
+   
+   /**
+    * Returns the start line of the method range.
+    * @return The start line of the method range.
+    * @throws NumberFormatException Occurred Exception
+    */
+   protected int getMethodRangeStartLine() throws NumberFormatException {
+      return Integer.parseInt(startLineText.getText());
+   }
+   
+   /**
+    * Returns the start column of the method range.
+    * @return The start column of the method range.
+    * @throws NumberFormatException Occurred Exception
+    */
+   protected int getMethodRangeStartColumn() throws NumberFormatException {
+      return Integer.parseInt(startColumnText.getText());
+   }
+   
+   /**
+    * Returns the end line of the method range.
+    * @return The end line of the method range.
+    * @throws NumberFormatException Occurred Exception
+    */
+   protected int getMethodRangeEndLine() throws NumberFormatException {
+      return Integer.parseInt(endLineText.getText());
+   }
+   
+   /**
+    * Returns the end column of the method range.
+    * @return The end column of the method range.
+    * @throws NumberFormatException Occurred Exception
+    */
+   protected int getMethodRangeEndColumn() throws NumberFormatException {
+      return Integer.parseInt(endColumnText.getText());
+   }
+
+   /**
+    * Updates the precondition viewer composite by setting the
+    * correct context for content assistant.
+    */
+   protected void updatePreconditionViewerComposite() {
+      IJavaDebugContentAssistContext context = null;
+      if (getType() == null) {
+         context = new TypeContext(null, -1);
+      }
+      else {
+         int position= -1;
+         IMethod method = getMethod();
+         if (method != null) {
+            try {
+               Block body = JDTUtil.getMethodBody(method);
+               if (body != null) {
+                  position = body.getStartPosition() + 1; // Go inside the method body directly after {
+               }
+               try {
+                  if (isExecuteMethodRange()) {
+                     int offset = KeYUtil.getOffsetForCursorPosition(method, 
+                                                                     getMethodRangeStartLine(), 
+                                                                     getMethodRangeStartColumn());
+                     if (offset >= 0) {
+                        position = offset;
+                     }
+                  }
+               }
+               catch (Exception e) {
+                  // Nothing to do, use method body position
+               }
+            }
+            catch (JavaModelException e) {
+               LogUtil.getLogger().logError(e);
+            }
+         }
+         context = new TypeContext(getType(), position);
+      }
+      preconditionViewer.setContentAssistContext(context);
    }
    
    /**
@@ -602,8 +928,17 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
          useGeneratedContractButton.setSelection(!useExistingContract);
          useExistingContractButton.setSelection(useExistingContract);
          existingContractText.setText(KeySEDUtil.getExistingContractValue(configuration));
-         lastDefinedExistingContract = existingContractText.getText();
-         updateExistingContractState();
+         preconditionViewer.setText(KeySEDUtil.getPrecondition(configuration));
+         boolean executeMethodRange = KeySEDUtil.isExecuteMethodRange(configuration);
+         executeMethodBodyButton.setSelection(!executeMethodRange);
+         executeMethodRangeButton.setSelection(executeMethodRange);
+         startLineText.setText(KeySEDUtil.getMethodRangeStartLine(configuration) + StringUtil.EMPTY_STRING);
+         startColumnText.setText(KeySEDUtil.getMethodRangeStartColumn(configuration) + StringUtil.EMPTY_STRING);
+         endLineText.setText(KeySEDUtil.getMethodRangeEndLine(configuration) + StringUtil.EMPTY_STRING);
+         endColumnText.setText(KeySEDUtil.getMethodRangeEndColumn(configuration) + StringUtil.EMPTY_STRING);
+         updateRangeTextEditableState();
+         updateShownContractComposite();
+         updatePreconditionViewerComposite();
       } 
       catch (CoreException e) {
          LogUtil.getLogger().logError(e);
@@ -624,8 +959,23 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
          useGeneratedContractButton.setSelection(!useExistingContract);
          useExistingContractButton.setSelection(useExistingContract);
          existingContractText.setText(settings.getExistingContract());
-         lastDefinedExistingContract = existingContractText.getText();
-         updateExistingContractState();
+         preconditionViewer.setText(settings.getPrecondition());
+         boolean executeMethodRange = settings.isExecuteMethodRange();
+         executeMethodBodyButton.setSelection(!executeMethodRange);
+         executeMethodRangeButton.setSelection(executeMethodRange);
+         Position startPosition = settings.getMethodRangeStart();
+         if (startPosition != null) {
+            startLineText.setText(startPosition.getLine() + StringUtil.EMPTY_STRING);
+            startColumnText.setText(startPosition.getColumn() + StringUtil.EMPTY_STRING);
+         }
+         Position endPosition = settings.getMethodRangeEnd();
+         if (endPosition != null) {
+            endLineText.setText(endPosition.getLine() + StringUtil.EMPTY_STRING);
+            endColumnText.setText(endPosition.getColumn() + StringUtil.EMPTY_STRING);
+         }
+         updateRangeTextEditableState();
+         updateShownContractComposite();
+         updatePreconditionViewerComposite();
       }
       catch (JavaModelException e) {
          LogUtil.getLogger().logError(e);
@@ -642,5 +992,31 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD, methodText.getText());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContractButton.getSelection());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT, existingContractText.getText());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionViewer.getText());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXECUTE_METHOD_RANGE, isExecuteMethodRange());
+      try {
+         configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_START_LINE, getMethodRangeStartLine());
+      }
+      catch (NumberFormatException e) {
+         configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_START_LINE, StringUtil.EMPTY_STRING);
+      }
+      try {
+         configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_START_COLUMN, getMethodRangeStartColumn());
+      }
+      catch (NumberFormatException e) {
+         configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_START_COLUMN, StringUtil.EMPTY_STRING);
+      }
+      try {
+         configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_END_LINE, getMethodRangeEndLine());
+      }
+      catch (NumberFormatException e) {
+         configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_END_LINE, StringUtil.EMPTY_STRING);
+      }
+      try {
+         configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_END_COLUMN, getMethodRangeEndColumn());
+      }
+      catch (NumberFormatException e) {
+         configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_END_COLUMN, StringUtil.EMPTY_STRING);
+      }
    }
 }

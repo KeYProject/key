@@ -43,6 +43,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Provides the functionality to test {@link KeYDebugTarget}s.
@@ -437,6 +438,8 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     * @param closePropertiesView Close properties sheet page?
     * @param closeExecutionTreeViews Close the views which visualizes the symbolic execution tree? Will increase the test perforamnce.
     * @param selector The {@link IMethodSelector} to select the {@link IMethod} to debug.
+    * @param useExistingContract Use existing contract? Use {@code null} to use default value.
+    * @param preconditionOrExistingContract Optional precondition or the ID of the existing contract to use Use {@code null} to use default value.
     * @param showMethodReturnValues Show method return values?
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
@@ -450,6 +453,8 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
                                        boolean closePropertiesView,
                                        boolean closeExecutionTreeViews,
                                        IMethodSelector selector,
+                                       Boolean useExistingContract,
+                                       String preconditionOrExistingContract,
                                        Boolean showMethodReturnValues,
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
@@ -462,6 +467,8 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
                            closePropertiesView,
                            closeExecutionTreeViews, 
                            selector, 
+                           useExistingContract,
+                           preconditionOrExistingContract,
                            showMethodReturnValues, 
                            showVariablesOfSelectedDebugNode, 
                            showKeYMainWindow, 
@@ -479,6 +486,8 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
     * @param closePropertiesView Close properties sheet page?
     * @param closeExecutionTreeViews Close the views which visualizes the symbolic execution tree? Will increase the test perforamnce.
     * @param selector The {@link IMethodSelector} to select the {@link IMethod} to debug.
+    * @param useExistingContract Use existing contract? Use {@code null} to use default value.
+    * @param preconditionOrExistingContract Optional precondition or the ID of the existing contract to use Use {@code null} to use default value.
     * @param showMethodReturnValues Show method return values?
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
@@ -493,6 +502,8 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
                                        boolean closePropertiesView,
                                        boolean closeExecutionTreeViews,
                                        IMethodSelector selector,
+                                       Boolean useExistingContract,
+                                       String preconditionOrExistingContract,
                                        Boolean showMethodReturnValues,
                                        Boolean showVariablesOfSelectedDebugNode,
                                        Boolean showKeYMainWindow,
@@ -530,17 +541,17 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
          // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!KeYUtil.isChoiceSettingInitialised()) {
+         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
             TestStarterCoreUtil.instantiateProofWithGeneratedContract(method);
             KeYUtil.clearProofList(MainWindow.getInstance());
          }
-         originalRuntimeExceptions = KeYUtil.getChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
+         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
          assertNotNull(originalRuntimeExceptions);
          // Set choice settings in KeY.
-         KeYUtil.setChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
-         assertEquals(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, KeYUtil.getChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
+         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
+         assertEquals(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW, SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS));
          // Launch method
-         TestSEDKeyCoreUtil.launchKeY(method, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions);
+         TestSEDKeyCoreUtil.launchKeY(method, useExistingContract, preconditionOrExistingContract, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions);
          // Find the launched ILaunch in the debug view
          SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
          debugTree = debugView.bot().tree();
@@ -554,7 +565,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          SWTBotPreferences.TIMEOUT = originalTimeout;
          // Restore runtime option
          if (originalRuntimeExceptions != null) {
-            KeYUtil.setChoiceSetting(KeYUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
+            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
          }
          // Terminate and remove all launches
          TestSedCoreUtil.terminateAndRemoveAll(debugTree);

@@ -23,11 +23,11 @@ public final class AbandonTaskAction extends MainWindowAction {
 	getMediator().enableWhenProof(this);
     }
 
-    public void actionPerformed(ActionEvent e) {
-	closeTask();
+    public synchronized void actionPerformed(ActionEvent e) {
+    	closeTask();
     }
     
-    private void closeTask() {
+    private synchronized void closeTask() {
 	final Proof proof = getMediator().getProof();
 	
 	if (proof != null) {
@@ -36,7 +36,7 @@ public final class AbandonTaskAction extends MainWindowAction {
 	}
     }
 
-    protected void closeTask(TaskTreeNode rootTask) {
+    protected synchronized void closeTask(TaskTreeNode rootTask) {
        if(mainWindow.getProofList().removeTask(rootTask)){
             for(Proof proof:rootTask.allProofs()){
                 //In a previous revision the following statement was performed only

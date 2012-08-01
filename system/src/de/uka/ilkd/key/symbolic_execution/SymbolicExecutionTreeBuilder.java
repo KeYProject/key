@@ -12,21 +12,30 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Node.NodeIterator;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
@@ -43,7 +52,6 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
-import de.uka.ilkd.key.symbolic_execution.po.SymbolicExecutionFunctionalOperationContractPO;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -56,7 +64,7 @@ import de.uka.ilkd.key.util.NodePreorderIterator;
  * from a normal KeY's proof tree. The requirement is that the proof contains
  * a predicate which is not evaluable to filter invalid execution tree paths.
  * The easiest way to achieve this is to use a 
- * {@link SymbolicExecutionFunctionalOperationContractPO} instance as proof
+ * {@link FunctionalOperationContractPO} (addUninterpretedPredicate = {@code true}) instance as proof
  * obligation to instantiate a {@link Proof} from.
  * </p>
  * <p>
@@ -90,7 +98,7 @@ import de.uka.ilkd.key.util.NodePreorderIterator;
  * an symbolic execution tree:
  * <pre>
  * {@code
- * Proof proof; // Create proof with proof obligation SymbolicExecutionFunctionalOperationContractPO
+ * Proof proof; // Create proof with proof obligation FunctionalOperationContractPO and set addUninterpretedPredicate to true
  * // Start KeY's auto mode with SymbolicExecutionStrategy to do the proof
  * SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof);
  * builder.analyse(); // Create initial symbolic execution tree
@@ -108,7 +116,7 @@ import de.uka.ilkd.key.util.NodePreorderIterator;
  * </pre>
  * </p>
  * @author Martin Hentschel
- * @see SymbolicExecutionFunctionalOperationContractPO
+ * @see FunctionalOperationContractPO#isAddUninterpretedPredicate()
  * @see IExecutionNode
  * @see IExecutionStartNode
  * @see SymbolicExecutionStrategy
@@ -180,8 +188,62 @@ public class SymbolicExecutionTreeBuilder {
       this.exceptionVariable = extractExceptionVariable(proof);
       this.startNode = new ExecutionStartNode(mediator, proof.root());
       this.keyNodeMapping.put(proof.root(), this.startNode);
+      initMethodCallStack(proof.root(), proof.getServices());
    }
    
+   /**
+    * <p>
+    * This method initializes {@link #methodCallStack} in case that the
+    * initial {@link Sequent} contains {@link MethodFrame}s in its modality.
+    * </p>
+    * <p>
+    * This is required because if a block of statements is executed instead
+    * of a method the initial {@link Sequent} contains also a {@link MethodFrame}.
+    * This initial {@link MethodFrame} is required to simulate an execution
+    * context which is required to access class members.
+    * </p>
+    * @param root The root {@link Node} with the initial {@link Sequent}.
+    * @param services The {@link Services} to use.
+    */
+   protected void initMethodCallStack(final Node root, Services services) {
+      // Find all modalities in the succedent
+      final List<Term> modalityTerms = new LinkedList<Term>();
+      for (SequentFormula sequentFormula : root.sequent().succedent()) {
+         sequentFormula.formula().execPreOrder(new Visitor() {
+            @Override
+            public void visit(Term visited) {
+               if (visited.op() instanceof Modality) {
+                  modalityTerms.add(visited);
+               }
+            }
+         });
+      }
+      // Make sure that at least one modality was found
+      if (modalityTerms.size() >= 2) {
+         throw new IllegalStateException("Sequent contains multiple modalities.");
+      }
+      // Check if modality contains method frames
+      if (!modalityTerms.isEmpty()) {
+         Term modalityTerm = modalityTerms.get(0);
+         JavaBlock javaBlock = modalityTerm.javaBlock();
+         final ProgramElement program = javaBlock.program(); 
+         new JavaASTVisitor(program, services) {
+            @Override
+            protected void doDefaultAction(SourceElement node) {
+            }
+            
+            @Override
+            public void performActionOnMethodFrame(MethodFrame x) {
+               methodCallStack.add(root);
+            }
+
+            public void run() {
+               walk(program);
+            }
+         }.run();
+      }
+   }
+
    /**
     * Extracts the exception variable which is used to check if the executed program in proof terminates normally.
     * @param proof The {@link Proof} to extract variable from.
@@ -514,8 +576,7 @@ public class SymbolicExecutionTreeBuilder {
             if (callNode != null) {
                // Find the call Node representation in SED, if not available ignore it.
                IExecutionNode callSEDNode = keyNodeMapping.get(callNode);
-               if (callSEDNode != null) {
-                  assert callSEDNode instanceof IExecutionMethodCall;
+               if (callSEDNode instanceof IExecutionMethodCall) { // Could be the start node if the initial sequent already contains some method frames.
                   result = new ExecutionMethodReturn(mediator, node, (IExecutionMethodCall)callSEDNode);
                }
             }
@@ -549,15 +610,17 @@ public class SymbolicExecutionTreeBuilder {
       // Compute number of call stack size
       int size = SymbolicExecutionUtil.computeStackSize(node, ruleApp);
       // Add call stack entries
-      IExecutionNode[] callStack = new IExecutionNode[size];
+      List<IExecutionNode> callStack = new LinkedList<IExecutionNode>();
       Iterator<Node> stackIter = methodCallStack.iterator();
       for (int i = 0; i < size; i++) {
          Node stackEntry = stackIter.next();
-         IExecutionNode executionNode = getExecutionNode(stackEntry);
-         assert executionNode != null : "Can't find execution node for KeY's proof node \"" + stackEntry + "\".";
-         callStack[i] = executionNode;
+         if (stackEntry != proof.root()) { // Ignore call stack entries provided by the initial sequent
+            IExecutionNode executionNode = getExecutionNode(stackEntry);
+            assert executionNode != null : "Can't find execution node for KeY's proof node \"" + stackEntry + "\".";
+            callStack.add(executionNode);
+         }
       }
-      return callStack;
+      return callStack.toArray(new IExecutionNode[callStack.size()]);
    }
 
    /**

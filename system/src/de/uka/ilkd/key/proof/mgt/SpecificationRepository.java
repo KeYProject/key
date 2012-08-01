@@ -995,6 +995,22 @@ public final class SpecificationRepository {
         return null;
     }    
     
+    /**
+     * Returns the {@link ProofOblInput} from which the given {@link Proof}
+     * was created.
+     * @param proof The {@link Proof}.
+     * @return The {@link ProofOblInput} of the given {@link Proof} or {@code null} if not available.
+     */
+    public ProofOblInput getProofOblInput(Proof proof) {
+       for(Map.Entry<ProofOblInput,ImmutableSet<Proof>> entry : proofs.entrySet()) {
+          ProofOblInput po = entry.getKey();
+          ImmutableSet<Proof> sop = entry.getValue();
+          if(sop.contains(proof)) {
+              return po;
+          }
+       }
+       return null;
+    }
     
     /**
      * Returns the target that the passed proof is about, or null.

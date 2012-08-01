@@ -34,6 +34,17 @@ public abstract class AbstractTabbedPropertiesAndLaunchConfigurationTab extends 
    }
 
    /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      if (contentComposite != null) {
+         contentComposite.dispose();
+      }
+      super.dispose();
+   }
+
+   /**
     * Creates the shown {@link AbstractTabbedPropertiesAndLaunchConfigurationTabComposite}.
     * @param parent The parent {@link Composite}.
     * @param style The style.

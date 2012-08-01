@@ -79,6 +79,12 @@ public class EnhancedForElimination extends ProgramTransformer {
      * </ul>
      * 
      * <p>
+     * Loops over arrays are treated by a taclet without use of this class.
+     * 
+     * <p>
+     * Loops over Iterable-objects are treated by this meta-construct.
+     * 
+     * <p>
      * The rules which use this meta construct must ensure that exp is of type
      * Iterable.
      * 

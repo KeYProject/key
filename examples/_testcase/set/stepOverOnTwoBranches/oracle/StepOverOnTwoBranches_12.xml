@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
-   <methodCall name="self.main(_a);" pathCondition="true" pathConditionChanged="false">
-      <branchNode name="if (_a==0) {int i = 2;int j = 3;int x = valueLonger(i);int y = value(j);int z = valueLonger(x)+valueLonger(y);int zz = value(-3)+value(-4);return value(z+zz); }else  {int i = 2;int j = 3;int x = value(i);int y = valueLonger(j);int z = value(x)+value(y);int zz = valueLonger(-3)+valueLonger(-4);return valueLonger(z+zz); }" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="a = 0 TRUE" pathCondition="a = 0" pathConditionChanged="true" branchCondition="a = 0">
+   <methodCall name="self.main(a);" pathCondition="true" pathConditionChanged="false">
+      <branchNode name="if (a==0) {int i = 2;int j = 3;int x = valueLonger(i);int y = value(j);int z = valueLonger(x)+valueLonger(y);int zz = value(-3)+value(-4);return value(z+zz); }else  {int i = 2;int j = 3;int x = value(i);int y = valueLonger(j);int z = value(x)+value(y);int zz = valueLonger(-3)+valueLonger(-4);return valueLonger(z+zz); }" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="a = 0 TRUE" pathCondition="a = 0" pathConditionChanged="true" branchCondition="a = 0" mergedBranchCondition="false">
             <statement name="int i = 2;" pathCondition="a = 0" pathConditionChanged="false">
                <statement name="int j = 3;" pathCondition="a = 0" pathConditionChanged="false">
                   <statement name="int x = valueLonger(i);" pathCondition="a = 0" pathConditionChanged="false">
@@ -37,7 +37,7 @@
                                                                                                          <methodCall name="self.value(i_14);" pathCondition="a = 0" pathConditionChanged="false">
                                                                                                             <statement name="return i_14;" pathCondition="a = 0" pathConditionChanged="false">
                                                                                                                <methodReturn name="&lt;return of self.value(i_14);&gt;" pathCondition="a = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-2&apos; as result of self.value(i_14);&gt;">
-                                                                                                                  <methodReturn name="&lt;return of self.main(_a);&gt;" pathCondition="a = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-2&apos; as result of self.main(_a);&gt;">
+                                                                                                                  <methodReturn name="&lt;return of self.main(a);&gt;" pathCondition="a = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-2&apos; as result of self.main(a);&gt;">
                                                                                                                      <termination name="&lt;end&gt;" pathCondition="a = 0" pathConditionChanged="false" exceptionalTermination="false">
                                                                                                                      </termination>
                                                                                                                   </methodReturn>
@@ -76,7 +76,7 @@
                </statement>
             </statement>
          </branchCondition>
-         <branchCondition name="a = 0 FALSE" pathCondition="!a = 0" pathConditionChanged="true" branchCondition="!a = 0">
+         <branchCondition name="a = 0 FALSE" pathCondition="!a = 0" pathConditionChanged="true" branchCondition="!a = 0" mergedBranchCondition="false">
             <statement name="int i = 2;" pathCondition="!a = 0" pathConditionChanged="false">
                <statement name="int j = 3;" pathCondition="!a = 0" pathConditionChanged="false">
                   <statement name="int x = value(i_1);" pathCondition="!a = 0" pathConditionChanged="false">
@@ -113,7 +113,7 @@
                                                                                                                <statement name="i_15=j_8;" pathCondition="!a = 0" pathConditionChanged="false">
                                                                                                                   <statement name="return j_8;" pathCondition="!a = 0" pathConditionChanged="false">
                                                                                                                      <methodReturn name="&lt;return of self.valueLonger(i_15);&gt;" pathCondition="!a = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-2&apos; as result of self.valueLonger(i_15);&gt;">
-                                                                                                                        <methodReturn name="&lt;return of self.main(_a);&gt;" pathCondition="!a = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-2&apos; as result of self.main(_a);&gt;">
+                                                                                                                        <methodReturn name="&lt;return of self.main(a);&gt;" pathCondition="!a = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-2&apos; as result of self.main(a);&gt;">
                                                                                                                            <termination name="&lt;end&gt;" pathCondition="!a = 0" pathConditionChanged="false" exceptionalTermination="false">
                                                                                                                            </termination>
                                                                                                                         </methodReturn>

@@ -6,6 +6,8 @@ import org.eclipse.jdt.core.IMethod;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 
+import de.uka.ilkd.key.java.Position;
+
 /**
  * Contains the settings used in an {@link ILaunch} which contains a
  * {@link KeYDebugTarget} as unmodifiable backup of the initial
@@ -30,6 +32,11 @@ public class KeYLaunchSettings {
    private String existingContract;
    
    /**
+    * The precondition.
+    */
+   private String precondition;
+   
+   /**
     * If this is {@code true} an {@link ISEDMethodReturn} will contain the return value,
     * but the performance will suffer.
     * If it is {@code false} only the name of the returned method is shown in an {@link ISEDMethodReturn}.
@@ -50,31 +57,58 @@ public class KeYLaunchSettings {
     * Merge branch conditions?
     */
    private boolean mergeBranchConditions;
+   
+   /**
+    * {@code true} execute method range, {@code false} execute complete method body.
+    */
+   private boolean executeMethodRange;
+   
+   /**
+    * The start of the method range to execute.
+    */
+   private Position methodRangeStart;
+   
+   /**
+    * The end of the method range to execute.
+    */
+   private Position methodRangeEnd;
 
    /**
     * Constructor.
     * @param method The {@link IMethod} to debug.
     * @param useExistingContract Use an existing contract or generate default contract?
     * @param existingContract The ID of the existing contract to use.
+    * @param precondition The precondition.
     * @param showMethodReturnValues Show method return values of {@link ISEDMethodReturn} instances?
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param executeMethodRange {@code true} execute method range, {@code false} execute complete method body.
+    * @param methodRangeStart The start of the method range to execute.
+    * @param methodRangeEnd The end of the method range to execute.
     */
    public KeYLaunchSettings(IMethod method, 
                             boolean useExistingContract, 
                             String existingContract, 
+                            String precondition,
                             boolean showMethodReturnValues,
                             boolean showVariablesOfSelectedDebugNode,
                             boolean showKeYMainWindow,
-                            boolean mergeBranchConditions) {
+                            boolean mergeBranchConditions,
+                            boolean executeMethodRange,
+                            Position methodRangeStart,
+                            Position methodRangeEnd) {
       this.method = method;
       this.useExistingContract = useExistingContract;
       this.existingContract = existingContract;
+      this.precondition = precondition;
       this.showMethodReturnValues = showMethodReturnValues;
       this.showVariablesOfSelectedDebugNode = showVariablesOfSelectedDebugNode;
       this.showKeYMainWindow = showKeYMainWindow;
       this.mergeBranchConditions = mergeBranchConditions;
+      this.executeMethodRange = executeMethodRange;
+      this.methodRangeStart = methodRangeStart;
+      this.methodRangeEnd = methodRangeEnd;
    }
 
    /**
@@ -131,5 +165,37 @@ public class KeYLaunchSettings {
     */
    public boolean isMergeBranchConditions() {
       return mergeBranchConditions;
+   }
+
+   /**
+    * Returns the precondition.
+    * @return The precondition.
+    */
+   public String getPrecondition() {
+      return precondition;
+   }
+
+   /**
+    * Checks if a method range or the complete method is executed.
+    * @return {@code true} execute method range, {@code false} execute complete method body.
+    */
+   public boolean isExecuteMethodRange() {
+      return executeMethodRange;
+   }
+
+   /**
+    * Returns the start of the method range to execute.
+    * @return The start of the method range to execute.
+    */
+   public Position getMethodRangeStart() {
+      return methodRangeStart;
+   }
+
+   /**
+    * Returns the end of the method range to execute.
+    * @return The end of the method range to execute.
+    */
+   public Position getMethodRangeEnd() {
+      return methodRangeEnd;
    }
 }

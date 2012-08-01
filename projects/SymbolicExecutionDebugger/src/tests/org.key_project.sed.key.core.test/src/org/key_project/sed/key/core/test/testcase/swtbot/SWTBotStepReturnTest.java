@@ -55,6 +55,8 @@ public class SWTBotStepReturnTest extends AbstractKeYDebugTargetTestCase {
                            true,
                            true,
                            createMethodSelector("StepReturnTest", "main", "I"), 
+                           null,
+                           null,
                            Boolean.FALSE, 
                            Boolean.FALSE,
                            Boolean.FALSE,

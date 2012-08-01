@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.proof.init;
 
+import java.io.IOException;
+import java.util.Properties;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
@@ -18,6 +21,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
@@ -29,6 +33,8 @@ public final class DependencyContractPO extends AbstractPO
                                         implements ContractPO {
     
     private Term mbyAtPre;    
+    
+    private DependencyContract contract;
            
     
     //-------------------------------------------------------------------------
@@ -37,8 +43,9 @@ public final class DependencyContractPO extends AbstractPO
     
     public DependencyContractPO(InitConfig initConfig, 
 	    			DependencyContract contract) {
-    	super(initConfig, contract.getName(), contract);
+    	super(initConfig, contract.getName());
     	assert !(contract instanceof FunctionalOperationContract);
+      this.contract = contract;
     }
     
     
@@ -203,7 +210,7 @@ public final class DependencyContractPO extends AbstractPO
     
     @Override
     public DependencyContract getContract() {
-        return (DependencyContract)contract;
+        return contract;
     }
     
     
@@ -228,4 +235,47 @@ public final class DependencyContractPO extends AbstractPO
         return contract.hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void fillSaveProperties(Properties properties) throws IOException {
+        super.fillSaveProperties(properties);
+        properties.setProperty("contract", contract.getName());
+    }
+    
+    /**
+     * Instantiates a new proof obligation with the given settings.
+     * @param initConfig The already load {@link InitConfig}.
+     * @param properties The settings of the proof obligation to instantiate.
+     * @return The instantiated proof obligation.
+     * @throws IOException Occurred Exception.
+     */
+    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
+       String contractName = properties.getProperty("contract");
+       int proofNum = 0;
+       String baseContractName = null;
+       int ind = -1;
+       for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
+          ind = contractName.indexOf("." + tag);
+          if (ind > 0) {
+             break;
+          }
+          proofNum++;
+       }
+       if (ind == -1) {
+          baseContractName = contractName;
+          proofNum = 0;
+       }
+       else {
+          baseContractName = contractName.substring(0, ind);
+       }
+       final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
+       if (contract == null) {
+          throw new RuntimeException("Contract not found: " + baseContractName);
+       }
+       else {
+          return new LoadedPOContainer(contract.createProofObl(initConfig, contract), proofNum);
+       }
+    }
 }

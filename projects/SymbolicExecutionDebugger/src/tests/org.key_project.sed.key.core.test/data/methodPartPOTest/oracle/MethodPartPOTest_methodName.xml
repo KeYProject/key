@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_655f0dd0-3bbf-4bd3-adc0-f293b7ed2dfc" name="doSomething(int, java.lang.String, boolean)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_222223de-d296-47d4-94f6-6f7dc022647e" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_b36dcb5b-0a24-4229-8f2b-40cdfedeb5ec" name="self.doSomething(asdf,a,b);" pathCondition="true" lineNumber="-1" charStart="248" charEnd="259">
+            <sedStatement xml:id="_a985f63c-cf0d-4232-9dd9-0a4baa910bb4" name="int x = 0;" pathCondition="true" lineNumber="-1" charStart="296" charEnd="306">
+               <sedBranchNode xml:id="_908bc9ca-59b4-48e7-96c5-415c03465586" name="if (asdf&lt;0) {   x=x*-1;   x+=2; }else  {   x-=42;return x; }" pathCondition="true" lineNumber="-1" charStart="310" charEnd="400">
+                  <sedBranchCondition xml:id="_6cfb40eb-5b68-4b9a-9770-15ca8ffaecf7" name="asdf &lt;= -1 TRUE" pathCondition="!asdf &gt;= 0">
+                     <sedStatement xml:id="_b9492a0f-d10b-407e-ba8f-d3a7c509a38e" name="x=x*-1;" pathCondition="!asdf &gt;= 0" lineNumber="-1" charStart="330" charEnd="341">
+                        <sedStatement xml:id="_6d6f9b84-ea62-40e0-825d-bea674090e5c" name="x+=2;" pathCondition="!asdf &gt;= 0" lineNumber="-1" charStart="346" charEnd="353">
+                           <sedStatement xml:id="_7ed7d51a-014e-4cdf-b189-f778a7ce5ba6" name="x=1*asdf;" pathCondition="!asdf &gt;= 0" lineNumber="-1" charStart="404" charEnd="417">
+                              <sedStatement xml:id="_34c63d9c-d3f9-466d-bbb3-4107237a298d" name="int y = 2+CONSTANT+field;" pathCondition="!asdf &gt;= 0" lineNumber="-1" charStart="421" charEnd="450">
+                                 <sedStatement xml:id="_5064c815-f868-4696-8718-354956cfe041" name="int doubleValue = doubleValue(x);" pathCondition="!asdf &gt;= 0" lineNumber="-1" charStart="454" charEnd="487">
+                                    <sedMethodCall xml:id="_ed2d8986-18dd-444f-8c83-72c65cf82963" name="self.doubleValue(value);" pathCondition="!asdf &gt;= 0" lineNumber="-1" charStart="554" charEnd="565">
+                                       <sedStatement xml:id="_27fe3d59-9283-4685-b827-051cd67c6ed4" name="int result;" pathCondition="!asdf &gt;= 0" lineNumber="-1" charStart="582" charEnd="593">
+                                          <sedStatement xml:id="_6cd277ea-6ff7-4c4e-9529-590bf1d42358" name="result_1=value+value;" pathCondition="!asdf &gt;= 0" lineNumber="-1" charStart="597" charEnd="620">
+                                             <sedStatement xml:id="_ec2edf22-1b4d-405f-ac0a-d8760ebd17a5" name="return result_1;" pathCondition="!asdf &gt;= 0" lineNumber="-1" charStart="624" charEnd="638">
+                                                <sedMethodReturn xml:id="_1427b773-5a20-440f-875a-1d06ce5c1914" name="&lt;return &apos;asdf * 2&apos; as result of self.doubleValue(value);&gt;" pathCondition="!asdf &gt;= 0" lineNumber="-1" charStart="554" charEnd="565">
+                                                   <sedStatement xml:id="_46b923e3-fdac-4960-9dad-0ab64a4e3813" name="int z = x+y+doubleValue;" pathCondition="!asdf &gt;= 0" lineNumber="-1" charStart="491" charEnd="519">
+                                                      <sedStatement xml:id="_a621020e-904e-4394-b174-c3bce14e13e5" name="return z;" pathCondition="!asdf &gt;= 0" lineNumber="-1" charStart="523" charEnd="532">
+                                                         <sedMethodReturn xml:id="_38ec5f44-6b0d-4e70-adec-a2ae275b49b9" name="&lt;return &apos;4 + asdf * 3 + self.field&apos; as result of self.doSomething(asdf,a,b);&gt;" pathCondition="!asdf &gt;= 0" lineNumber="-1" charStart="248" charEnd="259">
+                                                            <sedTermination xml:id="_d3f2e70b-4339-451a-b26d-f91c54ea8bbd" name="&lt;end&gt;" pathCondition="!asdf &gt;= 0">
+                                                            </sedTermination>
+                                                         </sedMethodReturn>
+                                                      </sedStatement>
+                                                   </sedStatement>
+                                                </sedMethodReturn>
+                                             </sedStatement>
+                                          </sedStatement>
+                                       </sedStatement>
+                                    </sedMethodCall>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedStatement>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedBranchCondition>
+                  <sedBranchCondition xml:id="_6cdc3ea7-8ade-45dc-8483-ba01863c85e8" name="asdf &lt;= -1 FALSE" pathCondition="!asdf &lt;= -1">
+                     <sedStatement xml:id="_ad700c08-0fc2-4676-8f4f-a0bccd24d223" name="x-=42;" pathCondition="!asdf &lt;= -1" lineNumber="-1" charStart="373" charEnd="381">
+                        <sedStatement xml:id="_646286a1-92ac-44a6-87e0-c0dc7fa45165" name="return x;" pathCondition="!asdf &lt;= -1" lineNumber="-1" charStart="386" charEnd="395">
+                           <sedMethodReturn xml:id="_dc768091-3924-4d6b-be4d-ee59b462d87b" name="&lt;return &apos;-42&apos; as result of self.doSomething(asdf,a,b);&gt;" pathCondition="!asdf &lt;= -1" lineNumber="-1" charStart="248" charEnd="259">
+                              <sedTermination xml:id="_becdf0db-08a2-4449-94b8-1db25b2cd1be" name="&lt;end&gt;" pathCondition="!asdf &lt;= -1">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedBranchCondition>
+               </sedBranchNode>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

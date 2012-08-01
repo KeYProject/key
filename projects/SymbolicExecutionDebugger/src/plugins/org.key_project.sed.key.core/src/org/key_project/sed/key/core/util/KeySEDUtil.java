@@ -35,6 +35,7 @@ import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 /**
@@ -64,6 +65,31 @@ public final class KeySEDUtil {
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD = "org.key_project.sed.key.core.launch.sed.key.attribute.method";
 
     /**
+     * The key of the attribute "execute method range" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXECUTE_METHOD_RANGE = "org.key_project.sed.key.core.launch.sed.key.attribute.executeMethodRange";
+
+    /**
+     * The key of the attribute "method range start line" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_START_LINE = "org.key_project.sed.key.core.launch.sed.key.attribute.methodRangeStartLine";
+
+    /**
+     * The key of the attribute "method range start column" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_START_COLUMN = "org.key_project.sed.key.core.launch.sed.key.attribute.methodRangeStartColumn";
+
+    /**
+     * The key of the attribute "method range end line" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_END_LINE = "org.key_project.sed.key.core.launch.sed.key.attribute.methodRangeEndLine";
+
+    /**
+     * The key of the attribute "method range end column" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_END_COLUMN = "org.key_project.sed.key.core.launch.sed.key.attribute.methodRangeEndColumn";
+
+    /**
      * The key of the attribute "useExistingContract" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
      */
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT = "org.key_project.sed.key.core.launch.sed.key.attribute.useExistingContract";
@@ -72,6 +98,11 @@ public final class KeySEDUtil {
      * The key of the attribute "existingContract" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
      */
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT = "org.key_project.sed.key.core.launch.sed.key.attribute.existingContract";
+
+    /**
+     * The key of the attribute "precondition" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION = "org.key_project.sed.key.core.launch.sed.key.attribute.precondition";
 
     /**
      * The key of the attribute "show method return values in debug nodes" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
@@ -161,6 +192,16 @@ public final class KeySEDUtil {
     }
     
     /**
+     * Returns the precondition attribute value from the given {@link ILaunchConfiguration}.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return The precondition attribute value.
+     * @throws CoreException Occurred Exception.
+     */
+    public static String getPrecondition(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, StringUtil.EMPTY_STRING) : StringUtil.EMPTY_STRING;
+    }
+    
+    /**
      * Returns the type attribute value from the given {@link ILaunchConfiguration}.
      * @param configuration The {@link ILaunchConfiguration} to read from.
      * @return The type attribute value.
@@ -241,6 +282,72 @@ public final class KeySEDUtil {
     }
     
     /**
+     * Checks if a method range should be executed.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} execute method range, {@code false} execute complete method.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isExecuteMethodRange(ILaunchConfiguration configuration) throws CoreException {
+        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXECUTE_METHOD_RANGE, false) : false;
+    }
+    
+    /**
+     * Returns the method range start line.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return The method range start line.
+     * @throws CoreException Occurred Exception.
+     */
+    public static int getMethodRangeStartLine(ILaunchConfiguration configuration) throws CoreException {
+       return getSaveInt(configuration, LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_START_LINE, 0);
+    }
+    
+    /**
+     * Returns the method range start column.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return The method range start column.
+     * @throws CoreException Occurred Exception.
+     */
+    public static int getMethodRangeStartColumn(ILaunchConfiguration configuration) throws CoreException {
+       return getSaveInt(configuration, LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_START_COLUMN, 0);
+    }
+    
+    /**
+     * Returns the method range end line.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return The method range end line.
+     * @throws CoreException Occurred Exception.
+     */
+    public static int getMethodRangeEndLine(ILaunchConfiguration configuration) throws CoreException {
+       return getSaveInt(configuration, LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_END_LINE, 0);
+    }
+    
+    /**
+     * Returns the method range end column.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return The method range end column.
+     * @throws CoreException Occurred Exception.
+     */
+    public static int getMethodRangeEndColumn(ILaunchConfiguration configuration) throws CoreException {
+       return getSaveInt(configuration, LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_END_COLUMN, 0);
+    }
+    
+    /**
+     * Returns an integer value savely without thrown exceptions.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @param key The key to read.
+     * @param defaultValue The default value to use.
+     * @return The value of the key.
+     */
+    public static int getSaveInt(ILaunchConfiguration configuration, String key, int defaultValue) {
+        try {
+            return configuration != null ? configuration.getAttribute(key, defaultValue) : defaultValue;
+        }
+        catch (Exception e) {
+            return defaultValue;
+        }
+    }
+    
+    /**
      * Searches the {@link IMethod} that is defined by the given {@link ILaunch}.
      * @param launch The {@link ILaunch} that defines an {@link IMethod}.
      * @return The found {@link IMethod} or {@code null} if no one was found.
@@ -289,19 +396,36 @@ public final class KeySEDUtil {
     /**
      * Creates a new {@link ILaunchConfiguration}.
      * @param method The {@link IMethod} to launch.
+     * @param methodStartPosition An optional start position to execute only parts of the method.
+     * @param methodEndPosition An optional end position to execute only parts of the method.
      * @return The new created {@link ILaunchConfiguration}.
      * @throws CoreException Occurred Exception.
      */
-    public static ILaunchConfiguration createConfiguration(IMethod method) throws CoreException {
+    public static ILaunchConfiguration createConfiguration(IMethod method,
+                                                           Position methodStartPosition,
+                                                           Position methodEndPosition) throws CoreException {
         ILaunchConfiguration config = null;
         ILaunchConfigurationWorkingCopy wc = null;
         ILaunchConfigurationType configType = getConfigurationType();
         String typeLabel = KeySEDUtil.getTypeValue(method);
         String methodLabel = KeySEDUtil.getMethodValue(method);
-        wc = configType.newInstance(null, LaunchUtil.getLaunchManager().generateLaunchConfigurationName(typeLabel + "#" + methodLabel));
+        String name = typeLabel + "#" + methodLabel;
+        if (methodStartPosition != null && methodEndPosition != null) {
+           name += " from " + methodStartPosition.getLine() + ", " + methodStartPosition.getColumn() + " to " + methodEndPosition.getLine() + ", " + methodEndPosition.getColumn(); // : is not alowed as name
+        }
+        wc = configType.newInstance(null, LaunchUtil.getLaunchManager().generateLaunchConfigurationName(name));
         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PROJECT, KeySEDUtil.getProjectValue(method));
         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TYPE, typeLabel);
         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD, methodLabel);
+        wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXECUTE_METHOD_RANGE, methodStartPosition != null && methodEndPosition != null);
+        if (methodStartPosition != null) {
+           wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_START_LINE, methodStartPosition.getLine());
+           wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_START_COLUMN, methodStartPosition.getColumn());
+        }
+        if (methodEndPosition != null) {
+           wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_END_LINE, methodEndPosition.getLine());
+           wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD_RANGE_END_COLUMN, methodEndPosition.getColumn());
+        }
         wc.setMappedResources(new IResource[] {method.getUnderlyingResource()});
         config = wc.doSave();
         return config;
@@ -311,22 +435,41 @@ public final class KeySEDUtil {
      * Searches all {@link ILaunchConfiguration} that handles
      * the given {@link IMethod}.
      * @param method The {@link IMethod} for that {@link ILaunchConfiguration}s are required.
+     * @param methodStartPosition An optional start position to execute only parts of the method.
+     * @param methodEndPosition An optional end position to execute only parts of the method.
      * @return The found {@link ILaunchConfiguration}s.
      * @throws CoreException Occurred Exception.
      */
-    public static List<ILaunchConfiguration> searchLaunchConfigurations(IMethod method) throws CoreException {
+    public static List<ILaunchConfiguration> searchLaunchConfigurations(IMethod method,
+                                                                        Position methodStartPosition,
+                                                                        Position methodEndPosition) throws CoreException {
         // Get parameters
-        String projectLabel = KeySEDUtil.getProjectValue(method);
-        String typeLabel = KeySEDUtil.getTypeValue(method);
-        String methodLabel = KeySEDUtil.getMethodValue(method);
+        String projectLabel = getProjectValue(method);
+        String typeLabel = getTypeValue(method);
+        String methodLabel = getMethodValue(method);
         // Compare existing configurations to with the parameters.
-        ILaunchConfiguration[] configs = DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations(KeySEDUtil.getConfigurationType());
+        ILaunchConfiguration[] configs = DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations(getConfigurationType());
         List<ILaunchConfiguration> result = new ArrayList<ILaunchConfiguration>(configs.length);
         for (ILaunchConfiguration config : configs) {
-            if (ObjectUtil.equals(projectLabel, KeySEDUtil.getProjectValue(config)) &&
-                ObjectUtil.equals(typeLabel, KeySEDUtil.getTypeValue(config)) &&
-                ObjectUtil.equals(methodLabel, KeySEDUtil.getMethodValue(config))) {
-                result.add(config);
+            // Check method
+            if (ObjectUtil.equals(projectLabel, getProjectValue(config)) &&
+                ObjectUtil.equals(typeLabel, getTypeValue(config)) &&
+                ObjectUtil.equals(methodLabel, getMethodValue(config))) {
+                // Check method body or method part definition
+                if (methodStartPosition != null && methodEndPosition != null) {
+                    if (isExecuteMethodRange(config) &&
+                        methodStartPosition.getLine() == getMethodRangeStartLine(config) &&
+                        methodStartPosition.getColumn() == getMethodRangeStartColumn(config) &&
+                        methodEndPosition.getLine() == getMethodRangeEndLine(config) &&
+                        methodEndPosition.getColumn() == getMethodRangeEndColumn(config)) {
+                        result.add(config);
+                    }
+                }
+                else {
+                    if (!isExecuteMethodRange(config)) {
+                        result.add(config);
+                    }
+                }
             }
         }
         return result;

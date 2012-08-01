@@ -85,8 +85,7 @@
                  \else (1))
 + \if (x_arr_9 = x_arr_4)
       \then (4)
-      \else (\if (  x_arr_9 = x_arr_4
-                  &amp; x_arr_9.length &gt;= 1)
+      \else (\if (x_arr_9 = x_arr_4)
                  \then (0)
                  \else (2))&apos; as result of self.main();&gt;">
                      <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">

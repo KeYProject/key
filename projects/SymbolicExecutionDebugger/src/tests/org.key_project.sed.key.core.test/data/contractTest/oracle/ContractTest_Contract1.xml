@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_9a3159ce-890b-45f5-b3ea-6687585eb6a8" name="ContractTest[ContractTest::returnValue(int)].JML operation contract.1" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_64ea5eac-f776-4143-8d08-5c5d8f4abd12" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_51a8b98e-7f75-4e9b-a7a8-1017658a76f9" name="self.returnValue(_value);" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
+            <sedStatement xml:id="_039a5ad6-5b64-4d81-8f55-486882a8ead8" name="return _value;" pathCondition="true" lineNumber="-1" charStart="150" charEnd="163">
+               <sedMethodReturn xml:id="_9c62f7dc-15cb-4c47-b2aa-80a645b185cc" name="&lt;return &apos;4&apos; as result of self.returnValue(_value);&gt;" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
+                  <sedTermination xml:id="_65a87557-4130-45de-ae19-cc105ec97bb7" name="&lt;end&gt;" pathCondition="true">
+                  </sedTermination>
+               </sedMethodReturn>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>
