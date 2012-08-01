@@ -309,6 +309,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet ( d, "javaIntegerSemantics", -5000 );
         
+        // always give infinite cost to obsolete rules
+        bindRuleSet (d, "obsolete", inftyConst());
+        
         
         bindRuleSet (d, "update_elim", -8000);
         bindRuleSet (d, "update_apply_on_update", -7000);
