@@ -200,31 +200,31 @@ public class EnhancedForElimination extends ProgramTransformer {
             Expression expression, Statement body) {
 
         // local variable "it"
-        VariableNamer varNamer = services.getVariableNamer();
-        KeYJavaType iteratorType = services.getJavaInfo().getTypeByName(ITERATOR);
-        ProgramElementName itName = varNamer.getTemporaryNameProposal(IT);
-        ProgramVariable itVar = new LocationVariable(itName, iteratorType);
+        final VariableNamer varNamer = services.getVariableNamer();
+        final KeYJavaType iteratorType = services.getJavaInfo().getTypeByName(ITERATOR);
+        final ProgramElementName itName = varNamer.getTemporaryNameProposal(IT);
+        final ProgramVariable itVar = new LocationVariable(itName, iteratorType);
 
         // local variable "values"
-        ProgramElementName valuesName = varNamer.getTemporaryNameProposal(VALUES);
-        KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-        LocationVariable valuesVar = new LocationVariable(valuesName, seqType);
+        final ProgramElementName valuesName = varNamer.getTemporaryNameProposal(VALUES);
+        final KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+        final LocationVariable valuesVar = new LocationVariable(valuesName, seqType);
 
-        Statement valuesInit = makeValuesInit(valuesVar);
+        final Statement valuesInit = makeValuesInit(valuesVar);
 
-        Statement itinit = makeIteratorInit(expression, itVar);
+        final Statement itinit = makeIteratorInit(expression, itVar);
 
-        Expression itGuard = makeGuard(itVar);
+        final Expression itGuard = makeGuard(itVar);
 
-        StatementBlock block = makeBlock(itVar, valuesVar, lvd, body);
+        final StatementBlock block = makeBlock(itVar, valuesVar, lvd, body);
 
         // while
-        While whileGuard = new While(itGuard, block, null, new ExtList());
+        final While whileGuard = new While(itGuard, block, null, new ExtList());
 
         // block
-        Statement[] statements = 
+        final Statement[] statements = 
                 new Statement[]{ itinit, valuesInit, whileGuard };
-        StatementBlock outerBlock = new StatementBlock(statements);
+        final StatementBlock outerBlock = new StatementBlock(statements);
         setInvariant(enhancedFor,whileGuard);
         return outerBlock;
 
@@ -234,13 +234,13 @@ public class EnhancedForElimination extends ProgramTransformer {
      * "ghost \seq values = \seq_empty"
      */
     private Statement makeValuesInit(LocationVariable valuesVar) {
-        KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-        TypeReference seqRef = new TypeRef(seqType);
-        Modifier[] ghost = { new Ghost() };
-        Expression seqEmpty = EmptySeqLiteral.INSTANCE;
-        VariableSpecification[] valuesSpec =
+        final KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+        final TypeReference seqRef = new TypeRef(seqType);
+        final Modifier[] ghost = { new Ghost() };
+        final Expression seqEmpty = EmptySeqLiteral.INSTANCE;
+        final VariableSpecification[] valuesSpec =
             { new VariableSpecification(valuesVar, seqEmpty, seqType) };
-        Statement valuesInit = new LocalVariableDeclaration(ghost, seqRef, valuesSpec);
+        final Statement valuesInit = new LocalVariableDeclaration(ghost, seqRef, valuesSpec);
         return valuesInit;
     }
 
@@ -250,11 +250,11 @@ public class EnhancedForElimination extends ProgramTransformer {
     private StatementBlock makeBlock(ProgramVariable itVar, LocationVariable valuesVar,
             LocalVariableDeclaration lvd, Statement body) {
 
-        Statement[] statements = 
+        final Statement[] statements = 
                 // ATTENTION: in order for the invariant rule to work correctly,
                 // the update to values needs to appear at the _second_ entry of the loop
                 { makeUpdate(itVar, lvd), makeValuesUpdate(valuesVar, lvd), body };
-        StatementBlock block = new StatementBlock(statements);
+        final StatementBlock block = new StatementBlock(statements);
         return block;
     }
 
@@ -262,13 +262,13 @@ public class EnhancedForElimination extends ProgramTransformer {
      * <values> = \seq_concat(<values>, \seq_singleton(<lvd>)); 
      */
     private Statement makeValuesUpdate(LocationVariable valuesVar, LocalVariableDeclaration lvd){
-        VariableSpecification var = lvd.getVariables().get(0);
-        IProgramVariable element = var.getProgramVariable();
+        final VariableSpecification var = lvd.getVariables().get(0);
+        final IProgramVariable element = var.getProgramVariable();
         assert element instanceof ProgramVariable :
             "Since this is a concrete program, the spec must not be schematic";
-        Expression seqSingleton = new SeqSingleton((ProgramVariable)element);
-        Expression seqConcat = new SeqConcat(valuesVar, seqSingleton);
-        Statement assignment = new CopyAssignment(valuesVar, seqConcat);
+        final Expression seqSingleton = new SeqSingleton((ProgramVariable)element);
+        final Expression seqConcat = new SeqConcat(valuesVar, seqSingleton);
+        final Statement assignment = new CopyAssignment(valuesVar, seqConcat);
         return assignment;
     }
 
@@ -278,18 +278,18 @@ public class EnhancedForElimination extends ProgramTransformer {
     private Statement makeUpdate(ProgramVariable itVar,
             LocalVariableDeclaration lvd) {
 
-        MethodReference methodCall = getItNext(itVar);
+        final MethodReference methodCall = getItNext(itVar);
 
         //
         // make local variable decl
-        VariableSpecification orgSpec =
+        final VariableSpecification orgSpec =
                 lvd.getVariableSpecifications().get(0);
-        VariableSpecification newSpec =
+        final VariableSpecification newSpec =
                 new VariableSpecification(orgSpec.getProgramVariable(),
                         methodCall, orgSpec.getType());
-        KeYJavaType keytype = (KeYJavaType) orgSpec.getType();
-        TypeRef tr = new TypeRef(keytype);
-        LocalVariableDeclaration lvdNew =
+        final KeYJavaType keytype = (KeYJavaType) orgSpec.getType();
+        final TypeRef tr = new TypeRef(keytype);
+        final LocalVariableDeclaration lvdNew =
                 new LocalVariableDeclaration(tr, newSpec);
 
         return lvdNew;
@@ -299,8 +299,8 @@ public class EnhancedForElimination extends ProgramTransformer {
      * "<it>.next()"
      */
     private MethodReference getItNext(ProgramVariable itVar) {
-        ProgramElementName nextMeth = new ProgramElementName(NEXT);
-        MethodReference methodCall =
+        final ProgramElementName nextMeth = new ProgramElementName(NEXT);
+        final MethodReference methodCall =
                 new MethodReference(new ImmutableArray<Expression>(), nextMeth, itVar);
         return methodCall;
     }
@@ -309,8 +309,8 @@ public class EnhancedForElimination extends ProgramTransformer {
      * "<it>.hasNext()"
      */
     private Expression makeGuard(ProgramVariable itVar) {
-        ProgramElementName hasNextMeth = new ProgramElementName(HAS_NEXT);
-        MethodReference methodCall =
+        final ProgramElementName hasNextMeth = new ProgramElementName(HAS_NEXT);
+        final MethodReference methodCall =
                 new MethodReference(new ImmutableArray<Expression>(), hasNextMeth, itVar);
 
         return methodCall;
@@ -324,18 +324,18 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         //
         // expression.iterator();
-        MethodName iteratorMeth = new ProgramElementName(ITERATOR_METH);
-        Expression methodcall =
+        final MethodName iteratorMeth = new ProgramElementName(ITERATOR_METH);
+        final Expression methodcall =
                 new MethodReference(new ImmutableArray<Expression>(), iteratorMeth,
                         new ParenthesizedExpression(expression));
 
         //
         // put together
-        VariableSpecification spec =
+        final VariableSpecification spec =
                 new VariableSpecification(itVar, methodcall, itVar.getKeYJavaType());
-        KeYJavaType iteratorType = services.getJavaInfo().getTypeByName(ITERATOR);
-        TypeRef iteratorTyperef = new TypeRef(iteratorType);
-        LocalVariableDeclaration init =
+        final KeYJavaType iteratorType = services.getJavaInfo().getTypeByName(ITERATOR);
+        final TypeRef iteratorTyperef = new TypeRef(iteratorType);
+        final LocalVariableDeclaration init =
                 new LocalVariableDeclaration(iteratorTyperef, spec);
         return init;
     }
