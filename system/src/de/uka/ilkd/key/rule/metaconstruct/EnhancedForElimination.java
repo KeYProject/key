@@ -19,7 +19,6 @@ import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
@@ -124,13 +123,15 @@ public class EnhancedForElimination extends ProgramTransformer {
     /** Transform an enhanced for-loop over an array to a regular for-loop. */
     private ProgramElement makeArrayForLoop(LocalVariableDeclaration lvd,
             Expression expression, Statement body) {
+        assert expression instanceof VariableReference;
+        final VariableReference arrayVar = (VariableReference) expression;
         final VariableNamer varNamer = services.getVariableNamer();
         final ProgramElementName itName = varNamer.getTemporaryNameProposal("i");
         final KeYJavaType intType = ji.getPrimitiveKeYJavaType("int");
         final ProgramVariable itVar = new LocationVariable(itName, intType);
 
         final ILoopInit inits = makeForInit(intType, itVar);
-        final IGuard guard = makeGuard(expression, itVar);
+        final IGuard guard = makeGuard(arrayVar, itVar);
         final IForUpdates updates = makeUpdates(itVar);
 
         // there may be only one variable iterated over (see Language Specification Sect. 14.14.2)
@@ -140,7 +141,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         final ProgramVariable lvdVar = (ProgramVariable)programVariable;
         final Statement declArrayElemVar = makeElemDecl(lvdVar);
 
-        final For forLoop = makeLoop(body, itVar, inits, guard, updates, expression,lvdVar);
+        final For forLoop = makeLoop(body, itVar, inits, guard, updates, arrayVar, lvdVar);
 
         // put everything together
         final Statement[] complete = {declArrayElemVar,forLoop};
@@ -160,9 +161,9 @@ public class EnhancedForElimination extends ProgramTransformer {
     /** Loop statement including assignment to the iterated element. */
     private For makeLoop(Statement body, ProgramVariable itVar,
             ILoopInit inits, IGuard guard, IForUpdates updates,
-            Expression array, ProgramVariable lvdVar) {
+            VariableReference array, ProgramVariable lvdVar) {
         final Expression[] arrayAccess = {itVar};
-        final Expression nextElement = new ArrayReference(new PassiveExpression(array), arrayAccess);
+        final Expression nextElement = new ArrayReference(array, arrayAccess);
         final VariableReference lhs = new VariableReference(lvdVar);
         final Statement getNextElement = new CopyAssignment(lhs, nextElement);
         final Statement[] newBlock = {getNextElement,body};
@@ -179,8 +180,9 @@ public class EnhancedForElimination extends ProgramTransformer {
     }
 
     /** For-loop guard (i < a.length). */
-    private IGuard makeGuard(Expression expression, ProgramVariable itVar) {
-        final Expression lengthExpr = new ArrayLengthReference(new PassiveExpression(expression));
+    private IGuard makeGuard(ReferencePrefix expression, ProgramVariable itVar) {
+        final ExtList array = new ExtList(new Object[]{expression});
+        final Expression lengthExpr = new ArrayLengthReference(array);
         final IGuard guard = new Guard(new LessThan(itVar,lengthExpr));
         return guard;
     }

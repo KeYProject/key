@@ -50,10 +50,6 @@ public class ArrayLengthReference extends JavaNonTerminalProgramElement
 	super(children);
 	prefix = children.get(ReferencePrefix.class);
     }
-    
-    public ArrayLengthReference(ReferencePrefix prefix){
-        this (new ExtList(new Object[]{prefix}));
-    }
 
     /**
      *      Returns the number of children of this node.
