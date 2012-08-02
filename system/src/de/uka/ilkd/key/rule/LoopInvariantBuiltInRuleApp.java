@@ -87,7 +87,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
 		Statement body = loop.getBody();
 		skipValues = !(body instanceof StatementBlock);
 		StatementBlock block = skipValues? null: ((StatementBlock)body);
-		Statement last = skipValues? null: block.getStatementAt(1); // get the second statement
+		Statement last = (skipValues || block.getStatementCount() < 2) ? null: block.getStatementAt(1); // get the second statement
 		skipValues = skipValues || !(last instanceof CopyAssignment);
 		CopyAssignment assignment = skipValues? null: ((CopyAssignment) last);
 		ProgramElement lhs = skipValues? null: assignment.getChildAt(0);
