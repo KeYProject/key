@@ -241,6 +241,7 @@ provable: ./standard_key/java_dl/incrementcounter.key
 provable: ./standard_key/java_dl/innerClasses/inner.key
 provable: ./standard_key/java_dl/iteratedAssignment.key
 provable: ./standard_key/java_dl/java5/vararg.key
+provable: ./standard_key/java_dl/java5/for_Iterable.key
 provable: ./standard_key/java_dl/jml-bigint/cast.key
 # commented out as proof gets too long
 # requires further investigations
