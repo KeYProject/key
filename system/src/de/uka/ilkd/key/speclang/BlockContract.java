@@ -15,6 +15,12 @@ public interface BlockContract extends FunctionalOperationContract {
     
 	public StatementBlock getBlock();
 
+    public Term getPre(LocationVariable heap, Services services);
+
+    public Term getPost(LocationVariable heap, Services services);
+
+    public Term getMod(LocationVariable heap, Services services);
+
     /*public Term getBreak(Label label,
                          Term heapTerm,
                          Term selfTerm,

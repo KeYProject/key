@@ -62,136 +62,17 @@ public final class BlockContractImpl extends FunctionalOperationContractImpl imp
         return block;
     }
 
-    /*public Term getBreak(Label label,
-                         ProgramVariable selfVar,
-                         ImmutableList<ProgramVariable> paramVars,
-                         Map<LocationVariable,? extends ProgramVariable> atPreVars,
-                         Services services) {
-        assert (selfVar == null) == (originalSelfVar == null);
-        assert paramVars != null;
-        assert paramVars.size() == originalParamVars.size();
-        assert atPreVars.size() != 0;
-        assert services != null;
-        final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar,
-                paramVars,
-                null,
-                null,
-                atPreVars,
-                services);
-        final OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(breaks.get(label));
+    public Term getPre(LocationVariable heap, Services services) {
+        return getPre(heap, originalSelfVar, originalParamVars, originalAtPreVars, services);
     }
 
-    public Term getBreak(Label label,
-                         Term heapTerm,
-                         Term selfTerm,
-                         ImmutableList<Term> paramTerms,
-                         Map<LocationVariable,Term> atPres,
-                         Services services) {
-        assert heapTerm != null;
-        assert (selfTerm == null) == (originalSelfVar == null);
-        assert paramTerms != null;
-        assert paramTerms.size() == originalParamVars.size();
-        assert atPres.size() != 0;
-        assert services != null;
-        final Map<Term, Term> replaceMap = getReplaceMap(heapTerm,
-                selfTerm,
-                paramTerms,
-                null,
-                null,
-                atPres,
-                services);
-        final OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(breaks.get(label));
+    public Term getPost(LocationVariable heap, Services services) {
+        return getPost(heap, originalSelfVar, originalParamVars, originalResultVar, originalExcVar, originalAtPreVars, services);
     }
 
-    public Term getContinue(Label label,
-                         ProgramVariable selfVar,
-                         ImmutableList<ProgramVariable> paramVars,
-                         Map<LocationVariable,? extends ProgramVariable> atPreVars,
-                         Services services) {
-        assert (selfVar == null) == (originalSelfVar == null);
-        assert paramVars != null;
-        assert paramVars.size() == originalParamVars.size();
-        assert atPreVars.size() != 0;
-        assert services != null;
-        final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar,
-                paramVars,
-                null,
-                null,
-                atPreVars,
-                services);
-        final OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(continues.get(label));
+    public Term getMod(LocationVariable heap, Services services) {
+        return getMod(heap, originalSelfVar, originalParamVars, services);
     }
-
-    public Term getContinue(Label label,
-                         Term heapTerm,
-                         Term selfTerm,
-                         ImmutableList<Term> paramTerms,
-                         Map<LocationVariable,Term> atPres,
-                         Services services) {
-        assert heapTerm != null;
-        assert (selfTerm == null) == (originalSelfVar == null);
-        assert paramTerms != null;
-        assert paramTerms.size() == originalParamVars.size();
-        assert atPres.size() != 0;
-        assert services != null;
-        final Map<Term, Term> replaceMap = getReplaceMap(heapTerm,
-                selfTerm,
-                paramTerms,
-                null,
-                null,
-                atPres,
-                services);
-        final OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(continues.get(label));
-    }
-
-    public Term getReturn(ProgramVariable selfVar,
-                          ImmutableList<ProgramVariable> paramVars,
-                          ProgramVariable resultVar,
-                          Map<LocationVariable,? extends ProgramVariable> atPreVars,
-                          Services services) {
-        assert (selfVar == null) == (originalSelfVar == null);
-        assert paramVars != null;
-        assert paramVars.size() == originalParamVars.size();
-        assert (resultVar == null) == (originalResultVar == null);
-        assert atPreVars.size() != 0;
-        assert services != null;
-        final Map<ProgramVariable, ProgramVariable> replaceMap = getReplaceMap(selfVar,
-                paramVars,
-                resultVar,
-                null,
-                atPreVars,
-                services);
-        final OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(returns);
-    }
-
-    public Term getReturn(Term heapTerm,
-                         Term selfTerm,
-                         ImmutableList<Term> paramTerms,
-                         Term resultTerm,
-                         Map<LocationVariable,Term> atPres,
-                         Services services) {
-        assert heapTerm != null;
-        assert (selfTerm == null) == (originalSelfVar == null);
-        assert paramTerms != null;
-        assert paramTerms.size() == originalParamVars.size();
-        assert (resultTerm == null) == (originalResultVar == null);
-        assert atPres.size() != 0;
-        assert services != null;
-        final Map<Term, Term> replaceMap = getReplaceMap(heapTerm,
-                selfTerm,
-                paramTerms,
-                resultTerm,
-                null,
-                atPres,
-                services);
-        final OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(returns);
-    }*/
 
     public Map<Label, ProgramVariable> getInternalBreakFlags() {
         return breakFlags;

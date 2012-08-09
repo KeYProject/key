@@ -114,6 +114,26 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     
     @Override
     public void performActionOnBlockContract(BlockContract x) {
-        // TODO
+        TermProgramVariableCollector collector = new TermProgramVariableCollector(services);
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            Term precondition = x.getPre(heap, services);
+            if (precondition != null) {
+                precondition.execPostOrder(collector);
+            }
+        }
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            Term postcondition = x.getPost(heap, services);
+            if (postcondition != null) {
+                postcondition.execPostOrder(collector);
+            }
+        }
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            Term modifiesCondition = x.getMod(heap, services);
+            if (modifiesCondition != null) {
+                modifiesCondition.execPostOrder(collector);
+            }
+        }
+        result.addAll(collector.result());
     }
+
 }
