@@ -9,19 +9,14 @@
 //
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -30,9 +25,8 @@ import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.statement.BranchStatement;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -114,6 +108,9 @@ public class JMLSpecFactory {
         public Term signals;
         public Term signalsOnly;
         public Term diverges;
+        public Map<Label, Term> breaks;
+        public Map<Label, Term> continues;
+        public Term returns;
         public boolean strictlyPure;
     }
 
@@ -189,6 +186,62 @@ public class JMLSpecFactory {
                 for (int j = 0, n = bs.getBranchCount(); j < n; j++) {
                     ImmutableList<ProgramVariable> lpv =
                             collectLocalVariables(bs.getBranchAt(j), loop);
+                    if (lpv != null) {
+                        result = result.prepend(lpv);
+                        return result;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    
+    
+    /**
+     * Collects local variables of the passed statement that are visible for 
+     * the passed block. Returns null if the block has not been found.
+     */
+    private ImmutableList<ProgramVariable> collectLocalVariables(
+            StatementContainer sc,
+            StatementBlock block) {
+        ImmutableList<ProgramVariable> result =
+                ImmutableSLList.<ProgramVariable>nil();
+        for (int i = 0, m = sc.getStatementCount(); i < m; i++) {
+            Statement s = sc.getStatementAt(i);
+
+            if (s instanceof For) {
+                ImmutableArray<VariableSpecification> avs =
+                        ((For) s).getVariablesInScope();
+                for (int j = 0, n = avs.size(); j < n; j++) {
+                    VariableSpecification vs = avs.get(j);
+                    ProgramVariable pv =
+                            (ProgramVariable) vs.getProgramVariable();
+                    result = result.prepend(pv);
+                }
+            }
+
+            if (s == block) {
+                return result;
+            } else if (s instanceof LocalVariableDeclaration) {
+                ImmutableArray<VariableSpecification> vars =
+                        ((LocalVariableDeclaration) s).getVariables();
+                for (int j = 0, n = vars.size(); j < n; j++) {
+                    ProgramVariable pv =
+                            (ProgramVariable) vars.get(j).getProgramVariable();
+                    result = result.prepend(pv);
+                }
+            } else if (s instanceof StatementContainer) {
+                ImmutableList<ProgramVariable> lpv =
+                        collectLocalVariables((StatementContainer) s, block);
+                if (lpv != null) {
+                    result = result.prepend(lpv);
+                    return result;
+                }
+            } else if (s instanceof BranchStatement) {
+                BranchStatement bs = (BranchStatement) s;
+                for (int j = 0, n = bs.getBranchCount(); j < n; j++) {
+                    ImmutableList<ProgramVariable> lpv =
+                            collectLocalVariables(bs.getBranchAt(j), block);
                     if (lpv != null) {
                         result = result.prepend(lpv);
                         return result;
@@ -294,6 +347,24 @@ public class JMLSpecFactory {
         clauses.diverges = translateOrClauses(pm, progVars.selfVar,
                                               progVars.paramVars,
                                               textualSpecCase.getDiverges());
+        clauses.breaks = translateBreaks(pm, progVars.selfVar,
+                progVars.paramVars,
+                progVars.resultVar, progVars.excVar,
+                progVars.atPres,
+                originalBehavior,
+                textualSpecCase.getBreaks());
+        clauses.continues = translateContinues(pm, progVars.selfVar,
+                progVars.paramVars,
+                progVars.resultVar, progVars.excVar,
+                progVars.atPres,
+                originalBehavior,
+                textualSpecCase.getContinues());
+        clauses.returns = translateReturns(pm, progVars.selfVar,
+                progVars.paramVars,
+                progVars.resultVar, progVars.excVar,
+                progVars.atPres,
+                originalBehavior,
+                textualSpecCase.getReturns());
         return clauses;
     }
 
@@ -418,6 +489,77 @@ public class JMLSpecFactory {
             result  = result.append(translated);
         }
         return result;
+    }
+
+
+    private Map<Label, Term> translateBreaks(
+            IProgramMethod pm,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar,
+            ProgramVariable excVar,
+            Map<LocationVariable,Term> atPres,
+            Behavior originalBehavior,
+            ImmutableList<PositionedString> originalClauses)
+            throws SLTranslationException {
+        PositionedString[] array = new PositionedString[originalClauses.size()];
+        originalClauses.toArray(array);
+        Map<Label, Term> result = new HashMap<Label, Term>();
+        for (int i = array.length - 1; i >= 0; i--) {
+            Pair<Label, Term> translation =
+                    JMLTranslator.translate(array[i], pm.getContainerType(),
+                            selfVar, paramVars, resultVar,
+                            excVar, atPres,
+                            Pair.class, services);
+            result.put(translation.first, translation.second);
+        }
+        return result;
+    }
+
+
+    private Map<Label, Term> translateContinues(
+            IProgramMethod pm,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar,
+            ProgramVariable excVar,
+            Map<LocationVariable,Term> atPres,
+            Behavior originalBehavior,
+            ImmutableList<PositionedString> originalClauses)
+            throws SLTranslationException {
+        PositionedString[] array = new PositionedString[originalClauses.size()];
+        originalClauses.toArray(array);
+        Map<Label, Term> result = new HashMap<Label, Term>();
+        for (int i = array.length - 1; i >= 0; i--) {
+            Pair<Label, Term> translation =
+                    JMLTranslator.translate(array[i], pm.getContainerType(),
+                            selfVar, paramVars, resultVar,
+                            excVar, atPres,
+                            Pair.class, services);
+            result.put(translation.first, translation.second);
+        }
+        return result;
+    }
+
+
+    private Term translateReturns(
+            IProgramMethod pm,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar,
+            ProgramVariable excVar,
+            Map<LocationVariable,Term> atPres,
+            Behavior originalBehavior,
+            ImmutableList<PositionedString> originalClauses)
+            throws SLTranslationException {
+        if (originalBehavior == Behavior.NORMAL_BEHAVIOR) {
+            assert originalClauses.isEmpty();
+            return TB.ff();
+        } else {
+            return translateAndClauses(pm, selfVar, paramVars, resultVar,
+                    excVar, atPres,
+                    originalClauses);
+        }
     }
 
 
@@ -927,7 +1069,146 @@ public class JMLSpecFactory {
 
         return result;
     }
+    
+    public ImmutableSet<Contract> createJMLBlockContracts(final IProgramMethod method,
+                                                          final StatementBlock block,
+                                                          final TextualJMLSpecCase specificationCase)
+            throws SLTranslationException {
+        assert method != null;
+        assert block != null;
+        assert specificationCase != null;
+        
+        final ProgramVariableCollection programVariables = createProgramVaribales(method);
+        programVariables.paramVars = programVariables.paramVars.append(collectLocalVariables(method.getBody(), block));
 
+        final Behavior behavior = specificationCase.getBehavior();
+        final String name = "Block - " + generateName(method, specificationCase, behavior);
+
+        final ContractClauses clauses = translateJMLClauses(method, specificationCase, programVariables, behavior);
+
+        final OuterBreakContinueAndReturnCollector collector = new OuterBreakContinueAndReturnCollector(block, services);
+        collector.start();
+        final List<Break> breaks = collector.getBreaks();
+        final List<Continue> continues = collector.getContinues();
+        final boolean returnOccurred = collector.hasReturns();
+
+        final Set<Label> breakLabels = collectLabels(breaks);
+        final Set<Label> continueLabels = collectLabels(continues);
+
+        final Map<Label, ProgramVariable> breakFlags = createFlags(breakLabels, "broke", services);
+        final Map<Label, ProgramVariable> continueFlags = createFlags(continueLabels, "continued", services);
+        final ProgramVariable returnFlag = returnOccurred ? getNewLocalVariable("returned", "boolean", services) : null;
+
+        Map<LocationVariable,Term> postconditions = generatePostconditions(breakFlags, continueFlags, returnFlag, programVariables.excVar, clauses, behavior);
+
+        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+        ImmutableSet<Contract> contracts = createFunctionalOperationContracts(name, method, programVariables, clauses, postconditions);
+        for (Contract contract : contracts) {
+            result = result.add(((FunctionalOperationContract) contract).toBlockContract(block, breakFlags, continueFlags, returnFlag));
+        }
+        return result;
+    }
+
+    private Map<LocationVariable, Term> generatePostconditions(Map<Label,ProgramVariable> breakFlags,
+                                                               Map<Label,ProgramVariable> continueFlags,
+                                                               ProgramVariable returnFlag,
+                                                               ProgramVariable exception,
+                                                               ContractClauses clauses,
+                                                               Behavior behavior) {
+        final Term breakPostcondition = conditionPostconditions(breakFlags, clauses.breaks);
+        final Term continuePostcondition = conditionPostconditions(continueFlags, clauses.continues);
+        final Term returnPostcondition = conditionPostcondition(returnFlag, clauses.returns);
+        final Term throwPostcondition = TB.imp(
+                TB.not(TB.equals(TB.var(exception), TB.NULL(services))),
+                TB.and(TB.convertToFormula(clauses.signals, services), TB.convertToFormula(clauses.signalsOnly, services)));
+
+        // Generalization of generatePostCondition(programVariables, clauses, behavior).
+        Map<LocationVariable,Term> postconditions = new LinkedHashMap<LocationVariable,Term>();
+        Term noAbruptTermination = generateNoAbruptTermination(breakFlags, continueFlags, returnFlag, exception);
+        Term abruptTerminationPost = TB.and(breakPostcondition, continuePostcondition, returnPostcondition, throwPostcondition);
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            if (clauses.ensures.get(heap) != null) {
+                Term post1 = (behavior == Behavior.NORMAL_BEHAVIOR
+                        ? TB.convertToFormula(clauses.ensures.get(heap),services)
+                        : TB.imp(noAbruptTermination, TB.convertToFormula(clauses.ensures.get(heap),services)));
+                Term post2 = (behavior == Behavior.EXCEPTIONAL_BEHAVIOR
+                        ? TB.and(TB.not(noAbruptTermination), abruptTerminationPost)
+                        : abruptTerminationPost);
+                postconditions.put(heap, heap == services.getTypeConverter().getHeapLDT().getHeap() ? TB.and(post1, post2) : post1);
+            }
+        }
+        return postconditions;
+    }
+
+    private Set<Label> collectLabels(List<? extends LabelJumpStatement> jumps) {
+        final Set<Label> result = new HashSet<Label>();
+        for (LabelJumpStatement jump : jumps) {
+            result.add(jump.getLabel());
+        }
+        return result;
+    }
+
+    private Map<Label, ProgramVariable> createFlags(Set<Label> labels, String prefix, Services services) {
+        final Map<Label, ProgramVariable> result = new HashMap<Label, ProgramVariable>();
+        for (Label label : labels) {
+            result.put(label, getNewLocalVariable(prefix + "_to_" + label, "boolean", services));
+        }
+        return result;
+    }
+
+    private ProgramVariable getNewLocalVariable(String varNameBase, String varType, Services services) {
+        return getNewLocalVariable(varNameBase, services.getJavaInfo().getKeYJavaType(varType), services);
+    }
+
+    private ProgramVariable getNewLocalVariable(String varNameBase, KeYJavaType varType, Services services) {
+        return KeYJavaASTFactory.localVariable(services.getVariableNamer().getTemporaryNameProposal(varNameBase), varType);
+    }
+
+    private Term conditionPostconditions(Map<Label, ProgramVariable> flags, Map<Label, Term> postconditions) {
+        Term result = TB.tt();
+        for (Label label : flags.keySet()) {
+            result = TB.and(result, conditionPostcondition(flags.get(label), postconditions.get(label)));
+        }
+        return result;
+    }
+
+    private Term conditionPostcondition(ProgramVariable flag, Term postcondition) {
+        Term result = TB.tt();
+        if (flag != null) {
+            result = TB.imp(TB.equals(services.getTypeConverter().convertToLogicElement(flag), TB.TRUE(services)),
+                            postcondition == null ? TB.tt() : postcondition);
+            //TODO If postcondition is null, use TB.tf() if contract is a normal beahvior contract.
+        }
+        return result;
+    }
+
+    private Term generateNoAbruptTermination(Map<Label, ProgramVariable> breakFlags,
+                                             Map<Label, ProgramVariable> continueFlags,
+                                             ProgramVariable returnFlag,
+                                             ProgramVariable exception) {
+        Term result = TB.tt();
+        result = TB.and(result, generateNoAbruptTermination(breakFlags));
+        result = TB.and(result, generateNoAbruptTermination(continueFlags));
+        result = TB.and(result, generateFlagIsFalse(returnFlag));
+        result = TB.and(result, TB.equals(TB.var(exception), TB.NULL(services)));
+        return result;
+    }
+
+    private Term generateNoAbruptTermination(Map<Label, ProgramVariable> flags) {
+        Term result = TB.tt();
+        for (Label label : flags.keySet()) {
+            result = TB.and(result, generateFlagIsFalse(flags.get(label)));
+        }
+        return result;
+    }
+
+    private Term generateFlagIsFalse(ProgramVariable flag) {
+        Term result = TB.tt();
+        if (flag != null) {
+            result = TB.equals(TB.var(flag), TB.FALSE(services));
+        }
+        return result;
+    }
 
     public LoopInvariant createJMLLoopInvariant(
             IProgramMethod pm,

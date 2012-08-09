@@ -337,12 +337,15 @@ top returns [Object result = null] throws  SLTranslationException
 :
     (   result = accessibleclause
     |   result = assignableclause
+    |   result = breaksclause
+    |   result = continuesclause
     |   result = dependsclause
     |   result = declassifyclause
     |   result = ensuresclause
     |   result = representsclause
     |   result = requiresclause
     |   result = respectsclause
+    |   result = returnsclause
     |   result = signalsclause
     |   result = signalsonlyclause
     |   result = termexpression
@@ -523,6 +526,47 @@ termexpression returns [Term result = null] throws SLTranslationException {
 :
     exp=expression { result = (Term) exp.getTerm(); }
     ;
+
+
+breaksclause returns [Pair result=null] throws SLTranslationException
+{
+    String label = null;
+    Term pred = null;
+}
+:
+	breaks:BREAKS (LPAREN id:IDENT { label = id.getText(); } RPAREN)?
+	(pred = predornot)?
+	{
+        result = translator.translate(breaks.getText(), Pair.class, pred, label, services);
+	}
+;
+
+
+continuesclause returns [Pair result=null] throws SLTranslationException
+{
+    String label = null;
+    Term pred = null;
+}
+:
+	continues:CONTINUES (LPAREN id:IDENT { label = id.getText(); } RPAREN)?
+	(pred = predornot)?
+	{
+        result = translator.translate(continues.getText(), Pair.class, pred, label, services);
+	}
+	;
+
+
+returnsclause returns [Term result=null] throws SLTranslationException
+{
+    Term pred = null;
+}
+:
+	rtrns:RETURNS
+	(result = predornot)?
+	{
+        result = translator.translate(rtrns.getText(), Term.class, result, services);
+	}
+    ;	
 
 
 storeRefUnion returns [Term result = null] throws SLTranslationException {
