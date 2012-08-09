@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -29,6 +30,12 @@ public interface SpecExtractor {
 
     public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm, boolean addInvariant)
         throws SLTranslationException;
+    
+    /**
+     * Returns the block contracts for the passed block.
+     */
+    public ImmutableSet<Contract> extractBlockSpecs(IProgramMethod pm, StatementBlock block)
+             throws SLTranslationException;
     
     /**
      * Returns the class invariants for the passed type.

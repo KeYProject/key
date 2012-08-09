@@ -43,6 +43,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaReduxFileCollection;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
@@ -301,6 +302,18 @@ public final class SLEnvInput extends AbstractEnvInput {
                         			(LoopStatement) loop);
                     if(inv != null) {
                         specRepos.setLoopInvariant(inv);
+                    }
+                }
+                
+                //block contracts
+                final JavaASTCollector blockCollector = new JavaASTCollector(pm.getBody(), StatementBlock.class);
+                blockCollector.start();
+                for (ProgramElement block : blockCollector.getNodes()) {
+                    ImmutableSet<Contract> blockSpecs = specExtractor.extractBlockSpecs(pm, (StatementBlock) block);
+                    if (!blockSpecs.isEmpty()) {
+                    	for (SpecificationElement spec : blockSpecs) {
+                    		specRepos.addBlockContract((BlockContract) spec);
+                    	}
                     }
                 }
             }
