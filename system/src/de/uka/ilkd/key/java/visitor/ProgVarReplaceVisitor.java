@@ -15,9 +15,12 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -26,6 +29,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.BlockContractImpl;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.ExtList;
@@ -213,7 +218,38 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     public void performActionOnProgramConstant(ProgramConstant x) {
         performActionOnProgramVariable(x);
     }
-    
+
+    public void performActionOnBlockContract(StatementBlock oldBlock, StatementBlock newBlock) {
+        //TODO Remove old block contracts.
+        ImmutableSet<BlockContract> contracts = services.getSpecificationRepository().getBlockContracts(oldBlock);
+        for (BlockContract c : contracts) {
+            BlockContractImpl contract = (BlockContractImpl) c;
+            ProgramVariable selfVar = contract.getInternalSelfVar();
+            ImmutableList<ProgramVariable> paramVars = contract.getInternalParamVars();
+            Map<LocationVariable, LocationVariable> atPreVars = contract.getInternalAtPreVars();
+            ProgramVariable resultVar = contract.getInternalResultVar();
+            ProgramVariable excVar = contract.getInternalExcVar();
+            final Map<LocationVariable, Term> newPres = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> newPosts = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> newMods = new LinkedHashMap<LocationVariable, Term>();
+            for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                newPres.put(heap, replaceVariablesInTerm(contract.getPre(heap, selfVar, paramVars, atPreVars, services)));
+                newPosts.put(heap, replaceVariablesInTerm(contract.getPost(heap, selfVar, paramVars, resultVar, excVar, atPreVars, services)));
+                newMods.put(heap, replaceVariablesInTerm(contract.getMod(heap, selfVar, paramVars, services)));
+            }
+            /*final Map<Label, Term> newBreaks = new LinkedHashMap<Label, Term>();
+            for (Label label : contract.getInternalBreaks().keySet()) {
+                newBreaks.put(label, contract.getBreak(label, selfVar, paramVars, atPreVars, services));
+            }
+            final Map<Label, Term> newContinues = new LinkedHashMap<Label, Term>();
+            for (Label label : contract.getInternalContinues().keySet()) {
+                newContinues.put(label, contract.getContinue(label, selfVar, paramVars, atPreVars, services));
+            }
+            final Term newReturns = replaceVariablesInTerm(contract.getReturn(selfVar, paramVars, resultVar, atPreVars, services));*/
+            //TODO What about selfVar, resultVar, excVar, breakFlags, continueFlags, returnFlag, ...?
+            services.getSpecificationRepository().addBlockContract(contract.update(newBlock, newPres, newPosts, newMods));
+        }
+    }
     
     public void performActionOnLoopInvariant(LoopStatement oldLoop, 
                                              LoopStatement newLoop) {

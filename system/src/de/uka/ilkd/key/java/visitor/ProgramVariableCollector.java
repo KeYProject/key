@@ -19,6 +19,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /** 
@@ -108,5 +109,11 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         }
 
         result.addAll(tpvc.result());
+    }
+    
+    
+    @Override
+    public void performActionOnBlockContract(BlockContract x) {
+        // TODO
     }
 }
