@@ -204,6 +204,7 @@ methodlevel_element[ImmutableList<String> mods]
     |   result=assert_statement[mods]
     |   result=assume_statement[mods]
     |   result=nowarn_pragma[mods]
+    |   result=block_specification[mods]
 ;
 
 
@@ -592,11 +593,14 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
 	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
-	|   ps=name_clause           { sc.addName(ps);}
+	|   ps=name_clause           { sc.addName(ps); }
 	|   captures_clause 
 	|   when_clause
 	|   working_space_clause
 	|   duration_clause
+	|   ps=breaks_clause         { sc.addBreaks(ps); }
+	|   ps=continues_clause      { sc.addContinues(ps); }
+	|   ps=returns_clause        { sc.addReturns(ps); }
     )
     {
     	if(b == Behavior.EXCEPTIONAL_BEHAVIOR 
@@ -607,8 +611,17 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
       	    raiseError("signals not allowed in normal behavior.");
     	} else if(b == Behavior.NORMAL_BEHAVIOR 
     	          && !sc.getSignalsOnly().isEmpty()) {
-	    raiseError("signals_only not allowed in normal behavior.");
-    	}
+	        raiseError("signals_only not allowed in normal behavior.");
+    	} else if(b == Behavior.NORMAL_BEHAVIOR 
+	              && !sc.getBreaks().isEmpty()) {
+		    raiseError("breaks not allowed in normal behavior.");
+    	} else if(b == Behavior.NORMAL_BEHAVIOR 
+	              && !sc.getContinues().isEmpty()) {
+		    raiseError("continues not allowed in normal behavior.");
+		} else if(b == Behavior.NORMAL_BEHAVIOR 
+	              && !sc.getReturns().isEmpty()) {
+		    raiseError("returns not allowed in normal behavior.");
+	    }
     }
 ;
 
@@ -840,7 +853,6 @@ field_declaration[ImmutableList<String> mods]
     	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(fd);
     }
 ;
-
 
 
 
@@ -1193,4 +1205,59 @@ expression returns [PositionedString result = null]
     { 
     	result = createPositionedString(t.getText(), t);
     }
+;
+
+
+
+//-----------------------------------------------------------------------------
+//block specifications
+//-----------------------------------------------------------------------------
+
+block_specification[ImmutableList<String> mods] 
+	returns [ImmutableList<TextualJMLConstruct> result = null] 
+	throws SLTranslationException
+:
+    
+    result=method_specification[mods]
+;
+
+breaks_clause
+	returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	breaks_keyword result=expression { result = result.prepend("breaks "); }
+;
+
+
+breaks_keyword
+:
+	BREAKS
+;
+
+
+continues_clause
+	returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	continues_keyword result=expression { result = result.prepend("continues "); }
+;
+
+
+continues_keyword
+:
+	CONTINUES
+;
+
+
+returns_clause
+	returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	returns_keyword result=expression { result = result.prepend("returns "); }
+;
+
+
+returns_keyword
+:
+	RETURNS
 ;
