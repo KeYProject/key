@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SetRuleFilter;
+import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -223,6 +224,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             loopInvF = loopInvFeature(inftyConst());
         }
         
+        final Feature blockContractF;
+        final String blockProp = strategyProperties.getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
+        if (blockProp.equals(StrategyProperties.BLOCK_CONTRACT)) {
+        	blockContractF = blockContractFeature(longConst(0));
+        } else {
+        	blockContractF = blockContractFeature(inftyConst());
+        }
+        
         final Feature oneStepSimplificationF 
         	= oneStepSimplificationFeature(longConst(-11000));
       //  final Feature smtF = smtFeature(inftyConst());
@@ -240,12 +249,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
               queryF,
               depSpecF,
               loopInvF,
+              blockContractF,
               ifMatchedF});
     }
     
     private Feature loopInvFeature(Feature cost) {
 	SetRuleFilter filter = new SetRuleFilter();
 	filter.addRuleToSet(WhileInvariantRule.INSTANCE);
+	return ConditionalFeature.createConditional(filter, cost);
+    }
+    
+    private Feature blockContractFeature(Feature cost) {
+	SetRuleFilter filter = new SetRuleFilter();
+	filter.addRuleToSet(BlockContractRule.INSTANCE);
 	return ConditionalFeature.createConditional(filter, cost);
     }
 

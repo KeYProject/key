@@ -40,6 +40,10 @@ public final class StrategyProperties extends Properties {
     public final static String LOOP_INVARIANT = "LOOP_INVARIANT";
     public final static String LOOP_NONE = "LOOP_NONE";
     
+    public final static String BLOCK_OPTIONS_KEY = "BLOCK_OPTIONS_KEY";
+    public final static String BLOCK_CONTRACT = "BLOCK_CONTRACT";
+    public final static String BLOCK_NONE = "BLOCK_NONE";
+    
     public final static String METHOD_OPTIONS_KEY = "METHOD_OPTIONS_KEY";
     public final static String METHOD_EXPAND = "METHOD_EXPAND";
     public final static String METHOD_CONTRACT = "METHOD_CONTRACT";
@@ -95,6 +99,7 @@ public final class StrategyProperties extends Properties {
     	RETREAT_MODE_OPTIONS_KEY, RETREAT_MODE_NONE, RETREAT_MODE_RETREAT,
     	SPLITTING_OPTIONS_KEY, SPLITTING_NORMAL, SPLITTING_OFF, SPLITTING_DELAYED,
     	LOOP_OPTIONS_KEY, LOOP_EXPAND, LOOP_EXPAND_BOUNDED, LOOP_INVARIANT, LOOP_NONE,
+    	BLOCK_OPTIONS_KEY, BLOCK_CONTRACT, BLOCK_NONE,
     	METHOD_OPTIONS_KEY, METHOD_EXPAND, METHOD_CONTRACT, METHOD_NONE,
     	DEP_OPTIONS_KEY, DEP_ON, DEP_OFF,
     	QUERY_OPTIONS_KEY, QUERY_ON, QUERY_RESTRICTED, QUERY_OFF,
@@ -112,6 +117,7 @@ public final class StrategyProperties extends Properties {
     static {
         defaultMap.setProperty(SPLITTING_OPTIONS_KEY, SPLITTING_DELAYED);
         defaultMap.setProperty(LOOP_OPTIONS_KEY, LOOP_INVARIANT);
+        defaultMap.setProperty(BLOCK_OPTIONS_KEY, BLOCK_CONTRACT);
         defaultMap.setProperty(METHOD_OPTIONS_KEY, METHOD_CONTRACT);
         defaultMap.setProperty(DEP_OPTIONS_KEY, DEP_ON);
         defaultMap.setProperty(QUERY_OPTIONS_KEY, QUERY_OFF);
@@ -128,7 +134,8 @@ public final class StrategyProperties extends Properties {
     
     public StrategyProperties() {
         put(SPLITTING_OPTIONS_KEY, defaultMap.get(SPLITTING_OPTIONS_KEY));                
-        put(LOOP_OPTIONS_KEY, defaultMap.get(LOOP_OPTIONS_KEY));      
+        put(LOOP_OPTIONS_KEY, defaultMap.get(LOOP_OPTIONS_KEY));
+        put(BLOCK_OPTIONS_KEY, defaultMap.get(BLOCK_OPTIONS_KEY));
         put(METHOD_OPTIONS_KEY, defaultMap.get(METHOD_OPTIONS_KEY));
         put(DEP_OPTIONS_KEY, defaultMap.get(DEP_OPTIONS_KEY));
         put(QUERY_OPTIONS_KEY, defaultMap.get(QUERY_OPTIONS_KEY));
@@ -157,7 +164,8 @@ public final class StrategyProperties extends Properties {
         StrategyProperties sp = new StrategyProperties();
 
         sp.put(SPLITTING_OPTIONS_KEY, readSingleOption(p, SPLITTING_OPTIONS_KEY));                
-        sp.put(LOOP_OPTIONS_KEY, readSingleOption(p, LOOP_OPTIONS_KEY)); 
+        sp.put(LOOP_OPTIONS_KEY, readSingleOption(p, LOOP_OPTIONS_KEY));
+        sp.put(BLOCK_OPTIONS_KEY, readSingleOption(p, BLOCK_OPTIONS_KEY)); 
         sp.put(METHOD_OPTIONS_KEY, readSingleOption(p, METHOD_OPTIONS_KEY));
         sp.put(DEP_OPTIONS_KEY, readSingleOption(p,DEP_OPTIONS_KEY));
         sp.put(QUERY_OPTIONS_KEY, readSingleOption(p,QUERY_OPTIONS_KEY));
@@ -185,6 +193,7 @@ public final class StrategyProperties extends Properties {
     public void write(Properties p) {                
         p.put("[StrategyProperty]"+SPLITTING_OPTIONS_KEY, get(SPLITTING_OPTIONS_KEY));
         p.put("[StrategyProperty]"+LOOP_OPTIONS_KEY, get(LOOP_OPTIONS_KEY));
+        p.put("[StrategyProperty]"+BLOCK_OPTIONS_KEY, get(BLOCK_OPTIONS_KEY));
         p.put("[StrategyProperty]"+METHOD_OPTIONS_KEY, get(METHOD_OPTIONS_KEY));
         p.put("[StrategyProperty]"+DEP_OPTIONS_KEY, get(DEP_OPTIONS_KEY));              
         p.put("[StrategyProperty]"+QUERY_OPTIONS_KEY, get(QUERY_OPTIONS_KEY));              
