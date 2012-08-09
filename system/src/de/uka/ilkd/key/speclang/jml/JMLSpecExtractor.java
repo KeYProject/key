@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -56,6 +57,11 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Extracts JML class invariants and operation contracts from JML comments. 
@@ -464,6 +470,46 @@ public final class JMLSpecExtractor implements SpecExtractor {
         }
 
         return result;
+    }
+    
+    
+    @Override
+    public ImmutableSet<Contract> extractBlockSpecs(IProgramMethod method, StatementBlock block) throws SLTranslationException {
+        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+        TextualJMLConstruct[] constructs = parseMethodLevelComments(block.getComments(), getFileName(method));
+        for (int i = constructs.length - 1; i >= 0 && constructs[i] instanceof TextualJMLSpecCase; i--) {
+            TextualJMLSpecCase specificationCase = (TextualJMLSpecCase) constructs[i];
+            try {
+            	ImmutableSet<Contract> contracts = jsf.createJMLBlockContracts(method, block, specificationCase);
+                for (Contract contract : contracts) {
+                    result = result.add(contract);
+                }
+            }
+            catch (SLWarningException exception) {
+                warnings = warnings.add(exception.getWarning());
+            }
+        }
+        return result;
+    }
+
+    private TextualJMLConstruct[] parseMethodLevelComments(Comment[] comments, String fileName) throws SLTranslationException {
+        if (comments.length == 0) {
+            return new TextualJMLConstruct[0];
+        }
+        //TODO For some odd reason every comment block appears twice. Thus I remove duplicates.
+        Set<Comment> uniqueComments = new LinkedHashSet<Comment>(Arrays.asList(comments));
+        String concatenatedComment = concatenate(uniqueComments.toArray(new Comment[uniqueComments.size()]));
+
+        Position position = comments[0].getStartPosition();
+        KeYJMLPreParser preParser = new KeYJMLPreParser(concatenatedComment, fileName, position);
+        ImmutableList<TextualJMLConstruct> constructs = preParser.parseMethodlevelComment();
+        warnings = warnings.union(preParser.getWarnings());
+        return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
+    }
+
+    private String getFileName(IProgramMethod method) {
+        TypeDeclaration type = (TypeDeclaration) method.getContainerType().getJavaType();
+        return type.getPositionInfo().getFileName();
     }
 
     
