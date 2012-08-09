@@ -65,6 +65,7 @@ public final class StrategySelectionView extends JPanel {
     ButtonGroup stratGroup = new ButtonGroup();
     ButtonGroup splittingGroup = new ButtonGroup();
     ButtonGroup loopGroup = new ButtonGroup();
+    ButtonGroup blockGroup = new ButtonGroup();
     ButtonGroup methodGroup = new ButtonGroup();
     ButtonGroup depGroup = new ButtonGroup();
     ButtonGroup queryGroup = new ButtonGroup();
@@ -85,6 +86,8 @@ public final class StrategySelectionView extends JPanel {
     JRadioButtonHashMap rdBut12;
     JRadioButtonHashMap rdBut13;
     JRadioButtonHashMap rdBut14;
+    JRadioButtonHashMap rdBut15;
+    JRadioButtonHashMap rdBut16;
     JRadioButtonHashMap rdBut17;
     JRadioButtonHashMap rdBut18;
     private JRadioButtonHashMap noRetreat;
@@ -352,6 +355,26 @@ public final class StrategySelectionView extends JPanel {
         methodGroup.add(rdBut14);
         addJavaDLOption ( rdBut14, javaDLOptionsLayout, 6, yCoord, 2 );        
         
+        ++yCoord;
+        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
+
+        ////////////////////////////////////////////////////////////////////////
+
+        ++yCoord;
+
+        addJavaDLOption ( new JLabel ( "Block treatment" ),
+                javaDLOptionsLayout, 1, yCoord, 7 );
+
+        ++yCoord;
+
+        rdBut15 = new JRadioButtonHashMap("Contract", StrategyProperties.BLOCK_CONTRACT, false, false);
+        blockGroup.add(rdBut15);
+        addJavaDLOption ( rdBut15, javaDLOptionsLayout, 2, yCoord, 2 );
+
+        rdBut16 = new JRadioButtonHashMap("None", StrategyProperties.BLOCK_NONE, false, false);
+        blockGroup.add(rdBut16);
+        addJavaDLOption ( rdBut16, javaDLOptionsLayout, 4, yCoord, 2 );
+
         ++yCoord;
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
 
@@ -762,11 +785,13 @@ public final class StrategySelectionView extends JPanel {
         //  for identifying Buttons
         bSimpleJavaCardDLStrategy.addActionListener(stratListener);
         rdBut9.addActionListener(optListener);	
-        rdBut10.addActionListener(optListener);       
-        rdBut11.addActionListener(optListener);    
+        rdBut10.addActionListener(optListener);
+        rdBut11.addActionListener(optListener);
         rdBut12.addActionListener(optListener);       
         rdBut13.addActionListener(optListener);     
         rdBut14.addActionListener(optListener);
+        rdBut15.addActionListener(optListener);
+        rdBut16.addActionListener(optListener);
         rdBut17.addActionListener(optListener);
         rdBut18.addActionListener(optListener);
         retreat.addActionListener(optListener);
@@ -1019,6 +1044,10 @@ public final class StrategySelectionView extends JPanel {
             JRadioButton bLoopActive = getStrategyOptionButton(activeLoopOptions, 
                     StrategyProperties.LOOP_OPTIONS_KEY);
             bLoopActive.setSelected(true);
+            String activeBlockOptions = p.getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
+            JRadioButton bBlockActive = getStrategyOptionButton(activeBlockOptions, 
+                    StrategyProperties.BLOCK_OPTIONS_KEY);
+            bBlockActive.setSelected(true);
             String activeMethodOptions = p.getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
             JRadioButton bMethodActive = getStrategyOptionButton(activeMethodOptions, 
                     StrategyProperties.METHOD_OPTIONS_KEY);
@@ -1151,6 +1180,8 @@ public final class StrategySelectionView extends JPanel {
                        splittingGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.LOOP_OPTIONS_KEY, 
                        loopGroup.getSelection().getActionCommand());
+        p.setProperty( StrategyProperties.BLOCK_OPTIONS_KEY, 
+                	   blockGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.METHOD_OPTIONS_KEY, 
                        methodGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.DEP_OPTIONS_KEY, 

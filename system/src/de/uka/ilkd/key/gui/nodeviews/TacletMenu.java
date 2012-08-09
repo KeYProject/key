@@ -224,13 +224,20 @@ class TacletMenu extends JMenu {
 				    MenuControl control) {
         JMenuItem item;
         if (builtInRule == WhileInvariantRule.INSTANCE) {
-            // we add to items in this case: one for auto one for interactive
+            // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(builtInRule.displayName(), 
                     "Apply Rule", "Applies a known and complete loop specification immediately.",
                     "Enter Loop Specification", "Allows to modify an existing or to enter a new loop specification.", builtInRule);
             item.addActionListener(control);
             add(item);
-        }  else if (builtInRule == UseOperationContractRule.INSTANCE) {
+        } else if (builtInRule == BlockContractRule.INSTANCE) {
+            // we add two items in this case: one for auto one for interactive
+            item = new MenuItemForTwoModeRules(builtInRule.displayName(), 
+                    "Apply Rule", "Applies a known and complete block specification immediately.",
+                    "Choose and Apply Contract", "Asks to select the contract to be applied.", builtInRule);
+            item.addActionListener(control);
+            add(item);
+        } else if (builtInRule == UseOperationContractRule.INSTANCE) {
             item = new MenuItemForTwoModeRules(builtInRule.displayName(), 
                     "Apply Contract", "All available contracts of the method are combined and applied.",
                     "Choose and Apply Contract", "Asks to select the contract to be applied.", builtInRule);
