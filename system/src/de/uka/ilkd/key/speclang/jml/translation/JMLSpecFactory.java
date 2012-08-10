@@ -35,19 +35,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassAxiomImpl;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.ContractFactory;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.InitiallyClause;
-import de.uka.ilkd.key.speclang.InitiallyClauseImpl;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.RepresentsAxiom;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -1071,19 +1059,45 @@ public class JMLSpecFactory {
         return result;
     }
     
-    public ImmutableSet<Contract> createJMLBlockContracts(final IProgramMethod method,
+    public ImmutableSet<BlockContract> createJMLBlockContracts(final IProgramMethod method,
                                                           final StatementBlock block,
                                                           final TextualJMLSpecCase specificationCase)
             throws SLTranslationException {
         assert method != null;
         assert block != null;
         assert specificationCase != null;
-        
-        final ProgramVariableCollection programVariables = createProgramVaribales(method);
-        programVariables.paramVars = programVariables.paramVars.append(collectLocalVariables(method.getBody(), block));
 
+        final Behavior behavior = specificationCase.getBehavior();
+        final String name = "Block - " + generateName(method, specificationCase, behavior);
+
+        final Triple<Map<Label, ProgramVariable>, Map<Label, ProgramVariable>, ProgramVariable> flags = createFlags(block);
+        final Map<Label, ProgramVariable> breakFlags = flags.first;
+        final Map<Label, ProgramVariable> continueFlags = flags.second;
+        final ProgramVariable returnFlag = flags.third;
+
+        final ProgramVariableCollection programVariablesWithFlags = createProgramVariables(method, breakFlags, continueFlags, returnFlag);
+        final ProgramVariableCollection programVariablesWithParametersAndLocalVariables = new ProgramVariableCollection(
+                programVariablesWithFlags.selfVar,
+                collectParameters(method).append(collectLocalVariables(method.getBody(), block)),
+                programVariablesWithFlags.resultVar, programVariablesWithFlags.excVar,
+                programVariablesWithFlags.atPreVars, programVariablesWithFlags.atPres
+        );
+
+        final ContractClauses clauses = translateJMLClauses(method, specificationCase, programVariablesWithParametersAndLocalVariables, behavior);
+        final Map<LocationVariable,Term> postconditions = generatePostconditions(breakFlags, continueFlags, returnFlag,
+                programVariablesWithFlags.excVar, clauses, behavior);
+        ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
+        ImmutableSet<Contract> contracts = createFunctionalOperationContracts(name, method, programVariablesWithFlags, clauses, postconditions);
+        for (Contract contract : contracts) {
+            result = result.add(((FunctionalOperationContract) contract).toBlockContract(block, breakFlags, continueFlags, returnFlag));
+        }
+        return result;
+    }
+
+    private Triple<Map<Label, ProgramVariable>, Map<Label, ProgramVariable>, ProgramVariable> createFlags(StatementBlock block) {
         final OuterBreakContinueAndReturnCollector collector = new OuterBreakContinueAndReturnCollector(block, services);
         collector.start();
+
         final List<Break> breaks = collector.getBreaks();
         final List<Continue> continues = collector.getContinues();
         final boolean returnOccurred = collector.hasReturns();
@@ -1094,56 +1108,8 @@ public class JMLSpecFactory {
         final Map<Label, ProgramVariable> breakFlags = createFlags(breakLabels, "broke", services);
         final Map<Label, ProgramVariable> continueFlags = createFlags(continueLabels, "continued", services);
         final ProgramVariable returnFlag = returnOccurred ? createFlag("returned", services) : null;
-        programVariables.paramVars = programVariables.paramVars.append(breakFlags.values());
-        programVariables.paramVars = programVariables.paramVars.append(continueFlags.values());
-        if (returnFlag != null) {
-            programVariables.paramVars = programVariables.paramVars.append(returnFlag);
-        }
 
-        final Behavior behavior = specificationCase.getBehavior();
-        final String name = "Block - " + generateName(method, specificationCase, behavior);
-
-        final ContractClauses clauses = translateJMLClauses(method, specificationCase, programVariables, behavior);
-
-        Map<LocationVariable,Term> postconditions = generatePostconditions(breakFlags, continueFlags, returnFlag, programVariables.excVar, clauses, behavior);
-
-        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
-        ImmutableSet<Contract> contracts = createFunctionalOperationContracts(name, method, programVariables, clauses, postconditions);
-        for (Contract contract : contracts) {
-            result = result.add(((FunctionalOperationContract) contract).toBlockContract(block, breakFlags, continueFlags, returnFlag));
-        }
-        return result;
-    }
-
-    private Map<LocationVariable, Term> generatePostconditions(Map<Label,ProgramVariable> breakFlags,
-                                                               Map<Label,ProgramVariable> continueFlags,
-                                                               ProgramVariable returnFlag,
-                                                               ProgramVariable exception,
-                                                               ContractClauses clauses,
-                                                               Behavior behavior) {
-        final Term breakPostcondition = conditionPostconditions(breakFlags, clauses.breaks);
-        final Term continuePostcondition = conditionPostconditions(continueFlags, clauses.continues);
-        final Term returnPostcondition = conditionPostcondition(returnFlag, clauses.returns);
-        final Term throwPostcondition = TB.imp(
-                TB.not(TB.equals(TB.var(exception), TB.NULL(services))),
-                TB.and(TB.convertToFormula(clauses.signals, services), TB.convertToFormula(clauses.signalsOnly, services)));
-
-        // Generalization of generatePostCondition(programVariables, clauses, behavior).
-        Map<LocationVariable,Term> postconditions = new LinkedHashMap<LocationVariable,Term>();
-        Term noAbruptTermination = generateNoAbruptTermination(breakFlags, continueFlags, returnFlag, exception);
-        Term abruptTerminationPost = TB.and(breakPostcondition, continuePostcondition, returnPostcondition, throwPostcondition);
-        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            if (clauses.ensures.get(heap) != null) {
-                Term post1 = (behavior == Behavior.NORMAL_BEHAVIOR
-                        ? TB.convertToFormula(clauses.ensures.get(heap),services)
-                        : TB.imp(noAbruptTermination, TB.convertToFormula(clauses.ensures.get(heap),services)));
-                Term post2 = (behavior == Behavior.EXCEPTIONAL_BEHAVIOR
-                        ? TB.and(TB.not(noAbruptTermination), abruptTerminationPost)
-                        : abruptTerminationPost);
-                postconditions.put(heap, heap == services.getTypeConverter().getHeapLDT().getHeap() ? TB.and(post1, post2) : post1);
-            }
-        }
-        return postconditions;
+        return new Triple<Map<Label, ProgramVariable>, Map<Label, ProgramVariable>, ProgramVariable>(breakFlags, continueFlags, returnFlag);
     }
 
     private Set<Label> collectLabels(List<? extends LabelJumpStatement> jumps) {
@@ -1166,6 +1132,62 @@ public class JMLSpecFactory {
         return new LocationVariable(new ProgramElementName(name), services.getJavaInfo().getKeYJavaType("boolean"));
     }
 
+    private ProgramVariableCollection createProgramVariables(IProgramMethod method,
+                                                              Map<Label, ProgramVariable> breakFlags,
+                                                              Map<Label, ProgramVariable> continueFlags,
+                                                              ProgramVariable returnFlag) {
+        ProgramVariableCollection result = createProgramVaribales(method);
+        result.paramVars = ImmutableSLList.<ProgramVariable>nil();
+        result.paramVars = result.paramVars.append(breakFlags.values());
+        result.paramVars = result.paramVars.append(continueFlags.values());
+        if (returnFlag != null) {
+            result.paramVars = result.paramVars.append(returnFlag);
+        }
+        return result;
+    }
+
+    private ImmutableList<ProgramVariable> collectParameters(IProgramMethod method) {
+        ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
+        int parameterCount = method.getParameterDeclarationCount();
+        for (int i = parameterCount - 1; i >= 0; i--) {
+            ParameterDeclaration parameter = method.getParameterDeclarationAt(i);
+            result = result.prepend((ProgramVariable) parameter.getVariableSpecification().getProgramVariable());
+        }
+        return result;
+    }
+
+    private Map<LocationVariable, Term> generatePostconditions(Map<Label,ProgramVariable> breakFlags,
+                                                               Map<Label,ProgramVariable> continueFlags,
+                                                               ProgramVariable returnFlag,
+                                                               ProgramVariable exception,
+                                                               ContractClauses clauses,
+                                                               Behavior behavior) {
+        final Term breakPostcondition = conditionPostconditions(breakFlags, clauses.breaks);
+        final Term continuePostcondition = conditionPostconditions(continueFlags, clauses.continues);
+        final Term returnPostcondition = conditionPostcondition(returnFlag, clauses.returns);
+        final Term throwPostcondition = TB.imp(
+                TB.not(TB.equals(TB.var(exception), TB.NULL(services))),
+                TB.and(TB.convertToFormula(clauses.signals, services), TB.convertToFormula(clauses.signalsOnly, services))
+        );
+
+        // Generalization of generatePostCondition(programVariables, clauses, behavior).
+        Map<LocationVariable,Term> postconditions = new LinkedHashMap<LocationVariable,Term>();
+        Term noAbruptTermination = generateNoAbruptTermination(breakFlags, continueFlags, returnFlag, exception);
+        Term abruptTerminationPost = TB.and(breakPostcondition, continuePostcondition, returnPostcondition, throwPostcondition);
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            if (clauses.ensures.get(heap) != null) {
+                Term post1 = (behavior == Behavior.NORMAL_BEHAVIOR
+                        ? TB.convertToFormula(clauses.ensures.get(heap), services)
+                        : TB.imp(noAbruptTermination, TB.convertToFormula(clauses.ensures.get(heap), services)));
+                Term post2 = (behavior == Behavior.EXCEPTIONAL_BEHAVIOR
+                        ? TB.and(TB.not(noAbruptTermination), abruptTerminationPost)
+                        : abruptTerminationPost);
+                postconditions.put(heap, heap == services.getTypeConverter().getHeapLDT().getHeap() ? TB.and(post1, post2) : post1);
+            }
+        }
+        return postconditions;
+    }
+
     private Term conditionPostconditions(Map<Label, ProgramVariable> flags, Map<Label, Term> postconditions) {
         Term result = TB.tt();
         for (Label label : flags.keySet()) {
@@ -1177,8 +1199,10 @@ public class JMLSpecFactory {
     private Term conditionPostcondition(ProgramVariable flag, Term postcondition) {
         Term result = TB.tt();
         if (flag != null) {
-            result = TB.imp(TB.equals(services.getTypeConverter().convertToLogicElement(flag), TB.TRUE(services)),
-                            postcondition == null ? TB.tt() : postcondition);
+            result = TB.imp(
+                    TB.equals(services.getTypeConverter().convertToLogicElement(flag), TB.TRUE(services)),
+                    postcondition == null ? TB.tt() : postcondition
+            );
             //TODO If postcondition is null, use TB.tf() if contract is a normal beahvior contract.
         }
         return result;

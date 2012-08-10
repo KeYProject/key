@@ -166,7 +166,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      	if(t==null) {
      	    return null;
      	}
-	if(t.op() instanceof ProgramVariable) { 
+	if(t.op() instanceof ProgramVariable) {
 	    if(replaceMap.containsKey(t.op())) {
 		Object o = replaceMap.get(t.op());
 		if(o instanceof ProgramVariable){
@@ -221,20 +221,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     public void performActionOnBlockContract(StatementBlock oldBlock, StatementBlock newBlock) {
         ImmutableSet<BlockContract> contracts = services.getSpecificationRepository().getBlockContracts(oldBlock);
-        for (BlockContract c : contracts) {
-            BlockContractImpl contract = (BlockContractImpl) c;
-            ProgramVariable selfVar = contract.getInternalSelfVar();
-            ImmutableList<ProgramVariable> paramVars = contract.getInternalParamVars();
-            Map<LocationVariable, LocationVariable> atPreVars = contract.getInternalAtPreVars();
-            ProgramVariable resultVar = contract.getInternalResultVar();
-            ProgramVariable excVar = contract.getInternalExcVar();
+        for (BlockContract contract : contracts) {
             final Map<LocationVariable, Term> newPres = new LinkedHashMap<LocationVariable, Term>();
             final Map<LocationVariable, Term> newPosts = new LinkedHashMap<LocationVariable, Term>();
             final Map<LocationVariable, Term> newMods = new LinkedHashMap<LocationVariable, Term>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                newPres.put(heap, replaceVariablesInTerm(contract.getPre(heap, selfVar, paramVars, atPreVars, services)));
-                newPosts.put(heap, replaceVariablesInTerm(contract.getPost(heap, selfVar, paramVars, resultVar, excVar, atPreVars, services)));
-                newMods.put(heap, replaceVariablesInTerm(contract.getMod(heap, selfVar, paramVars, services)));
+                newPres.put(heap, replaceVariablesInTerm(contract.getPre(heap, services)));
+                newPosts.put(heap, replaceVariablesInTerm(contract.getPost(heap, services)));
+                newMods.put(heap, replaceVariablesInTerm(contract.getMod(heap, services)));
             }
             //TODO What about selfVar, resultVar, excVar, breakFlags, continueFlags, returnFlag, ...?
             services.getSpecificationRepository().addBlockContract(contract.update(newBlock, newPres, newPosts, newMods));
@@ -243,7 +237,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     
     public void performActionOnLoopInvariant(LoopStatement oldLoop, 
                                              LoopStatement newLoop) {
-        LoopInvariant inv 
+        LoopInvariant inv
             = services.getSpecificationRepository().getLoopInvariant(oldLoop);
         if(inv == null) {
             return;
@@ -259,7 +253,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                      atPres,
                                      services));
            newMods.put(heap, m);
-           final Term i = replaceVariablesInTerm(inv.getInvariant(heap, selfTerm, 
+           final Term i = replaceVariablesInTerm(inv.getInvariant(heap, selfTerm,
                                      atPres,
                                      services));
            newInvariants.put(heap, i);

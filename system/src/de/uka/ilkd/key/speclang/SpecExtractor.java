@@ -30,13 +30,7 @@ public interface SpecExtractor {
 
     public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm, boolean addInvariant)
         throws SLTranslationException;
-    
-    /**
-     * Returns the block contracts for the passed block.
-     */
-    public ImmutableSet<Contract> extractBlockSpecs(IProgramMethod pm, StatementBlock block)
-             throws SLTranslationException;
-    
+
     /**
      * Returns the class invariants for the passed type.
      */
@@ -49,7 +43,12 @@ public interface SpecExtractor {
     public LoopInvariant extractLoopInvariant(IProgramMethod pm, 
                                               LoopStatement loop)
         throws SLTranslationException;
-    
+
+    /**
+     * Returns the block contracts for the passed block.
+     */
+    public ImmutableSet<BlockContract> extractBlockContracts(IProgramMethod method, StatementBlock block) throws SLTranslationException;
+
     /**
      * Returns all warnings generated so far in the translation process.
      * (e.g. this may warn about unsupported features which have been ignored 

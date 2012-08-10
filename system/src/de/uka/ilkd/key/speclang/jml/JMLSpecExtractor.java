@@ -35,14 +35,7 @@ import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.InitiallyClause;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.SpecExtractor;
-import de.uka.ilkd.key.speclang.SpecificationElement;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassAxiom;
@@ -474,16 +467,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
     
     
     @Override
-    public ImmutableSet<Contract> extractBlockSpecs(IProgramMethod method, StatementBlock block) throws SLTranslationException {
-        ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
+    public ImmutableSet<BlockContract> extractBlockContracts(IProgramMethod method, StatementBlock block) throws SLTranslationException {
+        ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
         TextualJMLConstruct[] constructs = parseMethodLevelComments(block.getComments(), getFileName(method));
         for (int i = constructs.length - 1; i >= 0 && constructs[i] instanceof TextualJMLSpecCase; i--) {
             TextualJMLSpecCase specificationCase = (TextualJMLSpecCase) constructs[i];
             try {
-            	ImmutableSet<Contract> contracts = jsf.createJMLBlockContracts(method, block, specificationCase);
-                for (Contract contract : contracts) {
-                    result = result.add(contract);
-                }
+                result = result.union(jsf.createJMLBlockContracts(method, block, specificationCase));
             }
             catch (SLWarningException exception) {
                 warnings = warnings.add(exception.getWarning());
@@ -492,14 +482,17 @@ public final class JMLSpecExtractor implements SpecExtractor {
         return result;
     }
 
+    private String getFileName(IProgramMethod method) {
+        TypeDeclaration type = (TypeDeclaration) method.getContainerType().getJavaType();
+        return type.getPositionInfo().getFileName();
+    }
+
     private TextualJMLConstruct[] parseMethodLevelComments(Comment[] comments, String fileName) throws SLTranslationException {
         if (comments.length == 0) {
             return new TextualJMLConstruct[0];
         }
-        //TODO For some odd reason every comment block appears twice. Thus I remove duplicates.
-        Set<Comment> uniqueComments = new LinkedHashSet<Comment>(Arrays.asList(comments));
-        String concatenatedComment = concatenate(uniqueComments.toArray(new Comment[uniqueComments.size()]));
-
+        // For some odd reason every comment block appears twice; thus we remove duplicates.
+        String concatenatedComment = concatenate(removeDuplicates(comments));
         Position position = comments[0].getStartPosition();
         KeYJMLPreParser preParser = new KeYJMLPreParser(concatenatedComment, fileName, position);
         ImmutableList<TextualJMLConstruct> constructs = preParser.parseMethodlevelComment();
@@ -507,9 +500,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
         return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
     }
 
-    private String getFileName(IProgramMethod method) {
-        TypeDeclaration type = (TypeDeclaration) method.getContainerType().getJavaType();
-        return type.getPositionInfo().getFileName();
+    private Comment[] removeDuplicates(Comment[] comments) {
+        Set<Comment> uniqueComments = new LinkedHashSet<Comment>(Arrays.asList(comments));
+        return uniqueComments.toArray(new Comment[uniqueComments.size()]);
     }
 
     

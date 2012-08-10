@@ -39,32 +39,7 @@ public final class JavaTools {
         return result;
     }
 
-    public static StatementBlock getActiveBlock(JavaBlock jb) {
-        assert jb.program() != null;
-        SourceElement element = jb.program().getFirstElement();
-        SourceElement parent = element;
-        while ((element instanceof ProgramPrefix || element instanceof CatchAllStatement)
-                && !(element instanceof StatementBlock && ((StatementBlock) element).isEmpty())) {
-            parent = element;
-            if (element instanceof LabeledStatement) {
-                element = ((LabeledStatement) element).getChildAt(1);
-            }
-            else if (element instanceof CatchAllStatement) {
-                element = ((CatchAllStatement) element).getBody();
-            }
-            else if (element instanceof StatementContainer) {
-                element = ((StatementContainer) element).getStatementAt(0);
-            }
-            else {
-                element = element.getFirstElement();
-            }
-        }
-        if (parent instanceof StatementBlock) {
-            return (StatementBlock) parent;
-        }
-        return null;
-    }
-    
+
     /**
      * Returns the passed java block without its active statement.
      */

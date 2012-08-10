@@ -19,7 +19,7 @@ public class BlockContractCompletion implements InteractiveRuleApplicationComple
                 return application;
             }
         }
-        Instantiation instantiation = BlockContractRule.computeInstantiation(application.posInOccurrence().subTerm(), services);
+        Instantiation instantiation = BlockContractRule.instantiate(application.posInOccurrence().subTerm(), services);
         ImmutableSet<BlockContract> contracts = BlockContractRule.getApplicableContracts(instantiation, services);
         ContractConfigurator configurator = new ContractConfigurator(
                 MainWindow.getInstance(), services, contracts.toArray(new BlockContract[contracts.size()]),

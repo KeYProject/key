@@ -136,6 +136,9 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 services.getSpecificationRepository().setLoopInvariant(newInv);                
             }
         }
+
+        // TODO Update block contracts?
+
         return TB.apply(atPreUpdate, target);
     }
 }

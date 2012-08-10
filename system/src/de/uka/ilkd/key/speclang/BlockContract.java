@@ -21,32 +21,16 @@ public interface BlockContract extends FunctionalOperationContract {
 
     public Term getMod(LocationVariable heap, Services services);
 
-    /*public Term getBreak(Label label,
-                         Term heapTerm,
-                         Term selfTerm,
-                         ImmutableList<Term> paramTerms,
-                         Map<LocationVariable,Term> atPres,
-                         Services services);
-
-    public Term getContinue(Label label,
-                         Term heapTerm,
-                         Term selfTerm,
-                         ImmutableList<Term> paramTerms,
-                         Map<LocationVariable,Term> atPres,
-                         Services services);
-
-    public Term getReturn(Term heapTerm,
-                          Term selfTerm,
-                          ImmutableList<Term> paramTerms,
-                          Term resultTerm,
-                          Map<LocationVariable,Term> atPres,
-                          Services services);*/
-
     public Map<Label, ProgramVariable> getInternalBreakFlags();
 
     public Map<Label, ProgramVariable> getInternalContinueFlags();
 
     public ProgramVariable getInternalReturnFlag();
+
+    public BlockContract update(StatementBlock newBlock,
+                                Map<LocationVariable,Term> newPres,
+                                Map<LocationVariable,Term> newPosts,
+                                Map<LocationVariable,Term> newMods);
 
     public void visit(Visitor v);
     

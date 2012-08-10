@@ -31,26 +31,28 @@ public final class BlockContractImpl extends FunctionalOperationContractImpl imp
     private final ProgramVariable returnFlag;
 
     public BlockContractImpl(String baseName,
-	                          String name,
-                                  KeYJavaType kjt,	                          
-                                  IProgramMethod pm,
-            		          Modality modality,
-            		          Map<LocationVariable,Term> pres,
-            		          Term mby,
-            		          Map<LocationVariable,Term> posts,
-            		          Map<LocationVariable,Term> mods,
-            		          boolean hasRealMod,
-            		          ProgramVariable selfVar,
-            		          ImmutableList<ProgramVariable> paramVars,
-            		          ProgramVariable resultVar,
-            		          ProgramVariable excVar,
-                                  Map<LocationVariable, LocationVariable> atPreVars,
-                                  int id,
-                                  boolean toBeSaved,
-                                  boolean transaction,
-                              StatementBlock block,
-                              Map<Label, ProgramVariable> breakFlags, Map<Label, ProgramVariable> continueFlags, ProgramVariable returnFlag) {
-	    super(baseName, name, kjt, pm, modality, pres, mby, posts, mods, hasRealMod, selfVar, paramVars, resultVar, excVar, atPreVars, id, toBeSaved, transaction);
+                             String name,
+                             KeYJavaType kjt,
+                             IProgramMethod pm,
+                             Modality modality,
+                             Map<LocationVariable, Term> pres,
+                             Term mby,
+                             Map<LocationVariable, Term> posts,
+                             Map<LocationVariable, Term> mods,
+                             boolean hasRealMod,
+                             ProgramVariable selfVar,
+                             ImmutableList<ProgramVariable> paramVars,
+                             ProgramVariable resultVar,
+                             ProgramVariable excVar,
+                             Map<LocationVariable, LocationVariable> atPreVars,
+                             int id,
+                             boolean toBeSaved,
+                             boolean transaction,
+                             StatementBlock block,
+                             Map<Label, ProgramVariable> breakFlags,
+                             Map<Label, ProgramVariable> continueFlags,
+                             ProgramVariable returnFlag) {
+        super(baseName, name, kjt, pm, modality, pres, mby, posts, mods, hasRealMod, selfVar, paramVars, resultVar, excVar, atPreVars, id, toBeSaved, transaction);
         this.block = block;
         this.breakFlags = breakFlags;
         this.continueFlags = continueFlags;
@@ -62,14 +64,17 @@ public final class BlockContractImpl extends FunctionalOperationContractImpl imp
         return block;
     }
 
+    @Override
     public Term getPre(LocationVariable heap, Services services) {
         return getPre(heap, originalSelfVar, originalParamVars, originalAtPreVars, services);
     }
 
+    @Override
     public Term getPost(LocationVariable heap, Services services) {
         return getPost(heap, originalSelfVar, originalParamVars, originalResultVar, originalExcVar, originalAtPreVars, services);
     }
 
+    @Override
     public Term getMod(LocationVariable heap, Services services) {
         return getMod(heap, originalSelfVar, originalParamVars, services);
     }
@@ -86,26 +91,7 @@ public final class BlockContractImpl extends FunctionalOperationContractImpl imp
         return returnFlag;
     }
 
-    public ProgramVariable getInternalSelfVar() {
-        return originalSelfVar;
-    }
-
-    public ImmutableList<ProgramVariable> getInternalParamVars() {
-        return originalParamVars;
-    }
-
-    public Map<LocationVariable, LocationVariable> getInternalAtPreVars() {
-        return originalAtPreVars;
-    }
-
-    public ProgramVariable getInternalResultVar() {
-        return originalResultVar;
-    }
-
-    public ProgramVariable getInternalExcVar() {
-        return originalExcVar;
-    }
-
+    @Override
     public BlockContract update(StatementBlock newBlock,
                                 Map<LocationVariable,Term> newPres,
                                 Map<LocationVariable,Term> newPosts,
