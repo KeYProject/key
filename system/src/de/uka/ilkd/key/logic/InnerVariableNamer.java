@@ -116,9 +116,6 @@ public class InnerVariableNamer extends VariableNamer {
             newvar = new LocationVariable(newname, var.getKeYJavaType());
             map.put(var, newvar);
             renamingHistory = map;
-            //execute renaming
-            ProgVarReplacer pvr = new ProgVarReplacer(map, services);
-            pvr.replace(goal);
         }
 
         assert newvar != null;

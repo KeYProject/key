@@ -38,15 +38,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
@@ -1176,14 +1170,20 @@ public abstract class Taclet implements Rule, Named {
 	    ProgramVariable inst
 		= (ProgramVariable)matchCond.getInstantiations ().getInstantiation(sv);
 	    final VariableNamer vn = services.getVariableNamer();
-	    inst = vn.rename(inst, goal, posOfFind);
-            final RenamingTable rt = 
+	    ProgramVariable renamedInst = vn.rename(inst, goal, posOfFind);
+	    goal.addProgramVariable(renamedInst);
+	    goal.proof().getServices().addNameProposal(renamedInst.name());
+            
+            HashMap<ProgramVariable, ProgramVariable> renamingMap =
+                    vn.getRenamingMap();
+            if (!renamingMap.isEmpty()) {        
+                //execute renaming
+                ProgVarReplacer pvr = new ProgVarReplacer(vn.getRenamingMap(), services);
+                pvr.replace(goal);
+                final RenamingTable rt = 
                 RenamingTable.getRenamingTable(vn.getRenamingMap());
-            if (rt != null) {
                 renamings = renamings.append(rt);
             }
-	    goal.addProgramVariable(inst);
-	    goal.proof().getServices().addNameProposal(inst.name());
 	}
 	goal.node().setRenamings(renamings);
     }
