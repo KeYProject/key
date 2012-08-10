@@ -154,19 +154,49 @@ public class BlockContractRule implements BuiltInRule {
     }
 
     public ImmutableList<Goal> apply(final Goal goal, final Services services, final BlockContractBuiltInRuleApp application) throws RuleAbortException {
-
-
-
-        // TODO Clean up
         final Instantiation instantiation = instantiate(application.posInOccurrence().subTerm(), services);
-
         final BlockContract contract = application.getContract();
         //assert contract.getBlock().equals(instantiation.block);
+        final IProgramMethod method = contract.getTarget();
+        final Term contextUpdate = instantiation.update;
+
+        // TODO Refactor.
+        List<ProgramVariable> localInVariables = new LinkedList<ProgramVariable>();
+        for (ProgramVariable variable : MiscTools.getLocalIns(instantiation.block, services)) {
+            localInVariables.add(variable);
+        }
+        Collections.reverse(localInVariables);
+        final Map<Label, ProgramVariable> breakFlags = contract.getInternalBreakFlags();
+        for (ProgramVariable flag : breakFlags.values()) {
+            String newName = TB.newName(services, flag.getProgramElementName().toString());
+            ProgramVariable newFlag = new LocationVariable(new ProgramElementName(newName), flag.getKeYJavaType());
+            localInVariables.add(newFlag);
+            goal.addProgramVariable(newFlag);
+        }
+        final Map<Label, ProgramVariable> continueFlags = contract.getInternalContinueFlags();
+        for (ProgramVariable flag : continueFlags.values()) {
+            String newName = TB.newName(services, flag.getProgramElementName().toString());
+            ProgramVariable newFlag = new LocationVariable(new ProgramElementName(newName), flag.getKeYJavaType());
+            localInVariables.add(newFlag);
+            goal.addProgramVariable(newFlag);
+        }
+        final ProgramVariable returnFlag = contract.getInternalReturnFlag();
+        if (returnFlag != null) {
+            localInVariables.add(returnFlag);
+            goal.addProgramVariable(returnFlag);
+        }
+        final ProgramVariable resultVar = method.isConstructor()
+                ? TB.selfVar(services, contract.getKJT(), true)
+                : TB.resultVar(services, method, true);
+        if (resultVar != null) {
+            goal.addProgramVariable(resultVar);
+        }
+        //TODO excVar should be of type Throwable and not of subtype Exception.
+        final ProgramVariable excVar = TB.excVar(services, method, true);
+        goal.addProgramVariable(excVar);
 
         //Modality modality = (Modality) TermBuilder.DF.goBelowUpdates(application.posInOccurrence().subTerm()).op();
         final List<LocationVariable> heaps = HeapContext.getModHeaps(goal.proof().getServices(), instantiation.modality.transaction());
-
-        //TODO Wirklich notwendig? contract.getInternalAtPres(); contract.getInternalAtPreVars();
         Map<LocationVariable, LocationVariable> atPreVars = HeapContext.getBeforeAtPreVars(heaps, services, "BeforeBlock_" + contract.getTarget().getName());
         for (LocationVariable v : atPreVars.values()) {
             goal.addProgramVariable(v);
@@ -176,31 +206,10 @@ public class BlockContractRule implements BuiltInRule {
 
 
 
-        final IProgramMethod method = contract.getTarget();
-
-        final Term contextUpdate = instantiation.update;
-
-        final ImmutableSet<ProgramVariable> localInVariables = MiscTools.getLocalIns(instantiation.block, services);
         final Term precondition = generatePrecondition(heaps, contract, instantiation.self, TB.var(localInVariables), atPres, services);
         final Term wellFormedHeapsCondition = generateWellFormedHeapsCondition(heaps, services);
         final Term reachableInCondition = generateReachableCondition(localInVariables, services);
         final Term[] preconditions = new Term[] {precondition, wellFormedHeapsCondition, reachableInCondition};
-
-
-
-
-        // TODO Clean up
-        final ProgramVariable resultVar = /*method.isConstructor()
-                ? TB.selfVar(services, inst.staticType, true)
-                : */TB.resultVar(services, method, true);
-        if (resultVar != null) {
-            goal.addProgramVariable(resultVar);
-        }
-        final ProgramVariable excVar = TB.excVar(services, method, true);
-        goal.addProgramVariable(excVar);
-
-
-
 
         final ImmutableSet<ProgramVariable> localOutVariables = MiscTools.getLocalOuts(instantiation.block, services);
         final Pair<Term, Map<LocationVariable, Map<Term, Term>>> remembranceUpdateAndVariables
@@ -213,35 +222,21 @@ public class BlockContractRule implements BuiltInRule {
         final Term anonymisationUpdate = anonymisationUpdateAndWellFormedAnonymisationHeapsCondition.first;
         final Term postcondition = generatePostcondition(heaps, contract, instantiation.self, TB.var(localInVariables), TB.var(resultVar), TB.var(excVar), atPres, services);
         final Term frameCondition = generateFrameCondition(heaps, modifiesConditions, remembranceVariables, services);
+        final Term atMostOneFlagSetCondition = generateAtMostOneFlagSetCondition(breakFlags, continueFlags, returnFlag, excVar, services);
         final Term wellFormedAnonymisationHeapsCondition = anonymisationUpdateAndWellFormedAnonymisationHeapsCondition.second;
         final Term reachableOutCondition = generateReachableCondition(localOutVariables, services);
-
-        // flags
-        // TODO Create new flags (as for resultVar and excVar) und replace old ones in terms (contract.getPost(...)).
-        final Map<Label, ProgramVariable> breakFlags = contract.getInternalBreakFlags();
-        for (ProgramVariable flag : breakFlags.values()) {
-            goal.addProgramVariable(flag);
-        }
-        final Map<Label, ProgramVariable> continueFlags = contract.getInternalContinueFlags();
-        for (ProgramVariable flag : continueFlags.values()) {
-            goal.addProgramVariable(flag);
-        }
-        final ProgramVariable returnFlag = contract.getInternalReturnFlag();
-        if (returnFlag != null) {
-            goal.addProgramVariable(returnFlag);
-        }
 
         final ImmutableList<Goal> result = goal.split(3);
         setUpValidityGoal(result.tail().tail().head(),
                 new Term[] {contextUpdate, remembranceUpdate},
                 preconditions, instantiation,
                 breakFlags, continueFlags, returnFlag, resultVar, contract.getTarget().getReturnType(), excVar,
-                new Term[] {postcondition, frameCondition},
+                new Term[] {postcondition, frameCondition/*, atMostOneFlagSetCondition*/},
                 application.posInOccurrence(), services);
         setUpPreconditionGoal(result.tail().head(), contextUpdate, preconditions, application.posInOccurrence());
         setUpUsageGoal(result.head(), instantiation.block,
                 new Term[] {contextUpdate, remembranceUpdate, anonymisationUpdate},
-                new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition},
+                new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition},
                 breakFlags, continueFlags, returnFlag, resultVar, excVar,
                 instantiation.formula, application.posInOccurrence(), services);
 
@@ -251,6 +246,8 @@ public class BlockContractRule implements BuiltInRule {
     private Term generatePrecondition(List<LocationVariable> heaps, BlockContract contract, Term self, ImmutableList<Term> variables, Map<LocationVariable, Term> atPres, Services services) {
         Term result = TB.tt();
         for (LocationVariable heap : heaps) {
+            //TODO variables are only localInVariables plus flags. But paramVars of getPre are ALL local variables plus flags. (see JMLSpecFactory)
+            //     This is problematic because the variable replacement map is constructed by position in the list.
             result = TB.and(result, contract.getPre(heap, TB.getBaseHeap(services), self, variables, atPres, services));
         }
         return result;
@@ -264,7 +261,7 @@ public class BlockContractRule implements BuiltInRule {
         return result;
     }
 
-    private Term generateReachableCondition(ImmutableSet<ProgramVariable> variables, Services services) {
+    private Term generateReachableCondition(Iterable<ProgramVariable> variables, Services services) {
         Term result = TB.tt();
         for (ProgramVariable variable : variables) {
             result = TB.and(result, TB.reachableValue(services, variable));
@@ -378,6 +375,38 @@ public class BlockContractRule implements BuiltInRule {
                 frameCondition = TB.frame(services, TB.var(heap), remembranceVariables.get(heap), modifiesCondition);
             }
             result = TB.and(result, frameCondition);
+        }
+        return result;
+    }
+
+    private Term generateAtMostOneFlagSetCondition(Map<Label, ProgramVariable> breakFlags,
+                                                   Map<Label, ProgramVariable> continueFlags,
+                                                   ProgramVariable returnFlag, ProgramVariable exception,
+                                                   Services services) {
+        List<Term> notSetConditions = new LinkedList<Term>();
+        for (ProgramVariable flag : breakFlags.values()) {
+            notSetConditions.add(TB.equals(TB.var(flag), TB.FALSE(services)));
+        }
+        for (ProgramVariable flag : continueFlags.values()) {
+            notSetConditions.add(TB.equals(TB.var(flag), TB.FALSE(services)));
+        }
+        if (returnFlag != null) {
+            notSetConditions.add(TB.equals(TB.var(returnFlag), TB.FALSE(services)));
+        }
+        notSetConditions.add(TB.equals(TB.var(exception), TB.NULL(services)));
+
+        Term result = TB.tt();
+        for (Term notSetCondition : notSetConditions) {
+            result = TB.and(result, notSetCondition);
+        }
+        for (Term onlySetNotSetCondition : notSetConditions) {
+            Term condition = TB.not(onlySetNotSetCondition);
+            for (Term notSetCondition : notSetConditions) {
+                if (notSetCondition != onlySetNotSetCondition) {
+                    condition = TB.and(condition, notSetCondition);
+                }
+            }
+            result = TB.or(result, condition);
         }
         return result;
     }

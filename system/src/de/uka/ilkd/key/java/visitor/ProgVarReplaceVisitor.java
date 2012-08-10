@@ -220,7 +220,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     public void performActionOnBlockContract(StatementBlock oldBlock, StatementBlock newBlock) {
-        //TODO Remove old block contracts.
         ImmutableSet<BlockContract> contracts = services.getSpecificationRepository().getBlockContracts(oldBlock);
         for (BlockContract c : contracts) {
             BlockContractImpl contract = (BlockContractImpl) c;
@@ -237,15 +236,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 newPosts.put(heap, replaceVariablesInTerm(contract.getPost(heap, selfVar, paramVars, resultVar, excVar, atPreVars, services)));
                 newMods.put(heap, replaceVariablesInTerm(contract.getMod(heap, selfVar, paramVars, services)));
             }
-            /*final Map<Label, Term> newBreaks = new LinkedHashMap<Label, Term>();
-            for (Label label : contract.getInternalBreaks().keySet()) {
-                newBreaks.put(label, contract.getBreak(label, selfVar, paramVars, atPreVars, services));
-            }
-            final Map<Label, Term> newContinues = new LinkedHashMap<Label, Term>();
-            for (Label label : contract.getInternalContinues().keySet()) {
-                newContinues.put(label, contract.getContinue(label, selfVar, paramVars, atPreVars, services));
-            }
-            final Term newReturns = replaceVariablesInTerm(contract.getReturn(selfVar, paramVars, resultVar, atPreVars, services));*/
             //TODO What about selfVar, resultVar, excVar, breakFlags, continueFlags, returnFlag, ...?
             services.getSpecificationRepository().addBlockContract(contract.update(newBlock, newPres, newPosts, newMods));
         }

@@ -108,7 +108,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert modality != null;
         assert (selfVar == null) == pm.isStatic();
         assert paramVars != null;
-        assert paramVars.size() == pm.getParameterDeclarationCount();
+        //TODO Block contracts use paramVars for local variables and flags. :(
+        //assert paramVars.size() == pm.getParameterDeclarationCount();
         if (resultVar == null){
             assert (pm.isVoid() || pm.isConstructor()) : "resultVar == null for method "+pm;
         } else {

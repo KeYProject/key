@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -1081,11 +1082,6 @@ public class JMLSpecFactory {
         final ProgramVariableCollection programVariables = createProgramVaribales(method);
         programVariables.paramVars = programVariables.paramVars.append(collectLocalVariables(method.getBody(), block));
 
-        final Behavior behavior = specificationCase.getBehavior();
-        final String name = "Block - " + generateName(method, specificationCase, behavior);
-
-        final ContractClauses clauses = translateJMLClauses(method, specificationCase, programVariables, behavior);
-
         final OuterBreakContinueAndReturnCollector collector = new OuterBreakContinueAndReturnCollector(block, services);
         collector.start();
         final List<Break> breaks = collector.getBreaks();
@@ -1097,7 +1093,17 @@ public class JMLSpecFactory {
 
         final Map<Label, ProgramVariable> breakFlags = createFlags(breakLabels, "broke", services);
         final Map<Label, ProgramVariable> continueFlags = createFlags(continueLabels, "continued", services);
-        final ProgramVariable returnFlag = returnOccurred ? getNewLocalVariable("returned", "boolean", services) : null;
+        final ProgramVariable returnFlag = returnOccurred ? createFlag("returned", services) : null;
+        programVariables.paramVars = programVariables.paramVars.append(breakFlags.values());
+        programVariables.paramVars = programVariables.paramVars.append(continueFlags.values());
+        if (returnFlag != null) {
+            programVariables.paramVars = programVariables.paramVars.append(returnFlag);
+        }
+
+        final Behavior behavior = specificationCase.getBehavior();
+        final String name = "Block - " + generateName(method, specificationCase, behavior);
+
+        final ContractClauses clauses = translateJMLClauses(method, specificationCase, programVariables, behavior);
 
         Map<LocationVariable,Term> postconditions = generatePostconditions(breakFlags, continueFlags, returnFlag, programVariables.excVar, clauses, behavior);
 
@@ -1149,19 +1155,15 @@ public class JMLSpecFactory {
     }
 
     private Map<Label, ProgramVariable> createFlags(Set<Label> labels, String prefix, Services services) {
-        final Map<Label, ProgramVariable> result = new HashMap<Label, ProgramVariable>();
+        final Map<Label, ProgramVariable> result = new LinkedHashMap<Label, ProgramVariable>();
         for (Label label : labels) {
-            result.put(label, getNewLocalVariable(prefix + "_to_" + label, "boolean", services));
+            result.put(label, createFlag(prefix + "_to_" + label, services));
         }
         return result;
     }
 
-    private ProgramVariable getNewLocalVariable(String varNameBase, String varType, Services services) {
-        return getNewLocalVariable(varNameBase, services.getJavaInfo().getKeYJavaType(varType), services);
-    }
-
-    private ProgramVariable getNewLocalVariable(String varNameBase, KeYJavaType varType, Services services) {
-        return KeYJavaASTFactory.localVariable(services.getVariableNamer().getTemporaryNameProposal(varNameBase), varType);
+    private ProgramVariable createFlag(String name, Services services) {
+        return new LocationVariable(new ProgramElementName(name), services.getJavaInfo().getKeYJavaType("boolean"));
     }
 
     private Term conditionPostconditions(Map<Label, ProgramVariable> flags, Map<Label, Term> postconditions) {
