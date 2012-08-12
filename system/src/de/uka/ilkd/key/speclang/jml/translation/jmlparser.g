@@ -251,18 +251,17 @@ options {
      * Converts a term so that all of its non-rigid operators refer to the pre-state.
      */
     // TODO: remove when all clients have been moved to JMLTranslator
-    private Term convertToOld(Term term) {
-	assert atPres != null && atPres.get(getBaseHeap()) != null;
-	Map map = new LinkedHashMap();
-        for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term t = atPres.get(h);
-            if(t != null) {
-              map.put(TB.var(h), t);
+    private Term convertToOld(final Term term) {
+	    assert atPres != null && atPres.get(getBaseHeap()) != null;
+	    Map<Term, Term> map = new LinkedHashMap<Term, Term>();
+        for (LocationVariable heap : atPres.keySet()) {
+            Term heapAtPre = atPres.get(heap);
+            if (heapAtPre != null) {
+                map.put(TB.var(heap), heapAtPre);
             }
         }
-
-	OpReplacer or = new OpReplacer(map);
-	return or.replace(term);
+	    OpReplacer or = new OpReplacer(map);
+	    return or.replace(term);
     }
 
     private Term convertToBackup(Term term) {

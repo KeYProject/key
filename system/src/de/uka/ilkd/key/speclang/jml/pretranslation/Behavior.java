@@ -24,6 +24,12 @@ public final class Behavior {
         = new Behavior("normal_behavior ");
     public static final Behavior EXCEPTIONAL_BEHAVIOR 
         = new Behavior("exceptional_behavior ");
+    public static final Behavior BREAK_BEHAVIOR
+            = new Behavior("break_behavior ");
+    public static final Behavior CONTINUE_BEHAVIOR
+            = new Behavior("continue_behavior ");
+    public static final Behavior RETURN_BEHAVIOR
+            = new Behavior("return_behavior ");
     
     
     private final String name;

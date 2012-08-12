@@ -390,8 +390,11 @@ heavyweight_spec_case[ImmutableList<String> mods]
     (s=modifier  { mods = mods.append(s); })?
     (
 	    result=behavior_spec_case[mods]
-	|   result=exceptional_behavior_spec_case[mods]
+	    |   result=break_behavior_spec_case[mods]
+	    |   result=continue_behavior_spec_case[mods]
+	    |   result=exceptional_behavior_spec_case[mods]
       	|   result=normal_behavior_spec_case[mods]
+      	|   result=return_behavior_spec_case[mods]
     )
 ;
 
@@ -1260,4 +1263,52 @@ returns_clause
 returns_keyword
 :
 	RETURNS
+;
+
+
+break_behavior_spec_case[ImmutableList<String> mods]
+	returns [ImmutableList<TextualJMLConstruct> result = null]
+	throws SLTranslationException
+:
+    break_behavior_keyword
+    result=generic_spec_case[mods, Behavior.BREAK_BEHAVIOR]
+;
+
+
+break_behavior_keyword
+:
+      	BREAK_BEHAVIOR
+    |	BREAK_BEHAVIOUR
+;
+
+
+continue_behavior_spec_case[ImmutableList<String> mods]
+	returns [ImmutableList<TextualJMLConstruct> result = null]
+	throws SLTranslationException
+:
+    continue_behavior_keyword
+    result=generic_spec_case[mods, Behavior.CONTINUE_BEHAVIOR]
+;
+
+
+continue_behavior_keyword
+:
+      	CONTINUE_BEHAVIOR
+    |	CONTINUE_BEHAVIOUR
+;
+
+
+return_behavior_spec_case[ImmutableList<String> mods]
+	returns [ImmutableList<TextualJMLConstruct> result = null]
+	throws SLTranslationException
+:
+    return_behavior_keyword
+    result=generic_spec_case[mods, Behavior.RETURN_BEHAVIOR]
+;
+
+
+return_behavior_keyword
+:
+      	RETURN_BEHAVIOR
+    |	RETURN_BEHAVIOUR
 ;
