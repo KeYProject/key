@@ -68,4 +68,113 @@ public class Weird {
         return z;
     }
     
+    /*@ requires x >= 0 && y >= 0;
+      @ ensures \result == x + y;
+      @ diverges false;
+      @ signals_only \nothing;
+      @ assignable \nothing;
+      @*/
+    public int foo(int x, int y) {
+        int z = 0;
+        label: {
+            /*@ normal_behavior
+              @ requires x > 0 && y > 0;
+              @ ensures z == x + y;
+              @ assignable \nothing;
+              @
+              @ also
+              @
+              @ break_behavior
+              @ requires x < 0 && y > 0;
+              @ breaks (label) z == x / y;
+              @ assignable \nothing;
+              @
+              @ also
+              @
+              @ continue_behavior
+              @ requires x > 0 && y < 0;
+              @ continues z == x % y;
+              @ assignable \nothing;
+              @
+              @ also
+              @
+              @ return_behavior
+              @ requires x < 0 && y < 0;
+              @ returns \result == x * y;
+              @ assignable \nothing;
+              @
+              @ also
+              @
+              @ exceptional_behavior
+              @ requires x == 0 && y == 0;
+              @ signals (Exception e) z == 0;
+              @ assignable \nothing;
+              @*/
+           {
+               if (x > 0 && y > 0) {
+                   z = x + y;
+               }
+               if (x < 0 && y > 0) {
+                   z = x / y;
+                   break label;
+               }
+               if (x > 0 && y < 0) {
+                   z = x % y;
+                   continue;
+               }
+               if (x < 0 && y < 0) {
+                   return x * y;
+               }
+               if (x == 0 && y == 0) {
+                   z = 0;
+                   throw new RuntimeException("foo");
+               }
+           }
+        }
+        return z;
+    }
+    
+    /*@ requires x >= 0 && y >= 0;
+      @ ensures \result == x + y;
+      @ diverges false;
+      @ signals_only \nothing;
+      @ assignable \nothing;
+      @*/
+    public int bar(int x, int y) {
+        int z = 0;
+        label: {
+            /*@ requires x > 0 && y > 0;
+              @ ensures z == \old(z);
+              @ breaks (label) z < \old(z);
+              @ continues z > \old(z);
+              @ returns z + \old(z) == 0 && \result == 100;
+              @ diverges x == y;
+              @ signals (Exception e) \old(z) - z == 0;
+              @ assignable \nothing;
+              @ assignable \nothing;
+              @*/
+           {
+               if (x > 0 && y > 0) {
+                   z = x + y;
+               }
+               if (x < 0 && y > 0) {
+                   z = x / y;
+                   break label;
+               }
+               if (x > 0 && y < 0) {
+                   z = x % y;
+                   continue;
+               }
+               if (x < 0 && y < 0) {
+                   return x * y;
+               }
+               if (x == 0 && y == 0) {
+                   z = 0;
+                   throw new RuntimeException("foo");
+               }
+           }
+        }
+        return z;
+    }
+    
 }

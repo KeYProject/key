@@ -37,13 +37,20 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
                                                Map<Label, ProgramVariable> continueFlags,
                                                ProgramVariable returnFlag,
                                                ProgramVariable returnValue,
-                                               Services services) {
+                                               Services services)
+    {
         super(block, services);
         breakOut = new Break(breakOutLabel);
         this.breakFlags = breakFlags;
         this.continueFlags = continueFlags;
         this.returnFlag = returnFlag;
         this.returnValue = returnValue;
+    }
+
+    public StatementBlock replace()
+    {
+        start();
+        return result;
     }
 
     public void start() {

@@ -10,7 +10,7 @@ import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.NotEquals;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
+import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -32,7 +32,9 @@ public class BlockContractRule implements BuiltInRule {
     private static final Name NAME = new Name("Block Contract");
     private static final TermBuilder TB = TermBuilder.DF;
 
-    public static Instantiation instantiate(final Term formula, final Services services) {
+    // TODO Refactor.
+    public static Instantiation instantiate(final Term formula, final Services services)
+    {
         final Pair<Term, Term> updateAndTarget = extractUpdate(formula);
         final Term update = updateAndTarget.first;
         final Term target = updateAndTarget.second;
@@ -50,7 +52,8 @@ public class BlockContractRule implements BuiltInRule {
         return new Instantiation(update, target, modality, self, block, context);
     }
 
-    private static Pair<Term, Term> extractUpdate(Term focusTerm) {
+    private static Pair<Term, Term> extractUpdate(Term focusTerm)
+    {
         if (focusTerm.op() instanceof UpdateApplication) {
             return new Pair<Term, Term>(UpdateApplication.getUpdate(focusTerm), UpdateApplication.getTarget(focusTerm));
         }
@@ -60,7 +63,8 @@ public class BlockContractRule implements BuiltInRule {
     }
 
     // TODO Find better name.
-    public static StatementBlock getActiveBlock(Modality modality, JavaBlock java, Services services) {
+    public static StatementBlock getActiveBlock(Modality modality, JavaBlock java, Services services)
+    {
         // TODO Clean up.
         // get first block in prefix that has an applicable contract
         SourceElement element = java.program().getFirstElement();
@@ -89,16 +93,18 @@ public class BlockContractRule implements BuiltInRule {
         return null;
     }
 
-    public static ImmutableSet<BlockContract> getApplicableContracts(final Instantiation instantiation, final Services services) {
+    public static ImmutableSet<BlockContract> getApplicableContracts(final Instantiation instantiation, final Services services)
+    {
         if (instantiation == null) {
-            return DefaultImmutableSet.<BlockContract>nil();
+            return DefaultImmutableSet.nil();
         }
         return getApplicableContracts(services.getSpecificationRepository(), instantiation.block, instantiation.modality);
     }
 
     private static ImmutableSet<BlockContract> getApplicableContracts(final SpecificationRepository specifications,
                                                                       final StatementBlock block,
-                                                                      final Modality modality) {
+                                                                      final Modality modality)
+    {
         ImmutableSet<BlockContract> result = specifications.getBlockContracts(block, modality);
         if (modality == Modality.BOX) {
             result = result.union(specifications.getBlockContracts(block, Modality.DIA));
@@ -134,67 +140,61 @@ public class BlockContractRule implements BuiltInRule {
         return apply(goal, services, (BlockContractBuiltInRuleApp) application);
     }
 
-    public ImmutableList<Goal> apply(final Goal goal, final Services services, final BlockContractBuiltInRuleApp application) throws RuleAbortException {
+    private ImmutableList<Goal> apply(final Goal goal, final Services services, final BlockContractBuiltInRuleApp application) throws RuleAbortException {
         final Instantiation instantiation = instantiateAndCache(application.posInOccurrence().subTerm(), services);
         final BlockContract contract = application.getContract();
         //assert contract.getBlock().equals(instantiation.block);
-        final IProgramMethod method = contract.getTarget();
         final Term contextUpdate = instantiation.update;
 
-        final Map<Label, ProgramVariable> breakFlags = contract.getInternalBreakFlags();
-        final Map<Label, ProgramVariable> continueFlags = contract.getInternalContinueFlags();
-        final ProgramVariable returnFlag = contract.getInternalReturnFlag();
-
-        final List<ProgramVariable> flags = createAndRegisterFlags(goal, breakFlags.values(), continueFlags.values(), returnFlag, services);
-        final ProgramVariable resultVariable = createAndRegisterResultVariable(goal, method, services);
-        final ProgramVariable exceptionVariable = createAndRegisterExceptionVariable(goal, method, services);
-
-        final List<LocationVariable> heaps = HeapContext.getModHeaps(goal.proof().getServices(), instantiation.modality.transaction());
-        // TODO Name atPreVars is not intuitive.
-        Map<LocationVariable, LocationVariable> atPreVars = createAndRegisterAtPreVars(goal, heaps, services);
-        final Map<LocationVariable, Term> atPres = HeapContext.getAtPres(atPreVars, services);
-
+        final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables = MiscTools.getLocalIns(instantiation.block, services);
-
-        final Term precondition = generatePrecondition(heaps, contract, instantiation.self, TB.var(flags), atPres, services);
-        final Term wellFormedHeapsCondition = generateWellFormedHeapsCondition(heaps, services);
-        final Term reachableInCondition = generateReachableCondition(localInVariables, services);
-        final Term[] preconditions = new Term[] {precondition, wellFormedHeapsCondition, reachableInCondition};
-
         final ImmutableSet<ProgramVariable> localOutVariables = MiscTools.getLocalOuts(instantiation.block, services);
+        final Map<LocationVariable, Function> anonymisationHeaps = createAndRegisterAnonymisationVariables(heaps, services);
+        //final Map<LocationVariable, Function> anonymisationLocalVariables = createAndRegisterAnonymisationVariables(localOutVariables, services);
 
-        final Pair<Term, Map<LocationVariable, Map<Term, Term>>> remembranceUpdateAndVariables
-                = generateRemembranceUpdateAndVariables(heaps, localOutVariables, services);
-        final Term remembranceUpdate = remembranceUpdateAndVariables.first;
-        final Map<LocationVariable, Map<Term, Term>> remembranceVariables = remembranceUpdateAndVariables.second;
-        final Map<LocationVariable, Term> modifiesConditions = generateModifiesConditions(heaps, contract, instantiation.self, TB.var(flags), services);
-        final Pair<Term, Term> anonymisationUpdateAndWellFormedAnonymisationHeapsCondition
-                = generateAnonymisationUpdateAndWellFormedAnonymisationHeapsCondition(heaps, localOutVariables, modifiesConditions, services);
-        final Term anonymisationUpdate = anonymisationUpdateAndWellFormedAnonymisationHeapsCondition.first;
-        final Term postcondition = generatePostcondition(heaps, contract, instantiation.self, TB.var(flags), TB.var(resultVariable), TB.var(exceptionVariable), atPres, services);
-        final Term frameCondition = generateFrameCondition(heaps, modifiesConditions, remembranceVariables, services);
-        final Term atMostOneFlagSetCondition = generateAtMostOneFlagSetCondition(breakFlags, continueFlags, returnFlag, exceptionVariable, services);
-        final Term wellFormedAnonymisationHeapsCondition = anonymisationUpdateAndWellFormedAnonymisationHeapsCondition.second;
-        final Term reachableOutCondition = generateReachableCondition(localOutVariables, services);
+        final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(
+            goal, contract.getPlaceholderVariables(), services
+        ).createAndRegister();
+
+        final ConditionsBuilder conditionsBuilder = new ConditionsBuilder(contract, heaps, variables, instantiation.self, services);
+        final Term precondition = conditionsBuilder.buildPrecondition();
+        final Term wellFormedHeapsCondition = conditionsBuilder.buildWellFormedHeapsCondition();
+        final Term reachableInCondition = conditionsBuilder.buildReachableCondition(localInVariables);
+        final Map<LocationVariable, Term> modifiesConditions = conditionsBuilder.buildModifiesConditions();
+
+        final Term postcondition = conditionsBuilder.buildPostcondition();
+        final Term frameCondition = conditionsBuilder.buildFrameCondition(modifiesConditions);
+        final Term wellFormedAnonymisationHeapsCondition = conditionsBuilder.buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
+        final Term reachableOutCondition = conditionsBuilder.buildReachableCondition(localOutVariables);
+        final Term atMostOneFlagSetCondition = conditionsBuilder.buildAtMostOneFlagSetCondition();
+
+        final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
+        final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate();
+        final Term anonymisationUpdate = updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps, /*anonymisationLocalVariables, */modifiesConditions);
 
         final ImmutableList<Goal> result = goal.split(3);
-        setUpValidityGoal(result.tail().tail().head(),
-                new Term[] {contextUpdate, remembranceUpdate},
-                preconditions, instantiation,
-                breakFlags, continueFlags, returnFlag, resultVariable, method.getReturnType(), exceptionVariable,
-                new Term[] {postcondition, frameCondition/*, atMostOneFlagSetCondition*/},
-                application.posInOccurrence(), services);
-        setUpPreconditionGoal(result.tail().head(), contextUpdate, preconditions, application.posInOccurrence());
-        setUpUsageGoal(result.head(), instantiation.block,
-                new Term[] {contextUpdate, remembranceUpdate, anonymisationUpdate},
-                new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition},
-                breakFlags, continueFlags, returnFlag, resultVariable, exceptionVariable,
-                instantiation.formula, application.posInOccurrence(), services);
-
+        final GoalsConfigurator configurator = new GoalsConfigurator(instantiation, variables, application.posInOccurrence(), services);
+        configurator.setUpValidityGoal(
+                result.tail().tail().head(),
+                new Term[]{contextUpdate, remembranceUpdate},
+                new Term[]{precondition, wellFormedHeapsCondition, reachableInCondition},
+                new Term[]{postcondition, frameCondition/*, atMostOneFlagSetCondition*/}
+        );
+        configurator.setUpPreconditionGoal(
+                result.tail().head(),
+                contextUpdate,
+                new Term[]{precondition, wellFormedHeapsCondition, reachableInCondition}
+        );
+        configurator.setUpUsageGoal(
+                result.head(),
+                new Term[]{contextUpdate, remembranceUpdate, anonymisationUpdate},
+                new Term[]{postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition}
+        );
         return result;
     }
 
-    private Instantiation instantiateAndCache(final Term focusTerm, final Services services) {
+    private Instantiation instantiateAndCache(final Term focusTerm, final Services services)
+    {
         if (focusTerm == lastFocusTerm) {
             return lastInstantiation;
         }
@@ -206,410 +206,44 @@ public class BlockContractRule implements BuiltInRule {
         }
     }
 
-    private List<ProgramVariable> createAndRegisterFlags(final Goal goal,
-                                                         final Collection<ProgramVariable> breakFlags,
-                                                         final Collection<ProgramVariable> continueFlags,
-                                                         final ProgramVariable returnFlag,
-                                                         final Services services) {
-        List<ProgramVariable> result = new LinkedList<ProgramVariable>();
-        result.addAll(createAndRegisterFlags(goal, breakFlags, services));
-        result.addAll(createAndRegisterFlags(goal, continueFlags, services));
-        if (returnFlag != null) {
-            result.add(returnFlag);
-            goal.addProgramVariable(returnFlag);
-        }
-        return result;
-    }
-
-    private List<ProgramVariable> createAndRegisterFlags(final Goal goal, final Collection<ProgramVariable> flags, final Services services) {
-        List<ProgramVariable> result = new LinkedList<ProgramVariable>();
-        for (ProgramVariable flag : flags) {
-            String newName = TB.newName(services, flag.getProgramElementName().toString());
-            ProgramVariable newFlag = new LocationVariable(new ProgramElementName(newName), flag.getKeYJavaType());
-            result.add(newFlag);
-            goal.addProgramVariable(newFlag);
-        }
-        return result;
-    }
-
-    private ProgramVariable createAndRegisterResultVariable(final Goal goal, final IProgramMethod method, final Services services) {
-        final ProgramVariable result = method.isConstructor()
-                ? TB.selfVar(services, method.getContainerType(), true)
-                : TB.resultVar(services, method, true);
-        if (result != null) {
-            goal.addProgramVariable(result);
-        }
-        return result;
-    }
-
-    private ProgramVariable createAndRegisterExceptionVariable(final Goal goal, final IProgramMethod method, final Services services) {
-        //TODO result should be of type Throwable and not of subtype Exception.
-        final ProgramVariable result = TB.excVar(services, method, true);
-        goal.addProgramVariable(result);
-        return result;
-    }
-
-    private Map<LocationVariable, LocationVariable> createAndRegisterAtPreVars(Goal goal, List<LocationVariable> heaps, Services services) {
-        Map<LocationVariable, LocationVariable> result = HeapContext.getBeforeAtPreVars(heaps, services, "BeforeBlock");
-        for (LocationVariable v : result.values()) {
-            goal.addProgramVariable(v);
-        }
-        return result;
-    }
-
-    private Term generatePrecondition(List<LocationVariable> heaps, BlockContract contract, Term self, ImmutableList<Term> variables, Map<LocationVariable, Term> atPres, Services services) {
-        Term result = TB.tt();
-        for (LocationVariable heap : heaps) {
-            result = TB.and(result, contract.getPre(heap, TB.getBaseHeap(services), self, variables, atPres, services));
-        }
-        return result;
-    }
-
-    private Term generateWellFormedHeapsCondition(List<LocationVariable> heaps, Services services) {
-        Term result = TB.tt();
-        for (LocationVariable heap : heaps) {
-            result = TB.and(result, TB.wellFormed(heap, services));
-        }
-        return result;
-    }
-
-    private Term generateReachableCondition(ImmutableSet<ProgramVariable> variables, Services services) {
-        Term result = TB.tt();
-        for (ProgramVariable variable : variables) {
-            result = TB.and(result, TB.reachableValue(services, variable));
-        }
-        return result;
-    }
-
-    private Pair<Term, Map<LocationVariable, Map<Term, Term>>> generateRemembranceUpdateAndVariables(List<LocationVariable> heaps, ImmutableSet<ProgramVariable> variables, Services services) {
-        Term remembranceUpdate = null;
-        final Map<LocationVariable, Map<Term, Term>> remembranceVariables = new LinkedHashMap<LocationVariable, Map<Term, Term>>();
-        for (LocationVariable heap : heaps) {
-            // remember heap
-            remembranceVariables.put(heap, new LinkedHashMap<Term, Term>());
-            final LocationVariable variable = TB.heapAtPreVar(services, heap.name() + "BeforeBlock", heap.sort(), true);
-            services.getNamespaces().programVariables().addSafely(variable);
-            final Term update = TB.elementary(services, variable, TB.var(heap));
-            if (remembranceUpdate == null) {
-                remembranceUpdate = update;
-            }
-            else {
-                remembranceUpdate = TB.parallel(remembranceUpdate, update);
-            }
-            remembranceVariables.get(heap).put(TB.var(heap), TB.var(variable));
-        }
-        for (ProgramVariable variable : variables) {
-            // remember variable
-            final String remembranceName = TB.newName(services, variable.name().toString() + "BeforeBlock");
-            final LocationVariable remembranceVariable = new LocationVariable(new ProgramElementName(remembranceName), variable.getKeYJavaType());
-            services.getNamespaces().programVariables().addSafely(remembranceVariable);
-            remembranceUpdate = TB.parallel(remembranceUpdate, TB.elementary(services, remembranceVariable, TB.var(variable)));
-            remembranceVariables.get(services.getTypeConverter().getHeapLDT().getHeap()).put(TB.var(variable), TB.var(remembranceVariable));
-        }
-        return new Pair<Term, Map<LocationVariable, Map<Term, Term>>>(remembranceUpdate, remembranceVariables);
-    }
-
-    private Map<LocationVariable, Term> generateModifiesConditions(List<LocationVariable> heaps, BlockContract contract, Term self, ImmutableList<Term> variables, Services services) {
-        Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
-        for (final LocationVariable heap : heaps) {
-            result.put(heap, contract.getMod(heap, TB.var(heap), self, variables, services));
-        }
-        return result;
-    }
-
-    private Pair<Term, Term> generateAnonymisationUpdateAndWellFormedAnonymisationHeapsCondition(
-            List<LocationVariable> heaps, ImmutableSet<ProgramVariable> variables, Map<LocationVariable, Term> modifies, Services services) {
-        Term anonymisationUpdate = generateLocalVariablesAnonymisationUpdate(variables, services);
-        Term wellFormedAnonymisationHeapsCondition = TB.tt();
-        for (LocationVariable heap : heaps) {
-            final Pair<Term, Term> anonymisationUpdateAndHeapTerm
-                    = generateHeapAnonymisationUpdateAndAnonymisationHeapTerm(heap, modifies.get(heap), services);
-            if (anonymisationUpdate == null) {
-                anonymisationUpdate = anonymisationUpdateAndHeapTerm.first;
-            }
-            else {
-                anonymisationUpdate = TB.parallel(anonymisationUpdate, anonymisationUpdateAndHeapTerm.first);
-            }
-            wellFormedAnonymisationHeapsCondition = TB.and(wellFormedAnonymisationHeapsCondition,
-                    TB.wellFormed(anonymisationUpdateAndHeapTerm.second, services));
-        }
-        return new Pair<Term, Term>(anonymisationUpdate, wellFormedAnonymisationHeapsCondition);
-    }
-
-    private Term generateLocalVariablesAnonymisationUpdate(ImmutableSet<ProgramVariable> variables, Services services) {
-        Term anonUpdate = null;
-        for (ProgramVariable variable : variables) {
-            final String anonymisationName = TB.newName(services, variable.name().toString());
+    // TODO Why don't we use the remembrance heaps in placeholder variables as blueprint?
+    public Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables, final Services services)
+    {
+        Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>();
+        for (LocationVariable variable : variables) {
+            final String anonymisationName = TB.newName(services, variable.name() + "AnonBlock");
             final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort());
             services.getNamespaces().functions().addSafely(anonymisationFunction);
-            final Term elementaryUpdate = TB.elementary(services, (LocationVariable) variable, TB.func(anonymisationFunction));
-            if (anonUpdate == null) {
-                anonUpdate = elementaryUpdate;
-            }
-            else {
-                anonUpdate = TB.parallel(anonUpdate, elementaryUpdate);
-            }
-        }
-        return anonUpdate;
-    }
-
-    private Pair<Term, Term> generateHeapAnonymisationUpdateAndAnonymisationHeapTerm(LocationVariable heap,
-                                                                                     Term mod,
-                                                                                     Services services) {
-        final Name anonymisationName = new Name(TB.newName(services, "anon_" + heap.name() + "_block"));
-        final Function anonymisationFunction = new Function(anonymisationName, services.getTypeConverter().getHeapLDT().targetSort());
-        services.getNamespaces().functions().addSafely(anonymisationFunction);
-        final Term anonymisationHeap = TB.func(anonymisationFunction);
-        Term anonymisationUpdate = TB.skip();
-        if (!TB.lessThanNothing().equals(mod)) {
-            anonymisationUpdate = TB.anonUpd(heap, services, mod, anonymisationHeap);
-        }
-        return new Pair<Term, Term>(anonymisationUpdate, anonymisationHeap);
-    }
-
-    private Term generatePostcondition(List<LocationVariable> heaps, BlockContract contract, Term self, ImmutableList<Term> variables, Term result, Term exception, Map<LocationVariable, Term> atPres, Services services) {
-        Term rezuld = TB.tt();
-        for (LocationVariable heap : heaps) {
-            rezuld = TB.and(rezuld, contract.getPost(heap, TB.getBaseHeap(services), self, variables, result, exception, atPres, services));
-        }
-        return rezuld;
-    }
-
-    private Term generateFrameCondition(List<LocationVariable> heaps, Map<LocationVariable, Term> modifiesConditions, Map<LocationVariable, Map<Term, Term>> remembranceVariables, Services services) {
-        Term result = TB.tt();
-        for (LocationVariable heap : heaps) {
-            final Term modifiesCondition = modifiesConditions.get(heap);
-            final Term frameCondition;
-            if (TB.lessThanNothing().equals(modifiesCondition) && heap == services.getTypeConverter().getHeapLDT().getHeap()) {
-                frameCondition = TB.frameStrictlyEmpty(services, TB.var(heap), remembranceVariables.get(heap));
-            }
-            else {
-                frameCondition = TB.frame(services, TB.var(heap), remembranceVariables.get(heap), modifiesCondition);
-            }
-            result = TB.and(result, frameCondition);
         }
         return result;
-    }
-
-    private Term generateAtMostOneFlagSetCondition(Map<Label, ProgramVariable> breakFlags,
-                                                   Map<Label, ProgramVariable> continueFlags,
-                                                   ProgramVariable returnFlag, ProgramVariable exception,
-                                                   Services services) {
-        List<Term> notSetConditions = new LinkedList<Term>();
-        for (ProgramVariable flag : breakFlags.values()) {
-            notSetConditions.add(TB.equals(TB.var(flag), TB.FALSE(services)));
-        }
-        for (ProgramVariable flag : continueFlags.values()) {
-            notSetConditions.add(TB.equals(TB.var(flag), TB.FALSE(services)));
-        }
-        if (returnFlag != null) {
-            notSetConditions.add(TB.equals(TB.var(returnFlag), TB.FALSE(services)));
-        }
-        notSetConditions.add(TB.equals(TB.var(exception), TB.NULL(services)));
-
-        Term result = TB.tt();
-        for (Term notSetCondition : notSetConditions) {
-            result = TB.and(result, notSetCondition);
-        }
-        for (Term onlySetNotSetCondition : notSetConditions) {
-            Term condition = TB.not(onlySetNotSetCondition);
-            for (Term notSetCondition : notSetConditions) {
-                if (notSetCondition != onlySetNotSetCondition) {
-                    condition = TB.and(condition, notSetCondition);
-                }
-            }
-            result = TB.or(result, condition);
-        }
-        return result;
-    }
-
-    private ProgramVariable createLocalVariable(String varNameBase, String varType, Services services) {
-        return createLocalVariable(varNameBase, services.getJavaInfo().getKeYJavaType(varType), services);
-    }
-
-    private ProgramVariable createLocalVariable(String varNameBase, KeYJavaType varType, Services services) {
-        return KeYJavaASTFactory.localVariable(services.getVariableNamer().getTemporaryNameProposal(varNameBase), varType);
-    }
-
-    private void setUpValidityGoal(Goal goal, Term[] updates, Term[] assumptions,
-                                   Instantiation instantiation, Map<Label, ProgramVariable> breakFlags,
-                                   Map<Label, ProgramVariable> continueFlags, ProgramVariable returnFlag,
-                                   ProgramVariable resultVariable, KeYJavaType returnType,
-                                   ProgramVariable exceptionVariable, Term[] postconditions,
-                                   PosInOccurrence occurrence, Services services) {
-        goal.setBranchLabel("Validity");
-        goal.addFormula(new SequentFormula(TB.applySequential(updates, TB.and(assumptions))), true, false);
-
-        final List<Statement> statements = new LinkedList<Statement>();
-        statements.addAll(declareFlagsFalseAndResultNull(breakFlags.values(), continueFlags.values(), returnFlag, resultVariable, returnType, services));
-        statements.add(declareExceptionNull(exceptionVariable, services));
-        // TODO What about label uniqueness?
-        final Label breakOutLabel = new ProgramElementName("breakOut");
-        final StatementBlock transformedBlock = replaceOuterBreaksContinuesAndReturns(
-                instantiation.block, breakOutLabel, breakFlags, continueFlags, returnFlag, resultVariable, services);
-        statements.add(constructTryCatchStatement(breakOutLabel, transformedBlock, exceptionVariable, services));
-
-        // TODO Clean up.
-        StatementBlock block = new StatementBlock(statements.toArray(new Statement[statements.size()]));
-
-        Statement st = block;
-        if (instantiation.context != null) {
-            st = new MethodFrame(null, instantiation.context, block);
-        }
-        final boolean transaction = (instantiation.modality == Modality.DIA_TRANSACTION
-                || instantiation.modality == Modality.BOX_TRANSACTION);
-        goal.changeFormula(new SequentFormula(TB.applySequential(updates,
-                TB.prog(instantiation.modality,
-                        JavaBlock.createJavaBlock(transaction
-                                ? new StatementBlock(new Statement[] {st, new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)})
-                                : new StatementBlock(st)),
-                        TB.and(postconditions)))), occurrence);
-    }
-
-    private List<Statement> declareFlagsFalseAndResultNull(final Collection<ProgramVariable> breakFlags,
-                                                           final Collection<ProgramVariable> continueFlags,
-                                                           final ProgramVariable returnFlag,
-                                                           final ProgramVariable resultVariable,
-                                                           final KeYJavaType returnType,
-                                                           final Services services) {
-        final List<Statement> result = new LinkedList<Statement>();
-        for (ProgramVariable flag : breakFlags) {
-            result.add(declareFlagFalse(flag, services));
-        }
-        for (ProgramVariable flag : continueFlags) {
-            result.add(declareFlagFalse(flag, services));
-        }
-        if (returnFlag != null) {
-            result.add(declareFlagFalse(returnFlag, services));
-            if (returnType != null) {
-                result.add(KeYJavaASTFactory.declare(resultVariable, NullLiteral.NULL, returnType));
-            }
-        }
-        return result;
-    }
-
-    private Statement declareFlagFalse(final ProgramVariable flag, final Services services) {
-        return KeYJavaASTFactory.declare(flag, BooleanLiteral.FALSE, services.getJavaInfo().getKeYJavaType("boolean"));
-    }
-
-    private Statement declareExceptionNull(final ProgramVariable exceptionVariable, final Services services) {
-        return KeYJavaASTFactory.declare(exceptionVariable, NullLiteral.NULL, services.getJavaInfo().getKeYJavaType("java.lang.Throwable"));
-    }
-
-    private StatementBlock replaceOuterBreaksContinuesAndReturns(final StatementBlock block,
-                                                                 final Label breakOutLabel,
-                                                                 final Map<Label, ProgramVariable> breakFlags,
-                                                                 final Map<Label, ProgramVariable> continueFlags,
-                                                                 final ProgramVariable returnFlag,
-                                                                 final ProgramVariable resultVariable,
-                                                                 final Services services) {
-        final OuterBreakContinueAndReturnReplacer transformer = new OuterBreakContinueAndReturnReplacer(
-                block, breakOutLabel, breakFlags, continueFlags, returnFlag, resultVariable, services);
-        transformer.start();
-        return transformer.getResult();
-    }
-
-    private Statement constructTryCatchStatement(final Label breakOutLabel, final StatementBlock block,
-                                                 final ProgramVariable exceptionVariable, final Services services) {
-        ProgramVariable exceptionParameter = createLocalVariable("e", "java.lang.Throwable", services);
-        Statement[] catchStatements = { KeYJavaASTFactory.assign(exceptionVariable, exceptionParameter) };
-        Catch katch = KeYJavaASTFactory.catchClause(KeYJavaASTFactory.parameterDeclaration(
-                services.getJavaInfo(),
-                services.getJavaInfo().getKeYJavaType("java.lang.Throwable"),
-                exceptionParameter), new StatementBlock(catchStatements));
-        Branch[] branch = { katch };
-        return new Try(new StatementBlock(new LabeledStatement(breakOutLabel, block)), branch);
-    }
-
-    private void setUpPreconditionGoal(final Goal goal, final Term update, final Term[] preconditions, final PosInOccurrence occurrence) {
-        goal.setBranchLabel("Precondition");
-        goal.changeFormula(new SequentFormula(TB.apply(update, TB.and(preconditions))), occurrence);
-    }
-
-    private void setUpUsageGoal(Goal goal, StatementBlock block, Term[] updates, Term[] assumptions, Map<Label, ProgramVariable> breakFlags,
-                                Map<Label, ProgramVariable> continueFlags, ProgramVariable returnFlag, ProgramVariable result,
-                                ProgramVariable exception, Term formula, PosInOccurrence occurrence, Services services) {
-        goal.setBranchLabel("Usage");
-        goal.addFormula(new SequentFormula(TB.applySequential(updates, TB.and(assumptions))), true, false);
-
-        // TODO Clean up.
-        Term newFormula = TB.prog((Modality) formula.op(),
-                replaceBlock(formula.javaBlock(), block,
-                        constructIfCascade(breakFlags, continueFlags, returnFlag, result, exception),
-                        services),
-                formula.sub(0));
-        goal.changeFormula(new SequentFormula(TB.applySequential(updates, newFormula)), occurrence);
-    }
-
-    private JavaBlock replaceBlock(final JavaBlock java, final StatementBlock oldBlock, final StatementBlock newBlock, final Services services) {
-        assert java.program() != null;
-        // TODO Extract.
-        Statement newProgram = (Statement) (new CreatingASTVisitor(java.program(), false, services) {
-            private boolean done = false;
-
-            public ProgramElement go() {
-                stack.push(new ExtList());
-                walk(root());
-                ExtList el = stack.peek();
-                return el.get(ProgramElement.class);
-            }
-
-            public void doAction(ProgramElement node) {
-                if (!done && node == oldBlock) {
-                    done = true;
-                    addChild(newBlock);
-                    changed();
-                }
-                else {
-                    super.doAction(node);
-                }
-            }
-        }).go();
-        return JavaBlock.createJavaBlock(newProgram instanceof StatementBlock ? (StatementBlock) newProgram : new StatementBlock(newProgram));
-    }
-
-    private StatementBlock constructIfCascade(final Map<Label, ProgramVariable> breakFlags,
-                                              final Map<Label, ProgramVariable> continueFlags,
-                                              final ProgramVariable returnFlag,
-                                              final ProgramVariable resultVariable,
-                                              final ProgramVariable exceptionVariable) {
-        List<If> ifCascade = new ArrayList<If>();
-        for (Map.Entry<Label, ProgramVariable> flag : breakFlags.entrySet()) {
-            ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(), KeYJavaASTFactory.breakStatement(flag.getKey())));
-        }
-        for (Map.Entry<Label, ProgramVariable> flag : continueFlags.entrySet()) {
-            ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(), KeYJavaASTFactory.continueStatement(flag.getKey())));
-        }
-        if (returnFlag != null) {
-            ifCascade.add(KeYJavaASTFactory.ifThen(returnFlag, KeYJavaASTFactory.returnClause(resultVariable)));
-        }
-        ifCascade.add(KeYJavaASTFactory.ifThen(
-                new NotEquals(new ExtList(new Expression[] {exceptionVariable, NullLiteral.NULL})),
-                KeYJavaASTFactory.throwClause(exceptionVariable)));
-        return new StatementBlock(ifCascade.toArray(new Statement[ifCascade.size()]));
     }
 
     @Override
-    public BlockContractBuiltInRuleApp createApp(final PosInOccurrence occurrence) {
+    public BlockContractBuiltInRuleApp createApp(final PosInOccurrence occurrence)
+    {
         return new BlockContractBuiltInRuleApp(this, occurrence);
     }
 
     @Override
-    public Name name() {
+    public Name name()
+    {
         return NAME;
     }
 
     @Override
-    public String displayName() {
+    public String displayName()
+    {
         return toString();
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return NAME.toString();
     }
 
     public static final class Instantiation {
+
         public final Term update;
         public final Term formula;
         public final Modality modality;
@@ -617,7 +251,9 @@ public class BlockContractRule implements BuiltInRule {
         public final StatementBlock block;
         public final ExecutionContext context;
 
-        public Instantiation(Term update, Term formula, Modality modality, Term self, StatementBlock block, ExecutionContext context) {
+        public Instantiation(final Term update, final Term formula, final Modality modality, final Term self,
+                             final StatementBlock block, final ExecutionContext context)
+        {
             assert update != null;
             assert update.sort() == Sort.UPDATE;
             assert formula != null;
@@ -631,6 +267,499 @@ public class BlockContractRule implements BuiltInRule {
             this.block = block;
             this.context = context;
         }
+
+    }
+
+    private static final class VariablesCreatorAndRegistrar {
+
+        private final Goal goal;
+        private final BlockContract.Variables placeholderVariables;
+        private final Services services;
+
+        public VariablesCreatorAndRegistrar(final Goal goal, final BlockContract.Variables placeholderVariables, final Services services)
+        {
+            this.goal = goal;
+            this.placeholderVariables = placeholderVariables;
+            this.services = services;
+        }
+
+        public BlockContract.Variables createAndRegister()
+        {
+            return new BlockContract.Variables(
+                null, // TODO Do we really don't know self as variable?
+                createAndRegisterFlags(placeholderVariables.breakFlags),
+                createAndRegisterFlags(placeholderVariables.continueFlags),
+                createAndRegisterVariable(placeholderVariables.returnFlag),
+                createAndRegisterVariable(placeholderVariables.result),
+                createAndRegisterVariable(placeholderVariables.exception),
+                createAndRegisterRemembranceVariables(placeholderVariables.remembranceHeaps),
+                createAndRegisterRemembranceVariables(placeholderVariables.remembranceLocalVariables)
+            );
+        }
+
+        private Map<Label, ProgramVariable> createAndRegisterFlags(final Map<Label, ProgramVariable> placeholderFlags)
+        {
+            Map<Label, ProgramVariable> result = new LinkedHashMap<Label, ProgramVariable>();
+            for (Map.Entry<Label, ProgramVariable> flag : placeholderFlags.entrySet()) {
+                result.put(flag.getKey(), createAndRegisterVariable(flag.getValue()));
+            }
+            return result;
+        }
+        private LocationVariable createAndRegisterVariable(final ProgramVariable placeholderVariable)
+        {
+            if (placeholderVariable != null) {
+                String newName = TB.newName(services, placeholderVariable.name().toString());
+                LocationVariable newVariable = new LocationVariable(new ProgramElementName(newName), placeholderVariable.getKeYJavaType());
+                goal.addProgramVariable(newVariable);
+                return newVariable;
+            }
+            else {
+                return null;
+            }
+        }
+
+        private Map<LocationVariable, LocationVariable> createAndRegisterRemembranceVariables(final Map<LocationVariable, LocationVariable> remembranceVariables)
+        {
+            final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
+            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables.entrySet()) {
+                result.put(remembranceVariable.getKey(), createAndRegisterVariable(remembranceVariable.getValue()));
+            }
+            return result;
+        }
+
+    }
+
+    private static final class UpdatesBuilder extends TermBuilder {
+
+        private final BlockContract.Variables variables;
+
+        public UpdatesBuilder(BlockContract.Variables variables, final Services services)
+        {
+            super(services);
+            this.variables = variables;
+        }
+
+        public Term buildRemembranceUpdate()
+        {
+            Term result = skip();
+            for (Map.Entry<LocationVariable, LocationVariable> remembranceHeap : variables.remembranceHeaps.entrySet()) {
+                final Term update = elementary(remembranceHeap.getValue(), var(remembranceHeap.getKey()));
+                result = parallel(result, update);
+            }
+            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : variables.remembranceLocalVariables.entrySet()) {
+                result = parallel(result, elementary(remembranceVariable.getValue(), var(remembranceVariable.getKey())));
+            }
+            return result;
+        }
+
+        public Term buildAnonymisationUpdate(final Map<LocationVariable, Function> anonymisationHeaps,
+                                             /*final Map<LocationVariable, Function> anonymisationLocalVariables,*/
+                                             final Map<LocationVariable, Term> modifiesConditions)
+        {
+            Term result = buildLocalVariablesAnonymisationUpdate(/*anonymisationLocalVariables*/);
+            for (Map.Entry<LocationVariable, Function> anonymisationHeap : anonymisationHeaps.entrySet()) {
+                Term anonymisationUpdate = skip();
+                final Term modifiesCondition = modifiesConditions.get(anonymisationHeap.getKey());
+                if (!modifiesCondition.equals(lessThanNothing())) {
+                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesCondition, func(anonymisationHeap.getValue()));
+                }
+                result = parallel(result, anonymisationUpdate);
+            }
+            return result;
+        }
+
+        private Term buildLocalVariablesAnonymisationUpdate(/*final Map<LocationVariable, Function> anonymisationLocalVariables,*/)
+        {
+            Term result = skip();
+            Collection<LocationVariable> localOutVariables = variables.remembranceLocalVariables.keySet();
+            for (LocationVariable variable : localOutVariables) {
+                final String anonymisationName = newName(variable.name() + "AnonBlock");
+                final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort());
+                services.getNamespaces().functions().addSafely(anonymisationFunction);
+                final Term elementaryUpdate = elementary(variable, func(anonymisationFunction));
+                result = parallel(result, elementaryUpdate);
+            }
+            return result;
+            /*Term result = skip();
+            for (Map.Entry<LocationVariable, Function> anonymisationLocalVariable : anonymisationLocalVariables.entrySet()) {
+                result = parallel(result, elementary(anonymisationLocalVariable.getKey(), func(anonymisationLocalVariable.getValue())));
+            }
+            return result;*/
+        }
+
+    }
+
+    private static final class ConditionsBuilder extends TermBuilder {
+
+        private final BlockContract contract;
+        private final List<LocationVariable> heaps;
+        private final BlockContract.Variables variables;
+        private final BlockContract.Terms terms;
+
+        public ConditionsBuilder(final BlockContract contract, final List<LocationVariable> heaps,
+                                 final BlockContract.Variables variables, final Term self, final Services services)
+        {
+            super(services);
+            this.contract = contract;
+            this.heaps = heaps;
+            this.variables = variables;
+            this.terms = termify(variables, self);
+        }
+
+        // TODO termify obviously belongs into the Variables class.
+        private BlockContract.Terms termify(final BlockContract.Variables variables, final Term self)
+        {
+            return new BlockContract.Terms(
+                self, /*var(variables.self),*/
+                termifyFlags(variables.breakFlags),
+                termifyFlags(variables.continueFlags),
+                termifyVariable(variables.returnFlag),
+                termifyVariable(variables.result),
+                termifyVariable(variables.exception),
+                termifyRemembranceVariables(variables.remembranceHeaps),
+                termifyRemembranceVariables(variables.remembranceLocalVariables)
+            );
+        }
+
+        private Map<Label, Term> termifyFlags(final Map<Label, ProgramVariable> flags)
+        {
+            final Map<Label, Term> result = new LinkedHashMap<Label, Term>();
+            for (Map.Entry<Label, ProgramVariable> flag : flags.entrySet()) {
+                result.put(flag.getKey(), var(flag.getValue()));
+            }
+            return result;
+        }
+
+        private Term termifyVariable(final ProgramVariable variable)
+        {
+            if (variable != null) {
+                return var(variable);
+            }
+            else {
+                return null;
+            }
+        }
+
+        private Map<LocationVariable, Term> termifyRemembranceVariables(final Map<LocationVariable, LocationVariable> remembranceVariables)
+        {
+            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables.entrySet()) {
+                result.put(remembranceVariable.getKey(), var(remembranceVariable.getValue()));
+            }
+            return result;
+        }
+
+        public Term buildPrecondition()
+        {
+            Term result = tt();
+            for (LocationVariable heap : heaps) {
+                result = and(result, contract.getPrecondition(heap, getBaseHeap(services), terms.self, terms.remembranceHeaps, services));
+            }
+            return result;
+        }
+
+        public Term buildWellFormedHeapsCondition()
+        {
+            Term result = tt();
+            for (LocationVariable heap : heaps) {
+                result = and(result, wellFormed(heap));
+            }
+            return result;
+        }
+
+        public Term buildReachableCondition(final ImmutableSet<ProgramVariable> variables)
+        {
+            Term result = tt();
+            for (ProgramVariable variable : variables) {
+                result = and(result, reachableValue(variable));
+            }
+            return result;
+        }
+
+        public Map<LocationVariable, Term> buildModifiesConditions()
+        {
+            Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            for (final LocationVariable heap : heaps) {
+                result.put(heap, contract.getModifiesCondition(heap, var(heap), terms.self, services));
+            }
+            return result;
+        }
+
+        public Term buildPostcondition()
+        {
+            Term result = tt();
+            for (LocationVariable heap : heaps) {
+                result = and(result, contract.getPostcondition(heap, getBaseHeap(services), terms, services));
+            }
+            return result;
+        }
+
+        public Term buildFrameCondition(final Map<LocationVariable, Term> modifiesConditions)
+        {
+            Term result = tt();
+            Map<LocationVariable, Map<Term, Term>> remembranceVariables = constructRemembranceVariables();
+            for (LocationVariable heap : heaps) {
+                final Term modifiesCondition = modifiesConditions.get(heap);
+                final Term frameCondition;
+                if (modifiesCondition.equals(lessThanNothing()) && heap == getBaseHeap()) {
+                    frameCondition = frameStrictlyEmpty(var(heap), remembranceVariables.get(heap));
+                }
+                else {
+                    frameCondition = frame(var(heap), remembranceVariables.get(heap), modifiesCondition);
+                }
+                result = and(result, frameCondition);
+            }
+            return result;
+        }
+
+        private Map<LocationVariable, Map<Term, Term>> constructRemembranceVariables()
+        {
+            Map<LocationVariable, Map<Term, Term>> result = new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+            for (Map.Entry<LocationVariable, LocationVariable> remembranceHeap : variables.remembranceHeaps.entrySet()) {
+                final LocationVariable heap = remembranceHeap.getKey();
+                result.put(heap, new LinkedHashMap<Term, Term>());
+                result.get(heap).put(var(heap), var(remembranceHeap.getValue()));
+            }
+            for (Map.Entry<LocationVariable, LocationVariable> remembranceLocalVariable : variables.remembranceLocalVariables.entrySet()) {
+                result.get(getBaseHeap()).put(var(remembranceLocalVariable.getKey()), var(remembranceLocalVariable.getValue()));
+            }
+            return result;
+        }
+
+        private LocationVariable getBaseHeap()
+        {
+            return services.getTypeConverter().getHeapLDT().getHeap();
+        }
+
+        public Term buildWellFormedAnonymisationHeapsCondition(final Map<LocationVariable, Function> anonymisationHeaps)
+        {
+            Term result = tt();
+            for (Function anonymisationFunction : anonymisationHeaps.values()) {
+                result = and(result, wellFormed(func(anonymisationFunction)));
+            }
+            return result;
+        }
+
+        public Term buildAtMostOneFlagSetCondition()
+        {
+            final List<Term> notSetConditions = new LinkedList<Term>();
+            notSetConditions.addAll(buildFlagsNotSetConditions(variables.breakFlags.values()));
+            notSetConditions.addAll(buildFlagsNotSetConditions(variables.continueFlags.values()));
+            if (variables.returnFlag != null) {
+                notSetConditions.add(buildFlagNotSetCondition(variables.returnFlag));
+            }
+            notSetConditions.add(equals(var(variables.exception), NULL()));
+
+            Term result = tt();
+            for (Term notSetCondition : notSetConditions) {
+                result = and(result, notSetCondition);
+            }
+            for (Term onlySetNotSetCondition : notSetConditions) {
+                Term condition = not(onlySetNotSetCondition);
+                for (Term notSetCondition : notSetConditions) {
+                    if (notSetCondition != onlySetNotSetCondition) {
+                        condition = and(condition, notSetCondition);
+                    }
+                }
+                result = or(result, condition);
+            }
+            return result;
+        }
+
+        private List<Term> buildFlagsNotSetConditions(final Collection<ProgramVariable> flags)
+        {
+            final List<Term> result = new LinkedList<Term>();
+            for (ProgramVariable flag : flags) {
+                result.add(buildFlagNotSetCondition(flag));
+            }
+            return result;
+        }
+
+        private Term buildFlagNotSetCondition(final ProgramVariable flag)
+        {
+            return equals(var(flag), FALSE());
+        }
+
+    }
+
+    private static final class GoalsConfigurator {
+
+        private final Instantiation instantiation;
+        private final BlockContract.Variables variables;
+        private final PosInOccurrence occurrence;
+        private final Services services;
+
+        public GoalsConfigurator(final Instantiation instantiation, final BlockContract.Variables variables,
+                                  final PosInOccurrence occurrence, final Services services)
+        {
+            this.instantiation = instantiation;
+            this.variables = variables;
+            this.occurrence = occurrence;
+            this.services = services;
+        }
+
+        public void setUpValidityGoal(final Goal goal, final Term[] updates, final Term[] assumptions, final Term[] postconditions)
+        {
+            goal.setBranchLabel("Validity");
+            goal.addFormulaToAntecedent(new SequentFormula(TB.applySequential(updates, TB.and(assumptions))), false);
+
+            final StatementBlock block = new ValidityProgramConstructor(
+                instantiation.block, variables, services
+            ).construct();
+
+            // TODO Clean up.
+            Statement st = block;
+            if (instantiation.context != null) {
+                st = new MethodFrame(null, instantiation.context, block);
+            }
+            final boolean transaction = (instantiation.modality == Modality.DIA_TRANSACTION
+                    || instantiation.modality == Modality.BOX_TRANSACTION);
+            goal.changeFormula(new SequentFormula(TB.applySequential(updates,
+                    TB.prog(instantiation.modality,
+                            JavaBlock.createJavaBlock(transaction
+                                    ? new StatementBlock(new Statement[] {st, new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)})
+                                    : new StatementBlock(st)),
+                            TB.and(postconditions)))), occurrence);
+        }
+
+        public void setUpPreconditionGoal(final Goal goal, final Term update, final Term[] preconditions)
+        {
+            goal.setBranchLabel("Precondition");
+            goal.changeFormula(new SequentFormula(TB.apply(update, TB.and(preconditions))), occurrence);
+        }
+
+        public void setUpUsageGoal(final Goal goal, final Term[] updates, final Term[] assumptions)
+        {
+            goal.setBranchLabel("Usage");
+            goal.addFormula(new SequentFormula(TB.applySequential(updates, TB.and(assumptions))), true, false);
+            goal.changeFormula(new SequentFormula(TB.applySequential(updates, buildUsageFormula())), occurrence);
+        }
+
+        private Term buildUsageFormula()
+        {
+            return TB.prog(
+                instantiation.modality,
+                replaceBlock(instantiation.formula.javaBlock(), instantiation.block, constructAbruptTerminationIfCascade()),
+                instantiation.formula.sub(0)
+            );
+        }
+
+        private JavaBlock replaceBlock(final JavaBlock java, final StatementBlock oldBlock, final StatementBlock newBlock)
+        {
+            Statement newProgram = (Statement) new ProgramElementReplacer(java.program(), services).replace(oldBlock, newBlock);
+            return JavaBlock.createJavaBlock(newProgram instanceof StatementBlock ? (StatementBlock) newProgram : new StatementBlock(newProgram));
+        }
+
+        private StatementBlock constructAbruptTerminationIfCascade()
+        {
+            List<If> ifCascade = new ArrayList<If>();
+            for (Map.Entry<Label, ProgramVariable> flag : variables.breakFlags.entrySet()) {
+                ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(), KeYJavaASTFactory.breakStatement(flag.getKey())));
+            }
+            for (Map.Entry<Label, ProgramVariable> flag : variables.continueFlags.entrySet()) {
+                ifCascade.add(KeYJavaASTFactory.ifThen(flag.getValue(), KeYJavaASTFactory.continueStatement(flag.getKey())));
+            }
+            if (variables.returnFlag != null) {
+                ifCascade.add(KeYJavaASTFactory.ifThen(variables.returnFlag, KeYJavaASTFactory.returnClause(variables.result)));
+            }
+            ifCascade.add(KeYJavaASTFactory.ifThen(
+                new NotEquals(new ExtList(new Expression[] {variables.exception, NullLiteral.NULL})),
+                KeYJavaASTFactory.throwClause(variables.exception)));
+            return new StatementBlock(ifCascade.toArray(new Statement[ifCascade.size()]));
+        }
+
+    }
+
+    private static final class ValidityProgramConstructor {
+
+        private final StatementBlock block;
+        private final BlockContract.Variables variables;
+        private final Services services;
+        private final List<Statement> statements;
+
+        public ValidityProgramConstructor(final StatementBlock block, final BlockContract.Variables variables, final Services services)
+        {
+            this.block = block;
+            this.variables = variables;
+            this.services = services;
+            statements = new LinkedList<Statement>();
+        }
+
+        public StatementBlock construct()
+        {
+            declareFlagsFalse();
+            declareResultDefault();
+            declareExceptionNull();
+            executeBlockSafely();
+            return new StatementBlock(statements.toArray(new Statement[statements.size()]));
+        }
+
+        private void declareFlagsFalse()
+        {
+            declareFlagsFalse(variables.breakFlags.values());
+            declareFlagsFalse(variables.continueFlags.values());
+            if (variables.returnFlag != null) {
+                declareFlagFalse(variables.returnFlag);
+            }
+        }
+
+        private void declareFlagsFalse(final Collection<ProgramVariable> flags)
+        {
+            for (ProgramVariable flag : flags) {
+                declareFlagFalse(flag);
+            }
+        }
+
+        private void declareFlagFalse(final ProgramVariable flag)
+        {
+            statements.add(KeYJavaASTFactory.declare(flag, BooleanLiteral.FALSE, services.getJavaInfo().getKeYJavaType("boolean")));
+        }
+
+        private void declareResultDefault()
+        {
+            // TODO Better names for inequalities: doesReturnOccur, hasMethodReturnValue (isMethodReturnTypeNotVoid)
+            if (variables.returnFlag != null && variables.result != null) {
+                KeYJavaType resultType = variables.result.getKeYJavaType();
+                statements.add(KeYJavaASTFactory.declare(variables.result, resultType.getDefaultValue(), resultType));
+            }
+        }
+
+        private void declareExceptionNull()
+        {
+            statements.add(KeYJavaASTFactory.declare(variables.exception, NullLiteral.NULL, variables.exception.getKeYJavaType()));
+        }
+
+        private void executeBlockSafely()
+        {
+            // TODO We want a unique label. Get it from TermBuilder: TB.newName(services, "breakOut")?
+            final Label breakOutLabel = new ProgramElementName("breakOut");
+            final StatementBlock almostSafeBlock = replaceOuterBreaksContinuesAndReturns(block, breakOutLabel);
+            final Statement safeStatement = wrapInTryCatch(almostSafeBlock);
+            statements.add(new LabeledStatement(breakOutLabel, safeStatement));
+        }
+
+        private StatementBlock replaceOuterBreaksContinuesAndReturns(final StatementBlock block, final Label breakOutLabel)
+        {
+            return new OuterBreakContinueAndReturnReplacer(
+                block, breakOutLabel, variables.breakFlags, variables.continueFlags, variables.returnFlag, variables.result, services
+            ).replace();
+        }
+
+        private Statement wrapInTryCatch(final StatementBlock block)
+        {
+            ProgramVariable exceptionParameter = createLocalVariable("e", variables.exception.getKeYJavaType());
+            Catch katch = KeYJavaASTFactory.catchClause(
+                KeYJavaASTFactory.parameterDeclaration(services.getJavaInfo(), exceptionParameter.getKeYJavaType(), exceptionParameter),
+                new StatementBlock(KeYJavaASTFactory.assign(variables.exception, exceptionParameter))
+            );
+            return new Try(block, new Branch[] {katch});
+        }
+
+        private ProgramVariable createLocalVariable(final String nameBase, final KeYJavaType type)
+        {
+            return KeYJavaASTFactory.localVariable(services.getVariableNamer().getTemporaryNameProposal(nameBase), type);
+        }
+
     }
 
 }

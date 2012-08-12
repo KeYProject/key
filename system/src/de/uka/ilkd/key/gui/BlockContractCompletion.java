@@ -3,35 +3,41 @@ package de.uka.ilkd.key.gui;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractRule.Instantiation;
 import de.uka.ilkd.key.speclang.BlockContract;
 
+// TODO Clean up.
 public class BlockContractCompletion implements InteractiveRuleApplicationCompletion {
 
 	@Override
-	public IBuiltInRuleApp complete(IBuiltInRuleApp application, Goal goal, boolean force) {
-		Services services = goal.proof().getServices();
+	public IBuiltInRuleApp complete(final IBuiltInRuleApp application, final Goal goal, final boolean force)
+    {
+        IBuiltInRuleApp result = application;
+		final Services services = goal.proof().getServices();
         if (force) {
-            application = application.tryToInstantiate(goal);
-            if (application.complete()) {
-                return application;
+            result = application.tryToInstantiate(goal);
+            if (result.complete()) {
+                return result;
             }
         }
-        Instantiation instantiation = BlockContractRule.instantiate(application.posInOccurrence().subTerm(), services);
-        ImmutableSet<BlockContract> contracts = BlockContractRule.getApplicableContracts(instantiation, services);
-        ContractConfigurator configurator = new ContractConfigurator(
-                MainWindow.getInstance(), services, contracts.toArray(new BlockContract[contracts.size()]),
-                "Contracts for Block: " + instantiation.block, true);
+        final Instantiation instantiation = BlockContractRule.instantiate(application.posInOccurrence().subTerm(), services);
+        final ImmutableSet<BlockContract> contracts = BlockContractRule.getApplicableContracts(instantiation, services);
+        final BlockContractConfigurator configurator = new BlockContractConfigurator(
+            MainWindow.getInstance(), services, contracts.toArray(new BlockContract[contracts.size()]),
+            "Contracts for Block: " + instantiation.block, true
+        );
         if (configurator.wasSuccessful()) {
-            return  ((BlockContractRule) application.rule()).createApp(application.posInOccurrence()).setContract(configurator.getContract());
+            return ((BlockContractBuiltInRuleApp) application.rule().createApp(application.posInOccurrence())).setContract(configurator.getContract(), goal);
         }
-        return application;
+        return result;
 	}
 
 	@Override
-	public boolean canComplete(IBuiltInRuleApp app) {
+	public boolean canComplete(final IBuiltInRuleApp app)
+    {
 		return app.rule() instanceof BlockContractRule;
 	}
 

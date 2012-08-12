@@ -1081,15 +1081,17 @@ public final class SpecificationRepository {
     }
 
 
+    // TODO Clean up.
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block, Modality modality) {
         ImmutableSet<BlockContract> result = getBlockContracts(block);
-        final boolean transactionModality = (modality == Modality.DIA_TRANSACTION || modality == Modality.BOX_TRANSACTION);
+        final boolean transactionModality = modality.transaction();
         final Modality matchModality = transactionModality
                 ? ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA : Modality.BOX)
                 : modality;
         for (BlockContract contract : result) {
+            // TODO Handle transactions properly.
             if (!contract.getModality().equals(matchModality)
-                    || (transactionModality && !contract.transactionApplicableContract() && !contract.isReadOnlyContract(services))) {
+                    /*|| (transactionModality && !contract.transactionApplicableContract() && !contract.isReadOnlyContract(services))*/) {
                 result = result.remove(contract);
             }
         }

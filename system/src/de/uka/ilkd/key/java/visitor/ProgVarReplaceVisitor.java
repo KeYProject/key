@@ -15,9 +15,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -30,7 +28,6 @@ import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockContractImpl;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.ExtList;
@@ -226,9 +223,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             final Map<LocationVariable, Term> newPosts = new LinkedHashMap<LocationVariable, Term>();
             final Map<LocationVariable, Term> newMods = new LinkedHashMap<LocationVariable, Term>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                newPres.put(heap, replaceVariablesInTerm(contract.getPre(heap, services)));
-                newPosts.put(heap, replaceVariablesInTerm(contract.getPost(heap, services)));
-                newMods.put(heap, replaceVariablesInTerm(contract.getMod(heap, services)));
+                newPres.put(heap, replaceVariablesInTerm(contract.getPrecondition(heap, services)));
+                newPosts.put(heap, replaceVariablesInTerm(contract.getPostcondition(heap, services)));
+                newMods.put(heap, replaceVariablesInTerm(contract.getModifiesCondition(heap, services)));
             }
             //TODO What about selfVar, resultVar, excVar, breakFlags, continueFlags, returnFlag, ...?
             services.getSpecificationRepository().addBlockContract(contract.update(newBlock, newPres, newPosts, newMods));

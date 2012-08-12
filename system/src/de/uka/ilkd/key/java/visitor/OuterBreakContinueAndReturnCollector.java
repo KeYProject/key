@@ -43,6 +43,11 @@ public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
         return !returns.isEmpty();
     }
 
+    public void collect()
+    {
+        start();
+    }
+
     @Override
     public void start() {
         loopAndSwitchCascadeDepth = 0;

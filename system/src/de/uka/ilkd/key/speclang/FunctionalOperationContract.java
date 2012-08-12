@@ -77,6 +77,4 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        Map<LocationVariable,Term> atPres,
 	    	        Services services);
 
-    public BlockContract toBlockContract(StatementBlock block, Map<Label, ProgramVariable> breakFlags, Map<Label, ProgramVariable> continueFlags, ProgramVariable returnFlag);
-
 }

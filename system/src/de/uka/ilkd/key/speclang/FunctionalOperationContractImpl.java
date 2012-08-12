@@ -108,8 +108,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         assert modality != null;
         assert (selfVar == null) == pm.isStatic();
         assert paramVars != null;
-        //TODO Block contracts use paramVars for local variables and flags. :(
-        //assert paramVars.size() == pm.getParameterDeclarationCount();
+        assert paramVars.size() == pm.getParameterDeclarationCount();
         if (resultVar == null){
             assert (pm.isVoid() || pm.isConstructor()) : "resultVar == null for method "+pm;
         } else {
@@ -918,13 +917,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     @Override
     public String getTypeName() {
         return ContractFactory.generateContractTypeName(baseName, kjt, pm);
-    }
-
-    @Override
-    public BlockContract toBlockContract(StatementBlock block, Map<Label, ProgramVariable> breakFlags, Map<Label, ProgramVariable> continueFlags, ProgramVariable returnFlag) {
-        return new BlockContractImpl(baseName, name, kjt, pm, modality, originalPres, originalMby, originalPosts, originalMods,
-                hasRealModifiesClause, originalSelfVar, originalParamVars, originalResultVar, originalExcVar, originalAtPreVars,
-                id, toBeSaved, transaction, block, breakFlags, continueFlags, returnFlag);
     }
 
 }
