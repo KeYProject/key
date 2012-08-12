@@ -191,6 +191,7 @@ public class TermBuilder {
                                     KeYJavaType kjt,
                                     boolean makeNameUnique)
     {
+        assert services != null;
         return selfVar(services, pm, kjt, makeNameUnique);
     }
     
@@ -720,6 +721,7 @@ public class TermBuilder {
 
     public Term elementary(UpdateableOperator lhs,
                            Term rhs) {
+        assert services != null;
         return elementary(services, lhs, rhs);
     }
 
@@ -1280,7 +1282,9 @@ public class TermBuilder {
     //heap operators    
     //-------------------------------------------------------------------------
 
-    public Term NULL() {
+    public Term NULL()
+    {
+        assert services != null;
         return NULL(services);
     }
 
@@ -1290,6 +1294,7 @@ public class TermBuilder {
 
     public Term wellFormed(Term heap)
     {
+        assert services != null;
         return wellFormed(heap, services);
     }
 
@@ -1301,6 +1306,7 @@ public class TermBuilder {
 
     public Term wellFormed(LocationVariable heap)
     {
+        assert services != null;
         return wellFormed(heap, services);
     }
 
@@ -1537,6 +1543,7 @@ public class TermBuilder {
 
     public Term reachableValue(ProgramVariable pv)
     {
+        assert services != null;
         return reachableValue(services, pv);
     }
 
@@ -1548,6 +1555,7 @@ public class TermBuilder {
 
     public Term frame(Term heapTerm, Map<Term,Term> normalToAtPre, Term mod)
     {
+        assert services != null;
         return frame(services, heapTerm, normalToAtPre, mod);
     }
 
@@ -1598,6 +1606,7 @@ public class TermBuilder {
 
     public Term frameStrictlyEmpty(Term heapTerm, Map<Term,Term> normalToAtPre)
     {
+        assert services != null;
         return frameStrictlyEmpty(services, heapTerm, normalToAtPre);
     }
     
@@ -1643,6 +1652,7 @@ public class TermBuilder {
 
 
     public Term anonUpd(LocationVariable heap, Term mod, Term anonHeap) {
+        assert services != null;
         return anonUpd(heap, services, mod, anonHeap);
     }
     
