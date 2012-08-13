@@ -16,6 +16,7 @@ import java.util.Map;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -84,7 +85,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     //%%% HACK: there should be a central facility for introducing new program
     // variables; this method is also used in <code>MethodCall</code> to
     // create copies of parameter variables
-    public static ProgramVariable copy(ProgramVariable pv) {
+    public static LocationVariable copy(ProgramVariable pv) {
 	return copy(pv, "");
     }
 
@@ -92,7 +93,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     //%%% HACK: there should be a central facility for introducing new program
     // variables; this method is also used in <code>MethodCall</code> to
     // create copies of parameter variables
-    public static ProgramVariable copy(ProgramVariable pv, String postFix) {
+    public static LocationVariable copy(ProgramVariable pv, String postFix) {
     	ProgramElementName name = pv.getProgramElementName();
     	//%%% HACK: final local variables are not renamed since they can occur in an
     	// anonymous class declared in their scope of visibility.
@@ -216,20 +217,85 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         performActionOnProgramVariable(x);
     }
 
+    // TODO Clean up.
     public void performActionOnBlockContract(StatementBlock oldBlock, StatementBlock newBlock) {
         ImmutableSet<BlockContract> contracts = services.getSpecificationRepository().getBlockContracts(oldBlock);
         for (BlockContract contract : contracts) {
-            final Map<LocationVariable, Term> newPres = new LinkedHashMap<LocationVariable, Term>();
-            final Map<LocationVariable, Term> newPosts = new LinkedHashMap<LocationVariable, Term>();
-            final Map<LocationVariable, Term> newMods = new LinkedHashMap<LocationVariable, Term>();
+            final BlockContract.Variables variables = contract.getPlaceholderVariables();
+            final BlockContract.Variables newVariables = new BlockContract.Variables(
+                replaceVariable(variables.self),
+                replaceFlags(variables.breakFlags),
+                replaceFlags(variables.continueFlags),
+                replaceVariable(variables.returnFlag),
+                replaceVariable(variables.result),
+                replaceVariable(variables.exception),
+                replaceRemembranceHeaps(variables.remembranceHeaps),
+                replaceRemembranceLocalVariables(variables.remembranceLocalVariables)
+            );
+            final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<LocationVariable, Term>();
+            final Map<LocationVariable, Term> newModifiesConditions = new LinkedHashMap<LocationVariable, Term>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                newPres.put(heap, replaceVariablesInTerm(contract.getPrecondition(heap, services)));
-                newPosts.put(heap, replaceVariablesInTerm(contract.getPostcondition(heap, services)));
-                newMods.put(heap, replaceVariablesInTerm(contract.getModifiesCondition(heap, services)));
+                newPreconditions.put(heap, replaceVariablesInTerm(contract.getPrecondition(heap, services)));
+                newPostconditions.put(heap, replaceVariablesInTerm(contract.getPostcondition(heap, services)));
+                newModifiesConditions.put(heap, replaceVariablesInTerm(contract.getModifiesCondition(heap, services)));
             }
-            //TODO What about selfVar, resultVar, excVar, breakFlags, continueFlags, returnFlag, ...?
-            services.getSpecificationRepository().addBlockContract(contract.update(newBlock, newPres, newPosts, newMods));
+            final BlockContract newContract = contract.update(newBlock, newPreconditions, newPostconditions, newModifiesConditions, newVariables);
+            services.getSpecificationRepository().addBlockContract(newContract);
         }
+    }
+
+    private ProgramVariable replaceVariable(final ProgramVariable variable)
+    {
+        if (variable != null) {
+            if (replaceMap.containsKey(variable)) {
+                // TODO Can we really safely assume that replaceMap contains a program variable?
+                return (ProgramVariable) replaceMap.get(variable);
+            }
+            else {
+                if (replaceallbynew) {
+                    replaceMap.put(variable, copy(variable));
+                    return (ProgramVariable) replaceMap.get(variable);
+                }
+                else {
+                    return variable;
+                }
+            }
+        }
+        else {
+            return null;
+        }
+    }
+
+    private Map<Label, ProgramVariable> replaceFlags(final Map<Label, ProgramVariable> flags)
+    {
+        final Map<Label, ProgramVariable> result = new LinkedHashMap<Label, ProgramVariable>();
+        for (Map.Entry<Label, ProgramVariable> flag : flags.entrySet()) {
+            result.put(flag.getKey(), replaceVariable(flag.getValue()));
+        }
+        return result;
+    }
+
+    private Map<LocationVariable, LocationVariable> replaceRemembranceHeaps(final Map<LocationVariable, LocationVariable> remembranceHeaps) {
+        final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
+        for (Map.Entry<LocationVariable, LocationVariable> remembranceHeap: remembranceHeaps.entrySet()) {
+            result.put(
+                remembranceHeap.getKey(),
+                (LocationVariable) replaceVariable(remembranceHeap.getValue())
+            );
+        }
+        return result;
+    }
+
+    private Map<LocationVariable, LocationVariable> replaceRemembranceLocalVariables(final Map<LocationVariable, LocationVariable> remembranceLocalVariables) {
+        final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
+        for (Map.Entry<LocationVariable, LocationVariable> remembranceLocalVariable: remembranceLocalVariables.entrySet()) {
+            result.put(
+                (LocationVariable) replaceVariable(remembranceLocalVariable.getKey()),
+                (LocationVariable) replaceVariable(remembranceLocalVariable.getValue())
+            );
+        }
+        return result;
     }
     
     public void performActionOnLoopInvariant(LoopStatement oldLoop, 

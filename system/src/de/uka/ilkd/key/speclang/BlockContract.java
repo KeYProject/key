@@ -53,11 +53,12 @@ public interface BlockContract extends SpecificationElement {
 
     public String getHtmlText(Services services);
 
-    // TODO I'd like to remve the following method.
+    // TODO Find better name: Creates a new block contract with the given changes.
     public BlockContract update(StatementBlock newBlock,
-                                Map<LocationVariable,Term> newPres,
-                                Map<LocationVariable,Term> newPosts,
-                                Map<LocationVariable,Term> newMods);
+                                Map<LocationVariable,Term> newPreconditions,
+                                Map<LocationVariable,Term> newPostconditions,
+                                Map<LocationVariable,Term> newModifiesConditions,
+                                Variables newVariables);
 
     public static class Variables {
 

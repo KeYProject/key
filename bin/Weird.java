@@ -177,4 +177,42 @@ public class Weird {
         return z;
     }
     
+    /*@ diverges false;
+      @*/
+    public int go(int x, int y) {
+        int z = 0;
+        /*@ requires z == 0;
+          @ ensures x == y;
+          @ breaks x > y;
+          @ continues x < y;
+          @ returns x == 0 && y == 0;
+          @ signals (Exception e) x + y == 0;
+          @ diverges x == y;
+          @ assignable \nothing;
+          @*/
+        {
+            if (x > 0) {
+                ta(z, x, 3);
+            }
+        }
+    }
+    
+    public void ta(int u, int v, int w) {
+        int x = 1;
+        /*@ requires x == 0;
+          @ ensures u == v;
+          @ breaks v > w;
+          @ continues w < v;
+          @ returns v == 0 && u == 0;
+          @ signals (Exception e) x + u == 0;
+          @ diverges x == u;
+          @ assignable \nothing;
+          @*/
+        {
+            if (u > 0) {
+                x = v + w;
+            }
+        }
+    }
+    
 }

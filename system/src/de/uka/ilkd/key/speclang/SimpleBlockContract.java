@@ -273,9 +273,10 @@ public final class SimpleBlockContract implements BlockContract {
     public BlockContract update(final StatementBlock newBlock,
                                 final Map<LocationVariable,Term> newPreconditions,
                                 final Map<LocationVariable,Term> newPostconditions,
-                                final Map<LocationVariable,Term> newModifiesConditions)
+                                final Map<LocationVariable,Term> newModifiesConditions,
+                                final Variables newVariables)
     {
-        return new SimpleBlockContract(newBlock, method, modality, newPreconditions, newPostconditions, newModifiesConditions, variables, transaction);
+        return new SimpleBlockContract(newBlock, method, modality, newPreconditions, newPostconditions, newModifiesConditions, newVariables, transaction);
     }
 
     private Map<ProgramVariable, ProgramVariable> createReplacementMap(final Variables newVariables, final Services services)
