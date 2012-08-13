@@ -56,6 +56,7 @@ public class ChoiceSettings implements Settings {
     
     /** returns a copy of the HashMap that maps categories to 
      * their choices. */ 
+    @SuppressWarnings("unchecked")
     public HashMap<String, Set<String>> getChoices(){
         return (HashMap<String, Set<String>>) category2Choices.clone();
     }
@@ -63,6 +64,7 @@ public class ChoiceSettings implements Settings {
     
     /** returns a copy of the HashMap that maps categories to 
      * their default choices. */ 
+    @SuppressWarnings("unchecked")
     public HashMap<String,String> getDefaultChoices(){
 	return (HashMap<String,String>) category2Default.clone();
     }
