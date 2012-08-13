@@ -131,6 +131,7 @@ public class TacletGenerator {
         // create schema terms
         final SchemaVariable heapSV = createSchemaVariable(heap);
         final SchemaVariable selfSV = createSchemaVariable(self);
+        @SuppressWarnings("unchecked")
         final TermAndBoundVarPair schemaAxiom =
                 createSchemaTerm(originalAxiom,
                                  new Pair<ProgramVariable, SchemaVariable>(heap, heapSV),
@@ -157,7 +158,7 @@ public class TacletGenerator {
         tacletBuilder.addTacletGoalTemplate(axiomTemplate);
         tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, heapSV, selfSV);
         tacletBuilder.addRuleSet(
-                new RuleSet(new Name("inReachableStateImplication")));
+                new RuleSet(new Name("classAxiomSplit")));
         return tacletBuilder.getTaclet();
     }
 
@@ -176,6 +177,7 @@ public class TacletGenerator {
         //instantiate axiom with schema variables
         final SchemaVariable heapSV = createSchemaVariable(heap);
         final SchemaVariable selfSV = createSchemaVariable(self);
+        @SuppressWarnings("unchecked")
         final TermAndBoundVarPair schemaRepresents =
                 createSchemaTerm(originalRepresentsTerm,
                                  new Pair<ProgramVariable, SchemaVariable>(heap, heapSV),
@@ -217,7 +219,7 @@ public class TacletGenerator {
             tacletBuilder.setIfSequent(ifSeq);
         }
         tacletBuilder.setName(name);
-        tacletBuilder.addRuleSet(new RuleSet(new Name("classAxiom")));
+        tacletBuilder.addRuleSet(new RuleSet(new Name("classAxiomSplit")));
         for (VariableSV boundSV : schemaRepresents.boundVars) {
             tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
             if (selfSV != null) {
