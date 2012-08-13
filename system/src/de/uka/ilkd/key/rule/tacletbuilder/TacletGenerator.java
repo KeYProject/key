@@ -18,7 +18,6 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -51,7 +50,6 @@ import de.uka.ilkd.key.util.Pair;
  */
 public class TacletGenerator {
 
-    private static final String CLASS_AXIOM_SPLIT = "classAxiomSplit";
     private static final TacletGenerator instance = new TacletGenerator();
     private static final TermBuilder TB = TermBuilder.DF;
 
@@ -160,7 +158,7 @@ public class TacletGenerator {
         tacletBuilder.addTacletGoalTemplate(axiomTemplate);
         tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, heapSV, selfSV);
         tacletBuilder.addRuleSet(
-                new RuleSet(new Name(CLASS_AXIOM_SPLIT)));
+                new RuleSet(new Name("classAxiomSplit")));
         return tacletBuilder.getTaclet();
     }
 
@@ -221,7 +219,7 @@ public class TacletGenerator {
             tacletBuilder.setIfSequent(ifSeq);
         }
         tacletBuilder.setName(name);
-        tacletBuilder.addRuleSet(new RuleSet(new Name(CLASS_AXIOM_SPLIT)));
+        tacletBuilder.addRuleSet(new RuleSet(new Name("classAxiomSplit")));
         for (VariableSV boundSV : schemaRepresents.boundVars) {
             tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
             if (selfSV != null) {
