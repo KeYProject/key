@@ -109,7 +109,13 @@ public class EnhancedForElimination extends ProgramTransformer {
         Statement body = enhancedFor.getBody();
         
 
-        ProgramElement result = iterable(expression)? makeIterableForLoop(lvd, expression, body) : makeArrayForLoop(lvd, expression, body);
+        ProgramElement result;
+        if(iterable(expression)) {
+            result = makeIterableForLoop(lvd, expression, body);
+        } else {
+            result = makeArrayForLoop(lvd, expression, body);
+        }
+        
         return result;
     }
 
@@ -165,10 +171,10 @@ public class EnhancedForElimination extends ProgramTransformer {
             ReferencePrefix array, ProgramVariable lvdVar) {
         final Expression[] arrayAccess = {itVar};
         final Expression nextElement = new ArrayReference(array, arrayAccess);
-        final VariableReference lhs = new VariableReference(lvdVar);
-        final Statement getNextElement = new CopyAssignment(lhs, nextElement);
+//        final VariableReference lhs = new VariableReference(lvdVar);
+        final Statement getNextElement = new CopyAssignment(lvdVar, nextElement);
         final Statement[] newBlock = {getNextElement,body};
-        body = new StatementBlock(newBlock);      
+        body = new StatementBlock(newBlock);
         final For forLoop = new For(inits, guard, updates, body);
         return forLoop;
     }
