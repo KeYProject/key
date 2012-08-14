@@ -20,31 +20,30 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
  * The main entry point for KeY
- * 
+ *
  * This has been extracted from MainWindow to keep GUI and control further apart.
  */
 public class Main {
 
-    public static final String INTERNAL_VERSION = 
-        KeYResourceManager.getManager().getSHA1();
+    public static final String INTERNAL_VERSION =
+            KeYResourceManager.getManager().getSHA1();
 
-    public static final String VERSION = 
-        KeYResourceManager.getManager().getVersion() + 
-        " (internal: "+INTERNAL_VERSION+")";
+    public static final String VERSION =
+            KeYResourceManager.getManager().getVersion() +
+            " (internal: "+INTERNAL_VERSION+")";
 
     public static final String COPYRIGHT="(C) Copyright 2001-2011 "
-        +"Universit\u00e4t Karlsruhe, Universit\u00e4t Koblenz-Landau, "
-        +"and Chalmers University of Technology";
-
+            +"Universit\u00e4t Karlsruhe, Universit\u00e4t Koblenz-Landau, "
+            +"and Chalmers University of Technology";
 
     private static final boolean VERBOSE_UI = Boolean.getBoolean("key.verbose-ui");
-        
+
     private static String statisticsFile = null;
 
     private static String examplesDir = null;
 
-
     private static String fileNameOnStartUp = null;
+    
     /**
      * <p>
      * This flag indicates if the example chooser should be shown
@@ -58,20 +57,20 @@ public class Main {
      * </p>
      */
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
-    
+
     public static void main(String[] args) {
         System.out.println("\nKeY Version " + VERSION);
         System.out.println(COPYRIGHT + "\nKeY is protected by the " +
-        "GNU General Public License\n");
+                "GNU General Public License\n");
 
         // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar","true");
 
         UserInterface userInterface = evaluateOptions(args);
 
-        loadCommandLineFile(userInterface);        
+        loadCommandLineFile(userInterface);
     }
-    
+
     public static void loadCommandLineFile(UserInterface ui) {
         if (Main.getFileNameOnStartUp() != null) {
             ui.loadProblem(new File(Main.getFileNameOnStartUp()));
@@ -79,19 +78,19 @@ public class Main {
             ui.openExamples();
         }
     }
-    
+
     /**
      * Returns the used title. This information is required in other
      * projects which instantiates the {@link MainWindow} manually.
      * @return The title of {@link MainWindow} to use.
      */
     public static String getMainWindowTitle() {
-       return "KeY " + KeYResourceManager.getManager().getVersion();
+        return "KeY " + KeYResourceManager.getManager().getVersion();
     }
 
     public static UserInterface evaluateOptions(String[] opt) {
         UserInterface ui = null;
-    	int index = 0;
+        int index = 0;
         ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
         String uiMode = "INTERACTIVE";
         while (opt.length > index) {
@@ -99,7 +98,7 @@ public class Main {
                 fileNameOnStartUp=opt[index];
             } else {
                 opt[index] = opt[index].toUpperCase();
-				if (opt[index].equals("NO_DEBUG")) {
+                if (opt[index].equals("NO_DEBUG")) {
                     de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
                 } else if (opt[index].equals("DEBUG")) {
                     de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = true;
@@ -115,11 +114,11 @@ public class Main {
                         options.add(opt[i]);
                     }
                     evaluateLemmataOptions(options);
-                    // is last option 
-                    break; 
+                    // is last option
+                    break;
                 } else if (opt[index].startsWith("AUTO")) {
-                        uiMode = opt[index];
-				} else if (opt[index].equals("TIMEOUT")) {
+                    uiMode = opt[index];
+                } else if (opt[index].equals("TIMEOUT")) {
                     long timeout = -1;
                     try {
                         timeout = Long.parseLong(opt[index + 1]);
@@ -129,11 +128,11 @@ public class Main {
                     }
                     if (timeout < -1) {
                         System.out.println("Illegal timeout (must be a number >=-1).");
-                        System.exit(-1);                        
+                        System.exit(-1);
                     }
-                    index++;                   
+                    index++;
                     ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
-                } else if (opt[index].equals("PRINT_STATISTICS")) {                     
+                } else if (opt[index].equals("PRINT_STATISTICS")) {
                     if ( !( opt.length > index + 1 ) ) printUsageAndExit ();
                     statisticsFile = opt[++index];
                 } else if(opt[index].equals("EXAMPLES")) {
@@ -141,46 +140,47 @@ public class Main {
                     examplesDir = opt[++index];
                 } else {
                     printUsageAndExit ();
-                }		
+                }
             }
 
             index++;
-        }	
+        }
         if (Debug.ENABLE_DEBUG) {
             System.out.println("Running in debug mode ...");
         } else {
             System.out.println("Running in normal mode ...");
         }
         if (Debug.ENABLE_ASSERTION) {
-            System.out.println("Using assertions ...");	   
+            System.out.println("Using assertions ...");
         } else {
-        	System.out.println("Not using assertions ...");	   
+            System.out.println("Not using assertions ...");
         }
-        
+
         if (uiMode.startsWith("AUTO")) {
-        	BatchMode batch = new BatchMode(fileNameOnStartUp, 
-        		uiMode.equals("AUTO_LOADONLY"));            
-        	ui = new ConsoleUserInterface(batch, VERBOSE_UI);
+            BatchMode batch = new BatchMode(fileNameOnStartUp,
+                    uiMode.equals("AUTO_LOADONLY"));
+            ui = new ConsoleUserInterface(batch, VERBOSE_UI);
         } else {
-        	GuiUtilities.invokeAndWait(new Runnable() {
-        		public void run() {
-        			MainWindow.createInstance(getMainWindowTitle());  
-        			MainWindow key = MainWindow.getInstance();
-        			key.setVisible(true);
-        		}
-        	});    
-        	ui = MainWindow.getInstance().getUserInterface();
+            GuiUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    MainWindow.createInstance(getMainWindowTitle());
+                    MainWindow key = MainWindow.getInstance();
+                    key.setVisible(true);
+                }
+            });
+            ui = MainWindow.getInstance().getUserInterface();
         }
         return ui;
-    }    
+    }
 
     private static void evaluateLemmataOptions(LinkedList<String> options){
+
         LemmataAutoModeOptions opt;
         try {
 
-            opt = new LemmataAutoModeOptions(options, INTERNAL_VERSION, 
+            opt = new LemmataAutoModeOptions(options, INTERNAL_VERSION,
                     PathConfig.getKeyConfigDir());
-            
+
         } catch(Exception e) {
             System.out.println("An error occured while reading the lemma parameters:");
             System.out.println(e.getMessage());
@@ -188,8 +188,8 @@ public class Main {
             System.exit(1);
             return;
         }
-        
-        
+
+
         try {
             LemmataHandler handler = new LemmataHandler(opt,
                     ProofSettings.DEFAULT_SETTINGS.getProfile());
@@ -212,12 +212,13 @@ public class Main {
         System.out.println("  no_assertion    : disables assertions");
         System.out.println("  assertion       : enables assertions (*)");
         System.out.println("  no_jmlspecs     : disables parsing JML specifications");
-        System.out.println("  auto	      : start prove procedure after initialisation");
+        System.out.println("  auto            : start prove procedure after initialisation");
+        System.out.println("  justifyrules    : autoprove taclets (add '?help' for instructions)");
         System.out.println("  print_statistics <filename>" );
         System.out.println("                  : in auto mode, output nr. of rule applications and time spent");
         System.out.println("  timeout <time in ms>");
         System.out.println("                  : set maximal time for rule " +
-                            "application in ms (-1 disables timeout)");
+                "application in ms (-1 disables timeout)");
         System.out.println("  <filename>      : loads a .key file");
         System.exit(-1);
     }
@@ -225,15 +226,15 @@ public class Main {
     public static String getExamplesDir() {
         return examplesDir;
     }
-    
+
     /**
-     * Defines the examples directory. This method is used by the 
+     * Defines the examples directory. This method is used by the
      * Eclipse integration (KeY4Eclipse) to use the examples extract
      * from the plug-in into the workspace.
      * @param newExamplesDir The new examples directory to use.
      */
     public static void setExamplesDir(String newExamplesDir) {
-       examplesDir = newExamplesDir;
+        examplesDir = newExamplesDir;
     }
 
     /**
