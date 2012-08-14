@@ -171,7 +171,6 @@ public class EnhancedForElimination extends ProgramTransformer {
             ReferencePrefix array, ProgramVariable lvdVar) {
         final Expression[] arrayAccess = {itVar};
         final Expression nextElement = new ArrayReference(array, arrayAccess);
-//        final VariableReference lhs = new VariableReference(lvdVar);
         final Statement getNextElement = new CopyAssignment(lvdVar, nextElement);
         final Statement[] newBlock = {getNextElement,body};
         body = new StatementBlock(newBlock);
