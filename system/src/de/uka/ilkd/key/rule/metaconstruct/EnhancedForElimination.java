@@ -14,12 +14,8 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.Modifier;
-import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -30,7 +26,6 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -187,17 +182,8 @@ public class EnhancedForElimination extends ProgramTransformer {
 
     /** For-loop guard (i < a.length). */
     private IGuard makeGuard(ReferencePrefix expression, ProgramVariable itVar) {
-        /*
-        final KeYJavaType intType = ji.getPrimitiveKeYJavaType("int");
-        final ArrayDeclaration arrayType = (ArrayDeclaration)ji.getKeYJavaType("java.lang.Object[]").getJavaType();
-        final KeYJavaType arrayKJT = new KeYJavaType(arrayType,null);
-        final ProgramElementName lengthName = new ProgramElementName("length");
-        final ProgramVariable length = new LocationVariable(lengthName,intType,arrayKJT,false,false);
+        final ProgramVariable length = ji.getArrayLength();
         final Expression lengthExpr = new FieldReference(length,expression);
-        */
-
-        // XXX strangely, a.length is NOT an ArrayLengthReference !!!!!!!!!
-        final Expression lengthExpr = new ArrayLengthReference(new ExtList(new Object[]{expression}));
         final IGuard guard = new Guard(new LessThan(itVar,lengthExpr));
         return guard;
     }
