@@ -18,6 +18,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -30,10 +31,9 @@ import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.LoopInvariantImpl;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 public final class IntroAtPreDefsOp extends AbstractTermTransformer {
           
@@ -56,25 +56,32 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         assert pe != null;
                 
         //collect all loops in the innermost method frame
-        final Pair<MethodFrame,ImmutableSet<LoopStatement>> frameAndLoops 
+        final Triple<MethodFrame,ImmutableSet<LoopStatement>,ImmutableSet<StatementBlock>> frameAndLoopsAndBlocks
         	= new JavaASTVisitor(pe, services) {
             private MethodFrame frame = null;
             private ImmutableSet<LoopStatement> loops 
             	= DefaultImmutableSet.<LoopStatement>nil();
+            private ImmutableSet<StatementBlock> blocks
+                = DefaultImmutableSet.nil();
             protected void doDefaultAction(SourceElement node) {
                 if(node instanceof MethodFrame && frame == null) {
                     frame = (MethodFrame) node;
                 } else if(frame == null && node instanceof LoopStatement) {
                     loops = loops.add((LoopStatement) node);
                 }
+                else if (frame == null && node instanceof StatementBlock) {
+                    blocks = blocks.add((StatementBlock) node);
+                }
             }
-            public Pair<MethodFrame,ImmutableSet<LoopStatement>> run() {
+            public Triple<MethodFrame,ImmutableSet<LoopStatement>,ImmutableSet<StatementBlock>> run() {
                 walk(root());
-                return new Pair<MethodFrame,ImmutableSet<LoopStatement>>(frame, loops);
+                return new Triple<MethodFrame,ImmutableSet<LoopStatement>,ImmutableSet<StatementBlock>>(
+                        frame, loops, blocks);
             }
         }.run();
-        final MethodFrame frame = frameAndLoops.first;
-        final ImmutableSet<LoopStatement> loops = frameAndLoops.second;
+        final MethodFrame frame = frameAndLoopsAndBlocks.first;
+        final ImmutableSet<LoopStatement> loops = frameAndLoopsAndBlocks.second;
+        final ImmutableSet<StatementBlock> blocks = frameAndLoopsAndBlocks.third;
         
         //determine "self"
         Term selfTerm;
@@ -92,6 +99,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         Term atPreUpdate = null;
         Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
+        Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
         for(LocationVariable heap : HeapContext.getModHeaps(services,transaction)) {
           final LocationVariable l = TB.heapAtPreVar(services, heap.name()+"Before_" + methodName, heap.sort(), true);
           final Term u = TB.elementary(services,
@@ -103,6 +111,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
              atPreUpdate = TB.parallel(atPreUpdate, u);
           }
           atPres.put(heap, TB.var(l));
+          atPreVars.put(heap, l);
         }
 
         //update loop invariants
@@ -137,7 +146,33 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             }
         }
 
-        // TODO Update block contracts?
+        //update block contracts
+        for (StatementBlock block : blocks) {
+            ImmutableSet<BlockContract> contracts = services.getSpecificationRepository().getBlockContracts(block);
+            for (BlockContract contract : contracts) {
+                final BlockContract.Variables variables = contract.getPlaceholderVariables();
+                final BlockContract.Variables newVariables = new BlockContract.Variables(
+                        variables.self,
+                        variables.breakFlags,
+                        variables.continueFlags,
+                        variables.returnFlag,
+                        variables.result,
+                        variables.exception,
+                        atPreVars,
+                        variables.remembranceLocalVariables
+                );
+                final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<LocationVariable, Term>();
+                final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<LocationVariable, Term>();
+                final Map<LocationVariable, Term> newModifiesConditions = new LinkedHashMap<LocationVariable, Term>();
+                for (LocationVariable heap : HeapContext.getModHeaps(services, transaction)) {
+                    newPreconditions.put(heap, contract.getPrecondition(heap, newVariables.self, atPreVars, services));
+                    newPostconditions.put(heap, contract.getPostcondition(heap, newVariables, services));
+                    newModifiesConditions.put(heap, contract.getModifiesCondition(heap, newVariables.self, services));
+                }
+                final BlockContract newBlockContract = contract.update(block, newPreconditions, newPostconditions, newModifiesConditions, newVariables);
+                services.getSpecificationRepository().addBlockContract(newBlockContract);
+            }
+        }
 
         return TB.apply(atPreUpdate, target);
     }
