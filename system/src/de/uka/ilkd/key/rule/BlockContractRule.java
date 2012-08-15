@@ -345,6 +345,16 @@ public class BlockContractRule implements BuiltInRule {
             }
             return result;
         }
+
+        private Map<LocationVariable, LocationVariable> createAndRegisterRemembranceVariables(final Map<LocationVariable, LocationVariable> remembranceVariables)
+        {
+            final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
+            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables.entrySet()) {
+                result.put(remembranceVariable.getKey(), createAndRegisterVariable(remembranceVariable.getValue()));
+            }
+            return result;
+        }
+
         private LocationVariable createAndRegisterVariable(final ProgramVariable placeholderVariable)
         {
             if (placeholderVariable != null) {
@@ -356,15 +366,6 @@ public class BlockContractRule implements BuiltInRule {
             else {
                 return null;
             }
-        }
-
-        private Map<LocationVariable, LocationVariable> createAndRegisterRemembranceVariables(final Map<LocationVariable, LocationVariable> remembranceVariables)
-        {
-            final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
-            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables.entrySet()) {
-                result.put(remembranceVariable.getKey(), createAndRegisterVariable(remembranceVariable.getValue()));
-            }
-            return result;
         }
 
     }
