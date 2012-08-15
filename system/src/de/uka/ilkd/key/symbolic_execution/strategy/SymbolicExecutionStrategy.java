@@ -34,7 +34,7 @@ public class SymbolicExecutionStrategy extends VBTStrategy {
         res.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
                 StrategyProperties.LOOP_EXPAND);
         res.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
-                StrategyProperties.BLOCK_NONE);
+                StrategyProperties.BLOCK_EXPAND);
         res.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
                 StrategyProperties.METHOD_EXPAND);
         res.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,

@@ -86,10 +86,11 @@ public final class StrategySelectionView extends JPanel {
     JRadioButtonHashMap rdBut12;
     JRadioButtonHashMap rdBut13;
     JRadioButtonHashMap rdBut14;
-    JRadioButtonHashMap rdBut15;
-    JRadioButtonHashMap rdBut16;
     JRadioButtonHashMap rdBut17;
     JRadioButtonHashMap rdBut18;
+    JRadioButtonHashMap blockContractRadioButton;
+    JRadioButtonHashMap blockExpandRadioButton;
+    JRadioButtonHashMap blockNoneRadioButton;
     private JRadioButtonHashMap noRetreat;
     private JRadioButtonHashMap retreat;
     private JRadioButtonHashMap splittingNormal;
@@ -310,14 +311,14 @@ public final class StrategySelectionView extends JPanel {
                     javaDLOptionsLayout, 1, yCoord, 7 );
         
         ++yCoord;
-        
-        rdBut9 = new JRadioButtonHashMap("Expand", StrategyProperties.LOOP_EXPAND, true, false);
-        loopGroup.add(rdBut9);
-        addJavaDLOption ( rdBut9, javaDLOptionsLayout, 4, yCoord, 2 );        
 
         rdBut10 = new JRadioButtonHashMap("Invariant", StrategyProperties.LOOP_INVARIANT, false, false);
         loopGroup.add(rdBut10);
-        addJavaDLOption ( rdBut10, javaDLOptionsLayout, 2, yCoord, 2 );        
+        addJavaDLOption ( rdBut10, javaDLOptionsLayout, 2, yCoord, 2 );
+
+        rdBut9 = new JRadioButtonHashMap("Expand", StrategyProperties.LOOP_EXPAND, true, false);
+        loopGroup.add(rdBut9);
+        addJavaDLOption ( rdBut9, javaDLOptionsLayout, 4, yCoord, 2 );
 
         rdBut11 = new JRadioButtonHashMap("None", StrategyProperties.LOOP_NONE, false, false);
         loopGroup.add(rdBut11);
@@ -325,6 +326,29 @@ public final class StrategySelectionView extends JPanel {
 
         ++yCoord;
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
+
+        ////////////////////////////////////////////////////////////////////////
+
+        ++yCoord;
+
+        addJavaDLOption(new JLabel("Block treatment"), javaDLOptionsLayout, 1, yCoord, 7);
+
+        ++yCoord;
+
+        blockContractRadioButton = new JRadioButtonHashMap("Contract", StrategyProperties.BLOCK_CONTRACT, false, false);
+        blockGroup.add(blockContractRadioButton);
+        addJavaDLOption(blockContractRadioButton, javaDLOptionsLayout, 2, yCoord, 2);
+
+        blockExpandRadioButton = new JRadioButtonHashMap("Expand", StrategyProperties.BLOCK_EXPAND, true, false);
+        blockGroup.add(blockExpandRadioButton);
+        addJavaDLOption(blockExpandRadioButton, javaDLOptionsLayout, 4, yCoord, 2);
+
+        blockNoneRadioButton = new JRadioButtonHashMap("None", StrategyProperties.BLOCK_NONE, false, false);
+        blockGroup.add(blockNoneRadioButton);
+        addJavaDLOption(blockNoneRadioButton, javaDLOptionsLayout, 6, yCoord, 2);
+
+        ++yCoord;
+        addJavaDLOptionSpace (javaDLOptionsLayout, yCoord);
 
         ////////////////////////////////////////////////////////////////////////
 
@@ -355,26 +379,6 @@ public final class StrategySelectionView extends JPanel {
         methodGroup.add(rdBut14);
         addJavaDLOption ( rdBut14, javaDLOptionsLayout, 6, yCoord, 2 );        
         
-        ++yCoord;
-        addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
-
-        ////////////////////////////////////////////////////////////////////////
-
-        ++yCoord;
-
-        addJavaDLOption ( new JLabel ( "Block treatment" ),
-                javaDLOptionsLayout, 1, yCoord, 7 );
-
-        ++yCoord;
-
-        rdBut15 = new JRadioButtonHashMap("Contract", StrategyProperties.BLOCK_CONTRACT, false, false);
-        blockGroup.add(rdBut15);
-        addJavaDLOption ( rdBut15, javaDLOptionsLayout, 2, yCoord, 2 );
-
-        rdBut16 = new JRadioButtonHashMap("None", StrategyProperties.BLOCK_NONE, false, false);
-        blockGroup.add(rdBut16);
-        addJavaDLOption ( rdBut16, javaDLOptionsLayout, 4, yCoord, 2 );
-
         ++yCoord;
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
 
@@ -790,10 +794,11 @@ public final class StrategySelectionView extends JPanel {
         rdBut12.addActionListener(optListener);       
         rdBut13.addActionListener(optListener);     
         rdBut14.addActionListener(optListener);
-        rdBut15.addActionListener(optListener);
-        rdBut16.addActionListener(optListener);
         rdBut17.addActionListener(optListener);
         rdBut18.addActionListener(optListener);
+        blockContractRadioButton.addActionListener(optListener);
+        blockExpandRadioButton.addActionListener(optListener);
+        blockNoneRadioButton.addActionListener(optListener);
         retreat.addActionListener(optListener);
         noRetreat.addActionListener(optListener);
         depOn.addActionListener(optListener);

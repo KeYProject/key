@@ -42,7 +42,7 @@ public class VBTStrategy extends JavaCardDLStrategy {
         }else{
             res.setProperty ( StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_EXPAND);
         }
-        res.setProperty ( StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_NONE );
+        res.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY, StrategyProperties.BLOCK_EXPAND);
         res.setProperty ( StrategyProperties.METHOD_OPTIONS_KEY,
                           StrategyProperties.METHOD_EXPAND );
         res.setProperty ( StrategyProperties.QUERY_OPTIONS_KEY,
@@ -145,6 +145,9 @@ public class VBTStrategy extends JavaCardDLStrategy {
 
                 clearRuleSetBindings (rsd, "loop_expand" );
                 bindRuleSet (rsd, "loop_expand", inftyConst());
+                
+                /*clearRuleSetBindings (rsd, "block_expand" );
+                bindRuleSet (rsd, "block_expand", inftyConst());*/
 
                 clearRuleSetBindings (rsd, "loop_expand_bounded" );
                 bindRuleSet (rsd, "loop_expand_bounded", inftyConst());

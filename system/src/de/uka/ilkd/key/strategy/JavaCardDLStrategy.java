@@ -224,12 +224,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             loopInvF = loopInvFeature(inftyConst());
         }
         
-        final Feature blockContractF;
-        final String blockProp = strategyProperties.getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
-        if (blockProp.equals(StrategyProperties.BLOCK_CONTRACT)) {
-        	blockContractF = blockContractFeature(longConst(0));
-        } else {
-        	blockContractF = blockContractFeature(inftyConst());
+        final Feature blockFeature;
+        final String blockProperty = strategyProperties.getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
+        if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT)) {
+        	blockFeature = blockContractFeature(longConst(Long.MIN_VALUE));
+        }
+        else {
+        	blockFeature = blockContractFeature(inftyConst());
         }
         
         final Feature oneStepSimplificationF 
@@ -249,7 +250,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
               queryF,
               depSpecF,
               loopInvF,
-              blockContractF,
+              blockFeature,
               ifMatchedF});
     }
     
@@ -428,6 +429,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         boolean useLoopExpand = strategyProperties.getProperty(
                 StrategyProperties.LOOP_OPTIONS_KEY).
                     equals(StrategyProperties.LOOP_EXPAND);
+        /*boolean useBlockExpand = strategyProperties.getProperty(
+                StrategyProperties.BLOCK_OPTIONS_KEY).
+                    equals(StrategyProperties.BLOCK_EXPAND);*/
         boolean programsToRight = true;//XXX
         
         final String methProp
@@ -462,6 +466,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "loop_expand",
                       useLoopExpand ? longConst ( 0 )
                                     : inftyConst () );
+        
+        /*bindRuleSet ( d, "block_expand",
+                      useBlockExpand ? longConst ( 0 )
+                                     : inftyConst () );*/
         
         // delete cast
         bindRuleSet ( d, "cast_deletion",
