@@ -467,41 +467,41 @@ public final class JMLSpecExtractor implements SpecExtractor {
     
     
     @Override
-    public ImmutableSet<BlockContract> extractBlockContracts(IProgramMethod method, StatementBlock block) throws SLTranslationException {
-        ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
-        TextualJMLConstruct[] constructs = parseMethodLevelComments(block.getComments(), getFileName(method));
+    public ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method, final StatementBlock block) throws SLTranslationException {
+        ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
+        // For some odd reason every comment block appears twice; thus we remove duplicates.
+        final TextualJMLConstruct[] constructs = parseMethodLevelComments(removeDuplicates(block.getComments()), getFileName(method));
         for (int i = constructs.length - 1; i >= 0 && constructs[i] instanceof TextualJMLSpecCase; i--) {
-            TextualJMLSpecCase specificationCase = (TextualJMLSpecCase) constructs[i];
+            final TextualJMLSpecCase specificationCase = (TextualJMLSpecCase) constructs[i];
             try {
                 result = result.union(jsf.createJMLBlockContracts(method, block, specificationCase));
             }
-            catch (SLWarningException exception) {
+            catch (final SLWarningException exception) {
                 warnings = warnings.add(exception.getWarning());
             }
         }
         return result;
     }
 
-    private String getFileName(IProgramMethod method) {
-        TypeDeclaration type = (TypeDeclaration) method.getContainerType().getJavaType();
+    private String getFileName(final IProgramMethod method) {
+        final TypeDeclaration type = (TypeDeclaration) method.getContainerType().getJavaType();
         return type.getPositionInfo().getFileName();
     }
 
-    private TextualJMLConstruct[] parseMethodLevelComments(Comment[] comments, String fileName) throws SLTranslationException {
+    private TextualJMLConstruct[] parseMethodLevelComments(final Comment[] comments, final String fileName) throws SLTranslationException {
         if (comments.length == 0) {
             return new TextualJMLConstruct[0];
         }
-        // For some odd reason every comment block appears twice; thus we remove duplicates.
-        String concatenatedComment = concatenate(removeDuplicates(comments));
-        Position position = comments[0].getStartPosition();
-        KeYJMLPreParser preParser = new KeYJMLPreParser(concatenatedComment, fileName, position);
-        ImmutableList<TextualJMLConstruct> constructs = preParser.parseMethodlevelComment();
+        final String concatenatedComment = concatenate(comments);
+        final Position position = comments[0].getStartPosition();
+        final KeYJMLPreParser preParser = new KeYJMLPreParser(concatenatedComment, fileName, position);
+        final ImmutableList<TextualJMLConstruct> constructs = preParser.parseMethodlevelComment();
         warnings = warnings.union(preParser.getWarnings());
         return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
     }
 
-    private Comment[] removeDuplicates(Comment[] comments) {
-        Set<Comment> uniqueComments = new LinkedHashSet<Comment>(Arrays.asList(comments));
+    private Comment[] removeDuplicates(final Comment[] comments) {
+        final Set<Comment> uniqueComments = new LinkedHashSet<Comment>(Arrays.asList(comments));
         return uniqueComments.toArray(new Comment[uniqueComments.size()]);
     }
 

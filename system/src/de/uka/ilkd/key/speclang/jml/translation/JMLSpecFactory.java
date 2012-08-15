@@ -1009,29 +1009,36 @@ public class JMLSpecFactory {
             throws SLTranslationException
     {
         final Behavior behavior = specificationCase.getBehavior();
-
-        // TODO Clean up.
         final BlockContract.Variables variables = BlockContract.Variables.create(block, method, services);
-        final Map<LocationVariable, LocationVariable> remembranceVariables = variables.combineRemembranceVariables();
-        final Map<LocationVariable, Term> remembranceTerms = new LinkedHashMap<LocationVariable, Term>();
-        for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables.entrySet()) {
-            remembranceTerms.put(remembranceVariable.getKey(), TB.var(remembranceVariable.getValue()));
-        }
-        final ProgramVariableCollection programVariableCollection = new ProgramVariableCollection(
-            variables.self, collectParameters(method).append(collectLocalVariablesVisibleTo(block, method)),
-            variables.result, variables.exception, remembranceVariables, remembranceTerms
-        );
-        final ContractClauses clauses = translateJMLClauses(method, specificationCase, programVariableCollection, behavior);
-
+        final ProgramVariableCollection programVariables = createProgramVariables(method, block, variables);
+        final ContractClauses clauses = translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new SimpleBlockContract.Creator(
             block, method, behavior, variables, clauses.requires, clauses.ensures, clauses.breaks, clauses.continues, clauses.returns,
             clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables, clauses.strictlyPure, services
         ).create();
     }
 
+    private ProgramVariableCollection createProgramVariables(final IProgramMethod method, final StatementBlock block, final BlockContract.Variables variables)
+    {
+        final Map<LocationVariable, LocationVariable> remembranceVariables = variables.combineRemembranceVariables();
+        return new ProgramVariableCollection(
+            variables.self, collectParameters(method).append(collectLocalVariablesVisibleTo(block, method)),
+            variables.result, variables.exception, remembranceVariables, termify(remembranceVariables)
+        );
+    }
+
+    private Map<LocationVariable, Term> termify(final Map<LocationVariable, LocationVariable> remembranceVariables)
+    {
+        final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+        for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables.entrySet()) {
+            result.put(remembranceVariable.getKey(), TB.var(remembranceVariable.getValue()));
+        }
+        return result;
+    }
+
     // TODO Move to IProgramMethod interface and its implementations.
     private ImmutableList<ProgramVariable> collectParameters(final IProgramMethod method) {
-        ImmutableList<ProgramVariable> result = ImmutableSLList.<ProgramVariable>nil();
+        ImmutableList<ProgramVariable> result = ImmutableSLList.nil();
         final int parameterCount = method.getParameterDeclarationCount();
         for (int i = parameterCount - 1; i >= 0; i--) {
             ParameterDeclaration parameter = method.getParameterDeclarationAt(i);
