@@ -85,18 +85,25 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
         if (complete() || cannotComplete(goal)) {
             return this;
         }
-        // TODO Instead of static methods we could use non-static methods on builtInRule.
         final Services services = goal.proof().getServices();
         final BlockContractRule.Instantiation instantiation = BlockContractRule.instantiate(posInOccurrence().subTerm(), services);
         final ImmutableSet<BlockContract> contracts = BlockContractRule.getApplicableContracts(instantiation, services);
-        final BlockContract contract = SimpleBlockContract.combine(contracts, services);
-        final List<LocationVariable> heaps = HeapContext.getModHeaps(services, instantiation.transaction());
-        return new BlockContractBuiltInRuleApp(builtInRule, pio, ifInsts, instantiation.block, contract, heaps);
+        block = instantiation.block;
+        contract = SimpleBlockContract.combine(contracts, services);
+        heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
+        return this;
 	}
 
-    private boolean cannotComplete(final Goal goal)
+    public boolean cannotComplete(final Goal goal)
     {
         return !builtInRule.isApplicable(goal, pio);
+    }
+
+    public void update(final StatementBlock block, final BlockContract contract, final List<LocationVariable> heaps)
+    {
+        this.block = block;
+        this.contract = contract;
+        this.heaps = heaps;
     }
 
 }

@@ -200,7 +200,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
           
     private ImmutableSet<Term> replaceVariablesInTerms(ImmutableSet<Term> terms) {
-        ImmutableSet<Term> res = DefaultImmutableSet.<Term>nil();        
+        ImmutableSet<Term> res = DefaultImmutableSet.nil();
         for (final Term term : terms) {
             res = res.add(replaceVariablesInTerm(term));
         }        
@@ -217,32 +217,39 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         performActionOnProgramVariable(x);
     }
 
-    // TODO Clean up.
-    public void performActionOnBlockContract(StatementBlock oldBlock, StatementBlock newBlock) {
-        ImmutableSet<BlockContract> contracts = services.getSpecificationRepository().getBlockContracts(oldBlock);
-        for (BlockContract contract : contracts) {
-            final BlockContract.Variables variables = contract.getPlaceholderVariables();
-            final BlockContract.Variables newVariables = new BlockContract.Variables(
-                replaceVariable(variables.self),
-                replaceFlags(variables.breakFlags),
-                replaceFlags(variables.continueFlags),
-                replaceVariable(variables.returnFlag),
-                replaceVariable(variables.result),
-                replaceVariable(variables.exception),
-                replaceRemembranceHeaps(variables.remembranceHeaps),
-                replaceRemembranceLocalVariables(variables.remembranceLocalVariables)
-            );
-            final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<LocationVariable, Term>();
-            final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<LocationVariable, Term>();
-            final Map<LocationVariable, Term> newModifiesConditions = new LinkedHashMap<LocationVariable, Term>();
-            for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                newPreconditions.put(heap, replaceVariablesInTerm(contract.getPrecondition(heap, services)));
-                newPostconditions.put(heap, replaceVariablesInTerm(contract.getPostcondition(heap, services)));
-                newModifiesConditions.put(heap, replaceVariablesInTerm(contract.getModifiesCondition(heap, services)));
-            }
-            final BlockContract newContract = contract.update(newBlock, newPreconditions, newPostconditions, newModifiesConditions, newVariables);
-            services.getSpecificationRepository().addBlockContract(newContract);
+    public void performActionOnBlockContract(final StatementBlock oldBlock, final StatementBlock newBlock) {
+        ImmutableSet<BlockContract> oldContracts = services.getSpecificationRepository().getBlockContracts(oldBlock);
+        for (BlockContract oldContract : oldContracts) {
+            services.getSpecificationRepository().addBlockContract(createNewBlockContract(oldContract, newBlock));
         }
+    }
+
+    private BlockContract createNewBlockContract(final BlockContract oldContract, final StatementBlock newBlock)
+    {
+        final BlockContract.Variables newVariables = replaceBlockContractVariables(oldContract.getPlaceholderVariables());
+        final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<LocationVariable, Term>();
+        final Map<LocationVariable, Term> newModifiesConditions = new LinkedHashMap<LocationVariable, Term>();
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            newPreconditions.put(heap, replaceVariablesInTerm(oldContract.getPrecondition(heap, services)));
+            newPostconditions.put(heap, replaceVariablesInTerm(oldContract.getPostcondition(heap, services)));
+            newModifiesConditions.put(heap, replaceVariablesInTerm(oldContract.getModifiesCondition(heap, services)));
+        }
+        return oldContract.update(newBlock, newPreconditions, newPostconditions, newModifiesConditions, newVariables);
+    }
+
+    private BlockContract.Variables replaceBlockContractVariables(final BlockContract.Variables variables)
+    {
+        return new BlockContract.Variables(
+            replaceVariable(variables.self),
+            replaceFlags(variables.breakFlags),
+            replaceFlags(variables.continueFlags),
+            replaceVariable(variables.returnFlag),
+            replaceVariable(variables.result),
+            replaceVariable(variables.exception),
+            replaceRemembranceHeaps(variables.remembranceHeaps),
+            replaceRemembranceLocalVariables(variables.remembranceLocalVariables)
+        );
     }
 
     private ProgramVariable replaceVariable(final ProgramVariable variable)
@@ -279,6 +286,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     private Map<LocationVariable, LocationVariable> replaceRemembranceHeaps(final Map<LocationVariable, LocationVariable> remembranceHeaps) {
         final Map<LocationVariable, LocationVariable> result = new LinkedHashMap<LocationVariable, LocationVariable>();
         for (Map.Entry<LocationVariable, LocationVariable> remembranceHeap: remembranceHeaps.entrySet()) {
+            // TODO Can we really safely assume that replaceVariable returns a location variable?
             result.put(
                 remembranceHeap.getKey(),
                 (LocationVariable) replaceVariable(remembranceHeap.getValue())

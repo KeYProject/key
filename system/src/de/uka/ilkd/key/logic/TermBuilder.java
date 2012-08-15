@@ -1806,6 +1806,11 @@ public class TermBuilder {
             return anonUpd(heap, services, modifiesCondition, anonymisationHeap);
         }
 
+        public Term union(final Term firstLocationSet, final Term secondLocationSet)
+        {
+            return union(services, firstLocationSet, secondLocationSet);
+        }
+
     }
 
 }

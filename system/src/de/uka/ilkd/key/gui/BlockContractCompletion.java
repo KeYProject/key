@@ -13,21 +13,22 @@ import de.uka.ilkd.key.speclang.HeapContext;
 
 import java.util.List;
 
-// TODO Clean up.
 public class BlockContractCompletion implements InteractiveRuleApplicationCompletion {
 
 	@Override
 	public IBuiltInRuleApp complete(final IBuiltInRuleApp application, final Goal goal, final boolean force)
     {
-        IBuiltInRuleApp result = application;
-		final Services services = goal.proof().getServices();
+        BlockContractBuiltInRuleApp result = (BlockContractBuiltInRuleApp) application;
+        if (!result.complete() && result.cannotComplete(goal)) {
+            return result;
+        }
         if (force) {
-            result = application.tryToInstantiate(goal);
+            result.tryToInstantiate(goal);
             if (result.complete()) {
                 return result;
             }
         }
-        // TODO This is more or less exactly the code in BlockContractBuiltInRuleApp#tryToInstantiate.
+        final Services services = goal.proof().getServices();
         final Instantiation instantiation = BlockContractRule.instantiate(application.posInOccurrence().subTerm(), services);
         final ImmutableSet<BlockContract> contracts = BlockContractRule.getApplicableContracts(instantiation, services);
         final BlockContractConfigurator configurator = new BlockContractConfigurator(
@@ -35,9 +36,8 @@ public class BlockContractCompletion implements InteractiveRuleApplicationComple
             "Contracts for Block: " + instantiation.block, true
         );
         if (configurator.wasSuccessful()) {
-            final List<LocationVariable> heaps = HeapContext.getModHeaps(services, instantiation.transaction());
-            return new BlockContractBuiltInRuleApp(application.rule(), application.posInOccurrence(), application.ifInsts(),
-                                                   instantiation.block, configurator.getContract(), heaps);
+            final List<LocationVariable> heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
+            result.update(instantiation.block, configurator.getContract(), heaps);
         }
         return result;
 	}

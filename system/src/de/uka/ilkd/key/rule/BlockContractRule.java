@@ -18,10 +18,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 
 import java.util.*;
 
@@ -30,80 +28,23 @@ public class BlockContractRule implements BuiltInRule {
     public static final BlockContractRule INSTANCE = new BlockContractRule();
 
     private static final Name NAME = new Name("Block Contract");
+    private static final String ANONYMISATION_SUFFIX = "AnonBlock";
     private static final TermBuilder TB = TermBuilder.DF;
 
-    // TODO Refactor.
-    public static Instantiation instantiate(final Term focusTerm, final Services services)
+    private static Term lastFocusTerm;
+    private static Instantiation lastInstantiation;
+
+    public static Instantiation instantiate(final Term formula, final Services services)
     {
-        if (focusTerm == lastFocusTerm) {
+        if (formula == lastFocusTerm) {
             return lastInstantiation;
         }
         else {
-            final Instantiation result = instantiateWithoutCaching(focusTerm, services);
-            lastFocusTerm = focusTerm;
+            final Instantiation result = new Instantiator(formula, services).instantiate();
+            lastFocusTerm = formula;
             lastInstantiation = result;
             return result;
         }
-    }
-
-    private static Instantiation instantiateWithoutCaching(final Term formula, final Services services)
-    {
-        final Pair<Term, Term> updateAndTarget = extractUpdate(formula);
-        final Term update = updateAndTarget.first;
-        final Term target = updateAndTarget.second;
-        if (!(target.op() instanceof Modality)) {
-            return null;
-        }
-        final Modality modality = (Modality) target.op();
-        final StatementBlock block = getActiveBlock(modality, target.javaBlock(), services);
-        if (block == null) {
-            return null;
-        }
-        final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
-        final Term self = (frame == null ? null : MiscTools.getSelfTerm(frame, services));
-        final ExecutionContext context = (frame == null ? null : (ExecutionContext) frame.getExecutionContext());
-        return new Instantiation(update, target, modality, self, block, context);
-    }
-
-    private static Pair<Term, Term> extractUpdate(Term focusTerm)
-    {
-        if (focusTerm.op() instanceof UpdateApplication) {
-            return new Pair<Term, Term>(UpdateApplication.getUpdate(focusTerm), UpdateApplication.getTarget(focusTerm));
-        }
-        else {
-            return new Pair<Term, Term>(TB.skip(), focusTerm);
-        }
-    }
-
-    // TODO Find better name.
-    public static StatementBlock getActiveBlock(Modality modality, JavaBlock java, Services services)
-    {
-        // TODO Clean up.
-        // get first block in prefix that has an applicable contract
-        SourceElement element = java.program().getFirstElement();
-        while ((element instanceof ProgramPrefix || element instanceof CatchAllStatement)
-                && !(element instanceof StatementBlock && ((StatementBlock) element).isEmpty())) {
-            if (element instanceof StatementBlock
-                    && !getApplicableContracts(services.getSpecificationRepository(), (StatementBlock) element, modality).isEmpty()) {
-                break;
-            }
-            if (element instanceof LabeledStatement) {
-                element = ((LabeledStatement) element).getChildAt(1);
-            }
-            else if (element instanceof CatchAllStatement) {
-                element = ((CatchAllStatement) element).getBody();
-            }
-            else if (element instanceof StatementContainer) {
-                element = ((StatementContainer) element).getStatementAt(0);
-            }
-            else {
-                element = element.getFirstElement();
-            }
-        }
-        if (element instanceof StatementBlock) {
-            return (StatementBlock) element;
-        }
-        return null;
     }
 
     public static ImmutableSet<BlockContract> getApplicableContracts(final Instantiation instantiation, final Services services)
@@ -128,15 +69,13 @@ public class BlockContractRule implements BuiltInRule {
         return result;
     }
 
-    private static Term lastFocusTerm;
-    private static Instantiation lastInstantiation;
-
     private BlockContractRule() {
     }
 
     @Override
-    public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
-        if (occurrence == null || !occurrence.isTopLevel() || occurrence.isInAntec()) {
+    public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence)
+    {
+        if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
         final Instantiation instantiation = instantiate(occurrence.subTerm(), goal.proof().getServices());
@@ -147,16 +86,23 @@ public class BlockContractRule implements BuiltInRule {
         return !contracts.isEmpty();
     }
 
+    private boolean occursNotAtTopLevelInSuccedent(final PosInOccurrence occurrence)
+    {
+        return occurrence == null || !occurrence.isTopLevel() || occurrence.isInAntec();
+    }
+
     @Override
-    public ImmutableList<Goal> apply(final Goal goal, final Services services, final RuleApp application) throws RuleAbortException {
+    public ImmutableList<Goal> apply(final Goal goal, final Services services, final RuleApp application) throws RuleAbortException
+    {
         assert application instanceof BlockContractBuiltInRuleApp;
         return apply(goal, services, (BlockContractBuiltInRuleApp) application);
     }
 
-    private ImmutableList<Goal> apply(final Goal goal, final Services services, final BlockContractBuiltInRuleApp application) throws RuleAbortException {
+    private ImmutableList<Goal> apply(final Goal goal, final Services services, final BlockContractBuiltInRuleApp application) throws RuleAbortException
+    {
         final Instantiation instantiation = instantiate(application.posInOccurrence().subTerm(), services);
         final BlockContract contract = application.getContract();
-        //assert contract.getBlock().equals(instantiation.block);
+        assert contract.getBlock().equals(instantiation.block);
         final Term contextUpdate = instantiation.update;
 
         final List<LocationVariable> heaps = application.getHeapContext();
@@ -206,12 +152,11 @@ public class BlockContractRule implements BuiltInRule {
         return result;
     }
 
-    // TODO Why don't we use the remembrance heaps in placeholder variables as blueprint?
-    public Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables, final Services services)
+    private Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables, final Services services)
     {
         Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>();
         for (LocationVariable variable : variables) {
-            final String anonymisationName = TB.newName(services, variable.name() + "AnonBlock");
+            final String anonymisationName = TB.newName(services, variable.name() + ANONYMISATION_SUFFIX);
             final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort());
             services.getNamespaces().functions().addSafely(anonymisationFunction);
         }
@@ -268,9 +213,99 @@ public class BlockContractRule implements BuiltInRule {
             this.context = context;
         }
 
-        public boolean transaction()
+        public boolean isTransactional()
         {
             return modality.transaction();
+        }
+
+    }
+
+    private static final class Instantiator {
+
+        private final Term formula;
+        private final Services services;
+
+        public Instantiator(final Term formula, final Services services)
+        {
+            this.formula = formula;
+            this.services = services;
+        }
+
+        public Instantiation instantiate()
+        {
+            final Term update = extractUpdate();
+            final Term target = extractUpdateTarget();
+            if (!(target.op() instanceof Modality)) {
+                return null;
+            }
+            final Modality modality = (Modality) target.op();
+            final StatementBlock block = getFirstBlockInPrefixWithAtLeastOneApplicableContract(modality, target.javaBlock());
+            if (block == null) {
+                return null;
+            }
+            final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
+            final Term self = extractSelf(frame);
+            final ExecutionContext context = extractExecutionContext(frame);
+            return new Instantiation(update, target, modality, self, block, context);
+        }
+
+        private Term extractUpdate()
+        {
+            if (formula.op() instanceof UpdateApplication) {
+                return UpdateApplication.getUpdate(formula);
+            }
+            else {
+                return TB.skip();
+            }
+        }
+
+        private Term extractUpdateTarget()
+        {
+            if (formula.op() instanceof UpdateApplication) {
+                return UpdateApplication.getTarget(formula);
+            }
+            else {
+                return formula;
+            }
+        }
+
+        private Term extractSelf(final MethodFrame frame)
+        {
+            if (frame == null) {
+                return null;
+            }
+            return MiscTools.getSelfTerm(frame, services);
+        }
+
+        private ExecutionContext extractExecutionContext(final MethodFrame frame)
+        {
+            if (frame == null) {
+                return null;
+            }
+            return (ExecutionContext) frame.getExecutionContext();
+        }
+
+        private StatementBlock getFirstBlockInPrefixWithAtLeastOneApplicableContract(final Modality modality, final JavaBlock java)
+        {
+            SourceElement element = java.program().getFirstElement();
+            while ((element instanceof ProgramPrefix || element instanceof CatchAllStatement)
+                    && !(element instanceof StatementBlock && ((StatementBlock) element).isEmpty())) {
+                if (element instanceof StatementBlock && hasApplicableContracts((StatementBlock) element, modality)) {
+                    return (StatementBlock) element;
+                }
+                else if (element instanceof StatementContainer) {
+                    element = ((StatementContainer) element).getStatementAt(0);
+                }
+                else {
+                    element = element.getFirstElement();
+                }
+            }
+            return null;
+        }
+
+        private boolean hasApplicableContracts(final StatementBlock block, final Modality modality)
+        {
+            return !getApplicableContracts(services.getSpecificationRepository(), block, modality).isEmpty();
         }
 
     }
@@ -291,7 +326,7 @@ public class BlockContractRule implements BuiltInRule {
         public BlockContract.Variables createAndRegister()
         {
             return new BlockContract.Variables(
-                null, // TODO Do we really don't know self as variable?
+                null, // TODO Do we really don't know self as program variable?
                 createAndRegisterFlags(placeholderVariables.breakFlags),
                 createAndRegisterFlags(placeholderVariables.continueFlags),
                 createAndRegisterVariable(placeholderVariables.returnFlag),
@@ -378,7 +413,7 @@ public class BlockContractRule implements BuiltInRule {
             Term result = skip();
             Collection<LocationVariable> localOutVariables = variables.remembranceLocalVariables.keySet();
             for (LocationVariable variable : localOutVariables) {
-                final String anonymisationName = newName(variable.name() + "AnonBlock");
+                final String anonymisationName = newName(variable.name() + ANONYMISATION_SUFFIX);
                 final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort());
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 final Term elementaryUpdate = elementary(variable, func(anonymisationFunction));
@@ -408,50 +443,7 @@ public class BlockContractRule implements BuiltInRule {
             this.contract = contract;
             this.heaps = heaps;
             this.variables = variables;
-            this.terms = termify(variables, self);
-        }
-
-        // TODO termify obviously belongs into the Variables class.
-        private BlockContract.Terms termify(final BlockContract.Variables variables, final Term self)
-        {
-            return new BlockContract.Terms(
-                self, /*var(variables.self),*/
-                termifyFlags(variables.breakFlags),
-                termifyFlags(variables.continueFlags),
-                termifyVariable(variables.returnFlag),
-                termifyVariable(variables.result),
-                termifyVariable(variables.exception),
-                termifyRemembranceVariables(variables.remembranceHeaps),
-                termifyRemembranceVariables(variables.remembranceLocalVariables)
-            );
-        }
-
-        private Map<Label, Term> termifyFlags(final Map<Label, ProgramVariable> flags)
-        {
-            final Map<Label, Term> result = new LinkedHashMap<Label, Term>();
-            for (Map.Entry<Label, ProgramVariable> flag : flags.entrySet()) {
-                result.put(flag.getKey(), var(flag.getValue()));
-            }
-            return result;
-        }
-
-        private Term termifyVariable(final ProgramVariable variable)
-        {
-            if (variable != null) {
-                return var(variable);
-            }
-            else {
-                return null;
-            }
-        }
-
-        private Map<LocationVariable, Term> termifyRemembranceVariables(final Map<LocationVariable, LocationVariable> remembranceVariables)
-        {
-            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
-            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables.entrySet()) {
-                result.put(remembranceVariable.getKey(), var(remembranceVariable.getValue()));
-            }
-            return result;
+            this.terms = variables.termify(self);
         }
 
         public Term buildPrecondition()
@@ -622,23 +614,39 @@ public class BlockContractRule implements BuiltInRule {
             goal.setBranchLabel("Validity");
             goal.addFormulaToAntecedent(new SequentFormula(TB.applySequential(updates, TB.and(assumptions))), false);
 
-            final StatementBlock block = new ValidityProgramConstructor(
-                instantiation.block, variables, services
-            ).construct();
+            final StatementBlock block = new ValidityProgramConstructor(instantiation.block, variables, services).construct();
+            Statement wrappedBlock = wrapInMethodFrameIfContextIsAvailable(block);
+            StatementBlock finishedBlock = finishTransactionIfModalityIsTransactional(wrappedBlock);
+            goal.changeFormula(new SequentFormula(
+                TB.applySequential(
+                    updates,
+                    TB.prog(instantiation.modality, JavaBlock.createJavaBlock(finishedBlock), TB.and(postconditions)))
+                ),
+                occurrence
+            );
+        }
 
-            // TODO Clean up.
-            Statement st = block;
-            if (instantiation.context != null) {
-                st = new MethodFrame(null, instantiation.context, block);
+        private Statement wrapInMethodFrameIfContextIsAvailable(final StatementBlock block)
+        {
+            if (instantiation.context == null) {
+                return block;
             }
-            final boolean transaction = (instantiation.modality == Modality.DIA_TRANSACTION
-                    || instantiation.modality == Modality.BOX_TRANSACTION);
-            goal.changeFormula(new SequentFormula(TB.applySequential(updates,
-                    TB.prog(instantiation.modality,
-                            JavaBlock.createJavaBlock(transaction
-                                    ? new StatementBlock(new Statement[] {st, new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)})
-                                    : new StatementBlock(st)),
-                            TB.and(postconditions)))), occurrence);
+            return new MethodFrame(null, instantiation.context, block);
+        }
+
+        private StatementBlock finishTransactionIfModalityIsTransactional(final Statement statement)
+        {
+            if (instantiation.isTransactional()) {
+                return new StatementBlock(new Statement[] {statement, new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)});
+            }
+            else {
+                if (statement instanceof StatementBlock) {
+                    return (StatementBlock) statement;
+                }
+                else {
+                    return new StatementBlock(statement);
+                }
+            }
         }
 
         public void setUpPreconditionGoal(final Goal goal, final Term update, final Term[] preconditions)
@@ -736,11 +744,15 @@ public class BlockContractRule implements BuiltInRule {
 
         private void declareResultDefault()
         {
-            // TODO Better names for inequalities: doesReturnOccur, hasMethodReturnValue (isMethodReturnTypeNotVoid)
-            if (variables.returnFlag != null && variables.result != null) {
+            if (occursReturnAndIsReturnTypeNotVoid()) {
                 KeYJavaType resultType = variables.result.getKeYJavaType();
                 statements.add(KeYJavaASTFactory.declare(variables.result, resultType.getDefaultValue(), resultType));
             }
+        }
+
+        private boolean occursReturnAndIsReturnTypeNotVoid()
+        {
+            return variables.returnFlag != null && variables.result != null;
         }
 
         private void declareExceptionNull()
@@ -756,7 +768,6 @@ public class BlockContractRule implements BuiltInRule {
             statements.add(new LabeledStatement(breakOutLabel, safeStatement));
         }
 
-        // TODO This method belongs into StatementBlock.
         private StatementBlock replaceOuterBreaksContinuesAndReturns(final StatementBlock block, final Label breakOutLabel)
         {
             return new OuterBreakContinueAndReturnReplacer(

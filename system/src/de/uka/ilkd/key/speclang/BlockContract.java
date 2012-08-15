@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.MiscTools;
 
 public interface BlockContract extends SpecificationElement {
-    
+
 	public StatementBlock getBlock();
     public IProgramMethod getMethod();
     public Modality getModality();
@@ -101,6 +101,48 @@ public interface BlockContract extends SpecificationElement {
             result.putAll(remembranceHeaps);
             result.putAll(remembranceLocalVariables);
             return result;
+        }
+
+        public Terms termify(final Term self)
+        {
+            return new BlockContract.Terms(
+                self, /*var(variables.self),*/
+                termifyFlags(breakFlags),
+                termifyFlags(continueFlags),
+                termifyVariable(returnFlag),
+                termifyVariable(result),
+                termifyVariable(exception),
+                termifyRemembranceVariables(remembranceHeaps),
+                termifyRemembranceVariables(remembranceLocalVariables)
+            );
+        }
+
+        private Map<Label, Term> termifyFlags(final Map<Label, ProgramVariable> flags)
+        {
+            final Map<Label, Term> result = new LinkedHashMap<Label, Term>();
+            for (Map.Entry<Label, ProgramVariable> flag : flags.entrySet()) {
+                result.put(flag.getKey(), termifyVariable(flag.getValue()));
+            }
+            return result;
+        }
+
+        private Map<LocationVariable, Term> termifyRemembranceVariables(final Map<LocationVariable, LocationVariable> remembranceVariables)
+        {
+            final Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
+            for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : remembranceVariables.entrySet()) {
+                result.put(remembranceVariable.getKey(), termifyVariable(remembranceVariable.getValue()));
+            }
+            return result;
+        }
+
+        private Term termifyVariable(final ProgramVariable variable)
+        {
+            if (variable != null) {
+                return TermBuilder.DF.var(variable);
+            }
+            else {
+                return null;
+            }
         }
 
     }
