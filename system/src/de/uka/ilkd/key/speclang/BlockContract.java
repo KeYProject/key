@@ -115,7 +115,7 @@ public interface BlockContract extends SpecificationElement {
         private Map<Label, ProgramVariable> continueFlags;
         private ProgramVariable returnFlag;
 
-        public VariablesCreator(final StatementBlock block, IProgramMethod method, final Services services)
+        public VariablesCreator(final StatementBlock block, final IProgramMethod method, final Services services)
         {
             super(services);
             this.block = block;
@@ -200,7 +200,7 @@ public interface BlockContract extends SpecificationElement {
             return result;
         }
 
-        private LocationVariable createVariable(final String name, KeYJavaType type)
+        private LocationVariable createVariable(final String name, final KeYJavaType type)
         {
             return new LocationVariable(new ProgramElementName(name), type);
         }
