@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -653,12 +652,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProofInputException Occurred Exception.
-    * @throws FileNotFoundException Occurred Exception.
+    * @throws IOException Occurred Exception.
     */
    protected static SymbolicExecutionEnvironment<CustomConsoleUserInterface> createSymbolicExecutionEnvironment(File baseDir, 
                                                                                                                 String javaPathInBaseDir, 
                                                                                                                 String baseContractName,
-                                                                                                                boolean mergeBranchConditions) throws ProofInputException, FileNotFoundException {
+                                                                                                                boolean mergeBranchConditions) throws ProofInputException, IOException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
@@ -693,14 +692,14 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProofInputException Occurred Exception.
-    * @throws FileNotFoundException Occurred Exception.
+    * @throws IOException Occurred Exception.
     */
    protected static SymbolicExecutionEnvironment<CustomConsoleUserInterface> createSymbolicExecutionEnvironment(File baseDir, 
                                                                                                                 String javaPathInBaseDir, 
                                                                                                                 String containerTypeName, 
                                                                                                                 String methodFullName,
                                                                                                                 String precondition,
-                                                                                                                boolean mergeBranchConditions) throws ProofInputException, FileNotFoundException {
+                                                                                                                boolean mergeBranchConditions) throws ProofInputException, IOException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
@@ -738,7 +737,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     * @param mergeBranchConditions Merge branch conditions?
     * @return The created {@link SymbolicExecutionEnvironment}.
     * @throws ProofInputException Occurred Exception.
-    * @throws FileNotFoundException Occurred Exception.
+    * @throws IOException Occurred Exception.
     */
    protected static SymbolicExecutionEnvironment<CustomConsoleUserInterface> createSymbolicExecutionEnvironment(File baseDir, 
                                                                                                                 String javaPathInBaseDir, 
@@ -747,7 +746,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                                                                                 String precondition,
                                                                                                                 Position startPosition,
                                                                                                                 Position endPosition,
-                                                                                                                boolean mergeBranchConditions) throws ProofInputException, FileNotFoundException {
+                                                                                                                boolean mergeBranchConditions) throws ProofInputException, IOException {
       // Make sure that required files exists
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
@@ -813,6 +812,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       File javaFile = new File(baseDir, javaPathInBaseDir);
       assertTrue(javaFile.exists());
       File tempFile = File.createTempFile("TestProgramMethodSubsetPO", ".proof", javaFile.getParentFile());
+      tempFile.deleteOnExit();
       try {
          ProofSaver saver = new ProofSaver(env.getProof(), tempFile.getAbsolutePath(), Main.INTERNAL_VERSION);
          assertNull(saver.save());

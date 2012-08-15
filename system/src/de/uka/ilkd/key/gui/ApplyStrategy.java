@@ -295,7 +295,7 @@ public class ApplyStrategy {
      * and returned to the instance that started the strategies.
      * 
      * It contains statistic information about the number of applied rules, time needed or 
-     * number of closed goals. In case teh rule application stopped at a non closeable goal,
+     * number of closed goals. In case the rule application stopped at a non closeable goal,
      * this goal is also stored to allow the caller to e.g. present it to the user for interaction.
      * 
      * In case of an unexpected, the thrown exception can be also retrieved from this container.
@@ -395,7 +395,13 @@ public class ApplyStrategy {
     private boolean stopAtFirstNonCloseableGoal;
 
     protected int closedGoals;
+    
+    private boolean cancelled;
 
+    IStopCondition stopCondition;
+    
+    IGoalChooser goalChooser;
+    
 
     // Please create this object beforehand and re-use it.
     // Otherwise the addition/removal of the InteractiveProofListener
@@ -471,10 +477,10 @@ public class ApplyStrategy {
                         (Goal) null, System.currentTimeMillis()-time, countApplied, closedGoals);
             }
         } catch (InterruptedException e) {
+            cancelled = true;
             return new ApplyStrategyInfo("Interrupted.", proof, null, 
                     goalChooser.getNextGoal(), System.currentTimeMillis()-time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
-            System.err.println(t);
             t.printStackTrace();
             return new ApplyStrategyInfo("Error.", proof, t, null, System.currentTimeMillis()-time, countApplied, closedGoals);
         } finally{
@@ -508,24 +514,74 @@ public class ApplyStrategy {
     }
 
 
-    private void init(Proof newProof, IGoalChooser goalChooser, ImmutableList<Goal> goals, int maxSteps, long timeout, IStopCondition stopCondition) {
+    private void init(Proof newProof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
         this.proof      = newProof;
         maxApplications = maxSteps;
         this.timeout    = timeout;
         countApplied    = 0; 
-        closedGoals     = 0;        
+        closedGoals     = 0;
+        cancelled       = false;
+        stopCondition = proof.getSettings().getStrategySettings().getApplyStrategyStopCondition();
+        assert stopCondition != null;
+        goalChooser = getGoalChooserForProof(proof);
+        assert goalChooser != null;
         goalChooser.init ( newProof, goals );
-        setAutoModeActive(true);
-
+        setAutoModeActive(true);        
         fireTaskStarted (stopCondition.getMaximalWork(maxSteps, timeout, newProof, goalChooser));
     }
-
     
-    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps, long timeout, boolean stopAtFirstNonCloseableGoal) {
+    
+    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, int maxSteps,
+            long timeout, boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
 
         this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal; 
 
+        ProofTreeListener treeListener =
+                prepareStrategy(proof, goals, maxSteps, timeout);
+        ApplyStrategyInfo result = executeStrategy(treeListener);
+        finishStrategy(result);
+        return result;
+    }
+    
+    public ApplyStrategyInfo startRetreat(Proof proof,
+                                          ImmutableList<Goal> goals,
+                                          int maxSteps,
+                                          long timeout,
+                                          boolean stopAtFirstNonCloseableGoal) {
+        assert proof != null;
+        assert !goals.isEmpty();
+
+        ApplyStrategyInfo result = null;
+        for (Goal g : goals) {
+            ImmutableList<Goal> gList = ImmutableSLList.<Goal>nil().prepend(g);
+            Node n = g.node();
+
+            this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal;
+
+            ProofTreeListener treeListener =
+                    prepareStrategy(proof, gList, maxSteps, timeout);
+            ApplyStrategyInfo subResult = executeStrategy(treeListener);
+            /* This is the iterative case, where proofs are done separately on multiple branches,
+             * sequentially though. So each gets accumulated with the one done before. After the
+             * accumulation, the method finishStrategy should be called.
+             */
+            result = joinStrategyInfos(result, subResult);
+
+            Proof automaticProof = result.getProof();
+            if (!n.isClosed()) {
+                automaticProof.pruneProof(n);
+            }
+            if (result.isError() || cancelled) {
+                break;
+            }
+        }
+        finishStrategy(result);
+        return result;
+    }
+    
+    private ProofTreeListener prepareStrategy(Proof proof, ImmutableList<Goal> goals, int maxSteps,
+            long timeout) {
         ProofTreeListener treeListener = new ProofTreeAdapter() {            
             @Override
             public void proofGoalsAdded(ProofTreeEvent e) {
@@ -537,18 +593,17 @@ public class ApplyStrategy {
                 }
             }            
         };
-
         proof.addProofTreeListener(treeListener);
+        init(proof, goals, maxSteps, timeout);
 
-        final IStopCondition stopCondition = proof.getSettings().getStrategySettings().getApplyStrategyStopCondition();
-        assert stopCondition != null;
-        final IGoalChooser goalChooser = getGoalChooserForProof(proof);
-        assert goalChooser != null;
-        init(proof, goalChooser, goals, maxSteps, timeout, stopCondition);
-
+        return treeListener;
+    }
+    
+    private ApplyStrategyInfo executeStrategy(ProofTreeListener treeListener) {
+        assert proof != null;
+        
         ProofListener pl = new ProofListener();
-        Goal.addRuleAppListener( pl );        
-
+        Goal.addRuleAppListener( pl );
         ApplyStrategyInfo result = null;
         try {  
             result = doWork(goalChooser, stopCondition);
@@ -556,16 +611,35 @@ public class ApplyStrategy {
             proof.removeProofTreeListener(treeListener);
             Goal.removeRuleAppListener(pl);            
             setAutoModeActive(false);
-        }
-
-        if (result != null) {
+        }        
+        return result;
+    }
+    
+    private void finishStrategy(ApplyStrategyInfo result) {
+//        if (result != null) {
+        assert result != null; // CS
             proof.addAutoModeTime(result.getTime());
-            
-            fireTaskFinished (new DefaultTaskFinishedInfo(this, result, 
-                    proof, result.getTime(), 
-                    result.getAppliedRuleApps(), result.getClosedGoals()));
-        }
 
+        fireTaskFinished (new DefaultTaskFinishedInfo(this, result, 
+                proof, result.getTime(), 
+                result.getAppliedRuleApps(), result.getClosedGoals()));
+//        }
+    }
+    
+    // Used to combine multiple iteratively called proofs and integrate their results in final result
+    private ApplyStrategyInfo joinStrategyInfos(ApplyStrategyInfo result, ApplyStrategyInfo subResult) {
+        if(result == null)
+            return subResult;
+        String msg = subResult.reason();
+        Proof prf = subResult.getProof();
+        Throwable err = subResult.getException();
+        if(result.isError())
+            err = result.getException();
+        Goal go = subResult.nonCloseableGoal();
+        long tme = result.getTime() + subResult.getTime();
+        int appl = result.getAppliedRuleApps() + subResult.getAppliedRuleApps();
+        int clsd = result.getClosedGoals() + subResult.getClosedGoals();
+        result = new ApplyStrategyInfo(msg,prf,err,go,tme,appl,clsd);
         return result;
     }
     
@@ -583,7 +657,6 @@ public class ApplyStrategy {
        }
        return chooser != null ? chooser : defaultGoalChooser;
     }
-
     public synchronized void addProverTaskObserver(ProverTaskListener observer) {
         proverTaskObservers.add(observer);
     }

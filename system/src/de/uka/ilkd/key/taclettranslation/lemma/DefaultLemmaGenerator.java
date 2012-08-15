@@ -44,17 +44,13 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         // logical variable.
         private HashMap<SchemaVariable, Term> mapping = new HashMap<SchemaVariable, Term>();
        
-        
-
-        
-        
         @Override
         public TacletFormula translate(Taclet taclet, Services services) {
                 String result = checkTaclet(taclet);
                 if(result != null){
                         throw new IllegalTacletException(result);
                 }
-                Term formula = SkeletonGenerator.FindTacletTranslator
+                Term formula = SkeletonGenerator.DEFAULT_TACLET_TRANSLATOR
                                 .translate(taclet);
                 formula = rebuild(taclet, formula, services,
                                 new HashSet<QuantifiableVariable>());
@@ -65,8 +61,6 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 return new LemmaFormula(taclet, formula);
         }
         
-
-
         private Term replace(Taclet taclet, Term term, Services services) {
                 if (term.op() instanceof SchemaVariable) {
                         return getInstantiation(taclet,
@@ -77,9 +71,10 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         }
         
        public static String checkTaclet(final Taclet taclet){
-               if(!(taclet instanceof FindTaclet)){
-                      return "Taclet is not of type FindTaclet";
-               }
+           // This restriction no longer applies
+           //    if(!(taclet instanceof FindTaclet)){
+           //           return "Taclet is not of type FindTaclet";
+           //    }
                String result = checkForIllegalConditions(taclet);
                if(result!=null) return result;
                TacletVisitor visitor = new TacletVisitor() {

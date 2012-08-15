@@ -1,11 +1,12 @@
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
@@ -13,7 +14,6 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 public abstract class AbstractUserInterface implements UserInterface {
@@ -39,11 +39,10 @@ public abstract class AbstractUserInterface implements UserInterface {
      * {@inheritDoc}
      */
     @Override
-    public InitConfig load(File file, List<File> classPath, File bootClassPath) throws FileNotFoundException, ProofInputException {
-       ProblemLoader loader = new ProblemLoader(file, classPath, bootClassPath, getMediator());
-       EnvInput envInput = loader.createEnvInput(file, classPath, bootClassPath);
-       ProblemInitializer init = createProblemInitializer();
-       return init.prepare(envInput);
+    public InitConfig load(File file, List<File> classPath, File bootClassPath) throws IOException, ProofInputException {
+       DefaultProblemLoader loader = new DefaultProblemLoader(file, classPath, bootClassPath, getMediator());
+       loader.load();
+       return loader.getInitConfig();
     }
     
     /**

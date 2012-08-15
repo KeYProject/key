@@ -47,6 +47,21 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    private static final int[] DEFAULT_MAXIMAL_SET_NODES_PER_RUN = {ALL_IN_ONE_RUN, SINGLE_SET_NODE_RUN};
 
    /**
+    * Tests example: examples/_testcase/set/variablesParameterAttributesChange
+    */
+   public void testElseIfTest_variablesParameterAttributesChange() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/variablesParameterAttributesChange/test/VariablesParameterAttributesChange.java", 
+             "VariablesParameterAttributesChange", 
+             "main", 
+             "examples/_testcase/set/variablesParameterAttributesChange/oracle/VariablesParameterAttributesChange.xml",
+             true,
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/elseIfTest
     */
    public void testElseIfTest_mergedBranchConditions() throws Exception {

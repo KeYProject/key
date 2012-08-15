@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -109,10 +109,10 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
      * @return The opened {@link InitConfig}.
-     * @throws FileNotFoundException Occurred Exception.
+     * @throws IOException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    InitConfig load(File file, List<File> classPaths, File bootClassPath) throws FileNotFoundException, ProofInputException;
+    InitConfig load(File file, List<File> classPaths, File bootClassPath) throws IOException, ProofInputException;
     
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterface} for the given

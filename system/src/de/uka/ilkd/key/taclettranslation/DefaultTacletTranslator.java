@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.AntecTaclet;
 import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.SuccTaclet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -32,7 +33,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
  * 
  * 
  */
-public class FindTacletTranslator extends AbstractSkeletonGenerator {
+public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 
 
     static private final int ANTE = 0;
@@ -142,11 +143,10 @@ public class FindTacletTranslator extends AbstractSkeletonGenerator {
      * Translates a RewriteTaclet to a formula.
      */
     @Override
-    public Term translate(Taclet t)
+    public Term translate(Taclet taclet)
     	throws IllegalTacletException {
 	
 
-	FindTaclet findTaclet = (FindTaclet) t;
 	TermBuilder tb = TermBuilder.DF;
 
 	// the standard translation of the patterns.
@@ -154,23 +154,25 @@ public class FindTacletTranslator extends AbstractSkeletonGenerator {
 	Term find = STD_FIND, assum = STD_ASSUM;
 
 	// translate the find pattern.
-	if (findTaclet.find() != null)
-	    find = findTaclet.find();
-	
+	if (taclet instanceof FindTaclet) {
+	    FindTaclet findTaclet = (FindTaclet) taclet;
+	    if (findTaclet.find() != null)
+	        find = findTaclet.find();
+	}
 
 	// translate the replace and add patterns of the taclet.
 	ImmutableList<Term> list = ImmutableSLList.nil();
 
-	for (TacletGoalTemplate template : findTaclet.goalTemplates()) {
+	for (TacletGoalTemplate template : taclet.goalTemplates()) {
 	    
-	    if(findTaclet instanceof AntecTaclet){
+	    if(taclet instanceof AntecTaclet){
 		list = list.append(translateReplaceAndAddSequent(template,ANTE));
 
-	    }else if(findTaclet instanceof SuccTaclet){
+	    } else if(taclet instanceof SuccTaclet){
 		list = list.append(translateReplaceAndAddSequent(template,SUCC));
 
-	    }else if(findTaclet instanceof RewriteTaclet){
-		    if (findTaclet.find().sort().equals(Sort.FORMULA)) {
+	    } else if(taclet instanceof RewriteTaclet){
+		    if (((RewriteTaclet)taclet).find().sort().equals(Sort.FORMULA)) {
 			list = list.append(translateReplaceAndAddFormula(
 			         template, find));
 
@@ -179,17 +181,21 @@ public class FindTacletTranslator extends AbstractSkeletonGenerator {
 			         template, find));
 
 		    }
-	    }else throw new IllegalTacletException("Not AntecTaclet, not SuccTaclet, not RewriteTaclet");
+	    } else if(taclet instanceof NoFindTaclet) {
+	        list = list.append(translateReplaceAndAddSequent(template, SUCC));
+	    } else {
+	        throw new IllegalTacletException("Not AntecTaclet, not SuccTaclet, not RewriteTaclet, not NoFindTaclet");
+	    }
 	}
-	if (findTaclet.ifSequent() != null) {
-	    if ((assum = translate(findTaclet.ifSequent())) == null) {
+	if (taclet.ifSequent() != null) {
+	    if ((assum = translate(taclet.ifSequent())) == null) {
 		assum = STD_ASSUM;
 	    }
 	}
 	
 	
-	if(findTaclet instanceof AntecTaclet || findTaclet instanceof SuccTaclet){
-	    if(findTaclet instanceof AntecTaclet){
+	if(taclet instanceof AntecTaclet || taclet instanceof SuccTaclet){
+	    if(taclet instanceof AntecTaclet){
 		find = tb.not(find); 
 	    }
 	    return tb.imp(tb.and(list),tb.or(find, assum));

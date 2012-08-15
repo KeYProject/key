@@ -37,7 +37,7 @@ public class InteractiveProver {
 
     /** the proof the interactive prover works on */
     private Proof proof;
-
+    
     /** the user focused goal */
     private Goal focusedGoal;
     
@@ -86,7 +86,7 @@ public class InteractiveProver {
     public void setProof(Proof p) {
 	proof = p;
     }
-
+    
     public void addAutoModeListener(AutoModeListener p) { 
 	synchronized(listenerList) {
 	    listenerList.add(p);
@@ -151,13 +151,13 @@ public class InteractiveProver {
      */
     public Proof getProof() {
 	return proof;
-    }    
-
+    }
+    
     /** starts the execution of rules with active strategy. The
      * strategy will only be applied on the goals of the list that
      * is handed over and on the new goals an applied rule adds
      */
-    public void startAutoMode ( ImmutableList<Goal> goals ) {
+    public void startAutoMode ( ImmutableList<Goal> goals) {
         if ( goals.isEmpty () ) {                        
         	mediator ().notify(new GeneralInformationEvent("No enabled goals available."));
         	return;
@@ -168,9 +168,6 @@ public class InteractiveProver {
         worker.start();
     }
     
-    
-    
-
     
     /** stops the execution of rules */
     public void stopAutoMode () {
@@ -196,7 +193,7 @@ public class InteractiveProver {
             goal.setRuleAppManager ( focusManager );
         }
 
-        startAutoMode ( ImmutableSLList.<Goal>nil().prepend ( goal ) );
+        startAutoMode ( ImmutableSLList.<Goal>nil().prepend ( goal ));
     }
 
     private void finishFocussedAutoMode () {
@@ -518,13 +515,13 @@ public class InteractiveProver {
      * </p>
      */
     private class AutoModeWorker extends SwingWorker {
-         
+        
         private ImmutableList<Goal> goals;
 
         public AutoModeWorker(ImmutableList<Goal> goals) {
             this.goals = goals;
-        }
-
+        }        
+        
         public Object construct() {
             return doWork();
         }
@@ -534,9 +531,22 @@ public class InteractiveProver {
                     .getActiveStrategyProperties().getProperty(
                             StrategyProperties.STOPMODE_OPTIONS_KEY)
                             .equals(StrategyProperties.STOPMODE_NONCLOSE);
-
-            
-            return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(), getTimeout(), stopMode );                    
+            boolean retreatMode = proof.getSettings().getStrategySettings()
+            .getActiveStrategyProperties().getProperty(
+                    StrategyProperties.RETREAT_MODE_OPTIONS_KEY)
+                    .equals(StrategyProperties.RETREAT_MODE_RETREAT);
+            /**
+             * In retreatMode, the proof on the node of each previous
+             * goal is pruned, unless it was closed in the automatic proof.
+             * Other than in standard mode, in retreatMode this is done for
+             * each goal (sequentially), even if we get stuck in a goal before. 
+             */
+            if(retreatMode) {
+                return applyStrategy.startRetreat ( proof, goals, mediator ().getMaxAutomaticSteps(),
+                        getTimeout(), stopMode );
+            } else
+                return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(),
+                        getTimeout(), stopMode );
         }
         
         /**
@@ -549,8 +559,8 @@ public class InteractiveProver {
         }
 
         public void finished() {
-            final ApplyStrategyInfo result = (ApplyStrategyInfo) get ();
-
+            final ApplyStrategyInfo result = (ApplyStrategyInfo) get ();            
+            
             mediator().setInteractive( true );            
             mediator().startInterface( true );
 
@@ -562,6 +572,5 @@ public class InteractiveProver {
 
         }       
     }
-
 
 }

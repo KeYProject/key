@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.ui.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -57,7 +58,7 @@ public class SaveProofHandler extends AbstractHandler {
                   IMethod method = keyTarget.getMethod();
                   // Open save dialog
                   SaveAsDialog dialog = new SaveAsDialog(HandlerUtil.getActiveShell(event));
-                  String proofFileName = target.getName() + ".proof";
+                  String proofFileName = target.getName() + "." + KeYUtil.PROOF_FILE_EXTENSION;
                   if (method != null && method.getResource() != null) {
                      IContainer parent = method.getResource().getParent();
                      dialog.setOriginalFile(parent.getFile(new Path(proofFileName)));

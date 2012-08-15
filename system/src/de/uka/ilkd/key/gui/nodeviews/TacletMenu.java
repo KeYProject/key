@@ -88,10 +88,33 @@ class TacletMenu extends JMenu {
 	this.sequentView = sequentView;
 	this.mediator = sequentView.mediator();
  	this.pos = pos;
+ 	findList = removeObsolete(findList);
+    rewriteList = removeObsolete(rewriteList);
+    noFindList = removeObsolete(noFindList);
 	// delete RewriteTaclet from findList because they will be in
 	// the rewrite list and concatenate both lists
 	createTacletMenu(removeRewrites(findList).prepend(rewriteList),
 			 noFindList, builtInList, new MenuControl());
+    }
+    
+    /** Remove rules which belong to rule set "obsolete".
+     * Obsolete rules are sound, but are discouraged to use in
+     * both automated and interactive proofs, mostly because of proof complexity issues.
+     */
+    private ImmutableList<TacletApp> removeObsolete(ImmutableList<TacletApp> list) {
+        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        for (TacletApp ta: list) {
+            boolean isObsolete = false;
+            for (RuleSet rs: ta.taclet().getRuleSets()) {
+                if (rs.name().equals(new Name("obsolete"))) {
+                    isObsolete = true;
+                    break;
+                }
+            }
+            if (!isObsolete)
+                result = result.append(ta);
+        }
+        return result;
     }
     
     /** removes RewriteTaclet from list

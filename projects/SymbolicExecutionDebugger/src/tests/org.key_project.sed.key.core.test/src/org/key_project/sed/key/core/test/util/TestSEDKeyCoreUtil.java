@@ -192,6 +192,6 @@ public final class TestSEDKeyCoreUtil {
     * @throws JavaModelException Occurred Exception
     */
    public static String computeTargetName(IMethod method) throws JavaModelException {
-      return JDTUtil.getTextLabel(method);
+      return JDTUtil.getQualifiedMethodLabel(method);
    }
 }

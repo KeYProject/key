@@ -158,7 +158,7 @@
             commandId="org.key_project.sed.key.ui.saveProofCommand"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+P">
+            sequence="M1+M2+K">
       </key>
    </extension>
       <extension

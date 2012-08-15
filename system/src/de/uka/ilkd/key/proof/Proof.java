@@ -461,6 +461,7 @@ public class Proof implements Named {
      * removing the last goal will fire the proofClosed event
      * @param goal the Goal to be removed
      */
+    // TODO this should not be public (MU)
     public void remove(Goal goal) {
 	ImmutableList<Goal> newOpenGoals = openGoals.removeAll(goal);
 	if (newOpenGoals != openGoals) {
