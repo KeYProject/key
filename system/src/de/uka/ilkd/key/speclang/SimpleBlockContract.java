@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -308,17 +309,17 @@ public final class SimpleBlockContract implements BlockContract {
         return result;
     }
 
-    private static class VariableReplacementMap extends LinkedHashMap<ProgramVariable, ProgramVariable> {
+    private abstract static class ReplacementMap<S extends Sorted> extends LinkedHashMap<S, S> {
 
-        public void replaceSelf(final ProgramVariable oldSelf, final ProgramVariable newSelf)
+        public void replaceSelf(final ProgramVariable oldSelf, final S newSelf)
         {
             if (newSelf != null) {
                 assert newSelf.sort().extendsTrans(oldSelf.sort());
-                put(oldSelf, newSelf);
+                put(convert(oldSelf), newSelf);
             }
         }
 
-        public void replaceFlags(final Map<Label, ProgramVariable> oldFlags, final Map<Label, ProgramVariable> newFlags)
+        public void replaceFlags(final Map<Label, ProgramVariable> oldFlags, final Map<Label, S> newFlags)
         {
             if (newFlags != null) {
                 assert newFlags.size() == oldFlags.size();
@@ -328,48 +329,59 @@ public final class SimpleBlockContract implements BlockContract {
             }
         }
 
-        public void replaceVariable(final ProgramVariable oldVariable, final ProgramVariable newVariable)
+        public void replaceVariable(final ProgramVariable oldVariable, final S newVariable)
         {
             if (newVariable != null) {
                 assert oldVariable.sort().equals(newVariable.sort());
-                put(oldVariable, newVariable);
+                put(convert(oldVariable), newVariable);
             }
         }
 
         public void replaceRemembranceHeaps(final Map<LocationVariable, LocationVariable> oldRemembranceHeaps,
-                                            final Map<LocationVariable, LocationVariable> newRemembranceHeaps,
+                                            final Map<LocationVariable, ? extends S> newRemembranceHeaps,
                                             final Services services)
         {
             if (newRemembranceHeaps != null) {
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                     if (newRemembranceHeaps.get(heap) != null) {
                         final LocationVariable oldRemembranceHeap = oldRemembranceHeaps.get(heap);
-                        final LocationVariable newRemembranceHeap = newRemembranceHeaps.get(heap);
+                        final S newRemembranceHeap = newRemembranceHeaps.get(heap);
                         assert oldRemembranceHeap.sort().equals(newRemembranceHeap.sort());
-                        put(oldRemembranceHeap, newRemembranceHeap);
+                        put(convert(oldRemembranceHeap), newRemembranceHeap);
                     }
                 }
             }
         }
 
         public void replaceRemembranceLocalVariables(final Map<LocationVariable, LocationVariable> oldRemembranceLocalVariables,
-                                                     final Map<LocationVariable, LocationVariable> newRemembranceLocalVariables)
+                                                     final Map<LocationVariable, ? extends S> newRemembranceLocalVariables)
         {
             if (newRemembranceLocalVariables != null) {
                 for (LocationVariable localVariable : oldRemembranceLocalVariables.keySet()) {
                     if (newRemembranceLocalVariables.get(localVariable) != null) {
                         LocationVariable oldRemembranceLocalVariable = oldRemembranceLocalVariables.get(localVariable);
-                        LocationVariable newRemembranceLocalVariable = newRemembranceLocalVariables.get(localVariable);
+                        S newRemembranceLocalVariable = newRemembranceLocalVariables.get(localVariable);
                         assert oldRemembranceLocalVariable.sort().equals(newRemembranceLocalVariable.sort());
-                        put(oldRemembranceLocalVariable, newRemembranceLocalVariable);
+                        put(convert(oldRemembranceLocalVariable), newRemembranceLocalVariable);
                     }
                 }
             }
         }
 
+        protected abstract S convert(ProgramVariable variable);
+
     }
 
-    private static class TermReplacementMap extends LinkedHashMap<Term, Term> {
+    private static class VariableReplacementMap extends ReplacementMap<ProgramVariable> {
+
+        protected ProgramVariable convert(ProgramVariable variable)
+        {
+            return variable;
+        }
+
+    }
+
+    private static class TermReplacementMap extends ReplacementMap<Term> {
 
         private static final TermBuilder TB = TermBuilder.DF;
 
@@ -380,60 +392,9 @@ public final class SimpleBlockContract implements BlockContract {
             put(TB.getBaseHeap(services), newHeap);
         }
 
-        public void replaceSelf(final ProgramVariable oldSelf, final Term newSelf)
+        protected Term convert(ProgramVariable variable)
         {
-            if (newSelf != null) {
-                assert newSelf.sort().extendsTrans(oldSelf.sort());
-                put(TB.var(oldSelf), newSelf);
-            }
-        }
-
-        public void replaceFlags(final Map<Label, ProgramVariable> oldFlags, final Map<Label, Term> newFlags)
-        {
-            if (newFlags != null) {
-                assert newFlags.size() == oldFlags.size();
-                for (Map.Entry<Label, ProgramVariable> oldFlag : oldFlags.entrySet()) {
-                    replaceVariable(oldFlag.getValue(), newFlags.get(oldFlag.getKey()));
-                }
-            }
-        }
-
-        public void replaceVariable(final ProgramVariable oldVariable, final Term newVariable)
-        {
-            if (newVariable != null) {
-                assert oldVariable.sort().equals(newVariable.sort());
-                put(TB.var(oldVariable), newVariable);
-            }
-        }
-
-        public void replaceRemembranceHeaps(final Map<LocationVariable, LocationVariable> oldRemembranceHeaps,
-                                            final Map<LocationVariable, Term> newRemembranceHeaps,
-                                            final Services services)
-        {
-            if (newRemembranceHeaps != null) {
-                for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                    if (newRemembranceHeaps.get(heap) != null) {
-                        final LocationVariable oldRemembranceHeap = oldRemembranceHeaps.get(heap);
-                        final Term newRemembranceHeap = newRemembranceHeaps.get(heap);
-                        assert oldRemembranceHeap.sort().equals(newRemembranceHeap.sort());
-                        put(TB.var(oldRemembranceHeap), newRemembranceHeap);
-                    }
-                }
-            }
-        }
-
-        public void replaceRemembranceLocalVariables(final Map<LocationVariable, LocationVariable> oldRemembranceLocalVariables,
-                                                     final Map<LocationVariable, Term> newRemembranceLocalVariables)
-        {
-            if (newRemembranceLocalVariables != null) {
-                for (LocationVariable localVariable : oldRemembranceLocalVariables.keySet()) {
-                    Term newRemembranceLocalVariable = newRemembranceLocalVariables.get(localVariable);
-                    if (newRemembranceLocalVariable != null) {
-                        assert oldRemembranceLocalVariables.get(localVariable).sort().equals(newRemembranceLocalVariable.sort());
-                        put(TB.var(localVariable), newRemembranceLocalVariable);
-                    }
-                }
-            }
+            return TB.var(variable);
         }
 
     }

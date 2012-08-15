@@ -175,20 +175,20 @@ public class BlockContractRule implements BuiltInRule {
         final ImmutableList<Goal> result = goal.split(3);
         final GoalsConfigurator configurator = new GoalsConfigurator(instantiation, variables, application.posInOccurrence(), services);
         configurator.setUpValidityGoal(
-                result.tail().tail().head(),
-                new Term[]{contextUpdate, remembranceUpdate},
-                new Term[]{precondition, wellFormedHeapsCondition, reachableInCondition},
-                new Term[]{postcondition, frameCondition/*, atMostOneFlagSetCondition*/}
+            result.tail().tail().head(),
+            new Term[] {contextUpdate, remembranceUpdate},
+            new Term[] {precondition, wellFormedHeapsCondition, reachableInCondition},
+            new Term[] {postcondition, frameCondition/*, atMostOneFlagSetCondition*/}
         );
         configurator.setUpPreconditionGoal(
-                result.tail().head(),
-                contextUpdate,
-                new Term[]{precondition, wellFormedHeapsCondition, reachableInCondition}
+            result.tail().head(),
+            contextUpdate,
+            new Term[] {precondition, wellFormedHeapsCondition, reachableInCondition}
         );
         configurator.setUpUsageGoal(
-                result.head(),
-                new Term[]{contextUpdate, remembranceUpdate, anonymisationUpdate},
-                new Term[]{postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition}
+            result.head(),
+            new Term[] {contextUpdate, remembranceUpdate, anonymisationUpdate},
+            new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition}
         );
         return result;
     }
@@ -745,13 +745,13 @@ public class BlockContractRule implements BuiltInRule {
 
         private void executeBlockSafely()
         {
-            // TODO We want a unique label. Get it from TermBuilder: TB.newName(services, "breakOut")?
             final Label breakOutLabel = new ProgramElementName("breakOut");
             final StatementBlock almostSafeBlock = replaceOuterBreaksContinuesAndReturns(block, breakOutLabel);
             final Statement safeStatement = wrapInTryCatch(almostSafeBlock);
             statements.add(new LabeledStatement(breakOutLabel, safeStatement));
         }
 
+        // TODO This method belongs into StatementBlock.
         private StatementBlock replaceOuterBreaksContinuesAndReturns(final StatementBlock block, final Label breakOutLabel)
         {
             return new OuterBreakContinueAndReturnReplacer(

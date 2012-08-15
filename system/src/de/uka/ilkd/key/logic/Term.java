@@ -48,7 +48,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * currently supported: {@link Term#execPostOrder(Visitor)} and
  * {@link Term#execPreOrder(Visitor)}. 
  */
-public interface Term extends SVSubstitute {
+public interface Term extends SVSubstitute, Sorted {
     
     /** 
      * The top operator (e.g., in "A and B" this is "and", in f(x,y) it is "f").
