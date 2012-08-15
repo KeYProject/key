@@ -105,8 +105,7 @@ public interface BlockContract extends SpecificationElement {
 
     }
 
-    public static class VariablesCreator extends TermBuilder
-    {
+    public static class VariablesCreator extends TermBuilder.Serviced {
 
         private static final String REMEMBRANCE_SUFFIX = "BeforeBlock";
 

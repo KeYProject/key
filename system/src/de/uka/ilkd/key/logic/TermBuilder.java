@@ -54,16 +54,9 @@ public class TermBuilder {
     
     private static final TermFactory tf = TermFactory.DEFAULT;    
     private static final Term tt = TermFactory.DEFAULT.createTerm(Junctor.TRUE); 
-    private static final Term ff = TermFactory.DEFAULT.createTerm(Junctor.FALSE); 
-
-    protected final Services services;
+    private static final Term ff = TermFactory.DEFAULT.createTerm(Junctor.FALSE);
 
     public TermBuilder() {
-        services = null;
-    }
-
-    public TermBuilder(Services services) {
-        this.services = services;
     }
     
     
@@ -127,12 +120,6 @@ public class TermBuilder {
 	return result.toLowerCase();
     }
 
-
-    public String newName(String baseName) {
-        assert services != null;
-        return newName(services, baseName);
-    }
-
     /**
      * Returns an available name constructed by affixing a counter to the passed
      * base name.
@@ -186,14 +173,6 @@ public class TermBuilder {
 	return new LocationVariable(new ProgramElementName(name), kjt);
     }
 
-
-    public LocationVariable selfVar(IProgramMethod pm,
-                                    KeYJavaType kjt,
-                                    boolean makeNameUnique)
-    {
-        assert services != null;
-        return selfVar(services, pm, kjt, makeNameUnique);
-    }
     
     /**
      * Creates a program variable for "self". Take care to register it
@@ -261,13 +240,6 @@ public class TermBuilder {
         return result;
     }
 
-
-    public LocationVariable resultVar(IProgramMethod pm,
-                                      boolean makeNameUnique)
-    {
-        assert services != null;
-        return resultVar(services, pm, makeNameUnique);
-    }
     
     /**
      * Creates a program variable for the result. Take care to register it
@@ -298,13 +270,6 @@ public class TermBuilder {
     }
 
 
-    public LocationVariable excVar(IProgramMethod pm,
-                                   boolean makeNameUnique)
-    {
-        assert services != null;
-        return excVar(services, pm, makeNameUnique);
-    }
-
     /**
      * Creates a program variable for the thrown exception. Take care to 
      * register it in the namespaces.
@@ -332,14 +297,6 @@ public class TermBuilder {
                                                    "java.lang.Exception"));
     }
 
-
-    public LocationVariable heapAtPreVar(String baseName,
-                                         Sort sort,
-                                         boolean makeNameUnique)
-    {
-        assert services != null;
-        return heapAtPreVar(services, baseName, sort, makeNameUnique);
-    }
 
     /**
      * Creates a program variable for the atPre heap. Take care to register it
@@ -692,12 +649,6 @@ public class TermBuilder {
     }
 
 
-    public Term convertToFormula(Term a)
-    {
-        assert services != null;
-        return convertToFormula(a, services);
-    }
-
     /**
      * If a is a boolean literal, the method returns the literal as a Formula.
      */
@@ -718,12 +669,6 @@ public class TermBuilder {
     //-------------------------------------------------------------------------
     //updates    
     //-------------------------------------------------------------------------
-
-    public Term elementary(UpdateableOperator lhs,
-                           Term rhs) {
-        assert services != null;
-        return elementary(services, lhs, rhs);
-    }
 
     public Term elementary(Services services, 
 	                   UpdateableOperator lhs, 
@@ -945,23 +890,10 @@ public class TermBuilder {
     //boolean operators    
     //-------------------------------------------------------------------------
 
-
-    public Term TRUE()
-    {
-        assert services != null;
-        return TRUE(services);
-    }
-
     public Term TRUE(Services services) {
         return services.getTypeConverter().getBooleanLDT().getTrueTerm();
     }
 
-
-    public Term FALSE()
-    {
-        assert services != null;
-        return FALSE(services);
-    }
 
     public Term FALSE(Services services) {
         return services.getTypeConverter().getBooleanLDT().getFalseTerm();
@@ -1282,32 +1214,13 @@ public class TermBuilder {
     //heap operators    
     //-------------------------------------------------------------------------
 
-    public Term NULL()
-    {
-        assert services != null;
-        return NULL(services);
-    }
-
     public Term NULL(Services services) {
         return func(services.getTypeConverter().getHeapLDT().getNull());
-    }
-
-    public Term wellFormed(Term heap)
-    {
-        assert services != null;
-        return wellFormed(heap, services);
     }
 
     public Term wellFormed(Term heap, Services services) {
         return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()), 
         	    heap);
-    }
-
-
-    public Term wellFormed(LocationVariable heap)
-    {
-        assert services != null;
-        return wellFormed(heap, services);
     }
 
 
@@ -1540,23 +1453,9 @@ public class TermBuilder {
 	return reachableValue(services, getBaseHeap(services), t, kjt);
     }
 
-
-    public Term reachableValue(ProgramVariable pv)
-    {
-        assert services != null;
-        return reachableValue(services, pv);
-    }
-
     
     public Term reachableValue(Services services, ProgramVariable pv) {
 	return reachableValue(services, var(pv), pv.getKeYJavaType());
-    }
-
-
-    public Term frame(Term heapTerm, Map<Term,Term> normalToAtPre, Term mod)
-    {
-        assert services != null;
-        return frame(services, heapTerm, normalToAtPre, mod);
     }
 
     
@@ -1603,12 +1502,6 @@ public class TermBuilder {
                                     objVarTerm,
                                     fieldVarTerm))));
     }
-
-    public Term frameStrictlyEmpty(Term heapTerm, Map<Term,Term> normalToAtPre)
-    {
-        assert services != null;
-        return frameStrictlyEmpty(services, heapTerm, normalToAtPre);
-    }
     
     /**
      * Returns the framing condition that the resulting heap is identical (i.e.
@@ -1648,12 +1541,6 @@ public class TermBuilder {
                                 or.replace(heapTerm),
                                 objVarTerm,
                                 fieldVarTerm)));
-    }
-
-
-    public Term anonUpd(LocationVariable heap, Term mod, Term anonHeap) {
-        assert services != null;
-        return anonUpd(heap, services, mod, anonHeap);
     }
     
     public Term anonUpd(LocationVariable heap, Services services, Term mod, Term anonHeap) {
@@ -1829,4 +1716,96 @@ public class TermBuilder {
        }
        return result;
     }
+
+    public static class Serviced extends TermBuilder {
+
+        protected final Services services;
+
+        public Serviced(final Services services)
+        {
+            assert services != null;
+            this.services = services;
+        }
+
+        public String newName(final String baseName)
+        {
+            return newName(services, baseName);
+        }
+
+        public LocationVariable selfVar(final IProgramMethod method, final KeYJavaType type, final boolean makeNameUnique)
+        {
+            return selfVar(services, method, type, makeNameUnique);
+        }
+
+        public LocationVariable resultVar(final IProgramMethod method, final boolean makeNameUnique)
+        {
+            return resultVar(services, method, makeNameUnique);
+        }
+
+        public LocationVariable excVar(final IProgramMethod method, final boolean makeNameUnique)
+        {
+            return excVar(services, method, makeNameUnique);
+        }
+
+        public LocationVariable heapAtPreVar(final String baseName, final Sort sort, final boolean makeNameUnique)
+        {
+            return heapAtPreVar(services, baseName, sort, makeNameUnique);
+        }
+
+        public Term convertToFormula(final Term term)
+        {
+            return convertToFormula(term, services);
+        }
+
+        public Term elementary(final UpdateableOperator leftHandSide, final Term rightHandSide) {
+            return elementary(services, leftHandSide, rightHandSide);
+        }
+
+        public Term TRUE()
+        {
+            return TRUE(services);
+        }
+
+        public Term FALSE()
+        {
+            return FALSE(services);
+        }
+
+        public Term NULL()
+        {
+            return NULL(services);
+        }
+
+        public Term wellFormed(final Term heap)
+        {
+            return wellFormed(heap, services);
+        }
+
+        public Term wellFormed(final LocationVariable heap)
+        {
+            return wellFormed(heap, services);
+        }
+
+        public Term reachableValue(final ProgramVariable variable)
+        {
+            return reachableValue(services, variable);
+        }
+
+        public Term frame(final Term heapTerm, final Map<Term, Term> normalToAtPre, final Term modifiesCondition)
+        {
+            return frame(services, heapTerm, normalToAtPre, modifiesCondition);
+        }
+
+        public Term frameStrictlyEmpty(final Term heapTerm, final Map<Term, Term> normalToAtPre)
+        {
+            return frameStrictlyEmpty(services, heapTerm, normalToAtPre);
+        }
+
+        public Term anonUpd(final LocationVariable heap, final Term modifiesCondition, final Term anonymisationHeap)
+        {
+            return anonUpd(heap, services, modifiesCondition, anonymisationHeap);
+        }
+
+    }
+
 }

@@ -438,7 +438,7 @@ public final class SimpleBlockContract implements BlockContract {
 
     }
 
-    public static final class Creator extends TermBuilder {
+    public static final class Creator extends TermBuilder.Serviced {
 
         private final StatementBlock block;
         private final IProgramMethod method;
@@ -709,8 +709,7 @@ public final class SimpleBlockContract implements BlockContract {
 
     }
 
-    private static final class Combiner extends TermBuilder
-    {
+    private static final class Combiner extends TermBuilder.Serviced {
 
         private final BlockContract[] contracts;
 

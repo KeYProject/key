@@ -329,7 +329,7 @@ public class BlockContractRule implements BuiltInRule {
 
     }
 
-    private static final class UpdatesBuilder extends TermBuilder {
+    private static final class UpdatesBuilder extends TermBuilder.Serviced {
 
         private final BlockContract.Variables variables;
 
@@ -389,7 +389,7 @@ public class BlockContractRule implements BuiltInRule {
 
     }
 
-    private static final class ConditionsBuilder extends TermBuilder {
+    private static final class ConditionsBuilder extends TermBuilder.Serviced {
 
         private final BlockContract contract;
         private final List<LocationVariable> heaps;
