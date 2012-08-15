@@ -309,7 +309,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 final JavaASTCollector blockCollector = new JavaASTCollector(pm.getBody(), StatementBlock.class);
                 blockCollector.start();
                 for (ProgramElement block : blockCollector.getNodes()) {
-                    ImmutableSet<BlockContract> blockContracts = specExtractor.extractBlockContracts(pm, (StatementBlock) block);
+                    final ImmutableSet<BlockContract> blockContracts = specExtractor.extractBlockContracts(pm, (StatementBlock) block);
                     for (BlockContract specification : blockContracts) {
                     	specRepos.addBlockContract(specification);
                     }

@@ -33,7 +33,20 @@ public class BlockContractRule implements BuiltInRule {
     private static final TermBuilder TB = TermBuilder.DF;
 
     // TODO Refactor.
-    public static Instantiation instantiate(final Term formula, final Services services)
+    public static Instantiation instantiate(final Term focusTerm, final Services services)
+    {
+        if (focusTerm == lastFocusTerm) {
+            return lastInstantiation;
+        }
+        else {
+            final Instantiation result = instantiateWithoutCaching(focusTerm, services);
+            lastFocusTerm = focusTerm;
+            lastInstantiation = result;
+            return result;
+        }
+    }
+
+    private static Instantiation instantiateWithoutCaching(final Term formula, final Services services)
     {
         final Pair<Term, Term> updateAndTarget = extractUpdate(formula);
         final Term update = updateAndTarget.first;
@@ -115,8 +128,8 @@ public class BlockContractRule implements BuiltInRule {
         return result;
     }
 
-    private Term lastFocusTerm;
-    private Instantiation lastInstantiation;
+    private static Term lastFocusTerm;
+    private static Instantiation lastInstantiation;
 
     private BlockContractRule() {
     }
@@ -126,7 +139,7 @@ public class BlockContractRule implements BuiltInRule {
         if (occurrence == null || !occurrence.isTopLevel() || occurrence.isInAntec()) {
             return false;
         }
-        final Instantiation instantiation = instantiateAndCache(occurrence.subTerm(), goal.proof().getServices());
+        final Instantiation instantiation = instantiate(occurrence.subTerm(), goal.proof().getServices());
         if (instantiation == null) {
             return false;
         }
@@ -141,7 +154,7 @@ public class BlockContractRule implements BuiltInRule {
     }
 
     private ImmutableList<Goal> apply(final Goal goal, final Services services, final BlockContractBuiltInRuleApp application) throws RuleAbortException {
-        final Instantiation instantiation = instantiateAndCache(application.posInOccurrence().subTerm(), services);
+        final Instantiation instantiation = instantiate(application.posInOccurrence().subTerm(), services);
         final BlockContract contract = application.getContract();
         //assert contract.getBlock().equals(instantiation.block);
         final Term contextUpdate = instantiation.update;
@@ -191,19 +204,6 @@ public class BlockContractRule implements BuiltInRule {
             new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition}
         );
         return result;
-    }
-
-    private Instantiation instantiateAndCache(final Term focusTerm, final Services services)
-    {
-        if (focusTerm == lastFocusTerm) {
-            return lastInstantiation;
-        }
-        else {
-            final Instantiation result = instantiate(focusTerm, services);
-            lastFocusTerm = focusTerm;
-            lastInstantiation = result;
-            return result;
-        }
     }
 
     // TODO Why don't we use the remembrance heaps in placeholder variables as blueprint?
@@ -266,6 +266,11 @@ public class BlockContractRule implements BuiltInRule {
             this.self = self;
             this.block = block;
             this.context = context;
+        }
+
+        public boolean transaction()
+        {
+            return modality.transaction();
         }
 
     }

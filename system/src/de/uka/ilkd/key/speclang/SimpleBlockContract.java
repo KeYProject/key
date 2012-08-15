@@ -280,6 +280,19 @@ public final class SimpleBlockContract implements BlockContract {
         return new SimpleBlockContract(newBlock, method, modality, newPreconditions, newPostconditions, newModifiesConditions, newVariables, transaction);
     }
 
+    // TODO Implement equals and hashCode properly.
+    @Override
+    public boolean equals(final Object object)
+    {
+        return super.equals(object);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return super.hashCode();
+    }
+
     private Map<ProgramVariable, ProgramVariable> createReplacementMap(final Variables newVariables, final Services services)
     {
         final VariableReplacementMap result = new VariableReplacementMap();

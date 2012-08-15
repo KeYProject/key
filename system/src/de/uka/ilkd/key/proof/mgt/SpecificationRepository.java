@@ -1106,21 +1106,29 @@ public final class SpecificationRepository {
     
     
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {
-	for(SpecificationElement spec : specs) {
-	    if(spec instanceof Contract) {
-		addContract((Contract)spec);
-	    } else if(spec instanceof ClassInvariant) {
-		addClassInvariant((ClassInvariant)spec);
-	    } else if(spec instanceof InitiallyClause){
-	        addInitiallyClause((InitiallyClause)spec);
-	    } else if(spec instanceof ClassAxiom) {
-		addClassAxiom((ClassAxiom)spec);
-	    } else if(spec instanceof LoopInvariant) {
-		setLoopInvariant((LoopInvariant)spec);
-	    } else {
-		assert false : "unexpected spec: " + spec +"\n("+spec.getClass()+")";
-	    }
-	}
+        for (SpecificationElement spec : specs) {
+            if (spec instanceof Contract) {
+                addContract((Contract)spec);
+            }
+            else if (spec instanceof ClassInvariant) {
+                addClassInvariant((ClassInvariant)spec);
+            }
+            else if (spec instanceof InitiallyClause) {
+                addInitiallyClause((InitiallyClause)spec);
+            }
+            else if (spec instanceof ClassAxiom) {
+                addClassAxiom((ClassAxiom)spec);
+            }
+            else if (spec instanceof LoopInvariant) {
+                setLoopInvariant((LoopInvariant)spec);
+            }
+            else if (spec instanceof BlockContract) {
+                addBlockContract((BlockContract) spec);
+            }
+            else {
+                assert false : "unexpected spec: " + spec + "\n(" + spec.getClass() + ")";
+            }
+        }
     }
     
     
