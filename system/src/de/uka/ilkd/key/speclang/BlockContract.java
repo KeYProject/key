@@ -107,6 +107,10 @@ public interface BlockContract extends SpecificationElement {
 
     public static class VariablesCreator extends TermBuilder.Serviced {
 
+        private static final String BREAK_FLAG_BASE_NAME = "broke";
+        private static final String CONTINUE_FLAG_BASE_NAME = "continued";
+        private static final String RETURN_FLAG_NAME = "returned";
+        private static final String FLAG_INFIX = "To";
         private static final String REMEMBRANCE_SUFFIX = "BeforeBlock";
 
         private final StatementBlock block;
@@ -149,9 +153,9 @@ public interface BlockContract extends SpecificationElement {
             final Set<Label> breakLabels = collectLabels(breaks);
             final Set<Label> continueLabels = collectLabels(continues);
 
-            breakFlags = createFlags(breakLabels, "broke");
-            continueFlags = createFlags(continueLabels, "continued");
-            returnFlag = returnOccurred ? createFlag("returned") : null;
+            breakFlags = createFlags(breakLabels, BREAK_FLAG_BASE_NAME);
+            continueFlags = createFlags(continueLabels, CONTINUE_FLAG_BASE_NAME);
+            returnFlag = returnOccurred ? createFlag(RETURN_FLAG_NAME) : null;
         }
 
         private Set<Label> collectLabels(final List<? extends LabelJumpStatement> jumps)
@@ -167,7 +171,7 @@ public interface BlockContract extends SpecificationElement {
         {
             final Map<Label, ProgramVariable> result = new LinkedHashMap<Label, ProgramVariable>();
             for (Label label : labels) {
-                final String suffix = label == null ? "" : "To" + label;
+                final String suffix = label == null ? "" : FLAG_INFIX + label;
                 result.put(label, createFlag(baseName + suffix));
             }
             return result;
