@@ -127,8 +127,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     private boolean isJumpToOuterLabel(final LabelJumpStatement x)
     {
         return loopAndSwitchCascadeDepth == 0 && x.getProgramElementName() == null
-                || x.getLabel() != null && labels.search(x.getLabel()) == -1
-                /*|| labels.contains(x.getProgramElementName())*/;
+                || x.getLabel() != null && labels.search(x.getLabel()) == -1;
     }
 
     public void performActionOnReturn(final Return x)
@@ -151,7 +150,6 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             changed();
         }
         else {
-            //frames.pop();
             doDefaultAction(x);
         }
     }
