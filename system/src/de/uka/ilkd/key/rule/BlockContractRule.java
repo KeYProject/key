@@ -159,13 +159,13 @@ public class BlockContractRule implements BuiltInRule {
         final ConditionsBuilder conditionsBuilder = new ConditionsBuilder(contract, heaps, variables, instantiation.self, services);
         final Term precondition = conditionsBuilder.buildPrecondition();
         final Term wellFormedHeapsCondition = conditionsBuilder.buildWellFormedHeapsCondition();
-        final Term reachableInCondition = conditionsBuilder.buildReachableCondition(localInVariables);
+        final Term reachableInCondition = conditionsBuilder.buildReachableInCondition(localInVariables);
         final Map<LocationVariable, Term> modifiesConditions = conditionsBuilder.buildModifiesConditions();
 
         final Term postcondition = conditionsBuilder.buildPostcondition();
         final Term frameCondition = conditionsBuilder.buildFrameCondition(modifiesConditions);
         final Term wellFormedAnonymisationHeapsCondition = conditionsBuilder.buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
-        final Term reachableOutCondition = conditionsBuilder.buildReachableCondition(localOutVariables);
+        final Term reachableOutCondition = conditionsBuilder.buildReachableOutCondition(localOutVariables);
         final Term atMostOneFlagSetCondition = conditionsBuilder.buildAtMostOneFlagSetCondition();
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
@@ -465,6 +465,20 @@ public class BlockContractRule implements BuiltInRule {
                 result = and(result, wellFormed(heap));
             }
             return result;
+        }
+
+        public Term buildReachableInCondition(final ImmutableSet<ProgramVariable> localInVariables)
+        {
+            return buildReachableCondition(localInVariables);
+        }
+
+        public Term buildReachableOutCondition(final ImmutableSet<ProgramVariable> localOutVariables)
+        {
+            return and(
+                buildReachableCondition(localOutVariables),
+                reachableValue(variables.result),
+                reachableValue(variables.exception)
+            );
         }
 
         public Term buildReachableCondition(final ImmutableSet<ProgramVariable> variables)
