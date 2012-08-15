@@ -147,7 +147,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         }
 
         //update block contracts
-        for (StatementBlock block : blocks) {
+        /*for (StatementBlock block : blocks) {
             ImmutableSet<BlockContract> contracts = services.getSpecificationRepository().getBlockContracts(block);
             for (BlockContract contract : contracts) {
                 final BlockContract.Variables variables = contract.getPlaceholderVariables();
@@ -172,7 +172,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 final BlockContract newBlockContract = contract.update(block, newPreconditions, newPostconditions, newModifiesConditions, newVariables);
                 services.getSpecificationRepository().addBlockContract(newBlockContract);
             }
-        }
+        }*/
 
         return TB.apply(atPreUpdate, target);
     }
