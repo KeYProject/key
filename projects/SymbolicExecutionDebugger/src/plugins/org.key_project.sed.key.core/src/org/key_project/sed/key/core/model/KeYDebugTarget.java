@@ -238,19 +238,21 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     */
    @Override
    public void terminate() throws DebugException {
-      // Remove auto mode listener
-      environment.getBuilder().getMediator().removeAutoModeListener(autoModeListener);
-      // Suspend first to stop the automatic mode
-      if (!isSuspended()) {
-         suspend();
-         environment.getUi().waitWhileAutoMode();
+      if (!isTerminated()) {
+         // Remove auto mode listener
+         environment.getBuilder().getMediator().removeAutoModeListener(autoModeListener);
+         // Suspend first to stop the automatic mode
+         if (!isSuspended()) {
+            suspend();
+            environment.getUi().waitWhileAutoMode();
+         }
+         // Remove proof from user interface
+         environment.getUi().removeProof(environment.getProof());
+         // Clear cache
+         environment.getBuilder().dispose();
+         environment = null;
+         executionToDebugMapping.clear();
       }
-      // Remove proof from user interface
-      environment.getUi().removeProof(environment.getProof());
-      // Clear cache
-      environment.getBuilder().dispose();
-      environment = null;
-      executionToDebugMapping.clear();
       // Inform UI that the process is terminated
       super.terminate();
    }

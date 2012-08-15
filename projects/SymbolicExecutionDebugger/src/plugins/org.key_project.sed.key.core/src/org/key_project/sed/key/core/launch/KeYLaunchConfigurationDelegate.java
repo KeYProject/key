@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
@@ -20,6 +23,7 @@ import org.key_project.key4eclipse.starter.core.util.KeYUtil.IRunnableWithDocume
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.core.util.LogUtil;
+import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
@@ -31,6 +35,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
@@ -60,18 +65,13 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                        ILaunch launch, 
                        IProgressMonitor monitor) throws CoreException {
        try {
-          // Get method and debug settings
-          final IMethod method = KeySEDUtil.findMethod(launch);
-          if (method == null) {
-              throw new CoreException(LogUtil.getLogger().createErrorStatus("Defined method does not exist. Please update the launch configuration \"" + configuration.getName() + "\"."));
-          }
-          final boolean useExistingContract = KeySEDUtil.isUseExistingContractValue(configuration);
-          final String existingContract = KeySEDUtil.getExistingContractValue(configuration);
-          if (useExistingContract && StringUtil.isTrimmedEmpty(existingContract)) {
-              throw new CoreException(LogUtil.getLogger().createErrorStatus("No existing contract defined. Please update the launch configuration \"" + configuration.getName() + "\"."));
-          }
-          final String precondition = KeySEDUtil.getPrecondition(configuration);
-          // Instantiate proof
+          // Instantiate proof settings
+          IMethod method = KeySEDUtil.findMethod(launch);
+          boolean useExistingContract = KeySEDUtil.isUseExistingContractValue(configuration);
+          String existingContract = KeySEDUtil.getExistingContractValue(configuration);
+          String precondition = KeySEDUtil.getPrecondition(configuration);
+          boolean newDebugSession = KeySEDUtil.isNewDebugSession(configuration);
+          String proofFileToLoad = KeySEDUtil.getFileToLoadValue(configuration);
           boolean showKeYMainWindow = KeySEDUtil.isShowKeYMainWindow(configuration);
           boolean mergeBranchConditions = KeySEDUtil.isMergeBranchConditions(configuration);
           boolean showMethodReturnValues = KeySEDUtil.isShowMethodReturnValuesInDebugNodes(configuration);
@@ -79,7 +79,33 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           boolean executeMethodRange = KeySEDUtil.isExecuteMethodRange(configuration);
           Position methodRangeStart = new KeYUtil.CursorPosition(KeySEDUtil.getMethodRangeStartLine(configuration), KeySEDUtil.getMethodRangeStartColumn(configuration));
           Position methodRangeEnd = new KeYUtil.CursorPosition(KeySEDUtil.getMethodRangeEndLine(configuration), KeySEDUtil.getMethodRangeEndColumn(configuration));
-          KeYLaunchSettings settings = new KeYLaunchSettings(method, useExistingContract, existingContract, precondition, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, executeMethodRange, methodRangeStart, methodRangeEnd); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
+          KeYLaunchSettings settings = new KeYLaunchSettings(newDebugSession, proofFileToLoad, method, useExistingContract, existingContract, precondition, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions, executeMethodRange, methodRangeStart, methodRangeEnd); // An unmodifiable backup of the ILaunchConfiguration because the ILaunchConfiguration may change during launch execution
+          // Validate proof settings
+          if (newDebugSession) {
+             if (method == null) {
+                throw new CoreException(LogUtil.getLogger().createErrorStatus("Defined method does not exist. Please update the launch configuration \"" + configuration.getName() + "\"."));
+             }
+             if (useExistingContract && StringUtil.isTrimmedEmpty(existingContract)) {
+                throw new CoreException(LogUtil.getLogger().createErrorStatus("No existing contract defined. Please update the launch configuration \"" + configuration.getName() + "\"."));
+             }
+          }
+          else {
+             if (StringUtil.isTrimmedEmpty(proofFileToLoad)) {
+                throw new CoreException(LogUtil.getLogger().createErrorStatus("No proof file to load defined. Please update the launch configuration \"" + configuration.getName() + "\"."));
+             }
+             else {
+                try {
+                   IFile locationFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(proofFileToLoad));
+                   if (locationFile == null || !locationFile.exists()) {
+                      throw new IllegalArgumentException("Proof file \"" + proofFileToLoad + "\" don't exist.");
+                   }
+                }
+                catch (Exception e) {
+                   throw new CoreException(LogUtil.getLogger().createErrorStatus("Proof file to load don't exist.. Please update the launch configuration \"" + configuration.getName() + "\".", e));
+                }
+             }
+          }
+          // Instantiate proof
           SymbolicExecutionEnvironment<?> environment = instantiateProof(configuration, settings);
           if (environment == null) {
               throw new CoreException(LogUtil.getLogger().createErrorStatus("Symbolic execution environment was not instantiated."));
@@ -105,27 +131,42 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
      */
     protected SymbolicExecutionEnvironment<?> instantiateProof(ILaunchConfiguration configuration,
                                                                KeYLaunchSettings settings) throws Exception {
-        // make sure that the method has a resource
-        Assert.isNotNull(settings.getMethod().getResource(), "Method \"" + settings.getMethod() + "\" is not part of a workspace resource.");
-        // Make sure that the location is contained in a Java project
-        IProject project = settings.getMethod().getResource().getProject();
-        Assert.isTrue(JDTUtil.isJavaProject(project), " The project \"" + project + "\" is no Java project.");
-        // Get source paths from class path
-        List<File> sourcePaths = JDTUtil.getSourceLocations(project);
-        Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
-        // Get KeY project settings
-        File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
-        List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
-        // Get local file for the eclipse resource
-        File location = sourcePaths.get(0);
-        Assert.isNotNull(location, "The resource \"" + settings.getMethod().getResource() + "\" is not local.");
-        // Instantiate proof in KeY's main window.
-        if (settings.isShowKeYMainWindow()) {
-           return instantiateProofInUserInterface(configuration.getName(), settings, location, bootClassPath, classPaths);
-        }
-        else {
-           return instantiateProofWithoutUserInterface(configuration.getName(), settings, location, bootClassPath, classPaths);
-        }
+       File location = null;
+       List<File> classPaths = null;
+       File bootClassPath = null;
+       if (settings.isNewDebugSession()) {
+          // make sure that the method has a resource
+          Assert.isNotNull(settings.getMethod().getResource(), "Method \"" + settings.getMethod() + "\" is not part of a workspace resource.");
+          // Make sure that the location is contained in a Java project
+          IProject project = settings.getMethod().getResource().getProject();
+          Assert.isTrue(JDTUtil.isJavaProject(project), " The project \"" + project + "\" is no Java project.");
+          // Get source paths from class path
+          List<File> sourcePaths = JDTUtil.getSourceLocations(project);
+          Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
+          // Get KeY project settings
+          bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
+          classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
+          // Get local file for the eclipse resource
+          location = sourcePaths.get(0);
+          Assert.isNotNull(location, "The resource \"" + settings.getMethod().getResource() + "\" is not local.");
+       }
+       else {
+          // Make sure that proof file exists
+          Assert.isNotNull(settings.getProofFileToContinue());
+          IFile locationFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(settings.getProofFileToContinue()));
+          Assert.isNotNull(locationFile);
+          Assert.isTrue(locationFile.exists());
+          location = ResourceUtil.getLocation(locationFile);
+          Assert.isNotNull(location);
+          Assert.isTrue(location.exists());
+       }
+       // Instantiate proof in KeY's main window.
+       if (settings.isShowKeYMainWindow()) {
+          return instantiateProofInUserInterface(configuration.getName(), settings, location, bootClassPath, classPaths);
+       }
+       else {
+          return instantiateProofWithoutUserInterface(configuration.getName(), settings, location, bootClassPath, classPaths);
+       }
     }
     
     protected SymbolicExecutionEnvironment<?> instantiateProofWithoutUserInterface(String launchConfigurationName,
@@ -134,16 +175,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                                                                    File bootClassPath, 
                                                                                    List<File> classPaths) throws Exception {
        UserInterface ui = new CustomConsoleUserInterface(false);
-       // Load location
-       InitConfig initConfig = ui.load(location, classPaths, bootClassPath);
-       // Create proof input
-       ProofOblInput input = createProofInput(launchConfigurationName, initConfig, settings);
-       // Create proof
-       Proof proof = ui.createProof(initConfig, input);
-       // Create symbolic execution tree builder
-       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions());
-       // Create environment used for symbolic execution
-       return new SymbolicExecutionEnvironment<UserInterface>(ui, initConfig, builder);
+       return instantiateProof(ui, launchConfigurationName, settings, location, bootClassPath, classPaths);
     }
     
     protected SymbolicExecutionEnvironment<?> instantiateProofInUserInterface(final String launchConfigurationName,
@@ -162,16 +194,8 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                    Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
                    MainWindow main = MainWindow.getInstance();
                    Assert.isNotNull(main, "KeY main window is not available.");
-                   // Load location
-                   InitConfig initConfig = KeYUtil.internalLoad(location, classPaths, bootClassPath, true);
-                   // Create proof input
-                   ProofOblInput input = createProofInput(launchConfigurationName, initConfig, settings);
-                   // Create proof
-                   Proof proof = MainWindow.getInstance().getUserInterface().createProof(initConfig, input);
-                   // Create symbolic execution tree builder
-                   SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(main.getMediator(), proof, settings.isMergeBranchConditions());
-                   // Create environment used for symbolic execution
-                   setResult(new SymbolicExecutionEnvironment<UserInterface>(main.getUserInterface(), initConfig, builder));
+                   // Load proof in user interface
+                   setResult(instantiateProof(main.getUserInterface(), launchConfigurationName, settings, location, bootClassPath, classPaths));
                }
                catch (Exception e) {
                    setException(e);
@@ -183,6 +207,30 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
            throw run.getException();
        }
        return run.getResult();
+    }
+    
+    protected SymbolicExecutionEnvironment<?> instantiateProof(UserInterface ui, 
+                                                               String launchConfigurationName, 
+                                                               KeYLaunchSettings settings, 
+                                                               File location, 
+                                                               File bootClassPath, 
+                                                               List<File> classPaths) throws Exception {
+       // Load location
+       DefaultProblemLoader loader = ui.load(location, classPaths, bootClassPath); 
+       InitConfig initConfig = loader.getInitConfig();
+       // Try to reuse already instantiated proof
+       Proof proof = loader.getProof();
+       if (proof == null) {
+       // Create proof input
+       ProofOblInput input = createProofInput(launchConfigurationName, initConfig, settings);
+       // Create proof
+       proof = ui.createProof(initConfig, input);
+       }
+       // Create symbolic execution tree builder
+       SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, settings.isMergeBranchConditions());
+       builder.analyse();
+       // Create environment used for symbolic execution
+       return new SymbolicExecutionEnvironment<UserInterface>(ui, initConfig, builder);
     }
     
     /**

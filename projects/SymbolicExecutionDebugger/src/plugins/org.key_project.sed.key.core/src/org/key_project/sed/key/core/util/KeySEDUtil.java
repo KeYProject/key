@@ -3,6 +3,7 @@ package org.key_project.sed.key.core.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
@@ -48,7 +49,17 @@ public final class KeySEDUtil {
      * The ID of the launch configuration type.
      */
     public static final String LAUNCH_CONFIGURATION_TYPE_ID = "org.key_project.sed.key.core.launch.sed.key";
-    
+
+    /**
+     * The key of the attribute "new debug session" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_NEW_DEBUG_SESSION = "org.key_project.sed.key.core.launch.sed.key.attribute.newDebugSession";;
+
+    /**
+     * The key of the attribute "file" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_FILE_TO_LOAD = "org.key_project.sed.key.core.launch.sed.key.attribute.fileToLoad";
+
     /**
      * The key of the attribute "project" in an {@link ILaunchConfiguration} of type {@value KeySEDUtil#LAUNCH_CONFIGURATION_TYPE_ID}.
      */
@@ -180,6 +191,16 @@ public final class KeySEDUtil {
             return null;
         }
     }
+
+    /**
+     * Returns the file to load attribute value from the given {@link ILaunchConfiguration}.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return The file to load attribute value.
+     * @throws CoreException Occurred Exception.
+     */
+    public static String getFileToLoadValue(ILaunchConfiguration configuration) throws CoreException {
+       return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_FILE_TO_LOAD, StringUtil.EMPTY_STRING) : StringUtil.EMPTY_STRING;
+    }
     
     /**
      * Returns the project attribute value from the given {@link ILaunchConfiguration}.
@@ -279,6 +300,16 @@ public final class KeySEDUtil {
      */
     public static boolean isMergeBranchConditions(ILaunchConfiguration configuration) throws CoreException {
         return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, KeYSEDPreferences.isMergeBranchConditions()) : KeYSEDPreferences.isMergeBranchConditions();
+    }
+
+    /**
+     * Checks if a new debug session should be started.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} start new debug session, {@code false} continue existing *.proof file.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isNewDebugSession(ILaunchConfiguration configuration) throws CoreException {
+       return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_NEW_DEBUG_SESSION, true) : true;
     }
     
     /**
@@ -395,6 +426,26 @@ public final class KeySEDUtil {
     
     /**
      * Creates a new {@link ILaunchConfiguration}.
+     * @param file The {@link IFile} to launch.
+     * @return The new created {@link ILaunchConfiguration}.
+     * @throws CoreException Occurred Exception.
+     */
+    public static ILaunchConfiguration createConfiguration(IFile file) throws CoreException {
+        ILaunchConfiguration config = null;
+        ILaunchConfigurationWorkingCopy wc = null;
+        ILaunchConfigurationType configType = getConfigurationType();
+        String path = file.getFullPath().toString();
+        String name = file.getName();
+        wc = configType.newInstance(null, LaunchUtil.getLaunchManager().generateLaunchConfigurationName(name));
+        wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_NEW_DEBUG_SESSION, false);
+        wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_FILE_TO_LOAD, path);
+        wc.setMappedResources(new IResource[] {file});
+        config = wc.doSave();
+        return config;
+    }
+    
+    /**
+     * Creates a new {@link ILaunchConfiguration}.
      * @param method The {@link IMethod} to launch.
      * @param methodStartPosition An optional start position to execute only parts of the method.
      * @param methodEndPosition An optional end position to execute only parts of the method.
@@ -414,6 +465,7 @@ public final class KeySEDUtil {
            name += " from " + methodStartPosition.getLine() + ", " + methodStartPosition.getColumn() + " to " + methodEndPosition.getLine() + ", " + methodEndPosition.getColumn(); // : is not alowed as name
         }
         wc = configType.newInstance(null, LaunchUtil.getLaunchManager().generateLaunchConfigurationName(name));
+        wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_NEW_DEBUG_SESSION, true);
         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PROJECT, KeySEDUtil.getProjectValue(method));
         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TYPE, typeLabel);
         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD, methodLabel);
@@ -440,6 +492,31 @@ public final class KeySEDUtil {
      * @return The found {@link ILaunchConfiguration}s.
      * @throws CoreException Occurred Exception.
      */
+    public static List<ILaunchConfiguration> searchLaunchConfigurations(IFile file) throws CoreException {
+        // Get parameters
+        String path = file != null ? file.getFullPath().toString() : null;
+        // Compare existing configurations to with the parameters.
+        ILaunchConfiguration[] configs = DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations(getConfigurationType());
+        List<ILaunchConfiguration> result = new ArrayList<ILaunchConfiguration>(configs.length);
+        for (ILaunchConfiguration config : configs) {
+            // Check method
+            if (!isNewDebugSession(config) &&
+                ObjectUtil.equals(path, getFileToLoadValue(config))) {
+               result.add(config);
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Searches all {@link ILaunchConfiguration} that handles
+     * the given {@link IMethod}.
+     * @param method The {@link IMethod} for that {@link ILaunchConfiguration}s are required.
+     * @param methodStartPosition An optional start position to execute only parts of the method.
+     * @param methodEndPosition An optional end position to execute only parts of the method.
+     * @return The found {@link ILaunchConfiguration}s.
+     * @throws CoreException Occurred Exception.
+     */
     public static List<ILaunchConfiguration> searchLaunchConfigurations(IMethod method,
                                                                         Position methodStartPosition,
                                                                         Position methodEndPosition) throws CoreException {
@@ -452,7 +529,8 @@ public final class KeySEDUtil {
         List<ILaunchConfiguration> result = new ArrayList<ILaunchConfiguration>(configs.length);
         for (ILaunchConfiguration config : configs) {
             // Check method
-            if (ObjectUtil.equals(projectLabel, getProjectValue(config)) &&
+            if (isNewDebugSession(config) &&
+                ObjectUtil.equals(projectLabel, getProjectValue(config)) &&
                 ObjectUtil.equals(typeLabel, getTypeValue(config)) &&
                 ObjectUtil.equals(methodLabel, getMethodValue(config))) {
                 // Check method body or method part definition

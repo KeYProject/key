@@ -306,8 +306,7 @@ public class KeyConnection extends MemoryConnection {
                try {
                   KeYMediator mediator = main.getMediator();
                   mediator.addGUIListener(mainGuiListener);
-                  DefaultProblemLoader loader = new DefaultProblemLoader(location, classPathEntries, bootClassPath, mediator);
-                  loader.load();
+                  DefaultProblemLoader loader = main.getUserInterface().load(location, classPathEntries, bootClassPath);
                   init = loader.getProblemInitializer();
                   initConfig = loader.getInitConfig();
                   // Analyze classes, interfaces, enums and packages

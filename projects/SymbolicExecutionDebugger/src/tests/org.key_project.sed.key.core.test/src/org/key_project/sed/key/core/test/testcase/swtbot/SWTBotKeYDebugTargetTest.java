@@ -36,6 +36,25 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
+   public void testMagic42() throws Exception {
+      assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMagic42",
+                     "data/magic42/test",
+                     false,
+                     createMethodSelector("Magic42", "compute", "I"),
+                     "data/magic42/oracle/Magic42.xml",
+                     true,
+                     14,
+                     true,
+                     false,
+                     false,
+                     false,
+                     false);
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
    public void testElseIf_mergeBranchConditions() throws Exception {
       assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testElseIf_mergeBranchConditions",
                                    "data/elseIfTest/test",

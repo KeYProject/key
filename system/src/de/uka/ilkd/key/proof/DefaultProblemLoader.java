@@ -109,12 +109,20 @@ public class DefaultProblemLoader {
       initConfig = createInitConfig();
       // Read proof obligation settings
       LoadedPOContainer poContainer = createProofObligationContainer();
-      if (poContainer == null) {
-         return selectProofObligation();
+      try {
+         if (poContainer == null) {
+            return selectProofObligation();
+         }
+         // Create proof and apply rules again if possible
+         proof = createProof(poContainer);
+         return ""; // Everything fine
       }
-      // Create proof and apply rules again if possible
-      proof = createProof(poContainer);
-      return ""; // Everything fine
+      finally {
+         getMediator().resetNrGoalsClosedByHeuristics();
+         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
+            ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
+         }  
+      }
    }
 
    /**
