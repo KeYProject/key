@@ -128,7 +128,7 @@ public class BlockContractRule implements BuiltInRule {
         final Term atMostOneFlagSetCondition = conditionsBuilder.buildAtMostOneFlagSetCondition();
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
-        final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate();
+        final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate = updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps, /*anonymisationLocalVariables, */modifiesConditions);
 
         final ImmutableList<Goal> result = goal.split(3);
@@ -374,17 +374,17 @@ public class BlockContractRule implements BuiltInRule {
 
         private final BlockContract.Variables variables;
 
-        public UpdatesBuilder(BlockContract.Variables variables, final Services services)
+        public UpdatesBuilder(final BlockContract.Variables variables, final Services services)
         {
             super(services);
             this.variables = variables;
         }
 
-        public Term buildRemembranceUpdate()
+        public Term buildRemembranceUpdate(final List<LocationVariable> heaps)
         {
             Term result = skip();
-            for (Map.Entry<LocationVariable, LocationVariable> remembranceHeap : variables.remembranceHeaps.entrySet()) {
-                final Term update = elementary(remembranceHeap.getValue(), var(remembranceHeap.getKey()));
+            for (LocationVariable heap : heaps) {
+                final Term update = elementary(variables.remembranceHeaps.get(heap), var(heap));
                 result = parallel(result, update);
             }
             for (Map.Entry<LocationVariable, LocationVariable> remembranceVariable : variables.remembranceLocalVariables.entrySet()) {
@@ -412,7 +412,7 @@ public class BlockContractRule implements BuiltInRule {
         private Term buildLocalVariablesAnonymisationUpdate(/*final Map<LocationVariable, Function> anonymisationLocalVariables,*/)
         {
             Term result = skip();
-            Collection<LocationVariable> localOutVariables = variables.remembranceLocalVariables.keySet();
+            final Collection<LocationVariable> localOutVariables = variables.remembranceLocalVariables.keySet();
             for (LocationVariable variable : localOutVariables) {
                 final String anonymisationName = newName(variable.name() + ANONYMISATION_SUFFIX);
                 final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort());

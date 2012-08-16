@@ -1080,31 +1080,36 @@ public final class SpecificationRepository {
         }
     }
 
-
-    // TODO Clean up.
-    public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block, Modality modality) {
+    public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block, final Modality modality)
+    {
         ImmutableSet<BlockContract> result = getBlockContracts(block);
-        final boolean transactionModality = modality.transaction();
-        final Modality matchModality = transactionModality
-                ? ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA : Modality.BOX)
-                : modality;
+        final Modality matchModality = getMatchModality(modality);
         for (BlockContract contract : result) {
-            // TODO Handle transactions properly.
             if (!contract.getModality().equals(matchModality)
-                    /*|| (transactionModality && !contract.transactionApplicableContract() && !contract.isReadOnlyContract(services))*/) {
+                    || (modality.transaction() && !contract.isTransactionApplicable() && !contract.isReadOnly(services))) {
                 result = result.remove(contract);
             }
         }
         return result;
     }
-    
-    
-    public void addBlockContract(BlockContract contract) {
-        StatementBlock block = contract.getBlock();
+
+    private Modality getMatchModality(final Modality modality)
+    {
+        if (modality.transaction()) {
+            return modality == Modality.DIA_TRANSACTION ? Modality.DIA : Modality.BOX;
+        }
+        else {
+            return modality;
+        }
+    }
+
+    public void addBlockContract(final BlockContract contract)
+    {
+        final StatementBlock block = contract.getBlock();
         blockContracts.put(block, getBlockContracts(block).add(contract));
     }
-    
-    
+
+
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {
         for (SpecificationElement spec : specs) {
             if (spec instanceof Contract) {

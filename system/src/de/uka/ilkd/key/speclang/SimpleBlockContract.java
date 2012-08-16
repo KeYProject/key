@@ -37,7 +37,7 @@ public final class SimpleBlockContract implements BlockContract {
 
     private final Variables variables;
 
-    private final boolean transaction;
+    private final boolean transactionApplicable;
 
     public SimpleBlockContract(final StatementBlock block,
                                final IProgramMethod method,
@@ -46,7 +46,7 @@ public final class SimpleBlockContract implements BlockContract {
                                final Map<LocationVariable, Term> postconditions,
                                final Map<LocationVariable, Term> modifiesConditions,
                                final Variables variables,
-                               final boolean transaction)
+                               final boolean transactionApplicable)
     {
         assert block != null;
         assert method != null;
@@ -66,7 +66,7 @@ public final class SimpleBlockContract implements BlockContract {
         this.postconditions = postconditions;
         this.modifiesConditions = modifiesConditions;
         this.variables = variables;
-        this.transaction = transaction;
+        this.transactionApplicable = transactionApplicable;
     }
 
     @Override
@@ -100,9 +100,16 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
     @Override
-    public boolean getTransaction()
+    public boolean isTransactionApplicable()
     {
-        return transaction;
+        return transactionApplicable;
+    }
+
+    @Override
+    public boolean isReadOnly(final Services services)
+    {
+        return modifiesConditions.get(services.getTypeConverter().getHeapLDT().getHeap()).op()
+                == services.getTypeConverter().getLocSetLDT().getEmpty();
     }
 
     @Override
@@ -285,7 +292,7 @@ public final class SimpleBlockContract implements BlockContract {
                 + mods
                 + "<br><b>termination</b> "
                 + getModality()
-                /*+ (transactionApplicableContract() ? "<br><b>transaction applicable</b>" : "")*/
+                /*+ (transactionApplicableContract() ? "<br><b>transactionApplicable applicable</b>" : "")*/
                 + "</html>";
     }
 
@@ -303,7 +310,7 @@ public final class SimpleBlockContract implements BlockContract {
                                 final Map<LocationVariable,Term> newModifiesConditions,
                                 final Variables newVariables)
     {
-        return new SimpleBlockContract(newBlock, method, modality, newPreconditions, newPostconditions, newModifiesConditions, newVariables, transaction);
+        return new SimpleBlockContract(newBlock, method, modality, newPreconditions, newPostconditions, newModifiesConditions, newVariables, transactionApplicable);
     }
 
     // TODO Implement equals and hashCode properly.
@@ -776,7 +783,7 @@ public final class SimpleBlockContract implements BlockContract {
             for (BlockContract contract : contracts) {
                 addConditionsFrom(contract);
             }
-            return new SimpleBlockContract(head.getBlock(), head.getMethod(), head.getModality(), preconditions, postconditions, modifiesConditions, placeholderVariables, head.getTransaction());
+            return new SimpleBlockContract(head.getBlock(), head.getMethod(), head.getModality(), preconditions, postconditions, modifiesConditions, placeholderVariables, head.isTransactionApplicable());
         }
 
         private void addConditionsFrom(final BlockContract contract)

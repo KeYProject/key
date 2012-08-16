@@ -27,7 +27,8 @@ public interface BlockContract extends SpecificationElement {
     public IProgramMethod getMethod();
     public Modality getModality();
     public Variables getPlaceholderVariables();
-    public boolean getTransaction();
+    public boolean isTransactionApplicable();
+    public boolean isReadOnly(Services services);
 
     // TODO Why do we need remembranceHeaps for the precondition? Do we also need remembranceLocalVariables?
     public Term getPrecondition(LocationVariable heap,
