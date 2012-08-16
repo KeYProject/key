@@ -1013,8 +1013,8 @@ public class JMLSpecFactory {
         final ProgramVariableCollection programVariables = createProgramVariables(method, block, variables);
         final ContractClauses clauses = translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new SimpleBlockContract.Creator(
-            block, method, behavior, variables, clauses.requires, clauses.ensures, clauses.breaks, clauses.continues, clauses.returns,
-            clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables, clauses.strictlyPure, services
+            block, method, behavior, variables, clauses.requires, clauses.ensures, clauses.breaks, clauses.continues,
+            clauses.returns, clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables, services
         ).create();
     }
 

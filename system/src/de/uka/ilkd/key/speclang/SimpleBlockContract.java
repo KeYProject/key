@@ -310,7 +310,8 @@ public final class SimpleBlockContract implements BlockContract {
                                 final Map<LocationVariable,Term> newModifiesConditions,
                                 final Variables newVariables)
     {
-        return new SimpleBlockContract(newBlock, method, modality, newPreconditions, newPostconditions, newModifiesConditions, newVariables, transactionApplicable);
+        return new SimpleBlockContract(newBlock, method, modality, newPreconditions, newPostconditions,
+                                       newModifiesConditions, newVariables, transactionApplicable);
     }
 
     // TODO Implement equals and hashCode properly.
@@ -470,7 +471,6 @@ public final class SimpleBlockContract implements BlockContract {
         private final Term signalsOnly;
         private final Term diverges;
         private final Map<LocationVariable, Term> assignables;
-        private final boolean strictlyPure;
         private final ImmutableArray<LocationVariable> heaps;
 
         public Creator(final StatementBlock block,
@@ -486,7 +486,6 @@ public final class SimpleBlockContract implements BlockContract {
                        final Term signalsOnly,
                        final Term diverges,
                        final Map<LocationVariable, Term> assignables,
-                       final boolean strictlyPure,
                        final Services services)
         {
             super(services);
@@ -503,7 +502,6 @@ public final class SimpleBlockContract implements BlockContract {
             this.signalsOnly = signalsOnly;
             this.diverges = diverges;
             this.assignables = assignables;
-            this.strictlyPure = strictlyPure;
             this.heaps = services.getTypeConverter().getHeapLDT().getAllHeaps();
         }
 
@@ -698,19 +696,19 @@ public final class SimpleBlockContract implements BlockContract {
                                                    final Map<LocationVariable, Term> modifiesConditions)
         {
             ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
-            final boolean transaction = modifiesConditions.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null;
+            final boolean transactionApplicable = modifiesConditions.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null;
             result = result.add(
                 new SimpleBlockContract(
                     block, method, diverges.equals(ff()) ? Modality.DIA : Modality.BOX,
                     preconditions, postconditions, modifiesConditions,
-                    variables, transaction
+                    variables, transactionApplicable
                 )
             );
             if (ifDivergesConditionCannotBeExpressedByAModality()) {
                 result = result.add(
                     new SimpleBlockContract(
                         block, method, Modality.DIA, addNegatedDivergesConditionToPreconditions(preconditions),
-                        postconditions, modifiesConditions, variables, transaction
+                        postconditions, modifiesConditions, variables, transactionApplicable
                     )
                 );
             }
@@ -783,7 +781,8 @@ public final class SimpleBlockContract implements BlockContract {
             for (BlockContract contract : contracts) {
                 addConditionsFrom(contract);
             }
-            return new SimpleBlockContract(head.getBlock(), head.getMethod(), head.getModality(), preconditions, postconditions, modifiesConditions, placeholderVariables, head.isTransactionApplicable());
+            return new SimpleBlockContract(head.getBlock(), head.getMethod(), head.getModality(), preconditions,
+                    postconditions, modifiesConditions, placeholderVariables, head.isTransactionApplicable());
         }
 
         private void addConditionsFrom(final BlockContract contract)
