@@ -23,7 +23,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 public interface BlockContract extends SpecificationElement {
 
-	public StatementBlock getBlock();
+    public StatementBlock getBlock();
     public IProgramMethod getMethod();
     public Modality getModality();
     public Variables getPlaceholderVariables();
@@ -46,9 +46,9 @@ public interface BlockContract extends SpecificationElement {
     public Term getPostcondition(LocationVariable heapVariable, Term heap, Terms terms, Services services);
     public Term getPostcondition(LocationVariable heap, Services services);
 
-    public Term getModifiesCondition(LocationVariable heap, ProgramVariable self, Services services);
-    public Term getModifiesCondition(LocationVariable heapVariable, Term heap, Term self, Services services);
-    public Term getModifiesCondition(LocationVariable heap, Services services);
+    public Term getModifiesClause(LocationVariable heap, ProgramVariable self, Services services);
+    public Term getModifiesClause(LocationVariable heapVariable, Term heap, Term self, Services services);
+    public Term getModifiesClause(LocationVariable heap, Services services);
 
     public void visit(Visitor visitor);
 
@@ -58,7 +58,7 @@ public interface BlockContract extends SpecificationElement {
     public BlockContract update(StatementBlock newBlock,
                                 Map<LocationVariable,Term> newPreconditions,
                                 Map<LocationVariable,Term> newPostconditions,
-                                Map<LocationVariable,Term> newModifiesConditions,
+                                Map<LocationVariable,Term> newModifiesClauses,
                                 Variables newVariables);
 
     public static class Variables {

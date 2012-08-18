@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -22,49 +22,49 @@ import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
-/** 
- * Walks through a java AST in depth-left-fist-order. 
+/**
+ * Walks through a java AST in depth-left-fist-order.
  * This walker is used collect all LocationVariables and optional function locations.
  */
 public class ProgramVariableCollector extends JavaASTVisitor {
 
-    private final HashSet<LocationVariable> result 
-    	= new HashSet<LocationVariable>();
+    private final HashSet<LocationVariable> result
+        = new HashSet<LocationVariable>();
 
     /**
      * collects all program variables occuring in the AST <tt>root</tt>
-     * using this constructor is equivalent to <tt>ProggramVariableCollector(root, false)</tt> 
+     * using this constructor is equivalent to <tt>ProggramVariableCollector(root, false)</tt>
      * @param root the ProgramElement which is the root of the AST
      * @param services the Services object
      */
-    public ProgramVariableCollector(ProgramElement root, 
+    public ProgramVariableCollector(ProgramElement root,
                                     Services services) {
-	super(root, services);
+    super(root, services);
         assert services != null;
         collectHeapVariables();
     }
-    
+
     protected void collectHeapVariables() {
        HeapLDT ldt = services.getTypeConverter().getHeapLDT();
        for(LocationVariable heap: ldt.getAllHeaps()) {
           result.add(heap);
        }
     }
-    
-    
+
+
     @Override
-    public void start() {	
-	walk(root());	
+    public void start() {
+    walk(root());
     }
 
-    
-    public HashSet<LocationVariable> result() { 
-	return result;
-    }    
+
+    public HashSet<LocationVariable> result() {
+    return result;
+    }
 
     @Override
     public String toString() {
-	return result.toString();
+    return result.toString();
     }
 
     @Override
@@ -76,14 +76,14 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     public void performActionOnLocationVariable(LocationVariable x) {
         result.add(x);
     }
-    
-    
+
+
     @Override
     public void performActionOnLoopInvariant(LoopInvariant x) {
-        TermProgramVariableCollector tpvc = 
+        TermProgramVariableCollector tpvc =
             new TermProgramVariableCollector(services);
         Term selfTerm = x.getInternalSelfTerm();
-        
+
         Map<LocationVariable,Term> atPres = x.getInternalAtPres();
 
         //invariants
@@ -110,8 +110,8 @@ public class ProgramVariableCollector extends JavaASTVisitor {
 
         result.addAll(tpvc.result());
     }
-    
-    
+
+
     @Override
     public void performActionOnBlockContract(BlockContract x) {
         TermProgramVariableCollector collector = new TermProgramVariableCollector(services);
@@ -128,9 +128,9 @@ public class ProgramVariableCollector extends JavaASTVisitor {
             }
         }
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            Term modifiesCondition = x.getModifiesCondition(heap, services);
-            if (modifiesCondition != null) {
-                modifiesCondition.execPostOrder(collector);
+            Term modifiesClause = x.getModifiesClause(heap, services);
+            if (modifiesClause != null) {
+                modifiesClause.execPostOrder(collector);
             }
         }
         result.addAll(collector.result());

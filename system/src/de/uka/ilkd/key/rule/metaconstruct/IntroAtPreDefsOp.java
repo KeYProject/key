@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -36,31 +36,31 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 public final class IntroAtPreDefsOp extends AbstractTermTransformer {
-          
+
     public IntroAtPreDefsOp() {
         super(new Name("#introAtPreDefs"), 1);
     }
 
-    
+
     @Override
-    public Term transform(Term term, 
-	    		  SVInstantiations svInst, 
-	    		  Services services) {
+    public Term transform(Term term,
+                  SVInstantiations svInst,
+                  Services services) {
         final Term target = term.sub(0);
         final boolean transaction =
               (target.op() != null &&
                   (target.op() == Modality.DIA_TRANSACTION || target.op() == Modality.BOX_TRANSACTION));
-       
-        //the target term should have a Java block 
+
+        //the target term should have a Java block
         final ProgramElement pe = target.javaBlock().program();
         assert pe != null;
-                
+
         //collect all loops in the innermost method frame
         final Triple<MethodFrame,ImmutableSet<LoopStatement>,ImmutableSet<StatementBlock>> frameAndLoopsAndBlocks
-        	= new JavaASTVisitor(pe, services) {
+            = new JavaASTVisitor(pe, services) {
             private MethodFrame frame = null;
-            private ImmutableSet<LoopStatement> loops 
-            	= DefaultImmutableSet.<LoopStatement>nil();
+            private ImmutableSet<LoopStatement> loops
+                = DefaultImmutableSet.<LoopStatement>nil();
             private ImmutableSet<StatementBlock> blocks
                 = DefaultImmutableSet.nil();
             protected void doDefaultAction(SourceElement node) {
@@ -82,18 +82,18 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         final MethodFrame frame = frameAndLoopsAndBlocks.first;
         final ImmutableSet<LoopStatement> loops = frameAndLoopsAndBlocks.second;
         final ImmutableSet<StatementBlock> blocks = frameAndLoopsAndBlocks.third;
-        
+
         //determine "self"
         Term selfTerm;
-        final ExecutionContext ec 
-        	= (ExecutionContext) frame.getExecutionContext();
+        final ExecutionContext ec
+            = (ExecutionContext) frame.getExecutionContext();
         final ReferencePrefix rp = ec.getRuntimeInstance();
         if(rp == null || rp instanceof TypeReference) {
             selfTerm = null;
         } else {
             selfTerm = services.getTypeConverter().convertToLogicElement(rp);
         }
-        
+
         //create atPre heap
         final String methodName = frame.getProgramMethod().getName();
 
@@ -116,7 +116,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         //update loop invariants
         for(LoopStatement loop : loops) {
-            LoopInvariant inv 
+            LoopInvariant inv
                 = services.getSpecificationRepository().getLoopInvariant(loop);
             if(inv != null) {
                 if(selfTerm != null && inv.getInternalSelfTerm() == null) {
@@ -135,14 +135,14 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                   newMods.put(heap, m);
                   newInvariants.put(heap, i);
                 }
-                final LoopInvariant newInv 
-             	       = new LoopInvariantImpl(loop, 
+                final LoopInvariant newInv
+                       = new LoopInvariantImpl(loop,
                                             newInvariants,
-                                            newMods, 
-                                            newVariant, 
+                                            newMods,
+                                            newVariant,
                                             selfTerm,
                                             atPres);
-                services.getSpecificationRepository().setLoopInvariant(newInv);                
+                services.getSpecificationRepository().setLoopInvariant(newInv);
             }
         }
 
@@ -163,13 +163,13 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 );
                 final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<LocationVariable, Term>();
                 final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<LocationVariable, Term>();
-                final Map<LocationVariable, Term> newModifiesConditions = new LinkedHashMap<LocationVariable, Term>();
+                final Map<LocationVariable, Term> newModifiesClauses = new LinkedHashMap<LocationVariable, Term>();
                 for (LocationVariable heap : HeapContext.getModHeaps(services, transaction)) {
                     newPreconditions.put(heap, contract.getPrecondition(heap, newVariables.self, atPreVars, services));
                     newPostconditions.put(heap, contract.getPostcondition(heap, newVariables, services));
-                    newModifiesConditions.put(heap, contract.getModifiesCondition(heap, newVariables.self, services));
+                    newModifiesClauses.put(heap, contract.getModifiesClause(heap, newVariables.self, services));
                 }
-                final BlockContract newBlockContract = contract.update(block, newPreconditions, newPostconditions, newModifiesConditions, newVariables);
+                final BlockContract newBlockContract = contract.update(block, newPreconditions, newPostconditions, newModifiesClauses, newVariables);
                 services.getSpecificationRepository().addBlockContract(newBlockContract);
             }
         }*/

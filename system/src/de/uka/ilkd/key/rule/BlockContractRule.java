@@ -115,21 +115,21 @@ public class BlockContractRule implements BuiltInRule {
             goal, contract.getPlaceholderVariables(), services
         ).createAndRegister();
 
-        final ConditionsBuilder conditionsBuilder = new ConditionsBuilder(contract, heaps, variables, instantiation.self, services);
-        final Term precondition = conditionsBuilder.buildPrecondition();
-        final Term wellFormedHeapsCondition = conditionsBuilder.buildWellFormedHeapsCondition();
-        final Term reachableInCondition = conditionsBuilder.buildReachableInCondition(localInVariables);
-        final Map<LocationVariable, Term> modifiesConditions = conditionsBuilder.buildModifiesConditions();
+        final ConditionsAndClausesBuilder conditionsAndClausesBuilder = new ConditionsAndClausesBuilder(contract, heaps, variables, instantiation.self, services);
+        final Term precondition = conditionsAndClausesBuilder.buildPrecondition();
+        final Term wellFormedHeapsCondition = conditionsAndClausesBuilder.buildWellFormedHeapsCondition();
+        final Term reachableInCondition = conditionsAndClausesBuilder.buildReachableInCondition(localInVariables);
+        final Map<LocationVariable, Term> modifiesClauses = conditionsAndClausesBuilder.buildModifiesClauses();
 
-        final Term postcondition = conditionsBuilder.buildPostcondition();
-        final Term frameCondition = conditionsBuilder.buildFrameCondition(modifiesConditions);
-        final Term wellFormedAnonymisationHeapsCondition = conditionsBuilder.buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
-        final Term reachableOutCondition = conditionsBuilder.buildReachableOutCondition(localOutVariables);
-        final Term atMostOneFlagSetCondition = conditionsBuilder.buildAtMostOneFlagSetCondition();
+        final Term postcondition = conditionsAndClausesBuilder.buildPostcondition();
+        final Term frameCondition = conditionsAndClausesBuilder.buildFrameCondition(modifiesClauses);
+        final Term wellFormedAnonymisationHeapsCondition = conditionsAndClausesBuilder.buildWellFormedAnonymisationHeapsCondition(anonymisationHeaps);
+        final Term reachableOutCondition = conditionsAndClausesBuilder.buildReachableOutCondition(localOutVariables);
+        final Term atMostOneFlagSetCondition = conditionsAndClausesBuilder.buildAtMostOneFlagSetCondition();
 
         final UpdatesBuilder updatesBuilder = new UpdatesBuilder(variables, services);
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
-        final Term anonymisationUpdate = updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps, /*anonymisationLocalVariables, */modifiesConditions);
+        final Term anonymisationUpdate = updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps, /*anonymisationLocalVariables, */modifiesClauses);
 
         final ImmutableList<Goal> result = goal.split(3);
         final GoalsConfigurator configurator = new GoalsConfigurator(instantiation, variables, application.posInOccurrence(), services);
@@ -395,14 +395,14 @@ public class BlockContractRule implements BuiltInRule {
 
         public Term buildAnonymisationUpdate(final Map<LocationVariable, Function> anonymisationHeaps,
                                              /*final Map<LocationVariable, Function> anonymisationLocalVariables,*/
-                                             final Map<LocationVariable, Term> modifiesConditions)
+                                             final Map<LocationVariable, Term> modifiesClauses)
         {
             Term result = buildLocalVariablesAnonymisationUpdate(/*anonymisationLocalVariables*/);
             for (Map.Entry<LocationVariable, Function> anonymisationHeap : anonymisationHeaps.entrySet()) {
                 Term anonymisationUpdate = skip();
-                final Term modifiesCondition = modifiesConditions.get(anonymisationHeap.getKey());
-                if (!modifiesCondition.equals(lessThanNothing())) {
-                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesCondition, func(anonymisationHeap.getValue()));
+                final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
+                if (!modifiesClause.equals(lessThanNothing())) {
+                    anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause, func(anonymisationHeap.getValue()));
                 }
                 result = parallel(result, anonymisationUpdate);
             }
@@ -430,15 +430,15 @@ public class BlockContractRule implements BuiltInRule {
 
     }
 
-    private static final class ConditionsBuilder extends TermBuilder.Serviced {
+    private static final class ConditionsAndClausesBuilder extends TermBuilder.Serviced {
 
         private final BlockContract contract;
         private final List<LocationVariable> heaps;
         private final BlockContract.Variables variables;
         private final BlockContract.Terms terms;
 
-        public ConditionsBuilder(final BlockContract contract, final List<LocationVariable> heaps,
-                                 final BlockContract.Variables variables, final Term self, final Services services)
+        public ConditionsAndClausesBuilder(final BlockContract contract, final List<LocationVariable> heaps,
+                                           final BlockContract.Variables variables, final Term self, final Services services)
         {
             super(services);
             this.contract = contract;
@@ -488,11 +488,11 @@ public class BlockContractRule implements BuiltInRule {
             return result;
         }
 
-        public Map<LocationVariable, Term> buildModifiesConditions()
+        public Map<LocationVariable, Term> buildModifiesClauses()
         {
             Map<LocationVariable, Term> result = new LinkedHashMap<LocationVariable, Term>();
             for (final LocationVariable heap : heaps) {
-                result.put(heap, contract.getModifiesCondition(heap, var(heap), terms.self, services));
+                result.put(heap, contract.getModifiesClause(heap, var(heap), terms.self, services));
             }
             return result;
         }
@@ -506,18 +506,18 @@ public class BlockContractRule implements BuiltInRule {
             return result;
         }
 
-        public Term buildFrameCondition(final Map<LocationVariable, Term> modifiesConditions)
+        public Term buildFrameCondition(final Map<LocationVariable, Term> modifiesClauses)
         {
             Term result = tt();
             Map<LocationVariable, Map<Term, Term>> remembranceVariables = constructRemembranceVariables();
             for (LocationVariable heap : heaps) {
-                final Term modifiesCondition = modifiesConditions.get(heap);
+                final Term modifiesClause = modifiesClauses.get(heap);
                 final Term frameCondition;
-                if (modifiesCondition.equals(lessThanNothing()) && heap == getBaseHeap()) {
+                if (modifiesClause.equals(lessThanNothing()) && heap == getBaseHeap()) {
                     frameCondition = frameStrictlyEmpty(var(heap), remembranceVariables.get(heap));
                 }
                 else {
-                    frameCondition = frame(var(heap), remembranceVariables.get(heap), modifiesCondition);
+                    frameCondition = frame(var(heap), remembranceVariables.get(heap), modifiesClause);
                 }
                 result = and(result, frameCondition);
             }
