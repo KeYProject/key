@@ -4,11 +4,12 @@ class For implements Iterable {
   Trivial it;
   For f;
 
-  //@ ensures \result == (\sum int j; 0 <= j && j < a.length; j);
+  //@ ensures \result == (\sum int j; 0 <= j && j < a.length; a[j]);
   int sum () {
     int s = 0;
     int z = a.length;
-    /*@ maintaining s == (\sum int j; 0 <= j && j < \index; j);
+
+    /*@ maintaining s == (\sum int j; 0 <= j && j < \index; a[j]);
       @ maintaining 0 <= \index && \index <= a.length;
       @ decreasing a.length - \index;
       @ assignable \less_than_nothing;

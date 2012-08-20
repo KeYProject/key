@@ -481,7 +481,6 @@ public class ApplyStrategy {
             return new ApplyStrategyInfo("Interrupted.", proof, null, 
                     goalChooser.getNextGoal(), System.currentTimeMillis()-time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
-            System.err.println(t);
             t.printStackTrace();
             return new ApplyStrategyInfo("Error.", proof, t, null, System.currentTimeMillis()-time, countApplied, closedGoals);
         } finally{

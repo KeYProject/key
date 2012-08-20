@@ -9,6 +9,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IStep;
@@ -114,15 +115,33 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
                                           boolean saveVariables,
                                           boolean saveCallStack) throws IOException, DebugException {
       if (oracleDirectory != null && oracleDirectory.isDirectory()) {
-         // Create sub folder structure
-         File oracleFile = new File(oracleDirectory, expectedModelPathInBundle);
-         oracleFile.getParentFile().mkdirs();
-         // Create oracle file
-         SEDXMLWriter writer = new SEDXMLWriter();
-         writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile), saveVariables, saveCallStack);
-         // Print message to the user.
-         printOracleDirectory();
+         createOracleFile(oracleDirectory, target, expectedModelPathInBundle, saveVariables, saveCallStack);
       }
+   }
+   
+   /**
+    * Creates a new oracle file for the given {@link ISEDDebugTarget}.
+    * @param oracleDirectory The oracle directory to create file in.
+    * @param target The given {@link ISEDDebugTarget} which provides the oracle data.
+    * @param expectedModelPathInBundle The path in the bundle under that the created oracle file will be later available. It is used to create sub directories in temp directory.
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
+    * @throws IOException Occurred Exception.
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void createOracleFile(File oracleDirectory,
+                                          ISEDDebugTarget target, 
+                                          String expectedModelPathInBundle, 
+                                          boolean saveVariables,
+                                          boolean saveCallStack) throws IOException, DebugException {
+      // Create sub folder structure
+      File oracleFile = new File(oracleDirectory, expectedModelPathInBundle);
+      oracleFile.getParentFile().mkdirs();
+      // Create oracle file
+      SEDXMLWriter writer = new SEDXMLWriter();
+      writer.write(target.getLaunch(), SEDXMLWriter.DEFAULT_ENCODING, new FileOutputStream(oracleFile), saveVariables, saveCallStack);
+      // Print message to the user.
+      printOracleDirectory();
    }
    
    /**
@@ -614,6 +633,145 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
       public void test(SWTWorkbenchBot bot, 
                        IJavaProject project, 
                        IMethod method, 
+                       String targetName, 
+                       SWTBotView debugView, 
+                       SWTBotTree debugTree, 
+                       ISEDDebugTarget target, 
+                       ILaunch launch) throws Exception;
+   }
+   
+   /**
+    * Performs a test on a {@link KeYDebugTarget}. This methods setups
+    * the environment an the real test is done in the given {@link IKeYDebugTargetTestExecutor}.
+    * @param projectName The project name.
+    * @param plugin The plug-in which contains the test data.
+    * @param pathInBundle The path to the test files in bundle.
+    * @param closePropertiesView Close properties sheet page?
+    * @param closeExecutionTreeViews Close the views which visualizes the symbolic execution tree? Will increase the test perforamnce.
+    * @param selector The {@link IFileSelector} to select the {@link IFIle} to debug.
+    * @param showMethodReturnValues Show method return values?
+    * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
+    * @param showKeYMainWindow Show KeY's main window?
+    * @param mergeBranchConditions Merge branch conditions?
+    * @param timeoutFactor The timeout factor used to increase {@link SWTBotPreferences#TIMEOUT}.
+    * @param executor The {@link IKeYDebugTargetProofFileTestExecutor} which does the real test steps.
+    * @throws Exception Occurred Exception.
+    */
+   protected void doKeYDebugTargetTest(String projectName,
+                                       String plugin,
+                                       String pathInBundle,
+                                       boolean closePropertiesView,
+                                       boolean closeExecutionTreeViews,
+                                       IFileSelector selector,
+                                       Boolean showMethodReturnValues,
+                                       Boolean showVariablesOfSelectedDebugNode,
+                                       Boolean showKeYMainWindow,
+                                       Boolean mergeBranchConditions,
+                                       int timeoutFactor,
+                                       IKeYDebugTargetProofFileTestExecutor executor) throws Exception {
+      // Create bot
+      SWTWorkbenchBot bot = new SWTWorkbenchBot();
+      // Get current settings to restore them in finally block
+      IPerspectiveDescriptor defaultPerspective = TestUtilsUtil.getActivePerspective();
+      SWTBotTree debugTree = null;
+      long originalTimeout = SWTBotPreferences.TIMEOUT;
+      boolean restoreExecutionTreeView = false;
+      boolean restoreThumbinalExecutionTreeView = false;
+      boolean restorePropertiesView = false;
+      List<? extends SWTBotEditor> oldEditors = bot.editors();
+      try {
+         // Open symbolic debug perspective
+         TestSedCoreUtil.openSymbolicDebugPerspective();
+         if (closeExecutionTreeViews) {
+            restoreExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeView.VIEW_ID);
+            restoreThumbinalExecutionTreeView = TestUtilsUtil.closeView(ExecutionTreeThumbNailView.VIEW_ID);
+         }
+         if (closePropertiesView) {
+            restorePropertiesView = TestUtilsUtil.closeView(IPageLayout.ID_PROP_SHEET);
+         }
+         // Create test project
+         IJavaProject project = TestUtilsUtil.createJavaProject(projectName);
+         BundleUtil.extractFromBundleToWorkspace(plugin, pathInBundle, project.getProject().getFolder("src"));
+         // Get method
+         assertNotNull(selector);
+         IFile file = selector.getFile(project);
+         String targetName = TestSEDKeyCoreUtil.computeTargetName(file);
+         // Increase timeout
+         SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
+         // Launch method
+         TestSEDKeyCoreUtil.launchKeY(file, showMethodReturnValues, showVariablesOfSelectedDebugNode, showKeYMainWindow, mergeBranchConditions);
+         // Find the launched ILaunch in the debug view
+         SWTBotView debugView = TestSedCoreUtil.getDebugView(bot);
+         debugTree = debugView.bot().tree();
+         ISEDDebugTarget target = TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
+         ILaunch launch = target.getLaunch();
+         // Do test
+         executor.test(bot, project, file, targetName, debugView, debugTree, target, launch);
+      }
+      finally {
+         // Restore timeout
+         SWTBotPreferences.TIMEOUT = originalTimeout;
+         // Terminate and remove all launches
+         TestSedCoreUtil.terminateAndRemoveAll(debugTree);
+         // Make sure that all jobs are done because otherwise older jobs may influence the next test execution
+         TestUtilsUtil.waitForJobs();
+         // Close all opened editors which where not opened before test execution
+         List<? extends SWTBotEditor> currentEditors = bot.editors();
+         for (SWTBotEditor editor : currentEditors) {
+            if (!oldEditors.contains(editor)) {
+               editor.close();
+            }
+         }
+         // Restore closed views if required
+         if (restorePropertiesView) {
+            TestUtilsUtil.openView(IPageLayout.ID_PROP_SHEET);
+         }
+         if (restoreExecutionTreeView) {
+            TestUtilsUtil.openView(ExecutionTreeView.VIEW_ID);
+         }
+         if (restoreThumbinalExecutionTreeView) {
+            TestUtilsUtil.openView(ExecutionTreeThumbNailView.VIEW_ID);
+         }
+         // Restore perspective
+         TestUtilsUtil.openPerspective(defaultPerspective);
+      }
+   }
+   
+   /**
+    * Utility class to select an {@link IFile} in a given {@link IJavaProject}.
+    * @author Martin Hentschel
+    */
+   public static interface IFileSelector {
+      /**
+       * Selects an {@link IFile} in the given {@link IJavaProject}.
+       * @param project The {@link IJavaProject}.
+       * @return The selected {@link IFile}.
+       * @throws Exception Occurred Exceptions.
+       */
+      public IFile getFile(IJavaProject project) throws Exception;
+   }
+   
+   /**
+    * Does a test in an environment configured via
+    * {@link AbstractKeYDebugTargetTestCase#doKeYDebugTargetTest(String, String, String, boolean, boolean, IFileSelector, Boolean, Boolean, Boolean, Boolean, int, IKeYDebugTargetProofFileTestExecutor)}.
+    * @author Martin Hentschel
+    */
+   protected static interface IKeYDebugTargetProofFileTestExecutor {
+      /**
+       * Does the test.
+       * @param bot The {@link SWTWorkbenchBot} to use.
+       * @param project The {@link IJavaProject} which contains the source code.
+       * @param file The {@link IFile} which is debugged.
+       * @param targetName The name of the launch configuration.
+       * @param debugView The launch view.
+       * @param debugTree The tree of the launch view.
+       * @param target The created {@link ISEDDebugTarget}.
+       * @param launch The {@link ILaunch} which is executed.
+       * @throws Exception Occurred Exception.
+       */
+      public void test(SWTWorkbenchBot bot, 
+                       IJavaProject project, 
+                       IFile file, 
                        String targetName, 
                        SWTBotView debugView, 
                        SWTBotTree debugTree, 

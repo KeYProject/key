@@ -2,6 +2,7 @@ package org.key_project.sed.key.ui.launch;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -39,6 +40,9 @@ public class KeYLaunchShortcut implements ILaunchShortcut {
                 Object element = ((IStructuredSelection)selection).getFirstElement();
                 if (element instanceof IMethod) {
                     launch((IMethod)element, mode, null, null);
+                }
+                else if (element instanceof IFile) {
+                   launch((IFile)element, mode);
                 }
             }
         }
@@ -83,6 +87,55 @@ public class KeYLaunchShortcut implements ILaunchShortcut {
         catch (Exception e) {
             LogUtil.getLogger().logError(e);
             LogUtil.getLogger().openErrorDialog(null, e);
+        }
+    }
+    
+    /**
+     * Launches the given {@link IFile}.
+     * @param file The {@link IFile} to launch.
+     * @param mode The mode to use.
+     * @throws CoreException Occurred Exception.
+     */
+    protected void launch(IFile file, 
+                          String mode) throws CoreException {
+        try {
+            ILaunchConfiguration config = findLaunchConfiguration(file);
+            if (config == null) {
+                config = KeySEDUtil.createConfiguration(file);
+            }
+            if (config != null) {
+                DebugUITools.launch(config, mode);
+            }
+        }
+        catch (OperationCanceledException e) {
+            // Nothing to do
+        }
+    }
+    
+    /**
+     * Tries to find an existing {@link ILaunchConfiguration} for the
+     * given {@link IFile}. If multiple {@link ILaunchConfiguration} exists
+     * the user is asked to select one.
+     * @param file The {@link IFile} for that an {@link ILaunchConfiguration} is needed.
+     * @return The found {@link ILaunchConfiguration} or {@code null} if no one was found.
+     * @throws CoreException Occurred Exception.
+     * @throws OperationCanceledException When the user has canceled the select dialog.
+     */
+    protected ILaunchConfiguration findLaunchConfiguration(IFile file) throws CoreException {
+        List<ILaunchConfiguration> candidateConfigs = KeySEDUtil.searchLaunchConfigurations(file);
+        int candidateCount = candidateConfigs.size();
+        if (candidateCount == 1) {
+            return (ILaunchConfiguration)candidateConfigs.get(0);
+        }
+        else if (candidateCount > 1) {
+            ILaunchConfiguration choosen = LaunchUIUtil.chooseConfiguration(candidateConfigs, "Symbolic Execution Debugger (SED)");
+            if (choosen == null) {
+                throw new OperationCanceledException();
+            }
+            return choosen;
+        }
+        else {
+            return null;
         }
     }
     

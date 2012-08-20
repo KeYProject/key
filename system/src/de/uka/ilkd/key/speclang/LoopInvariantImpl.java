@@ -115,7 +115,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
         if(atPres != null) {
           for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-             if(atPres.get(h) != null) {
+             if(atPres.get(h) != null && originalAtPres.get(h) != null) {
                  assert originalAtPres.get(h).sort().equals(atPres.get(h).sort());
                  result.put(originalAtPres.get(h), atPres.get(h));
              }

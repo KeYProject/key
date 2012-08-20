@@ -7,9 +7,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.jdt.core.IJavaElement;
@@ -54,7 +57,9 @@ import org.key_project.sed.key.ui.jdt.AllOperationsSearchEngine;
 import org.key_project.sed.key.ui.jdt.AllTypesSearchEngine;
 import org.key_project.sed.key.ui.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
+import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.eclipse.swt.viewer.FileExtensionViewerFilter;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.SwingUtil;
@@ -78,6 +83,41 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
  */
 @SuppressWarnings("restriction")
 public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAndLaunchConfigurationTabComposite {
+   /**
+    * Radio button to start a new debug session.
+    */
+   private Button newDebugSessionButton;
+   
+   /**
+    * Radio button to continue an existing debug session (*.proof file).
+    */
+   private Button continueDebugSessionButton;
+   
+   /**
+    * Shows {@link #newDebugSessionComposite} or {@link #continueDebugSessionComposite}.
+    */
+   private Composite newOrContinueComposite;
+   
+   /**
+    * {@link StackLayout} used in {@link #newOrContinueComposite}.
+    */
+   private StackLayout newOrContinueCompositeLayout;
+   
+   /**
+    * Contains the UI controls to start a new debug session.
+    */
+   private Composite newDebugSessionComposite;
+   
+   /**
+    * Contains the UI controls to continue an existing debug session.
+    */
+   private Composite continueDebugSessionComposite;
+   
+   /**
+    * Defines the proof file to continue.
+    */
+   private Text proofFileText;
+   
    /**
     * Defines the project that contains the type to debug.
     */
@@ -198,8 +238,69 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
       // Content composite
       Composite composite = widgetFactory.createFlatFormComposite(this);
       composite.setLayout(new GridLayout(1, false));
+      // New continue radio button composite
+      Composite newOrConitnueRadioButtonComposite = widgetFactory.createComposite(composite);
+      newOrConitnueRadioButtonComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      newOrConitnueRadioButtonComposite.setLayout(new GridLayout(2, false));
+      newDebugSessionButton = widgetFactory.createButton(newOrConitnueRadioButtonComposite, "New debug session", SWT.RADIO);
+      newDebugSessionButton.setEnabled(isEditable());
+      newDebugSessionButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            if (newDebugSessionButton.getSelection()) {
+               updateShownSessionComposite();
+               updateLaunchConfigurationDialog();
+            }
+         }
+      });
+      continueDebugSessionButton = widgetFactory.createButton(newOrConitnueRadioButtonComposite, "Continue debug session (*." + KeYUtil.PROOF_FILE_EXTENSION + " file)", SWT.RADIO);
+      continueDebugSessionButton.setEnabled(isEditable());
+      continueDebugSessionButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            if (continueDebugSessionButton.getSelection()) {
+               updateShownSessionComposite();
+               updateLaunchConfigurationDialog();
+            }
+         }
+      });
+      // New or continue composite
+      newOrContinueCompositeLayout = new StackLayout();
+      newOrContinueComposite = widgetFactory.createComposite(composite);
+      newOrContinueComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+      newOrContinueComposite.setLayout(newOrContinueCompositeLayout);
+      // Continue debug session composite
+      continueDebugSessionComposite = widgetFactory.createComposite(newOrContinueComposite);
+      continueDebugSessionComposite.setLayout(new GridLayout(1, false));
+      // New debug session composite
+      newDebugSessionComposite = widgetFactory.createComposite(newOrContinueComposite);
+      newDebugSessionComposite.setLayout(new GridLayout(1, false));
+      newOrContinueCompositeLayout.topControl = newDebugSessionComposite;
+      // Existing file group
+      Group existingFileGroup = widgetFactory.createGroup(continueDebugSessionComposite, "Existing *." + KeYUtil.PROOF_FILE_EXTENSION + " file");
+      existingFileGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      existingFileGroup.setLayout(new GridLayout(isEditable() ? 3 : 2, false));
+      widgetFactory.createLabel(existingFileGroup, "&File");
+      proofFileText = widgetFactory.createText(existingFileGroup, null);
+      proofFileText.setEditable(isEditable());
+      proofFileText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      proofFileText.addModifyListener(new ModifyListener() {
+         @Override
+         public void modifyText(ModifyEvent e) {
+            updateLaunchConfigurationDialog();
+         }
+      });
+      if (isEditable()) {
+         Button browseProofFileButton = widgetFactory.createButton(existingFileGroup, "B&rowse", SWT.PUSH);
+         browseProofFileButton.addSelectionListener(new SelectionAdapter() {
+             @Override
+             public void widgetSelected(SelectionEvent e) {
+                 browseProofFile();
+             }
+         });
+      }
       // Project
-      Group projectGroup = widgetFactory.createGroup(composite, "Project");
+      Group projectGroup = widgetFactory.createGroup(newDebugSessionComposite, "Project");
       projectGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       projectGroup.setLayout(new GridLayout(isEditable() ? 3 : 2, false));
       widgetFactory.createLabel(projectGroup, "&Project name");
@@ -223,7 +324,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
          });
       }
       // Java
-      Group javaGroup = widgetFactory.createGroup(composite, "Java");
+      Group javaGroup = widgetFactory.createGroup(newDebugSessionComposite, "Java");
       javaGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       javaGroup.setLayout(new GridLayout(isEditable() ? 3 : 2, false));
       widgetFactory.createLabel(javaGroup, "&Type");
@@ -326,7 +427,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
          }
       });
       // Verification
-      Group verificationGroup = widgetFactory.createGroup(composite, "Verification");
+      Group verificationGroup = widgetFactory.createGroup(newDebugSessionComposite, "Verification");
       verificationGroup.setLayoutData(new GridData(GridData.FILL_BOTH));
       verificationGroup.setLayout(new GridLayout(1, false));
       Composite usedContractComposite = widgetFactory.createPlainComposite(verificationGroup, SWT.NONE);
@@ -435,7 +536,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
     * Updates the shown operation contract.
     */
    protected void updateShownContractComposite() {
-       // Update shown text and top control of stack layout
+       // Update shown top control of stack layout
        boolean useExistingContract = useExistingContractButton.getSelection();
        if (useExistingContract) {
            contractCompositeLayout.topControl = existingContractComposite;
@@ -445,6 +546,23 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
        }
        // Layout ui
        contractComposite.layout();
+   }
+
+   /**
+    * Updates the shown controls to start a new debug session or
+    * to continue an existing one saved as *.proof file.
+    */
+   protected void updateShownSessionComposite() {
+      // Update shown top control of stack layout
+      boolean newDebugSession = newDebugSessionButton.getSelection();
+      if (newDebugSession) {
+          newOrContinueCompositeLayout.topControl = newDebugSessionComposite;
+      }
+      else {
+         newOrContinueCompositeLayout.topControl = continueDebugSessionComposite;
+      }
+      // Layout ui
+      newOrContinueComposite.layout();
    }
 
    /**
@@ -535,6 +653,42 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
            LogUtil.getLogger().logError(e);
            LogUtil.getLogger().openErrorDialog(getShell(), e);
        }
+   }
+
+   /**
+    * Opens a dialog to select a *.proof file.
+    */
+   public void browseProofFile() {
+      IFile selectedFile = getProofFile();
+      IFile[] files = WorkbenchUtil.openFileSelection(getShell(), 
+                                                      "File Selection", 
+                                                      "Select a *." + KeYUtil.PROOF_FILE_EXTENSION + " file.", 
+                                                      false, 
+                                                      selectedFile != null && selectedFile.exists() ? new Object[] {selectedFile} : null, 
+                                                      Collections.singleton(new FileExtensionViewerFilter(true, new String[] {KeYUtil.PROOF_FILE_EXTENSION})));
+      if (files != null && files.length == 1) {
+         proofFileText.setText(files[0].getFullPath().toString());
+      }
+   }
+   
+   /**
+    * Returns the selected proof file.
+    * @return The selected proof file.
+    */
+   protected IFile getProofFile() {
+      try {
+         String selectedText = proofFileText.getText();
+         IFile selectedFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(selectedText));
+         if (selectedFile != null && selectedFile.exists()) {
+            return selectedFile;
+         }
+         else {
+            return null;
+         }
+      }
+      catch (Exception e) {
+         return null;
+      }
    }
 
    /**
@@ -730,102 +884,122 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
    @Override
    public String getNotValidMessage() {
       String message = null;
-      // Validate Java project
-      if (message == null) {
-          IJavaProject project = getJavaProject();
-          if (project == null || !project.exists()) {
-              message = "No existing Java project selected.";
-          }
-      }
-      // Validate type
-      if (message == null) {
-          IType type = getType();
-          if (type == null || !type.exists()) {
-              message = "No existing type selected.";
-          }
-      }
-      // Validate method
-      IMethod method = null;
-      if (message == null) {
-          method = getMethod();
-          if (method == null || !method.exists()) {
-              message = "No existing method selected.";
-          }
-      }
-      // Validate method range
-      if (message == null && isExecuteMethodRange()) {
-         // Make sure that line and columns of method range are valid integers
-         int startLine = 0;
-         try {
-            startLine = getMethodRangeStartLine();
-         }
-         catch (NumberFormatException e) {
-            message = "Start line of method range \"" + startLineText.getText() + "\" is no valid integer.";
-         }
-         int startColumn = 0;
+      if (newDebugSessionButton.getSelection()) {
+         // Validate Java project
          if (message == null) {
+             IJavaProject project = getJavaProject();
+             if (project == null || !project.exists()) {
+                 message = "No existing Java project selected.";
+             }
+         }
+         // Validate type
+         if (message == null) {
+             IType type = getType();
+             if (type == null || !type.exists()) {
+                 message = "No existing type selected.";
+             }
+         }
+         // Validate method
+         IMethod method = null;
+         if (message == null) {
+             method = getMethod();
+             if (method == null || !method.exists()) {
+                 message = "No existing method selected.";
+             }
+         }
+         // Validate method range
+         if (message == null && isExecuteMethodRange()) {
+            // Make sure that line and columns of method range are valid integers
+            int startLine = 0;
             try {
-               startColumn = getMethodRangeStartColumn();
+               startLine = getMethodRangeStartLine();
             }
             catch (NumberFormatException e) {
-               message = "Start column of method range \"" + startColumnText.getText() + "\" is no valid integer.";
+               message = "Start line of method range \"" + startLineText.getText() + "\" is no valid integer.";
+            }
+            int startColumn = 0;
+            if (message == null) {
+               try {
+                  startColumn = getMethodRangeStartColumn();
+               }
+               catch (NumberFormatException e) {
+                  message = "Start column of method range \"" + startColumnText.getText() + "\" is no valid integer.";
+               }
+            }
+            int endLine = 0;
+            if (message == null) {
+               try {
+                  endLine = getMethodRangeEndLine();
+               }
+               catch (NumberFormatException e) {
+                  message = "To line of method range \"" + endLineText.getText() + "\" is no valid integer.";
+               }
+            }
+            int endColumn = 0;
+            if (message == null) {
+               try {
+                  endColumn = getMethodRangeEndColumn();
+               }
+               catch (NumberFormatException e) {
+                  message = "To column of method range \"" + endColumnText.getText() + "\" is no valid integer.";
+               }
+            }
+            // Make sure that defined start and end are in method's source range
+            if (message == null) {
+               try {
+                  ISourceRange methodSourceRange = method.getSourceRange();
+                  Position methodStartPosition = KeYUtil.getCursorPositionForOffset(method, methodSourceRange.getOffset());
+                  Position methodEndPosition = KeYUtil.getCursorPositionForOffset(method, methodSourceRange.getOffset() + methodSourceRange.getLength());
+                  Position startPosition = new KeYUtil.CursorPosition(startLine, startColumn);
+                  if (startPosition.compareTo(methodStartPosition) < 0) {
+                     message = "From method range (" + startPosition + ") must be greater or equal to \"" + methodStartPosition + "\".";
+                  }
+                  if (message == null && startPosition.compareTo(methodEndPosition) > 0) {
+                     message = "From method range (" + startPosition + ") must be lower or equal to \"" + methodEndPosition + "\".";
+                  }
+                  Position endPosition = new KeYUtil.CursorPosition(endLine, endColumn);
+                  if (message == null && endPosition.compareTo(methodEndPosition) > 0) {
+                     message = "To method range (" + endPosition + ") must be lower or equal to \"" + methodEndPosition + "\".";
+                  }
+                  if (message == null && endPosition.compareTo(methodStartPosition) < 0) {
+                     message = "To method range (" + endPosition + ") must be greater or equal to \"" + methodStartPosition + "\".";
+                  }
+                  // Make sure that end is after start
+                  if (message == null && startPosition.compareTo(endPosition) > 0) {
+                     message = "Method range to (" + startPosition + ") must be greater or equal to method range from (" + endPosition + ").";
+                  }
+               }
+               catch (Exception e) {
+                  message = e.getMessage();
+               }
             }
          }
-         int endLine = 0;
+         // Validate contract
          if (message == null) {
-            try {
-               endLine = getMethodRangeEndLine();
-            }
-            catch (NumberFormatException e) {
-               message = "To line of method range \"" + endLineText.getText() + "\" is no valid integer.";
-            }
-         }
-         int endColumn = 0;
-         if (message == null) {
-            try {
-               endColumn = getMethodRangeEndColumn();
-            }
-            catch (NumberFormatException e) {
-               message = "To column of method range \"" + endColumnText.getText() + "\" is no valid integer.";
-            }
-         }
-         // Make sure that defined start and end are in method's source range
-         if (message == null) {
-            try {
-               ISourceRange methodSourceRange = method.getSourceRange();
-               Position methodStartPosition = KeYUtil.getCursorPositionForOffset(method, methodSourceRange.getOffset());
-               Position methodEndPosition = KeYUtil.getCursorPositionForOffset(method, methodSourceRange.getOffset() + methodSourceRange.getLength());
-               Position startPosition = new KeYUtil.CursorPosition(startLine, startColumn);
-               if (startPosition.compareTo(methodStartPosition) < 0) {
-                  message = "From method range (" + startPosition + ") must be greater or equal to \"" + methodStartPosition + "\".";
-               }
-               if (message == null && startPosition.compareTo(methodEndPosition) > 0) {
-                  message = "From method range (" + startPosition + ") must be lower or equal to \"" + methodEndPosition + "\".";
-               }
-               Position endPosition = new KeYUtil.CursorPosition(endLine, endColumn);
-               if (message == null && endPosition.compareTo(methodEndPosition) > 0) {
-                  message = "To method range (" + endPosition + ") must be lower or equal to \"" + methodEndPosition + "\".";
-               }
-               if (message == null && endPosition.compareTo(methodStartPosition) < 0) {
-                  message = "To method range (" + endPosition + ") must be greater or equal to \"" + methodStartPosition + "\".";
-               }
-               // Make sure that end is after start
-               if (message == null && startPosition.compareTo(endPosition) > 0) {
-                  message = "Method range to (" + startPosition + ") must be greater or equal to method range from (" + endPosition + ").";
-               }
-            }
-            catch (Exception e) {
-               message = e.getMessage();
-            }
+             if (useExistingContractButton.getSelection()) {
+                 if (StringUtil.isTrimmedEmpty(getContractId())) {
+                     message = "No existing contract defined.";
+                 }
+             }
          }
       }
-      // Validate contract
-      if (message == null) {
-          if (useExistingContractButton.getSelection()) {
-              if (StringUtil.isTrimmedEmpty(getContractId())) {
-                  message = "No existing contract defined.";
-              }
-          }
+      else {
+         // Validate proof file
+         String proofText = proofFileText.getText();
+         if (StringUtil.isEmpty(proofText)) {
+            message = "No proof file to continue defined.";
+         }
+         else {
+            IFile proofFile = getProofFile();
+            if (proofFile != null && proofFile.exists()) {
+               if (!KeYUtil.PROOF_FILE_EXTENSION.equals(proofFile.getFileExtension())) {
+                  message = "Proof file \"" + proofFile.getFullPath().toString() + "\" has not the expected file extension \"" + KeYUtil.PROOF_FILE_EXTENSION + "\".";
+               }
+            }
+            else {
+               message = "Proof file \"" + proofText + "\" don't exist.";
+            }
+         }
       }
       return message;
    }
@@ -921,13 +1095,17 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
    @Override
    public void initializeFrom(ILaunchConfiguration configuration) {
       try {
-         projectText.setText(KeySEDUtil.getProjectValue(configuration));
-         typeText.setText(KeySEDUtil.getTypeValue(configuration));
-         methodText.setText(KeySEDUtil.getMethodValue(configuration));
+         boolean newDebugSession = KeySEDUtil.isNewDebugSession(configuration);
+         newDebugSessionButton.setSelection(newDebugSession);
+         continueDebugSessionButton.setSelection(!newDebugSession);
+         SWTUtil.setText(proofFileText, KeySEDUtil.getFileToLoadValue(configuration));
+         SWTUtil.setText(projectText, KeySEDUtil.getProjectValue(configuration));
+         SWTUtil.setText(typeText, KeySEDUtil.getTypeValue(configuration));
+         SWTUtil.setText(methodText, KeySEDUtil.getMethodValue(configuration));
          boolean useExistingContract = KeySEDUtil.isUseExistingContractValue(configuration);
          useGeneratedContractButton.setSelection(!useExistingContract);
          useExistingContractButton.setSelection(useExistingContract);
-         existingContractText.setText(KeySEDUtil.getExistingContractValue(configuration));
+         SWTUtil.setText(existingContractText, KeySEDUtil.getExistingContractValue(configuration));
          preconditionViewer.setText(KeySEDUtil.getPrecondition(configuration));
          boolean executeMethodRange = KeySEDUtil.isExecuteMethodRange(configuration);
          executeMethodBodyButton.setSelection(!executeMethodRange);
@@ -936,6 +1114,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
          startColumnText.setText(KeySEDUtil.getMethodRangeStartColumn(configuration) + StringUtil.EMPTY_STRING);
          endLineText.setText(KeySEDUtil.getMethodRangeEndLine(configuration) + StringUtil.EMPTY_STRING);
          endColumnText.setText(KeySEDUtil.getMethodRangeEndColumn(configuration) + StringUtil.EMPTY_STRING);
+         updateShownSessionComposite();
          updateRangeTextEditableState();
          updateShownContractComposite();
          updatePreconditionViewerComposite();
@@ -951,14 +1130,18 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
     */
    public void initializeFrom(KeYLaunchSettings settings) {
       try {
+         boolean newDebugSession = settings.isNewDebugSession();
+         newDebugSessionButton.setSelection(newDebugSession);
+         continueDebugSessionButton.setSelection(!newDebugSession);
+         SWTUtil.setText(proofFileText, settings.getProofFileToContinue());
          IMethod method = settings.getMethod();
-         projectText.setText(KeySEDUtil.getProjectValue(method));
-         typeText.setText(KeySEDUtil.getTypeValue(method));
-         methodText.setText(KeySEDUtil.getMethodValue(method));
+         SWTUtil.setText(projectText, KeySEDUtil.getProjectValue(method));
+         SWTUtil.setText(typeText, KeySEDUtil.getTypeValue(method));
+         SWTUtil.setText(methodText, KeySEDUtil.getMethodValue(method));
          boolean useExistingContract = settings.isUseExistingContract();
          useGeneratedContractButton.setSelection(!useExistingContract);
          useExistingContractButton.setSelection(useExistingContract);
-         existingContractText.setText(settings.getExistingContract());
+         SWTUtil.setText(existingContractText, settings.getExistingContract());
          preconditionViewer.setText(settings.getPrecondition());
          boolean executeMethodRange = settings.isExecuteMethodRange();
          executeMethodBodyButton.setSelection(!executeMethodRange);
@@ -973,6 +1156,7 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
             endLineText.setText(endPosition.getLine() + StringUtil.EMPTY_STRING);
             endColumnText.setText(endPosition.getColumn() + StringUtil.EMPTY_STRING);
          }
+         updateShownSessionComposite();
          updateRangeTextEditableState();
          updateShownContractComposite();
          updatePreconditionViewerComposite();
@@ -987,6 +1171,8 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
     */
    @Override
    public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_NEW_DEBUG_SESSION, newDebugSessionButton.getSelection());
+      configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_FILE_TO_LOAD, proofFileText.getText());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PROJECT, projectText.getText());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TYPE, typeText.getText());
       configuration.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_METHOD, methodText.getText());

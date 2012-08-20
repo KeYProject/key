@@ -54,6 +54,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -391,7 +392,8 @@ public final class KeYUtil {
                     InitConfig initConfig = getInitConfig(location);
                     if (initConfig == null) {
                         // Load local file
-                        initConfig = main.getUserInterface().load(location, classPaths, bootClassPath);
+                        DefaultProblemLoader loader = main.getUserInterface().load(location, classPaths, bootClassPath);
+                        initConfig = loader.getInitConfig();
                     }
                     setResult(initConfig);
                 }

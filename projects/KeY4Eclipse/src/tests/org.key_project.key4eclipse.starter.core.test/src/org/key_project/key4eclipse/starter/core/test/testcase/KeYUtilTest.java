@@ -35,6 +35,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
@@ -62,7 +63,8 @@ public class KeYUtilTest extends TestCase {
       assertEquals("run", run.getElementName());
       // Open project in KeY
       CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
-      InitConfig initConfig = ui.load(ResourceUtil.getLocation(project.getResource()), null, null);
+      DefaultProblemLoader loader = ui.load(ResourceUtil.getLocation(project.getResource()), null, null);
+      InitConfig initConfig = loader.getInitConfig();
       JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
       // Test conversion of doSomething
       IProgramMethod pm = KeYUtil.getProgramMethod(doSomething, javaInfo);
