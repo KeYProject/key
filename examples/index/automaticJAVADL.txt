@@ -348,8 +348,8 @@ provable: ./standard_key/strings/substring4.key
 provable: ./standard_key/strings/substring5.key
 provable: ./_testcase/classpath/classpath.key
 
-notprovable: ./heap/inconsistent_represents/MyClass_m.key
-notprovable: ./heap/inconsistent_represents/MyClass_n.key
+# notprovable: ./heap/inconsistent_represents/MyClass_m.key
+# notprovable: ./heap/inconsistent_represents/MyClass_n.key
 notprovable: ./heap/information_flow/UpdateAbstraction_ex7_1_insecure.key
 notprovable: ./heap/information_flow/UpdateAbstraction_ex7_2_insecure.key
 notprovable: ./standard_key/arrays/arrayStoreException/array2Dim.key
