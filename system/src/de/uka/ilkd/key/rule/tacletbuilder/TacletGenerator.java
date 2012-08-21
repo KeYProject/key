@@ -176,7 +176,6 @@ public class TacletGenerator {
         //instantiate axiom with schema variables
         final SchemaVariable heapSV = createSchemaVariable(heap);
         final SchemaVariable selfSV = createSchemaVariable(self);
-        @SuppressWarnings("unchecked")
         final TermAndBoundVarPair schemaRepresents =
                 createSchemaTerm(originalRepresentsTerm,
                                  new Pair<ProgramVariable, SchemaVariable>(heap, heapSV),
@@ -227,9 +226,6 @@ public class TacletGenerator {
         }
 
         //add satisfiability branch
-        // has been commented out because functional represents clauses are
-        // always satisfiable (with possibly underspecified values) -- DB 08/12
-        /*
         final Term targetTerm =
                 target.isStatic()
                 ? TB.func(target, TB.var(heapSV))
@@ -277,7 +273,6 @@ public class TacletGenerator {
                 skolemSV)));
         tacletBuilder.goalTemplates().tail().head().setName("Use Axiom");
         tacletBuilder.goalTemplates().head().setName("Show Axiom Satisfiability");
-        */
         tacletBuilder.setStateRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         result = result.add(tacletBuilder.getTaclet());
 
