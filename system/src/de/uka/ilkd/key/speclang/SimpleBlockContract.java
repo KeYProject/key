@@ -28,6 +28,7 @@ public final class SimpleBlockContract implements BlockContract {
     }
 
 	private final StatementBlock block;
+    private final List<Label> labels;
     private final IProgramMethod method;
     private final Modality modality;
 
@@ -40,6 +41,7 @@ public final class SimpleBlockContract implements BlockContract {
     private final boolean transactionApplicable;
 
     public SimpleBlockContract(final StatementBlock block,
+                               final List<Label> labels,
                                final IProgramMethod method,
                                final Modality modality,
                                final Map<LocationVariable, Term> preconditions,
@@ -49,6 +51,7 @@ public final class SimpleBlockContract implements BlockContract {
                                final boolean transactionApplicable)
     {
         assert block != null;
+        assert labels != null;
         assert method != null;
         assert modality != null;
         assert preconditions != null;
@@ -60,6 +63,7 @@ public final class SimpleBlockContract implements BlockContract {
         assert variables.remembranceHeaps != null && variables.remembranceHeaps.size() > 0;
         assert variables.remembranceLocalVariables != null;
         this.block = block;
+        this.labels = labels;
         this.method = method;
         this.modality = modality;
         this.preconditions = preconditions;
@@ -73,6 +77,12 @@ public final class SimpleBlockContract implements BlockContract {
     public StatementBlock getBlock()
     {
         return block;
+    }
+
+    @Override
+    public List<Label> getLabels()
+    {
+        return labels;
     }
 
     @Override
@@ -310,7 +320,7 @@ public final class SimpleBlockContract implements BlockContract {
                                 final Map<LocationVariable,Term> newModifiesClauses,
                                 final Variables newVariables)
     {
-        return new SimpleBlockContract(newBlock, method, modality, newPreconditions, newPostconditions,
+        return new SimpleBlockContract(newBlock, labels, method, modality, newPreconditions, newPostconditions,
                                        newModifiesClauses, newVariables, transactionApplicable);
     }
 
@@ -459,6 +469,7 @@ public final class SimpleBlockContract implements BlockContract {
     public static final class Creator extends TermBuilder.Serviced {
 
         private final StatementBlock block;
+        private final List<Label> labels;
         private final IProgramMethod method;
         private final Behavior behavior;
         private final Variables variables;
@@ -474,6 +485,7 @@ public final class SimpleBlockContract implements BlockContract {
         private final ImmutableArray<LocationVariable> heaps;
 
         public Creator(final StatementBlock block,
+                       final List<Label> labels,
                        final IProgramMethod method,
                        final Behavior behavior,
                        final Variables variables,
@@ -490,6 +502,7 @@ public final class SimpleBlockContract implements BlockContract {
         {
             super(services);
             this.block = block;
+            this.labels = labels;
             this.method = method;
             this.behavior = behavior;
             this.variables = variables;
@@ -699,7 +712,7 @@ public final class SimpleBlockContract implements BlockContract {
             final boolean transactionApplicable = modifiesClauses.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null;
             result = result.add(
                 new SimpleBlockContract(
-                    block, method, diverges.equals(ff()) ? Modality.DIA : Modality.BOX,
+                    block, labels, method, diverges.equals(ff()) ? Modality.DIA : Modality.BOX,
                     preconditions, postconditions, modifiesClauses,
                     variables, transactionApplicable
                 )
@@ -707,7 +720,7 @@ public final class SimpleBlockContract implements BlockContract {
             if (ifDivergesConditionCannotBeExpressedByAModality()) {
                 result = result.add(
                     new SimpleBlockContract(
-                        block, method, Modality.DIA, addNegatedDivergesConditionToPreconditions(preconditions),
+                        block, labels, method, Modality.DIA, addNegatedDivergesConditionToPreconditions(preconditions),
                         postconditions, modifiesClauses, variables, transactionApplicable
                     )
                 );
@@ -781,7 +794,7 @@ public final class SimpleBlockContract implements BlockContract {
             for (BlockContract contract : contracts) {
                 addConditionsFrom(contract);
             }
-            return new SimpleBlockContract(head.getBlock(), head.getMethod(), head.getModality(), preconditions,
+            return new SimpleBlockContract(head.getBlock(), head.getLabels(), head.getMethod(), head.getModality(), preconditions,
                     postconditions, modifiesClauses, placeholderVariables, head.isTransactionApplicable());
         }
 

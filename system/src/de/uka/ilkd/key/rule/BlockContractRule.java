@@ -132,7 +132,7 @@ public class BlockContractRule implements BuiltInRule {
         final Term anonymisationUpdate = updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps, /*anonymisationLocalVariables, */modifiesClauses);
 
         final ImmutableList<Goal> result = goal.split(3);
-        final GoalsConfigurator configurator = new GoalsConfigurator(instantiation, variables, application.posInOccurrence(), services);
+        final GoalsConfigurator configurator = new GoalsConfigurator(instantiation, contract.getLabels(), variables, application.posInOccurrence(), services);
         configurator.setUpValidityGoal(
             result.tail().tail().head(),
             new Term[] {contextUpdate, remembranceUpdate},
@@ -597,14 +597,19 @@ public class BlockContractRule implements BuiltInRule {
     private static final class GoalsConfigurator {
 
         private final Instantiation instantiation;
+        private final List<Label> labels;
         private final BlockContract.Variables variables;
         private final PosInOccurrence occurrence;
         private final Services services;
 
-        public GoalsConfigurator(final Instantiation instantiation, final BlockContract.Variables variables,
-                                  final PosInOccurrence occurrence, final Services services)
+        public GoalsConfigurator(final Instantiation instantiation,
+                                 final List<Label> labels,
+                                 final BlockContract.Variables variables,
+                                 final PosInOccurrence occurrence,
+                                 final Services services)
         {
             this.instantiation = instantiation;
+            this.labels = labels;
             this.variables = variables;
             this.occurrence = occurrence;
             this.services = services;
@@ -615,7 +620,7 @@ public class BlockContractRule implements BuiltInRule {
             goal.setBranchLabel("Validity");
             goal.addFormulaToAntecedent(new SequentFormula(TB.applySequential(updates, TB.and(assumptions))), false);
 
-            final StatementBlock block = new ValidityProgramConstructor(instantiation.block, variables, services).construct();
+            final StatementBlock block = new ValidityProgramConstructor(labels, instantiation.block, variables, services).construct();
             Statement wrappedBlock = wrapInMethodFrameIfContextIsAvailable(block);
             StatementBlock finishedBlock = finishTransactionIfModalityIsTransactional(wrappedBlock);
             goal.changeFormula(new SequentFormula(
@@ -700,13 +705,18 @@ public class BlockContractRule implements BuiltInRule {
 
     private static final class ValidityProgramConstructor {
 
+        private final List<Label> labels;
         private final StatementBlock block;
         private final BlockContract.Variables variables;
         private final Services services;
         private final List<Statement> statements;
 
-        public ValidityProgramConstructor(final StatementBlock block, final BlockContract.Variables variables, final Services services)
+        public ValidityProgramConstructor(final List<Label> labels,
+                                          final StatementBlock block,
+                                          final BlockContract.Variables variables,
+                                          final Services services)
         {
+            this.labels = labels;
             this.block = block;
             this.variables = variables;
             this.services = services;
@@ -765,25 +775,35 @@ public class BlockContractRule implements BuiltInRule {
         {
             final Label breakOutLabel = new ProgramElementName("breakOut");
             final StatementBlock almostSafeBlock = replaceOuterBreaksContinuesAndReturns(block, breakOutLabel);
-            final Statement safeStatement = wrapInTryCatch(almostSafeBlock);
+            final Statement labeledAlmostSafeBlock = label(almostSafeBlock, labels);
+            final Statement safeStatement = wrapInTryCatch(labeledAlmostSafeBlock);
             statements.add(new LabeledStatement(breakOutLabel, safeStatement));
+        }
+
+        private Statement label(final StatementBlock block, List<Label> labels)
+        {
+            Statement result = block;
+            for (Label label : labels) {
+                result = new LabeledStatement(label, result);
+            }
+            return result;
         }
 
         private StatementBlock replaceOuterBreaksContinuesAndReturns(final StatementBlock block, final Label breakOutLabel)
         {
             return new OuterBreakContinueAndReturnReplacer(
-                block, breakOutLabel, variables.breakFlags, variables.continueFlags, variables.returnFlag, variables.result, services
+                block, labels, breakOutLabel, variables.breakFlags, variables.continueFlags, variables.returnFlag, variables.result, services
             ).replace();
         }
 
-        private Statement wrapInTryCatch(final StatementBlock block)
+        private Statement wrapInTryCatch(final Statement labeldBlock)
         {
             ProgramVariable exceptionParameter = createLocalVariable("e", variables.exception.getKeYJavaType());
             Catch katch = KeYJavaASTFactory.catchClause(
                 KeYJavaASTFactory.parameterDeclaration(services.getJavaInfo(), exceptionParameter.getKeYJavaType(), exceptionParameter),
                 new StatementBlock(KeYJavaASTFactory.assign(variables.exception, exceptionParameter))
             );
-            return new Try(block, new Branch[] {katch});
+            return new Try(new StatementBlock(labeldBlock), new Branch[] {katch});
         }
 
         private ProgramVariable createLocalVariable(final String nameBase, final KeYJavaType type)

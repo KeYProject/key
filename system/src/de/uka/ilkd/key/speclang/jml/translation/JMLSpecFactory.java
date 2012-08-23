@@ -1004,16 +1004,17 @@ public class JMLSpecFactory {
     }
     
     public ImmutableSet<BlockContract> createJMLBlockContracts(final IProgramMethod method,
+                                                               final List<Label> labels,
                                                                final StatementBlock block,
                                                                final TextualJMLSpecCase specificationCase)
             throws SLTranslationException
     {
         final Behavior behavior = specificationCase.getBehavior();
-        final BlockContract.Variables variables = BlockContract.Variables.create(block, method, services);
+        final BlockContract.Variables variables = BlockContract.Variables.create(block, labels, method, services);
         final ProgramVariableCollection programVariables = createProgramVariables(method, block, variables);
         final ContractClauses clauses = translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new SimpleBlockContract.Creator(
-            block, method, behavior, variables, clauses.requires, clauses.ensures, clauses.breaks, clauses.continues,
+            block, labels, method, behavior, variables, clauses.requires, clauses.ensures, clauses.breaks, clauses.continues,
             clauses.returns, clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables, services
         ).create();
     }
@@ -1047,7 +1048,6 @@ public class JMLSpecFactory {
         return result;
     }
 
-    // TODO Is there a difference to MiscTools#getLocalIns
     protected ImmutableList<ProgramVariable> collectLocalVariablesVisibleTo(final Statement statement, final IProgramMethod method)
     {
         return collectLocalVariablesVisibleTo(statement, method.getBody());

@@ -15,13 +15,14 @@ public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
     private final Stack<Label> labels;
     private final Stack<MethodFrame> frames;
 
-    public OuterBreakContinueAndReturnCollector(final ProgramElement root, final Services services)
+    public OuterBreakContinueAndReturnCollector(final ProgramElement root, final List<Label> alwaysInnerLabels, final Services services)
     {
         super(root, services);
         breaks = new LinkedList<Break>();
         continues = new LinkedList<Continue>();
         returns = new LinkedList<Return>();
         labels = new Stack<Label>();
+        labels.addAll(alwaysInnerLabels);
         frames = new Stack<MethodFrame>();
     }
 

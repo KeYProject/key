@@ -15,11 +15,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -33,7 +29,9 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -52,9 +50,7 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Extracts JML class invariants and operation contracts from JML comments. 
@@ -467,14 +463,43 @@ public final class JMLSpecExtractor implements SpecExtractor {
     
     
     @Override
-    public ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method, final StatementBlock block) throws SLTranslationException {
+    public ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method, final StatementBlock block) throws SLTranslationException
+    {
+        return createBlockContracts(method, new LinkedList<Label>(), block, block.getComments());
+    }
+
+    @Override
+    public ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method, final LabeledStatement labeled) throws SLTranslationException
+    {
+        final List<Label> labels = new LinkedList<Label>();
+        labels.add(labeled.getLabel());
+        Statement nextNonLabeled = labeled.getBody();
+        while (nextNonLabeled instanceof LabeledStatement) {
+            final LabeledStatement currentLabeled = (LabeledStatement) nextNonLabeled;
+            labels.add(currentLabeled.getLabel());
+            nextNonLabeled = currentLabeled.getBody();
+        }
+        if (nextNonLabeled instanceof StatementBlock) {
+            return createBlockContracts(method, labels, (StatementBlock) nextNonLabeled, labeled.getComments());
+        }
+        else {
+            return DefaultImmutableSet.nil();
+        }
+    }
+
+    private ImmutableSet<BlockContract> createBlockContracts(final IProgramMethod method,
+                                                             final List<Label> labels,
+                                                             final StatementBlock block,
+                                                             final Comment[] comments)
+            throws SLTranslationException
+    {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
         // For some odd reason every comment block appears twice; thus we remove duplicates.
-        final TextualJMLConstruct[] constructs = parseMethodLevelComments(removeDuplicates(block.getComments()), getFileName(method));
+        final TextualJMLConstruct[] constructs = parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
         for (int i = constructs.length - 1; i >= 0 && constructs[i] instanceof TextualJMLSpecCase; i--) {
             final TextualJMLSpecCase specificationCase = (TextualJMLSpecCase) constructs[i];
             try {
-                result = result.union(jsf.createJMLBlockContracts(method, block, specificationCase));
+                result = result.union(jsf.createJMLBlockContracts(method, labels, block, specificationCase));
             }
             catch (final SLWarningException exception) {
                 warnings = warnings.add(exception.getWarning());

@@ -24,6 +24,7 @@ import de.uka.ilkd.key.util.MiscTools;
 public interface BlockContract extends SpecificationElement {
 
     public StatementBlock getBlock();
+    public List<Label> getLabels();
     public IProgramMethod getMethod();
     public Modality getModality();
     public Variables getPlaceholderVariables();
@@ -63,9 +64,9 @@ public interface BlockContract extends SpecificationElement {
 
     public static class Variables {
 
-        public static Variables create(StatementBlock block, IProgramMethod method, Services services)
+        public static Variables create(final StatementBlock block, final List<Label> labels, final IProgramMethod method, final Services services)
         {
-            return new VariablesCreator(block, method, services).create();
+            return new VariablesCreator(block, labels, method, services).create();
         }
 
         public final ProgramVariable self;
@@ -157,15 +158,17 @@ public interface BlockContract extends SpecificationElement {
         private static final String REMEMBRANCE_SUFFIX = "BeforeBlock";
 
         private final StatementBlock block;
+        private final List<Label> labels;
         private final IProgramMethod method;
         private Map<Label, ProgramVariable> breakFlags;
         private Map<Label, ProgramVariable> continueFlags;
         private ProgramVariable returnFlag;
 
-        public VariablesCreator(final StatementBlock block, final IProgramMethod method, final Services services)
+        public VariablesCreator(final StatementBlock block, final List<Label> labels, final IProgramMethod method, final Services services)
         {
             super(services);
             this.block = block;
+            this.labels = labels;
             this.method = method;
         }
 
@@ -186,7 +189,7 @@ public interface BlockContract extends SpecificationElement {
 
         private void createAndStoreFlags()
         {
-            final OuterBreakContinueAndReturnCollector collector = new OuterBreakContinueAndReturnCollector(block, services);
+            final OuterBreakContinueAndReturnCollector collector = new OuterBreakContinueAndReturnCollector(block, labels, services);
             collector.collect();
 
             final List<Break> breaks = collector.getBreaks();
