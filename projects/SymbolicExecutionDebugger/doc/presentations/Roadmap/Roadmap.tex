@@ -1,0 +1,202 @@
+%
+% TU Darmstadt Latex Template is available at http://exp1.fkp.physik.tu-darmstadt.de/tuddesign/
+%
+\documentclass[accentcolor=tud9d,colorbacktitle,inverttitle,landscape,english,presentation,t]{tudbeamer}
+\usepackage{babel}
+
+\usepackage{keylogo} % For the KeY name via \KeY
+
+\usepackage{color}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\definecolor{darkred}{rgb}{0.5,0,0}
+
+\begin{document}
+
+\title{Roadmap}
+\subtitle{Symbolic Execution Debugger (SED)}
+
+\author{Martin Hentschel}
+\institute{Department of Computer Science | Software Engineering}
+
+\logo{\includegraphics{FachbereichInformatik}}
+% \logo{\color{tudtextaccent}\large IFP}
+
+\date{\today}
+
+\begin{titleframe}
+\end{titleframe}
+
+
+\section{Current Features}
+
+	\begin{frame}[t]
+		\frametitle{Current Features (Old vs New)}
+      
+      \begin{table}
+         \centering
+            \begin{tabular}{|l|l|l|}
+               \hline
+               Feature & Old Debugger & New Debugger \\
+               \hline
+               \hline
+               Launch of & Method with contract & \textcolor{darkgreen}{Any method or contract} \\
+               Source code & Modified version & \textcolor{darkgreen}{Original} \\
+               Multiple Launches & No & \textcolor{darkgreen}{Yes (Eclipse Debug API)} \\
+               Configurable Launches & No & \textcolor{darkgreen}{Per launch and defaults} \\
+               Hiding of KeY main window & No & \textcolor{darkgreen}{Yes (configurable)} \\
+               \hline
+            \end{tabular}
+      \end{table}
+	\end{frame}
+   
+   	\begin{frame}[t]
+		\frametitle{Current Features (Old vs New)}
+      
+      \begin{table}
+         \centering
+            \begin{tabular}{|l|l|l|}
+               \hline
+               Feature & Old Debugger & New Debugger \\
+               \hline
+               \hline
+               Classified SET nodes & Yes (Form) & \textcolor{darkgreen}{Yes (Icon, Form, Text)} \\
+               Visualization of SET & Yes & Yes \\
+               Merged Branch Conditions & Yes & Yes (optionally) \\
+               Execution Path Hiding & Yes & \textcolor{darkred}{No} \\ % Old: Set Root, Expand, Collapse, Isolate, Show all
+               Execution options & Run, Into, Over & \textcolor{darkgreen}{Run, Into, Over, Return, Pause} \\
+               Break-/Watchpoints & Yes & \textcolor{darkred}{No} \\
+               Path condition of SET nodes & Yes & Yes \\
+               Code highlighting & Yes & Yes \\
+               Proof reference & No & \textcolor{darkgreen}{Yes (node with sequent)} \\
+               Call stack of SET nodes & No & \textcolor{darkgreen}{Yes (node with sequent)} \\
+               \hline
+            \end{tabular}
+      \end{table}
+	\end{frame}
+   
+   \begin{frame}[t]
+		\frametitle{Current Features (Old vs New)}
+      
+      \begin{table}
+         \centering
+            \begin{tabular}{|l|l|l|}
+               \hline
+               Feature & Old Debugger & New Debugger \\
+               \hline
+               \hline
+               Variables of SET node & No (only diagram) & \textcolor{darkgreen}{Yes, all updates} \\
+               Symbolic Object diagram & Yes & \textcolor{darkred}{No} \\
+               Equivalent classes & Yes & \textcolor{darkred}{No} \\
+               \hline
+               Testcase generation & Yes & \textcolor{darkred}{No} \\
+               \hline
+               Stable & No & \textcolor{darkgreen}{Yes} \\
+               Tested & ??? & \textcolor{darkgreen}{Yes (JUnit, SWTBot)} \\
+               Well in Eclipse integrated & Elementary & \textcolor{darkgreen}{Extended Eclipse Debug API} \\
+               \hline
+            \end{tabular}
+      \end{table}
+	\end{frame}
+   \section{Features}
+
+\section{Milestones}
+   \begin{frame}[t]
+		\frametitle{Milestones}
+      
+      \begin{itemize}
+         \item M1: 04.07.2012
+               \begin{itemize}
+                  \item Features mentioned on previous slides: Current Features (Old vs New)
+               \end{itemize}         
+         \item M2
+               \begin{itemize}
+                  \item Release on \KeY website
+                  \item Incompatibility between \KeY GPL and Eclipse EPL solved
+               \end{itemize}         
+         \item M3
+               \begin{itemize}
+                  \item Launching (Any statement/block and save/load)
+                  \item Symbolic Object Diagram including Equivalent classes
+                  \item Paper "`Debug anything at any time"'
+               \end{itemize}
+         \item M4: Identification of bugs in SET
+         \item Off topic: Setup continuous integration server
+      \end{itemize}
+	\end{frame}
+   
+\section{Future Work}
+   \begin{frame}[t]
+		\frametitle{Ideas for Future Work (1)}
+      
+      \begin{itemize}
+         \item Launching
+               \begin{itemize}
+                  \item Any statement or block of statements
+                  \item Optional definition of method parameters \& heap initialization (or precondition?)
+                  \item Save/Load execution tree to/from *.proof files
+               \end{itemize}
+         \item Execution (Bachelor Thesis)
+               \begin{itemize}
+                  \item Breakpoints (Full JDT functionality, e.g. including conditions)
+                  \item Watchpoints (Condition without source code line)
+               \end{itemize}
+         \item Symbolic Execution Tree (SET)
+               \begin{itemize}
+                  \item Source code location for branch conditions and termination (open question)
+                  \item Different return values, multiple values of variables (open question)
+                  \item Avoid unknown identifiers in values (open question)
+                  \item Avoid unknown identifiers in SET caused by variable declaration (open question)
+                  \item Path condition simplification (open question), maybe SMT, Values as update
+                  \item Loop conditions in path conditions? (open question) (Allow single BC)
+                  \item Execution path hiding: Set Root, Expand, Collapse, Isolate, Show all
+                  \item Extract constraints from Antecedent per SET node and show them to the user
+               \end{itemize}
+      \end{itemize}
+	\end{frame}
+   
+   \begin{frame}[t]
+		\frametitle{Ideas for Future Work (2)}
+      
+      \begin{itemize}
+         \item Visualization of variables
+               \begin{itemize}
+                  \item Symbolic Object diagram
+                  \item Equivalent classes
+               \end{itemize}
+         \item Testcase generation (work from Gabriele and Christopher)
+               \begin{itemize}
+                  \item Combination with real execution based on the generated model.
+               \end{itemize}
+         \item Compiling and optimization (work from Ran)
+         \item Bug detection
+               \begin{itemize}
+                  \item Highlighting method calls/returns which violate specifications
+                  \item Declarative Debugging (Master Thesis)
+                  \item Definition of failure states (search comparable to watchpoints)
+                  \item Reconstruction of stack traces (maybe helpful for Johannes)
+               \end{itemize}
+         \item Verification
+               \begin{itemize}
+                  \item Optional use operation contracts as method treatment
+                  \item Optional use loop invariants to treat loops
+                  \item Use Symbolic Execution Debugger as frontend for verification
+               \end{itemize}
+      \end{itemize}
+	\end{frame}
+   
+   \begin{frame}[t]
+		\frametitle{Ideas for Future Work (3)}
+      
+      \begin{itemize}
+         \item Extension to full Java (Float, Threads, dynamic class loading, API, $\dots$)
+         \item Experimental evaluation (e.g as part of the EISE exercises)
+      \end{itemize}
+	\end{frame}
+   
+\section{Discussion and Comments}
+   
+   \begin{frame}[t]
+		\frametitle{Discussion and Comments}
+	\end{frame}
+
+\end{document}

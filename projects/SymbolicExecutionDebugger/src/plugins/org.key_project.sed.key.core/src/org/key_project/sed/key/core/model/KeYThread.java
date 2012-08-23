@@ -5,7 +5,9 @@ import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDThread;
 import org.key_project.sed.key.core.util.KeYModelUtil;
+import org.key_project.sed.key.core.util.LogUtil;
 
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 
@@ -24,6 +26,11 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     * The contained children.
     */
    private IKeYSEDDebugNode<?>[] children;
+
+   /**
+    * The method call stack.
+    */
+   private IKeYSEDDebugNode<?>[] callStack;
 
    /**
     * Constructor.
@@ -57,14 +64,16 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     */
    @Override
    public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
-      IExecutionNode[] executionChildren = executionNode.getChildren();
-      if (children == null) {
-         children = KeYModelUtil.createChildren(this, executionChildren);
+      synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
+         IExecutionNode[] executionChildren = executionNode.getChildren();
+         if (children == null) {
+            children = KeYModelUtil.createChildren(this, executionChildren);
+         }
+         else if (children.length != executionChildren.length) { // Assumption: Only new children are added, they are never replaced or removed
+            children = KeYModelUtil.updateChildren(this, children, executionChildren);
+         }
+         return children;
       }
-      else if (children.length != executionChildren.length) { // Assumption: Only new children are added, they are never replaced or removed
-         children = KeYModelUtil.updateChildren(this, children, executionChildren);
-      }
-      return children;
    }
 
    /**
@@ -80,6 +89,85 @@ public class KeYThread extends AbstractSEDThread implements IKeYSEDDebugNode<IEx
     */
    @Override
    public String getName() throws DebugException {
-      return executionNode.getName();
+      try {
+         return executionNode.getName();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute name.", e));
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getPathCondition() throws DebugException {
+      try {
+         return executionNode.getFormatedPathCondition();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute path condition.", e));
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canStepInto() {
+      return getDebugTarget().canStepInto(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void stepInto() throws DebugException {
+      getDebugTarget().stepInto(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canStepOver() {
+      return getDebugTarget().canStepOver(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void stepOver() throws DebugException {
+      getDebugTarget().stepOver(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean canStepReturn() {
+      return getDebugTarget().canStepReturn(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void stepReturn() throws DebugException {
+      getDebugTarget().stepReturn(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+      synchronized (this) {
+         if (callStack == null) {
+            callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
+         }
+         return callStack;
+      }
    }
 }

@@ -11,18 +11,23 @@
 
 package de.hentschel.visualdbc.datasource.key.intern.helper;
 
+import java.util.Map;
+
 import org.eclipse.core.runtime.Assert;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.hentschel.visualdbc.datasource.model.exception.DSException;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 
 /**
  * Provides static methods that uses java reflections to access not public
@@ -73,9 +78,24 @@ public final class KeyHacks {
          // An alternative possible solution will be to convert the HTML text back to plain text.
          // This realization is implemented, because it is easier and more performant. 
          Assert.isNotNull(contract);
-         Term originalPre = ObjectUtil.get(contract, "originalPre");
-         String inv = LogicPrinter.quickPrintTerm(originalPre, services);
-         return StringUtil.trim(inv); // Trim the text to remove line breaks in the end
+         if (contract instanceof FunctionalOperationContractImpl) {
+            final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+            final LocationVariable baseHeap = heapLDT.getHeap();
+            Map<LocationVariable,Term> originalPres = ObjectUtil.get(contract, "originalPres");
+            String pres = "";
+            for(LocationVariable h : heapLDT.getAllHeaps()) {
+               if(originalPres.get(h) != null) {
+                 pres = pres + (h == baseHeap ? "" : "["+h+"]")+" " +
+                   LogicPrinter.quickPrintTerm(originalPres.get(h),services);
+               }
+            }
+            return StringUtil.trim(pres); // Trim the text to remove line breaks in the end
+         }
+         else {
+            Term originalPre = ObjectUtil.get(contract, "originalPre");
+            String inv = LogicPrinter.quickPrintTerm(originalPre, services);
+            return StringUtil.trim(inv); // Trim the text to remove line breaks in the end
+         }
       }
       catch (Exception e) {
          throw new DSException("Can't read pre condition from contract: " + contract, e);
@@ -94,11 +114,19 @@ public final class KeyHacks {
       try {
          // This implementation uses the code copied from de.uka.ilkd.key.speclang.OperationContractImpl#getHTMLText(de.uka.ilkd.key.java.Services); without the transformation to HTML.
          // An alternative possible solution will be to convert the HTML text back to plain text.
-         // This realization is implemented, because it is easier and more performant. 
+         // This realization is implemented, because it is easier and more performant.
          Assert.isNotNull(operationContract);
-         Term originalPost = ObjectUtil.get(operationContract, "originalPost");
-         String inv = LogicPrinter.quickPrintTerm(originalPost, services);
-         return StringUtil.trim(inv); // Trim the text to remove line breaks in the end
+         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+         final LocationVariable baseHeap = heapLDT.getHeap();
+         Map<LocationVariable,Term> originalPosts = ObjectUtil.get(operationContract, "originalPosts");
+         String posts = "";
+         for(LocationVariable h : heapLDT.getAllHeaps()) {
+            if(originalPosts.get(h) != null) {
+              posts = posts + (h == baseHeap ? "" : "["+h+"]")+" " +
+                LogicPrinter.quickPrintTerm(originalPosts.get(h),services);
+            }
+         }
+         return StringUtil.trim(posts); // Trim the text to remove line breaks in the end
       }
       catch (Exception e) {
          throw new DSException("Can't read post condition from operation contract: " + operationContract, e);
@@ -137,13 +165,23 @@ public final class KeyHacks {
    public static String getOperationContractModifies(Services services,
                                                      FunctionalOperationContract contract) throws DSException {
       try {
-         // This implementation uses the code copied from de.uka.ilkd.key.speclang.OperationContractImpl#getHTMLText(de.uka.ilkd.key.java.Services); without the transformation to HTML.
+         // This implementation uses the code copied from de.uka.ilkd.key.speclang.FunctionalOperationContractImpl#getHTMLText(de.uka.ilkd.key.java.Services); without the transformation to HTML.
          // An alternative possible solution will be to convert the HTML text back to plain text.
          // This realization is implemented, because it is easier and more performant. 
          Assert.isNotNull(contract);
-         Term originalModifies = ObjectUtil.get(contract, "originalMod");
-         String inv = LogicPrinter.quickPrintTerm(originalModifies, services);
-         return StringUtil.trim(inv); // Trim the text to remove line breaks in the end
+         Map<LocationVariable,Term> originalMods = ObjectUtil.get(contract, "originalMods");
+         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+         final LocationVariable baseHeap = heapLDT.getHeap();
+         String mods = "";
+         for(LocationVariable h : heapLDT.getAllHeaps()) {
+            if(originalMods.get(h) != null) {
+               mods = mods + "mod[" + h + "]: " + LogicPrinter.quickPrintTerm(originalMods.get(h), services);
+               if(h == baseHeap && !contract.hasModifiesClause()) {
+                  mods = mods + ", creates no new objects";
+               }
+            }
+         }
+         return StringUtil.trim(mods); // Trim the text to remove line breaks in the end
       }
       catch (Exception e) {
          throw new DSException("Can't read post condition from operation contract: " + contract, e);

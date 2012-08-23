@@ -4,6 +4,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunch;
@@ -20,13 +21,16 @@ import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
+import de.uka.ilkd.key.java.Position;
+
 /**
  * Tests for {@link KeySEDUtil}.
  * @author Martin Hentschel
  */
 public class KeySEDUtilTest extends TestCase {
     /**
-     * Tests {@link KeySEDUtil#searchLaunchConfigurations(IMethod)}.
+     * Tests {@link KeySEDUtil#searchLaunchConfigurations(IMethod, Position, Position)} and
+     * {@link KeySEDUtil#searchLaunchConfigurations(org.eclipse.core.resources.IFile)}.
      */
     @Test
     public void testSearchLaunchConfigurations() throws CoreException, InterruptedException {
@@ -39,48 +43,133 @@ public class KeySEDUtilTest extends TestCase {
         IMethod firstMethod = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "charge", Signature.C_INT + "");
         IMethod secondMethod = TestUtilsUtil.getJdtMethod(javaProject, "banking.LoggingPayCard", "charge", Signature.C_INT + "");
         // Create first configuration
-        ILaunchConfiguration firstConfiguration = KeySEDUtil.createConfiguration(firstMethod);
+        ILaunchConfiguration firstConfiguration = KeySEDUtil.createConfiguration(firstMethod, null, null);
         assertNotNull(firstConfiguration);
+        ILaunchConfiguration firstConfigurationPart = KeySEDUtil.createConfiguration(firstMethod, new Position(1, 2), new Position(3, 4));
+        assertNotNull(firstConfigurationPart);
         // Create second and third configuration
-        ILaunchConfiguration secondConfiguration = KeySEDUtil.createConfiguration(secondMethod);
+        ILaunchConfiguration secondConfiguration = KeySEDUtil.createConfiguration(secondMethod, null, null);
         assertNotNull(secondConfiguration);
-        ILaunchConfiguration thirdConfiguration = KeySEDUtil.createConfiguration(secondMethod);
+        ILaunchConfiguration secondConfigurationPart = KeySEDUtil.createConfiguration(secondMethod, new Position(5, 6), new Position(7, 8));
+        assertNotNull(secondConfigurationPart);
+        ILaunchConfiguration thirdConfiguration = KeySEDUtil.createConfiguration(secondMethod, null, null);
         assertNotNull(thirdConfiguration);
+        ILaunchConfiguration thirdConfigurationPart = KeySEDUtil.createConfiguration(secondMethod, new Position(5, 6), new Position(7, 8));
+        assertNotNull(thirdConfigurationPart);
+        ILaunchConfiguration thirdConfigurationPartDifferent = KeySEDUtil.createConfiguration(secondMethod, new Position(9, 10), new Position(11, 12));
+        assertNotNull(thirdConfigurationPartDifferent);
+        // Create configurations for files
+        ILaunchConfiguration firstFileConfiguration = KeySEDUtil.createConfiguration((IFile)firstMethod.getUnderlyingResource());
+        assertNotNull(firstFileConfiguration);
+        ILaunchConfiguration secondFileConfiguration = KeySEDUtil.createConfiguration((IFile)secondMethod.getUnderlyingResource());
+        assertNotNull(secondFileConfiguration);
+        ILaunchConfiguration thirdFileConfiguration = KeySEDUtil.createConfiguration((IFile)secondMethod.getUnderlyingResource());
+        assertNotNull(thirdFileConfiguration);
         // Test null
-        List<ILaunchConfiguration> result = KeySEDUtil.searchLaunchConfigurations(null);
+        List<ILaunchConfiguration> result = KeySEDUtil.searchLaunchConfigurations(null, null, null);
         assertNotNull(result);
         assertEquals(0, result.size());
         // Search configuration for first method
-        result = KeySEDUtil.searchLaunchConfigurations(firstMethod);
+        result = KeySEDUtil.searchLaunchConfigurations(firstMethod, null, null);
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals(firstConfiguration, result.get(0));
+        // Search configuration for first method with part
+        result = KeySEDUtil.searchLaunchConfigurations(firstMethod, new Position(1, 2), new Position(3, 4));
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(firstConfigurationPart, result.get(0));
         // Search configurations for second method
-        result = KeySEDUtil.searchLaunchConfigurations(secondMethod);
+        result = KeySEDUtil.searchLaunchConfigurations(secondMethod, null, null);
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(secondConfiguration, result.get(0));
         assertEquals(thirdConfiguration, result.get(1));
+        // Search configurations for second method with part
+        result = KeySEDUtil.searchLaunchConfigurations(secondMethod, new Position(5, 6), new Position(7, 8));
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals(secondConfigurationPart, result.get(0));
+        assertEquals(thirdConfigurationPart, result.get(1));
+        // Search configurations for second method with different part
+        result = KeySEDUtil.searchLaunchConfigurations(secondMethod, new Position(9, 10), new Position(11, 12));
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(thirdConfigurationPartDifferent, result.get(0));
+        // Search configurations for second method with not existing part
+        result = KeySEDUtil.searchLaunchConfigurations(secondMethod, new Position(9, 10), new Position(42, 42));
+        assertNotNull(result);
+        assertEquals(0, result.size());
+        
+        // Test file null
+        result = KeySEDUtil.searchLaunchConfigurations(null);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+        // Search configuration for first file
+        result = KeySEDUtil.searchLaunchConfigurations((IFile)firstMethod.getUnderlyingResource());
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(firstFileConfiguration, result.get(0));
+        // Search configuration for second file
+        result = KeySEDUtil.searchLaunchConfigurations((IFile)secondMethod.getUnderlyingResource());
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals(secondFileConfiguration, result.get(0));
+        assertEquals(thirdFileConfiguration, result.get(1));
     }
     
     /**
-     * Tests {@link KeySEDUtil#createConfiguration(IMethod)}.
+     * Tests {@link KeySEDUtil#createConfiguration(IFile)}.
      */
     @Test
-    public void testCreateConfiguration() throws CoreException, InterruptedException {
+    public void testCreateConfiguration_IFile() throws CoreException, InterruptedException {
         // Create projects with test content
-        IJavaProject javaProject = TestUtilsUtil.createJavaProject("KeySEDUtilTest_testCreateConfiguration");
+        IJavaProject javaProject = TestUtilsUtil.createJavaProject("KeySEDUtilTest_testCreateConfiguration_IFile");
         IFolder srcFolder = javaProject.getProject().getFolder("src");
         IFolder banking = TestUtilsUtil.createFolder(srcFolder, "banking");
         BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/banking", banking);
         // Get method
         IMethod method = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "charge", Signature.C_INT + "");
-        // Create configuration
-        ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method);
+        // Create configuration without method range
+        IFile file = (IFile)method.getUnderlyingResource();
+        ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(file);
+        assertNotNull(configuration);
+        assertEquals(file.getFullPath().toString(), KeySEDUtil.getFileToLoadValue(configuration));
+        assertFalse(KeySEDUtil.isNewDebugSession(configuration));
+    }
+    
+    /**
+     * Tests {@link KeySEDUtil#createConfiguration(IMethod, Position, Position)}.
+     */
+    @Test
+    public void testCreateConfiguration_IMethod() throws CoreException, InterruptedException {
+        // Create projects with test content
+        IJavaProject javaProject = TestUtilsUtil.createJavaProject("KeySEDUtilTest_testCreateConfiguration_IMethod");
+        IFolder srcFolder = javaProject.getProject().getFolder("src");
+        IFolder banking = TestUtilsUtil.createFolder(srcFolder, "banking");
+        BundleUtil.extractFromBundleToWorkspace(Activator.PLUGIN_ID, "data/banking", banking);
+        // Get method
+        IMethod method = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "charge", Signature.C_INT + "");
+        // Create configuration without method range
+        ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method, null, null);
         assertNotNull(configuration);
         assertEquals(javaProject.getProject().getName(), KeySEDUtil.getProjectValue(configuration));
         assertEquals("banking.PayCard", KeySEDUtil.getTypeValue(configuration));
         assertEquals("charge(int)", KeySEDUtil.getMethodValue(configuration));
+        assertFalse(KeySEDUtil.isExecuteMethodRange(configuration));
+        assertTrue(KeySEDUtil.isNewDebugSession(configuration));
+        // Create configuration with method range
+        configuration = KeySEDUtil.createConfiguration(method, new Position(1, 2), new Position(3, 4));
+        assertNotNull(configuration);
+        assertEquals(javaProject.getProject().getName(), KeySEDUtil.getProjectValue(configuration));
+        assertEquals("banking.PayCard", KeySEDUtil.getTypeValue(configuration));
+        assertEquals("charge(int)", KeySEDUtil.getMethodValue(configuration));
+        assertTrue(KeySEDUtil.isExecuteMethodRange(configuration));
+        assertEquals(1, KeySEDUtil.getMethodRangeStartLine(configuration));
+        assertEquals(2, KeySEDUtil.getMethodRangeStartColumn(configuration));
+        assertEquals(3, KeySEDUtil.getMethodRangeEndLine(configuration));
+        assertEquals(4, KeySEDUtil.getMethodRangeEndColumn(configuration));
+        assertTrue(KeySEDUtil.isNewDebugSession(configuration));
     }
     
     /**
@@ -106,7 +195,7 @@ public class KeySEDUtilTest extends TestCase {
         // Get method
         IMethod method = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "charge", Signature.C_INT + "");
         // Create configuration
-        ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method);
+        ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method, null, null);
         assertNotNull(configuration);
         // Create launch
         ILaunch launch = new Launch(configuration, KeySEDUtil.MODE, null);
@@ -129,7 +218,7 @@ public class KeySEDUtilTest extends TestCase {
         // Get method
         IMethod method = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "charge", Signature.C_INT + "");
         // Create configuration
-        ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method);
+        ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method, null, null);
         assertNotNull(configuration);
         // Test null
         assertNull(KeySEDUtil.findMethod((ILaunchConfiguration)null));
@@ -150,7 +239,7 @@ public class KeySEDUtilTest extends TestCase {
         // Get method
         IMethod method = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "charge", Signature.C_INT + "");
         // Create configuration
-        ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method);
+        ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method, null, null);
         assertNotNull(configuration);
         // Test null
         assertEquals(StringUtil.EMPTY_STRING, KeySEDUtil.getProjectValue((ILaunchConfiguration)null));
@@ -171,7 +260,7 @@ public class KeySEDUtilTest extends TestCase {
         // Get method
         IMethod method = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "charge", Signature.C_INT + "");
         // Create configuration
-        ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method);
+        ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method, null, null);
         assertNotNull(configuration);
         // Test null
         assertEquals(StringUtil.EMPTY_STRING, KeySEDUtil.getTypeValue((ILaunchConfiguration)null));
@@ -192,7 +281,7 @@ public class KeySEDUtilTest extends TestCase {
         // Get method
         IMethod method = TestUtilsUtil.getJdtMethod(javaProject, "banking.PayCard", "charge", Signature.C_INT + "");
         // Create configuration
-        ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method);
+        ILaunchConfiguration configuration = KeySEDUtil.createConfiguration(method, null, null);
         assertNotNull(configuration);
         // Test null
         assertEquals(StringUtil.EMPTY_STRING, KeySEDUtil.getMethodValue((ILaunchConfiguration)null));

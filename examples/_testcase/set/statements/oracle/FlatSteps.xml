@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true">
-   <methodCall name="self.doSomething(_asdf,_a,_b);" pathCondition="true">
-      <statement name="int x = 1;" pathCondition="true">
-         <statement name="int y = 2;" pathCondition="true">
-            <statement name="int z = 3;" pathCondition="true">
-               <methodReturn name="&lt;return of self.doSomething(_asdf,_a,_b);&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return of self.doSomething(_asdf,_a,_b);&gt;">
-                  <termination name="&lt;end&gt;" pathCondition="true" exceptionalTermination="false">
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.doSomething(asdf,a,b);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int x = 1;" pathCondition="true" pathConditionChanged="false">
+         <statement name="int y = 2;" pathCondition="true" pathConditionChanged="false">
+            <statement name="int z = 3;" pathCondition="true" pathConditionChanged="false">
+               <methodReturn name="&lt;return of self.doSomething(asdf,a,b);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of self.doSomething(asdf,a,b);&gt;">
+                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
                   </termination>
                </methodReturn>
             </statement>

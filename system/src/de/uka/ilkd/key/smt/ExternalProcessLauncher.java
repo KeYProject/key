@@ -113,6 +113,9 @@ public class ExternalProcessLauncher<T> {
     	return pipe.getSession();
     }
 	
+    /**
+     * Stops the external process: In particular the pipe is closed and the process is destroyed. 
+     */
 	public void stop(){
 	    pipe.close();
 	    if(process != null){
@@ -121,6 +124,10 @@ public class ExternalProcessLauncher<T> {
 	    
 	}
 	
+	/**
+	 * Clean up:
+	 * - destroy the process and close all chanels.
+	 */
 	public void cleanUp(){
 		try{
 			lockProcess.lock();

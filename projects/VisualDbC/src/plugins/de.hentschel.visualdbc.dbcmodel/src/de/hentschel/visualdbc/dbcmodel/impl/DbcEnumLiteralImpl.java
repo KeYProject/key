@@ -17,15 +17,16 @@
  */
 package de.hentschel.visualdbc.dbcmodel.impl;
 
-import de.hentschel.visualdbc.dbcmodel.DbcEnumLiteral;
-import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
-
 import org.eclipse.emf.common.notify.Notification;
-
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
+import org.eclipse.emf.ecore.util.EObjectResolvingEList;
+
+import de.hentschel.visualdbc.dbcmodel.DbcEnumLiteral;
+import de.hentschel.visualdbc.dbcmodel.DbcProofReference;
+import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -34,6 +35,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcEnumLiteralImpl#getAllReferences <em>All References</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcEnumLiteralImpl#getName <em>Name</em>}</li>
  * </ul>
  * </p>
@@ -41,6 +43,16 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * @generated
  */
 public class DbcEnumLiteralImpl extends EObjectImpl implements DbcEnumLiteral {
+   /**
+    * The cached value of the '{@link #getAllReferences() <em>All References</em>}' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getAllReferences()
+    * @generated
+    * @ordered
+    */
+   protected EList<DbcProofReference> allReferences;
+
    /**
     * The default value of the '{@link #getName() <em>Name</em>}' attribute.
     * <!-- begin-user-doc -->
@@ -85,6 +97,18 @@ public class DbcEnumLiteralImpl extends EObjectImpl implements DbcEnumLiteral {
     * <!-- end-user-doc -->
     * @generated
     */
+   public EList<DbcProofReference> getAllReferences() {
+      if (allReferences == null) {
+         allReferences = new EObjectResolvingEList<DbcProofReference>(DbcProofReference.class, this, DbcmodelPackage.DBC_ENUM_LITERAL__ALL_REFERENCES);
+      }
+      return allReferences;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    public String getName() {
       return name;
    }
@@ -109,6 +133,8 @@ public class DbcEnumLiteralImpl extends EObjectImpl implements DbcEnumLiteral {
    @Override
    public Object eGet(int featureID, boolean resolve, boolean coreType) {
       switch (featureID) {
+         case DbcmodelPackage.DBC_ENUM_LITERAL__ALL_REFERENCES:
+            return getAllReferences();
          case DbcmodelPackage.DBC_ENUM_LITERAL__NAME:
             return getName();
       }
@@ -153,6 +179,8 @@ public class DbcEnumLiteralImpl extends EObjectImpl implements DbcEnumLiteral {
    @Override
    public boolean eIsSet(int featureID) {
       switch (featureID) {
+         case DbcmodelPackage.DBC_ENUM_LITERAL__ALL_REFERENCES:
+            return allReferences != null && !allReferences.isEmpty();
          case DbcmodelPackage.DBC_ENUM_LITERAL__NAME:
             return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
       }

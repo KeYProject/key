@@ -1,8 +1,9 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -16,10 +17,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodyStatement> implements IExecutionMethodCall {
    /**
     * Constructor.
+    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public ExecutionMethodCall(Node proofNode) {
-      super(proofNode);
+   public ExecutionMethodCall(KeYMediator mediator, Node proofNode) {
+      super(mediator, proofNode);
    }
 
    /**
@@ -42,7 +44,7 @@ public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodySt
     * {@inheritDoc}
     */
    @Override
-   public ProgramMethod getProgramMethod() {
+   public IProgramMethod getProgramMethod() {
       return getActiveStatement().getProgramMethod(getServices());
    }
 

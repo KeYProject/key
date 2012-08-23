@@ -1,10 +1,14 @@
 package de.uka.ilkd.key.rule;
 
+import java.util.List;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.speclang.HeapContext;
 
 public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 
@@ -95,6 +99,10 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
         return complete();      
     }
 
+    @Override
+    public List<LocationVariable> getHeapContext() {
+      return null;
+    }
     
 	/** returns true if all variables are instantiated 
      * @return true if all variables are instantiated 

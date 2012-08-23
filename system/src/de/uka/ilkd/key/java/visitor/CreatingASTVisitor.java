@@ -403,7 +403,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnEnhancedFor(EnhancedFor x) {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
-                return new EnhancedFor(changeList);
+                EnhancedFor enhancedFor = new EnhancedFor(changeList);
+                performActionOnLoopInvariant((EnhancedFor)pe, enhancedFor);
+                return enhancedFor;
             }
         };
         def.doAction(x);
@@ -448,13 +450,11 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             if (x.getChildCount() == 3) {
                 addChild(new MethodFrame((IProgramVariable) changeList.get(0),
                         (IExecutionContext) changeList.get(1),
-                        (StatementBlock) changeList.get(2), x
-                                .getProgramMethod(), pi));
+                        (StatementBlock) changeList.get(2), pi));
 
             } else if (x.getChildCount() == 2) {
                 addChild(new MethodFrame(null, (IExecutionContext) changeList
-                        .get(0), (StatementBlock) changeList.get(1), x
-                        .getProgramMethod(), pi));
+                        .get(0), (StatementBlock) changeList.get(1), pi));
             } else {
                 throw new IllegalStateException(
                         "Methodframe has not allowed number of children.");

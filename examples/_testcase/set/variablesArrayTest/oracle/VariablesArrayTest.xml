@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true">
-   <methodCall name="self.main();" pathCondition="true">
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
       </variable>
-      <statement name="int[][] multiArray = new int[2][];" pathCondition="true">
+      <statement name="int[][] multiArray = new int[2][];" pathCondition="true" pathConditionChanged="false">
          <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
          </variable>
          <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
          </variable>
-         <statement name="multiArray[0]=new int[]{1,2 };" pathCondition="true">
+         <statement name="multiArray[0]=new int[]{1,2 };" pathCondition="true" pathConditionChanged="false">
             <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
             </variable>
             <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
@@ -37,7 +37,7 @@
                   </variable>
                </variable>
             </variable>
-            <statement name="multiArray[1]=new int[]{3,4,5 };" pathCondition="true">
+            <statement name="multiArray[1]=new int[]{3,4,5 };" pathCondition="true" pathConditionChanged="false">
                <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
                </variable>
                <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
@@ -60,7 +60,7 @@
                      </variable>
                   </variable>
                </variable>
-               <statement name="return multiArray[0][0]+multiArray[0][1]+multiArray[1][0]+multiArray[1][1]+multiArray[1][2];" pathCondition="true">
+               <statement name="return multiArray[0][0]+multiArray[0][1]+multiArray[1][0]+multiArray[1][1]+multiArray[1][2];" pathCondition="true" pathConditionChanged="false">
                   <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
                   </variable>
                   <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
@@ -77,7 +77,7 @@
                         </variable>
                      </variable>
                   </variable>
-                  <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;  12
+                  <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  12
 + \if (x_arr_9 = x_arr_4)
       \then (3)
       \else (\if (x_arr_9 = x_arr_4)
@@ -85,15 +85,14 @@
                  \else (1))
 + \if (x_arr_9 = x_arr_4)
       \then (4)
-      \else (\if (  x_arr_9 = x_arr_4
-                  &amp; x_arr_9.length &gt;= 1)
+      \else (\if (x_arr_9 = x_arr_4)
                  \then (0)
                  \else (2))&apos; as result of self.main();&gt;">
                      <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
                      </variable>
                      <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
                      </variable>
-                     <termination name="&lt;end&gt;" pathCondition="true" exceptionalTermination="false">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
                      </termination>
                   </methodReturn>
                </statement>

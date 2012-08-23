@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main(a);" pathCondition="true" pathConditionChanged="false">
+      <statement name="firstLevel(a);" pathCondition="true" pathConditionChanged="false">
+         <methodCall name="self.firstLevel(a_1);" pathCondition="true" pathConditionChanged="false">
+            <statement name="secondLevel(a_1);" pathCondition="true" pathConditionChanged="false">
+               <methodCall name="self.secondLevel(a_2);" pathCondition="true" pathConditionChanged="false">
+                  <statement name="thirdLevel(a_2);" pathCondition="true" pathConditionChanged="false">
+                     <methodCall name="self.thirdLevel(a_3);" pathCondition="true" pathConditionChanged="false">
+                        <statement name="fourthLevel(a_3);" pathCondition="true" pathConditionChanged="false">
+                        </statement>
+                     </methodCall>
+                  </statement>
+               </methodCall>
+            </statement>
+         </methodCall>
+      </statement>
+   </methodCall>
+</startNode>

@@ -9,6 +9,8 @@ import org.eclipse.debug.internal.ui.viewers.model.provisional.IPresentationCont
 import org.eclipse.debug.internal.ui.viewers.model.provisional.IViewerUpdate;
 import org.eclipse.debug.ui.IDebugUIConstants;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.util.ISEDConstants;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
 import org.key_project.util.java.ArrayUtil;
 
@@ -27,7 +29,7 @@ import org.key_project.util.java.ArrayUtil;
  * a compact symbolic execution tree is shown. It means that all following children
  * are returned as child of the given node until a child has not exactly one following child.
  * This hierarchy is computed via {@link #getCompactChildren(ISEDDebugNode)}. If
- * a node was reordered in this view can be checked via {@link #isCompactNod(ISEDDebugNode)}.
+ * a node was reordered in this view can be checked via {@link #isCompactNode(ISEDDebugNode)}.
  * </p>
  * @author Martin Hentschel
  */
@@ -59,7 +61,13 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
    protected Object[] getAllChildren(Object parent, IPresentationContext context) throws CoreException {
       if (IDebugUIConstants.ID_VARIABLE_VIEW.equals(context.getId())) {
          if (parent instanceof IStackFrame) {
-            return ((IStackFrame)parent).getVariables();
+            IStackFrame frame = ((IStackFrame)parent);
+            if (frame.hasVariables()) {
+               return frame.getVariables();
+            }
+            else {
+               return EMPTY;
+            }
          }
          else {
             return EMPTY;
@@ -67,32 +75,63 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
       }
       else if (IDebugUIConstants.ID_REGISTER_VIEW.equals(context.getId())) {
          if (parent instanceof IStackFrame) {
-            return ((IStackFrame)parent).getRegisterGroups();
+            IStackFrame frame = ((IStackFrame)parent);
+            if (frame.hasRegisterGroups()) {
+               return frame.getRegisterGroups();
+            }
+            else {
+               return EMPTY;
+            }
+         }
+         else {
+            return EMPTY;
+         }
+      }
+      else if (ISEDConstants.ID_CALL_STACK.equals(context.getId())) {
+         if (parent instanceof ISEDDebugNode) {
+            Object root = context.getProperty(ISEDConstants.PRESENTATION_CONTEXT_PROPERTY_INPUT);
+            if (root == null || root == parent) { // Return only children if it is the viewers input because otherwise the stack elements are expandable.
+               ISEDDebugNode[] callStack = ((ISEDDebugNode)parent).getCallStack();
+               return callStack != null ? callStack : EMPTY; 
+            }
+            else {
+               return EMPTY;
+            }
          }
          else {
             return EMPTY;
          }
       }
       else {
-         if (parent instanceof ISEDDebugNode) {
-            if (SEDPreferenceUtil.isShowCompactExecutionTree()) {
-               ISEDDebugNode node = (ISEDDebugNode)parent;
-               if (!isCompactNod(node)) {
-                  Object[] children = getCompactChildren(node);
-                  return children != null ? children : EMPTY;
-               }
-               else {
-                  return EMPTY;
-               }
+         return getAllDebugNodeChildren(parent);
+      }
+   }
+   
+   /**
+    * Returns all children of the given parent in view "Debug".
+    * @param parent The parent element.
+    * @return The children.
+    * @throws DebugException Occurred Exception
+    */
+   public Object[] getAllDebugNodeChildren(Object parent) throws DebugException {
+      if (parent instanceof ISEDDebugNode) {
+         if (SEDPreferenceUtil.isShowCompactExecutionTree()) {
+            ISEDDebugNode node = (ISEDDebugNode)parent;
+            if (!isCompactNode(node)) {
+               Object[] children = getCompactChildren(node);
+               return children != null ? children : EMPTY;
             }
             else {
-               Object[] children = ((ISEDDebugNode)parent).getChildren();
-               return children != null ? children : EMPTY;
+               return EMPTY;
             }
          }
          else {
-            return EMPTY;
+            Object[] children = ((ISEDDebugNode)parent).getChildren();
+            return children != null ? children : EMPTY;
          }
+      }
+      else {
+         return EMPTY;
       }
    }
    
@@ -104,7 +143,7 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
     * @return {@code true} is compact node and should have no children, {@code false} is no compact node and should have his children
     * @throws DebugException Occurred Exception.
     */
-   protected boolean isCompactNod(ISEDDebugNode node) throws DebugException {
+   protected boolean isCompactNode(ISEDDebugNode node) throws DebugException {
       if (node != null) {
          ISEDDebugNode parent = node.getParent();
          if (parent != null) {
@@ -156,6 +195,31 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
    }
 
    /**
+    * Returns the parent of a given {@link ISEDDebugNode} as shown
+    * in view "Debug".
+    * @param element The current element.
+    * @return Its parent shown in view "Debug".
+    * @throws DebugException Occurred Exception
+    */
+   public Object getDebugNodeParent(Object element) throws DebugException {
+      if (element instanceof ISEDThread) {
+         return ((ISEDThread)element).getDebugTarget();
+      }
+      else if (element instanceof ISEDDebugNode) {
+         ISEDDebugNode parent = ((ISEDDebugNode)element).getParent();
+         if (SEDPreferenceUtil.isShowCompactExecutionTree()) {
+            while (isCompactNode(parent)) {
+               parent = parent.getParent();
+            }
+         }
+         return parent;
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
     * {@inheritDoc}
     */
    @Override
@@ -178,7 +242,8 @@ public class SEDDebugNodeContentProvider extends ElementContentProvider {
    protected boolean supportsContextId(String id) {
       return IDebugUIConstants.ID_DEBUG_VIEW.equals(id) ||
              IDebugUIConstants.ID_VARIABLE_VIEW.equals(id) ||
-             IDebugUIConstants.ID_REGISTER_VIEW.equals(id);
+             IDebugUIConstants.ID_REGISTER_VIEW.equals(id) ||
+             ISEDConstants.ID_CALL_STACK.equals(id);
    }
    
    /**

@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -22,10 +22,16 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -35,7 +41,6 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -262,9 +267,9 @@ public final class UseDependencyContractRule implements BuiltInRule {
     
     private static Map<Term, PosInOccurrence> collectBaseOccs(Term focus, 
 	    					       Sequent seq) {
-	assert focus.op() instanceof ObserverFunction;
+	assert focus.op() instanceof IObserverFunction;
 	final Map<Term, PosInOccurrence> result 
-		= new HashMap<Term, PosInOccurrence>();
+		= new LinkedHashMap<Term, PosInOccurrence>();
 	for(SequentFormula cf : seq.antecedent()) {
 	    final PosInOccurrence pos 
 	    	= new PosInOccurrence(cf, PosInTerm.TOP_LEVEL, true);
@@ -283,7 +288,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	    				  Sequent seq,
 	    				  Services services) {
 	final Term focus = pos.subTerm();
-	assert focus.op() instanceof ObserverFunction;
+	assert focus.op() instanceof IObserverFunction;
 	
 	final List<PosInOccurrence> result 
 		= new LinkedList<PosInOccurrence>();
@@ -338,7 +343,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     public static ImmutableSet<Contract> getApplicableContracts(
 	    					Services services,  
                                                 KeYJavaType kjt,
-                                                ObserverFunction target) {
+                                                IObserverFunction target) {
         ImmutableSet<Contract> result 
         	= services.getSpecificationRepository().getContracts(kjt, 
         							     target);
@@ -365,7 +370,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	
 	//top level symbol must be observer
 	final Term focus = pio.subTerm();
-	if(!(focus.op() instanceof ObserverFunction)) {
+	if(!(focus.op() instanceof IObserverFunction)) {
 	    return false;
 	}
 	
@@ -382,7 +387,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	}
 
 	//there must be contracts for the observer
-	final ObserverFunction target = (ObserverFunction) focus.op();
+	final IObserverFunction target = (IObserverFunction) focus.op();
 	final KeYJavaType kjt 
 		= target.isStatic() 
 		  ? target.getContainerType()
@@ -413,7 +418,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 	final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
 	final PosInOccurrence pio = ruleApp.posInOccurrence();	
         final Term focus = pio.subTerm();
-        final ObserverFunction target = (ObserverFunction) focus.op();
+        final IObserverFunction target = (IObserverFunction) focus.op();
 
         final Term selfTerm;
         if (target.isStatic()) {
@@ -462,8 +467,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
         
         //get precondition, dependency term, measured_by
         Term freePre 
-        	= TB.and(TB.wellFormed(services, subStep),
-        		 TB.wellFormed(services, focus.sub(0)));
+        	= TB.and(TB.wellFormed(subStep, services),
+        		 TB.wellFormed(focus.sub(0), services));
 	if(!target.isStatic()) {
 	    freePre = TB.and(freePre, TB.not(TB.equals(selfTerm, TB.NULL(services))));
 	    freePre = TB.and(freePre, TB.created(services,
@@ -477,7 +482,8 @@ public final class UseDependencyContractRule implements BuiltInRule {
 					       		paramTerm, 
 					       		target.getParamType(i++)));
 	}
-        final Term pre = contract.getPre(subStep,
+        final Term pre = contract.getPre(services.getTypeConverter().getHeapLDT().getHeap(),
+                                         subStep,
         	                         selfTerm, 
         	                         paramTerms,
                                          null, 
@@ -512,7 +518,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         //bail out if obviously not helpful
         if(!changedLocs.first.op().equals(locSetLDT.getEmpty())) {
             final ImmutableSet<Term> changed 
-            	= addEqualDefs(MiscTools.unionToSet(
+            	= addEqualDefs(TB.unionToSet(
             				      changedLocs.first, 
             				      services), 
             				      goal);

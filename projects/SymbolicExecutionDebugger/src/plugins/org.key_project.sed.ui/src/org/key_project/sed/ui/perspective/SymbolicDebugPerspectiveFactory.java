@@ -25,6 +25,9 @@ public class SymbolicDebugPerspectiveFactory implements IPerspectiveFactory {
       // Put the debug view on the left.
       IFolderLayout leftFolder = layout.createFolder("left", IPageLayout.LEFT, 0.5f, editorArea);
       leftFolder.addView(IDebugUIConstants.ID_DEBUG_VIEW);
+      // Put the properties view on bottom left.
+      IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeft", IPageLayout.BOTTOM, 0.8f, "left");
+      bottomLeftFolder.addView(IPageLayout.ID_PROP_SHEET);
       // Put the variables view on top.
       IFolderLayout topFolder = layout.createFolder("top", IPageLayout.TOP, 0.2f, editorArea);
       topFolder.addView(IDebugUIConstants.ID_VARIABLE_VIEW);
@@ -36,5 +39,6 @@ public class SymbolicDebugPerspectiveFactory implements IPerspectiveFactory {
       // View Shortcuts
       layout.addShowViewShortcut(IDebugUIConstants.ID_DEBUG_VIEW);
       layout.addShowViewShortcut(IDebugUIConstants.ID_VARIABLE_VIEW);
+      layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
    }
 }

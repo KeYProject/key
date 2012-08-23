@@ -16,11 +16,27 @@ import java.io.File;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
 
+
+/**
+ * This interface is used for modeling different solvers. It provides methods that encode information
+ * about the concrete solver:
+ * - name 
+ * - command for starting the solver
+ * - parameters
+ * - supported versions
+ *
+ */
 public interface SolverType extends PipeListener<SolverCommunication> {
 
+		/**
+		 * Creates an instance of SMTSolver representing a concrete instance of that solver.
+		 * 		 */
         public SMTSolver createSolver(SMTProblem problem,
                         SolverListener listener, Services services);
 
+        /**
+         * Returns the name of the solver.
+         *   */
         public String getName();
 
         /**
@@ -54,12 +70,15 @@ public interface SolverType extends PipeListener<SolverCommunication> {
         /**
          * The translator to be used. So far each solver supports only one format. 
          */
-        public SMTTranslator getTranslator(Services services);
+        public SMTTranslator createTranslator(Services services);
         /**
          * The delimiters of the messages that are sent from the solver to KeY. For example it could be "\n"
          */
         public String[]  getDelimiters();
         
+        /**
+         * Returns true if and only if the solver supports if-then-else terms.
+         *          */
         public boolean supportsIfThenElse();
         
         /**
@@ -68,11 +87,30 @@ public interface SolverType extends PipeListener<SolverCommunication> {
          */
         public String modifyProblem(String problem);
         
+        /**
+         * Returns the parameter that can be used to gain the version of the solver when 
+         * executing it.
+         *       */
         public String getVersionParameter();
+        /**
+         * Returns an array of all versions that are supported by KeY.
+         *     */
         public String[] getSupportedVersions();
+        /**
+         * Returns the current version that is installed, if it has already been checked, otherwise null.
+         *    */
         public String getVersion();
+        /**
+         * Returns whether the currently installed version is supported.
+         *     */
         public boolean isSupportedVersion();
+        /**
+         * Checks for support and returns the result.
+         * */
         public boolean checkForSupport();
+        /**
+         * returns true if and only if the support has been checked for the currently installed solver.
+         */
         public boolean supportHasBeenChecked();
         
 
@@ -118,7 +156,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                         return true;
                 };
                 @Override
-                public SMTTranslator getTranslator(Services services) {
+                public SMTTranslator createTranslator(Services services) {
                         return new SmtLib2Translator(services,
                                         new Configuration(false,false));
                 }
@@ -228,7 +266,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 };
 
                 @Override
-                public SMTTranslator getTranslator(Services services) {
+                public SMTTranslator createTranslator(Services services) {
                         return new SmtLibTranslator(services,
                                         new Configuration(false,true));
                 }
@@ -289,7 +327,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 }
 
                 @Override
-                public SMTTranslator getTranslator(Services services) {
+                public SMTTranslator createTranslator(Services services) {
                         return new SmtLibTranslator(services,
                                         new Configuration(true,true));
                 }
@@ -373,7 +411,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 }
 
                 @Override
-                public SMTTranslator getTranslator(Services services) {
+                public SMTTranslator createTranslator(Services services) {
                         return new SimplifyTranslator(services,
                                         new Configuration(false,true));
                 }

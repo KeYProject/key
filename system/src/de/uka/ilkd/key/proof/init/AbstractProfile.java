@@ -12,9 +12,9 @@ package de.uka.ilkd.key.proof.init;
 
 import java.util.Iterator;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Name;
@@ -27,6 +27,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooserBuilder;
 
 public abstract class AbstractProfile implements Profile {
 
@@ -70,7 +71,8 @@ public abstract class AbstractProfile implements Profile {
         this(standardRuleFilename,
                 DefaultImmutableSet.<GoalChooserBuilder>nil().
                 add(new DefaultGoalChooserBuilder()).
-                add(new DepthFirstGoalChooserBuilder()));
+                add(new DepthFirstGoalChooserBuilder()).
+                add(new SymbolicExecutionGoalChooserBuilder()));
     }
 
     public RuleCollection getStandardRules() {

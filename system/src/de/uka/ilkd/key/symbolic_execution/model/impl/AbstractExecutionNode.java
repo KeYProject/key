@@ -3,6 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.model.impl;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.Node;
@@ -25,11 +26,17 @@ public abstract class AbstractExecutionNode extends AbstractExecutionElement imp
    private List<IExecutionNode> children = new LinkedList<IExecutionNode>();
    
    /**
+    * The contained call stack.
+    */
+   private IExecutionNode[] callStack;
+   
+   /**
     * Constructor.
+    * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     */
-   public AbstractExecutionNode(Node proofNode) {
-      super(proofNode);
+   public AbstractExecutionNode(KeYMediator mediator, Node proofNode) {
+      super(mediator, proofNode);
    }
 
    /**
@@ -70,13 +77,28 @@ public abstract class AbstractExecutionNode extends AbstractExecutionElement imp
     * {@inheritDoc}
     */
    @Override
+   public boolean isPathConditionChanged() {
+      return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public Term getPathCondition() throws ProofInputException {
-      if (getParent() != null) {
-         return getParent().getPathCondition(); // By default the path condition of the parent is used because only branch conditions change it.
+      // Search path condition of the parent which is used by default.
+      Term result = null;
+      AbstractExecutionNode parent = getParent();
+      while (result == null && parent != null) {
+         if (parent.isPathConditionChanged()) {
+            result = parent.getPathCondition();
+         }
+         else {
+            parent = parent.getParent();
+         }
       }
-      else {
-         return TermBuilder.DF.tt();
-      }
+      // Check if a path condition was found.
+      return result != null ? result :  TermBuilder.DF.tt();
    }
 
    /**
@@ -84,11 +106,34 @@ public abstract class AbstractExecutionNode extends AbstractExecutionElement imp
     */
    @Override
    public String getFormatedPathCondition() throws ProofInputException {
-      if (getParent() != null) {
-         return getParent().getFormatedPathCondition(); // By default the path condition of the parent is used because only branch conditions change it.
+      // Search path condition of the parent which is used by default.
+      String result = null;
+      AbstractExecutionNode parent = getParent();
+      while (result == null && parent != null) {
+         if (parent.isPathConditionChanged()) {
+            result = parent.getFormatedPathCondition();
+         }
+         else {
+            parent = parent.getParent();
+         }
       }
-      else {
-         return TermBuilder.DF.tt().toString();
-      }
+      // Check if a path condition was found.
+      return result != null ? result :  TermBuilder.DF.tt().toString();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IExecutionNode[] getCallStack() {
+      return callStack;
+   }
+   
+   /**
+    * Sets the call stack.
+    * @param callStack The call stack.
+    */
+   public void setCallStack(IExecutionNode[] callStack) {
+      this.callStack = callStack;
    }
 }

@@ -1,5 +1,6 @@
 package org.key_project.sed.ui.visualization.execution_tree.feature;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -57,8 +58,8 @@ import org.key_project.util.java.ObjectUtil;
  *                <li>Iterate over subtree in order.</li>
  *                <li>First branch (ends in first leaf node) is completely left centered with x = 0.</li>
  *                <li>
- *                   If a new branch is detected, the maximal width of the previous 
- *                   child branch is computed via {@link #computeSubTreeBounds(ISEDDebugNode)}
+ *                   If a further branch is detected, the maximal width of the previous 
+ *                   branch is computed via {@link #computeSubTreeBounds(ISEDDebugNode)}
  *                   and the x coordinate is the maximal bound (x + width) + a given offset of two grid units.
  *                </li>
  *             </ol>
@@ -81,6 +82,14 @@ import org.key_project.util.java.ObjectUtil;
  *                <li>
  *                   Go back to starting child (leaf node) and center each element with the computed maximal width.
  *                </li>
+ *             </ol>
+ *          </li>
+ *          <li>
+ *             Move righter branches if the width of a modified branch was expanded via {@link #updateParents(PictogramElement, IProgressMonitor)}.
+ *             <ol>
+ *                <li>Find most left node via {@link #findMostLeftSiblingPE(ISEDDebugNode)}</li>
+ *                <li>Compute distance to move as most right node of branch + offset - most left sibling</li>
+ *                <li>Move all righter nodes via {@link #moveRighterNodes(ISEDDebugNode, int, IProgressMonitor)}</li>
  *             </ol>
  *          </li>
  *       </ol>
@@ -270,15 +279,22 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          else {
             monitor = new NullProgressMonitor();
          }
-         // Retrieve name from business model
+         // Update name
          PictogramElement pictogramElement = context.getPictogramElement();
-         monitor.beginTask("Update element: " + pictogramElement, 2);
+         monitor.beginTask("Update element: " + pictogramElement, 3);
          boolean success = updateName(pictogramElement, new SubProgressMonitor(monitor, 1));
          monitor.worked(1);
+         // Update children, they have the correct layout after this step
+         final int OFFSET = getDiagram().getGridUnit() * 2;
          if (success) {
-            success = updateChildren(pictogramElement, new SubProgressMonitor(monitor, 1));
+            success = updateChildren(pictogramElement, OFFSET, new SubProgressMonitor(monitor, 1));
          }
-         monitor.worked(2);
+         monitor.worked(1);
+         // Update parents, because children maybe have now a bigger width and overlap with other branches
+         if (success) {
+            success = updateParents(pictogramElement, OFFSET, new SubProgressMonitor(monitor, 1));
+         }
+         monitor.worked(1);
          monitor.done();
          return success;
       }
@@ -332,14 +348,15 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
     * Updates the children of the {@link ISEDDebugNode} represented
     * by the given {@link PictogramElement}.
     * @param pictogramElement The {@link PictogramElement} to update.
+    * @param offsetBetweenPictogramElements The offset between {@link PictogramElement}s.
     * @param monitor The {@link IProgressMonitor} to use.
     * @return {@code true}, if update process was successful
     * @throws DebugException Occurred Exception.
     */
-   protected boolean updateChildren(PictogramElement pictogramElement, 
+   protected boolean updateChildren(PictogramElement pictogramElement,
+                                    int offsetBetweenPictogramElements,
                                     IProgressMonitor monitor) throws DebugException {
       monitor.beginTask("Update children", IProgressMonitor.UNKNOWN);
-      final int OFFSET = getDiagram().getGridUnit() * 2;
       maxX = 0;
       try {
          if (!monitor.isCanceled()) {
@@ -348,7 +365,8 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             while (i < bos.length && !monitor.isCanceled()) {
                if (bos[i] instanceof ISEDDebugElement) {
                   // Add all children left aligned
-                  Set<ISEDDebugNode> leafs = updateChildrenLeftAligned((ISEDDebugElement)bos[i], monitor, OFFSET, maxX + OFFSET);
+                  Set<ISEDDebugNode> leafs = updateChildrenLeftAligned((ISEDDebugElement)bos[i], monitor, offsetBetweenPictogramElements, maxX);
+                  maxX += offsetBetweenPictogramElements;
                   monitor.worked(1);
                   // Center sub tree
                   centerChildren(leafs, monitor);
@@ -387,7 +405,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
          if (nextPE == null) {
             if (next instanceof ISEDDebugNode) { // Ignore ISEDDebugTarget which has no graphical representation
                ISEDDebugNode nextNode = (ISEDDebugNode)next;
-               createGraphicalRepresentationForSubtree(parentPE, nextNode, offsetBetweenPictogramElements, initialX);
+               createGraphicalRepresentationForNode(parentPE, nextNode, offsetBetweenPictogramElements, initialX);
                nextPE = getPictogramElementForBusinessObject(next);
                if (nextPE != null) {
                   // Update maxX to make sure that ISEDDebugTargets don't overlap each other.
@@ -410,20 +428,20 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    /**
     * Creates a new graphical representation for the given {@link ISEDDebugNode}.
     * @param parentPE The {@link PictogramElement} of {@link ISEDDebugNode#getParent()} or {@code null} if it is an {@link ISEDThread}.
-    * @param root The {@link ISEDDebugNode} for that a graphical representation is needed.
+    * @param node The {@link ISEDDebugNode} for that a graphical representation is needed.
     * @param offsetBetweenPictogramElements The offset between {@link PictogramElement}s, e.g. to parent or to previous sibling.
     * @param initialX The initial X value which is used if no parentPE is defined.
     * @throws DebugException Occurred Exception.
     */
-   protected void createGraphicalRepresentationForSubtree(PictogramElement parentPE,
-                                                          ISEDDebugNode root,
-                                                          int offsetBetweenPictogramElements,
-                                                          int initialX) throws DebugException {
+   protected void createGraphicalRepresentationForNode(PictogramElement parentPE,
+                                                       ISEDDebugNode node,
+                                                       int offsetBetweenPictogramElements,
+                                                       int initialX) throws DebugException { 
       AreaContext areaContext = new AreaContext();
       if (parentPE != null) {
-         ISEDDebugNode parent = root.getParent();
+         ISEDDebugNode parent = node.getParent();
          if (parent != null) {
-            ISEDDebugNode previousSibling = ArrayUtil.getPrevious(parent.getChildren(), root);
+            ISEDDebugNode previousSibling = ArrayUtil.getPrevious(parent.getChildren(), node);
             if (previousSibling != null) {
                // Compute bounds of the sub tree starting by the previous sibling.
                Rectangle previousBounds = computeSubTreeBounds(previousSibling);
@@ -434,15 +452,18 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
                }
                else {
                   // Add directly under parent
+                  // Add directly under parent, but use x of most left pe in branch
+                  int x = findMostLeftXOfBranchInParents(parent);
                   GraphicsAlgorithm parentGA = parentPE.getGraphicsAlgorithm();
-                  areaContext.setX(parentGA.getX()); 
+                  areaContext.setX(x); 
                   areaContext.setY(parentGA.getY() + parentGA.getHeight() + offsetBetweenPictogramElements);
                }
             }
             else {
-               // Add directly under parent
+               // Add directly under parent, but use x of most left pe in branch
+               int x = findMostLeftXOfBranchInParents(parent);
                GraphicsAlgorithm parentGA = parentPE.getGraphicsAlgorithm();
-               areaContext.setX(parentGA.getX()); 
+               areaContext.setX(x); 
                areaContext.setY(parentGA.getY() + parentGA.getHeight() + offsetBetweenPictogramElements);
             }
          }
@@ -456,14 +477,46 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
       else {
          areaContext.setLocation(initialX, getDiagram().getGridUnit());
       }
-      AddContext addContext = new AddContext(areaContext, root);
+      AddContext addContext = new AddContext(areaContext, node);
       addContext.setTargetContainer(getDiagram());
-
       // Execute add feature manually because getFeatureProvider().addIfPossible(addContext) changes the selection
       IAddFeature feature = getFeatureProvider().getAddFeature(addContext);
       if (feature != null && feature.canExecute(addContext)) {
          feature.execute(addContext);
       }
+   }
+
+   /**
+    * Iterates over the parents of the given {@link ISEDDebugNode} until
+    * the beginning of the branch is reached and computes the x value
+    * of the most left visited {@link ISEDDebugNode}.
+    * @param node The {@link ISEDDebugNode} to start.
+    * @return The most left x value of parent {@link ISEDDebugNode}s in the same branch.
+    * @throws DebugException Occurred Exception.
+    */
+   protected int findMostLeftXOfBranchInParents(ISEDDebugNode node) throws DebugException {
+      int mostLeftXInBranch = 0;
+      boolean mostLeftXInBranchInitialized = false;
+      while (node != null) {
+         PictogramElement pe = getPictogramElementForBusinessObject(node);
+         if (pe != null) {
+            if (mostLeftXInBranchInitialized) {
+               if (pe.getGraphicsAlgorithm().getX() < mostLeftXInBranch) {
+                  mostLeftXInBranch = pe.getGraphicsAlgorithm().getX();
+               }
+            }
+            else {
+               mostLeftXInBranch = pe.getGraphicsAlgorithm().getX();
+               mostLeftXInBranchInitialized = true;
+            }
+         }
+         // Select parent for next loop iteration
+         node = node.getParent();
+         if (node != null && node.getChildren().length != 1) {
+            node = null;
+         }
+      }
+      return mostLeftXInBranch;
    }
 
    /**
@@ -482,7 +535,10 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             if (nextPE != null) {
                GraphicsAlgorithm nextGA = nextPE.getGraphicsAlgorithm();
                if (result == null) {
-                  result = new Rectangle(nextGA.getX(), nextGA.getY(), nextGA.getWidth(), nextGA.getHeight());
+                  result = new Rectangle(nextGA.getX(), 
+                                         nextGA.getY(), 
+                                         nextGA.getX() + nextGA.getWidth(), 
+                                         nextGA.getY() + nextGA.getHeight());
                }
                else {
                   if (nextGA.getX() < result.x()) {
@@ -568,6 +624,241 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             ga.setX(xMargin + xStart + (maxWidth - ga.getWidth()) / 2);
          }
          monitor.worked(1);
+      }
+   }
+
+   /**
+    * The sub tree of the given {@link PictogramElement} may overlap
+    * with other branches on the right sight. This method moves all branches
+    * right to the given {@link PictogramElement} to the right and re-centers
+    * the parent nodes.
+    * @param pictogramElement The {@link PictogramElement} which was updated.
+    * @param offsetBetweenPictogramElements The offset between {@link PictogramElement}s.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @return {@code true}, if update process was successful
+    * @throws DebugException Occurred Exception.
+    */
+   protected boolean updateParents(PictogramElement pictogramElement, 
+                                   int offsetBetweenPictogramElements,
+                                   IProgressMonitor monitor) throws DebugException {
+      monitor.beginTask("Update parents", IProgressMonitor.UNKNOWN);
+      try {
+         if (!monitor.isCanceled()) {
+            Object[] bos = getAllBusinessObjectsForPictogramElement(pictogramElement);
+            int i = 0;
+            while (i < bos.length && !monitor.isCanceled()) {
+               if (bos[i] instanceof ISEDDebugNode) {
+                  ISEDDebugNode node = (ISEDDebugNode)bos[i];
+                  ISEDDebugNode parent = node.getParent();
+                  if (parent != null) {
+                     // Find most left node in righter nodes
+                     PictogramElement mostLeftSiblingPE = findMostLeftSiblingPE(node);
+                     if (mostLeftSiblingPE != null) {
+                        // Compute maximal branch x and width
+                        int maxXOnParents = findMostRightXOfBranchInParents(node);
+                        int maxXInChildren = findMostRightXInSubtree(node);
+                        int maxXOfBranch = maxXOnParents > maxXInChildren ? maxXOnParents : maxXInChildren; 
+                        // Compute distance to move righter nodes
+                        int distance = maxXOfBranch + offsetBetweenPictogramElements - mostLeftSiblingPE.getGraphicsAlgorithm().getX();
+                        if (distance != 0) {
+                           // Move righter nodes by the given distance
+                           moveRighterNodes(node, distance, monitor);
+                        }
+                     }
+                  }
+               }
+               i++;
+            }
+         }
+         return true;
+      }
+      finally {
+         monitor.done();
+      }
+   }
+
+   /**
+    * Searches the sibling node which is X coordinate is more to the right
+    * and which is the one which is most left of all siblings.
+    * @param node The {@link ISEDDebugNode} to search in.
+    * @return The found {@link PictogramElement} or {@code null} if no one was found.
+    * @throws DebugException Occurred Exception.
+    */
+   protected PictogramElement findMostLeftSiblingPE(ISEDDebugNode node) throws DebugException {
+      PictogramElement sibling = null;
+      if (node != null) {
+         ISEDDebugNode parent = node.getParent();
+         while (parent != null && sibling == null) {
+            ISEDDebugNode[] siblings = parent.getChildren();
+            int index = ArrayUtil.indexOf(siblings, node);
+            if (index < 0) {
+               throw new DebugException(LogUtil.getLogger().createErrorStatus("Child \"" + node + "\" is not contained in parent's children \"" + Arrays.toString(siblings) + "\"."));
+            }
+            if (index < siblings.length - 1) {
+               sibling = findMostLeftNodePE(siblings[index + 1]);
+            }
+            else {
+               node = parent;
+               parent = node.getParent();
+            }
+         }
+      }
+      return sibling;
+   }
+   
+   /**
+    * Searches the node in the subtree starting at the given {@link ISEDDebugNode}
+    * which has the X coordinate most left.
+    * @param node The {@link ISEDDebugNode} to search in.
+    * @return The found {@link PictogramElement} of the most left node or {@code null} if no one was found.
+    * @throws DebugException Occurred Exception.
+    */
+   protected PictogramElement findMostLeftNodePE(ISEDDebugNode node) throws DebugException {
+      // Compute initial left position
+      ISEDDebugNode mostLeft = node;
+      PictogramElement mostLeftPE = getPictogramElementForBusinessObject(mostLeft);
+      // Iterate over most left sub trees
+      while (node != null) {
+         // Check if the current node is more left
+         PictogramElement nodePE = getPictogramElementForBusinessObject(node);
+         if (nodePE != null && nodePE.getGraphicsAlgorithm().getX() < mostLeftPE.getGraphicsAlgorithm().getX()) {
+            mostLeft = node;
+            mostLeftPE = nodePE;
+         }
+         // Change node for next loop iteration
+         ISEDDebugNode[] children = node.getChildren();
+         if (!ArrayUtil.isEmpty(children)) {
+            node = children[0];
+         }
+         else {
+            node = null;
+         }
+      }
+      return mostLeftPE;
+   }
+
+   /**
+    * Iterates over the parents of the given {@link ISEDDebugNode} until
+    * the beginning of the branch is reached and computes the maximal x value
+    * (x + width) of the visited {@link ISEDDebugNode}s.
+    * @param node The {@link ISEDDebugNode} to start.
+    * @return The most maximal x value of parent {@link ISEDDebugNode}s in the same branch.
+    * @throws DebugException Occurred Exception.
+    */
+   protected int findMostRightXOfBranchInParents(ISEDDebugNode node) throws DebugException {
+      int mostRightXInBranch = 0;
+      boolean mostRightXInBranchInitialized = false;
+      while (node != null) {
+         PictogramElement pe = getPictogramElementForBusinessObject(node);
+         if (pe != null) {
+            if (mostRightXInBranchInitialized) {
+               if (pe.getGraphicsAlgorithm().getX() + pe.getGraphicsAlgorithm().getWidth() > mostRightXInBranch) {
+                  mostRightXInBranch = pe.getGraphicsAlgorithm().getX() + pe.getGraphicsAlgorithm().getWidth();
+               }
+            }
+            else {
+               mostRightXInBranch = pe.getGraphicsAlgorithm().getX() + pe.getGraphicsAlgorithm().getWidth();
+               mostRightXInBranchInitialized = true;
+            }
+         }
+         // Select parent for next loop iteration
+         node = node.getParent();
+         if (node != null && node.getChildren().length != 1) {
+            node = null;
+         }
+      }
+      return mostRightXInBranch;
+   }
+
+   /**
+    * Iterates over the most right children of the given {@link ISEDDebugNode}
+    * and computes the maximal x value (x + width) of the visited child {@link ISEDDebugNode}s.
+    * @param node The {@link ISEDDebugNode} to start.
+    * @return The most maximal x value of most right child {@link ISEDDebugNode}s.
+    * @throws DebugException Occurred Exception.
+    */
+   protected int findMostRightXInSubtree(ISEDDebugNode node) throws DebugException {
+      int mostRightXInSubtree = 0;
+      boolean mostRightXInSubtreeInitialized = false;
+      while (node != null) {
+         PictogramElement pe = getPictogramElementForBusinessObject(node);
+         if (pe != null) {
+            if (mostRightXInSubtreeInitialized) {
+               if (pe.getGraphicsAlgorithm().getX() + pe.getGraphicsAlgorithm().getWidth() > mostRightXInSubtree) {
+                  mostRightXInSubtree = pe.getGraphicsAlgorithm().getX() + pe.getGraphicsAlgorithm().getWidth();
+               }
+            }
+            else {
+               mostRightXInSubtree = pe.getGraphicsAlgorithm().getX() + pe.getGraphicsAlgorithm().getWidth();
+               mostRightXInSubtreeInitialized = true;
+            }
+         }
+         // Select child for next loop iteration
+         ISEDDebugNode[] children = node.getChildren();
+         node = ArrayUtil.getLast(children);
+      }
+      return mostRightXInSubtree;
+   }
+
+   /**
+    * Moves all nodes which x coordinate is more to the right as the 
+    * given node by the given distance.
+    * @param node The {@link ISEDDebugNode} to start moving.
+    * @param distance The distance to move.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void moveRighterNodes(ISEDDebugNode node, 
+                                   int distance, 
+                                   IProgressMonitor monitor) throws DebugException {
+      if (node != null) {
+         ISEDDebugNode parent = node.getParent();
+         while (parent != null && !monitor.isCanceled()) {
+            ISEDDebugNode[] siblings = parent.getChildren();
+            int index = ArrayUtil.indexOf(siblings, node);
+            if (index < 0) {
+               throw new DebugException(LogUtil.getLogger().createErrorStatus("Child \"" + node + "\" is not contained in parent's children \"" + Arrays.toString(siblings) + "\"."));
+            }
+            // Move subtree of all siblings
+            for (int i = index + 1; i < siblings.length; i++) {
+               moveSubTree(siblings[i], distance, monitor);
+            }
+            // Re-center parent
+            ISEDDebugNode firstChild = ArrayUtil.getFirst(siblings);
+            ISEDDebugNode lastChild = ArrayUtil.getLast(siblings);
+            PictogramElement parentPE = getPictogramElementForBusinessObject(parent);
+            PictogramElement firstChildPE = getPictogramElementForBusinessObject(firstChild);
+            PictogramElement lastChildPE = getPictogramElementForBusinessObject(lastChild);
+            int childWidth = lastChildPE.getGraphicsAlgorithm().getX() + lastChildPE.getGraphicsAlgorithm().getWidth() - 
+                             firstChildPE.getGraphicsAlgorithm().getX();
+            int xMargin = (childWidth - parentPE.getGraphicsAlgorithm().getWidth()) / 2;
+            int xStart = firstChildPE.getGraphicsAlgorithm().getX();
+            parentPE.getGraphicsAlgorithm().setX(xStart + xMargin);
+            // Define node for next loop iteration
+            node = parent;
+            parent = node.getParent();
+         }
+      }
+   }
+
+   /**
+    * Moves all nodes in the sub tree starting at the given {@link ISEDDebugNode}
+    * horizontal by the given distance.
+    * @param root The {@link ISEDDebugNode} to start moving.
+    * @param distance The distance to move in x direction.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @throws DebugException Occurred Exception
+    */
+   protected void moveSubTree(ISEDDebugNode root, 
+                              int distance, 
+                              IProgressMonitor monitor) throws DebugException {
+      ISEDIterator iter = new SEDPreorderIterator(root);
+      while (iter.hasNext() && !monitor.isCanceled()) {
+         ISEDDebugElement node = iter.next();
+         PictogramElement pe = getPictogramElementForBusinessObject(node);
+         if (pe != null) {
+            pe.getGraphicsAlgorithm().setX(pe.getGraphicsAlgorithm().getX() + distance);
+         }
       }
    }
 }

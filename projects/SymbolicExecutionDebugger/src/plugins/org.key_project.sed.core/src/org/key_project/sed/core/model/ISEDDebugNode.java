@@ -82,4 +82,24 @@ public interface ISEDDebugNode extends ISEDDebugElement {
     * the failure.</li>
     */
    public String getNodeType() throws DebugException; 
+   
+   /**
+    * Returns a human readable path condition to the current node.
+    * @return The human readable path condition to the current node.
+    * @throws DebugException DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public String getPathCondition() throws DebugException;
+   
+   /**
+    * Returns the method call stack.
+    * @return The method call stack.
+    * @throws DebugException DebugException if this method fails.  Reasons include:
+    * <ul><li>Failure communicating with the VM.  The DebugException's
+    * status code contains the underlying exception responsible for
+    * the failure.</li>
+    */
+   public ISEDDebugNode[] getCallStack() throws DebugException;
 }

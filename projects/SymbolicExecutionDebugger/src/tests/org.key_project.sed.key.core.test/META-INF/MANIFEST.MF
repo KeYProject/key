@@ -20,10 +20,13 @@ Require-Bundle: org.eclipse.ui,
  org.key_project.sed.key.core;bundle-version="1.0.0",
  org.key_project.sed.core.test;bundle-version="1.0.0",
  org.key_project.sed.core;bundle-version="1.0.0",
+ org.key_project.sed.ui.visualization;bundle-version="1.0.0",
  org.key_project.key4eclipse.starter.core.test;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.key.core.test.suite,
  org.key_project.sed.key.core.test.suite.swtbot,
+ org.key_project.sed.key.core.test.testcase,
+ org.key_project.sed.key.core.test.testcase.swtbot,
  org.key_project.sed.key.core.test.util

@@ -17,16 +17,17 @@
  */
 package de.hentschel.visualdbc.dbcmodel.impl;
 
-import de.hentschel.visualdbc.dbcmodel.DbcAttribute;
-import de.hentschel.visualdbc.dbcmodel.DbcVisibility;
-import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
-
 import org.eclipse.emf.common.notify.Notification;
-
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
+import org.eclipse.emf.ecore.util.EObjectResolvingEList;
+
+import de.hentschel.visualdbc.dbcmodel.DbcAttribute;
+import de.hentschel.visualdbc.dbcmodel.DbcProofReference;
+import de.hentschel.visualdbc.dbcmodel.DbcVisibility;
+import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -35,6 +36,7 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcAttributeImpl#getAllReferences <em>All References</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcAttributeImpl#getName <em>Name</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcAttributeImpl#getType <em>Type</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcAttributeImpl#getVisibility <em>Visibility</em>}</li>
@@ -46,6 +48,16 @@ import org.eclipse.emf.ecore.impl.EObjectImpl;
  * @generated
  */
 public class DbcAttributeImpl extends EObjectImpl implements DbcAttribute {
+   /**
+    * The cached value of the '{@link #getAllReferences() <em>All References</em>}' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getAllReferences()
+    * @generated
+    * @ordered
+    */
+   protected EList<DbcProofReference> allReferences;
+
    /**
     * The default value of the '{@link #getName() <em>Name</em>}' attribute.
     * <!-- begin-user-doc -->
@@ -170,6 +182,18 @@ public class DbcAttributeImpl extends EObjectImpl implements DbcAttribute {
     * <!-- end-user-doc -->
     * @generated
     */
+   public EList<DbcProofReference> getAllReferences() {
+      if (allReferences == null) {
+         allReferences = new EObjectResolvingEList<DbcProofReference>(DbcProofReference.class, this, DbcmodelPackage.DBC_ATTRIBUTE__ALL_REFERENCES);
+      }
+      return allReferences;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    public String getName() {
       return name;
    }
@@ -278,6 +302,8 @@ public class DbcAttributeImpl extends EObjectImpl implements DbcAttribute {
    @Override
    public Object eGet(int featureID, boolean resolve, boolean coreType) {
       switch (featureID) {
+         case DbcmodelPackage.DBC_ATTRIBUTE__ALL_REFERENCES:
+            return getAllReferences();
          case DbcmodelPackage.DBC_ATTRIBUTE__NAME:
             return getName();
          case DbcmodelPackage.DBC_ATTRIBUTE__TYPE:
@@ -354,6 +380,8 @@ public class DbcAttributeImpl extends EObjectImpl implements DbcAttribute {
    @Override
    public boolean eIsSet(int featureID) {
       switch (featureID) {
+         case DbcmodelPackage.DBC_ATTRIBUTE__ALL_REFERENCES:
+            return allReferences != null && !allReferences.isEmpty();
          case DbcmodelPackage.DBC_ATTRIBUTE__NAME:
             return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
          case DbcmodelPackage.DBC_ATTRIBUTE__TYPE:

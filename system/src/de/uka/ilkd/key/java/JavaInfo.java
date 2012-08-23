@@ -14,9 +14,26 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.abstraction.ArrayType;
+import de.uka.ilkd.key.java.abstraction.ClassType;
+import de.uka.ilkd.key.java.abstraction.Field;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Method;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.declaration.SuperArrayDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -122,9 +139,10 @@ public final class JavaInfo {
     
     /** the name of the class used as default execution context */
     protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
+    protected static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
     
-    private ObserverFunction inv;
-    private HashMap<KeYJavaType,ObserverFunction> staticInvs = new HashMap<KeYJavaType,ObserverFunction>();
+    private IObserverFunction inv;
+    private HashMap<KeYJavaType,IObserverFunction> staticInvs = new HashMap<KeYJavaType,IObserverFunction>();
 
     
     /**
@@ -518,25 +536,25 @@ public final class JavaInfo {
     }
 
     /**
-     * returns all methods from the given Type as ProgramMethods
+     * returns all methods from the given Type as IProgramMethods
      */
-    public ImmutableList<ProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
+    public ImmutableList<IProgramMethod> getAllProgramMethods(KeYJavaType kjt) {
         return kpmi.getAllProgramMethods(kjt);
     }
     
     /**
-     * returns all methods declared in the given Type as ProgramMethods
+     * returns all methods declared in the given Type as IProgramMethods
      */
-    public ImmutableList<ProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {        
+    public ImmutableList<IProgramMethod> getAllProgramMethodsLocallyDeclared(KeYJavaType kjt) {        
         return kpmi.getAllProgramMethodsLocallyDeclared(kjt);
     }
     
 
-    public ImmutableList<ProgramMethod> getConstructors(KeYJavaType kjt) {
+    public ImmutableList<IProgramMethod> getConstructors(KeYJavaType kjt) {
 	return kpmi.getConstructors(kjt);
     }
     
-    public ProgramMethod getConstructor(KeYJavaType kjt, 
+    public IProgramMethod getConstructor(KeYJavaType kjt, 
 	    				ImmutableList<KeYJavaType> signature) {
 	return kpmi.getConstructor(kjt, signature);
     }
@@ -552,7 +570,7 @@ public final class JavaInfo {
      *  the method is called 
      * @return a matching program method 
      */
-    public ProgramMethod getProgramMethod(KeYJavaType classType, 
+    public IProgramMethod getProgramMethod(KeYJavaType classType, 
             			          String methodName,
             			          ImmutableList<? extends Type> signature,
             			          KeYJavaType context) {
@@ -560,11 +578,11 @@ public final class JavaInfo {
     }
     
     
-    public ProgramMethod getToplevelPM(KeYJavaType kjt, 
+    public IProgramMethod getToplevelPM(KeYJavaType kjt, 
 	    			       String methodName, 
 	    			       ImmutableList<KeYJavaType> sig) {
 	for(KeYJavaType sup : getAllSupertypes(kjt).removeAll(kjt)) {
-	    final ProgramMethod result = getToplevelPM(sup, methodName, sig);
+	    final IProgramMethod result = getToplevelPM(sup, methodName, sig);
 	    if(result != null) {
 		return result;
 	    }
@@ -573,7 +591,7 @@ public final class JavaInfo {
     }
 
     
-    public ProgramMethod getToplevelPM(KeYJavaType kjt, ProgramMethod pm) {
+    public IProgramMethod getToplevelPM(KeYJavaType kjt, IProgramMethod pm) {
 	final String methodName = pm.getName();
     	final ImmutableList<KeYJavaType> sig 
 		= ImmutableSLList.<KeYJavaType>nil()
@@ -590,7 +608,7 @@ public final class JavaInfo {
 				     String className) {
 	ImmutableList<KeYJavaType> sig = ImmutableSLList.<KeYJavaType>nil();
 	Term[] subs = new Term[args.length+2];
-	subs[0] = TermBuilder.DF.heap(services);
+	subs[0] = TermBuilder.DF.getBaseHeap(services);
 	subs[1] = prefix;
 	for(int i = 2; i < subs.length; i++) {
               Term t = args[i-2];             
@@ -600,7 +618,7 @@ public final class JavaInfo {
 	}
 	className = translateArrayType(className);
 	KeYJavaType clType = getKeYJavaTypeByClassName(className);
-	ProgramMethod pm   = getProgramMethod(clType, methodName, sig, clType);
+	IProgramMethod pm   = getProgramMethod(clType, methodName, sig, clType);
 	if(pm == null) {
 	    throw new IllegalArgumentException("Program method "+methodName
 					       +" in "+className+" not found.");
@@ -703,7 +721,7 @@ public final class JavaInfo {
      *  the method is called 
      * @return a matching program method
      */
-    public ProgramMethod getProgramMethod(KeYJavaType classType, 
+    public IProgramMethod getProgramMethod(KeYJavaType classType, 
 	    				  String methodName, 
 	    				  ProgramVariable[] args,
 	    				  KeYJavaType context){
@@ -1152,7 +1170,7 @@ public final class JavaInfo {
             final KeYJavaType kjt = 
                 getKeYJavaTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);                            
             defaultExecutionContext = 
-                new ExecutionContext(new TypeRef(kjt), null);
+                new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null);
         }
         return defaultExecutionContext;
     }
@@ -1268,7 +1286,7 @@ public final class JavaInfo {
     /**
      * Returns the special symbol <code>&lt;inv&gt;</code> which stands for the class invariant of an object.
      */
-    public ObserverFunction getInv() {
+    public IObserverFunction getInv() {
 	if(inv == null) {
 	    inv = new ObserverFunction("<inv>",
         			       Sort.FORMULA,
@@ -1284,7 +1302,7 @@ public final class JavaInfo {
     /**
      * Returns the special symbol <code>&lt;staticInv&gt;</code> which stands for the static invariant of a type.
      */
-    public ObserverFunction getStaticInv(KeYJavaType target) {
+    public IObserverFunction getStaticInv(KeYJavaType target) {
         if (!staticInvs.containsKey(target))
             staticInvs.put(target, new ObserverFunction("<$inv>",
                            Sort.FORMULA,

@@ -12,18 +12,32 @@ package de.uka.ilkd.key.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.event.*;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.*;
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.notification.events.AbandonTaskEvent;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.mgt.*;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofTreeAdapter;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.proof.mgt.BasicTask;
+import de.uka.ilkd.key.proof.mgt.EnvNode;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.ProofStatus;
+import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
+import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.util.Debug;
 
 public class TaskTree extends JPanel {
@@ -158,8 +172,72 @@ public class TaskTree extends JPanel {
 	} 
     }
 
-    public void removeProof(Proof p) {
-	// %% not implemented
+    /**
+     * <p>
+     * Checks if the given {@link Proof} is contained in the model.
+     * </p>
+     * <p>
+     * This functionality is required for instance for the symbolic execution
+     * debugger to check if a {@link Proof} is still available in KeY's
+     * {@link MainWindow} or not, because if it was removed the auto mode is
+     * no longer available.
+     * </p>
+     * @param proof The {@link Proof} to check.
+     * @return {@code true} proof is available in model, {@code false} proof is not available in model.
+     */
+    public boolean containsProof(Proof proof) {
+       boolean contains = false;
+       int i = 0;
+       while (!contains && i < model.getChildCount(model.getRoot())) {
+          Object rootChild = model.getChild(model.getRoot(), i);
+          if (rootChild instanceof EnvNode) {
+             EnvNode envNode = (EnvNode)rootChild;
+             int j = 0;
+             while (!contains && j < envNode.getChildCount()) {
+                Object envChild = envNode.getChildAt(j);
+                if (envChild instanceof TaskTreeNode) {
+                   TaskTreeNode taskChild = (TaskTreeNode)envChild;
+                   contains = taskChild.proof() == proof;
+                }
+                j++;
+             }
+          }
+          i++;
+       }
+       return contains;
+    }
+    
+    /**
+     * Removes the given proof from the model.
+     * @param proof The proof to remove.
+     */
+    public void removeProof(Proof proof) {
+       if (proof != null) {
+          ProofEnvironment env = proof.env();
+          // Search EnvNode which contains the environment of the given proof.
+          EnvNode envNode = null;
+          for (int i = 0; i < model.getChildCount(model.getRoot()); i++) {
+             Object child = model.getChild(model.getRoot(), i);
+             if (child instanceof EnvNode) {
+                EnvNode envChild = (EnvNode)child;
+                if (env != null ? env.equals(envChild.getProofEnv()) : envChild.getProofEnv() == null) {
+                   envNode = envChild;
+                }
+             }
+          }
+          // Remove proof from found environment node.
+          if (envNode != null) {
+             for (int i = 0; i < envNode.getChildCount(); i++) {
+                Object child = envNode.getChildAt(i);
+                if (child instanceof TaskTreeNode) {
+                   TaskTreeNode taskChild = (TaskTreeNode)child;
+                   if (taskChild.proof() == proof) {
+                      removeTaskWithoutInteraction(taskChild);
+                   }
+                }
+             }
+          }
+       }
     }
 
     
@@ -168,13 +246,9 @@ public class TaskTree extends JPanel {
      */
     class TaskTreeMouseListener extends MouseAdapter {
 
-	public void mouseClicked(MouseEvent e) {
-	    if (e.getClickCount() == 1 
-		&& e.getModifiers() != 
-                   (InputEvent.CTRL_MASK+InputEvent.BUTTON1_MASK)) {
- 		problemChosen();
- 	    }
-	}
+    	public void mouseClicked(MouseEvent e) {
+    		problemChosen();
+    	}
     }
 
 
@@ -285,9 +359,6 @@ public class TaskTree extends JPanel {
     public TaskTreeModel getModel() {
        return model;
     }
-
-
-
 } // end of TaskTree
 
 

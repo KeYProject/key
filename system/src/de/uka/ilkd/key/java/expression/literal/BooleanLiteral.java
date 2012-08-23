@@ -12,6 +12,7 @@
 package de.uka.ilkd.key.java.expression.literal;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -66,6 +67,27 @@ public class BooleanLiteral extends Literal {
     }
 
     /**
+     * Boolean literal.
+     * @param children list with all children
+     * @param pos The source code position.
+     * @param value a boolean value.
+     */
+    public BooleanLiteral(ExtList children, PositionInfo pos, boolean value) {
+        super(children, pos);
+        this.value=value;
+    }
+
+    /**
+     * Boolean literal.
+     * @param pos The source code position.
+     * @param value a boolean value.
+     */
+    public BooleanLiteral(PositionInfo pos, boolean value) {
+        super(pos);
+        this.value=value;
+    }
+
+   /**
  *      Get value.
  *      @return the string.
      */

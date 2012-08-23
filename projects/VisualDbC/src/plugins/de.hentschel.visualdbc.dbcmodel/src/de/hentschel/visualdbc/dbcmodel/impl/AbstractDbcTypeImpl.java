@@ -35,6 +35,7 @@ import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
 import de.hentschel.visualdbc.dbcmodel.DbcInvariant;
 import de.hentschel.visualdbc.dbcmodel.DbcProof;
 import de.hentschel.visualdbc.dbcmodel.DbcProofObligation;
+import de.hentschel.visualdbc.dbcmodel.DbcProofReference;
 import de.hentschel.visualdbc.dbcmodel.DbcVisibility;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 import de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable;
@@ -47,6 +48,7 @@ import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcTypeImpl#getAllReferences <em>All References</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcTypeImpl#getProofObligations <em>Proof Obligations</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcTypeImpl#getAllProofs <em>All Proofs</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.AbstractDbcTypeImpl#getName <em>Name</em>}</li>
@@ -60,6 +62,16 @@ import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
  * @generated
  */
 public abstract class AbstractDbcTypeImpl extends AbstractDbcTypeContainerImpl implements AbstractDbcType {
+   /**
+    * The cached value of the '{@link #getAllReferences() <em>All References</em>}' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getAllReferences()
+    * @generated
+    * @ordered
+    */
+   protected EList<DbcProofReference> allReferences;
+
    /**
     * The cached value of the '{@link #getProofObligations() <em>Proof Obligations</em>}' reference list.
     * <!-- begin-user-doc -->
@@ -177,6 +189,18 @@ public abstract class AbstractDbcTypeImpl extends AbstractDbcTypeContainerImpl i
    @Override
    protected EClass eStaticClass() {
       return DbcmodelPackage.Literals.ABSTRACT_DBC_TYPE;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EList<DbcProofReference> getAllReferences() {
+      if (allReferences == null) {
+         allReferences = new EObjectResolvingEList<DbcProofReference>(DbcProofReference.class, this, DbcmodelPackage.ABSTRACT_DBC_TYPE__ALL_REFERENCES);
+      }
+      return allReferences;
    }
 
    /**
@@ -348,6 +372,8 @@ public abstract class AbstractDbcTypeImpl extends AbstractDbcTypeContainerImpl i
    @Override
    public Object eGet(int featureID, boolean resolve, boolean coreType) {
       switch (featureID) {
+         case DbcmodelPackage.ABSTRACT_DBC_TYPE__ALL_REFERENCES:
+            return getAllReferences();
          case DbcmodelPackage.ABSTRACT_DBC_TYPE__PROOF_OBLIGATIONS:
             return getProofObligations();
          case DbcmodelPackage.ABSTRACT_DBC_TYPE__ALL_PROOFS:
@@ -438,6 +464,8 @@ public abstract class AbstractDbcTypeImpl extends AbstractDbcTypeContainerImpl i
    @Override
    public boolean eIsSet(int featureID) {
       switch (featureID) {
+         case DbcmodelPackage.ABSTRACT_DBC_TYPE__ALL_REFERENCES:
+            return allReferences != null && !allReferences.isEmpty();
          case DbcmodelPackage.ABSTRACT_DBC_TYPE__PROOF_OBLIGATIONS:
             return proofObligations != null && !proofObligations.isEmpty();
          case DbcmodelPackage.ABSTRACT_DBC_TYPE__ALL_PROOFS:
@@ -465,6 +493,7 @@ public abstract class AbstractDbcTypeImpl extends AbstractDbcTypeContainerImpl i
    public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass) {
       if (baseClass == IDbCProofReferencable.class) {
          switch (derivedFeatureID) {
+            case DbcmodelPackage.ABSTRACT_DBC_TYPE__ALL_REFERENCES: return DbcmodelPackage.IDB_CPROOF_REFERENCABLE__ALL_REFERENCES;
             default: return -1;
          }
       }
@@ -487,6 +516,7 @@ public abstract class AbstractDbcTypeImpl extends AbstractDbcTypeContainerImpl i
    public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
       if (baseClass == IDbCProofReferencable.class) {
          switch (baseFeatureID) {
+            case DbcmodelPackage.IDB_CPROOF_REFERENCABLE__ALL_REFERENCES: return DbcmodelPackage.ABSTRACT_DBC_TYPE__ALL_REFERENCES;
             default: return -1;
          }
       }

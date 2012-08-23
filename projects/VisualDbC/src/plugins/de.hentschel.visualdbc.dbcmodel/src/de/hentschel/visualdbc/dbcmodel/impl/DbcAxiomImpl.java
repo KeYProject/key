@@ -17,11 +17,13 @@ import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
+import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 
 import de.hentschel.visualdbc.dbcmodel.AbstractDbcSpecification;
 import de.hentschel.visualdbc.dbcmodel.DbCAxiomContract;
 import de.hentschel.visualdbc.dbcmodel.DbcAxiom;
+import de.hentschel.visualdbc.dbcmodel.DbcProofReference;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 
 /**
@@ -31,6 +33,7 @@ import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcAxiomImpl#getAllReferences <em>All References</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcAxiomImpl#getName <em>Name</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcAxiomImpl#getDefinition <em>Definition</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcAxiomImpl#getAxiomContracts <em>Axiom Contracts</em>}</li>
@@ -41,6 +44,16 @@ import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
  */
 public class DbcAxiomImpl extends EObjectImpl implements DbcAxiom {
     /**
+    * The cached value of the '{@link #getAllReferences() <em>All References</em>}' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getAllReferences()
+    * @generated
+    * @ordered
+    */
+   protected EList<DbcProofReference> allReferences;
+
+   /**
     * The default value of the '{@link #getName() <em>Name</em>}' attribute.
     * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
@@ -110,6 +123,18 @@ public class DbcAxiomImpl extends EObjectImpl implements DbcAxiom {
    }
 
     /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EList<DbcProofReference> getAllReferences() {
+      if (allReferences == null) {
+         allReferences = new EObjectResolvingEList<DbcProofReference>(DbcProofReference.class, this, DbcmodelPackage.DBC_AXIOM__ALL_REFERENCES);
+      }
+      return allReferences;
+   }
+
+   /**
     * <!-- begin-user-doc -->
      * <!-- end-user-doc -->
     * @generated
@@ -202,6 +227,8 @@ public class DbcAxiomImpl extends EObjectImpl implements DbcAxiom {
     @Override
     public Object eGet(int featureID, boolean resolve, boolean coreType) {
       switch (featureID) {
+         case DbcmodelPackage.DBC_AXIOM__ALL_REFERENCES:
+            return getAllReferences();
          case DbcmodelPackage.DBC_AXIOM__NAME:
             return getName();
          case DbcmodelPackage.DBC_AXIOM__DEFINITION:
@@ -264,6 +291,8 @@ public class DbcAxiomImpl extends EObjectImpl implements DbcAxiom {
     @Override
     public boolean eIsSet(int featureID) {
       switch (featureID) {
+         case DbcmodelPackage.DBC_AXIOM__ALL_REFERENCES:
+            return allReferences != null && !allReferences.isEmpty();
          case DbcmodelPackage.DBC_AXIOM__NAME:
             return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
          case DbcmodelPackage.DBC_AXIOM__DEFINITION:

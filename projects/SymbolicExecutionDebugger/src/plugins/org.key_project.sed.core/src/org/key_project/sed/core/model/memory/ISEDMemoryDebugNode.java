@@ -21,6 +21,12 @@ public interface ISEDMemoryDebugNode extends ISEDDebugNode {
    public void setName(String name);
    
    /**
+    * Sets the path condition.
+    * @param pathCondtion The path condition to set.
+    */
+   public void setPathCondition(String pathCondition);
+   
+   /**
     * Adds a new {@link ISEDDebugNode} child node.
     * @param child The {@link ISEDDebugNode} to add.
     */
@@ -45,4 +51,10 @@ public interface ISEDMemoryDebugNode extends ISEDDebugNode {
     * @return The index of the child {@link ISEDDebugNode} or {@code -1} if it is no child.
     */
    public int indexOfChild(ISEDDebugNode child);
+   
+   /**
+    * Sets the call stack.
+    * @param callStack The call stack to use.
+    */
+   public void setCallStack(ISEDDebugNode[] callStack);
 }

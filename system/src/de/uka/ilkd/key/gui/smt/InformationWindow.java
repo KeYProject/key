@@ -23,7 +23,13 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Element;
 
 
-
+/**
+ * The information window is used to present detailed information about the execution of a solver. 
+ * In particular it presents information about:
+ * - the concrete translation that was passed to the solver
+ * - the translation of the taclets
+ * - the messages that were sent between KeY and the external solvers.
+ */
 public class InformationWindow extends JDialog {
 
     private static final long serialVersionUID = 1L;

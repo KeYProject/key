@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_a2bd292f-593f-48d2-94a3-0f09b5e6f90d" name="MethodCallOnObject[MethodCallOnObject::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_af0fa57d-1a62-45e5-8259-915cd0ecfe28" name="&lt;start&gt;">
-         <sedMethodCall xml:id="_868f7b2f-9846-433d-9d6f-d18c5c268436" name="MethodCallOnObject.main();" lineNumber="-1" charStart="56" charEnd="60">
-            <sedStatement xml:id="_326b55bb-d678-4f06-895a-a8498b98f494" name="MethodCallOnObject x = new MethodCallOnObject ();" lineNumber="-1" charStart="68" charEnd="116">
-               <sedStatement xml:id="_3ef02f3b-7e1f-4d86-809b-19fabf7bc435" name="return x.doSomething();" lineNumber="-1" charStart="120" charEnd="143">
-                  <sedMethodCall xml:id="_fea26517-0061-452f-afaa-b081b1ffff8c" name="x.doSomething();" lineNumber="-1" charStart="164" charEnd="175">
-                     <sedStatement xml:id="_cd140e08-775b-42c1-8603-6e7a7d302a0b" name="return 42;" lineNumber="-1" charStart="183" charEnd="193">
-                        <sedMethodReturn xml:id="_be09d194-e084-49c7-9fc0-b0fea18bf3fe" name="&lt;return &apos;42&apos; as result of x.doSomething();&gt;" lineNumber="-1" charStart="164" charEnd="175">
-                           <sedMethodReturn xml:id="_99d4f6a1-8605-4d92-8861-b7fe2dc59ee7" name="&lt;return &apos;42&apos; as result of MethodCallOnObject.main();&gt;" lineNumber="-1" charStart="56" charEnd="60">
-                              <sedTermination xml:id="_2fbab465-15ed-4784-9498-8c1e44378b61" name="&lt;end&gt;">
+   <sedTarget xml:id="_3b01ba0f-ec3f-4922-9116-b7fd27494e39" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_d69c5f28-3c24-4868-9795-7bbb77f35671" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_939b4683-4a05-4887-b03d-cbbb5f831197" name="MethodCallOnObject.main();" pathCondition="true" lineNumber="-1" charStart="56" charEnd="60">
+            <sedStatement xml:id="_c1f140d2-e2f1-425a-94a6-873108ea610f" name="MethodCallOnObject x = new MethodCallOnObject ();" pathCondition="true" lineNumber="-1" charStart="68" charEnd="116">
+               <sedStatement xml:id="_5c367bcc-3e1f-41ec-a625-ab028c62d898" name="return x.doSomething();" pathCondition="true" lineNumber="-1" charStart="120" charEnd="143">
+                  <sedMethodCall xml:id="_e2a55a36-ad1a-4ca5-9972-23696658866a" name="x.doSomething();" pathCondition="true" lineNumber="-1" charStart="164" charEnd="175">
+                     <sedStatement xml:id="_4e7de922-d5f3-4ec8-b1f2-ce0b8f48a4fa" name="return 42;" pathCondition="true" lineNumber="-1" charStart="183" charEnd="193">
+                        <sedMethodReturn xml:id="_d7f2688c-ef98-4602-a9c4-7cb252af1865" name="&lt;return &apos;42&apos; as result of x.doSomething();&gt;" pathCondition="true" lineNumber="-1" charStart="164" charEnd="175">
+                           <sedMethodReturn xml:id="_b85b2f26-32be-414d-89df-a8607f3dcf2c" name="&lt;return &apos;42&apos; as result of MethodCallOnObject.main();&gt;" pathCondition="true" lineNumber="-1" charStart="56" charEnd="60">
+                              <sedTermination xml:id="_52f25ce1-a9d1-4f4c-af3d-8fa50818a5a1" name="&lt;end&gt;" pathCondition="true">
                               </sedTermination>
                            </sedMethodReturn>
                         </sedMethodReturn>

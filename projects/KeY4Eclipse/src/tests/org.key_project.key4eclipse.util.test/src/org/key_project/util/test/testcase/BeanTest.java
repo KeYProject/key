@@ -18,7 +18,7 @@ public class BeanTest extends AbstractIBeanTest {
    }
    
    /**
-    * The uesed example bean.
+    * The used example bean.
     * @author Martin Hentschel
     */
    private static class TestBean extends Bean implements ITestBean {       

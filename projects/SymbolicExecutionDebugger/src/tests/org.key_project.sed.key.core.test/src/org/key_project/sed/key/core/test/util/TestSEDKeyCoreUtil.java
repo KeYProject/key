@@ -7,6 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -15,7 +16,6 @@ import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.widgets.Display;
-import org.key_project.key4eclipse.test.util.TestKeY4EclipseUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
@@ -25,7 +25,6 @@ import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.util.eclipse.BundleUtil;
-import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
 import org.key_project.util.java.thread.IRunnableWithException;
 import org.key_project.util.jdt.JDTUtil;
@@ -45,21 +44,122 @@ public final class TestSEDKeyCoreUtil {
    }
    
    /**
+    * Launches the {@link IFile} in the symbolic execution debugger
+    * based on KeY.
+    * @param file The {@link IFile} to debug.
+    * @param showMethodReturnValues Show method return values? Use {@code null} to use default value.
+    * @param showVariablesOfSelectedDebugNode Show variables of selected debug node? Use {@code null} to use default value.
+    * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
+    * @param mergeBranchConditions Merge branch conditions?
+    * @throws Exception Occurred Exception.
+    */
+   public static void launchKeY(final IFile file,
+                                final Boolean showMethodReturnValues,
+                                final Boolean showVariablesOfSelectedDebugNode,
+                                final Boolean showKeYMainWindow,
+                                final Boolean mergeBranchConditions) throws Exception {
+      IRunnableWithException run = new AbstractRunnableWithException() {
+         @Override
+         public void run() {
+            try {
+               ILaunchConfiguration config = getKeYLaunchConfiguration(file);
+               ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
+               if (showMethodReturnValues != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
+               }
+               if (showVariablesOfSelectedDebugNode != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNode);
+               }
+               if (showKeYMainWindow != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindow);
+               }
+               if (mergeBranchConditions != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
+               }
+               config = wc.doSave();
+               DebugUITools.launch(config, KeySEDUtil.MODE);
+            }
+            catch (Exception e) {
+               setException(e);
+            }
+         }
+      };
+      Display.getDefault().syncExec(run);
+      if (run.getException() != null) {
+         throw run.getException();
+      }
+   }
+   
+   /**
+    * Returns an {@link ILaunchConfiguration} for the given {@link IFile}
+    * that starts the symbolic execution debugger based on KeY.
+    * @param method The {@link IFile} to debug.
+    * @return The {@link ILaunchConfiguration}.
+    * @throws CoreException Occurred Exception.
+    */
+   public static ILaunchConfiguration getKeYLaunchConfiguration(IFile file) throws CoreException {
+      List<ILaunchConfiguration> configs = KeySEDUtil.searchLaunchConfigurations(file);
+      if (!configs.isEmpty()) {
+         return configs.get(0);
+      }
+      else {
+         return KeySEDUtil.createConfiguration(file);
+      }
+   }
+   
+   /**
     * Launches the {@link IMethod} in the symbolic execution debugger
     * based on KeY.
     * @param method The {@link IMethod} to debug.
-    * @param showMethodReturnValues Show method return values?
+    * @param useExistingContract Use existing contract? Use {@code null} to use default value.
+    * @param preconditionOrExistingContract Optional precondition or the ID of the existing contract to use Use {@code null} to use default value.
+    * @param showMethodReturnValues Show method return values? Use {@code null} to use default value.
+    * @param showVariablesOfSelectedDebugNode Show variables of selected debug node? Use {@code null} to use default value.
+    * @param showKeYMainWindow Show KeY's main window? Use {@code null} to use default value.
+    * @param mergeBranchConditions Merge branch conditions?
     * @throws Exception Occurred Exception.
     */
    public static void launchKeY(final IMethod method,
-                                final boolean showMethodReturnValues) throws Exception {
+                                final Boolean useExistingContract,
+                                final String preconditionOrExistingContract,
+                                final Boolean showMethodReturnValues,
+                                final Boolean showVariablesOfSelectedDebugNode,
+                                final Boolean showKeYMainWindow,
+                                final Boolean mergeBranchConditions) throws Exception {
       IRunnableWithException run = new AbstractRunnableWithException() {
          @Override
          public void run() {
             try {
                ILaunchConfiguration config = getKeYLaunchConfiguration(method);
                ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
-               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
+               if (useExistingContract != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContract);
+                  if (preconditionOrExistingContract != null) {
+                     if (useExistingContract) {
+                        wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT, preconditionOrExistingContract);
+                     }
+                     else {
+                        wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+                     }
+                  }
+               }
+               else {
+                  if (preconditionOrExistingContract != null) {
+                     wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+                  }
+               }
+               if (showMethodReturnValues != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
+               }
+               if (showVariablesOfSelectedDebugNode != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNode);
+               }
+               if (showKeYMainWindow != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindow);
+               }
+               if (mergeBranchConditions != null) {
+                  wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
+               }
                config = wc.doSave();
                DebugUITools.launch(config, KeySEDUtil.MODE);
             }
@@ -82,12 +182,12 @@ public final class TestSEDKeyCoreUtil {
     * @throws CoreException Occurred Exception.
     */
    public static ILaunchConfiguration getKeYLaunchConfiguration(IMethod method) throws CoreException {
-      List<ILaunchConfiguration> configs = KeySEDUtil.searchLaunchConfigurations(method);
+      List<ILaunchConfiguration> configs = KeySEDUtil.searchLaunchConfigurations(method, null, null);
       if (!configs.isEmpty()) {
          return configs.get(0);
       }
       else {
-         return KeySEDUtil.createConfiguration(method);
+         return KeySEDUtil.createConfiguration(method, null, null);
       }
    }
 
@@ -133,7 +233,7 @@ public final class TestSEDKeyCoreUtil {
     * @throws DebugException Occurred Exception.
     */
    public static void assertInitialTarget(ISEDDebugTarget target, String targetName) throws DebugException {
-      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName), target, false, false);
+      TestSedCoreUtil.compareDebugTarget(createExpectedInitialModel(targetName), target, false, false, false);
    }
    
    /**
@@ -146,21 +246,27 @@ public final class TestSEDKeyCoreUtil {
     * @throws ParserConfigurationException Occurred Exception.
     */
    public static void assertFlatStepsExample(ISEDDebugTarget target) throws DebugException, ParserConfigurationException, SAXException, IOException {
-      TestSedCoreUtil.compareDebugTarget(createExpectedModel("data/statements/oracle/FlatSteps.xml"), target, false, false);
+      TestSedCoreUtil.compareDebugTarget(createExpectedModel("data/statements/oracle/FlatSteps.xml"), target, false, false, false);
    }
    
    /**
     * Computes the name of a {@link KeYDebugTarget} which debugs
     * the given {@link IMethod} with generated operation contract.
-    * @param method The debuged {@link IMethod}.
+    * @param method The debugged {@link IMethod}.
     * @return The used target name in a {@link KeYDebugTarget} with generated operation contract.
     * @throws JavaModelException Occurred Exception
     */
    public static String computeTargetName(IMethod method) throws JavaModelException {
-      TestCase.assertNotNull(method);
-      return TestKeY4EclipseUtil.createOperationContractId(method.getDeclaringType().getElementName(), 
-                                                           JDTUtil.getQualifiedMethodLabel(method).replaceAll(" ", StringUtil.EMPTY_STRING),
-                                                           "-2147483648", 
-                                                           "normal_behavior");
+      return JDTUtil.getQualifiedMethodLabel(method);
+   }
+   
+   /**
+    * Computes the name of a {@link KeYDebugTarget} which debugs
+    * the given {@link IFile}.
+    * @param file The debugged {@link IFile}.
+    * @return The used target name in a {@link KeYDebugTarget}.
+    */
+   public static String computeTargetName(IFile file) {
+      return file != null ? file.getName() : null;
    }
 }

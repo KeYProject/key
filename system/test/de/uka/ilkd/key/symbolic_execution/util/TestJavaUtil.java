@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,16 +12,30 @@ import junit.framework.TestCase;
  */
 public class TestJavaUtil extends TestCase {
    /**
+    * Tests {@link JavaUtil#indexOf(Object[], Object)}
+    */
+   public void testIndexOf_array() {
+      String[] array = {"A", "B", "C"};
+      assertEquals(-1, JavaUtil.indexOf((Object[])null, null));
+      assertEquals(-1, JavaUtil.indexOf(array, null));
+      assertEquals(-1, JavaUtil.indexOf((String[])null, "A"));
+      assertEquals(0, JavaUtil.indexOf(array, "A"));
+      assertEquals(1, JavaUtil.indexOf(array, "B"));
+      assertEquals(2, JavaUtil.indexOf(array, "C"));
+      assertEquals(-1, JavaUtil.indexOf(array, "D"));
+   }
+   
+   /**
     * Tests {@link JavaUtil#indexOf(java.util.Iterator, Object)}
     */
-   public void testIndexOf() {
+   public void testIndexOf_Iterator() {
       List<String> list = new LinkedList<String>();
       list.add("A");
       list.add("B");
       list.add("C");
-      assertEquals(-1, JavaUtil.indexOf(null, null));
+      assertEquals(-1, JavaUtil.indexOf((Iterator<?>)null, null));
       assertEquals(-1, JavaUtil.indexOf(list.iterator(), null));
-      assertEquals(-1, JavaUtil.indexOf(null, "A"));
+      assertEquals(-1, JavaUtil.indexOf((Iterator<String>)null, "A"));
       assertEquals(0, JavaUtil.indexOf(list.iterator(), "A"));
       assertEquals(1, JavaUtil.indexOf(list.iterator(), "B"));
       assertEquals(2, JavaUtil.indexOf(list.iterator(), "C"));

@@ -10,10 +10,18 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import recoder.java.*;
+import recoder.java.Expression;
+import recoder.java.ExpressionContainer;
+import recoder.java.JavaNonTerminalProgramElement;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.PrettyPrinter;
+import recoder.java.ProgramElement;
+import recoder.java.Reference;
+import recoder.java.SourceVisitor;
 import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
 import recoder.java.reference.TypeReferenceContainer;
+import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
 
 public class ExecutionContext
     extends JavaNonTerminalProgramElement 
@@ -36,6 +44,11 @@ public class ExecutionContext
     private TypeReference classContext;
     
     /**
+     * the method signature of the currently active method
+     */
+    private MethodSignature methodContext;
+    
+    /**
      * the reference to the active object
      */
     private ReferencePrefix runtimeInstance;
@@ -44,14 +57,17 @@ public class ExecutionContext
 
     /**
      * creates an execution context reference
-     * @param classContext the TypeReference refering to the next enclosing
+     * @param classContext the TypeReference referring to the next enclosing
      * class 
+     * @param methodContext the method signature representing the currently active method
      * @param runtimeInstance a ReferencePrefix to the object that
      * is currently active/executed
      */
-    public ExecutionContext(TypeReference classContext, 
+    public ExecutionContext(TypeReference classContext,
+             MethodSignature methodContext,
 			    ReferencePrefix runtimeInstance) {
 	this.classContext = classContext;
+	this.methodContext = methodContext;
 	this.runtimeInstance  = runtimeInstance;
 	makeParentRoleValid();
     }
@@ -64,6 +80,7 @@ public class ExecutionContext
 	int count = 0;
 	if (runtimeInstance != null) count++;
 	if (classContext != null) count++;
+   if (methodContext != null) count++;
 	return count;
     }
 
@@ -77,12 +94,16 @@ public class ExecutionContext
      */
     public ProgramElement getChildAt(int index) {
 	if (classContext != null) {
-	    if (index == 0) return classContext;
-	    index--;
+	   if (index == 0) return classContext;
+	   index--;
 	}
+   if (methodContext != null) {
+      if (index == 0) return methodContext;
+      index--;
+   }
 	if (runtimeInstance != null) {
-	    if (index == 0) return runtimeInstance;
-	    index--;
+	   if (index == 0) return runtimeInstance;
+	   index--;
 	}
 	throw new ArrayIndexOutOfBoundsException();
     }
@@ -93,20 +114,26 @@ public class ExecutionContext
      * @return the positional code of the given child, or <CODE>-1</CODE>.
      */
     public int getChildPositionCode(ProgramElement child) {
-	if (child != null) {
-	    if (child == classContext) return 0;
-	}
-	if (runtimeInstance != null) {
-	    if (child == runtimeInstance) return (1 << 4 | 1);
-	}
-	return -1;
+       int idx = 0;
+       if (classContext != null) {
+          if (child == classContext) return idx;
+          idx ++;
+       }
+       if (methodContext != null) {
+          if (child == methodContext) return idx;
+          idx ++;
+       }
+       if (runtimeInstance != null) {
+          if (child == runtimeInstance) return idx;
+       }
+       return -1;
     }
 
     public void accept(SourceVisitor visitor) {       
     }
 
     public ExecutionContext deepClone() {
-	return new ExecutionContext(classContext, runtimeInstance);
+	return new ExecutionContext(classContext, methodContext, runtimeInstance);
     }
 
     public NonTerminalProgramElement getASTParent() {
@@ -176,6 +203,15 @@ public class ExecutionContext
     public TypeReference getTypeReference() {
 	return classContext;
     }
+
+    /**
+     * returns the method signature of the currently active method
+     * @return the method signature of the currently active method
+     */
+    public MethodSignature getMethodContext() {
+   return methodContext;
+    }
+
     
     /**
      * returns the runtime instance object

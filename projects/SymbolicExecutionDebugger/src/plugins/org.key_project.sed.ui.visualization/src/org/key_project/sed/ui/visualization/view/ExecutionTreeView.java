@@ -1,18 +1,11 @@
 package org.key_project.sed.ui.visualization.view;
 
-import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.ui.IDebugUIConstants;
@@ -31,22 +24,15 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
-import org.eclipse.jface.viewers.ILazyTreeContentProvider;
-import org.eclipse.jface.viewers.ILazyTreePathContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewSite;
 import org.key_project.sed.core.model.ISEDDebugElement;
-import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.ui.visualization.execution_tree.editor.AbstractExecutionTreeDiagramEditorJob;
+import org.key_project.sed.ui.job.AbstractExecutionTreeDiagramEditorJob;
+import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ReadonlyDiagramEditorActionBarContributor;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugTargetConnectFeature;
@@ -55,15 +41,10 @@ import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTre
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
-import org.key_project.util.eclipse.JobUtil;
-import org.key_project.util.eclipse.job.ScheduledJobCollector;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
-import org.key_project.util.java.thread.AbstractRunnableWithResult;
-import org.key_project.util.java.thread.IRunnableWithResult;
 
 /**
  * This view shows the symbolic execution tree of selected {@link ISEDDebugTarget}s
@@ -71,6 +52,11 @@ import org.key_project.util.java.thread.IRunnableWithResult;
  * @author Martin Hentschel
  */
 public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<ExecutionTreeDiagramEditor, ReadonlyDiagramEditorActionBarContributor> {
+   /**
+    * The ID of this view.
+    */
+   public static final String VIEW_ID = "org.key_project.sed.ui.graphiti.view.ExecutionTreeView";
+   
    /**
     * The message which is shown to the user if the debug view is not opened.
     */
@@ -202,7 +188,6 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     * When the selection on {@link #getEditorPart()} has changed.
     * @param event The event.
     */
-   // TODO: Selection is not synchronized with debug view if debug view is not visible, e.g. when execution tree view is maximized.
    protected void handleEditorSelectionChanged(final SelectionChangedEvent event) {
       // Check if the selection changed was caused programmatically during synchronization or by the user.
       if (internalSelectionUpdate) {
@@ -225,174 +210,11 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
             }
             businessObjects.add(element);
          }
-         // Make sure that the old selected business objects are different to the new one
-         ISelection oldSelection = getDebugView().getViewer().getSelection();
-         if (!businessObjects.equals(SWTUtil.toList(oldSelection))) {
-            // Change selection in debug view if new elements are selected in a Job because the debug view uses Jobs itself to expand the debug model and it is required to wait for them.
-            AbstractExecutionTreeDiagramEditorJob.cancelJobs(getEditorPart());
-            Job selectJob = new AbstractExecutionTreeDiagramEditorJob("Synchronizing selection", getEditorPart()) {
-               @Override
-               protected IStatus run(IProgressMonitor monitor) {
-                  try {
-                     // Expand viewer up to the elements to select.
-                     final Viewer debugViewer = getDebugView().getViewer();
-                     if (debugViewer instanceof TreeViewer) {
-                        TreeViewer treeViewer = (TreeViewer)debugViewer;
-                        for (Object element : businessObjects) {
-                           try {
-                              monitor.beginTask(getName(), IProgressMonitor.UNKNOWN);
-                              monitor.subTask("Collecting unknown elements");
-                              Deque<Object> expandQue = collectUnknownParents(treeViewer, element);
-                              monitor.beginTask(getName(), expandQue.size() + 1);
-                              monitor.subTask("Expanding unknown elements");
-                              expandElements(treeViewer, expandQue, monitor);
-                           }
-                           catch (DebugException e) {
-                              LogUtil.getLogger().logError("Can't expand debug view to element \"" + element + "\".", e);
-                           }
-                        }
-                     }
-                     // Select new elements
-                     monitor.subTask("Select element");
-                     ISelection newSelection = SWTUtil.createSelection(businessObjects);
-                     SWTUtil.select(debugViewer, newSelection, true);
-                     monitor.worked(1);
-                     monitor.done();
-                     return Status.OK_STATUS;
-                  }
-                  catch (OperationCanceledException e) {
-                     return Status.CANCEL_STATUS;
-                  }
-               }
-            };
-            selectJob.schedule();
-         }
+         // Select in debug viewer
+         SEDUIUtil.selectInDebugView(getEditorPart(), getDebugView(), businessObjects);
       }
    }
    
-   /**
-    * <p>
-    * Collects all parent elements starting from the given one that
-    * are unknown in the given {@link TreeViewer}.
-    * </p>
-    * <p>
-    * Unknown elements are possible if an {@link ILazyTreeContentProvider} or
-    * an {@link ILazyTreePathContentProvider} is used.
-    * </p>
-    * @param treeViewer The {@link TreeViewer} to search in.
-    * @param element The element to start search for unknown elements.
-    * @return A {@link Deque} which contains all unknown elements in order from root to given element.
-    * @throws DebugException Occurred Exception.
-    */
-   protected Deque<Object> collectUnknownParents(final TreeViewer treeViewer, Object element) throws DebugException {
-      // List parents to expand them first unknown element up to the given element.
-      Deque<Object> expandQue = new LinkedList<Object>();
-      Object previous = null;
-      while (element != null) {
-         boolean goOn = true;
-         if (previous != null) { // Ignore first element
-            // Check if the previous element is known in tree
-            final Object toTest = previous;
-            IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
-               @Override
-               public void run() {
-                  Widget item = treeViewer.testFindItem(toTest);
-                  setResult(item == null);
-               }
-            };
-            treeViewer.getControl().getDisplay().syncExec(run);
-            if (run.getResult() != null && run.getResult().booleanValue()) {
-               // Previous element is not known, add to Deque and continue with parent.
-               expandQue.addFirst(element);
-            }
-            else {
-               // Previous element is known in tree, search can be stopped.
-               goOn = false;
-            }
-         }
-         // Update previous and current element for next iteration.
-         if (goOn) {
-            previous = element;
-            if (element instanceof ISEDThread) {
-               element = ((ISEDThread)element).getDebugTarget();
-            }
-            else if (element instanceof ISEDDebugNode) {
-               element = ((ISEDDebugNode)element).getParent();
-            }
-            else if (element instanceof ISEDDebugTarget) {
-               element = ((ISEDDebugTarget)element).getLaunch();
-            }
-            else {
-               element = null;
-            }
-         }
-         else {
-            element = null;
-         }
-      }
-      return expandQue;
-   }
-
-   /**
-    * Expands all elements in the given {@link Deque}.
-    * @param treeViewer The {@link TreeViewer} to expand in.
-    * @param expandQue The {@link Deque} which defines the elements to expand in order from root to child.
-    * @param monitor The {@link IProgressMonitor} to use.
-    */
-   protected void expandElements(final TreeViewer treeViewer, 
-                                 Deque<Object> expandQue,
-                                 IProgressMonitor monitor) {
-      
-      // Expand elements starting at the root to make the familiar in tree
-      for (final Object toExpand : expandQue) {
-         SWTUtil.checkCanceled(monitor);
-         IFilter<Job> jobFilter = new IFilter<Job>() {
-            @Override
-            public boolean select(Job element) {
-               String className = element.getClass().getName();
-               return className.startsWith("org.eclipse.debug") ||
-                      className.startsWith("org.eclipse.ui.internal.progress");
-            }
-         };
-         ScheduledJobCollector collector = new ScheduledJobCollector(jobFilter);
-         try {
-            // Start collecting update jobs started by the debug view
-            collector.start();
-            // Expand tree
-            treeViewer.getTree().getDisplay().syncExec(new Runnable() {
-               @Override
-               public void run() {
-                  if (!treeViewer.getExpandedState(toExpand)) {
-                     // Search item to expand
-                     Widget item = treeViewer.testFindItem(toExpand);
-                     if (item instanceof TreeItem) {
-                        TreeItem treeItem = (TreeItem)item;
-                        // Make item visible and expand it. Invisible elements are not expanded.
-                        treeViewer.getTree().showItem(treeItem);
-                        treeViewer.setExpandedState(toExpand, true);
-                        // Make all children visible because otherwise lazy loading will not update them if the expanded element is exactly the last visible element.
-                        for (TreeItem child : treeItem.getItems()) {
-                           treeViewer.getTree().showItem(child);
-                        }
-                     }
-                  }
-               }
-            });
-         }
-         finally {
-            // Stop collecting update jobs
-            collector.stop();
-         }
-         // Wait until all update jobs have finished before
-         Job[] jobs = collector.getJobs();
-         for (Job job : jobs) {
-            SWTUtil.checkCanceled(monitor);
-            JobUtil.waitFor(job, 10);
-         }
-         // Update monitor
-         monitor.worked(1);
-      }
-   }
    
    /**
     * Updates the {@link Diagram} in a way that only {@link ISEDDebugTarget}

@@ -18,6 +18,9 @@ header {
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.speclang.*;
     import de.uka.ilkd.key.speclang.translation.*;
+    import de.uka.ilkd.key.ldt.HeapLDT;
+    import de.uka.ilkd.key.logic.Name;
+    import de.uka.ilkd.key.logic.TermBuilder;
 }
 
 
@@ -100,6 +103,23 @@ options {
     public ImmutableSet<PositionedString> getWarnings() {
     	return warnings;
     }
+
+    private PositionedString flipHeaps(String declString, PositionedString result) {
+      String t = result.text;
+      String p = declString+" ";
+      for(Name heapName : HeapLDT.VALID_HEAP_NAMES) {
+        t = t.trim();
+	String l = "<"+heapName+">";
+        if(t.startsWith(l)) {
+           p = l + p;
+           t = t.substring(l.length());
+        }
+        result = new PositionedString(t, result.fileName, result.pos);
+      }
+      result = result.prepend(p);
+      return result;
+    }
+
 }
 
 
@@ -225,7 +245,6 @@ modifier returns [String result = null]:
     |   spr:SPEC_PROTECTED      { result = spr.getText(); }
     |   spu:SPEC_PUBLIC         { result = spu.getText(); }
     |   sta:STATIC              { result = sta.getText(); }
-    |   tra:TRANSACTION         { result = tra.getText(); }
 ;
 
 
@@ -497,7 +516,7 @@ requires_clause
 	returns [PositionedString result = null] 
 	throws SLTranslationException
 :
-    requires_keyword result=expression { result = result.prepend("requires "); }
+    requires_keyword result=expression { result = flipHeaps("requires", result); }
 ;
 
 
@@ -567,7 +586,6 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 :
     (
 	    ps=assignable_clause     { sc.addAssignable(ps); }
-	|   ps=assignable_backup_clause { sc.addAssignableBackup(ps); }
 	|   ps=accessible_clause     { sc.addAccessible(ps); }
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
@@ -600,26 +618,11 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 //simple specification body clauses
 //-----------------------------------------------------------------------------
 
-assignable_backup_clause 
-	returns [PositionedString result = null] 
-	throws SLTranslationException
-:
-    assignable_backup_keyword result=expression { result = result.prepend("assignable "); }
-;
-
-assignable_backup_keyword
-:
-    	ASSIGNABLE_TRA 
-    |   MODIFIABLE_TRA 
-    |   MODIFIES_TRA
-;
-
-
 assignable_clause 
 	returns [PositionedString result = null] 
 	throws SLTranslationException
 :
-    assignable_keyword result=expression { result = result.prepend("assignable "); }
+    assignable_keyword result=expression { result = flipHeaps("assignable", result); } 
 ;
 
 
@@ -668,7 +671,7 @@ ensures_clause
 	returns [PositionedString result = null] 
 	throws SLTranslationException
 :
-    ensures_keyword result=expression { result = result.prepend("ensures "); }
+    ensures_keyword result=expression { result = flipHeaps("ensures", result); }
 ;
 
 
@@ -1089,9 +1092,7 @@ loop_specification[ImmutableList<String> mods]
     	options { greedy = true; }
     	:
     	    ps=loop_invariant       { ls.addInvariant(ps); }
-        |   ps=loop_invariant_tra   { ls.addTransactionInvariant(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
-	|   ps=assignable_backup_clause { ls.addAssignableBackup(ps); }
         |   ps=variant_function     { ls.setVariant(ps); } 
     )+
 ;
@@ -1099,14 +1100,8 @@ loop_specification[ImmutableList<String> mods]
 
 loop_invariant returns [PositionedString result = null]
 :
-    maintaining_keyword result=expression
+    maintaining_keyword result=expression { result = flipHeaps("", result); }
 ;
-
-loop_invariant_tra returns [PositionedString result = null]
-:
-    LOOP_INVARIANT_TRA result=expression
-;
-
 
 maintaining_keyword 
 :

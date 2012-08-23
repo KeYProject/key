@@ -483,7 +483,7 @@ public final class TestKeyUtil {
                                                                "  = int::select(heapAtPre, null, transactionCounter)\n" +
                                                                "& self.<inv>\n" +
                                                                "& exc = null", 
-                                                               "{(self, empty)} \\cup {(self, balance)}\n" +
+                                                               "mod[heap]:           {(self, empty)} \\cup {(self, balance)}\n" +
                                                                "     \\cup {(self, transactionId)}\n" +
                                                                "\\cup {(null, transactionCounter)}", 
                                                                "diamond");
@@ -494,7 +494,9 @@ public final class TestKeyUtil {
       addOperationObligations(getBalance, true, true, true);
       MemoryOperationContract gb2 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(logRecordFullqualifiedName, "getBalance()", operationContractIds[2], "normal_behavior"),
                                                                 "self.<inv>", 
-                                                                "result = self.balance & self.<inv> & exc = null", "{}", "diamond");
+                                                                "result = self.balance & self.<inv> & exc = null", 
+                                                                "mod[heap]: {}", 
+                                                                "diamond");
       addAllOperationContractObligations(gb2);
       getBalance.addOperationContract(gb2);
       result.addMethod(getBalance);
@@ -502,7 +504,9 @@ public final class TestKeyUtil {
       addOperationObligations(getTransactionId, true, true, true);
       MemoryOperationContract gti2 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(logRecordFullqualifiedName, "getTransactionId()", operationContractIds[3], "normal_behavior"),
                                                                  "self.<inv>", 
-                                                                 "result = self.transactionId & self.<inv> & exc = null", "{}", "diamond");
+                                                                 "result = self.transactionId & self.<inv> & exc = null", 
+                                                                 "mod[heap]: {}", 
+                                                                 "diamond");
       addAllOperationContractObligations(gti2);
       getTransactionId.addOperationContract(gti2);
       result.addMethod(getTransactionId);
@@ -544,7 +548,7 @@ public final class TestKeyUtil {
                                                                 "true", 
                                                                 "(exc = null -> result.limit = 100 & !result = null)\n" +
                                                                 "& exc = null", 
-                                                                "allLocs", 
+                                                                "mod[heap]: allLocs", 
                                                                 "diamond");
       addAllOperationContractObligations(cjc);
       createJuniorCard.addOperationContract(cjc);
@@ -558,7 +562,7 @@ public final class TestKeyUtil {
                                                                "      -> self.<inv>)\n" +
                                                                "   &   java.lang.IllegalArgumentException::instance(exc)\n" +
                                                                "     = TRUE)", 
-                                                               "allLocs", 
+                                                               "mod[heap]: allLocs", 
                                                                "diamond");
       addAllOperationContractObligations(c1);
       MemoryOperationContract c2 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, "charge(int)", operationContractIDs[2], "normal_behavior"),
@@ -573,7 +577,7 @@ public final class TestKeyUtil {
                                                                "                  1)\n" +
                                                                "   & self.<inv>)\n" +
                                                                "& exc = null", 
-                                                               "{(self, unsuccessfulOperations)}", 
+                                                               "mod[heap]: {(self, unsuccessfulOperations)}", 
                                                                "diamond");
       addAllOperationContractObligations(c2);
       MemoryOperationContract c3 = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId(qualifiedPaycardName, "charge(int)", operationContractIDs[3], "normal_behavior"),
@@ -586,7 +590,7 @@ public final class TestKeyUtil {
                                                                "                  int::select(heapAtPre, self, balance))\n" +
                                                                "   & self.<inv>)\n" +
                                                                "& exc = null", 
-                                                               "{(self, balance)}", 
+                                                               "mod[heap]: {(self, balance)}", 
                                                                "diamond");
       addAllOperationContractObligations(c3);
       charge.addOperationContract(c1);
@@ -600,7 +604,7 @@ public final class TestKeyUtil {
                                                                 "self.balance >= int::select(heapAtPre, self, balance)\n" +
                                                                 "& self.<inv>\n" +
                                                                 "& exc = null", 
-                                                                "allLocs \\setMinus freshLocs(heap)", 
+                                                                "mod[heap]: allLocs \\setMinus freshLocs(heap)", 
                                                                 "diamond");
       addAllOperationContractObligations(car);
       chargeAndRecord.addOperationContract(car);
@@ -612,7 +616,7 @@ public final class TestKeyUtil {
                                                                 "(result = TRUE <-> self.unsuccessfulOperations <= 3)\n" +
                                                                 "& self.<inv>\n" +
                                                                 "& exc = null", 
-                                                                "{}", 
+                                                                "mod[heap]: {}", 
                                                                 "diamond");
       addAllOperationContractObligations(iv2);
       isValid.addOperationContract(iv2);
@@ -670,7 +674,7 @@ public final class TestKeyUtil {
                                                                 "     = balance\n" +
                                                                 "   & self.<inv>)\n" +
                                                                 "& exc = null", 
-                                                                "allLocs", 
+                                                                "mod[heap]: allLocs", 
                                                                 "diamond");
       addAllOperationContractObligations(ar1);
       addRecord.addOperationContract(ar1);
@@ -684,7 +688,7 @@ public final class TestKeyUtil {
                                                                 "     -> self.logArray[i].balance <= result.balance)\n" +
                                                                 "& (self.<inv> & !result = null)\n" +
                                                                 "& exc = null", 
-                                                                "{}", 
+                                                                "mod[heap]: {}", 
                                                                 "box");
       addAllOperationContractObligations(mr2);
       getMaximumRecord.addOperationContract(mr2);
@@ -886,7 +890,7 @@ public final class TestKeyUtil {
       MemoryOperationContract doubleXcontract = new MemoryOperationContract(TestKeY4EclipseUtil.createOperationContractId("ModelFieldTest", "doubleX()", "0", null),
                                                                             "self.<inv>", 
                                                                             "(exc = null -> result = self.f & self.<inv>)\n& exc = null", 
-                                                                            "allLocs", 
+                                                                            "mod[heap]: allLocs", 
                                                                             "diamond");
       addAllOperationContractObligations(doubleXcontract);
       doubleX.addOperationContract(doubleXcontract);
@@ -1139,8 +1143,8 @@ public final class TestKeyUtil {
       b.getImplementsFullnames().add("InterfaceB");
       b.getImplements().add(interfaceB);
       con.addClass(b);
-      MemoryClass c = new MemoryClass("C", DSVisibility.PUBLIC);
-      c.addConstructor(createDefaultConstructor("C()", "X", false, false));
+      MemoryClass c = new MemoryClass("CX", DSVisibility.PUBLIC);
+      c.addConstructor(createDefaultConstructor("CX()", "X", false, false));
       c.getExtendsFullnames().add("B");
       c.getExtends().add(b);
       c.getImplementsFullnames().add("InterfaceC");

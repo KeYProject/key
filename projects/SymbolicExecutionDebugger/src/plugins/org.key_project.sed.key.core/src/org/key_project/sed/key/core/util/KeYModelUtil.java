@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -14,9 +15,8 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.core.model.KeYBranchCondition;
@@ -32,6 +32,7 @@ import org.key_project.sed.key.core.model.KeYTermination;
 import org.key_project.sed.key.core.model.KeYVariable;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.IOUtil.LineInformation;
+import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -51,7 +52,6 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
  * implementations to compute their content and child {@link IKeYSEDDebugNode}s.
  * @author Martin Hentschel
  */
-@SuppressWarnings("restriction")
 public final class KeYModelUtil {
    /**
     * Forbid instances.
@@ -261,13 +261,13 @@ public final class KeYModelUtil {
     * @throws DebugException Occurred Exception.
     */
    public static SourceLocation updateLocationFromAST(IStackFrame frame,
-                                                         SourceLocation sourceLocation) throws DebugException {
+                                                      SourceLocation sourceLocation) throws DebugException {
       try {
          SourceLocation result = sourceLocation;
          if (sourceLocation != null && sourceLocation.getCharEnd() >= 0) {
             ICompilationUnit compilationUnit = findCompilationUnit(frame);
             if (compilationUnit != null) {
-               ASTNode root = parse(compilationUnit, sourceLocation.getCharStart(), sourceLocation.getCharEnd() - sourceLocation.getCharStart());
+               ASTNode root = JDTUtil.parse(compilationUnit, sourceLocation.getCharStart(), sourceLocation.getCharEnd() - sourceLocation.getCharStart());
                ASTNode statementNode = ASTNodeByEndIndexSearcher.search(root, sourceLocation.getCharEnd());
                if (statementNode != null) {
                   result = new SourceLocation(-1, 
@@ -330,20 +330,6 @@ public final class KeYModelUtil {
          }
       }
       return result;
-   }
-   
-   /**
-    * Parses the given {@link ICompilationUnit} in the specified range into an AST. 
-    * @param compilationUnit The {@link ICompilationUnit} to parse.
-    * @param offset The start index in the text to parse.
-    * @param length The length of the text to parse.
-    * @return The {@link ASTNode} which is the root of the AST.
-    */
-   protected static ASTNode parse(ICompilationUnit compilationUnit, int offset, int length) {
-      ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL); // Hopefully always the newest AST level (e.g. AST.JLS4)
-      parser.setSource(compilationUnit);
-      parser.setSourceRange(offset, length);
-      return parser.createAST(null);
    }
    
    /**
@@ -433,6 +419,30 @@ public final class KeYModelUtil {
       }
       else {
          return new KeYVariable[0];
+      }
+   }
+
+   /**
+    * Converts the given call stack of {@link IExecutionNode} into 
+    * a call stack of {@link ISEDDebugNode}s.
+    * @param debugTarget The {@link KeYDebugTarget} which maps {@link IExecutionNode}s to {@link ISEDDebugNode}s.
+    * @param callStack The call stack to convert.
+    * @return The converted call stack.
+    */
+   public static IKeYSEDDebugNode<?>[] createCallStack(KeYDebugTarget debugTarget, IExecutionNode[] callStack) {
+      if (debugTarget != null && callStack != null) {
+         IKeYSEDDebugNode<?>[] result = new IKeYSEDDebugNode<?>[callStack.length];
+         int i = 0;
+         for (IExecutionNode executionNode : callStack) {
+            IKeYSEDDebugNode<?> debugNode = debugTarget.getDebugNode(executionNode);
+            Assert.isNotNull(debugNode, "Can't find debug node for execution node \"" + executionNode + "\".");
+            result[i] = debugNode;
+            i++;
+         }
+         return result;
+      }
+      else {
+         return new IKeYSEDDebugNode<?>[0];
       }
    }
 }

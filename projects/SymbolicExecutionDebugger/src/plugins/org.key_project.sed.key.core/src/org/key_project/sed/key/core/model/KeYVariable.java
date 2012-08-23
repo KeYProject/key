@@ -3,7 +3,6 @@ package org.key_project.sed.key.core.model;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
-import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.core.model.impl.AbstractSEDVariable;
 import org.key_project.sed.core.util.LogUtil;
@@ -30,13 +29,21 @@ public class KeYVariable extends AbstractSEDVariable {
 
    /**
     * Constructor.
-    * @param target The {@link ISEDDebugTarget} in that this element is contained.
+    * @param target The {@link KeYDebugTarget} in that this element is contained.
     * @param executionVariable The {@link IExecutionVariable} to represent in debug model.
     */
-   public KeYVariable(ISEDDebugTarget target, IExecutionVariable executionVariable) {
+   public KeYVariable(KeYDebugTarget target, IExecutionVariable executionVariable) {
       super(target);
       Assert.isNotNull(executionVariable);
       this.executionVariable = executionVariable;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYDebugTarget getDebugTarget() {
+      return (KeYDebugTarget)super.getDebugTarget();
    }
 
    /**
@@ -44,7 +51,12 @@ public class KeYVariable extends AbstractSEDVariable {
     */
    @Override
    public String getName() throws DebugException {
-      return executionVariable.getName();
+      try {
+         return executionVariable.getName();
+      }
+      catch (ProofInputException e) {
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute name.", e));
+      }
    }
 
    /**

@@ -11,9 +11,11 @@
 package de.uka.ilkd.key.logic;
 
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -31,6 +33,8 @@ import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.util.Pair;
+
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -53,7 +57,6 @@ public final class TermBuilder {
     private static final Term tt = TermFactory.DEFAULT.createTerm(Junctor.TRUE); 
     private static final Term ff = TermFactory.DEFAULT.createTerm(Junctor.FALSE); 
 
-    
     private TermBuilder() {
     }
     
@@ -178,7 +181,7 @@ public final class TermBuilder {
      * in the namespaces!
      */
     public LocationVariable selfVar(Services services, 
-                                    ProgramMethod pm,
+                                    IProgramMethod pm,
                                     KeYJavaType kjt,
                                     boolean makeNameUnique) {
         if(pm.isStatic()) {
@@ -194,15 +197,15 @@ public final class TermBuilder {
      * in the namespaces!
      */
     public ImmutableList<ProgramVariable> paramVars(Services services, 
-                                                    ObserverFunction obs,
+                                                    IObserverFunction obs,
                                                     boolean makeNamesUnique) {
         ImmutableList<ProgramVariable> result 
         	= ImmutableSLList.<ProgramVariable>nil(); 
         for(int i = 0, n = obs.getNumParams(); i < n; i++) {
             final KeYJavaType paramType = obs.getParamType(i);
             String name; 
-            if(obs instanceof ProgramMethod) {
-        	name = ((ProgramMethod)obs).getParameterDeclarationAt(i)
+            if(obs instanceof IProgramMethod) {
+        	name = ((IProgramMethod)obs).getParameterDeclarationAt(i)
         	                           .getVariableSpecification()
         	                           .getName();
             } else {
@@ -224,7 +227,7 @@ public final class TermBuilder {
      * in the namespaces!
      */
     public ImmutableList<ProgramVariable> paramVars(Services services,
-	    String postfix, ObserverFunction obs, boolean makeNamesUnique) {
+	    String postfix, IObserverFunction obs, boolean makeNamesUnique) {
 	final ImmutableList<ProgramVariable> paramVars 
 		= paramVars(services, obs, true);
 	ImmutableList<ProgramVariable> result 
@@ -245,7 +248,7 @@ public final class TermBuilder {
      * in the namespaces.
      */
     public LocationVariable resultVar(Services services, 
-                                      ProgramMethod pm,
+                                      IProgramMethod pm,
                                       boolean makeNameUnique) {
 	return resultVar(services, "result", pm, makeNameUnique);
     }
@@ -256,7 +259,7 @@ public final class TermBuilder {
      * register it in the namespaces.
      */
     public LocationVariable resultVar(Services services, String name,
-	    ProgramMethod pm, boolean makeNameUnique) {
+	    IProgramMethod pm, boolean makeNameUnique) {
 	if(pm.isVoid() || pm.isConstructor()) {
 	    return null;
 	} else {
@@ -274,7 +277,7 @@ public final class TermBuilder {
      * register it in the namespaces.
      */
     public LocationVariable excVar(Services services, 
-                                   ProgramMethod pm,
+                                   IProgramMethod pm,
                                    boolean makeNameUnique) {
 	return excVar(services, "exc", pm, makeNameUnique);
     }
@@ -286,7 +289,7 @@ public final class TermBuilder {
      */
     public LocationVariable excVar(Services services,
 	    			   String name,
-                                   ProgramMethod pm,
+                                   IProgramMethod pm,
                                    boolean makeNameUnique) {
 	if(makeNameUnique) {
 	    name = newName(services, name);
@@ -303,14 +306,14 @@ public final class TermBuilder {
      */
     public LocationVariable heapAtPreVar(Services services,
 	    				 String baseName,
+                                         Sort sort,
 	    			         boolean makeNameUnique) {
+        assert sort != null;
 	if(makeNameUnique) {
 	    baseName = newName(services, baseName);
 	}	
 	return new LocationVariable(new ProgramElementName(baseName),
-		            	    new KeYJavaType(services.getTypeConverter()
-		            	            		    .getHeapLDT()
-		            	            		    .targetSort()));
+		            	    new KeYJavaType(sort));
     }
         
     //-------------------------------------------------------------------------
@@ -376,6 +379,10 @@ public final class TermBuilder {
         return tf.createTerm(f, s, null, null);
     }
     
+    public Term func(IObserverFunction f, Term ... s) {
+       return tf.createTerm(f, s, null, null);
+   }
+   
     public Term func(Function f, 
 	    	     Term[] s, 
 	    	     ImmutableArray<QuantifiableVariable> boundVars) {
@@ -440,6 +447,18 @@ public final class TermBuilder {
 	return all(t.freeVars(), t);
     }
 
+    /**
+     * Removes universal quantifiers from a formula.
+     */
+    public Term open(Term formula) {
+    assert formula.sort() == Sort.FORMULA;
+    if(formula.op() == Quantifier.ALL) {
+        return open(formula.sub(0)); 
+    } else {
+        return formula;
+    }
+    }
+    
 
     public Term ex(QuantifiableVariable qv, Term t) {
 	return tf.createTerm(Quantifier.EX, 
@@ -685,7 +704,7 @@ public final class TermBuilder {
 
 
     public Term elementary(Services services, Term heapTerm) {
-        return elementary(services, heap(services), heapTerm);
+        return elementary(services, getBaseHeap(services), heapTerm);
     }
 
 
@@ -1188,7 +1207,7 @@ public final class TermBuilder {
     public Term createdLocs(Services services) {
         return setMinus(services, 
         	        allLocs(services), 
-                        freshLocs(services, heap(services))); 
+                        freshLocs(services, getBaseHeap(services))); 
     }    
     
     
@@ -1203,24 +1222,14 @@ public final class TermBuilder {
         return func(services.getTypeConverter().getHeapLDT().getNull());
     }
 
-    
-    public Term heap(Services services) {
-        return var(services.getTypeConverter().getHeapLDT().getHeap());
-    }
-
-    public Term savedHeap(Services services) {
-        return var(services.getTypeConverter().getHeapLDT().getSavedHeap());
-    }
-    
-    
-    public Term wellFormed(Services services, Term h) {
-        return func(services.getTypeConverter().getHeapLDT().getWellFormed(), 
-        	    h);
+    public Term wellFormed(Term heap, Services services) {
+        return func(services.getTypeConverter().getHeapLDT().getWellFormed(heap.sort()), 
+        	    heap);
     }
     
 
-    public Term wellFormedHeap(Services services) {
-        return wellFormed(services, heap(services));
+    public Term wellFormed(LocationVariable heap, Services services) {
+        return wellFormed(var(heap), services);
     }
     
     
@@ -1232,7 +1241,7 @@ public final class TermBuilder {
     
     
     public Term inv(Services services, Term o) {
-	return inv(services, heap(services),  o);
+	return inv(services, getBaseHeap(services),  o);
     }
     
     public Term staticInv(Services services, Term h, KeYJavaType t){
@@ -1240,7 +1249,7 @@ public final class TermBuilder {
     }
     
     public Term staticInv(Services services, KeYJavaType t){
-        return func(services.getJavaInfo().getStaticInv(t), heap(services));
+        return func(services.getJavaInfo().getStaticInv(t), getBaseHeap(services));
     }
 
     
@@ -1253,16 +1262,19 @@ public final class TermBuilder {
 
     
     public Term dot(Services services, Sort asSort, Term o, Term f) {
-        return select(services, asSort, heap(services), o, f);
+        return select(services, asSort, getBaseHeap(services), o, f);
     }
 
+    public Term getBaseHeap(Services services) {
+        return var(services.getTypeConverter().getHeapLDT().getHeap());
+    }
     
     public Term dot(Services services, Sort asSort, Term o, Function f) {
 	final Sort fieldSort 
 		= services.getTypeConverter().getHeapLDT().getFieldSort();
         return f.sort() == fieldSort
                ? dot(services, asSort, o, func(f))
-               : func(f, heap(services), o);
+               : func(f, getBaseHeap(services), o);
     }
     
 
@@ -1276,7 +1288,7 @@ public final class TermBuilder {
 		= services.getTypeConverter().getHeapLDT().getFieldSort();
 	return f.sort() == fieldSort
 	       ? staticDot(services, asSort, func(f))
-	       : func(f, heap(services));
+	       : func(f, getBaseHeap(services));
     }
     
 
@@ -1304,7 +1316,7 @@ public final class TermBuilder {
         
         return select(services, 
         	      elementSort, 
-        	      heap(services), 
+        	      getBaseHeap(services), 
         	      ref, 
         	      arr(services, idx));
     }    
@@ -1328,7 +1340,7 @@ public final class TermBuilder {
 
 
     public Term created(Services services, Term o) {
-	return created(services, heap(services), o);
+	return created(services, getBaseHeap(services), o);
     }
 
     
@@ -1402,7 +1414,7 @@ public final class TermBuilder {
     
                
     public Term fieldStore(Services services, Term o, Function f, Term v) {
-        return store(services, heap(services), o, func(f), v);
+        return store(services, getBaseHeap(services), o, func(f), v);
     }
     
     
@@ -1413,7 +1425,7 @@ public final class TermBuilder {
     
     public Term arrayStore(Services services, Term o, Term i, Term v) {
         return store(services, 
-        	     heap(services), 
+                getBaseHeap(services), 
         	     o, 
         	     func(services.getTypeConverter().getHeapLDT().getArr(), i),
         	     v);
@@ -1442,7 +1454,7 @@ public final class TermBuilder {
 
 
     public Term reachableValue(Services services, Term t, KeYJavaType kjt) {
-	return reachableValue(services, heap(services), t, kjt);
+	return reachableValue(services, getBaseHeap(services), t, kjt);
     }
     
     
@@ -1470,7 +1482,7 @@ public final class TermBuilder {
 	
 	final OpReplacer or = new OpReplacer(normalToAtPre);
 	final Term modAtPre = or.replace(mod);
-	final Term createdAtPre = or.replace(created(services, objVarTerm));
+	final Term createdAtPre = or.replace(created(services, heapTerm, objVarTerm));
 
         ImmutableList<QuantifiableVariable> quantVars =
                 ImmutableSLList.<QuantifiableVariable>nil();
@@ -1536,12 +1548,11 @@ public final class TermBuilder {
     }
     
     
-    public Term anonUpd(Services services, Term mod, Term anonHeap, boolean savedHeap) {
+    public Term anonUpd(LocationVariable heap, Services services, Term mod, Term anonHeap) {
 	return elementary(services,
-		          savedHeap ? services.getTypeConverter().getHeapLDT().getSavedHeap()
-		                    : services.getTypeConverter().getHeapLDT().getHeap(),
+		          heap,
 		          anon(services, 
-		               savedHeap ? savedHeap(services) : heap(services), 
+		               var(heap), 
 		               mod, 
 		               anonHeap));
     }
@@ -1631,6 +1642,57 @@ public final class TermBuilder {
     public Term seqReverse(Services services, Term s) {
 	return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
     }
+
+    //-------------------------------------------------------------------------
+    // misc    (moved from key.util.MiscTools)
+    //-------------------------------------------------------------------------
+    
+
+    
+    public ImmutableSet<Term> unionToSet(Term s, Services services) {
+    final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
+    assert s.sort().equals(setLDT.targetSort());
+    final Function union = setLDT.getUnion();
+    ImmutableSet<Term> result = DefaultImmutableSet.<Term>nil();
+        ImmutableList<Term> workingList = ImmutableSLList.<Term>nil().prepend(s);
+        while(!workingList.isEmpty()) {
+            Term f = workingList.head();
+            workingList = workingList.tail();
+            if(f.op() == union) {
+                workingList = workingList.prepend(f.sub(1)).prepend(f.sub(0));
+            } else {
+                result = result.add(f);
+            }
+        }
+        return result;
+    }
+
+
+    
+    /**
+     * Removes leading updates from the passed term.
+     */
+    public Term goBelowUpdates(Term term) {
+        while(term.op() instanceof UpdateApplication) {
+            term = UpdateApplication.getTarget(term);
+        }        
+        return term;
+    }
+    
+
+    
+    /**
+     * Removes leading updates from the passed term.
+     */
+    public Pair<ImmutableList<Term>,Term> goBelowUpdates2(Term term) {
+    ImmutableList<Term> updates = ImmutableSLList.<Term>nil();
+        while(term.op() instanceof UpdateApplication) {
+            updates = updates.append(UpdateApplication.getUpdate(term));
+            term = UpdateApplication.getTarget(term);
+        }        
+        return new Pair<ImmutableList<Term>,Term>(updates, term);
+    }    
+    
     
     
     public Term seqDef(QuantifiableVariable qv,
@@ -1645,5 +1707,18 @@ public final class TermBuilder {
     
     public Term values(Services services){
     	return func(services.getTypeConverter().getSeqLDT().getValues());
+    }
+
+    /**
+      * Returns the {@link Sort}s of the given {@link Term}s.
+      * @param terms The given {@link Term}s.
+      * @return The {@link Term} {@link Sort}s.
+      */
+    public ImmutableList<Sort> getSorts(Iterable<Term> terms) {
+       ImmutableList<Sort> result = ImmutableSLList.<Sort>nil();
+       for (Term t : terms) {
+          result = result.append(t.sort());
+       }
+       return result;
     }
 }

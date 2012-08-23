@@ -606,6 +606,7 @@ public class TestMatchTaclet extends TestCase {
 	    (new TypeRef(new KeYJavaType
 		(PrimitiveType.JAVA_BYTE, 
 		 new SortImpl(new Name("byte")))),
+		 null,
 	     new LocationVariable(new ProgramElementName("testVar"),
 				 new SortImpl(new Name("testSort"))));
 	MethodFrame mframe = new MethodFrame(null, ec, prg);

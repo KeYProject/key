@@ -128,6 +128,8 @@ options {
     private ParserMode parserMode;
 
     private String chooseContract = null;
+    private String proofObligation = null;
+    
     private int savedGuessing = -1;
 
     private int lineOffset=0;
@@ -139,7 +141,7 @@ options {
 
     // if this is used then we can capture parts of the input for later use
     private DeclPicker capturer = null;
-    private ProgramMethod pm = null;
+    private IProgramMethod pm = null;
 
     private ImmutableSet<Taclet> taclets = DefaultImmutableSet.<Taclet>nil(); 
     private ImmutableSet<Contract> contracts = DefaultImmutableSet.<Contract>nil();
@@ -334,6 +336,10 @@ options {
 
     public String getChooseContract() {
       return chooseContract;
+    }
+    
+    public String getProofObligation() {
+      return proofObligation;
     }
     
     public String getFilename() {
@@ -831,7 +837,7 @@ options {
             }
             result = TermBuilder.DF.select(getServices(), 
                                            sv.sort(), 
-                                           TermBuilder.DF.heap(getServices()), 
+                                           TermBuilder.DF.getBaseHeap(getServices()), 
                                            prefix, 
                                            tf.createTerm(attribute));
         } else {
@@ -1170,9 +1176,9 @@ options {
         kjt = getTypeByClassName(className.toString());
         if (kjt != null) { 
            if (LA(n+1) == DOT && LA(n+3) == LPAREN) {
-               Iterator<ProgramMethod> it = javaInfo.getAllProgramMethods(kjt).iterator();
+               Iterator<IProgramMethod> it = javaInfo.getAllProgramMethods(kjt).iterator();
                while(it.hasNext()) {
-                 final ProgramMethod pm = it.next();
+                 final IProgramMethod pm = it.next();
                  final String name = kjt.getFullName()+"::"+LT(n+2).getText();                 
                  if(pm != null && pm.isStatic() && pm.name().toString().equals(name) ) {
                    result = true;
@@ -1319,7 +1325,7 @@ options {
     /**
      * returns the ProgramMethod parsed in the jml_specifications section.
      */
-    public ProgramMethod getProgramMethod(){
+    public IProgramMethod getProgramMethod(){
         return pm;
     }
 
@@ -1484,6 +1490,9 @@ choice_option[String cat]{
         }
     ;
 
+/* TODO: Why is the result of one_sort_decl stored in the local variables?
+ * It does not seem to be employed at all ?! (MU)
+ */
 sort_decls 
 {
   ImmutableList<Sort> lsorts = ImmutableSLList.<Sort>nil();
@@ -3239,7 +3248,7 @@ funcpredvarterm returns [Term a = null]
                 
         {  
             if(varfuncid.equals("inReachableState") && args == null) {
-	        a = TermBuilder.DF.wellFormedHeap(getServices());
+	        a = TermBuilder.DF.wellFormed(getServices().getTypeConverter().getHeapLDT().getHeap(), getServices());
 	    } else if(varfuncid.equals("skip") && args == null) {
 	        a = tf.createTerm(UpdateJunctor.SKIP);
 	    } else {
@@ -4273,7 +4282,17 @@ problem returns [ Term a = null ]
 	       if(chooseContract == null) {
 	           chooseContract = "";
 	       }
-           } 
+           }
+           | 
+           PROOFOBLIGATION  (proofObligation=string_literal SEMI)?
+           {
+               if (capturer != null) {
+                    capturer.capture();
+               }
+               if(proofObligation == null) {
+                   proofObligation = "";
+               }
+           }
 	)?
    ;
    
@@ -4332,19 +4351,19 @@ preferences returns [String s = null]:
 		RBRACE )?
 	;
 	
-proof [ProblemLoader prl] :
+proof [IProofFileParser prl] :
         ( PROOF proofBody[prl] )?
     ;
 
 
-proofBody [ProblemLoader prl] :
+proofBody [IProofFileParser prl] :
         LBRACE
             ( pseudosexpr[prl] )+ 
         RBRACE
     ;
 
 
-pseudosexpr [ProblemLoader prl] { char eid='0'; String str = ""; } :
+pseudosexpr [IProofFileParser prl] { char eid='0'; String str = ""; } :
         LPAREN (eid=expreid
             (str = string_literal )? 
                { prl.beginExpr(eid,str); } 

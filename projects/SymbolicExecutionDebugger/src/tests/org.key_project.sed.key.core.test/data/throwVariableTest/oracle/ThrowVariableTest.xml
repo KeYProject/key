@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_eaf9ea56-d9ad-4d77-9d12-694ed7b4f114" name="ThrowVariableTest[ThrowVariableTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_d4e0e352-3625-4f33-95b2-6b00c6fca080" name="&lt;start&gt;">
-         <sedMethodCall xml:id="_0c73773e-5ee4-4512-b743-538090dbb6ec" name="self.main();" lineNumber="-1" charStart="49" charEnd="53">
-            <sedStatement xml:id="_c5987d41-a89d-477a-b3fd-944b48cf8eae" name="IllegalArgumentException e = new IllegalArgumentException ();" lineNumber="-1" charStart="61" charEnd="121">
-               <sedStatement xml:id="_8d9ab4d3-ec4e-4e07-89fe-77619b826c46" name="throw e;" lineNumber="-1" charStart="125" charEnd="133">
-                  <sedExceptionalTermination xml:id="_98e836bc-c545-41be-baee-bf7df7a54bff" name="&lt;uncaught java.lang.IllegalArgumentException&gt;">
+   <sedTarget xml:id="_e40e3c88-8d63-412a-ae3b-333da02d3ad4" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_4ad686f8-83a6-4f0b-b9d6-38b7df25a347" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_3138090a-9b9c-4afb-91d1-98e4fc4602a1" name="self.main();" pathCondition="true" lineNumber="-1" charStart="49" charEnd="53">
+            <sedStatement xml:id="_51da0cd4-22c0-4b09-883b-eebf9feef6d9" name="IllegalArgumentException e = new IllegalArgumentException ();" pathCondition="true" lineNumber="-1" charStart="61" charEnd="121">
+               <sedStatement xml:id="_7723a3d5-0554-43a3-ae0e-8715c2103ed2" name="throw e;" pathCondition="true" lineNumber="-1" charStart="125" charEnd="133">
+                  <sedExceptionalTermination xml:id="_02c13ae6-af13-46aa-a6db-be8dce4b2ba1" name="&lt;uncaught java.lang.IllegalArgumentException&gt;" pathCondition="true">
                   </sedExceptionalTermination>
                </sedStatement>
             </sedStatement>

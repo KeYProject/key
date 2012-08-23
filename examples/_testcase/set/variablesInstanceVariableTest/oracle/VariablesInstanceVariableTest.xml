@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true">
-   <methodCall name="self.main(_param);" pathCondition="true">
-      <variable name="_param" typeString="IntWrapper" valueString="param" arrayIndex="-1" isArrayIndex="false">
-         <variable name="value" typeString="int" valueString="param.value" arrayIndex="-1" isArrayIndex="false">
-         </variable>
-      </variable>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main(param);" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
       </variable>
-      <statement name="int x = 5;" pathCondition="true">
+      <statement name="int x = 5;" pathCondition="true" pathConditionChanged="false">
          <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
             <variable name="a" typeString="int" valueString="self.a" arrayIndex="-1" isArrayIndex="false">
             </variable>
@@ -18,13 +14,13 @@
                </variable>
             </variable>
          </variable>
-         <variable name="_param" typeString="IntWrapper" valueString="param" arrayIndex="-1" isArrayIndex="false">
+         <variable name="param" typeString="IntWrapper" valueString="param" arrayIndex="-1" isArrayIndex="false">
             <variable name="value" typeString="int" valueString="param.value" arrayIndex="-1" isArrayIndex="false">
             </variable>
          </variable>
          <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
          </variable>
-         <statement name="a=x;" pathCondition="true">
+         <statement name="a=x;" pathCondition="true" pathConditionChanged="false">
             <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
                <variable name="a" typeString="int" valueString="self.a" arrayIndex="-1" isArrayIndex="false">
                </variable>
@@ -35,7 +31,7 @@
                   </variable>
                </variable>
             </variable>
-            <variable name="_param" typeString="IntWrapper" valueString="param" arrayIndex="-1" isArrayIndex="false">
+            <variable name="param" typeString="IntWrapper" valueString="param" arrayIndex="-1" isArrayIndex="false">
                <variable name="value" typeString="int" valueString="param.value" arrayIndex="-1" isArrayIndex="false">
                </variable>
             </variable>
@@ -43,7 +39,7 @@
             </variable>
             <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
             </variable>
-            <statement name="b=3;" pathCondition="true">
+            <statement name="b=3;" pathCondition="true" pathConditionChanged="false">
                <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
                   <variable name="a" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
                   </variable>
@@ -54,7 +50,7 @@
                      </variable>
                   </variable>
                </variable>
-               <variable name="_param" typeString="IntWrapper" valueString="param" arrayIndex="-1" isArrayIndex="false">
+               <variable name="param" typeString="IntWrapper" valueString="param" arrayIndex="-1" isArrayIndex="false">
                   <variable name="value" typeString="int" valueString="param.value" arrayIndex="-1" isArrayIndex="false">
                   </variable>
                </variable>
@@ -62,7 +58,7 @@
                </variable>
                <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
                </variable>
-               <statement name="_param=new IntWrapper ();" pathCondition="true">
+               <statement name="param=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
                   <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
                      <variable name="a" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
                      </variable>
@@ -73,7 +69,7 @@
                         </variable>
                      </variable>
                   </variable>
-                  <variable name="_param" typeString="IntWrapper" valueString="param" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="param" typeString="IntWrapper" valueString="param" arrayIndex="-1" isArrayIndex="false">
                      <variable name="value" typeString="int" valueString="param.value" arrayIndex="-1" isArrayIndex="false">
                      </variable>
                   </variable>
@@ -81,16 +77,28 @@
                   </variable>
                   <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
                   </variable>
-                  <statement name="_param.value=1;" pathCondition="true">
+                  <statement name="param.value=1;" pathCondition="true" pathConditionChanged="false">
+                     <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="a" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
+                        </variable>
+                        <variable name="b" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false">
+                        </variable>
+                        <variable name="wrapper" typeString="IntWrapper" valueString="self.wrapper" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="value" typeString="int" valueString="\if (self.wrapper = i_2)
+    \then (0)
+    \else (self.wrapper.value)" arrayIndex="-1" isArrayIndex="false">
+                           </variable>
+                        </variable>
+                     </variable>
+                     <variable name="param" typeString="IntWrapper" valueString="i_2" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="value" typeString="int" valueString="0" arrayIndex="-1" isArrayIndex="false">
+                        </variable>
+                     </variable>
                      <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
                      </variable>
                      <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
                      </variable>
-                     <variable name="_param" typeString="IntWrapper" valueString="i_2" arrayIndex="-1" isArrayIndex="false">
-                        <variable name="value" typeString="int" valueString="0" arrayIndex="-1" isArrayIndex="false">
-                        </variable>
-                     </variable>
-                     <statement name="wrapper=new IntWrapper ();" pathCondition="true">
+                     <statement name="wrapper=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
                         <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
                            <variable name="a" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
                            </variable>
@@ -103,24 +111,34 @@
                               </variable>
                            </variable>
                         </variable>
+                        <variable name="param" typeString="IntWrapper" valueString="i_2" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="value" typeString="int" valueString="1" arrayIndex="-1" isArrayIndex="false">
+                           </variable>
+                        </variable>
                         <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
                         </variable>
                         <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
                         </variable>
-                        <variable name="_param" typeString="IntWrapper" valueString="i_2" arrayIndex="-1" isArrayIndex="false">
-                           <variable name="value" typeString="int" valueString="1" arrayIndex="-1" isArrayIndex="false">
+                        <statement name="wrapper.value=4;" pathCondition="true" pathConditionChanged="false">
+                           <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="a" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
+                              </variable>
+                              <variable name="b" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false">
+                              </variable>
+                              <variable name="wrapper" typeString="IntWrapper" valueString="i_5" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="value" typeString="int" valueString="0" arrayIndex="-1" isArrayIndex="false">
+                                 </variable>
+                              </variable>
                            </variable>
-                        </variable>
-                        <statement name="wrapper.value=4;" pathCondition="true">
+                           <variable name="param" typeString="IntWrapper" valueString="i_2" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="value" typeString="int" valueString="\if (i_5 = i_2)  \then (0)  \else (1)" arrayIndex="-1" isArrayIndex="false">
+                              </variable>
+                           </variable>
                            <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
                            </variable>
                            <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
                            </variable>
-                           <variable name="_param" typeString="IntWrapper" valueString="i_2" arrayIndex="-1" isArrayIndex="false">
-                              <variable name="value" typeString="int" valueString="\if (i_5 = i_2)  \then (0)  \else (1)" arrayIndex="-1" isArrayIndex="false">
-                              </variable>
-                           </variable>
-                           <statement name="return a+b+x+wrapper.value+_param.value;" pathCondition="true">
+                           <statement name="return a+b+x+wrapper.value+param.value;" pathCondition="true" pathConditionChanged="false">
                               <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
                                  <variable name="a" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
                                  </variable>
@@ -131,15 +149,15 @@
                                     </variable>
                                  </variable>
                               </variable>
+                              <variable name="param" typeString="IntWrapper" valueString="i_2" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="value" typeString="int" valueString="\if (i_5 = i_2)  \then (4)  \else (1)" arrayIndex="-1" isArrayIndex="false">
+                                 </variable>
+                              </variable>
                               <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
                               </variable>
                               <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
                               </variable>
-                              <variable name="_param" typeString="IntWrapper" valueString="i_2" arrayIndex="-1" isArrayIndex="false">
-                                 <variable name="value" typeString="int" valueString="\if (i_5 = i_2)  \then (4)  \else (1)" arrayIndex="-1" isArrayIndex="false">
-                                 </variable>
-                              </variable>
-                              <methodReturn name="&lt;return of self.main(_param);&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;17 + \if (i_5 = i_2)  \then (4)  \else (1)&apos; as result of self.main(_param);&gt;">
+                              <methodReturn name="&lt;return of self.main(param);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;17 + \if (i_5 = i_2)  \then (4)  \else (1)&apos; as result of self.main(param);&gt;">
                                  <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
                                     <variable name="a" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
                                     </variable>
@@ -150,9 +168,13 @@
                                        </variable>
                                     </variable>
                                  </variable>
+                                 <variable name="param" typeString="IntWrapper" valueString="i_2" arrayIndex="-1" isArrayIndex="false">
+                                    <variable name="value" typeString="int" valueString="\if (i_5 = i_2)  \then (4)  \else (1)" arrayIndex="-1" isArrayIndex="false">
+                                    </variable>
+                                 </variable>
                                  <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
                                  </variable>
-                                 <termination name="&lt;end&gt;" pathCondition="true" exceptionalTermination="false">
+                                 <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
                                  </termination>
                               </methodReturn>
                            </statement>

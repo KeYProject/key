@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_0f52bcb2-75f0-4925-8bff-0b4dd5af1cde" name="FlatSteps[FlatSteps::doSomething(int,java.lang.String,boolean)].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_88a5b9ef-fa3d-48ec-9af5-d871f626aee7" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_f1e1ab30-a3b8-48d6-b65d-bf9db9a30d0f" name="self_0.doSomething(_asdf,_a,_b);" pathCondition="true" lineNumber="-1" charStart="228" charEnd="239">
+            <sedStatement xml:id="_7b979ac1-c6dd-4a92-8afe-c001c58fd999" name="int x = 1;" pathCondition="true" lineNumber="-1" charStart="276" charEnd="286">
+               <sedStatement xml:id="_46d7b266-21bc-42af-bc72-0ef5b2e3fe2e" name="int y = 2;" pathCondition="true" lineNumber="-1" charStart="290" charEnd="300">
+                  <sedStatement xml:id="_a52f2fcc-2484-497c-9cb0-ba5764bfd35b" name="int z = 3;" pathCondition="true" lineNumber="-1" charStart="304" charEnd="314">
+                     <sedMethodReturn xml:id="_b42e187c-a61d-472d-bc88-5bd4422f874e" name="&lt;return of self_0.doSomething(_asdf,_a,_b);&gt;" pathCondition="true" lineNumber="-1" charStart="228" charEnd="239">
+                        <sedTermination xml:id="_4074abb5-8e31-43d3-8fd9-150a8408a9c6" name="&lt;end&gt;" pathCondition="true">
+                        </sedTermination>
+                     </sedMethodReturn>
+                  </sedStatement>
+               </sedStatement>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

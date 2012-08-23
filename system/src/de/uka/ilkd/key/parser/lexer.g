@@ -150,6 +150,7 @@ tokens {
 	RULES = "\\rules";
         PROBLEM = "\\problem";
         CHOOSECONTRACT = "\\chooseContract";
+        PROOFOBLIGATION = "\\proofObligation";
         PROOF = "\\proof";
         CONTRACTS = "\\contracts";
         INVARIANTS = "\\invariants";
@@ -218,8 +219,8 @@ tokens {
    private String modalityBegin = null;
    private String modalityEnd = null;
 
-   private static HashMap modNames = new HashMap(20);
-   private static HashMap modPairs = new HashMap(20);
+   private static HashMap<String,String> modNames = new HashMap<String,String>(20);
+   private static HashMap<String,String> modPairs = new HashMap<String,String>(20);
    
    static {
       modNames.put("\\<","diamond");
@@ -242,6 +243,11 @@ tokens {
       modPairs.put("\\[[","\\]]");
       modPairs.put("\\throughout","\\endmodality");
       modPairs.put("\\throughout_transaction","\\endmodality");
+   }
+   
+   public void recover( RecognitionException ex, BitSet tokenSet ) throws CharStreamException {
+     consume();
+     consumeUntil( tokenSet );
    }
 
    private void matchAndTransformModality(int beginIndex) throws antlr.RecognitionException {

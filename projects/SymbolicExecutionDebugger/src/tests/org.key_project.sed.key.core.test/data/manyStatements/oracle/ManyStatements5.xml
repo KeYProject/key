@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_c54ed5c4-b14f-4ad7-9d78-2d5f11db6c50" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_739758b6-e49f-4e76-91b0-9bf27b49684d" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_25c9dfa5-67e5-48bf-8fb2-e18b5d415fc5" name="self.main();" pathCondition="true" lineNumber="-1" charStart="45" charEnd="49">
+            <sedStatement xml:id="_e5081607-b8ba-4e55-9c12-7babb5fb73ed" name="int a = 1;" pathCondition="true" lineNumber="-1" charStart="57" charEnd="67">
+               <sedStatement xml:id="_2ae0ff06-e1d2-42c4-ac26-4f20b4e815f9" name="int b = 1;" pathCondition="true" lineNumber="-1" charStart="71" charEnd="81">
+                  <sedStatement xml:id="_08ee96bf-bf29-4313-b642-ea0956573cbf" name="int c = 1;" pathCondition="true" lineNumber="-1" charStart="85" charEnd="95">
+                     <sedStatement xml:id="_2ac0486a-4ec9-4268-ba9c-eb04054a8769" name="int d = 1;" pathCondition="true" lineNumber="-1" charStart="99" charEnd="109">
+                        <sedStatement xml:id="_8efa2f2e-f31e-4ccb-9905-63ce270659c2" name="int e = 1;" pathCondition="true" lineNumber="-1" charStart="113" charEnd="123">
+                           <sedStatement xml:id="_cc9a0940-8608-4cbf-a5bc-23f17d7722d7" name="int f = 1;" pathCondition="true" lineNumber="-1" charStart="127" charEnd="137">
+                              <sedStatement xml:id="_f74506dc-ec16-429b-80d4-173c60ead6a1" name="int g = 1;" pathCondition="true" lineNumber="-1" charStart="141" charEnd="151">
+                                 <sedStatement xml:id="_4dfba0d3-4fc1-4198-aaab-11b75f87b4bb" name="int h = 1;" pathCondition="true" lineNumber="-1" charStart="155" charEnd="165">
+                                    <sedStatement xml:id="_c87ccaa3-dfcc-49b0-a89c-80c68baf683d" name="int i = 1;" pathCondition="true" lineNumber="-1" charStart="169" charEnd="179">
+                                       <sedStatement xml:id="_fd27381b-a91e-4cf6-9894-c4483859acde" name="int j = 1;" pathCondition="true" lineNumber="-1" charStart="183" charEnd="193">
+                                          <sedStatement xml:id="_af2fa962-63f7-4f7c-81a7-560deeadbe55" name="int k = 1;" pathCondition="true" lineNumber="-1" charStart="197" charEnd="207">
+                                             <sedStatement xml:id="_131a7cc4-4c83-41af-b2b9-fc9b18c0f4bb" name="int l = 1;" pathCondition="true" lineNumber="-1" charStart="211" charEnd="221">
+                                                <sedStatement xml:id="_5b7d44c2-0a45-44d8-a60c-3bc51b313af0" name="int m = 1;" pathCondition="true" lineNumber="-1" charStart="225" charEnd="235">
+                                                   <sedStatement xml:id="_cdec0e6b-4820-43c7-90e5-df811e2f17b7" name="int n = 1;" pathCondition="true" lineNumber="-1" charStart="239" charEnd="249">
+                                                      <sedStatement xml:id="_0054a15f-9e8f-4fd9-99a9-9e0105515531" name="int o = 1;" pathCondition="true" lineNumber="-1" charStart="253" charEnd="263">
+                                                         <sedStatement xml:id="_4ad7c2bd-4d0c-460d-8c96-03ec7dfa62f2" name="int p = 1;" pathCondition="true" lineNumber="-1" charStart="267" charEnd="277">
+                                                            <sedStatement xml:id="_5bd66fb6-9c52-497b-8c3a-ad24057d4a32" name="int q = 1;" pathCondition="true" lineNumber="-1" charStart="281" charEnd="291">
+                                                               <sedStatement xml:id="_88cdb0ab-b777-478a-bfc5-cdacccde1e9d" name="int r = 1;" pathCondition="true" lineNumber="-1" charStart="295" charEnd="305">
+                                                                  <sedStatement xml:id="_8b11f905-97ac-41fb-adc4-6f054a7d7f71" name="int s = 1;" pathCondition="true" lineNumber="-1" charStart="309" charEnd="319">
+                                                                     <sedStatement xml:id="_87f3b5cb-9500-4971-a919-18edf9d772ad" name="int t = 1;" pathCondition="true" lineNumber="-1" charStart="323" charEnd="333">
+                                                                        <sedStatement xml:id="_1337a3dc-c5ce-4cfc-95a8-3cbd2c4e120f" name="int u = 1;" pathCondition="true" lineNumber="-1" charStart="337" charEnd="347">
+                                                                           <sedStatement xml:id="_c44dd61d-5d6e-417d-8e9e-677ba2e4cf26" name="int v = 1;" pathCondition="true" lineNumber="-1" charStart="351" charEnd="361">
+                                                                              <sedStatement xml:id="_c91ec5d7-62da-4f92-b97d-44c838a48903" name="int w = 1;" pathCondition="true" lineNumber="-1" charStart="365" charEnd="375">
+                                                                                 <sedStatement xml:id="_f41994d1-94fc-4812-948b-a1ba44e087ff" name="int x = 1;" pathCondition="true" lineNumber="-1" charStart="379" charEnd="389">
+                                                                                    <sedStatement xml:id="_756d706a-0b2d-4c52-a60f-2312123f6612" name="int y = 1;" pathCondition="true" lineNumber="-1" charStart="393" charEnd="403">
+                                                                                       <sedStatement xml:id="_f0514d01-543f-420e-8cb7-ae9066421ec2" name="int z = 1;" pathCondition="true" lineNumber="-1" charStart="407" charEnd="417">
+                                                                                          <sedStatement xml:id="_e5e78b75-0210-4d3c-badf-23d713121d22" name="return a+b+c+d+e+f+g+h+i+j+k+l+m+n+o+p+q+r+s+t+u+v+w+x+y+z;" pathCondition="true" lineNumber="-1" charStart="421" charEnd="530">
+                                                                                             <sedMethodReturn xml:id="_96200553-9ad4-4038-96af-4b3df05165c9" name="&lt;return of self.main();&gt;" pathCondition="true" lineNumber="-1" charStart="45" charEnd="49">
+                                                                                                <sedTermination xml:id="_35701baa-135f-4953-a866-03770ae8356d" name="&lt;end&gt;" pathCondition="true">
+                                                                                                </sedTermination>
+                                                                                             </sedMethodReturn>
+                                                                                          </sedStatement>
+                                                                                       </sedStatement>
+                                                                                    </sedStatement>
+                                                                                 </sedStatement>
+                                                                              </sedStatement>
+                                                                           </sedStatement>
+                                                                        </sedStatement>
+                                                                     </sedStatement>
+                                                                  </sedStatement>
+                                                               </sedStatement>
+                                                            </sedStatement>
+                                                         </sedStatement>
+                                                      </sedStatement>
+                                                   </sedStatement>
+                                                </sedStatement>
+                                             </sedStatement>
+                                          </sedStatement>
+                                       </sedStatement>
+                                    </sedStatement>
+                                 </sedStatement>
+                              </sedStatement>
+                           </sedStatement>
+                        </sedStatement>
+                     </sedStatement>
+                  </sedStatement>
+               </sedStatement>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

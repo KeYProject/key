@@ -27,6 +27,16 @@ public class SEDMemoryTermination extends AbstractSEDTermination implements ISED
    private String name;
    
    /**
+    * The human readable path condition to this node.
+    */
+   private String pathCondition;
+
+   /**
+    * The method call stack.
+    */
+   private ISEDDebugNode[] callStack;
+   
+   /**
     * Constructor.
     * @param target The {@link ISEDDebugTarget} in that this termination is contained.
     * @param parent The parent in that this node is contained as child.
@@ -116,5 +126,37 @@ public class SEDMemoryTermination extends AbstractSEDTermination implements ISED
    @Override
    public void setId(String id) {
       super.setId(id);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getPathCondition() throws DebugException {
+      return pathCondition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setPathCondition(String pathCondition) {
+      this.pathCondition = pathCondition;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISEDDebugNode[] getCallStack() throws DebugException {
+      return callStack;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void setCallStack(ISEDDebugNode[] callStack) {
+      this.callStack = callStack;
    }
 }

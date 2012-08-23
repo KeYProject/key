@@ -331,7 +331,7 @@ public final class WorkbenchUtil {
     }
     
     /**
-     * Opens a select folder dialog.
+     * Opens a select file dialog.
      * @param parent The parent {@link Shell}.
      * @param title The title.
      * @param message The message. 

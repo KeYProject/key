@@ -84,6 +84,26 @@
                       </test>
                    </with>
                 </and>
+                <with
+                      variable="selection">
+                   <and>
+                      <count
+                            value="1">
+                      </count>
+                      <iterate
+                            ifEmpty="false"
+                            operator="and">
+                         <instanceof
+                               value="org.eclipse.core.resources.IFile">
+                         </instanceof>
+                         <test
+                               forcePluginActivation="true"
+                               property="org.eclipse.core.resources.extension"
+                               value="proof">
+                         </test>
+                      </iterate>
+                   </and>
+                </with>
              </or>
           </enablement></contextualLaunch>
       </shortcut>
@@ -95,7 +115,57 @@
             categoryId="org.eclipse.debug.ui.category.run"
             id="org.key_project.sed.key.core.launch.sed.key.shortcut.debug">
       </command>
+      <command
+            categoryId="org.eclipse.debug.ui.category.run"
+            description="Save KeY&apos;s proof from which the symbolic execution tree was extracted as *.proof file."
+            id="org.key_project.sed.key.ui.saveProofCommand"
+            name="Save Symbolic Execution Tree as Proof File">
+      </command>
    </extension>
+      <extension
+            point="org.eclipse.ui.commandImages">
+         <image
+               commandId="org.key_project.sed.key.core.launch.sed.key.shortcut.debug"
+               icon="icons/logo16.gif">
+         </image>
+         <image
+               commandId="org.key_project.sed.key.ui.saveProofCommand"
+               icon="icons/saveKeYProof.gif">
+         </image>
+      </extension>
+      <extension
+            point="org.eclipse.ui.handlers">
+         <handler
+               class="org.key_project.sed.key.ui.command.SaveProofHandler"
+               commandId="org.key_project.sed.key.ui.saveProofCommand">
+            <enabledWhen>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <or>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.debug.core.ILaunch">
+                        </instanceof>
+                        <test
+                              forcePluginActivation="true"
+                              property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                        </test>
+                     </and>
+                     <and>
+                        <instanceof
+                              value="org.eclipse.debug.core.model.IDebugElement">
+                        </instanceof>
+                        <test
+                              forcePluginActivation="true"
+                              property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                        </test>
+                     </and>
+                  </or>
+               </iterate>
+            </enabledWhen>
+         </handler>
+      </extension>
    <extension
          point="org.eclipse.ui.bindings">
       <key
@@ -104,6 +174,12 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+D">
       </key>
+      <key
+            commandId="org.key_project.sed.key.ui.saveProofCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+K">
+      </key>
    </extension>
       <extension
             point="org.eclipse.debug.ui.debugModelPresentations">
@@ -111,5 +187,149 @@
                class="org.key_project.sed.key.ui.presentation.KeYDebugModelPresentation"
                id="org.key_project.sed.key.core">
          </debugModelPresentation>
+      </extension>
+      <extension
+            point="org.eclipse.ui.preferencePages">
+         <page
+               category="org.key_project.sed.ui.preference.page.symbolic_debug"
+               class="org.key_project.sed.key.ui.preference.page.KeYSymbolicDebugPreferencePage"
+               id="org.key_project.sed.key.ui.preference.page.key_symbolic_debug"
+               name="KeY">
+         </page>
+         <page
+               category="org.key_project.sed.ui.preference.page.symbolic_debug"
+               class="org.key_project.sed.key.ui.preference.page.KeYLaunchSymbolicDebugPreferencePage"
+               id="org.key_project.sed.key.ui.preference.page.key_launch_defaults"
+               name="KeY Launch Defaults">
+         </page>
+      </extension>
+      <extension
+            point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+         <propertyTabs
+               contributorId="org.key_project.sed.launchViewPropertyContributor">
+            <propertyTab
+                  afterTab="org.key_project.sed.ui.node.tab"
+                  category="Debug"
+                  id="org.key_project.sed.ui.key.tab"
+                  label="KeY">
+            </propertyTab>
+            <propertyTab
+                  category="Debug"
+                  id="org.key_project.sed.ui.main.tab"
+                  image="icons/logo16.gif"
+                  label="Main">
+            </propertyTab>
+            <propertyTab
+                  afterTab="org.key_project.sed.ui.main.tab"
+                  category="Debug"
+                  id="org.key_project.sed.ui.customization.tab"
+                  image="icons/keyCustomization.gif"
+                  label="Customization">
+            </propertyTab>
+         </propertyTabs>
+      </extension>
+      <extension
+            point="org.eclipse.ui.views.properties.tabbed.propertySections">
+         <propertySections
+               contributorId="org.key_project.sed.launchViewPropertyContributor">
+            <propertySection
+                  class="org.key_project.sed.key.ui.property.KeYDebugNodePropertySection"
+                  filter="org.key_project.sed.key.ui.property.KeYDebugNodeTreeFilter"
+                  id="org.key_project.sed.key.ui.property.KeYDebugNodePropertySection"
+                  tab="org.key_project.sed.ui.key.tab">
+            </propertySection>
+            <propertySection
+                  class="org.key_project.sed.key.ui.property.MainKeYDebugTargetPropertySection"
+                  filter="org.key_project.sed.key.ui.property.KeYDebugTargetTreeFilter"
+                  id="org.key_project.sed.key.ui.property.KeYDebugTargetPropertySection"
+                  tab="org.key_project.sed.ui.main.tab">
+            </propertySection>
+            <propertySection
+                  class="org.key_project.sed.key.ui.property.CustomizationKeYDebugTargetPropertySection"
+                  filter="org.key_project.sed.key.ui.property.KeYDebugTargetTreeFilter"
+                  id="org.key_project.sed.key.ui.property.CustomizationKeYDebugTargetPropertySection"
+                  tab="org.key_project.sed.ui.customization.tab">
+            </propertySection>
+         </propertySections>
+      </extension>
+      <extension
+            point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+         <propertyTabs
+               contributorId="symbolicExecutionTreeDiagram.PropertyContributor">
+            <propertyTab
+                  afterTab="org.key_project.sed.ui.visualization.node.tab"
+                  category="Graphiti"
+                  id="org.key_project.sed.ui.visualization.key.tab"
+                  label="KeY">
+            </propertyTab>
+         </propertyTabs>
+      </extension>
+      <extension
+            point="org.eclipse.ui.views.properties.tabbed.propertySections">
+         <propertySections
+               contributorId="symbolicExecutionTreeDiagram.PropertyContributor">
+            <propertySection
+                  class="org.key_project.sed.key.ui.property.KeYGraphitiDebugNodePropertySection"
+                  filter="org.key_project.sed.key.ui.property.KeYGraphitiDebugNodeTreeFilter"
+                  id="org.key_project.sed.key.ui.property.KeYGraphitiDebugNodePropertySection"
+                  tab="org.key_project.sed.ui.visualization.key.tab">
+            </propertySection>
+         </propertySections>
+      </extension>
+      <extension
+            point="org.eclipse.ui.menus">
+         <menuContribution
+               allPopups="true"
+               locationURI="popup:org.eclipse.debug.ui.DebugView?after=additions">
+            <command
+                  commandId="org.key_project.sed.key.ui.saveProofCommand"
+                  icon="icons/saveKeYProof.gif"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="true">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.debug.core.ILaunch">
+                           </instanceof>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                           </test>
+                        </and>
+                        <and>
+                           <instanceof
+                                 value="org.eclipse.debug.core.model.IDebugElement">
+                           </instanceof>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
+                           </test>
+                        </and>
+                     </or>
+                  </iterate>
+               </visibleWhen>
+            </command>
+         </menuContribution>
+      </extension>
+      <extension
+            point="org.eclipse.core.expressions.propertyTesters">
+         <propertyTester
+               class="org.key_project.sed.key.ui.propertyTester.KeYDebugTargetPropertyTester"
+               id="org.key_project.sed.key.ui.launchPropertyTester"
+               namespace="org.key_project.sed.key.ui"
+               properties="isSingleKeyDebugTarget"
+               type="org.eclipse.debug.core.ILaunch">
+         </propertyTester>
+         <propertyTester
+               class="org.key_project.sed.key.ui.propertyTester.KeYDebugTargetPropertyTester"
+               id="org.key_project.sed.key.ui.debugElementPropertyTester"
+               namespace="org.key_project.sed.key.ui"
+               properties="isSingleKeyDebugTarget"
+               type="org.eclipse.debug.core.model.IDebugElement">
+         </propertyTester>
       </extension>
 </plugin>

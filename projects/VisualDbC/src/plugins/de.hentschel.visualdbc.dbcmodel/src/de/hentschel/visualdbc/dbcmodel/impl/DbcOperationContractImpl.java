@@ -28,6 +28,7 @@ import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import de.hentschel.visualdbc.dbcmodel.DbcOperationContract;
 import de.hentschel.visualdbc.dbcmodel.DbcProof;
 import de.hentschel.visualdbc.dbcmodel.DbcProofObligation;
+import de.hentschel.visualdbc.dbcmodel.DbcProofReference;
 import de.hentschel.visualdbc.dbcmodel.DbcmodelPackage;
 import de.hentschel.visualdbc.dbcmodel.IDbCProofReferencable;
 import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
@@ -39,6 +40,7 @@ import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
  * <p>
  * The following features are implemented:
  * <ul>
+ *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcOperationContractImpl#getAllReferences <em>All References</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcOperationContractImpl#getProofObligations <em>Proof Obligations</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcOperationContractImpl#getAllProofs <em>All Proofs</em>}</li>
  *   <li>{@link de.hentschel.visualdbc.dbcmodel.impl.DbcOperationContractImpl#getPre <em>Pre</em>}</li>
@@ -51,6 +53,16 @@ import de.hentschel.visualdbc.dbcmodel.IDbCProvable;
  * @generated
  */
 public class DbcOperationContractImpl extends AbstractDbcSpecificationImpl implements DbcOperationContract {
+   /**
+    * The cached value of the '{@link #getAllReferences() <em>All References</em>}' reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see #getAllReferences()
+    * @generated
+    * @ordered
+    */
+   protected EList<DbcProofReference> allReferences;
+
    /**
     * The cached value of the '{@link #getProofObligations() <em>Proof Obligations</em>}' reference list.
     * <!-- begin-user-doc -->
@@ -175,6 +187,18 @@ public class DbcOperationContractImpl extends AbstractDbcSpecificationImpl imple
     * <!-- end-user-doc -->
     * @generated
     */
+   public EList<DbcProofReference> getAllReferences() {
+      if (allReferences == null) {
+         allReferences = new EObjectResolvingEList<DbcProofReference>(DbcProofReference.class, this, DbcmodelPackage.DBC_OPERATION_CONTRACT__ALL_REFERENCES);
+      }
+      return allReferences;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    public EList<DbcProofObligation> getProofObligations() {
       if (proofObligations == null) {
          proofObligations = new EObjectResolvingEList<DbcProofObligation>(DbcProofObligation.class, this, DbcmodelPackage.DBC_OPERATION_CONTRACT__PROOF_OBLIGATIONS);
@@ -286,6 +310,8 @@ public class DbcOperationContractImpl extends AbstractDbcSpecificationImpl imple
    @Override
    public Object eGet(int featureID, boolean resolve, boolean coreType) {
       switch (featureID) {
+         case DbcmodelPackage.DBC_OPERATION_CONTRACT__ALL_REFERENCES:
+            return getAllReferences();
          case DbcmodelPackage.DBC_OPERATION_CONTRACT__PROOF_OBLIGATIONS:
             return getProofObligations();
          case DbcmodelPackage.DBC_OPERATION_CONTRACT__ALL_PROOFS:
@@ -366,6 +392,8 @@ public class DbcOperationContractImpl extends AbstractDbcSpecificationImpl imple
    @Override
    public boolean eIsSet(int featureID) {
       switch (featureID) {
+         case DbcmodelPackage.DBC_OPERATION_CONTRACT__ALL_REFERENCES:
+            return allReferences != null && !allReferences.isEmpty();
          case DbcmodelPackage.DBC_OPERATION_CONTRACT__PROOF_OBLIGATIONS:
             return proofObligations != null && !proofObligations.isEmpty();
          case DbcmodelPackage.DBC_OPERATION_CONTRACT__ALL_PROOFS:
@@ -391,6 +419,7 @@ public class DbcOperationContractImpl extends AbstractDbcSpecificationImpl imple
    public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass) {
       if (baseClass == IDbCProofReferencable.class) {
          switch (derivedFeatureID) {
+            case DbcmodelPackage.DBC_OPERATION_CONTRACT__ALL_REFERENCES: return DbcmodelPackage.IDB_CPROOF_REFERENCABLE__ALL_REFERENCES;
             default: return -1;
          }
       }
@@ -413,6 +442,7 @@ public class DbcOperationContractImpl extends AbstractDbcSpecificationImpl imple
    public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
       if (baseClass == IDbCProofReferencable.class) {
          switch (baseFeatureID) {
+            case DbcmodelPackage.IDB_CPROOF_REFERENCABLE__ALL_REFERENCES: return DbcmodelPackage.DBC_OPERATION_CONTRACT__ALL_REFERENCES;
             default: return -1;
          }
       }

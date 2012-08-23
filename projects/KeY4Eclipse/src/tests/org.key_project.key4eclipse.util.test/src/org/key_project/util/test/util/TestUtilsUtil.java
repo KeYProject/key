@@ -6,9 +6,11 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
 
 import junit.framework.TestCase;
 
@@ -47,6 +49,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
@@ -276,6 +279,48 @@ public class TestUtilsUtil {
    }
 
    /**
+    * <p>
+    * Collects all leaf nodes in the subtree starting at the given {@link SWTBotTreeItem}.
+    * </p>
+    * </p>
+    * <b>Attention:</b> Lazy provider are also supported. For this reason
+    * is the selection changed and each node in the subtree expanded.
+    * <p>
+    * @param item The {@link SWTBotTreeItem} to start collecting.
+    * @return The found leaf {@link SWTBotTreeItem}s.
+    */
+   public static List<SWTBotTreeItem> collectLeafs(SWTBotTreeItem item) {
+      List<SWTBotTreeItem> result = new LinkedList<SWTBotTreeItem>();
+      internalCollectLeafs(result, item);
+      return result;
+   }
+
+   /**
+    * Internal methods to collect leaf items recursive of {@link #collectLeafs(SWTBotTreeItem)}.
+    * @param leafItems The result {@link List} to fill.
+    * @param item The current item.
+    */
+   private static void internalCollectLeafs(List<SWTBotTreeItem> leafItems, SWTBotTreeItem item) {
+      if (item != null) {
+         if (getTreeItemData(item) == null) {
+            item.select();
+         }
+         if (!item.isExpanded()) {
+            item.expand();
+         }
+         SWTBotTreeItem[] children = item.getItems();
+         if (ArrayUtil.isEmpty(children)) {
+            leafItems.add(item);
+         }
+         else {
+            for (SWTBotTreeItem child : children) {
+               internalCollectLeafs(leafItems, child);
+            }
+         }
+      }
+   }
+
+   /**
     * Executes a click in the main menu.
     * @param bot The {@link SWTWorkbenchBot} to use.
     * @param menuItems The menu path to click on.
@@ -464,34 +509,38 @@ public class TestUtilsUtil {
    }
 
    /**
-    * Returns the {@link ProofEnvironment} in the proof list at
+    * Returns the {@link Proof} in the proof list at
     * the given index.
-    * @param index The index.
+    * @param envIndex The index of the {@link ProofEnvironment}.
+    * @param proofIndex The index of the {@link Proof} in the {@link ProofEnvironment}.
     * @return The found {@link ProofEnvironment}.
     */
-   public static ProofEnvironment keyGetProofEnv(int index) {
+   public static Proof keyGetProof(int envIndex, int proofIndex) {
        SwingBotJFrame frame = TestUtilsUtil.keyGetMainWindow();
        SwingBotJTree tree = frame.bot().jTree(TaskTreeModel.class);
-       return keyGetProofEnv(tree, index);
+       return keyGetProof(tree, envIndex, proofIndex);
    }
    
    /**
     * Returns the {@link ProofEnvironment} in the proof list at
     * the given index.
     * @param tree The {@link SwingBotJTree} to search in.
-    * @param index The index.
+    * @param envIndex The index of the {@link ProofEnvironment}.
+    * @param proofIndex The index of the {@link Proof} in the {@link ProofEnvironment}.
     * @return The found {@link ProofEnvironment}.
     */
-   public static ProofEnvironment keyGetProofEnv(SwingBotJTree tree, int index) {
+   public static Proof keyGetProof(SwingBotJTree tree, int envIndex, int proofIndex) {
        TestCase.assertNotNull(tree);
-       TestCase.assertTrue(index >= 0);
+       TestCase.assertTrue(envIndex >= 0);
+       TestCase.assertTrue(proofIndex >= 0);
        TreeModel model = tree.getModel();
        TestCase.assertNotNull(model);
-       TestCase.assertTrue(index < model.getChildCount(model.getRoot()));
-       Object child = model.getChild(model.getRoot(), index);
+       TestCase.assertTrue(envIndex < model.getChildCount(model.getRoot()));
+       Object child = model.getChild(model.getRoot(), envIndex);
        TestCase.assertTrue(child instanceof EnvNode);
-       ProofEnvironment result = ((EnvNode)child).getProofEnv();
-       return result;
+       TreeNode proofNode = ((EnvNode)child).getChildAt(proofIndex);
+       TestCase.assertTrue(child instanceof TaskTreeNode);
+       return ((TaskTreeNode)proofNode).proof();
    }
    
    /**
@@ -875,5 +924,74 @@ public class TestUtilsUtil {
       }
       TestCase.assertNotNull(run.getResult());
       return run.getResult();
+   }
+
+   /**
+    * Closes a view with the given ID in the active {@link IWorkbenchPage}.
+    * @param viewId The ID of the view to close.
+    * @return {@code true} view was closed, {@code false} view was not opened.
+    */
+   public static boolean closeView(final String viewId) {
+      IRunnableWithResult<Boolean> run = new AbstractRunnableWithResult<Boolean>() {
+         @Override
+         public void run() {
+            IViewPart view = WorkbenchUtil.findView(viewId);
+            if (view != null) {
+               WorkbenchUtil.closeView(view);
+               setResult(Boolean.TRUE);
+            }
+         }
+      };
+      Display.getDefault().syncExec(run);
+      return run.getResult() != null && run.getResult().booleanValue();
+   }
+
+   /**
+    * Waits until the given {@link Thread}s have terminated.
+    * @param threads The {@link Thread}s to wait for.
+    */
+   public static void waitForThreads(Thread[] threads) {
+      if (threads != null) {
+         for (Thread thread : threads) {
+            while (thread.isAlive()) {
+               sleep(100);
+            }
+         }
+      }
+   }
+
+   /**
+    * Returns the active perspective of the active {@link IWorkbenchPage}.
+    * @return The active perspective.
+    */
+   public static IPerspectiveDescriptor getActivePerspective() {
+      IRunnableWithResult<IPerspectiveDescriptor> run = new AbstractRunnableWithResult<IPerspectiveDescriptor>() {
+         @Override
+         public void run() {
+            IWorkbenchPage page = WorkbenchUtil.getActivePage();
+            if (page != null) {
+               setResult(page.getPerspective());
+            }
+         }
+      };
+      Display.getDefault().syncExec(run);
+      return run.getResult();
+   }
+
+   /**
+    * Opens the given perspective in the active {@link IWorkbenchPage}.
+    * @param perspectiveDescriptor The perspective to open.
+    */
+   public static void openPerspective(final IPerspectiveDescriptor perspectiveDescriptor) {
+      TestCase.assertNotNull(perspectiveDescriptor);
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            IWorkbenchPage page = WorkbenchUtil.getActivePage();
+            if (page != null) {
+               page.setPerspective(perspectiveDescriptor);
+            }
+         }
+      });
    }
 }

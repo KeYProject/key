@@ -1,18 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<startNode name="&lt;start&gt;" pathCondition="true">
-   <methodCall name="self.main();" pathCondition="true">
-      <statement name="return a();" pathCondition="true">
-         <methodCall name="self.a();" pathCondition="true">
-            <statement name="return b();" pathCondition="true">
-               <methodCall name="self.b();" pathCondition="true">
-                  <statement name="return c();" pathCondition="true">
-                     <methodCall name="self.c();" pathCondition="true">
-                        <statement name="return 42;" pathCondition="true">
-                           <methodReturn name="&lt;return of self.c();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.c();&gt;">
-                              <methodReturn name="&lt;return of self.b();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.b();&gt;">
-                                 <methodReturn name="&lt;return of self.a();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.a();&gt;">
-                                    <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.main();&gt;">
-                                       <termination name="&lt;end&gt;" pathCondition="true" exceptionalTermination="false">
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
+      <statement name="return a();" pathCondition="true" pathConditionChanged="false">
+         <callStackEntry path="/0"/>
+         <methodCall name="self.a();" pathCondition="true" pathConditionChanged="false">
+            <callStackEntry path="/0"/>
+            <statement name="return b();" pathCondition="true" pathConditionChanged="false">
+               <callStackEntry path="/0"/>
+               <callStackEntry path="/0/0/0"/>
+               <methodCall name="self.b();" pathCondition="true" pathConditionChanged="false">
+                  <callStackEntry path="/0"/>
+                  <callStackEntry path="/0/0/0"/>
+                  <statement name="return c();" pathCondition="true" pathConditionChanged="false">
+                     <callStackEntry path="/0"/>
+                     <callStackEntry path="/0/0/0"/>
+                     <callStackEntry path="/0/0/0/0/0"/>
+                     <methodCall name="self.c();" pathCondition="true" pathConditionChanged="false">
+                        <callStackEntry path="/0"/>
+                        <callStackEntry path="/0/0/0"/>
+                        <callStackEntry path="/0/0/0/0/0"/>
+                        <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
+                           <callStackEntry path="/0"/>
+                           <callStackEntry path="/0/0/0"/>
+                           <callStackEntry path="/0/0/0/0/0"/>
+                           <callStackEntry path="/0/0/0/0/0/0/0"/>
+                           <methodReturn name="&lt;return of self.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.c();&gt;">
+                              <callStackEntry path="/0"/>
+                              <callStackEntry path="/0/0/0"/>
+                              <callStackEntry path="/0/0/0/0/0"/>
+                              <callStackEntry path="/0/0/0/0/0/0/0"/>
+                              <methodReturn name="&lt;return of self.b();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.b();&gt;">
+                                 <callStackEntry path="/0"/>
+                                 <callStackEntry path="/0/0/0"/>
+                                 <callStackEntry path="/0/0/0/0/0"/>
+                                 <methodReturn name="&lt;return of self.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.a();&gt;">
+                                    <callStackEntry path="/0"/>
+                                    <callStackEntry path="/0/0/0"/>
+                                    <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.main();&gt;">
+                                       <callStackEntry path="/0"/>
+                                       <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
                                        </termination>
                                     </methodReturn>
                                  </methodReturn>

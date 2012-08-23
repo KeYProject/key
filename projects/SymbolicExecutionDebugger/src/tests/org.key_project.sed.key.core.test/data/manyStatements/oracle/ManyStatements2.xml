@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_c54ed5c4-b14f-4ad7-9d78-2d5f11db6c50" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_739758b6-e49f-4e76-91b0-9bf27b49684d" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_25c9dfa5-67e5-48bf-8fb2-e18b5d415fc5" name="self.main();" pathCondition="true" lineNumber="-1" charStart="45" charEnd="49">
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>
