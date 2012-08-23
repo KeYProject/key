@@ -39,8 +39,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
    @author AL
    @author RN
  */
-public class PrimitiveType
-    implements Type {
+public final class PrimitiveType implements Type {
     
     // must be first in file.
     private static final HashMap<String,PrimitiveType> typeMap = 

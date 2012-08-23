@@ -30,6 +30,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
+// TODO Make LDTs in this class less hard-coded.
+// Every time a new LDT is introduced, this must be touched.
+// Perhaps a map going from Class<T extends LDT> to T would make
+// this more flexible.   (MU)
 
 public final class TypeConverter {
     
@@ -174,6 +178,8 @@ public final class TypeConverter {
 	    responsibleLDT = seqLDT;
 	} else if(setLDT.isResponsible(op, subs, services, ec)) {
 	    responsibleLDT = setLDT;
+	} else if(genLDT.isResponsible(op, subs, services, ec)) {
+	    responsibleLDT = genLDT;
 	} else if(charListLDT.isResponsible(op, subs, services, ec)) {
 	    responsibleLDT = charListLDT;
     	} else if(op instanceof Equals) {
@@ -384,7 +390,7 @@ public final class TypeConverter {
 	} else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
 	    return translateOperator
 		((de.uka.ilkd.key.java.expression.Operator)pe, ec);
-	} else if (pe instanceof PrimitiveType) {
+	} else if (pe instanceof recoder.abstraction.PrimitiveType) {
 	    throw new IllegalArgumentException("TypeConverter could not handle"
 					       +" this primitive type");
 	} else if (pe instanceof MetaClassReference) {
