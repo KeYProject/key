@@ -1,4 +1,4 @@
-Team KeY README file
+README for the VSTTE 12 examples
 
 == Contact
 Richard Bubel <bubel@cs.uni-darmstadt.de>
@@ -8,6 +8,10 @@ Mattias Ulbrich <ulbrich@kit.edu>
 == Resources
 All solutions were produced using KeY in a modified version of the current development version (1.7). KeY can be downloaded in source or bytecode distribution from its homepage. The easiest way is to use Java Webstart; point your browser to the following address:
 http://www.key-project.org/vstte12/
+
+The internal version is 436134a8464639588288bdb07cb707ce3a06f07e
+To prove problems 1 and 5 in an upstream version of KeY, please merge the file seq.key found in system/resources/de/uka/ilkd/key/proof/rules into your upstream version, it contains additional function definitions and rules.
+
 
 To replay the proofs, start KeY (graphical frontend) and open the respective *.key file in the problem directory and select a method contract. On the top left of the window should be a button with a green "play" icon. Push it.
 To investigate the proof made beforehand without replaying it, you can load the respective *.proof file instead (should be named after the method which contract has been proven). If loading a proof or replaying fails for some reason, please make sure that you have a fresh installation of KeY (no configuration in $home/.key/*).
@@ -20,6 +24,7 @@ Specification: JML* (JML + dynamic frames + sequence ADT)
 Verification: KeY
 
 --PROBLEM 1:
+[Not working with upstream versions of KeY]
 
 The sorting algorithm has been implemented in class TwoWaySwap. The class contains a boolean typed field "a". This array is sorted when calling the method twoWaySort implementing the algorithm from the task description. As in the original task the method makes use of the helper method swap.
 
@@ -35,6 +40,7 @@ The problem1 directory contains the proofs for all three methods of the class. N
 
 
 --PROBLEM 3:
+[Working with KeY 1.7.3400]
 
 The data structure has been implemented in class RingBuffer with the given operations as instance methods. The content of the buffer is specified using an (ADT) sequence ghost field list which represents the currently allocated area in the buffer. Although Java provides a modulo operator %, we opted to implement a method "modulo" ensuring correct indexing. The arithmetic engine in KeY does not seem to support % very efficiently, so the method with a special contract made proofs shorter (or feasible).
 
@@ -48,6 +54,7 @@ All proofs were done automatically.
 
 
 --PROBLEM 4:
+[Not working with upstream versions of KeY]
 
 The tree datatype is implemented in class Tree which is designed as an immutable data structure. Instances can be constructed with no (Leaf) or two (Node) trees as arguments. Class List provides the mutable list data structure. Failure is implemented by throwing an exception of class TreeException. Like in Problem 3, we use a ghost field -- called heights -- of type sequence (\seq) to encode the subtree of a given through the (relative) heights of its leaves. The constructor Tree(Tree,Tree) contains a ghost assignment which uses a function \dl_seqInc on integer sequences denoting increment by 1 on each sequence item.
 
