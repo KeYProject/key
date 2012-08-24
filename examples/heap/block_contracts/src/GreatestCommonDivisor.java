@@ -1,0 +1,105 @@
+public class GreatestCommonDivisor {
+
+    /*@ public normal_behavior
+      @ requires a != 0 || b != 0;
+      @ ensures (a % \result == 0 && b % \result == 0 &&
+      @         (\forall int x; x > 0 && a % x == 0 && b % x == 0; \result % x == 0));
+      @ assignable \nothing;
+      @*/
+    public static int ofWith(final int a, final int b)
+    {
+        /*@ normal_behavior
+          @ ensures    (\old(a) >= 0 ==> a == \old(a)) && (\old(a) < 0 ==> a == -\old(a))
+          @         && (\old(b) >= 0 ==> b == \old(b)) && (\old(b) < 0 ==> b == -\old(b));
+          @ assignable \nothing;
+          @*/
+        {
+            if (a < 0) a = -a;
+            if (b < 0) b = -b;
+        }
+        final int small;
+        final int big;
+        /*@ normal_behavior
+          @ ensures    (a <= b ==> small == a && big == b)
+          @         && (a >  b ==> small == b && big == a);
+          @ assignable \nothing;
+          @*/
+        {
+            if (a <= b) {
+                small = a;
+                big = b;
+            }
+            else {
+                small = b;
+                big = a;
+            }
+        }
+        int currentBig = big;
+        int currentSmall = small;
+        /*@ public normal_behavior
+          @ requires small >= 0 && big >= small;
+          @ ensures big != 0 ==> (big % currentBig == 0 && small % currentBig == 0
+          @                       && (\forall int x; x > 0 && big % x == 0 && small % x == 0; currentBig % x == 0));
+          @ assignable \nothing;
+          @*/
+        {
+            /*@ loop_invariant currentSmall >= 0 && currentBig >= currentSmall
+              @                && (currentBig == 0 ==> big == 0)
+              @                && (\forall int x; x > 0; (currentBig % x == 0 && currentSmall % x == 0)
+              @                                           <==> (big % x == 0 && small % x == 0));
+              @ decreases currentSmall;
+              @ assignable \nothing;
+              @*/
+            while (currentSmall != 0) {
+                final int remainder = currentBig % currentSmall;
+                currentBig = currentSmall;
+                currentSmall = remainder;
+            }
+        }
+        return currentBig;
+    }
+
+    /*@ public normal_behavior
+      @ requires a != 0 || b != 0;
+      @ ensures (a % \result == 0 && b % \result == 0 &&
+      @         (\forall int x; x > 0 && a % x == 0 && b % x == 0; \result % x == 0));
+      @ assignable \nothing;
+      @*/
+    public static int ofWithout(final int a, final int b)
+    {
+        {
+            if (a < 0) a = -a;
+            if (b < 0) b = -b;
+        }
+        final int small;
+        final int big;
+        {
+            if (a <= b) {
+                small = a;
+                big = b;
+            }
+            else {
+                small = b;
+                big = a;
+            }
+        }
+        int currentBig = big;
+        int currentSmall = small;
+        {
+            /*@ loop_invariant currentSmall >= 0 && currentBig >= currentSmall
+              @                && (currentBig == 0 ==> big == 0)
+              @                && (\forall int x; x > 0; (currentBig % x == 0 && currentSmall % x == 0)
+              @                                           <==> (big % x == 0 && small % x == 0));
+              @ decreases currentSmall;
+              @ assignable \nothing;
+              @*/
+            while (currentSmall != 0) {
+                final int remainder = currentBig % currentSmall;
+                currentBig = currentSmall;
+                currentSmall = remainder;
+            }
+        }
+        return currentBig;
+    }
+
+}
