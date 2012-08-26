@@ -20,8 +20,6 @@ import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.SwingWorker;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
 import de.uka.ilkd.key.util.KeYExceptionHandler;
 
@@ -33,58 +31,54 @@ import de.uka.ilkd.key.util.KeYExceptionHandler;
  * @author Martin Hentschel
  */
 public final class ProblemLoader extends DefaultProblemLoader implements Runnable {
-    private SwingWorker worker;
-    private ProverTaskListener ptl;
-    
-    public ProblemLoader(File file, List<File> classPath, File bootClassPath, KeYMediator mediator) {
-        super(file, classPath, bootClassPath, mediator);
-    }
+   private SwingWorker worker;
+   private ProverTaskListener ptl;
 
-    public void addTaskListener(ProverTaskListener ptl) {
-        this.ptl = ptl;
-    }
-    
+   public ProblemLoader(File file, List<File> classPath, File bootClassPath, KeYMediator mediator) {
+      super(file, classPath, bootClassPath, mediator);
+   }
 
-    public void run() {
-        /* Invoking start() on the SwingWorker causes a new Thread
-         * to be created that will call construct(), and then
-         * finished().  Note that finished() is called even if
-         * the worker is interrupted because we catch the
-         * InterruptedException in doWork().
-         */
-        worker = new SwingWorker() {
-                private long time;
-		public Object construct() {
-                    time = System.currentTimeMillis();
-                    String res = doWork();
-                    time = System.currentTimeMillis() - time;
-		    return res;
-		}
-		public void finished() {
-		   getMediator().startInterface(true);
-		    final String msg = (String) get();
-		    if (ptl != null) {                        
-                        final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, 
-                                msg, getProof(), time, 
-                                (getProof() != null ? getProof().countNodes() : 0),                                
-                                (getProof() != null ? getProof().countBranches() -
-                                      getProof().openGoals().size() : 0));
-                        ptl.taskFinished(tfi);
-		    }
-		}
-        };
-        getMediator().stopInterface(true);
-        if (ptl != null) { 
-        	ptl.taskStarted("Loading problem ...", 0);
-        }
-        worker.start();
-    }
-    
-    
+   public void addTaskListener(ProverTaskListener ptl) {
+      this.ptl = ptl;
+   }    
+
+   public void run() {
+      /*
+       * Invoking start() on the SwingWorker causes a new Thread to be created
+       * that will call construct(), and then finished(). Note that finished()
+       * is called even if the worker is interrupted because we catch the
+       * InterruptedException in doWork().
+       */
+      worker = new SwingWorker() {
+         private long time;
+
+         @Override
+         public Object construct() {
+            time = System.currentTimeMillis();
+            String res = doWork();
+            time = System.currentTimeMillis() - time;
+            return res;
+         }
+
+         @Override
+         public void finished() {
+            getMediator().startInterface(true);
+            final String msg = (String) get();
+            if (ptl != null) {
+               final TaskFinishedInfo tfi = new DefaultTaskFinishedInfo(ProblemLoader.this, msg, getProof(), time, (getProof() != null ? getProof().countNodes() : 0), (getProof() != null ? getProof().countBranches() - getProof().openGoals().size() : 0));
+               ptl.taskFinished(tfi);
+            }
+         }
+      };
+      getMediator().stopInterface(true);
+      if (ptl != null) {
+         ptl.taskStarted("Loading problem ...", 0);
+      }
+      worker.start();
+   }
     
    private String doWork() {
       String status = "";
-      ProofOblInput po = null;
       try {
          try {
             status = load();
@@ -104,12 +98,6 @@ public final class ProblemLoader extends DefaultProblemLoader implements Runnabl
          getMediator().getUI().notify(new ExceptionFailureEvent(errorMessage, ex));
          getMediator().getUI().reportStatus(this, errorMessage);
          status = ex.toString();
-      }
-      finally {
-         getMediator().resetNrGoalsClosedByHeuristics();
-         if (po instanceof KeYUserProblemFile) {
-            ((KeYUserProblemFile) po).close();
-         }
       }
       return status;
    }

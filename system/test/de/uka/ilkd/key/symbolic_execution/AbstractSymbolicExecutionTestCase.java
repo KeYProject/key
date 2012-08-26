@@ -32,6 +32,7 @@ import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
@@ -664,7 +665,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Create user interface
       CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
       // Load java file
-      InitConfig initConfig = ui.load(javaFile, null, null);
+      DefaultProblemLoader loader = ui.load(javaFile, null, null);
+      InitConfig initConfig = loader.getInitConfig();
       // Start proof
       final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
       assertTrue(contract instanceof FunctionalOperationContract);
@@ -706,13 +708,46 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Create user interface
       CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
       // Load java file
-      InitConfig initConfig = ui.load(javaFile, null, null);
+      DefaultProblemLoader loader = ui.load(javaFile, null, null); 
+      InitConfig initConfig = loader.getInitConfig();
       // Search method to proof
       Services services = initConfig.getServices();
       IProgramMethod pm = searchProgramMethod(services, containerTypeName, methodFullName);
       // Start proof
       ProofOblInput input = new ProgramMethodPO(initConfig, pm.getFullName(), pm, precondition, true);
       Proof proof = ui.createProof(initConfig, input);
+      assertNotNull(proof);
+      // Set strategy and goal chooser to use for auto mode
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
+      // Create symbolic execution tree which contains only the start node at beginning
+      SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(ui.getMediator(), proof, mergeBranchConditions);
+      builder.analyse();
+      assertNotNull(builder.getStartNode());
+      return new SymbolicExecutionEnvironment<CustomConsoleUserInterface>(ui, initConfig, builder);
+   }
+   
+   /**
+    * Creates a {@link SymbolicExecutionEnvironment} which consists
+    * of loading a proof file to load and creation with configuration of {@link SymbolicExecutionTreeBuilder}.
+    * @param baseDir The base directory which contains test and oracle file.
+    * @param proofPathInBaseDir The path to the proof file inside the base directory.
+    * @param mergeBranchConditions Merge branch conditions?
+    * @return The created {@link SymbolicExecutionEnvironment}.
+    * @throws ProofInputException Occurred Exception.
+    * @throws IOException Occurred Exception.
+    */
+   protected static SymbolicExecutionEnvironment<CustomConsoleUserInterface> createSymbolicExecutionEnvironment(File baseDir, 
+                                                                                                                String proofPathInBaseDir, 
+                                                                                                                boolean mergeBranchConditions) throws ProofInputException, IOException {
+      // Make sure that required files exists
+      File proofFile = new File(baseDir, proofPathInBaseDir);
+      assertTrue(proofFile.exists());
+      // Create user interface
+      CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
+      // Load java file
+      DefaultProblemLoader loader = ui.load(proofFile, null, null); 
+      InitConfig initConfig = loader.getInitConfig();
+      Proof proof = loader.getProof();
       assertNotNull(proof);
       // Set strategy and goal chooser to use for auto mode
       SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
@@ -753,7 +788,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Create user interface
       CustomConsoleUserInterface ui = new CustomConsoleUserInterface(false);
       // Load java file
-      InitConfig initConfig = ui.load(javaFile, null, null);
+      DefaultProblemLoader loader = ui.load(javaFile, null, null); 
+      InitConfig initConfig = loader.getInitConfig();
       // Search method to proof
       Services services = initConfig.getServices();
       IProgramMethod pm = searchProgramMethod(services, containerTypeName, methodFullName);

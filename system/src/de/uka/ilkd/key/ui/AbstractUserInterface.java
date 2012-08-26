@@ -39,10 +39,12 @@ public abstract class AbstractUserInterface implements UserInterface {
      * {@inheritDoc}
      */
     @Override
-    public InitConfig load(File file, List<File> classPath, File bootClassPath) throws IOException, ProofInputException {
+    public DefaultProblemLoader load(File file, List<File> classPath, File bootClassPath) throws IOException, ProofInputException {
+       getMediator().stopInterface(true);
        DefaultProblemLoader loader = new DefaultProblemLoader(file, classPath, bootClassPath, getMediator());
        loader.load();
-       return loader.getInitConfig();
+       getMediator().startInterface(true);
+       return loader;
     }
     
     /**

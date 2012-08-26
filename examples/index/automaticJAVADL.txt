@@ -259,6 +259,7 @@ provable: ./standard_key/java_dl/reverseArray.key
 provable: ./standard_key/java_dl/reverseArray2.key
 provable: ./standard_key/java_dl/simpleAssignment.key
 provable: ./standard_key/java_dl/simpleAssignment2.key
+provable: ./standard_key/java_dl/strassen/strassen.key
 # commented out as proof gets too long
 # requires further investigations
 #provable: ./standard_key/java_dl/symmArray.key

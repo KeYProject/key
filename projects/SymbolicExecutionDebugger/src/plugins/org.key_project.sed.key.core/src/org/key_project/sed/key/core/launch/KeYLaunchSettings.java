@@ -17,6 +17,16 @@ import de.uka.ilkd.key.java.Position;
  */
 public class KeYLaunchSettings {
    /**
+    * {@code true} new debug session, {@code false} continue existing *.proof file.
+    */
+   private boolean newDebugSession;
+   
+   /**
+    * The path to the proof file to continue.
+    */
+   private String proofFileToContinue;
+
+   /**
     * The {@link IMethod} to debug.
     */
    private IMethod method;
@@ -75,6 +85,8 @@ public class KeYLaunchSettings {
 
    /**
     * Constructor.
+    * @param newDebugSession {@code true} new debug session, {@code false} continue existing *.proof file.
+    * @param proofFileToContinue The path to the proof file to continue.
     * @param method The {@link IMethod} to debug.
     * @param useExistingContract Use an existing contract or generate default contract?
     * @param existingContract The ID of the existing contract to use.
@@ -87,7 +99,9 @@ public class KeYLaunchSettings {
     * @param methodRangeStart The start of the method range to execute.
     * @param methodRangeEnd The end of the method range to execute.
     */
-   public KeYLaunchSettings(IMethod method, 
+   public KeYLaunchSettings(boolean newDebugSession,
+                            String proofFileToContinue,
+                            IMethod method, 
                             boolean useExistingContract, 
                             String existingContract, 
                             String precondition,
@@ -98,6 +112,8 @@ public class KeYLaunchSettings {
                             boolean executeMethodRange,
                             Position methodRangeStart,
                             Position methodRangeEnd) {
+      this.newDebugSession = newDebugSession;
+      this.proofFileToContinue = proofFileToContinue;
       this.method = method;
       this.useExistingContract = useExistingContract;
       this.existingContract = existingContract;
@@ -109,6 +125,22 @@ public class KeYLaunchSettings {
       this.executeMethodRange = executeMethodRange;
       this.methodRangeStart = methodRangeStart;
       this.methodRangeEnd = methodRangeEnd;
+   }
+   
+   /**
+    * Checks if a new debug session should be started or an existing one continued.
+    * @return {@code true} new debug session, {@code false} continue existing *.proof file.
+    */
+   public boolean isNewDebugSession() {
+      return newDebugSession;
+   }
+
+   /**
+    * Returns the path to the proof file to continue.
+    * @return The path to the proof file to continue.
+    */
+   public String getProofFileToContinue() {
+      return proofFileToContinue;
    }
 
    /**
