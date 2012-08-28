@@ -73,7 +73,22 @@ public abstract class KeYJavaASTFactory {
 		  init, type));
     }
 
-
+    /**
+     * Create a local variable declaration.
+     * 
+     * <pre>
+     * type var = init;
+     * </pre>
+     * 
+     * @param var
+     *            the named and typed {@link ProgramVariable} to be declared
+     * @param init
+     *            the {@link Expression} <code>var</code> is initialized with
+     * @param type
+     *            the static {@link KeYJavaType} of <code>var</code>
+     * @return a {@link LocalVariableDeclaration} of <code>var</code> with
+     *         static type <code>type</code> and initial value <code>init</code>
+     */
     public static LocalVariableDeclaration declare
 	(ProgramVariable var, Expression init, KeYJavaType type) {
 	return new LocalVariableDeclaration
@@ -81,6 +96,20 @@ public abstract class KeYJavaASTFactory {
 	     new VariableSpecification(var, init, type));
     }
 
+    /**
+     * Create a local variable declaration without initialization.
+     * 
+     * <pre>
+     * type var;
+     * </pre>
+     * 
+     * @param var
+     *            the named and typed {@link ProgramVariable} to be declared
+     * @param type
+     *            the static {@link KeYJavaType} of <code>var</code>
+     * @return a {@link LocalVariableDeclaration} of <code>var</code> with
+     *         static type <code>type</code>
+     */
     public static LocalVariableDeclaration declare
 	(ProgramVariable var, KeYJavaType type) {
 	return new LocalVariableDeclaration
@@ -112,6 +141,23 @@ public abstract class KeYJavaASTFactory {
 	     new VariableSpecification(localVariable(name, kjt)), false);
     }
 
+    /**
+     * Create a parameter declaration.
+     * 
+     * <pre>
+     * kjt var
+     * </pre>
+     * 
+     * @param javaInfo
+     *            the Java model containing <code>kjt</code>
+     * @param kjt
+     *            the static {@link KeYJavaType} of <code>var</code>
+     * @param var
+     *            the named and typed {@link ProgramVariable} to be declared as
+     *            parameter
+     * @return a {@link ParameterDeclaration} of <code>var</code> with static
+     *         type <code>kjt</code>
+     */
     public static ParameterDeclaration parameterDeclaration(JavaInfo javaInfo,
 							    KeYJavaType kjt, 
 							    ProgramVariable var) {
@@ -158,12 +204,52 @@ public abstract class KeYJavaASTFactory {
 	return new Catch(param, body);
     }
 
+    /**
+     * Create a catch clause.
+     * 
+     * <pre>
+     * catch (kjt param)
+     *    body
+     * </pre>
+     * 
+     * @param javaInfo
+     *            the {@link JavaInfo} containing <code>kjt</code>
+     * @param param
+     *            the {@link String} name of the exception object variable
+     * @param kjt
+     *            the {@link KeYJavaType} of the exception object variable
+     * @param body
+     *            the {@link StatementBlock} catch clause body
+     * @return a new {@link Catch} with parameter <code>param</code> of static
+     *         type <code>kjt</code> and body <code>body</code>
+     */
     public static Catch catchClause(JavaInfo javaInfo, String param, 
 				    KeYJavaType kjt, StatementBlock body) {
 
 	return new Catch(parameterDeclaration(javaInfo, kjt, param), body);
     }
 
+    /**
+     * Create a catch clause.
+     * 
+     * <pre>
+     * catch (type param)
+     *    body
+     * </pre>
+     * 
+     * @param javaInfo
+     *            the {@link JavaInfo} containing a {@link KeYJavaType} named
+     *            <code>type</code>
+     * @param param
+     *            the {@link String} name of the exception object variable
+     * @param type
+     *            the <code>String</code> name of the exception object
+     *            variable's <code>KeYJavaType</code>
+     * @param body
+     *            the {@link StatementBlock} catch clause body
+     * @return a new {@link Catch} with parameter <code>param</code> of static
+     *         type <code>type</code> and body <code>body</code>
+     */
     public static Catch catchClause(JavaInfo javaInfo, String param, 
 				    String type, StatementBlock body) {
 
@@ -171,31 +257,97 @@ public abstract class KeYJavaASTFactory {
 			   javaInfo.getKeYJavaType(type), body);
     }
     
-
+    /**
+     * Create a throw clause.
+     * 
+     * <pre>
+     * throw e
+     * </pre>
+     * 
+     * @param e
+     *            the throw {@link Expression}
+     * @return a new {@link Throw} statement with expression <code>e</code>
+     */
     public static Throw throwClause(Expression e) {
 	return new Throw(e);
     }
 
+    /**
+     * Create a return clause.
+     * 
+     * <pre>
+     * return e
+     * </pre>
+     * 
+     * @param e
+     *            the return {@link Expression}
+     * @return a new {@link Return} statement with expression <code>e</code>
+     */
     public static Return returnClause(Expression e) {
 	return new Return(e);
     }
 
-
+    /**
+     * Create an if statement with no else branch.
+     * 
+     * <pre>
+     * if (guard)
+     *    then
+     * </pre>
+     * 
+     * @param guard
+     *            the if statement condition {@link Expression}
+     * @param then
+     *            the if statement then branch {@link Statement}
+     * @return an {@link If} with expression <code>guard</code> and then branch
+     *         <code>then</code>
+     */
     public static If ifThen(Expression guard, 
 			    Statement then) {
 	return new If(guard, new Then(then));
     }
 
+    /**
+     * Create an if statement including an else branch.
+     * 
+     * <pre>
+     * if (guard)
+     *    then
+     * else
+     *    els
+     * </pre>
+     * 
+     * @param guard
+     *            the if statement condition {@link Expression}
+     * @param then
+     *            the if statement then branch {@link Statement}
+     * @param els
+     *            the if statement else branch <code>Statement</code>
+     * @return an {@link If} with expression <code>guard</code>, then branch
+     *         <code>then</code> and else branch <code>els</code>
+     */
     public static If ifElse(Expression guard, 
 		     Then then,
 		     Else els) {
 	return new If(guard, then, els);
     }
 
+    /**
+     * Create a break statement.
+     * 
+     * @param l
+     *            the break destination {@link Label}
+     * @return a new {@link Break} with label <code>l</code>
+     */
     public static Break breakStatement(Label l) {
 	return new Break(l);
     }
 
+    /**
+     * Create an empty statement.
+     * 
+     * @return a new {@link EmptyStatement}
+     */
     public static EmptyStatement emptyStatement() {
 	return new EmptyStatement();
     }
