@@ -3,7 +3,9 @@ package org.key_project.sed.key.core.test.suite.swtbot;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotContractTest;
+import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotKeYDebugTargetProofFileTest;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotKeYDebugTargetTest;
+import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotKeYLaunchConfigurationDelegateTest;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotKeYModelThreadSaveChildAccessTest;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotLaunchDefaultPreferencesTest;
 import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest;
@@ -17,7 +19,9 @@ import org.key_project.sed.key.core.test.testcase.swtbot.SWTBotStepReturnTest;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
    SWTBotContractTest.class,
+   SWTBotKeYDebugTargetProofFileTest.class,
    SWTBotKeYDebugTargetTest.class,
+   SWTBotKeYLaunchConfigurationDelegateTest.class,
    SWTBotKeYModelThreadSaveChildAccessTest.class,
    SWTBotLaunchDefaultPreferencesTest.class,
    SWTBotMaximalNumberOfSetNodesPerBranchOnRunTest.class,

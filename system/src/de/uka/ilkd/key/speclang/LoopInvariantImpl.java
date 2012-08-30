@@ -19,7 +19,6 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 
@@ -116,7 +115,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
         if(atPres != null) {
           for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-             if(atPres.get(h) != null) {
+             if(atPres.get(h) != null && originalAtPres.get(h) != null) {
                  assert originalAtPres.get(h).sort().equals(atPres.get(h).sort());
                  result.put(originalAtPres.get(h), atPres.get(h));
              }

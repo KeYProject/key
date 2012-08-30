@@ -3,25 +3,33 @@ package org.key_project.key4eclipse.starter.core.util;
 import java.awt.Component;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JOptionPane;
 
+import org.eclipse.core.filebuffers.FileBuffers;
+import org.eclipse.core.filebuffers.ITextFileBuffer;
+import org.eclipse.core.filebuffers.ITextFileBufferManager;
+import org.eclipse.core.filebuffers.LocationKind;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -40,12 +48,13 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.NotificationEventID;
 import de.uka.ilkd.key.gui.notification.NotificationTask;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -76,21 +85,6 @@ import de.uka.ilkd.key.util.MiscTools;
  * @author Martin Hentschel
  */
 public final class KeYUtil {
-    /**
-     * Key for the choice option "runtimeExceptions".
-     */
-    public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS = "runtimeExceptions";
-   
-    /**
-     * Value in choice option "runtimeExceptions" to ban exceptions.
-     */
-    public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_BAN = "runtimeExceptions:ban";
-    
-    /**
-     * Value in choice option "runtimeExceptions" to allow exceptions.
-     */
-    public static final String CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW = "runtimeExceptions:allow";
-   
     /**
      * The file extension for *.key files.
      */
@@ -398,7 +392,8 @@ public final class KeYUtil {
                     InitConfig initConfig = getInitConfig(location);
                     if (initConfig == null) {
                         // Load local file
-                        initConfig = main.getUserInterface().load(location, classPaths, bootClassPath);
+                        DefaultProblemLoader loader = main.getUserInterface().load(location, classPaths, bootClassPath);
+                        initConfig = loader.getInitConfig();
                     }
                     setResult(initConfig);
                 }
@@ -427,6 +422,7 @@ public final class KeYUtil {
             // Determine container type
             IType containerType = method.getDeclaringType();
             String containerTypeName = containerType.getFullyQualifiedName();
+            containerTypeName = containerTypeName.replace('$', '.'); // Inner and anonymous classes are separated with '.' instead of '$' in KeY
             KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
             Assert.isNotNull(containerKJT, "Can't find type \"" + containerTypeName + "\" in KeY.\nIt can happen when Java packages are based on links in Eclipse.");
             // Determine parameter types
@@ -607,44 +603,7 @@ public final class KeYUtil {
              main.getNotificationManager().addNotificationTask(task);
           }
        }
-    }
-
-   /**
-    * Returns the default choice value.
-    * <b>Attention: </b> This method returns {@code null} if it is called before
-    * a proof is instantiated the first time. It can be checked via
-    * {@link #isChoiceSettingInitialised()}.
-    * @param key The choice key.
-    * @return The choice value.
-    */
-   public static String getChoiceSetting(String key) {
-      Map<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
-      return settings.get(key);
-   }
-   
-   /**
-    * Sets the default choice value.
-    * <b>Attention: </b> Settings should not be changed before the first proof
-    * is instantiated in KeY. Otherwise the default settings are not loaded.
-    * If default settings are defined can be checked via {@link #isChoiceSettingInitialised()}.
-    * @param key The choice key to modify.
-    * @param value The new choice value to set.
-    */
-   public static void setChoiceSetting(String key, String value) {
-      HashMap<String, String> settings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
-      HashMap<String, String> clone = new HashMap<String, String>();
-      clone.putAll(settings);
-      clone.put(key, value);
-      ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
-   }
-
-   /**
-    * Checks if the choice settings are initialized.
-    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
-    */
-   public static boolean isChoiceSettingInitialised() {
-      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
-   }   
+    }  
    
    /**
     * Checks if the {@link Proof} exists in the user interface.
@@ -745,6 +704,376 @@ public final class KeYUtil {
       }
       else {
          return column;
+      }
+   }
+
+   /**
+    * <p>
+    * Opens an {@link IDocument} for the source file defined by the given {@link IJavaElement}
+    * and executes some code on it defined via the give {@link IRunnableWithDocument}.
+    * </p>
+    * <p>
+    * If the {@link IDocument} is already opened its {@link IDocument} is used.
+    * If it is not opened it is opened and closed after executing the {@link IRunnableWithDocument}.
+    * </p>
+    * @param element The {@link IJavaElement} to open its source file.
+    * @param run The {@link IRunnableWithDocument} to execute on the opened {@link IDocument}.
+    * @return {@code true} {@link IRunnableWithDocument} was executed, {@code false} {@link IRunnableWithDocument} was not executed.
+    * @throws CoreException Occurred Exception.
+    */
+
+   public static boolean runOnDocument(IJavaElement element, IRunnableWithDocument run) throws CoreException {
+      if (element != null) {
+         return runOnDocument(element.getPath(), run);
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * <p>
+    * Opens an {@link IDocument} for the file defined by the given {@link IPath}
+    * and executes some code on it defined via the give {@link IRunnableWithDocument}.
+    * </p>
+    * <p>
+    * If the {@link IDocument} is already opened its {@link IDocument} is used.
+    * If it is not opened it is opened and closed after executing the {@link IRunnableWithDocument}.
+    * </p>
+    * @param location The {@link IPath} to open.
+    * @param run The {@link IRunnableWithDocument} to execute on the opened {@link IDocument}.
+    * @return {@code true} {@link IRunnableWithDocument} was executed, {@code false} {@link IRunnableWithDocument} was not executed.
+    * @throws CoreException Occurred Exception.
+    */
+   public static boolean runOnDocument(IPath location, IRunnableWithDocument run) throws CoreException {
+      if (location != null && run != null) {
+         boolean closeRequired = false;
+         ITextFileBufferManager bufferManager = FileBuffers.getTextFileBufferManager();
+         try {
+            ITextFileBuffer textFileBuffer = bufferManager.getTextFileBuffer(location, LocationKind.IFILE);
+            if (textFileBuffer == null) {
+               closeRequired = true;
+               bufferManager.connect(location, LocationKind.IFILE, null);
+               textFileBuffer = bufferManager.getTextFileBuffer(location, LocationKind.IFILE);
+            }
+            if (textFileBuffer != null) {
+               IDocument document = textFileBuffer.getDocument();
+               run.run(document);
+               return true;
+            }
+            else {
+               return false;
+            }
+         }
+         finally {
+            if (closeRequired && bufferManager != null) {
+               bufferManager.disconnect(location, LocationKind.IFILE, null);
+            }
+         }
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * The method {@link #run(IDocument)} is executed via 
+    * {@link KeYUtil#runOnDocument(IJavaElement, IRunnableWithDocument)} or
+    * {@link KeYUtil#runOnDocument(IPath, IRunnableWithDocument)} and can
+    * be used to do something with an opened {@link IDocument}.
+    * @author Martin Hentschel
+    */
+   public static interface IRunnableWithDocument {
+      /**
+       * Does something with the given {@link IDocument}.
+       * @param document The {@link IDocument} to work with.
+       * @throws CoreException Occurred Exception.
+       */
+      public void run(IDocument document) throws CoreException;
+   }
+   
+   /**
+    * Converts the offset used in the source file of the given {@link IJavaElement}
+    * into the cursor position shown to the user in the UI.
+    * @param element The {@link IJavaElement} in which the offset is used.
+    * @param offset The offset.
+    * @return The cursor position shown to the user.
+    * @throws CoreException Occurred Exception.
+    */
+   public static Position getCursorPositionForOffset(IJavaElement element, 
+                                                     int offset) throws CoreException {
+      if (element != null) {
+         CursorPositionRunnable run = new CursorPositionRunnable(element, offset);
+         runOnDocument(element, run);
+         return run.getPosition();
+      }
+      else {
+         return Position.UNDEFINED;
+      }
+   }
+   
+   /**
+    * {@link IRunnableWithDocument} to compute the cursor position of
+    * {@link KeYUtil#getCursorPositionForOffset(IJavaElement, int)}.
+    * @author Martin Hentschel
+    */
+   private static class CursorPositionRunnable implements IRunnableWithDocument {
+      /**
+       * The {@link IJavaElement} in which the offset is used.
+       */
+      private IJavaElement element;
+      
+      /**
+       * The offset.
+       */
+      private int offset;
+      
+      /**
+       * The cursor position shown to the user.
+       */
+      private CursorPosition position;
+
+      /**
+       * Constructor.
+       * @param element The {@link IJavaElement} in which the offset is used.
+       * @param offset The offset.
+       */
+      public CursorPositionRunnable(IJavaElement element, int offset) {
+         super();
+         this.element = element;
+         this.offset = offset;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void run(IDocument document) throws CoreException {
+         try {
+            int line = document.getLineOfOffset(offset);
+            int lineOffset = document.getLineOffset(line);
+            int tabWidth = JDTUtil.getTabWidth(element);
+            int editorColumn = convertColumnToCursorColumn(document, lineOffset, offset, tabWidth);
+            position = new CursorPosition(line + 1, editorColumn + 1);
+         }
+         catch (BadLocationException e) {
+            throw new CoreException(LogUtil.getLogger().createErrorStatus("Can't compute cursor position for offset \"" + offset + "\" in \"" + element + "\".", e));
+         }
+      }
+
+      /**
+       * Returns the cursor position shown to the user.
+       * @return The cursor position shown to the user.
+       */
+      public CursorPosition getPosition() {
+         return position;
+      }
+   }
+   
+   /**
+    * <p>
+    * Computes for the offset used in the given {@link IDocument} with the
+    * given tab width the column of the cursor position shown to the user.
+    * </p>
+    * <p>
+    * The functionality was copied from {@link AbstractTextEditor#getCursorPosition()}.
+    * </p>
+    * @param document The {@link IDocument}.
+    * @param lineOffset The line offset.
+    * @param offset The offset.
+    * @param tabWidth The tab width.
+    * @return The cursor column.
+    * @throws BadLocationException Occurred Exception.
+    */
+   private static int convertColumnToCursorColumn(IDocument document, 
+                                                  int lineOffset, 
+                                                  int offset, 
+                                                  int tabWidth) throws BadLocationException {
+      int column= 0;
+      for (int i= lineOffset; i < offset; i++)
+         if ('\t' == document.getChar(i))
+            column += tabWidth - (tabWidth == 0 ? 0 : column % tabWidth);
+         else
+            column++;
+      return column;
+   }
+   
+   /**
+    * An extension of KeY's recorder position which now represents
+    * a cursor position shown to the user.
+    * @author Martin Hentschel
+    */
+   public static class CursorPosition extends Position {
+      /**
+       * Constructor.
+       * @param line The cursor line.
+       * @param column The cursor column.
+       */
+      public CursorPosition(int line, int column) {
+         super(line, column);
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String toString() {
+         StringBuffer buf = new StringBuffer();
+         buf.append(getLine()).append(" : ").append(getColumn());
+         return buf.toString();
+      }
+   }
+   
+   /**
+    * Changes the cursor position if the tab width has changed.
+    * @param document The {@link IDocument}.
+    * @param position The old cursor position.
+    * @param oldTabWidth The old tab width.
+    * @param newTabWidth The new tab width.
+    * @return The computed new cursor position with the new tab width.
+    * @throws BadLocationException Occurred Exception.
+    */
+   public static Position changeCursorPositionTabWidth(IDocument document, 
+                                                       Position position,
+                                                       int oldTabWidth, 
+                                                       int newTabWidth) throws BadLocationException {
+      if (document != null && position != null) {
+         int lineOffset = document.getLineOffset(position.getLine() - 1);
+         int oldColumn = position.getColumn() - 1;
+         int oldColumnRecomputed = 0;
+         int newColumn = 0;
+         int i = 0;
+         while (oldColumnRecomputed < oldColumn) {
+            if ('\t' == document.getChar(lineOffset + i)) {
+               oldColumnRecomputed += oldTabWidth - (oldTabWidth == 0 ? 0 : oldColumnRecomputed % oldTabWidth);
+               newColumn += newTabWidth - (newTabWidth == 0 ? 0 : newColumn % newTabWidth);
+            }
+            else {
+               oldColumnRecomputed++;
+               newColumn++;
+            }
+            i++;
+         }
+         return new CursorPosition(position.getLine(), newColumn + 1);
+      }
+      else {
+         return Position.UNDEFINED;
+      }
+   }
+   
+   /**
+    * Computes the offset for the given cursor position (line, column)
+    * in the given {@link IDocument}.
+    * @param document The {@link IDocument}.
+    * @param cursorLine The line of the cursor.
+    * @param cursorColumn The column of the cursor.
+    * @param tabWidth The tab width.
+    * @return The computed offset.
+    * @throws BadLocationException Occurred Exception
+    */
+   public static int getOffsetForCursorPosition(IDocument document, 
+                                                int cursorLine, 
+                                                int cursorColumn, 
+                                                int tabWidth) throws BadLocationException {
+      if (document != null) {
+         int lineOffset = document.getLineOffset(cursorLine - 1);
+         int oldColumn = cursorColumn - 1;
+         int oldColumnRecomputed = 0;
+         int i = 0;
+         while (oldColumnRecomputed < oldColumn) {
+            if ('\t' == document.getChar(lineOffset + i)) {
+               oldColumnRecomputed += tabWidth - (tabWidth == 0 ? 0 : oldColumnRecomputed % tabWidth);
+            }
+            else {
+               oldColumnRecomputed++;
+            }
+            i++;
+         }
+         return lineOffset + i;
+      }
+      else {
+         return -1;
+      }
+   }
+   
+   /**
+    * Computes the offset for the given cursor position (line, column)
+    * in the source document of the given {@link IJavaElement}.
+    * @param element The given {@link IJavaElement}.
+    * @param cursorLine The line of the cursor.
+    * @param cursorColumn The column of the cursor.
+    * @return The computed offset.
+    * @throws CoreException Occurred Exception
+    */
+   public static int getOffsetForCursorPosition(IJavaElement element, 
+                                                int cursorLine, 
+                                                int cursorColumn) throws CoreException {
+      int tabWidth = JDTUtil.getTabWidth(element);
+      OffsetForCursorPositionRunnableWithDocument run = new OffsetForCursorPositionRunnableWithDocument(cursorLine, cursorColumn, tabWidth);
+      runOnDocument(element, run);
+      return run.getOffset();
+   }
+   
+   /**
+    * Implementation of {@link IRunnableWithDocument} to compute the offset
+    * of a given cursor position used by {@link KeYUtil#getOffsetForCursorPosition(IJavaElement, int, int)}.
+    * @author Martin Hentschel
+    */
+   private static class OffsetForCursorPositionRunnableWithDocument implements IRunnableWithDocument {
+      /**
+       * The cursor line.
+       */
+      private int cursorLine;
+      
+      /**
+       * The cursor column.
+       */
+      private int cursorColumn;
+      
+      /**
+       * The tab width.
+       */
+      private int tabWidth;
+
+      /**
+       * The computed offset.
+       */
+      private int offset;
+      
+      /**
+       * Constructor.
+       * @param cursorLine The cursor line.
+       * @param cursorColumn The cursor column.
+       * @param tabWidth The tab width.
+       */
+      public OffsetForCursorPositionRunnableWithDocument(int cursorLine, 
+                                                         int cursorColumn, 
+                                                         int tabWidth) {
+         super();
+         this.cursorLine = cursorLine;
+         this.cursorColumn = cursorColumn;
+         this.tabWidth = tabWidth;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void run(IDocument document) throws CoreException {
+         try {
+            offset = getOffsetForCursorPosition(document, cursorLine, cursorColumn, tabWidth);
+         }
+         catch (BadLocationException e) {
+            throw new CoreException(LogUtil.getLogger().createErrorStatus("Can't compute offset for cursor position " + cursorLine + " : " + cursorColumn + " with tab width " + tabWidth + ".", e));
+         }
+      }
+
+      /**
+       * The computed offset.
+       * @return The computed offset.
+       */
+      public int getOffset() {
+         return offset;
       }
    }
 }

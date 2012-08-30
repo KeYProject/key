@@ -60,6 +60,8 @@ public class KeYFile implements EnvInput {
     
     private String chooseContract = null;
 
+    private String proofObligation = null;
+    
     // when parsing the key file store the classPaths here
     private ImmutableList<String> classPaths;
     
@@ -329,6 +331,7 @@ public class KeYFile implements EnvInput {
                 specRepos.addContracts(problemParser.getContracts());
                 specRepos.addClassInvariants(problemParser.getInvariants());
                 chooseContract = problemParser.getChooseContract();
+                proofObligation = problemParser.getProofObligation();
                 Debug.out("Read KeY file   ", file);
             } finally {
                 cinp.close();
@@ -443,6 +446,11 @@ public class KeYFile implements EnvInput {
     
     public String chooseContract() {
         return chooseContract;
+    }
+    
+    
+    public String getProofObligation() {
+        return proofObligation;
     }
 
     

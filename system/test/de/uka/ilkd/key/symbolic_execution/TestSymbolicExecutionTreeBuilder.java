@@ -14,6 +14,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
@@ -45,6 +46,21 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     */
    private static final int[] DEFAULT_MAXIMAL_SET_NODES_PER_RUN = {ALL_IN_ONE_RUN, SINGLE_SET_NODE_RUN};
 
+   /**
+    * Tests example: examples/_testcase/set/variablesParameterAttributesChange
+    */
+   public void testElseIfTest_variablesParameterAttributesChange() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/variablesParameterAttributesChange/test/VariablesParameterAttributesChange.java", 
+             "VariablesParameterAttributesChange", 
+             "main", 
+             "examples/_testcase/set/variablesParameterAttributesChange/oracle/VariablesParameterAttributesChange.xml",
+             true,
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false);
+   }
+   
    /**
     * Tests example: examples/_testcase/set/elseIfTest
     */
@@ -793,41 +809,57 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                          boolean includeCallStack,
                          int maximalNumberOfExecutedSetNodes,
                          boolean mergeBranchConditions) throws ProofInputException, IOException, ParserConfigurationException, SAXException {
-      // Make sure that parameter are valid.
-      assertNotNull(javaPathInBaseDir);
-      assertNotNull(containerTypeName);
-      assertNotNull(methodFullName);
-      assertNotNull(oraclePathInBaseDirFile);
-      File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
-      if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
-         assertTrue("Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.", oracleFile.exists());
-      }
-      assertTrue(maximalNumberOfExecutedSetNodes >= 1);
-      // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, mergeBranchConditions);
-      // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
-      ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
-      env.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
-      // Execute auto mode until no more symbolic execution tree nodes are found
-      do {
-         // Run proof
-         env.getUi().startAndWaitForProof(env.getProof());
-         // Update symbolic execution tree 
-         env.getBuilder().analyse();
-         // Make sure that not to many set nodes are executed
-         Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
-         for (Integer value : executedSetNodesPerGoal.values()) {
-            assertNotNull(value);
-            assertTrue(value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes, value.intValue() <= maximalNumberOfExecutedSetNodes);
+      String originalRuntimeExceptions = null;
+      try {
+         // Make sure that parameter are valid.
+         assertNotNull(javaPathInBaseDir);
+         assertNotNull(containerTypeName);
+         assertNotNull(methodFullName);
+         assertNotNull(oraclePathInBaseDirFile);
+         File oracleFile = new File(baseDir, oraclePathInBaseDirFile);
+         if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
+            assertTrue("Oracle file does not exist. Set \"CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY\" to true to create an oracle file.", oracleFile.exists());
          }
-      } while(stopCondition.wasSetNodeExecuted());
-      // Create new oracle file if required in a temporary directory
-      createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeVariables, includeCallStack);
-      // Read oracle file
-      ExecutionNodeReader reader = new ExecutionNodeReader();
-      IExecutionNode oracleRoot = reader.read(oracleFile);
-      assertNotNull(oracleRoot);
-      // Make sure that the created symbolic execution tree matches the expected one.
-      assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false);
+         assertTrue(maximalNumberOfExecutedSetNodes >= 1);
+         // Store original settings of KeY which requires that at least one proof was instantiated.
+         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
+            createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, mergeBranchConditions);
+         }
+         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
+         assertNotNull(originalRuntimeExceptions);
+         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
+         // Create proof environment for symbolic execution
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, mergeBranchConditions);
+         // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
+         ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
+         env.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
+         // Execute auto mode until no more symbolic execution tree nodes are found
+         do {
+            // Run proof
+            env.getUi().startAndWaitForProof(env.getProof());
+            // Update symbolic execution tree 
+            env.getBuilder().analyse();
+            // Make sure that not to many set nodes are executed
+            Map<Goal, Integer> executedSetNodesPerGoal = stopCondition.getExectuedSetNodesPerGoal();
+            for (Integer value : executedSetNodesPerGoal.values()) {
+               assertNotNull(value);
+               assertTrue(value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes, value.intValue() <= maximalNumberOfExecutedSetNodes);
+            }
+         } while(stopCondition.wasSetNodeExecuted());
+         // Create new oracle file if required in a temporary directory
+         createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeVariables, includeCallStack);
+         // Read oracle file
+         ExecutionNodeReader reader = new ExecutionNodeReader();
+         IExecutionNode oracleRoot = reader.read(oracleFile);
+         assertNotNull(oracleRoot);
+         // Make sure that the created symbolic execution tree matches the expected one.
+         assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false);
+      }
+      finally {
+         // Restore runtime option
+         if (originalRuntimeExceptions != null) {
+            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
+         }
+      }
    }
 }

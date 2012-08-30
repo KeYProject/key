@@ -150,6 +150,7 @@ tokens {
 	RULES = "\\rules";
         PROBLEM = "\\problem";
         CHOOSECONTRACT = "\\chooseContract";
+        PROOFOBLIGATION = "\\proofObligation";
         PROOF = "\\proof";
         CONTRACTS = "\\contracts";
         INVARIANTS = "\\invariants";
@@ -242,6 +243,11 @@ tokens {
       modPairs.put("\\[[","\\]]");
       modPairs.put("\\throughout","\\endmodality");
       modPairs.put("\\throughout_transaction","\\endmodality");
+   }
+   
+   public void recover( RecognitionException ex, BitSet tokenSet ) throws CharStreamException {
+     consume();
+     consumeUntil( tokenSet );
    }
 
    private void matchAndTransformModality(int beginIndex) throws antlr.RecognitionException {

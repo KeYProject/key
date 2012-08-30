@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -9,6 +9,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
+import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -103,16 +104,16 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
     KeYMediator getMediator();
     
     /**
-     * Opens a java file in this {@link UserInterface} and returns the instantiated {@link InitConfig}
+     * Opens a java file in this {@link UserInterface} and returns the instantiated {@link DefaultProblemLoader}
      * which can be used to instantiated proofs programmatically.
      * @param file The java file to open.
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
-     * @return The opened {@link InitConfig}.
-     * @throws FileNotFoundException Occurred Exception.
+     * @return The opened {@link DefaultProblemLoader}.
+     * @throws IOException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    InitConfig load(File file, List<File> classPaths, File bootClassPath) throws FileNotFoundException, ProofInputException;
+    DefaultProblemLoader load(File file, List<File> classPaths, File bootClassPath) throws IOException, ProofInputException;
     
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterface} for the given

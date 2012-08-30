@@ -1302,6 +1302,10 @@ public class PrettyPrinter {
     }
 
     public void printTypeReference(TypeReference x) throws java.io.IOException {
+       printTypeReference(x, false);
+    }
+
+    public void printTypeReference(TypeReference x, boolean fullTypeNames) throws java.io.IOException {
 	if (x.getKeYJavaType().getJavaType() instanceof ArrayDeclaration) {
 	    printArrayDeclaration
 		((ArrayDeclaration)x.getKeYJavaType().getJavaType());
@@ -1312,7 +1316,12 @@ public class PrettyPrinter {
 //		writeElement(x.getReferencePrefix());
 //		writeToken(".", x);
 	    } else {
-		writeElement(x.getProgramElementName());
+	       if (fullTypeNames) {
+	          write(x.getKeYJavaType().getFullName());
+	       }
+	       else {
+	          writeElement(x.getProgramElementName());
+	       }
 	    }
             printFooter(x);            
         }
@@ -2724,6 +2733,12 @@ public class PrettyPrinter {
     }
 
     public void printFullMethodSignature(IProgramMethod x) throws java.io.IOException {
+       printHeader(x);
+       writeFullMethodSignature(x);
+       printFooter(x);
+    }
+    
+    protected void writeFullMethodSignature(IProgramMethod x) throws java.io.IOException {
         write(x.getName().toString());
         write("(");
         boolean afterFirst = false;
@@ -2737,7 +2752,7 @@ public class PrettyPrinter {
             boolean originalNoLinefeed = noLinefeed;
             try {
                noLinefeed = true;
-               writeElement(pd.getTypeReference());
+               printTypeReference(pd.getTypeReference(), true);
             }
             finally {
                noLinefeed = originalNoLinefeed;
@@ -2749,7 +2764,7 @@ public class PrettyPrinter {
     public void printExecutionContext(ExecutionContext x) 
 	throws java.io.IOException {
 	write("source=");
-	printFullMethodSignature(x.getMethodContext());
+	writeFullMethodSignature(x.getMethodContext());
 	write("@");
 	writeElement(x.getTypeReference());
 	if (x.getRuntimeInstance() != null) {

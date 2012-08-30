@@ -139,6 +139,7 @@ public class RunAllProofsTest extends TestCase {
                                                "de.uka.ilkd.key.gui.Main",
                                                fileToTest.getAbsolutePath(), 
                                                "auto");
+        System.out.println("Starting process: " + sb.command());
         Process process = sb.start();
         InputStream in = process.getInputStream();
         InputStream err = process.getErrorStream();
@@ -228,8 +229,7 @@ public class RunAllProofsTest extends TestCase {
         String defaultHeader = IOUtil.readFrom(new FileInputStream(new File(exampleDir, "index/headerJavaDL.txt")));
         // Collect test files
         Collection<Object[]> data = new LinkedList<Object[]>();
-        data.addAll(dataFromFile(defaultHeader, exampleDir, new File(exampleDir, "index/automaticJAVADL.txt"), true));
-        data.addAll(dataFromFile(defaultHeader, exampleDir, new File(exampleDir, "index/notProvableJavaDL.txt"), false));
+        data.addAll(dataFromFile(defaultHeader, exampleDir, new File(exampleDir, "index/automaticJAVADL.txt")));
         return data;
     }
     
@@ -242,26 +242,37 @@ public class RunAllProofsTest extends TestCase {
      * @return The created parameters.
      * @throws IOException Occurred Exception.
      */
-    protected static List<Object[]> dataFromFile(String defaultHeader, File exampleDir, File indexFile, boolean successExpected) throws IOException {
+    protected static List<Object[]> dataFromFile(String defaultHeader, File exampleDir, File indexFile) throws IOException {
         List<Object[]> result = new LinkedList<Object[]>();
-        BufferedReader reader = new BufferedReader(new FileReader(indexFile));
-        try {
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("./")) {
-                    line = line.substring("./".length());
-                }
-                File testFile = new File(exampleDir, line);
-                if (testFile.isFile()) {
-                    result.add(new Object[] {testFile, defaultHeader, successExpected});
-                }
-            }
-            return result;
-        } 
-        finally {
-            if (reader != null) {
-                reader.close();
-            }
+        if (indexFile.isFile()) {
+           BufferedReader reader = new BufferedReader(new FileReader(indexFile));
+           try {
+               String line = null;
+               while ((line = reader.readLine()) != null) {
+                   if (line.startsWith("./")) {
+                       line = line.substring("./".length());
+                   }
+                   int indexSeparator = line.indexOf(":");
+                   if (indexSeparator >= 0) {
+                      String successString = line.substring(0, indexSeparator).trim();
+                      String fileString = line.substring(indexSeparator + 1).trim();
+                      boolean successExpected = "provable".equals(successString);
+                      File testFile = new File(exampleDir, fileString);
+                      if (testFile.isFile()) {
+                          result.add(new Object[] {testFile, defaultHeader, successExpected});
+                      }
+                   }
+               }
+           } 
+           finally {
+               if (reader != null) {
+                   reader.close();
+               }
+           }
         }
+        else {
+           System.out.println("Skipping \"" + indexFile + "\" becaue it is no existing file.");
+        }
+        return result;
     }
 }

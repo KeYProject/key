@@ -46,8 +46,8 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IProofFileParser;
 import de.uka.ilkd.key.proof.JavaModel;
-import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.EnvInput;
@@ -592,9 +592,9 @@ public final class ProblemInitializer {
     }
     
     
-    public void tryReadProof(ProblemLoader prl, KeYUserProblemFile kupf) 
+    public void tryReadProof(IProofFileParser pfp, KeYUserProblemFile kupf) 
     		throws ProofInputException {
 	reportStatus("Loading proof", kupf.getNumberOfChars());
-	kupf.readProof(prl);
+	kupf.readProof(pfp);
     }
 }

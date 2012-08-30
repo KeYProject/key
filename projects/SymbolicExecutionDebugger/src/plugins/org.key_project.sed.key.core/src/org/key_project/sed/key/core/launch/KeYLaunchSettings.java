@@ -6,6 +6,8 @@ import org.eclipse.jdt.core.IMethod;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 
+import de.uka.ilkd.key.java.Position;
+
 /**
  * Contains the settings used in an {@link ILaunch} which contains a
  * {@link KeYDebugTarget} as unmodifiable backup of the initial
@@ -14,6 +16,16 @@ import org.key_project.sed.key.core.model.KeYDebugTarget;
  * @author Martin Hentschel
  */
 public class KeYLaunchSettings {
+   /**
+    * {@code true} new debug session, {@code false} continue existing *.proof file.
+    */
+   private boolean newDebugSession;
+   
+   /**
+    * The path to the proof file to continue.
+    */
+   private String proofFileToContinue;
+
    /**
     * The {@link IMethod} to debug.
     */
@@ -55,9 +67,26 @@ public class KeYLaunchSettings {
     * Merge branch conditions?
     */
    private boolean mergeBranchConditions;
+   
+   /**
+    * {@code true} execute method range, {@code false} execute complete method body.
+    */
+   private boolean executeMethodRange;
+   
+   /**
+    * The start of the method range to execute.
+    */
+   private Position methodRangeStart;
+   
+   /**
+    * The end of the method range to execute.
+    */
+   private Position methodRangeEnd;
 
    /**
     * Constructor.
+    * @param newDebugSession {@code true} new debug session, {@code false} continue existing *.proof file.
+    * @param proofFileToContinue The path to the proof file to continue.
     * @param method The {@link IMethod} to debug.
     * @param useExistingContract Use an existing contract or generate default contract?
     * @param existingContract The ID of the existing contract to use.
@@ -66,15 +95,25 @@ public class KeYLaunchSettings {
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
+    * @param executeMethodRange {@code true} execute method range, {@code false} execute complete method body.
+    * @param methodRangeStart The start of the method range to execute.
+    * @param methodRangeEnd The end of the method range to execute.
     */
-   public KeYLaunchSettings(IMethod method, 
+   public KeYLaunchSettings(boolean newDebugSession,
+                            String proofFileToContinue,
+                            IMethod method, 
                             boolean useExistingContract, 
                             String existingContract, 
                             String precondition,
                             boolean showMethodReturnValues,
                             boolean showVariablesOfSelectedDebugNode,
                             boolean showKeYMainWindow,
-                            boolean mergeBranchConditions) {
+                            boolean mergeBranchConditions,
+                            boolean executeMethodRange,
+                            Position methodRangeStart,
+                            Position methodRangeEnd) {
+      this.newDebugSession = newDebugSession;
+      this.proofFileToContinue = proofFileToContinue;
       this.method = method;
       this.useExistingContract = useExistingContract;
       this.existingContract = existingContract;
@@ -83,6 +122,25 @@ public class KeYLaunchSettings {
       this.showVariablesOfSelectedDebugNode = showVariablesOfSelectedDebugNode;
       this.showKeYMainWindow = showKeYMainWindow;
       this.mergeBranchConditions = mergeBranchConditions;
+      this.executeMethodRange = executeMethodRange;
+      this.methodRangeStart = methodRangeStart;
+      this.methodRangeEnd = methodRangeEnd;
+   }
+   
+   /**
+    * Checks if a new debug session should be started or an existing one continued.
+    * @return {@code true} new debug session, {@code false} continue existing *.proof file.
+    */
+   public boolean isNewDebugSession() {
+      return newDebugSession;
+   }
+
+   /**
+    * Returns the path to the proof file to continue.
+    * @return The path to the proof file to continue.
+    */
+   public String getProofFileToContinue() {
+      return proofFileToContinue;
    }
 
    /**
@@ -147,5 +205,29 @@ public class KeYLaunchSettings {
     */
    public String getPrecondition() {
       return precondition;
+   }
+
+   /**
+    * Checks if a method range or the complete method is executed.
+    * @return {@code true} execute method range, {@code false} execute complete method body.
+    */
+   public boolean isExecuteMethodRange() {
+      return executeMethodRange;
+   }
+
+   /**
+    * Returns the start of the method range to execute.
+    * @return The start of the method range to execute.
+    */
+   public Position getMethodRangeStart() {
+      return methodRangeStart;
+   }
+
+   /**
+    * Returns the end of the method range to execute.
+    * @return The end of the method range to execute.
+    */
+   public Position getMethodRangeEnd() {
+      return methodRangeEnd;
    }
 }

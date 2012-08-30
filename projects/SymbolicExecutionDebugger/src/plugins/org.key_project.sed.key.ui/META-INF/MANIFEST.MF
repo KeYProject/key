@@ -5,6 +5,7 @@ Bundle-SymbolicName: org.key_project.sed.key.ui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.sed.key.ui.Activator
 Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.expressions;bundle-version="3.4.300",
  org.eclipse.core.resources;bundle-version="3.7.100",
  org.eclipse.ui,
  org.eclipse.ui.views.properties.tabbed;bundle-version="3.5.200",

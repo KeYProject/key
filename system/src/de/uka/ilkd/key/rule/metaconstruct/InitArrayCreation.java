@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
@@ -228,12 +229,28 @@ public class InitArrayCreation extends InitArray {
 		return arrayCreationWithoutInitializers(array, na, services);
 	    }
 	} else if (pe instanceof ArrayInitializer) {
-	    assert false : "dubious code";
 	    final KeYJavaType kjt = 
 		array.getKeYJavaType(services, svInst.getExecutionContext());
-	    na = new NewArray(new Expression[0],
-			      ((ArrayType)kjt.getJavaType()).getBaseType(),
-			      kjt, (ArrayInitializer)pe, 0);
+	    final ArrayInitializer init = (ArrayInitializer)pe;
+	    ArrayType arrayType = null;
+	    try {
+            arrayType = (ArrayType)kjt.getJavaType();
+	    } catch (ClassCastException e) {
+	        throw new RuntimeException("Array dimension does not match its definition. This is a Java syntax error.",e);
+	    }
+        final int dimension = arrayType.getDimension();
+        final Expression[] size = { }; // XXX don't know what that is for
+        Type baseType = arrayType;
+        TypeReference baseTypeRef = null;
+        while (baseType instanceof ArrayType) {
+            baseTypeRef = ((ArrayType)baseType).getBaseType();
+            baseType = baseTypeRef.getKeYJavaType();
+        }
+        // XXX known issue: multi-dimensional array new declarations are displayed improperly
+        assert baseTypeRef != null;
+        na = new NewArray(size,
+			      baseTypeRef,
+			      kjt, init, dimension);
 	} else {
 	    return pe;
 	}

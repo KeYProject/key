@@ -628,7 +628,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         if(rp != null 
            && !(rp instanceof ThisReference) 
            && !(rp instanceof SuperReference)
-           && !(rp instanceof TypeReference)) {
+           && !(rp instanceof TypeReference)
+           && !(inst.pm.isStatic())) {
             result = goal.split(4);
             postGoal = result.tail().tail().tail().head();
             excPostGoal = result.tail().tail().head();

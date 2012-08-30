@@ -37,7 +37,12 @@ public class SourceTabComposite extends Composite {
     * The {@link TabbedPropertySheetWidgetFactory} to use.
     */
    private TabbedPropertySheetWidgetFactory factory;
-   
+ 
+   /**
+    * The used {@link WorkbenchLabelProvider} to get {@link Image}s of {@link IResource}s.
+    */
+   private WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
+
    /**
     * Constructor.
     * @param parent The parent {@link Composite}.
@@ -66,14 +71,8 @@ public class SourceTabComposite extends Composite {
          Object source = frame.getLaunch().getSourceLocator().getSourceElement(frame);
          if (source instanceof IResource) {
             IResource resource = (IResource)source;
-            WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
-            try {
-               sourceText = labelProvider.getText(resource);
-               sourceIcon = labelProvider.getImage(resource);
-            }
-            finally {
-               labelProvider.dispose();
-            }
+            sourceText = labelProvider.getText(resource);
+            sourceIcon = labelProvider.getImage(resource);
             workspacePath = resource.getFullPath().toString();
             File file = ResourceUtil.getLocation(resource);
             if (file != null) {
@@ -129,6 +128,7 @@ public class SourceTabComposite extends Composite {
       if (composite != null) {
          composite.setVisible(false);
          composite.dispose();
+         composite = null;
       }
    }
    
@@ -261,5 +261,16 @@ public class SourceTabComposite extends Composite {
          data.top = new FormAttachment(charEndText, 0, SWT.CENTER);
          charEndLabel.setLayoutData(data);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      if (labelProvider != null) {
+         labelProvider.dispose();
+      }
+      super.dispose();
    }
 }

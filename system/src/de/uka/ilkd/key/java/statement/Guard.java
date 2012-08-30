@@ -48,4 +48,8 @@ public class Guard extends JavaNonTerminalProgramElement
 	if (index==0) return expr;
 	return null;
     }
+    
+    public String toString(){
+        return expr.toString();
+    }
 }

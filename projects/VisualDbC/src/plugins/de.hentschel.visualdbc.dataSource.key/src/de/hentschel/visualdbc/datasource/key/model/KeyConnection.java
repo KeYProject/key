@@ -104,13 +104,12 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
@@ -307,10 +306,9 @@ public class KeyConnection extends MemoryConnection {
                try {
                   KeYMediator mediator = main.getMediator();
                   mediator.addGUIListener(mainGuiListener);
-                  ProblemLoader loader = new ProblemLoader(location, classPathEntries, bootClassPath, mediator);
-                  EnvInput envInput = loader.createEnvInput(location, classPathEntries, bootClassPath);
-                  init = main.getUserInterface().createProblemInitializer();
-                  initConfig = init.prepare(envInput);
+                  DefaultProblemLoader loader = main.getUserInterface().load(location, classPathEntries, bootClassPath);
+                  init = loader.getProblemInitializer();
+                  initConfig = loader.getInitConfig();
                   // Analyze classes, interfaces, enums and packages
                   analyzeTypes(initConfig.getServices(), skipLibraryClasses, packageManagement, monitor);
                }

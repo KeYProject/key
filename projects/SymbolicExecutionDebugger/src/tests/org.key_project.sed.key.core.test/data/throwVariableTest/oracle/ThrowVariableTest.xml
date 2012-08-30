@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch xmlns="http://key-project.org/sed/serialization">
-   <sedTarget xml:id="_d34e48a2-9498-4a3e-bf61-b9ca0585194a" name="ThrowVariableTest[ThrowVariableTest::main()].JML normal_behavior operation contract.-2147483648" modelIdentifier="org.key_project.sed.key.core">
-      <sedThread xml:id="_ebc838ce-fe62-4cd3-9e93-8070b4bc3f5b" name="&lt;start&gt;" pathCondition="true">
-         <sedMethodCall xml:id="_208b29d5-6379-4af0-8c35-7132f963382f" name="self.main();" pathCondition="true" lineNumber="-1" charStart="49" charEnd="53">
-            <sedStatement xml:id="_5c1e75a7-5ac3-46e7-a670-bcb4b157e74f" name="IllegalArgumentException e = new IllegalArgumentException ();" pathCondition="true" lineNumber="-1" charStart="61" charEnd="121">
-               <sedStatement xml:id="_7b781cd8-ea23-4223-b23c-50a6aed7e336" name="throw e;" pathCondition="true" lineNumber="-1" charStart="125" charEnd="133">
-                  <sedExceptionalTermination xml:id="_3f2a9ee8-814c-44c5-97ac-7fdd884c3072" name="&lt;uncaught java.lang.IllegalArgumentException&gt;" pathCondition="true">
+   <sedTarget xml:id="_e40e3c88-8d63-412a-ae3b-333da02d3ad4" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_4ad686f8-83a6-4f0b-b9d6-38b7df25a347" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_3138090a-9b9c-4afb-91d1-98e4fc4602a1" name="self.main();" pathCondition="true" lineNumber="-1" charStart="49" charEnd="53">
+            <sedStatement xml:id="_51da0cd4-22c0-4b09-883b-eebf9feef6d9" name="IllegalArgumentException e = new IllegalArgumentException ();" pathCondition="true" lineNumber="-1" charStart="61" charEnd="121">
+               <sedStatement xml:id="_7723a3d5-0554-43a3-ae0e-8715c2103ed2" name="throw e;" pathCondition="true" lineNumber="-1" charStart="125" charEnd="133">
+                  <sedExceptionalTermination xml:id="_02c13ae6-af13-46aa-a6db-be8dce4b2ba1" name="&lt;uncaught java.lang.IllegalArgumentException&gt;" pathCondition="true">
                   </sedExceptionalTermination>
                </sedStatement>
             </sedStatement>

@@ -29,7 +29,7 @@ public class TestStepReturnSymbolicExecutionTreeNodesStopCondition extends Abstr
       String oraclePathInkeyRepDirectoryFile = "examples/_testcase/set/stepReturnTest/oracle/StepReturnTest";
       String oracleFileExtension = ".xml";
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, false);
+      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false);
       // Make sure that initial tree is valid
       int oracleIndex = 0;
       assertSetTreeAfterStep(env.getBuilder(), oraclePathInkeyRepDirectoryFile, ++oracleIndex, oracleFileExtension, keyRepDirectory);
