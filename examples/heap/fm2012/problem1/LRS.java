@@ -20,19 +20,21 @@
 public class LRS {
 
 
-    private static int solStart = 0;
-    private static int solLength = 0;
-    private static int[] a;
+    private int solStart = 0;
+    private int solLength = 0;
+    private int[] a;
 
 
     /*@ normal_behavior
-      @ requires a != null;
       @ requires solStart == 0 && solLength == 0;
       @*/
-    public static void doLRS() {
+    public void doLRS() {
         SuffixArray sa = new SuffixArray(a);
 
         /*@ maintaining \invariant_for(sa);
+          @ maintaining 0 <= solStart && solStart < a.length;
+          @ maintaining 0 <= solLength && solLength < a.length;
+          @ maintaining 0 <= solStart+solLength-1 && solStart+solLength-1 < a.length;
           @ decreasing a.length-i;
           @ assignable solStart,solLength;
           @*/

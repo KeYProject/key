@@ -33,12 +33,13 @@ public class SuffixArray {
 
 
     /*@ normal_behavior
+      @ requires a != null;
       @ requires 0 <= x && x < a.length;
       @ requires 0 <= y && y < a.length;
       @ requires x != y;
       @ ensures (\forall int i; 0 <= i && i < \result; a[x+i]==a[y+i]);
       @ ensures a[x+\result]!=a[y+\result] || \result == a.length-x || \result == a.length-y;
-      @ strictly_pure
+      @ strictly_pure helper
       @*/
     private int lcp(int x, int y) {
         int l = 0;
@@ -49,11 +50,14 @@ public class SuffixArray {
     }
 
 
+// TODO: better spec with sortedness of suffixes in mind
+
     /*@ normal_behavior
+      @ requires a != null && suffixes != null;
       @ requires 0 < i && i < N;
       @ ensures (\forall int i; 0 <= i && i < \result; a[x+i]==a[y+i]);
       @ ensures a[suffixes[i]+\result]!=a[suffixes[i-1]+\result] || \result == a.length-suffixes[i] || \result == a.length-suffixes[i-1];
-      @ strictly_pure
+      @ strictly_pure helper
       @*/
     public int lcp(int i) {
         return lcp(suffixes[i], suffixes[i-1]);
