@@ -22,13 +22,16 @@ public class LRS {
 
     private int solStart = 0;
     private int solLength = 0;
-    private int[] a;
+    private final int[] a;
 
 
     /*@ normal_behavior
+      @ requires a.length >= 2;
       @ requires solStart == 0 && solLength == 0;
       @ ensures (\exists int i; 0 <= i && i < a.length && i != solStart;
       @           (\forall int j; 0 <= j && j < solLength; a[solStart+j] == a[i+j]));
+      @ ensures !(\exists int i,k; 0 <= i && i < k && k < a.length;
+      @           (\forall int j; 0 <= j && j < solLength+1; a[k+j] == a[i+j]));
       @*/
     public void doLRS() {
         SuffixArray sa = new SuffixArray(a);
@@ -36,14 +39,20 @@ public class LRS {
         /*@ maintaining \invariant_for(sa);
           @ maintaining 0 <= solStart && solStart < a.length;
           @ maintaining 0 <= solLength && solLength < a.length;
-          @ maintaining 0 <= solStart+solLength-1 && solStart+solLength-1 < a.length;
-          @ decreasing a.length-i;
+          @ maintaining solStart+solLength-1 < a.length;
+          @ maintaining 0 < l && l <= a.length;
+          @ maintaining (\exists int i; 0 <= i && i < l && i != solStart;
+          @           (\forall int j; 0 <= j && j < solLength; a[solStart+j] == a[i+j]))
+          @             || solLength == 0;
+          @ maintaining !(\exists int i,k; 0 <= i && i < k && k < l;
+          @           (\forall int j; 0 <= j && j < solLength+1; a[k+j] == a[i+j]));
+          @ decreasing a.length-l;
           @ assignable solStart,solLength;
           @*/
-        for (int i=1; i < a.length; i++) {
-            int length = sa.lcp(i);
+        for (int l=1; l < a.length; l++) {
+            int length = sa.lcp(l);
             if (length > solLength) {
-                solStart = sa.select(i);
+                solStart = sa.select(l);
                 solLength = length;
             }
         }

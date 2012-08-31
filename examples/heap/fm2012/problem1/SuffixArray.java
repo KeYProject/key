@@ -1,4 +1,4 @@
-public class SuffixArray {
+public final class SuffixArray {
 
     private final int[] a;
     private final int[] suffixes;
@@ -53,11 +53,10 @@ public class SuffixArray {
 // TODO: better spec with sortedness of suffixes in mind
 
     /*@ normal_behavior
-      @ requires a != null && suffixes != null;
       @ requires 0 < i && i < N;
       @ ensures (\forall int j; 0 <= j && j < \result; a[suffixes[i]+j]==a[suffixes[i-1]+j]);
       @ ensures a[suffixes[i]+\result]!=a[suffixes[i-1]+\result] || \result == a.length-suffixes[i] || \result == a.length-suffixes[i-1];
-      @ strictly_pure helper
+      @ strictly_pure
       @*/
     public int lcp(int i) {
         return lcp(suffixes[i], suffixes[i-1]);
