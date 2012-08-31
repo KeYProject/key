@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -379,4 +380,22 @@ public abstract class KeYJavaASTFactory {
 	    insertStatementInBlock(stmnts, b);
     }
 
+    /**
+     * Create a local variable declaration that assigns zero initially.
+     * 
+     * <pre>
+     * type variable = 0;
+     * </pre>
+     * 
+     * @param type
+     *            the static {@link KeYJavaType} of <code>variable</code>
+     * @param variable
+     *            the named and typed {@link ProgramVariable} to be declared
+     * @return a new {@link LocalVariableDeclaration} of <code>variable</code>
+     *         with static type <code>type</code> and initial value zero
+     */
+    public static LocalVariableDeclaration declareZero(final KeYJavaType type,
+	    final ProgramVariable variable) {
+	return KeYJavaASTFactory.declare(variable, new IntLiteral(0), type);
+    }
 }

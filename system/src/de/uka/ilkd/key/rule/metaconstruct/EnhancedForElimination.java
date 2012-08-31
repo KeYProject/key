@@ -20,7 +20,6 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
@@ -195,11 +194,8 @@ public class EnhancedForElimination extends ProgramTransformer {
 
     /** Declare index variable and assign zero. */
     private ILoopInit makeForInit(KeYJavaType intType, ProgramVariable itVar) {
-        final VariableSpecification spec =
-                new VariableSpecification(itVar, new IntLiteral(0), intType);
-        final TypeRef intTyperef = new TypeRef(intType);
-        final LocalVariableDeclaration init =
-                new LocalVariableDeclaration(intTyperef, spec);
+	final LocalVariableDeclaration init = KeYJavaASTFactory.declareZero(
+		intType, itVar);
         final LoopInitializer[] linit = {init};
         final ILoopInit inits = new LoopInit(linit);
         return inits;
