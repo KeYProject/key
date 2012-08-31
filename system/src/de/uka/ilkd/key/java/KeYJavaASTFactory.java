@@ -415,4 +415,28 @@ public abstract class KeYJavaASTFactory {
 
 	return new LoopInit(initializers);
     }
+
+    /**
+     * Create a loop initialization that declares and assigns zero to a local
+     * variable.
+     * 
+     * <pre>
+     * type variable = 0
+     * </pre>
+     * 
+     * @param type
+     *            the static {@link KeYJavaType} of <code>variable</code>
+     * @param variable
+     *            the named and typed {@link ProgramVariable} to be declared
+     * @return a new {@link ILoopInit} that declares variable
+     *         <code>variable</code> with static type <code>type</code> and
+     *         initial value zero
+     */
+    public static ILoopInit loopInit(final KeYJavaType type,
+	    final ProgramVariable variable) {
+	final LoopInitializer initializer = KeYJavaASTFactory.declareZero(type,
+		variable);
+
+	return KeYJavaASTFactory.loopInit(initializer);
+    }
 }

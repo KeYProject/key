@@ -136,7 +136,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         final KeYJavaType intType = ji.getPrimitiveKeYJavaType("int");
         final ProgramVariable itVar = new LocationVariable(itName, intType);
 
-        final ILoopInit inits = makeForInit(intType, itVar);
+	final ILoopInit inits = KeYJavaASTFactory.loopInit(intType, itVar);
         final IGuard guard = makeGuard(arrayVar, itVar);
         final IForUpdates updates = makeUpdates(itVar);
 
@@ -190,14 +190,6 @@ public class EnhancedForElimination extends ProgramTransformer {
         final Expression lengthExpr = new FieldReference(length,expression);
         final IGuard guard = new Guard(new LessThan(itVar,lengthExpr));
         return guard;
-    }
-
-    /** Declare index variable and assign zero. */
-    private ILoopInit makeForInit(KeYJavaType intType, ProgramVariable itVar) {
-	final LocalVariableDeclaration init = KeYJavaASTFactory.declareZero(
-		intType, itVar);
-	final ILoopInit inits = KeYJavaASTFactory.loopInit(init);
-        return inits;
     }
 
     // Methods to transform loops over Iterable
