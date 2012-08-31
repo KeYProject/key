@@ -1,22 +1,28 @@
-
-
+/** Implementation of the Longest Repeated Substring algorithm.
+  * <em>FM 2012 Verification Competition, Problem 1 (part b).</em><br>
+  * Together with a suffix array, LCP can be used to solve interesting text
+  * problems, such as finding the longest repeated substring (LRS) in a text.<br>
+  * A suffix array (for a given text) is an array of all suffixes of the
+  * text. For the text [7,8,8,6], the suffix array is
+  *   [[7,8,8,6],
+  *      [8,8,6],
+  *        [8,6],
+  *          [6]]
+  * <p>Typically, the suffixes are not stored explicitly as above but
+  * represented as pointers into the original text. The suffixes in a suffix
+  * array  are sorted in lexicographical order. This way, occurrences of
+  * repeated substrings in the original text are neighbors in the suffix
+  * array.</p>
+  *
+  * For the above, example (assuming pointers are 0-based integers), the
+  * sorted suffix array is: [3,0,2,1]
+  */
 public class LRS {
 
 
     private static int solStart = 0;
     private static int solLength = 0;
     private static int[] a;
-
-/*
-    public static void main(String[] args) {
-        a = new int[args.length];
-        for (int i=0; i<args.length; i++) {
-            a[i]=Integer.parseInt(args[i]);
-        }
-        doLRS();
-        System.out.println(solStart+"->"+solLength);
-    }
-*/
 
 
     /*@ normal_behavior

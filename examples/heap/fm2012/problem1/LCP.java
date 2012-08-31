@@ -1,3 +1,12 @@
+/** Contains an implementation for the Longest Common Prefix algorithm.
+  * <em>FM 2012 Verification Competition, Problem 1 (part a).</em><br>
+  * Longest Common Prefix (LCP) is an algorithm used for text querying. In
+  * the following, we model text as an integer array. <ul>
+  * <li> Input:  an integer array a, and two indices x and y into this array
+  * <li> Output: length of the longest common prefix of the subarrays of a
+  *     starting at x and y respectively.</ul>
+  * @author bruns, woj
+  */
 class LCP {
 
 
