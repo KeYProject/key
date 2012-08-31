@@ -196,8 +196,7 @@ public class EnhancedForElimination extends ProgramTransformer {
     private ILoopInit makeForInit(KeYJavaType intType, ProgramVariable itVar) {
 	final LocalVariableDeclaration init = KeYJavaASTFactory.declareZero(
 		intType, itVar);
-        final LoopInitializer[] linit = {init};
-        final ILoopInit inits = new LoopInit(linit);
+	final ILoopInit inits = KeYJavaASTFactory.loopInit(init);
         return inits;
     }
 

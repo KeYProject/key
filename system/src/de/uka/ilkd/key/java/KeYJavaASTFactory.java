@@ -398,4 +398,21 @@ public abstract class KeYJavaASTFactory {
 	    final ProgramVariable variable) {
 	return KeYJavaASTFactory.declare(variable, new IntLiteral(0), type);
     }
+
+    /**
+     * Create a loop initialization that consists of a single statement.
+     * 
+     * <pre>
+     * init
+     * </pre>
+     * 
+     * @param init
+     *            the single {@link LoopInitializer}
+     * @return a new {@link ILoopInit} that consists of <code>init</code> only
+     */
+    public static ILoopInit loopInit(final LoopInitializer init) {
+	final LoopInitializer[] initializers = { init };
+
+	return new LoopInit(initializers);
+    }
 }
