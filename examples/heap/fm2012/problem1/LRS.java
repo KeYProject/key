@@ -27,6 +27,8 @@ public class LRS {
 
     /*@ normal_behavior
       @ requires solStart == 0 && solLength == 0;
+      @ ensures (\exists int i; 0 <= i && i < a.length && i != solStart;
+      @           (\forall int j; 0 <= j && j < solLength; a[solStart+j] == a[i+j]));
       @*/
     public void doLRS() {
         SuffixArray sa = new SuffixArray(a);

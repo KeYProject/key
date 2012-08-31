@@ -55,7 +55,7 @@ public class SuffixArray {
     /*@ normal_behavior
       @ requires a != null && suffixes != null;
       @ requires 0 < i && i < N;
-      @ ensures (\forall int i; 0 <= i && i < \result; a[x+i]==a[y+i]);
+      @ ensures (\forall int j; 0 <= j && j < \result; a[suffixes[i]+j]==a[suffixes[i-1]+j]);
       @ ensures a[suffixes[i]+\result]!=a[suffixes[i-1]+\result] || \result == a.length-suffixes[i] || \result == a.length-suffixes[i-1];
       @ strictly_pure helper
       @*/
