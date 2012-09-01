@@ -90,7 +90,7 @@ public final class StrategySelectionView extends JPanel {
     JRadioButtonHashMap rdBut18;
     JRadioButtonHashMap blockContractRadioButton;
     JRadioButtonHashMap blockExpandRadioButton;
-    JRadioButtonHashMap blockNoneRadioButton;
+    //JRadioButtonHashMap blockNoneRadioButton;
     private JRadioButtonHashMap noRetreat;
     private JRadioButtonHashMap retreat;
     private JRadioButtonHashMap splittingNormal;
@@ -343,9 +343,10 @@ public final class StrategySelectionView extends JPanel {
         blockGroup.add(blockExpandRadioButton);
         addJavaDLOption(blockExpandRadioButton, javaDLOptionsLayout, 4, yCoord, 2);
 
-        blockNoneRadioButton = new JRadioButtonHashMap("None", StrategyProperties.BLOCK_NONE, false, false);
+        //TODO Implement Strategy 'None' for Block contracts. 'None' means, that the solver stops if it encounters an (applicable) block contract.
+        /*blockNoneRadioButton = new JRadioButtonHashMap("None", StrategyProperties.BLOCK_NONE, false, false);
         blockGroup.add(blockNoneRadioButton);
-        addJavaDLOption(blockNoneRadioButton, javaDLOptionsLayout, 6, yCoord, 2);
+        addJavaDLOption(blockNoneRadioButton, javaDLOptionsLayout, 6, yCoord, 2);*/
 
         ++yCoord;
         addJavaDLOptionSpace (javaDLOptionsLayout, yCoord);
@@ -798,7 +799,7 @@ public final class StrategySelectionView extends JPanel {
         rdBut18.addActionListener(optListener);
         blockContractRadioButton.addActionListener(optListener);
         blockExpandRadioButton.addActionListener(optListener);
-        blockNoneRadioButton.addActionListener(optListener);
+        //blockNoneRadioButton.addActionListener(optListener);
         retreat.addActionListener(optListener);
         noRetreat.addActionListener(optListener);
         depOn.addActionListener(optListener);
