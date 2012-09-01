@@ -1,0 +1,3 @@
+If you apply a block contract there are three new goals. One of them establishes the validity of the contract for the block. The block itself appears in the modality of this goal and thus the block contract is again applicable. But you don't want to apply it again!
+
+So, turn block contracts off when proving the validity goal of an applied block contract, as long as the block of the contract appears unmodified in the modality.

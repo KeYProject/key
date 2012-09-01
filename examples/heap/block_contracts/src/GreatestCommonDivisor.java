@@ -1,5 +1,9 @@
+// Stolen from examples/standard_key/arith/euclidean/src/Gcd.java
+// and adapted.
 public class GreatestCommonDivisor {
 
+    // Automatically provable with options: 'Block treatment': Contract; 'Arithmetic treatment': DefOps.
+    // As said in the readme, make sure to turn block contracts off in validity goals of block contracts.
     /*@ public normal_behavior
       @ requires a != 0 || b != 0;
       @ ensures (a % \result == 0 && b % \result == 0 &&

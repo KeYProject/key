@@ -1,82 +1,18 @@
 public class Weird {
-    
-    /*@ requires x >= 0 && y >= 0;
-      @ ensures \result == x + y;
-      @ diverges false;
-      @ signals_only \nothing;
-      @ assignable \nothing;
-      @
-      @ also
-      @
-      @ requires x < 0 && y < 0;
-      @ ensures \result == x * y;
-      @ diverges false;
-      @ signals_only \nothing;
-      @ assignable \nothing;
-      @
-      @ also
-      @
-      @ requires x < 0 && y > 0;
-      @ ensures \result == x / y;
+
+    // Not provable. But demonstrates usage of different behaviors.
+    /*@ ensures x > 0 && y > 0 ==> \result == x + y;
+      @ ensures x < 0 && y > 0 ==> \result == x / y;
+      @ ensures x > 0 && y < 0 ==> \result == x % y;
+      @ ensures x < 0 && y < 0 ==> \result == x * y;
+      @ signals (Exception e) x == 0 && y == 0;
       @ diverges false;
       @ signals_only \nothing;
       @ assignable \nothing;
       @*/
-    public int add(int x, int y) {
+    public int behaviors(int x, int y) {
         int z = 0;
-        label: {
-            /*@ requires x >= 0 && y >= 0;
-              @ ensures z == x + y;
-              @ diverges false;
-              @ signals_only \nothing;
-              @ assignable \nothing;
-              @
-              @ also
-              @
-              @ requires x < 0 && y < 0;
-              @ returns \result == x * y;
-              @ diverges false;
-              @ signals_only \nothing;
-              @ assignable \nothing;
-              @
-              @ also
-              @
-              @ requires x < 0 && y > 0;
-              @ breaks (label) z == x / y;
-              @ diverges false;
-              @ signals_only \nothing;
-              @ assignable \nothing;
-              @*/
-           {
-               if (x >= 0 && y >= 0) {
-                   z = x + y;
-               }
-               if (x < 0 && y < 0) {
-                   return x * y;
-               }
-               while (true) {
-                   if (x < 0 && y >= 0) {
-                       z = x / y;
-                       break label;
-                   }
-                   else {
-                       continue;
-                   }
-               }
-           }
-        }
-        return z;
-    }
-    
-    /*@ requires x >= 0 && y >= 0;
-      @ ensures \result == x + y;
-      @ diverges false;
-      @ signals_only \nothing;
-      @ assignable \nothing;
-      @*/
-    public int foo(int x, int y) {
-        int z = 0;
-        label: {
+        outside: {
             /*@ normal_behavior
               @ requires x > 0 && y > 0;
               @ ensures z == x + y;
@@ -86,7 +22,7 @@ public class Weird {
               @
               @ break_behavior
               @ requires x < 0 && y > 0;
-              @ breaks (label) z == x / y;
+              @ breaks (outside) z == x / y;
               @ assignable \nothing;
               @
               @ also
@@ -116,10 +52,11 @@ public class Weird {
                }
                if (x < 0 && y > 0) {
                    z = x / y;
-                   break label;
+                   break outside;
                }
                if (x > 0 && y < 0) {
                    z = x % y;
+                   // Note that this is incorrect java code, because there is no loop statement.
                    continue;
                }
                if (x < 0 && y < 0) {
@@ -133,7 +70,77 @@ public class Weird {
         }
         return z;
     }
-    
+
+    // Not provable.
+    /*@ requires x >= 0 && y >= 0;
+      @ ensures \result == x + y;
+      @ diverges false;
+      @ signals_only \nothing;
+      @ assignable \nothing;
+      @
+      @ also
+      @
+      @ requires x < 0 && y < 0;
+      @ ensures \result == x * y;
+      @ diverges false;
+      @ signals_only \nothing;
+      @ assignable \nothing;
+      @
+      @ also
+      @
+      @ requires x < 0 && y > 0;
+      @ ensures \result == x / y;
+      @ diverges false;
+      @ signals_only \nothing;
+      @ assignable \nothing;
+      @*/
+    public int multipleBlockContracts(int x, int y) {
+        int z = 0;
+        outside: {
+            /*@ requires x >= 0 && y >= 0;
+              @ ensures z == x + y;
+              @ diverges false;
+              @ signals_only \nothing;
+              @ assignable \nothing;
+              @
+              @ also
+              @
+              @ requires x < 0 && y < 0;
+              @ returns \result == x * y;
+              @ diverges false;
+              @ signals_only \nothing;
+              @ assignable \nothing;
+              @
+              @ also
+              @
+              @ requires x < 0 && y > 0;
+              @ breaks (outside) z == x / y;
+              @ diverges false;
+              @ signals_only \nothing;
+              @ assignable \nothing;
+              @*/
+           {
+               if (x >= 0 && y >= 0) {
+                   z = x + y;
+               }
+               if (x < 0 && y < 0) {
+                   return x * y;
+               }
+               while (true) {
+                   if (x < 0 && y >= 0) {
+                       z = x / y;
+                       break label;
+                   }
+                   else {
+                       continue;
+                   }
+               }
+           }
+        }
+        return z;
+    }
+
+    // Not provable.
     /*@ requires x >= 0 && y >= 0;
       @ ensures \result == x + y;
       @ diverges false;
@@ -176,7 +183,9 @@ public class Weird {
         }
         return z;
     }
-    
+
+    // I used this to test variable renaming done by ProgVarReplacer.
+    // Expand method 'ta'.
     /*@ diverges false;
       @*/
     public int go(int x, int y) {
@@ -196,7 +205,7 @@ public class Weird {
             }
         }
     }
-    
+
     public void ta(int u, int v, int w) {
         int x = 1;
         /*@ requires x == 0;
@@ -214,5 +223,5 @@ public class Weird {
             }
         }
     }
-    
+
 }
