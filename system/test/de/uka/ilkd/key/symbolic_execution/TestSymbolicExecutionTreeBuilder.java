@@ -833,8 +833,11 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
          // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
          ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
          env.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
-         // Execute auto mode until no more symbolic execution tree nodes are found
+         int nodeCount;
+         // Execute auto mode until no more symbolic execution tree nodes are found or no new rules are applied.
          do {
+            // Store the number of nodes before start of the auto mode 
+            nodeCount = env.getProof().countNodes();
             // Run proof
             env.getUi().startAndWaitForProof(env.getProof());
             // Update symbolic execution tree 
@@ -845,7 +848,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                assertNotNull(value);
                assertTrue(value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes, value.intValue() <= maximalNumberOfExecutedSetNodes);
             }
-         } while(stopCondition.wasSetNodeExecuted());
+         } while(stopCondition.wasSetNodeExecuted() && nodeCount != env.getProof().countNodes());
          // Create new oracle file if required in a temporary directory
          createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeVariables, includeCallStack);
          // Read oracle file
