@@ -1097,4 +1097,19 @@ public final class SymbolicExecutionUtil {
    public static boolean isChoiceSettingInitialised() {
       return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
    }
+
+   /**
+    * This method should be called before the auto mode is started in
+    * context of symbolic execution. The method sets {@link StrategyProperties}
+    * of the auto mode which are not supported in context of symbolic execution
+    * to valid default values.
+    * @param proof The {@link Proof} to configure its {@link StrategyProperties} for symbolic execution.
+    */
+   public static void updateStrategyPropertiesForSymbolicExecution(Proof proof) {
+      if (proof != null) {
+         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); 
+         sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
+         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+      }
+   }
 }

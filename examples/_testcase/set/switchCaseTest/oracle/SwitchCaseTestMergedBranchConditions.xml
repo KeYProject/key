@@ -3,7 +3,7 @@
    <methodCall name="self.switchCase(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="int a;" pathCondition="true" pathConditionChanged="false">
          <branchNode name="switch (x) {case 0:a=1;break ;case 1:case 2:   a=-1;case 3:   a=x*x;break ;case 4:return 42;default:   a=x; }" pathCondition="true" pathConditionChanged="false">
-            <branchCondition name="x = 0 TRUE" pathCondition="x = 0" pathConditionChanged="true" branchCondition="x = 0" mergedBranchCondition="false">
+            <branchCondition name="x = 0" pathCondition="x = 0" pathConditionChanged="true" branchCondition="x = 0" mergedBranchCondition="false">
                <statement name="a=1;" pathCondition="x = 0" pathConditionChanged="false">
                   <statement name="return a;" pathCondition="x = 0" pathConditionChanged="false">
                      <methodReturn name="&lt;return of self.switchCase(x);&gt;" pathCondition="x = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;1&apos; as result of self.switchCase(x);&gt;">
