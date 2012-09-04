@@ -1,20 +1,44 @@
-//import java.util.Arrays;
+// import java.util.Arrays;
 
 class PrefixSumRec {
 
-    private int[] a;
+    private final int[] a; // non_null
 
     PrefixSumRec(int [] a) {
 	this.a = a;
     }
 
 
+/*@ public normal_behavior
+     ensures \result ==> (x % 2 == 0  && isPow2(x/2) || x == 1);
+     strictly_pure
+@*/
+private boolean isPow2(int x){
+  if (x==1) return true;
+  else 
+    if (x % 2 != 0 ) return false;
+  return isPow2(x/2);
+}
+
+    /*@ public normal_behavior
+          requires right > left;
+          requires left >= 0;
+          requires right < a.length;
+          requires isPow2(a.length);
+          requires isPow2(right - left);
+          // requires right % 2 == 0 && (left % 2 == 0 || right - left == 1);
+          //ensures a[right] == (\sum int i; 0 <= i && i < right; \old(a[i]));
+          ensures a[right] == (\sum int i; 2*left-right+1 <= i && i < right+1; \old(a[i]));
+          measured_by right - left;
+          assignable a[*]; // every second entry <= right
+      @*/
     public void upsweep(int left, int right) {
-        if (right > left+1) {
-            int space = right - left;
+        int space = right - left;
+        if (space > 1) {
             upsweep(left-space/2,left);
             upsweep(right-space/2,right);
         }
+        // @ assert space == 1;
         a[right] = a[left]+a[right];
     }
     
@@ -31,8 +55,7 @@ class PrefixSumRec {
     
     }
 
- 
-/*      
+/*       
     public static void main (String [] args) {
         int [] a = {3,1,7,0,4,1,6,3};
         PrefixSumRec p = new PrefixSumRec(a);
@@ -44,7 +67,6 @@ class PrefixSumRec {
         System.out.println(Arrays.toString(a));
     }
 */
-
 }
 
 
