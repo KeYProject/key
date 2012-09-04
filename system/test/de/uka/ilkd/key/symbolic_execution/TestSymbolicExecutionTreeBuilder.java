@@ -839,6 +839,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
             // Store the number of nodes before start of the auto mode 
             nodeCount = env.getProof().countNodes();
             // Run proof
+            SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(env.getProof());
             env.getUi().startAndWaitForProof(env.getProof());
             // Update symbolic execution tree 
             env.getBuilder().analyse();
