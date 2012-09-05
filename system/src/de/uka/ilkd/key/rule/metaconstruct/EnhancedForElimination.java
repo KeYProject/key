@@ -137,7 +137,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         final ProgramVariable itVar = new LocationVariable(itName, intType);
 
 	final ILoopInit inits = KeYJavaASTFactory.loopInit(intType, itVar);
-        final IGuard guard = makeGuard(arrayVar, itVar);
+        final IGuard guard = KeYJavaASTFactory.lessThanArrayLengthGuard(ji, itVar, arrayVar);
         final IForUpdates updates = makeUpdates(itVar);
 
         // there may be only one variable iterated over (see Language Specification Sect. 14.14.2)
@@ -182,14 +182,6 @@ public class EnhancedForElimination extends ProgramTransformer {
         final Expression[] update = {new PostIncrement(itVar)};
         final IForUpdates updates = new ForUpdates(new ImmutableArray<Expression>(update));
         return updates;
-    }
-
-    /** For-loop guard (i < a.length). */
-    private IGuard makeGuard(ReferencePrefix expression, ProgramVariable itVar) {
-        final ProgramVariable length = ji.getArrayLength();
-        final Expression lengthExpr = new FieldReference(length,expression);
-        final IGuard guard = new Guard(new LessThan(itVar,lengthExpr));
-        return guard;
     }
 
     // Methods to transform loops over Iterable
