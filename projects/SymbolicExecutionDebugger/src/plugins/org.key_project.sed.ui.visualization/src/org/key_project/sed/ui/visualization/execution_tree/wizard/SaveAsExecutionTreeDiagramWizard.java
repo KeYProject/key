@@ -56,6 +56,14 @@ public class SaveAsExecutionTreeDiagramWizard extends AbstractExecutionTreeDiagr
     * {@inheritDoc}
     */
    @Override
+   protected String getInitialWindowTitle() {
+      return "Save Symbolic Execution Tree Diagram";
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    protected String getDiagramPageTitle() {
       return "Save Symbolic Execution Tree Diagram";
    }
