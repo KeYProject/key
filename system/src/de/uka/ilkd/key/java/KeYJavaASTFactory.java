@@ -515,4 +515,23 @@ public abstract class KeYJavaASTFactory {
 
 	return guard;
     }
+
+    /**
+     * Create a list of loop updates that consists of a single expression.
+     * 
+     * <pre>
+     * update
+     * </pre>
+     * 
+     * @param update
+     *            the single update {@link Expression}
+     * @return a new {@link ForUpdates} that consists of <code>update</code>
+     *         only
+     */
+    public static IForUpdates forUpdates(final Expression update) {
+	final IForUpdates forUpdates = new ForUpdates(
+		new ImmutableArray<Expression>(update));
+
+	return forUpdates;
+    }
 }
