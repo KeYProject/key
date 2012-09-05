@@ -579,4 +579,24 @@ public abstract class KeYJavaASTFactory {
 
 	return access;
     }
+
+    /**
+     * Create a block from an arbitrary number of statements.
+     * 
+     * <pre>
+     * {
+     *   statements;
+     * }
+     * </pre>
+     * 
+     * @param statements
+     *            the {@link Statement}s to appear in the block
+     * @return a new {@link StatementBlock} that consists of the given
+     *         <code>statements</code> in the very same order
+     */
+    public static StatementBlock block(final Statement... statements) {
+	final StatementBlock block = new StatementBlock(statements);
+
+	return block;
+    }
 }
