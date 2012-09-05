@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
+import de.uka.ilkd.key.java.expression.operator.PostIncrement;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
@@ -531,6 +532,27 @@ public abstract class KeYJavaASTFactory {
     public static IForUpdates forUpdates(final Expression update) {
 	final IForUpdates forUpdates = new ForUpdates(
 		new ImmutableArray<Expression>(update));
+
+	return forUpdates;
+    }
+
+    /**
+     * Create a loop update expression that post increments a given variable.
+     * 
+     * <pre>
+     * variable++
+     * </pre>
+     * 
+     * @param variable
+     *            the {@link ProgramVariable} to be post incremented during the
+     *            loop updates
+     * @return a new {@link ForUpdates} that consists of the post increment of
+     *         <code>variable</code>
+     */
+    public static IForUpdates postIncrementForUpdates(
+	    final ProgramVariable variable) {
+	final Expression update = new PostIncrement(variable);
+	final IForUpdates forUpdates = KeYJavaASTFactory.forUpdates(update);
 
 	return forUpdates;
     }
