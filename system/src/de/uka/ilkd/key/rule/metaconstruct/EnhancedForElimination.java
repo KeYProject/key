@@ -138,7 +138,7 @@ public class EnhancedForElimination extends ProgramTransformer {
 
 	final ILoopInit inits = KeYJavaASTFactory.loopInit(intType, itVar);
         final IGuard guard = KeYJavaASTFactory.lessThanArrayLengthGuard(ji, itVar, arrayVar);
-        final IForUpdates updates = makeUpdates(itVar);
+        final IForUpdates updates = KeYJavaASTFactory.postIncrementForUpdates(itVar);
 
         // there may be only one variable iterated over (see Language Specification Sect. 14.14.2)
         final IProgramVariable programVariable = lvd.getVariables().get(0).getProgramVariable();
@@ -175,13 +175,6 @@ public class EnhancedForElimination extends ProgramTransformer {
         body = new StatementBlock(newBlock);
         final For forLoop = new For(inits, guard, updates, body);
         return forLoop;
-    }
-
-    /** Updates to loop index variable (i++). */
-    private IForUpdates makeUpdates(ProgramVariable itVar) {
-        final Expression[] update = {new PostIncrement(itVar)};
-        final IForUpdates updates = new ForUpdates(new ImmutableArray<Expression>(update));
-        return updates;
     }
 
     // Methods to transform loops over Iterable
