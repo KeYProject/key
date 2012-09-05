@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
+import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
@@ -555,5 +556,27 @@ public abstract class KeYJavaASTFactory {
 	final IForUpdates forUpdates = KeYJavaASTFactory.forUpdates(update);
 
 	return forUpdates;
+    }
+
+    /**
+     * Create an array field access with a single index.
+     * 
+     * <pre>
+     * array[index]
+     * </pre>
+     * 
+     * @param array
+     *            the {@link ReferencePrefix} to be accessed
+     * @param index
+     *            the array access index {@link Expression}
+     * @return a new {@link ArrayReference} for access of <code>array</code> at
+     *         <code>index</code>
+     */
+    public static ArrayReference arrayFieldAccess(final ReferencePrefix array,
+	    final Expression index) {
+	final Expression[] indices = new Expression[] { index };
+	final ArrayReference access = new ArrayReference(array, indices);
+
+	return access;
     }
 }
