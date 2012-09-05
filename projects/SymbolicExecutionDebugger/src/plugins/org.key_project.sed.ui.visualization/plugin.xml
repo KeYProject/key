@@ -15,14 +15,14 @@
       point="org.eclipse.graphiti.ui.diagramTypeProviders">
     <diagramTypeProvider
       class="org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider"
-      description="This is my editor for the Graphiti tutorial"
+      description="This is the Symbolic Execution Tree editor"
       id="org.key_project.sed.ui.graphiti.ExecutionTreeDiagramTypeProvider"
       name="Symbolic Execution Tree Editor">
       <diagramType
         id="org.key_project.sed.ui.graphiti.ExecutionTreeDiagramType">
       </diagramType>
       <imageProvider
-            id="org.key_project.sed.ui.visualization.execution_tree.provider.MyTutorialImageProvider">
+            id="org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeImageProvider">
       </imageProvider>
     </diagramTypeProvider>
   </extension>
@@ -31,7 +31,7 @@
          point="org.eclipse.graphiti.ui.imageProviders">
       <imageProvider
             class="org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeImageProvider"
-            id="org.key_project.sed.ui.visualization.execution_tree.provider.MyTutorialImageProvider">
+            id="org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeImageProvider">
       </imageProvider>
    </extension>
     <extension
