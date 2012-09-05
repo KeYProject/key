@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
@@ -438,5 +439,80 @@ public abstract class KeYJavaASTFactory {
 		variable);
 
 	return KeYJavaASTFactory.loopInit(initializer);
+    }
+
+    /**
+     * Create an array length access.
+     * 
+     * <pre>
+     * array.length
+     * </pre>
+     * 
+     * @param model
+     *            the {@link JavaInfo} to retrieve the array super class type,
+     *            which holds the length attribute, from
+     * @param array
+     *            the {@link ReferencePrefix} whose length attribute is accessed
+     * @return a new {@link FieldReference} for <code>array</code>'s length
+     *         attribute
+     */
+    public static FieldReference arrayLength(final JavaInfo model,
+	    final ReferencePrefix array) {
+	final ProgramVariable lengthField = model.getArrayLength();
+	final FieldReference reference = new FieldReference(lengthField, array);
+
+	return reference;
+    }
+
+    /**
+     * Create a condition that compares two expressions using the less than
+     * operator.
+     * 
+     * <pre>
+     * left &lt; right
+     * </pre>
+     * 
+     * @param left
+     *            the {@link Expression} to be compared less than
+     *            <code>right</code>
+     * @param right
+     *            the <code>Expression</code> to be compared greater than
+     *            <code>left</code>
+     * @return a new {@link Guard} that compares <code>left</code> less than
+     *         <code>right</code>
+     */
+    public static IGuard lessThanGuard(final Expression left,
+	    final Expression right) {
+	final IGuard guard = new Guard(new LessThan(left, right));
+
+	return guard;
+    }
+
+    /**
+     * Create a condition that compares a variable and an array length using the
+     * less than operator.
+     * 
+     * <pre>
+     * variable &lt; array.length
+     * </pre>
+     * 
+     * @param model
+     *            the {@link JavaInfo} to retrieve the array super class type,
+     *            which holds the length attribute, from
+     * @param variable
+     *            the {@link ProgramVariable} to be compared less than
+     *            <code>array</code>'s length
+     * @param array
+     *            the {@link ReferencePrefix} whose length attribute is accessed
+     * @return a new {@link Guard} that compares <code>variable</code> less than
+     *         <code>array</code>'s length
+     */
+    public static IGuard lessThanArrayLengthGuard(final JavaInfo model,
+	    final ProgramVariable variable, final ReferencePrefix array) {
+	final FieldReference length = KeYJavaASTFactory.arrayLength(model,
+		array);
+	final IGuard guard = KeYJavaASTFactory.lessThanGuard(variable, length);
+
+	return guard;
     }
 }
