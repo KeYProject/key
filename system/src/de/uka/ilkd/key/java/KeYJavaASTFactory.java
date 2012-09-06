@@ -38,7 +38,7 @@ public abstract class KeYJavaASTFactory {
     /** 
      * creates an assignment <code> lhs:=rhs </code>
      */
-    public static Statement assign(Expression lhs, Expression rhs) {
+    public static CopyAssignment assign(Expression lhs, Expression rhs) {
 	return new CopyAssignment(lhs, rhs);
     }
 
@@ -627,5 +627,32 @@ public abstract class KeYJavaASTFactory {
 	final StatementBlock body = KeYJavaASTFactory.block(statements);
 
 	return new For(init, guard, updates, body);
+    }
+
+    /**
+     * Create a statement that assigns an array element to a variable.
+     * 
+     * <pre>
+     * variable = array[index];
+     * </pre>
+     * 
+     * @param variable
+     *            the {@link ProgramVariable} to be assigned to
+     * @param array
+     *            the array {@link ReferencePrefix} to be accessed
+     * @param index
+     *            the array access index {@link Expression}
+     * @return a new {@link CopyAssignment} of <code>array</code> element at
+     *         <code>index</code> to <code>variable</code>
+     */
+    public static CopyAssignment assignArrayField(
+	    final ProgramVariable variable, final ReferencePrefix array,
+	    final Expression index) {
+	final ArrayReference element = KeYJavaASTFactory.arrayFieldAccess(
+		array, index);
+	final CopyAssignment assignment = KeYJavaASTFactory.assign(variable,
+		element);
+
+	return assignment;
     }
 }
