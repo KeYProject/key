@@ -95,9 +95,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declare
 	(ProgramVariable var, Expression init, KeYJavaType type) {
-	return new LocalVariableDeclaration
-	    (new TypeRef(type), 
-	     new VariableSpecification(var, init, type));
+	return KeYJavaASTFactory.declare(new Modifier[0], var, init, type);
     }
 
     /**
@@ -116,9 +114,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declare
 	(ProgramVariable var, KeYJavaType type) {
-	return new LocalVariableDeclaration
-	    (new TypeRef(type), 
-	     new VariableSpecification(var, type));
+	return KeYJavaASTFactory.declare(var, null, type);
     }
 
 
@@ -675,6 +671,103 @@ public abstract class KeYJavaASTFactory {
 	final KeYJavaType type = variable.getKeYJavaType();
 	final LocalVariableDeclaration declaration = KeYJavaASTFactory.declare(
 		variable, type);
+
+	return declaration;
+    }
+
+    /**
+     * Create a local variable declaration with a single modifier.
+     * 
+     * <pre>
+     * modifier type variable = init;
+     * </pre>
+     * 
+     * @param modifier
+     *            the {@link Modifier}
+     * @param variable
+     *            the named and typed {@link ProgramVariable} to be declared
+     * @param init
+     *            the {@link Expression} <code>variable</code> is initialized
+     *            with
+     * @param type
+     *            the static {@link KeYJavaType} of <code>variable</code>
+     * @return a new {@link LocalVariableDeclaration} of <code>variable</code>
+     *         with static type <code>type</code> and initial value
+     *         <code>init</code>
+     */
+    public static LocalVariableDeclaration declare(final Modifier modifier,
+	    final ProgramVariable variable, final Expression init,
+	    final KeYJavaType type) {
+	final ImmutableArray<Modifier> modifiers = new ImmutableArray<Modifier>(
+		modifier);
+	final LocalVariableDeclaration declaration = KeYJavaASTFactory.declare(
+		modifiers, variable, init, type);
+
+	return declaration;
+    }
+
+    /**
+     * Create a local variable declaration with an arbitrary number of
+     * modifiers.
+     * 
+     * <pre>
+     * modifiers type variable = init;
+     * </pre>
+     * 
+     * @param modifiers
+     *            the {@link Modifier}s
+     * @param variable
+     *            the named and typed {@link ProgramVariable} to be declared
+     * @param init
+     *            the {@link Expression} <code>variable</code> is initialized
+     *            with
+     * @param type
+     *            the static {@link KeYJavaType} of <code>variable</code>
+     * @return a new {@link LocalVariableDeclaration} of <code>variable</code>
+     *         with static type <code>type</code> and initial value
+     *         <code>init</code>
+     */
+    public static LocalVariableDeclaration declare(final Modifier[] modifiers,
+	    final ProgramVariable variable, final Expression init,
+	    final KeYJavaType type) {
+	final ImmutableArray<Modifier> m = new ImmutableArray<Modifier>(
+		modifiers);
+	final LocalVariableDeclaration declaration = KeYJavaASTFactory.declare(
+		m, variable, init, type);
+
+	return declaration;
+    }
+
+    /**
+     * Create a local variable declaration with an arbitrary number of
+     * modifiers.
+     * 
+     * <pre>
+     * modifiers type variable = init;
+     * </pre>
+     * 
+     * @param modifiers
+     *            the {@link Modifier}s
+     * @param variable
+     *            the named and typed {@link ProgramVariable} to be declared
+     * @param init
+     *            the {@link Expression} <code>variable</code> is initialized
+     *            with
+     * @param type
+     *            the static {@link KeYJavaType} of <code>variable</code>
+     * @return a new {@link LocalVariableDeclaration} of <code>variable</code>
+     *         with static type <code>type</code> and initial value
+     *         <code>init</code>
+     */
+    public static LocalVariableDeclaration declare(
+	    final ImmutableArray<Modifier> modifiers,
+	    final ProgramVariable variable, final Expression init,
+	    final KeYJavaType type) {
+	final TypeRef typeRef = new TypeRef(type);
+	final VariableSpecification varSpec = new VariableSpecification(
+		variable, init, type);
+	final LocalVariableDeclaration declaration = new LocalVariableDeclaration(
+		modifiers, typeRef, varSpec);
 
 	return declaration;
     }
