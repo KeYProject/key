@@ -15,7 +15,6 @@ import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
@@ -176,7 +175,9 @@ public class EnhancedForElimination extends ProgramTransformer {
         final KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
         final LocationVariable valuesVar = new LocationVariable(valuesName, seqType);
 
-        final Statement valuesInit = makeValuesInit(valuesVar);
+	// ghost \seq values = \seq_empty
+	final Statement valuesInit = KeYJavaASTFactory.declare(new Ghost(),
+		valuesVar, EmptySeqLiteral.INSTANCE, seqType);
 
         final Statement itinit = makeIteratorInit(expression, itVar);
 
@@ -194,20 +195,6 @@ public class EnhancedForElimination extends ProgramTransformer {
         setInvariant(enhancedFor,whileGuard);
         return outerBlock;
 
-    }
-
-    /*
-     * "ghost \seq values = \seq_empty"
-     */
-    private Statement makeValuesInit(LocationVariable valuesVar) {
-        final KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-        final TypeReference seqRef = new TypeRef(seqType);
-        final Modifier[] ghost = { new Ghost() };
-        final Expression seqEmpty = EmptySeqLiteral.INSTANCE;
-        final VariableSpecification[] valuesSpec =
-            { new VariableSpecification(valuesVar, seqEmpty, seqType) };
-        final Statement valuesInit = new LocalVariableDeclaration(ghost, seqRef, valuesSpec);
-        return valuesInit;
     }
 
     /*
