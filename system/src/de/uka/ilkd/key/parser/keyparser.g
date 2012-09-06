@@ -1387,7 +1387,7 @@ decls :
            if(parse_includes) return;
            activatedChoices = DefaultImmutableSet.<Choice>nil();  
 	}
-        (options_choice)? { if(onlyWith) return; }
+        (options_choice)? 
         (
             option_decls
         |    
@@ -1404,6 +1404,7 @@ decls :
             ruleset_decls
 
         ) *
+        { if(onlyWith) return; }
     ;
 
 one_include_statement
@@ -1903,13 +1904,16 @@ pred_decl
                 }
                 
 		if (lookup(p.name()) != null) {
-		    throw new AmbigiousDeclException(p.name().toString(), 
-		                                     getFilename(), 
-		                                     getLine(), 
-		                                     getColumn());
-		}
-		
-                addFunction(p);         
+		    if(!isProblemParser()) {
+		        throw new AmbigiousDeclException(p.name().toString(), 
+		                                         getFilename(), 
+		                                         getLine(), 
+		                                         getColumn());
+		                                     
+		    }
+		}else{
+                  addFunction(p);         
+                }
             } 
         }
         SEMI
@@ -2001,13 +2005,15 @@ func_decl
 	        }
 	        
 		if (lookup(f.name()) != null) {
-		    throw new AmbigiousDeclException(f.name().toString(), 
+		    if(!isProblemParser()) {
+		      throw new AmbigiousDeclException(f.name().toString(), 
 		                                     getFilename(), 
 		                                     getLine(), 
 		                                     getColumn());
-		}
-	        
-	        addFunction(f);
+		    }
+		}else{
+	    	    addFunction(f);
+	        }
             } 
         }
         SEMI
@@ -2171,13 +2177,16 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
                 name = PrimitiveType.JAVA_BIGINT.getName();
             }
             
-            Sort s = lookupSort(name);
-            if(checkSort && s == null) {
-                throw new NotDeclException("sort", 
+            Sort s = null;
+            if(checkSort) {
+                s = lookupSort(name);
+                if(s == null) {
+                  throw new NotDeclException("sort", 
                                            name, 
                                            getFilename(), 
                                            getLine(),  
-                                           getColumn());
+                                           getColumn()); 
+                }
             }
             
             result = new Pair<Sort,Type>(s, t);
@@ -4231,17 +4240,20 @@ problem returns [ Term a = null ]
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.mark(); }
         
+
+
         string = bootClassPath
         // the result is of no importance here (strange enough)        
         
         stlist = classPaths 
-
         string = javaSource
+
         decls
         { 
             if(parse_includes || onlyWith) return null;
             switchToNormalMode();
         }
+
         // WATCHOUT: choices is always going to be an empty set here,
 	// isn't it?
 	( contracts )*
