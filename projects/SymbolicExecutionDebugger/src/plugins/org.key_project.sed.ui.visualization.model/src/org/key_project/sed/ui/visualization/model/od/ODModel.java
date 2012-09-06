@@ -19,6 +19,7 @@ import org.eclipse.emf.ecore.EObject;
  * The following features are supported:
  * <ul>
  *   <li>{@link org.key_project.sed.ui.visualization.model.od.ODModel#getObjects <em>Objects</em>}</li>
+ *   <li>{@link org.key_project.sed.ui.visualization.model.od.ODModel#getStates <em>States</em>}</li>
  * </ul>
  * </p>
  *
@@ -42,5 +43,21 @@ public interface ODModel extends EObject {
     * @generated
     */
    EList<ODObject> getObjects();
+
+   /**
+    * Returns the value of the '<em><b>States</b></em>' containment reference list.
+    * The list contents are of type {@link org.key_project.sed.ui.visualization.model.od.ODState}.
+    * <!-- begin-user-doc -->
+    * <p>
+    * If the meaning of the '<em>States</em>' containment reference list isn't clear,
+    * there really should be more of a description here...
+    * </p>
+    * <!-- end-user-doc -->
+    * @return the value of the '<em>States</em>' containment reference list.
+    * @see org.key_project.sed.ui.visualization.model.od.ODPackage#getODModel_States()
+    * @model containment="true"
+    * @generated
+    */
+   EList<ODState> getStates();
 
 } // ODModel

@@ -88,6 +88,14 @@ public class ODAdapterFactory extends AdapterFactoryImpl {
             return createODAssociationAdapter();
          }
          @Override
+         public Adapter caseODState(ODState object) {
+            return createODStateAdapter();
+         }
+         @Override
+         public Adapter caseAbstractODValueContainer(AbstractODValueContainer object) {
+            return createAbstractODValueContainerAdapter();
+         }
+         @Override
          public Adapter defaultCase(EObject object) {
             return createEObjectAdapter();
          }
@@ -160,6 +168,34 @@ public class ODAdapterFactory extends AdapterFactoryImpl {
     * @generated
     */
    public Adapter createODAssociationAdapter() {
+      return null;
+   }
+
+   /**
+    * Creates a new adapter for an object of class '{@link org.key_project.sed.ui.visualization.model.od.ODState <em>State</em>}'.
+    * <!-- begin-user-doc -->
+    * This default implementation returns null so that we can easily ignore cases;
+    * it's useful to ignore a case when inheritance will catch all the cases anyway.
+    * <!-- end-user-doc -->
+    * @return the new adapter.
+    * @see org.key_project.sed.ui.visualization.model.od.ODState
+    * @generated
+    */
+   public Adapter createODStateAdapter() {
+      return null;
+   }
+
+   /**
+    * Creates a new adapter for an object of class '{@link org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer <em>Abstract OD Value Container</em>}'.
+    * <!-- begin-user-doc -->
+    * This default implementation returns null so that we can easily ignore cases;
+    * it's useful to ignore a case when inheritance will catch all the cases anyway.
+    * <!-- end-user-doc -->
+    * @return the new adapter.
+    * @see org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer
+    * @generated
+    */
+   public Adapter createAbstractODValueContainerAdapter() {
       return null;
    }
 

@@ -73,6 +73,7 @@ public class ODSwitch<T> extends Switch<T> {
          case ODPackage.OD_OBJECT: {
             ODObject odObject = (ODObject)theEObject;
             T result = caseODObject(odObject);
+            if (result == null) result = caseAbstractODValueContainer(odObject);
             if (result == null) result = defaultCase(theEObject);
             return result;
          }
@@ -91,6 +92,19 @@ public class ODSwitch<T> extends Switch<T> {
          case ODPackage.OD_ASSOCIATION: {
             ODAssociation odAssociation = (ODAssociation)theEObject;
             T result = caseODAssociation(odAssociation);
+            if (result == null) result = defaultCase(theEObject);
+            return result;
+         }
+         case ODPackage.OD_STATE: {
+            ODState odState = (ODState)theEObject;
+            T result = caseODState(odState);
+            if (result == null) result = caseAbstractODValueContainer(odState);
+            if (result == null) result = defaultCase(theEObject);
+            return result;
+         }
+         case ODPackage.ABSTRACT_OD_VALUE_CONTAINER: {
+            AbstractODValueContainer abstractODValueContainer = (AbstractODValueContainer)theEObject;
+            T result = caseAbstractODValueContainer(abstractODValueContainer);
             if (result == null) result = defaultCase(theEObject);
             return result;
          }
@@ -155,6 +169,36 @@ public class ODSwitch<T> extends Switch<T> {
     * @generated
     */
    public T caseODAssociation(ODAssociation object) {
+      return null;
+   }
+
+   /**
+    * Returns the result of interpreting the object as an instance of '<em>State</em>'.
+    * <!-- begin-user-doc -->
+    * This implementation returns null;
+    * returning a non-null result will terminate the switch.
+    * <!-- end-user-doc -->
+    * @param object the target of the switch.
+    * @return the result of interpreting the object as an instance of '<em>State</em>'.
+    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+    * @generated
+    */
+   public T caseODState(ODState object) {
+      return null;
+   }
+
+   /**
+    * Returns the result of interpreting the object as an instance of '<em>Abstract OD Value Container</em>'.
+    * <!-- begin-user-doc -->
+    * This implementation returns null;
+    * returning a non-null result will terminate the switch.
+    * <!-- end-user-doc -->
+    * @param object the target of the switch.
+    * @return the result of interpreting the object as an instance of '<em>Abstract OD Value Container</em>'.
+    * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+    * @generated
+    */
+   public T caseAbstractODValueContainer(AbstractODValueContainer object) {
       return null;
    }
 

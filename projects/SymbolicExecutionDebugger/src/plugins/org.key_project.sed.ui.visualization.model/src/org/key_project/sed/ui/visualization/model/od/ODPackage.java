@@ -60,6 +60,52 @@ public interface ODPackage extends EPackage {
    ODPackage eINSTANCE = org.key_project.sed.ui.visualization.model.od.impl.ODPackageImpl.init();
 
    /**
+    * The meta object id for the '{@link org.key_project.sed.ui.visualization.model.od.impl.AbstractODValueContainerImpl <em>Abstract OD Value Container</em>}' class.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see org.key_project.sed.ui.visualization.model.od.impl.AbstractODValueContainerImpl
+    * @see org.key_project.sed.ui.visualization.model.od.impl.ODPackageImpl#getAbstractODValueContainer()
+    * @generated
+    */
+   int ABSTRACT_OD_VALUE_CONTAINER = 5;
+
+   /**
+    * The feature id for the '<em><b>Values</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int ABSTRACT_OD_VALUE_CONTAINER__VALUES = 0;
+
+   /**
+    * The feature id for the '<em><b>Associations</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int ABSTRACT_OD_VALUE_CONTAINER__ASSOCIATIONS = 1;
+
+   /**
+    * The feature id for the '<em><b>Name</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int ABSTRACT_OD_VALUE_CONTAINER__NAME = 2;
+
+   /**
+    * The number of structural features of the '<em>Abstract OD Value Container</em>' class.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int ABSTRACT_OD_VALUE_CONTAINER_FEATURE_COUNT = 3;
+
+   /**
     * The meta object id for the '{@link org.key_project.sed.ui.visualization.model.od.impl.ODObjectImpl <em>Object</em>}' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -70,31 +116,13 @@ public interface ODPackage extends EPackage {
    int OD_OBJECT = 0;
 
    /**
-    * The feature id for the '<em><b>Name</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int OD_OBJECT__NAME = 0;
-
-   /**
-    * The feature id for the '<em><b>Type</b></em>' attribute.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    * @ordered
-    */
-   int OD_OBJECT__TYPE = 1;
-
-   /**
     * The feature id for the '<em><b>Values</b></em>' containment reference list.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int OD_OBJECT__VALUES = 2;
+   int OD_OBJECT__VALUES = ABSTRACT_OD_VALUE_CONTAINER__VALUES;
 
    /**
     * The feature id for the '<em><b>Associations</b></em>' containment reference list.
@@ -103,7 +131,25 @@ public interface ODPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int OD_OBJECT__ASSOCIATIONS = 3;
+   int OD_OBJECT__ASSOCIATIONS = ABSTRACT_OD_VALUE_CONTAINER__ASSOCIATIONS;
+
+   /**
+    * The feature id for the '<em><b>Name</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int OD_OBJECT__NAME = ABSTRACT_OD_VALUE_CONTAINER__NAME;
+
+   /**
+    * The feature id for the '<em><b>Type</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int OD_OBJECT__TYPE = ABSTRACT_OD_VALUE_CONTAINER_FEATURE_COUNT + 0;
 
    /**
     * The number of structural features of the '<em>Object</em>' class.
@@ -112,7 +158,7 @@ public interface ODPackage extends EPackage {
     * @generated
     * @ordered
     */
-   int OD_OBJECT_FEATURE_COUNT = 4;
+   int OD_OBJECT_FEATURE_COUNT = ABSTRACT_OD_VALUE_CONTAINER_FEATURE_COUNT + 1;
 
    /**
     * The meta object id for the '{@link org.key_project.sed.ui.visualization.model.od.impl.ODValueImpl <em>Value</em>}' class.
@@ -180,13 +226,22 @@ public interface ODPackage extends EPackage {
    int OD_MODEL__OBJECTS = 0;
 
    /**
+    * The feature id for the '<em><b>States</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int OD_MODEL__STATES = 1;
+
+   /**
     * The number of structural features of the '<em>Model</em>' class.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
     * @generated
     * @ordered
     */
-   int OD_MODEL_FEATURE_COUNT = 1;
+   int OD_MODEL_FEATURE_COUNT = 2;
 
    /**
     * The meta object id for the '{@link org.key_project.sed.ui.visualization.model.od.impl.ODAssociationImpl <em>Association</em>}' class.
@@ -225,6 +280,52 @@ public interface ODPackage extends EPackage {
     */
    int OD_ASSOCIATION_FEATURE_COUNT = 2;
 
+   /**
+    * The meta object id for the '{@link org.key_project.sed.ui.visualization.model.od.impl.ODStateImpl <em>State</em>}' class.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @see org.key_project.sed.ui.visualization.model.od.impl.ODStateImpl
+    * @see org.key_project.sed.ui.visualization.model.od.impl.ODPackageImpl#getODState()
+    * @generated
+    */
+   int OD_STATE = 4;
+
+   /**
+    * The feature id for the '<em><b>Values</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int OD_STATE__VALUES = ABSTRACT_OD_VALUE_CONTAINER__VALUES;
+
+   /**
+    * The feature id for the '<em><b>Associations</b></em>' containment reference list.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int OD_STATE__ASSOCIATIONS = ABSTRACT_OD_VALUE_CONTAINER__ASSOCIATIONS;
+
+   /**
+    * The feature id for the '<em><b>Name</b></em>' attribute.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int OD_STATE__NAME = ABSTRACT_OD_VALUE_CONTAINER__NAME;
+
+   /**
+    * The number of structural features of the '<em>State</em>' class.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    * @ordered
+    */
+   int OD_STATE_FEATURE_COUNT = ABSTRACT_OD_VALUE_CONTAINER_FEATURE_COUNT + 0;
+
 
    /**
     * Returns the meta object for class '{@link org.key_project.sed.ui.visualization.model.od.ODObject <em>Object</em>}'.
@@ -237,17 +338,6 @@ public interface ODPackage extends EPackage {
    EClass getODObject();
 
    /**
-    * Returns the meta object for the attribute '{@link org.key_project.sed.ui.visualization.model.od.ODObject#getName <em>Name</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for the attribute '<em>Name</em>'.
-    * @see org.key_project.sed.ui.visualization.model.od.ODObject#getName()
-    * @see #getODObject()
-    * @generated
-    */
-   EAttribute getODObject_Name();
-
-   /**
     * Returns the meta object for the attribute '{@link org.key_project.sed.ui.visualization.model.od.ODObject#getType <em>Type</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -257,28 +347,6 @@ public interface ODPackage extends EPackage {
     * @generated
     */
    EAttribute getODObject_Type();
-
-   /**
-    * Returns the meta object for the containment reference list '{@link org.key_project.sed.ui.visualization.model.od.ODObject#getValues <em>Values</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for the containment reference list '<em>Values</em>'.
-    * @see org.key_project.sed.ui.visualization.model.od.ODObject#getValues()
-    * @see #getODObject()
-    * @generated
-    */
-   EReference getODObject_Values();
-
-   /**
-    * Returns the meta object for the containment reference list '{@link org.key_project.sed.ui.visualization.model.od.ODObject#getAssociations <em>Associations</em>}'.
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @return the meta object for the containment reference list '<em>Associations</em>'.
-    * @see org.key_project.sed.ui.visualization.model.od.ODObject#getAssociations()
-    * @see #getODObject()
-    * @generated
-    */
-   EReference getODObject_Associations();
 
    /**
     * Returns the meta object for class '{@link org.key_project.sed.ui.visualization.model.od.ODValue <em>Value</em>}'.
@@ -345,6 +413,17 @@ public interface ODPackage extends EPackage {
    EReference getODModel_Objects();
 
    /**
+    * Returns the meta object for the containment reference list '{@link org.key_project.sed.ui.visualization.model.od.ODModel#getStates <em>States</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the containment reference list '<em>States</em>'.
+    * @see org.key_project.sed.ui.visualization.model.od.ODModel#getStates()
+    * @see #getODModel()
+    * @generated
+    */
+   EReference getODModel_States();
+
+   /**
     * Returns the meta object for class '{@link org.key_project.sed.ui.visualization.model.od.ODAssociation <em>Association</em>}'.
     * <!-- begin-user-doc -->
     * <!-- end-user-doc -->
@@ -375,6 +454,59 @@ public interface ODPackage extends EPackage {
     * @generated
     */
    EReference getODAssociation_Target();
+
+   /**
+    * Returns the meta object for class '{@link org.key_project.sed.ui.visualization.model.od.ODState <em>State</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for class '<em>State</em>'.
+    * @see org.key_project.sed.ui.visualization.model.od.ODState
+    * @generated
+    */
+   EClass getODState();
+
+   /**
+    * Returns the meta object for class '{@link org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer <em>Abstract OD Value Container</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for class '<em>Abstract OD Value Container</em>'.
+    * @see org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer
+    * @generated
+    */
+   EClass getAbstractODValueContainer();
+
+   /**
+    * Returns the meta object for the containment reference list '{@link org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer#getValues <em>Values</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the containment reference list '<em>Values</em>'.
+    * @see org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer#getValues()
+    * @see #getAbstractODValueContainer()
+    * @generated
+    */
+   EReference getAbstractODValueContainer_Values();
+
+   /**
+    * Returns the meta object for the containment reference list '{@link org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer#getAssociations <em>Associations</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the containment reference list '<em>Associations</em>'.
+    * @see org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer#getAssociations()
+    * @see #getAbstractODValueContainer()
+    * @generated
+    */
+   EReference getAbstractODValueContainer_Associations();
+
+   /**
+    * Returns the meta object for the attribute '{@link org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer#getName <em>Name</em>}'.
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @return the meta object for the attribute '<em>Name</em>'.
+    * @see org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer#getName()
+    * @see #getAbstractODValueContainer()
+    * @generated
+    */
+   EAttribute getAbstractODValueContainer_Name();
 
    /**
     * Returns the factory that creates the instances of the model.
@@ -409,36 +541,12 @@ public interface ODPackage extends EPackage {
       EClass OD_OBJECT = eINSTANCE.getODObject();
 
       /**
-       * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
-       * <!-- begin-user-doc -->
-       * <!-- end-user-doc -->
-       * @generated
-       */
-      EAttribute OD_OBJECT__NAME = eINSTANCE.getODObject_Name();
-
-      /**
        * The meta object literal for the '<em><b>Type</b></em>' attribute feature.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->
        * @generated
        */
       EAttribute OD_OBJECT__TYPE = eINSTANCE.getODObject_Type();
-
-      /**
-       * The meta object literal for the '<em><b>Values</b></em>' containment reference list feature.
-       * <!-- begin-user-doc -->
-       * <!-- end-user-doc -->
-       * @generated
-       */
-      EReference OD_OBJECT__VALUES = eINSTANCE.getODObject_Values();
-
-      /**
-       * The meta object literal for the '<em><b>Associations</b></em>' containment reference list feature.
-       * <!-- begin-user-doc -->
-       * <!-- end-user-doc -->
-       * @generated
-       */
-      EReference OD_OBJECT__ASSOCIATIONS = eINSTANCE.getODObject_Associations();
 
       /**
        * The meta object literal for the '{@link org.key_project.sed.ui.visualization.model.od.impl.ODValueImpl <em>Value</em>}' class.
@@ -493,6 +601,14 @@ public interface ODPackage extends EPackage {
       EReference OD_MODEL__OBJECTS = eINSTANCE.getODModel_Objects();
 
       /**
+       * The meta object literal for the '<em><b>States</b></em>' containment reference list feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EReference OD_MODEL__STATES = eINSTANCE.getODModel_States();
+
+      /**
        * The meta object literal for the '{@link org.key_project.sed.ui.visualization.model.od.impl.ODAssociationImpl <em>Association</em>}' class.
        * <!-- begin-user-doc -->
        * <!-- end-user-doc -->
@@ -517,6 +633,50 @@ public interface ODPackage extends EPackage {
        * @generated
        */
       EReference OD_ASSOCIATION__TARGET = eINSTANCE.getODAssociation_Target();
+
+      /**
+       * The meta object literal for the '{@link org.key_project.sed.ui.visualization.model.od.impl.ODStateImpl <em>State</em>}' class.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @see org.key_project.sed.ui.visualization.model.od.impl.ODStateImpl
+       * @see org.key_project.sed.ui.visualization.model.od.impl.ODPackageImpl#getODState()
+       * @generated
+       */
+      EClass OD_STATE = eINSTANCE.getODState();
+
+      /**
+       * The meta object literal for the '{@link org.key_project.sed.ui.visualization.model.od.impl.AbstractODValueContainerImpl <em>Abstract OD Value Container</em>}' class.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @see org.key_project.sed.ui.visualization.model.od.impl.AbstractODValueContainerImpl
+       * @see org.key_project.sed.ui.visualization.model.od.impl.ODPackageImpl#getAbstractODValueContainer()
+       * @generated
+       */
+      EClass ABSTRACT_OD_VALUE_CONTAINER = eINSTANCE.getAbstractODValueContainer();
+
+      /**
+       * The meta object literal for the '<em><b>Values</b></em>' containment reference list feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EReference ABSTRACT_OD_VALUE_CONTAINER__VALUES = eINSTANCE.getAbstractODValueContainer_Values();
+
+      /**
+       * The meta object literal for the '<em><b>Associations</b></em>' containment reference list feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EReference ABSTRACT_OD_VALUE_CONTAINER__ASSOCIATIONS = eINSTANCE.getAbstractODValueContainer_Associations();
+
+      /**
+       * The meta object literal for the '<em><b>Name</b></em>' attribute feature.
+       * <!-- begin-user-doc -->
+       * <!-- end-user-doc -->
+       * @generated
+       */
+      EAttribute ABSTRACT_OD_VALUE_CONTAINER__NAME = eINSTANCE.getAbstractODValueContainer_Name();
 
    }
 

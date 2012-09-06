@@ -6,6 +6,7 @@ import org.eclipse.graphiti.features.context.ICreateConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
 import org.eclipse.graphiti.features.impl.AbstractCreateConnectionFeature;
 import org.eclipse.graphiti.mm.pictograms.Connection;
+import org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer;
 import org.key_project.sed.ui.visualization.model.od.ODAssociation;
 import org.key_project.sed.ui.visualization.model.od.ODObject;
 import org.key_project.sed.ui.visualization.object_diagram.provider.IObjectDiagramImageConstants;
@@ -39,8 +40,7 @@ public class AssociationCreateFeature extends AbstractCreateConnectionFeature {
     */
    @Override
    public boolean canStartConnection(ICreateConnectionContext context) {
-      // return true if start anchor belongs to an ODObject
-      ODObject source = ObjectDiagramUtil.getObject(getFeatureProvider(), context.getSourceAnchor());
+      AbstractODValueContainer source = ObjectDiagramUtil.getValueContainer(getFeatureProvider(), context.getSourceAnchor());
       return source != null;
    }
 
@@ -49,8 +49,7 @@ public class AssociationCreateFeature extends AbstractCreateConnectionFeature {
     */
    @Override
    public boolean canCreate(ICreateConnectionContext context) {
-      // return true if both anchors belong to an ODObject
-      ODObject source = ObjectDiagramUtil.getObject(getFeatureProvider(), context.getSourceAnchor());
+      AbstractODValueContainer source = ObjectDiagramUtil.getValueContainer(getFeatureProvider(), context.getSourceAnchor());
       ODObject target = ObjectDiagramUtil.getObject(getFeatureProvider(), context.getTargetAnchor());
       return source != null && target != null;
    }
@@ -66,7 +65,7 @@ public class AssociationCreateFeature extends AbstractCreateConnectionFeature {
          Connection newConnection = null;
 
          // get ODObject which should be connected
-         ODObject source = ObjectDiagramUtil.getObject(getFeatureProvider(), context.getSourceAnchor());
+         AbstractODValueContainer source = ObjectDiagramUtil.getValueContainer(getFeatureProvider(), context.getSourceAnchor());
          ODObject target = ObjectDiagramUtil.getObject(getFeatureProvider(), context.getTargetAnchor());
          
          if (source != null && target != null) {

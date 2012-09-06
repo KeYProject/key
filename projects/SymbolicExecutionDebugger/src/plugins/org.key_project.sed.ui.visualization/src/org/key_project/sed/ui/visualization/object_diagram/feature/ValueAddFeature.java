@@ -14,6 +14,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
+import org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer;
 import org.key_project.sed.ui.visualization.model.od.ODObject;
 import org.key_project.sed.ui.visualization.model.od.ODValue;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramStyleUtil;
@@ -38,15 +39,14 @@ public class ValueAddFeature extends AbstractAddShapeFeature {
     */
    @Override
    public boolean canAdd(IAddContext context) {
-      // check if user wants to add a EClass
       if (context.getNewObject() instanceof ODValue) {
-         // check if user wants to add to an ODObject
-         ContainerShape targetContainer = context.getTargetContainer();
-         if (targetContainer != null) {
-            return getBusinessObjectForPictogramElement(targetContainer) instanceof ODObject;
-         }
+         ODValue value = (ODValue)context.getNewObject();
+         return value.eContainer() != null && 
+                getFeatureProvider().getPictogramElementForBusinessObject(value.eContainer()) instanceof ContainerShape;
       }
-      return false;
+      else {
+         return false;
+      }
    }
 
    /**
@@ -55,7 +55,7 @@ public class ValueAddFeature extends AbstractAddShapeFeature {
    @Override
    public PictogramElement add(IAddContext context) {
       ODValue addedValue = (ODValue)context.getNewObject();
-      ContainerShape targetContainer = context.getTargetContainer();
+      ContainerShape targetContainer = (ContainerShape)getFeatureProvider().getPictogramElementForBusinessObject(addedValue.eContainer());
 
       // CONTAINER SHAPE WITH ROUNDED RECTANGLE
       IPeCreateService peCreateService = Graphiti.getPeCreateService();
@@ -93,7 +93,7 @@ public class ValueAddFeature extends AbstractAddShapeFeature {
     * @return The Y coordinate for a new {@link ODValue}.
     */
    protected int getYForNewValue(ContainerShape targetContainer) {
-      ODObject object = (ODObject)getBusinessObjectForPictogramElement(targetContainer);
+      AbstractODValueContainer object = (AbstractODValueContainer)getBusinessObjectForPictogramElement(targetContainer);
       int maxY = 0;
       boolean peFound = false;
       for (ODValue value : object.getValues()) {

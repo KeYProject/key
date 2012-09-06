@@ -18,6 +18,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 import org.key_project.sed.ui.visualization.model.od.ODAssociation;
 import org.key_project.sed.ui.visualization.model.od.ODObject;
+import org.key_project.sed.ui.visualization.model.od.ODState;
 import org.key_project.sed.ui.visualization.model.od.ODValue;
 import org.key_project.sed.ui.visualization.object_diagram.feature.AssociationAddFeature;
 import org.key_project.sed.ui.visualization.object_diagram.feature.AssociationCreateFeature;
@@ -25,6 +26,9 @@ import org.key_project.sed.ui.visualization.object_diagram.feature.AssociationRe
 import org.key_project.sed.ui.visualization.object_diagram.feature.ObjectAddFeature;
 import org.key_project.sed.ui.visualization.object_diagram.feature.ObjectCreateFeature;
 import org.key_project.sed.ui.visualization.object_diagram.feature.ObjectLayoutFeature;
+import org.key_project.sed.ui.visualization.object_diagram.feature.StateAddFeature;
+import org.key_project.sed.ui.visualization.object_diagram.feature.StateCreateFeature;
+import org.key_project.sed.ui.visualization.object_diagram.feature.StateLayoutFeature;
 import org.key_project.sed.ui.visualization.object_diagram.feature.ValueAddFeature;
 import org.key_project.sed.ui.visualization.object_diagram.feature.ValueCreateFeature;
 import org.key_project.sed.ui.visualization.object_diagram.feature.ValueMoveFeature;
@@ -47,6 +51,16 @@ public class ObjectDiagramFeatureProvider extends DefaultFeatureProvider {
     * {@inheritDoc}
     */
    @Override
+   public ICreateFeature[] getCreateFeatures() {
+      return new ICreateFeature[] { new StateCreateFeature(this),
+                                    new ObjectCreateFeature(this),
+                                    new ValueCreateFeature(this) };
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public IAddFeature getAddFeature(IAddContext context) {
       if (context.getNewObject() instanceof ODObject) {
          return new ObjectAddFeature(this);
@@ -57,18 +71,12 @@ public class ObjectDiagramFeatureProvider extends DefaultFeatureProvider {
       else if (context.getNewObject() instanceof ODValue) {
          return new ValueAddFeature(this);
       }
+      else if (context.getNewObject() instanceof ODState) {
+         return new StateAddFeature(this);
+      }
       else {
          return super.getAddFeature(context);
       }
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public ICreateFeature[] getCreateFeatures() {
-      return new ICreateFeature[] { new ObjectCreateFeature(this),
-                                    new ValueCreateFeature(this) };
    }
 
    /**
@@ -80,6 +88,9 @@ public class ObjectDiagramFeatureProvider extends DefaultFeatureProvider {
       Object bo = getBusinessObjectForPictogramElement(pictogramElement);
       if (bo instanceof ODObject) {
          return new ObjectLayoutFeature(this);
+      }
+      else if (bo instanceof ODState) {
+         return new StateLayoutFeature(this);
       }
       else {
          return super.getLayoutFeature(context);

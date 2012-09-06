@@ -5,23 +5,23 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.key_project.sed.ui.visualization.model.od.ODObject;
+import org.key_project.sed.ui.visualization.model.od.ODState;
 import org.key_project.sed.ui.visualization.object_diagram.provider.IObjectDiagramImageConstants;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
-import org.key_project.sed.ui.visualization.object_diagram.wizard.CreateObjectWizard;
+import org.key_project.sed.ui.visualization.object_diagram.wizard.CreateStateWizard;
 import org.key_project.util.eclipse.WorkbenchUtil;
 
 /**
- * Implementation of {@link ICreateFeature} for {@link ODObject}s.
+ * Implementation of {@link ICreateFeature} for {@link ODState}s.
  * @author Martin Hentschel
  */
-public class ObjectCreateFeature extends AbstractCreateFeature {
+public class StateCreateFeature extends AbstractCreateFeature {
    /**
     * Constructor.
     * @param fp The {@link IFeatureProvider} which provides this {@link ICreateFeature}.
     */
-   public ObjectCreateFeature(IFeatureProvider fp) {
-      super(fp, "Object", "Create Object");
+   public StateCreateFeature(IFeatureProvider fp) {
+      super(fp, "State", "Create State");
    }
    
    /**
@@ -29,7 +29,7 @@ public class ObjectCreateFeature extends AbstractCreateFeature {
     */
    @Override
    public String getCreateImageId() {
-      return IObjectDiagramImageConstants.IMG_OBJECT;
+      return IObjectDiagramImageConstants.IMG_STATE;
    }
 
    /**
@@ -45,18 +45,18 @@ public class ObjectCreateFeature extends AbstractCreateFeature {
     */
    @Override
    public Object[] create(ICreateContext context) {
-      // Create new object 
-      ODObject object = CreateObjectWizard.openWizard(WorkbenchUtil.getActiveShell());
-      if (object == null) {
+      // Create new state 
+      ODState state = CreateStateWizard.openWizard(WorkbenchUtil.getActiveShell());
+      if (state == null) {
          return EMPTY;
       }
       else {
          // Add model element to resource of the diagram.
-         ObjectDiagramUtil.getModel(getDiagram()).getObjects().add(object);
+         ObjectDiagramUtil.getModel(getDiagram()).getStates().add(state);
          // Do the add
-         addGraphicalRepresentation(context, object);
+         addGraphicalRepresentation(context, state);
          // Return newly created business object(s)
-         return new Object[] { object };
+         return new Object[] { state };
       }
    }
 }

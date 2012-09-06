@@ -64,6 +64,7 @@ public class ODFactoryImpl extends EFactoryImpl implements ODFactory {
          case ODPackage.OD_VALUE: return createODValue();
          case ODPackage.OD_MODEL: return createODModel();
          case ODPackage.OD_ASSOCIATION: return createODAssociation();
+         case ODPackage.OD_STATE: return createODState();
          default:
             throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier");
       }
@@ -107,6 +108,16 @@ public class ODFactoryImpl extends EFactoryImpl implements ODFactory {
    public ODAssociation createODAssociation() {
       ODAssociationImpl odAssociation = new ODAssociationImpl();
       return odAssociation;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public ODState createODState() {
+      ODStateImpl odState = new ODStateImpl();
+      return odState;
    }
 
    /**

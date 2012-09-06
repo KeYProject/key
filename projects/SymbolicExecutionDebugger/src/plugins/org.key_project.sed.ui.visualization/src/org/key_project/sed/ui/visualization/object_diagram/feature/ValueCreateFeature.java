@@ -1,11 +1,12 @@
 package org.key_project.sed.ui.visualization.object_diagram.feature;
 
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
-import org.key_project.sed.ui.visualization.model.od.ODObject;
+import org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer;
 import org.key_project.sed.ui.visualization.model.od.ODValue;
 import org.key_project.sed.ui.visualization.object_diagram.provider.IObjectDiagramImageConstants;
 import org.key_project.sed.ui.visualization.object_diagram.wizard.CreateValueWizard;
@@ -38,14 +39,39 @@ public class ValueCreateFeature extends AbstractCreateFeature {
     */
    @Override
    public boolean canCreate(ICreateContext context) {
-      ContainerShape shape = context.getTargetContainer();
-      if (shape != null) {
-         Object bo = getBusinessObjectForPictogramElement(shape);
-         return bo instanceof ODObject;
+      ContainerShape targetContainer = context.getTargetContainer();
+      if (targetContainer != null) {
+         return findValueContainer(targetContainer) != null;
       }
       else {
          return false;
       }
+   }
+   
+   /**
+    * Searches the first {@link AbstractODValueContainer} in the containment
+    * hierarchy of the business {@link EObject}s starting at the business object
+    * of the given {@link ContainerShape}.
+    * @param targetContainer The starting point.
+    * @return The found {@link AbstractODValueContainer} or {@code null} if no one was found.
+    */
+   protected AbstractODValueContainer findValueContainer(ContainerShape targetContainer) {
+      AbstractODValueContainer result = null;
+      if (targetContainer != null) {
+         Object bo = getBusinessObjectForPictogramElement(targetContainer);
+         if (bo instanceof EObject) {
+            EObject ebo = (EObject)bo;
+            while (result == null && ebo != null) {
+               if (ebo instanceof AbstractODValueContainer) {
+                  result = (AbstractODValueContainer)ebo;
+               }
+               else {
+                  ebo = ebo.eContainer();
+               }
+            }
+         }
+      }
+      return result;
    }
 
    /**
@@ -60,7 +86,7 @@ public class ValueCreateFeature extends AbstractCreateFeature {
       }
       else {
          // Add model element to resource of the diagram.
-         ODObject bo = (ODObject)getBusinessObjectForPictogramElement(context.getTargetContainer());
+         AbstractODValueContainer bo = findValueContainer(context.getTargetContainer());
          bo.getValues().add(value);
          // Do the add
          addGraphicalRepresentation(context, value);

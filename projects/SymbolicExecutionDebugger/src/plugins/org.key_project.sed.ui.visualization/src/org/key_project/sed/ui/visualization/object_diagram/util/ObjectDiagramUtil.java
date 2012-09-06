@@ -6,6 +6,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer;
 import org.key_project.sed.ui.visualization.model.od.ODFactory;
 import org.key_project.sed.ui.visualization.model.od.ODModel;
 import org.key_project.sed.ui.visualization.model.od.ODObject;
@@ -74,6 +75,23 @@ public final class ObjectDiagramUtil {
    }
 
    /**
+    * Returns the {@link AbstractODValueContainer} belonging to the anchor, or {@code null} if not available.
+    * @param fp The {@link IFeatureProvider} to use.
+    * @param anchor The {@link Anchor} to get its business object.
+    * @return The found business object or {@code null} if not available.
+    */
+   public static AbstractODValueContainer getValueContainer(IFeatureProvider fp, Anchor anchor) {
+      AbstractODValueContainer result = null;
+      if (fp != null && anchor != null) {
+         Object bo = fp.getBusinessObjectForPictogramElement(anchor.getParent());
+         if (bo instanceof AbstractODValueContainer) {
+            result = (AbstractODValueContainer)bo;
+         }
+      }
+      return result;
+   }
+
+   /**
     * Returns the {@link ODObject} belonging to the anchor, or {@code null} if not available.
     * @param fp The {@link IFeatureProvider} to use.
     * @param anchor The {@link Anchor} to get its business object.
@@ -84,7 +102,7 @@ public final class ObjectDiagramUtil {
       if (fp != null && anchor != null) {
          Object bo = fp.getBusinessObjectForPictogramElement(anchor.getParent());
          if (bo instanceof ODObject) {
-            return (ODObject)bo;
+            result = (ODObject)bo;
          }
       }
       return result;

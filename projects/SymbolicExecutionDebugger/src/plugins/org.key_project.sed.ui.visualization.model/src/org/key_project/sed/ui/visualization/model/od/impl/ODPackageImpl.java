@@ -13,11 +13,13 @@ import org.eclipse.emf.ecore.EReference;
 
 import org.eclipse.emf.ecore.impl.EPackageImpl;
 
+import org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer;
 import org.key_project.sed.ui.visualization.model.od.ODAssociation;
 import org.key_project.sed.ui.visualization.model.od.ODFactory;
 import org.key_project.sed.ui.visualization.model.od.ODModel;
 import org.key_project.sed.ui.visualization.model.od.ODObject;
 import org.key_project.sed.ui.visualization.model.od.ODPackage;
+import org.key_project.sed.ui.visualization.model.od.ODState;
 import org.key_project.sed.ui.visualization.model.od.ODValue;
 
 /**
@@ -54,6 +56,20 @@ public class ODPackageImpl extends EPackageImpl implements ODPackage {
     * @generated
     */
    private EClass odAssociationEClass = null;
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   private EClass odStateEClass = null;
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   private EClass abstractODValueContainerEClass = null;
 
    /**
     * Creates an instance of the model <b>Package</b>, registered with
@@ -130,35 +146,8 @@ public class ODPackageImpl extends EPackageImpl implements ODPackage {
     * <!-- end-user-doc -->
     * @generated
     */
-   public EAttribute getODObject_Name() {
-      return (EAttribute)odObjectEClass.getEStructuralFeatures().get(0);
-   }
-
-   /**
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    */
    public EAttribute getODObject_Type() {
-      return (EAttribute)odObjectEClass.getEStructuralFeatures().get(1);
-   }
-
-   /**
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    */
-   public EReference getODObject_Values() {
-      return (EReference)odObjectEClass.getEStructuralFeatures().get(2);
-   }
-
-   /**
-    * <!-- begin-user-doc -->
-    * <!-- end-user-doc -->
-    * @generated
-    */
-   public EReference getODObject_Associations() {
-      return (EReference)odObjectEClass.getEStructuralFeatures().get(3);
+      return (EAttribute)odObjectEClass.getEStructuralFeatures().get(0);
    }
 
    /**
@@ -220,6 +209,15 @@ public class ODPackageImpl extends EPackageImpl implements ODPackage {
     * <!-- end-user-doc -->
     * @generated
     */
+   public EReference getODModel_States() {
+      return (EReference)odModelEClass.getEStructuralFeatures().get(1);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
    public EClass getODAssociation() {
       return odAssociationEClass;
    }
@@ -240,6 +238,51 @@ public class ODPackageImpl extends EPackageImpl implements ODPackage {
     */
    public EReference getODAssociation_Target() {
       return (EReference)odAssociationEClass.getEStructuralFeatures().get(1);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EClass getODState() {
+      return odStateEClass;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EClass getAbstractODValueContainer() {
+      return abstractODValueContainerEClass;
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EReference getAbstractODValueContainer_Values() {
+      return (EReference)abstractODValueContainerEClass.getEStructuralFeatures().get(0);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EReference getAbstractODValueContainer_Associations() {
+      return (EReference)abstractODValueContainerEClass.getEStructuralFeatures().get(1);
+   }
+
+   /**
+    * <!-- begin-user-doc -->
+    * <!-- end-user-doc -->
+    * @generated
+    */
+   public EAttribute getAbstractODValueContainer_Name() {
+      return (EAttribute)abstractODValueContainerEClass.getEStructuralFeatures().get(2);
    }
 
    /**
@@ -271,10 +314,7 @@ public class ODPackageImpl extends EPackageImpl implements ODPackage {
 
       // Create classes and their features
       odObjectEClass = createEClass(OD_OBJECT);
-      createEAttribute(odObjectEClass, OD_OBJECT__NAME);
       createEAttribute(odObjectEClass, OD_OBJECT__TYPE);
-      createEReference(odObjectEClass, OD_OBJECT__VALUES);
-      createEReference(odObjectEClass, OD_OBJECT__ASSOCIATIONS);
 
       odValueEClass = createEClass(OD_VALUE);
       createEAttribute(odValueEClass, OD_VALUE__NAME);
@@ -283,10 +323,18 @@ public class ODPackageImpl extends EPackageImpl implements ODPackage {
 
       odModelEClass = createEClass(OD_MODEL);
       createEReference(odModelEClass, OD_MODEL__OBJECTS);
+      createEReference(odModelEClass, OD_MODEL__STATES);
 
       odAssociationEClass = createEClass(OD_ASSOCIATION);
       createEAttribute(odAssociationEClass, OD_ASSOCIATION__NAME);
       createEReference(odAssociationEClass, OD_ASSOCIATION__TARGET);
+
+      odStateEClass = createEClass(OD_STATE);
+
+      abstractODValueContainerEClass = createEClass(ABSTRACT_OD_VALUE_CONTAINER);
+      createEReference(abstractODValueContainerEClass, ABSTRACT_OD_VALUE_CONTAINER__VALUES);
+      createEReference(abstractODValueContainerEClass, ABSTRACT_OD_VALUE_CONTAINER__ASSOCIATIONS);
+      createEAttribute(abstractODValueContainerEClass, ABSTRACT_OD_VALUE_CONTAINER__NAME);
    }
 
    /**
@@ -317,13 +365,12 @@ public class ODPackageImpl extends EPackageImpl implements ODPackage {
       // Set bounds for type parameters
 
       // Add supertypes to classes
+      odObjectEClass.getESuperTypes().add(this.getAbstractODValueContainer());
+      odStateEClass.getESuperTypes().add(this.getAbstractODValueContainer());
 
       // Initialize classes and features; add operations and parameters
       initEClass(odObjectEClass, ODObject.class, "ODObject", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-      initEAttribute(getODObject_Name(), ecorePackage.getEString(), "name", null, 0, 1, ODObject.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
       initEAttribute(getODObject_Type(), ecorePackage.getEString(), "type", null, 0, 1, ODObject.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-      initEReference(getODObject_Values(), this.getODValue(), null, "values", null, 0, -1, ODObject.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-      initEReference(getODObject_Associations(), this.getODAssociation(), null, "associations", null, 0, -1, ODObject.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
       initEClass(odValueEClass, ODValue.class, "ODValue", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEAttribute(getODValue_Name(), ecorePackage.getEString(), "name", null, 0, 1, ODValue.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -332,10 +379,18 @@ public class ODPackageImpl extends EPackageImpl implements ODPackage {
 
       initEClass(odModelEClass, ODModel.class, "ODModel", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEReference(getODModel_Objects(), this.getODObject(), null, "objects", null, 0, -1, ODModel.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+      initEReference(getODModel_States(), this.getODState(), null, "states", null, 0, -1, ODModel.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
       initEClass(odAssociationEClass, ODAssociation.class, "ODAssociation", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
       initEAttribute(getODAssociation_Name(), ecorePackage.getEString(), "name", null, 0, 1, ODAssociation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
       initEReference(getODAssociation_Target(), this.getODObject(), null, "target", null, 1, 1, ODAssociation.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+      initEClass(odStateEClass, ODState.class, "ODState", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+
+      initEClass(abstractODValueContainerEClass, AbstractODValueContainer.class, "AbstractODValueContainer", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+      initEReference(getAbstractODValueContainer_Values(), this.getODValue(), null, "values", null, 0, -1, AbstractODValueContainer.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+      initEReference(getAbstractODValueContainer_Associations(), this.getODAssociation(), null, "associations", null, 0, -1, AbstractODValueContainer.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+      initEAttribute(getAbstractODValueContainer_Name(), ecorePackage.getEString(), "name", null, 0, 1, AbstractODValueContainer.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
       // Create resource
       createResource(eNS_URI);
