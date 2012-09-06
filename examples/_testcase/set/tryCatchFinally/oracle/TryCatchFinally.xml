@@ -3,7 +3,7 @@
    <methodCall name="self.tryCatchFinally(input);" pathCondition="true" pathConditionChanged="false">
       <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
          <statement name="result_1=1/input;" pathCondition="true" pathConditionChanged="false">
-            <branchCondition name="input = 0 TRUE" pathCondition="input = 0" pathConditionChanged="true" branchCondition="input = 0" mergedBranchCondition="false">
+            <branchCondition name="input = 0" pathCondition="input = 0" pathConditionChanged="true" branchCondition="input = 0" mergedBranchCondition="false">
                <statement name="result_1=2;" pathCondition="input = 0" pathConditionChanged="false">
                   <statement name="result_1=result_1*2;" pathCondition="input = 0" pathConditionChanged="false">
                      <statement name="return result_1;" pathCondition="input = 0" pathConditionChanged="false">
@@ -15,7 +15,7 @@
                   </statement>
                </statement>
             </branchCondition>
-            <branchCondition name="input = 0 FALSE" pathCondition="!input = 0" pathConditionChanged="true" branchCondition="!input = 0" mergedBranchCondition="false">
+            <branchCondition name="!input = 0" pathCondition="!input = 0" pathConditionChanged="true" branchCondition="!input = 0" mergedBranchCondition="false">
                <statement name="result_1=result_1*2;" pathCondition="!input = 0" pathConditionChanged="false">
                   <statement name="return result_1;" pathCondition="!input = 0" pathConditionChanged="false">
                      <methodReturn name="&lt;return of self.tryCatchFinally(input);&gt;" pathCondition="!input = 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;quotient_0 * 2&apos; as result of self.tryCatchFinally(input);&gt;">

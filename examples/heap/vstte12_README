@@ -10,7 +10,7 @@ All solutions were produced using KeY in a modified version of the current devel
 http://www.key-project.org/vstte12/
 
 The internal version is 436134a8464639588288bdb07cb707ce3a06f07e
-To prove problems 1 and 5 in an upstream version of KeY, please merge the file seq.key found in system/resources/de/uka/ilkd/key/proof/rules into your upstream version, it contains additional function definitions and rules.
+To prove problems 1 and 4 in an upstream version of KeY, please merge the file seq.key found in system/resources/de/uka/ilkd/key/proof/rules into your upstream version, it contains additional function definitions and rules.
 
 
 To replay the proofs, start KeY (graphical frontend) and open the respective *.key file in the problem directory and select a method contract. On the top left of the window should be a button with a green "play" icon. Push it.
