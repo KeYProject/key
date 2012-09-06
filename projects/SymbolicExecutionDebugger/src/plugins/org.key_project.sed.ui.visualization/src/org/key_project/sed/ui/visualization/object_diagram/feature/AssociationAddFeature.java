@@ -73,6 +73,7 @@ public class AssociationAddFeature extends AbstractAddFeature {
       gaService.setLocation(text, 10, 0);
       // set reference name in the text decorator
       text.setValue(addedAssociation.getName());
+      link(text.getPictogramElement(), addedAssociation);
 
       // add static graphical decorator (composition and navigable)
       ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
