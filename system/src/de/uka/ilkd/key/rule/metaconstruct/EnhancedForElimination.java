@@ -145,7 +145,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         assert programVariable instanceof ProgramVariable :
             "Since this is a concrete program, the spec must not be schematic";
         final ProgramVariable lvdVar = (ProgramVariable)programVariable;
-        final Statement declArrayElemVar = makeElemDecl(lvdVar);
+        final Statement declArrayElemVar = KeYJavaASTFactory.declare(lvdVar);
 
         // assign element of the current iteration to the enhanced for-loop iterator variable
         final Statement getNextElement = KeYJavaASTFactory.assignArrayField(lvdVar, arrayVar, itVar);
@@ -155,15 +155,6 @@ public class EnhancedForElimination extends ProgramTransformer {
         final Statement[] complete = {declArrayElemVar,forLoop};
         setInvariant(enhancedFor, forLoop);
         return new StatementBlock(complete);
-    }
-
-    /** Declare the iterated element. */
-    private Statement makeElemDecl(ProgramVariable lvdVar) {
-        final KeYJavaType lvdType = lvdVar.getKeYJavaType();
-        final TypeRef lvdTyperef = new TypeRef(lvdType);
-        final VariableSpecification lvdSpec = new VariableSpecification(lvdVar, lvdType);
-        final Statement declArrayElemVar = new LocalVariableDeclaration(lvdTyperef,lvdSpec);
-        return declArrayElemVar;
     }
 
     // Methods to transform loops over Iterable
