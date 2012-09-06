@@ -147,7 +147,9 @@ public class EnhancedForElimination extends ProgramTransformer {
         final ProgramVariable lvdVar = (ProgramVariable)programVariable;
         final Statement declArrayElemVar = makeElemDecl(lvdVar);
 
-        final For forLoop = makeLoop(body, itVar, inits, guard, updates, arrayVar, lvdVar);
+        // assign element of the current iteration to the enhanced for-loop iterator variable
+        final Statement getNextElement = KeYJavaASTFactory.assignArrayField(lvdVar, arrayVar, itVar);
+        final For forLoop = KeYJavaASTFactory.forLoop(inits, guard, updates, getNextElement, body);
 
         // put everything together
         final Statement[] complete = {declArrayElemVar,forLoop};
@@ -162,19 +164,6 @@ public class EnhancedForElimination extends ProgramTransformer {
         final VariableSpecification lvdSpec = new VariableSpecification(lvdVar, lvdType);
         final Statement declArrayElemVar = new LocalVariableDeclaration(lvdTyperef,lvdSpec);
         return declArrayElemVar;
-    }
-
-    /** Loop statement including assignment to the iterated element. */
-    private For makeLoop(Statement body, ProgramVariable itVar,
-            ILoopInit inits, IGuard guard, IForUpdates updates,
-            ReferencePrefix array, ProgramVariable lvdVar) {
-        final Expression[] arrayAccess = {itVar};
-        final Expression nextElement = new ArrayReference(array, arrayAccess);
-        final Statement getNextElement = new CopyAssignment(lvdVar, nextElement);
-        final Statement[] newBlock = {getNextElement,body};
-        body = new StatementBlock(newBlock);
-        final For forLoop = new For(inits, guard, updates, body);
-        return forLoop;
     }
 
     // Methods to transform loops over Iterable
