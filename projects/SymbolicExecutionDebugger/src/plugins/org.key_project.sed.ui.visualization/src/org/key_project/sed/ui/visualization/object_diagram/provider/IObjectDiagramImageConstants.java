@@ -2,6 +2,7 @@ package org.key_project.sed.ui.visualization.object_diagram.provider;
 
 import org.key_project.sed.ui.visualization.model.od.ODAssociation;
 import org.key_project.sed.ui.visualization.model.od.ODObject;
+import org.key_project.sed.ui.visualization.model.od.ODValue;
 
 /**
  * <p>
@@ -30,4 +31,9 @@ public interface IObjectDiagramImageConstants {
     * Key of the image for {@link ODAssociation}s.
     */
    public static final String IMG_ASSOCIATION = PREFIX + "association";
+
+   /**
+    * Key of the image for {@link ODValue}s.
+    */
+   public static final String IMG_VALUE = PREFIX + "value";
 }

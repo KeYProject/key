@@ -18,6 +18,16 @@ import org.key_project.util.java.IFilter;
  */
 public final class ObjectDiagramUtil {
    /**
+    * Vertical offset used with diagram elements.
+    */
+   public static final int VERTICAL_OFFSET = 3;
+
+   /**
+    * Horizontal offset used with diagram elements.
+    */
+   public static final int HORIZONTAL_OFFSET = 10;
+
+   /**
     * File extension for diagram file with included model.
     */
    public static final String DIAGRAM_AND_MODEL_FILE_EXTENSION = "od";

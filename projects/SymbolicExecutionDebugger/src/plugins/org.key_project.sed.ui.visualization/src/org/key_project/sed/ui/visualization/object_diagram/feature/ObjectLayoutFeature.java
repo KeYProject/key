@@ -16,6 +16,8 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.key_project.sed.ui.visualization.model.od.ODObject;
+import org.key_project.sed.ui.visualization.model.od.ODValue;
+import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
 
 /**
  * Implementation of {@link ILayoutFeature} for {@link ODObject}s.
@@ -30,7 +32,7 @@ public class ObjectLayoutFeature extends AbstractLayoutFeature {
    /**
     * The minimal height of the graphical representation of an {@link ODObject}.
     */
-   public static final int MIN_HEIGHT = 30;
+   public static final int MIN_HEIGHT = 50;
 
    /**
     * Constructor.
@@ -89,7 +91,13 @@ public class ObjectLayoutFeature extends AbstractLayoutFeature {
                anythingChanged = true;
             }
             else {
-               gaService.setWidth(graphicsAlgorithm, containerWidth);
+               Object bo = getBusinessObjectForPictogramElement(graphicsAlgorithm.getPictogramElement());
+               if (bo instanceof ODValue) {
+                  gaService.setWidth(graphicsAlgorithm, containerWidth - (2 * ObjectDiagramUtil.HORIZONTAL_OFFSET));
+               }
+               else {
+                  gaService.setWidth(graphicsAlgorithm, containerWidth);
+               }
                anythingChanged = true;
             }
          }

@@ -6,20 +6,29 @@ import org.eclipse.graphiti.features.ICreateConnectionFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
+import org.eclipse.graphiti.features.IMoveShapeFeature;
 import org.eclipse.graphiti.features.IReconnectionFeature;
+import org.eclipse.graphiti.features.IResizeShapeFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.context.ILayoutContext;
+import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IReconnectionContext;
+import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 import org.key_project.sed.ui.visualization.model.od.ODAssociation;
 import org.key_project.sed.ui.visualization.model.od.ODObject;
+import org.key_project.sed.ui.visualization.model.od.ODValue;
 import org.key_project.sed.ui.visualization.object_diagram.feature.AssociationAddFeature;
 import org.key_project.sed.ui.visualization.object_diagram.feature.AssociationCreateFeature;
 import org.key_project.sed.ui.visualization.object_diagram.feature.AssociationReconnectionFeature;
 import org.key_project.sed.ui.visualization.object_diagram.feature.ObjectAddFeature;
 import org.key_project.sed.ui.visualization.object_diagram.feature.ObjectCreateFeature;
 import org.key_project.sed.ui.visualization.object_diagram.feature.ObjectLayoutFeature;
+import org.key_project.sed.ui.visualization.object_diagram.feature.ValueAddFeature;
+import org.key_project.sed.ui.visualization.object_diagram.feature.ValueCreateFeature;
+import org.key_project.sed.ui.visualization.object_diagram.feature.ValueMoveFeature;
+import org.key_project.sed.ui.visualization.object_diagram.feature.ValueResizeFeature;
 
 /**
  * {@link IFeatureProvider} specific implementation for object diagrams.
@@ -45,6 +54,9 @@ public class ObjectDiagramFeatureProvider extends DefaultFeatureProvider {
       else if (context.getNewObject() instanceof ODAssociation) {
          return new AssociationAddFeature(this);
       }
+      else if (context.getNewObject() instanceof ODValue) {
+         return new ValueAddFeature(this);
+      }
       else {
          return super.getAddFeature(context);
       }
@@ -55,7 +67,8 @@ public class ObjectDiagramFeatureProvider extends DefaultFeatureProvider {
     */
    @Override
    public ICreateFeature[] getCreateFeatures() {
-      return new ICreateFeature[] { new ObjectCreateFeature(this) };
+      return new ICreateFeature[] { new ObjectCreateFeature(this),
+                                    new ValueCreateFeature(this) };
    }
 
    /**
@@ -70,6 +83,36 @@ public class ObjectDiagramFeatureProvider extends DefaultFeatureProvider {
       }
       else {
          return super.getLayoutFeature(context);
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IMoveShapeFeature getMoveShapeFeature(IMoveShapeContext context) {
+      PictogramElement pictogramElement = context.getPictogramElement();
+      Object bo = getBusinessObjectForPictogramElement(pictogramElement);
+      if (bo instanceof ODValue) {
+         return new ValueMoveFeature(this);
+      }
+      else {
+         return super.getMoveShapeFeature(context);
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IResizeShapeFeature getResizeShapeFeature(IResizeShapeContext context) {
+      PictogramElement pictogramElement = context.getPictogramElement();
+      Object bo = getBusinessObjectForPictogramElement(pictogramElement);
+      if (bo instanceof ODValue) {
+         return new ValueResizeFeature(this);
+      }
+      else {
+         return super.getResizeShapeFeature(context);
       }
    }
    

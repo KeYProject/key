@@ -29,5 +29,6 @@ public class ObjectDiagramImageProvider extends AbstractImageProvider {
    protected void addAvailableImages() {
        addImageFilePath(IObjectDiagramImageConstants.IMG_OBJECT, ROOT_FOLDER_FOR_IMG + "object.gif");
        addImageFilePath(IObjectDiagramImageConstants.IMG_ASSOCIATION, ROOT_FOLDER_FOR_IMG + "association.gif");
+       addImageFilePath(IObjectDiagramImageConstants.IMG_VALUE, ROOT_FOLDER_FOR_IMG + "value.gif");
    }
 }

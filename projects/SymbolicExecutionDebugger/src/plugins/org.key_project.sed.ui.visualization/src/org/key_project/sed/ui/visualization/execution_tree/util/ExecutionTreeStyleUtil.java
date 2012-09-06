@@ -50,6 +50,7 @@ public final class ExecutionTreeStyleUtil {
          style.setForeground(gaService.manageColor(diagram, DEBUG_NODE_FOREGROUND));
          gaService.setRenderingStyle(style, PredefinedColoredAreas.getBlueWhiteGlossAdaptions());
          style.setLineWidth(2);
+         style.setFont(GraphitiUtil.getDefaultFont(diagram));
       }
       return style;
    }

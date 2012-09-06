@@ -9,6 +9,7 @@ import org.eclipse.graphiti.util.IColorConstant;
 import org.eclipse.graphiti.util.PredefinedColoredAreas;
 import org.key_project.sed.ui.visualization.model.od.ODAssociation;
 import org.key_project.sed.ui.visualization.model.od.ODObject;
+import org.key_project.sed.ui.visualization.model.od.ODValue;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 
 /**
@@ -25,6 +26,11 @@ public final class ObjectDiagramStyleUtil {
     * The foreground color for {@link ODObject}s.
     */
    public static final IColorConstant OBJECT_TEXT_FOREGROUND = IColorConstant.BLACK;
+   
+   /**
+    * The foreground color for {@link ODValue}s.
+    */
+   public static final IColorConstant VALUE_TEXT_FOREGROUND = IColorConstant.BLACK;
    
    /**
     * The foreground color for {@link ODAssociation}s.
@@ -56,6 +62,7 @@ public final class ObjectDiagramStyleUtil {
          style.setForeground(gaService.manageColor(diagram, OBJECT_FOREGROUND));
          gaService.setRenderingStyle(style, PredefinedColoredAreas.getBlueWhiteGlossAdaptions());
          style.setLineWidth(2);
+         style.setFont(GraphitiUtil.getDefaultFont(diagram));
       }
       return style;
    }
@@ -80,6 +87,25 @@ public final class ObjectDiagramStyleUtil {
    }
 
    /**
+    * Returns the {@link Style} used for text in {@link ODValue}s.
+    * @param diagram The {@link Diagram} to use the {@link Style} in.
+    * @return The {@link Style} for text in {@link ODValue}s.
+    */
+   public static Style getStyleForValueText(Diagram diagram) {
+      final String STYLE_ID = "valueText";
+      // this is a child style of the e-class-style
+      Style parentStyle = getStyleForObject(diagram);
+      Style style = GraphitiUtil.findStyle(parentStyle, STYLE_ID);
+      if (style == null) { // style not found - create new style
+         IGaService gaService = Graphiti.getGaService();
+         style = gaService.createStyle(getStyleForObject(diagram), STYLE_ID);
+         // "overwrites" values from parent style
+         style.setForeground(gaService.manageColor(diagram, VALUE_TEXT_FOREGROUND));
+      }
+      return style;
+   }
+
+   /**
     * Returns the {@link Style} used for {@link ODAssociation}s.
     * @param diagram The {@link Diagram} to use the {@link Style} in.
     * @return The {@link Style} for {@link ODAssociation}s.
@@ -94,6 +120,7 @@ public final class ObjectDiagramStyleUtil {
          style = gaService.createStyle(getStyleForObject(diagram), STYLE_ID);
          // "overwrites" values from parent style
          style.setForeground(gaService.manageColor(diagram, ASSOCIATION_FOREGROUND));
+         style.setFont(GraphitiUtil.getDefaultFont(diagram));
       }
       return style;
    }

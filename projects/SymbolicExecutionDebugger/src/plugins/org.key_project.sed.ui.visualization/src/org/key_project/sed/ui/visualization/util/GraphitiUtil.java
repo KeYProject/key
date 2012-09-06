@@ -17,11 +17,14 @@ import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.datatypes.IDimension;
 import org.eclipse.graphiti.internal.datatypes.impl.DimensionImpl;
+import org.eclipse.graphiti.internal.services.impl.GaServiceImpl;
 import org.eclipse.graphiti.mm.StyleContainer;
 import org.eclipse.graphiti.mm.algorithms.styles.Font;
 import org.eclipse.graphiti.mm.algorithms.styles.Style;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.services.Graphiti;
+import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.ui.editor.DiagramEditorFactory;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.internal.services.impl.GefService;
@@ -256,5 +259,20 @@ public final class GraphitiUtil {
          }
       }
       return null;
+   }
+   
+   /**
+    * Returns the default font of the given {@link Diagram}.
+    * @param diagram The {@link Diagram} to get its default font.
+    * @return The default font or {@code null} if the given {@link Diagram} is {@code null}.
+    */
+   public static Font getDefaultFont(Diagram diagram) {
+      if (diagram != null) {
+         IGaService gaService = Graphiti.getGaService();
+         return gaService.manageFont(diagram, GaServiceImpl.DEFAULT_FONT, 10);
+      }
+      else {
+         return null;
+      }
    }
 }
