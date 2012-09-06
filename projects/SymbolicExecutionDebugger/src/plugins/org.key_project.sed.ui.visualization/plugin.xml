@@ -9,6 +9,12 @@
       name="Symbolic Execution Tree"
       type="symbolicExecutionTreeDiagram">
     </diagramType>
+    <diagramType
+          description="This is the diagram type for Object Diagrams"
+          id="org.key_project.sed.ui.graphiti.ObjectDiagramType"
+          name="Object Diagram"
+          type="objectDiagram">
+    </diagramType>
   </extension>
  
   <extension
@@ -25,6 +31,18 @@
             id="org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeImageProvider">
       </imageProvider>
     </diagramTypeProvider>
+    <diagramTypeProvider
+          class="org.key_project.sed.ui.visualization.object_diagram.provider.ObjectDiagramTypeProvider"
+          description="This is the Object Diagram editor"
+          id="org.key_project.sed.ui.graphiti.ObjectDiagramTypeProvider"
+          name="Object Diagram Editor">
+       <diagramType
+             id="org.key_project.sed.ui.graphiti.ObjectDiagramType">
+       </diagramType>
+       <imageProvider
+             id="org.key_project.sed.ui.visualization.object_diagram.provider.ObjectDiagramImageProvider">
+       </imageProvider>
+    </diagramTypeProvider>
   </extension>
   
     <extension
@@ -32,6 +50,10 @@
       <imageProvider
             class="org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeImageProvider"
             id="org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeImageProvider">
+      </imageProvider>
+      <imageProvider
+            class="org.key_project.sed.ui.visualization.object_diagram.provider.ObjectDiagramImageProvider"
+            id="org.key_project.sed.ui.visualization.object_diagram.provider.ObjectDiagramImageProvider">
       </imageProvider>
    </extension>
     <extension
@@ -49,6 +71,17 @@
              project="false">
           <description>
              Create a new Symbolic Execution Tree Diagram
+          </description>
+       </wizard>
+       <wizard
+             category="org.key_project.sed.ui.visualization.category"
+             class="org.key_project.sed.ui.visualization.object_diagram.wizard.NewObjectDiagramWizard"
+             icon="icons/object_diagram.gif"
+             id="org.key_project.sed.ui.visualization.object_diagram.wizard.NewObjectDiagramWizard"
+             name="Object Diagram"
+             project="false">
+          <description>
+             Create a new Object Diagram
           </description>
        </wizard>
     </extension>
@@ -75,6 +108,18 @@
              name="Symbolic Execution Tree Editor">
           <contentTypeBinding
                 contentTypeId="org.eclipse.core.runtime.xml">
+          </contentTypeBinding>
+       </editor>
+       <editor
+             class="org.key_project.sed.ui.visualization.object_diagram.editor.ObjectDiagramEditor"
+             contributorClass="org.eclipse.graphiti.ui.editor.DiagramEditorActionBarContributor"
+             default="true"
+             extensions="od"
+             icon="icons/object_diagram.gif"
+             id="org.key_project.sed.ui.visualization.ObjectDiagramEditor"
+             name="Object Diagram Editor">
+          <contentTypeBinding
+                contentTypeId="org.eclipse.graphiti.content.diagram">
           </contentTypeBinding>
        </editor>
     </extension>

@@ -1,5 +1,6 @@
 package org.key_project.sed.ui.visualization.util;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,7 +17,9 @@ import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.datatypes.IDimension;
 import org.eclipse.graphiti.internal.datatypes.impl.DimensionImpl;
+import org.eclipse.graphiti.mm.StyleContainer;
 import org.eclipse.graphiti.mm.algorithms.styles.Font;
+import org.eclipse.graphiti.mm.algorithms.styles.Style;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditorFactory;
@@ -26,6 +29,7 @@ import org.eclipse.graphiti.ui.internal.util.DataTypeTransformation;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.eclipse.graphiti.ui.services.IUiLayoutService;
 import org.eclipse.swt.widgets.Display;
+import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 
@@ -234,5 +238,23 @@ public final class GraphitiUtil {
          }
       }
       return result.toArray(new PictogramElement[result.size()]);
+   }
+
+   /**
+    * Searches a style with the given ID in the given {@link StyleContainer}.
+    * @param styleContainer The {@link StyleContainer} to search in.
+    * @param id The ID of the style to search.
+    * @return The found {@link Style} or {@code null} if no style with the given ID is available.
+    */
+   public static Style findStyle(StyleContainer styleContainer, String id) {
+      Collection<Style> styles = styleContainer.getStyles();
+      if (styles != null) {
+         for (Style style : styles) {
+            if (ObjectUtil.equals(id, style.getId())) {
+               return style;
+            }
+         }
+      }
+      return null;
    }
 }
