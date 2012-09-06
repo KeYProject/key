@@ -655,4 +655,27 @@ public abstract class KeYJavaASTFactory {
 
 	return assignment;
     }
+
+    /**
+     * Create a local variable declaration without initialization.
+     * 
+     * <pre>
+     * type variable;
+     * </pre>
+     * 
+     * where <code>type</code> is <code>variable</code>'s {@link KeYJavaType} as
+     * it is returned by {@link ProgramVariable#getKeYJavaType()}.
+     * 
+     * @param variable
+     *            the named and typed {@link ProgramVariable} to be declared
+     * @return a new {@link LocalVariableDeclaration} of <code>variable</code>
+     */
+    public static LocalVariableDeclaration declare(
+	    final ProgramVariable variable) {
+	final KeYJavaType type = variable.getKeYJavaType();
+	final LocalVariableDeclaration declaration = KeYJavaASTFactory.declare(
+		variable, type);
+
+	return declaration;
+    }
 }
