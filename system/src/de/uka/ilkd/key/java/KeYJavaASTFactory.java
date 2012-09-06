@@ -599,4 +599,33 @@ public abstract class KeYJavaASTFactory {
 
 	return block;
     }
+
+    /**
+     * Create a for loop from the loop definition and an arbitrary number of
+     * body statements.
+     * 
+     * <pre>
+     * for (init; guard; updates) {
+     *    statements;
+     * }
+     * </pre>
+     * 
+     * @param init
+     *            the {@link ILoopInit} loop initializations
+     * @param guard
+     *            the {@link IGuard} loop condition
+     * @param updates
+     *            the {@link IForUpdates} loop updates
+     * @param statements
+     *            the body {@link Statement}s
+     * @return a new {@link For} with initializers <code>init</code>, condition
+     *         <code>guard</code>, updates <code>updates</code> and body
+     *         <code>statements</code>
+     */
+    public static For forLoop(final ILoopInit init, final IGuard guard,
+	    final IForUpdates updates, final Statement... statements) {
+	final StatementBlock body = KeYJavaASTFactory.block(statements);
+
+	return new For(init, guard, updates, body);
+    }
 }
