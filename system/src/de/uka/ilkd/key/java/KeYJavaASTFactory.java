@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -95,7 +96,7 @@ public abstract class KeYJavaASTFactory {
      *         static type <code>type</code> and initial value <code>init</code>
      */
     public static LocalVariableDeclaration declare
-	(ProgramVariable var, Expression init, KeYJavaType type) {
+	(IProgramVariable var, Expression init, KeYJavaType type) {
 	return KeYJavaASTFactory.declare(new Modifier[0], var, init, type);
     }
 
@@ -114,7 +115,7 @@ public abstract class KeYJavaASTFactory {
      *         static type <code>type</code>
      */
     public static LocalVariableDeclaration declare
-	(ProgramVariable var, KeYJavaType type) {
+	(IProgramVariable var, KeYJavaType type) {
 	return KeYJavaASTFactory.declare(var, null, type);
     }
 
@@ -395,7 +396,7 @@ public abstract class KeYJavaASTFactory {
      *         with static type <code>type</code> and initial value zero
      */
     public static LocalVariableDeclaration declareZero(final KeYJavaType type,
-	    final ProgramVariable variable) {
+	    final IProgramVariable variable) {
 	return KeYJavaASTFactory.declare(variable, new IntLiteral(0), type);
     }
 
@@ -668,7 +669,7 @@ public abstract class KeYJavaASTFactory {
      * @return a new {@link LocalVariableDeclaration} of <code>variable</code>
      */
     public static LocalVariableDeclaration declare(
-	    final ProgramVariable variable) {
+	    final IProgramVariable variable) {
 	final KeYJavaType type = variable.getKeYJavaType();
 	final LocalVariableDeclaration declaration = KeYJavaASTFactory.declare(
 		variable, type);
@@ -697,7 +698,7 @@ public abstract class KeYJavaASTFactory {
      *         <code>init</code>
      */
     public static LocalVariableDeclaration declare(final Modifier modifier,
-	    final ProgramVariable variable, final Expression init,
+	    final IProgramVariable variable, final Expression init,
 	    final KeYJavaType type) {
 	final ImmutableArray<Modifier> modifiers = new ImmutableArray<Modifier>(
 		modifier);
@@ -729,7 +730,7 @@ public abstract class KeYJavaASTFactory {
      *         <code>init</code>
      */
     public static LocalVariableDeclaration declare(final Modifier[] modifiers,
-	    final ProgramVariable variable, final Expression init,
+	    final IProgramVariable variable, final Expression init,
 	    final KeYJavaType type) {
 	final ImmutableArray<Modifier> m = new ImmutableArray<Modifier>(
 		modifiers);
@@ -762,7 +763,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declare(
 	    final ImmutableArray<Modifier> modifiers,
-	    final ProgramVariable variable, final Expression init,
+	    final IProgramVariable variable, final Expression init,
 	    final KeYJavaType type) {
 	final TypeRef typeRef = new TypeRef(type);
 	final VariableSpecification varSpec = new VariableSpecification(
