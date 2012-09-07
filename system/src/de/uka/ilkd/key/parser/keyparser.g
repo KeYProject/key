@@ -1018,7 +1018,7 @@ options {
      * If the sort is not found for the first time, the name is expanded with "java.lang." 
      * and the look up restarts
      */
-     private Sort lookupSort(String name) throws SemanticException {        
+     private Sort lookupSort(String name) throws SemanticException {
 	Sort result = (Sort) sorts().lookup(new Name(name));
 	if (result == null) {
 	    if(name.equals(NullSort.NAME.toString())) {
@@ -1389,22 +1389,21 @@ decls :
 	}
         (options_choice)? 
         (
-            option_decls
+            {!onlyWith}? option_decls
         |    
-            sort_decls
+            {!onlyWith}? sort_decls
         |
-            prog_var_decls
+            {!onlyWith}? prog_var_decls
         |
-            schema_var_decls
+            {!onlyWith}? schema_var_decls
         |
             pred_decls
         |
             func_decls
         |
-            ruleset_decls
+            {!onlyWith}? ruleset_decls
 
         ) *
-        { if(onlyWith) return; }
     ;
 
 one_include_statement
@@ -1902,7 +1901,6 @@ pred_decl
                     		     whereToBind,
                     		     false);
                 }
-                
 		if (lookup(p.name()) != null) {
 		    if(!isProblemParser()) {
 		        throw new AmbigiousDeclException(p.name().toString(), 
@@ -2003,7 +2001,6 @@ func_decl
 	                             whereToBind,
 	                             unique);                    
 	        }
-	        
 		if (lookup(f.name()) != null) {
 		    if(!isProblemParser()) {
 		      throw new AmbigiousDeclException(f.name().toString(), 
