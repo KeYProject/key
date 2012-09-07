@@ -83,10 +83,19 @@ public abstract class AbstractEditorInViewActionBarContributor extends ActionBar
          super.addAction(action);
       }
       else {
-         GlobalEnablementWrapperAction wrapper = new GlobalEnablementWrapperAction(action);
+         GlobalEnablementWrapperAction wrapper = createActionWrapper(action);
          registerGlobalEnablement(wrapper);
          super.addAction(wrapper);
       }
+   }
+   
+   /**
+    * Creates a {@link GlobalEnablementWrapperAction} for the given {@link IAction}.
+    * @param action The {@link IAction} to instantiate {@link GlobalEnablementWrapperAction} for.
+    * @return The instantiated {@link GlobalEnablementWrapperAction} which wrapps the given {@link IAction}.
+    */
+   protected GlobalEnablementWrapperAction createActionWrapper(IAction action) {
+      return new GlobalEnablementWrapperAction(action);
    }
 
    /**

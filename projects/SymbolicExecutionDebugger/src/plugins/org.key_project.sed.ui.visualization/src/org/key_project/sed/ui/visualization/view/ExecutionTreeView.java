@@ -43,7 +43,6 @@ import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUti
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 
 /**
@@ -162,9 +161,9 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    @Override
    protected DiagramEditorInput createEditorInput() {
       // Create empty diagram
-      final Diagram diagram = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, 
-                                                                          IOUtil.getFileNameWithoutExtension("Empty Diagram"), 
-                                                                          true);
+      Diagram diagram = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, 
+                                                                    "Empty Diagram", 
+                                                                    true);
       URI domainURI = URI.createURI("INVALID" + ExecutionTreeUtil.DOMAIN_FILE_EXTENSION_WITH_DOT);
       GraphitiUi.getPeService().setPropertyValue(diagram, ExecutionTreeUtil.USER_PROPERTY_DOMAIN_MODEL_FILE, domainURI.toString());
       // Create editing domain and resource that contains the diagram

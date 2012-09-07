@@ -1,5 +1,6 @@
 package org.key_project.sed.ui.visualization.util;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,6 +9,8 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.SnapToGrid;
 import org.eclipse.gef.commands.CommandStack;
+import org.eclipse.gef.editparts.ZoomManager;
+import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.gef.ui.palette.FlyoutPaletteComposite.FlyoutPreferences;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
@@ -19,6 +22,7 @@ import org.eclipse.graphiti.internal.command.ICommand;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
+import org.eclipse.graphiti.ui.internal.action.AbstractPreDefinedAction;
 import org.eclipse.graphiti.ui.internal.command.GefCommandWrapper;
 import org.eclipse.graphiti.ui.internal.config.IConfigurationProvider;
 import org.eclipse.graphiti.ui.internal.editor.DiagramEditorInternal;
@@ -143,13 +147,30 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
     * {@inheritDoc}
     */
    @Override
+   protected void initActionRegistry(ZoomManager zoomManager) {
+      super.initActionRegistry(zoomManager);
+      // Make sure that all action always use this editor as selection provider instead of the currently active editor because this is required if the editor is shown in a view!
+      ActionRegistry actionRegistry = getActionRegistry();
+      Iterator<?> iter = actionRegistry.getActions();
+      while (iter.hasNext()) {
+         Object next = iter.next();
+         if (next instanceof AbstractPreDefinedAction) {
+            ((AbstractPreDefinedAction)next).setSelectionProvider(getGraphicalViewer());
+         }
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    protected void registerAction(IAction action) {
       if (action instanceof IGlobalEnablement) {
          registerGlobalEnablement((IGlobalEnablement)action);
          super.registerAction(action);
       }
       else {
-         GlobalEnablementWrapperAction wrapper = new GlobalEnablementWrapperAction(action); // Required to disable keyboard shortcuts if a message is shown.
+         GraphitiGlobalEnablementWrapperAction wrapper = new GraphitiGlobalEnablementWrapperAction(action); // Required to disable keyboard shortcuts if a message is shown.
          registerGlobalEnablement(wrapper);
          super.registerAction(wrapper);
       }

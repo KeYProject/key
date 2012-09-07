@@ -8,4 +8,16 @@ import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
  * @author Martin Hentschel
  */
 public class ObjectDiagramEditor extends PaletteHideableDiagramEditor {
+   /**
+    * The ID of this editor.
+    */
+   public static final String EDITOR_ID = "org.key_project.sed.ui.visualization.ObjectDiagramEditor";
+   
+   /**
+    * Constructor.
+    */
+   public ObjectDiagramEditor() {
+      setGlobalEnabled(true);
+      setDefaultSelectionSynchronizationEnabled(false);
+   }
 }
