@@ -523,17 +523,17 @@ options {
     private Named lookup(Name n) {
        if(isProblemParser()) {
           final Namespace[] lookups = {
-            normalConfig.namespaces().functions(), 
-            schemaConfig.namespaces().functions(), 
+            schemaConfig.namespaces().programVariables(),
             normalConfig.namespaces().variables(), 
             schemaConfig.namespaces().variables(), 
-            schemaConfig.namespaces().programVariables()
+            normalConfig.namespaces().functions(), 
+            schemaConfig.namespaces().functions(), 
           };
           return doLookup(n,lookups);
        } else {
           final Namespace[] lookups = {
-              functions(), variables(), 
-              programVariables()
+              programVariables(), variables(),
+              functions()
           };
           return doLookup(n,lookups);
        }
@@ -1048,23 +1048,24 @@ options {
      */
     private Operator lookupVarfuncId(String varfunc_name, Term[] args) 
         throws NotDeclException, SemanticException {
-        // case 1: variable
-        Operator v = (Operator) variables().lookup(new Name(varfunc_name));
+
+        // case 1: program variable
+        Operator v = (Operator) programVariables().lookup
+            (new ProgramElementName(varfunc_name));
+        if (v != null && args==null) {
+            return v;
+        }
+        
+        // case 2: variable
+        v = (Operator) variables().lookup(new Name(varfunc_name));
         if (v != null && (args == null || (inSchemaMode() && v instanceof ModalOperatorSV))) {
             return v;
         }
         
-        // case 2: function
+        // case 3: function
         v = (Operator) functions().lookup(new Name(varfunc_name));
         if (v != null) { // we allow both args==null (e.g. `c')
                          // and args.length=0 (e.g. 'c())' here 
-            return v;
-        }
-        
-        // case 3: program variable
-        v = (Operator) programVariables().lookup
-            (new ProgramElementName(varfunc_name));
-        if (v != null && args==null) {
             return v;
         }
         
@@ -1677,9 +1678,9 @@ prog_var_decls
                   if (name != null ) {
 		    // commented out as pv do not have unique name (at the moment)
 		    //  throw new AmbigiousDeclException
-     		    //  	(var_name, getFilename(), getLine(), getColumn()); 
-		    if(name instanceof ProgramVariable && 
-			    !((ProgramVariable)name).getKeYJavaType().equals(kjt)) { 
+     		    //  	(var_name, getFilename(), getLine(), getColumn());
+		    if(!(name instanceof ProgramVariable) || (name instanceof ProgramVariable && 
+			    !((ProgramVariable)name).getKeYJavaType().equals(kjt))) { 
                       namespaces().programVariables().add(new LocationVariable
                         (pvName, kjt));
 		    }
