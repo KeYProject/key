@@ -1049,16 +1049,16 @@ options {
     private Operator lookupVarfuncId(String varfunc_name, Term[] args) 
         throws NotDeclException, SemanticException {
 
-        // case 1: program variable
-        Operator v = (Operator) programVariables().lookup
-            (new ProgramElementName(varfunc_name));
-        if (v != null && args==null) {
+        // case 1: variable
+        Operator v = (Operator) variables().lookup(new Name(varfunc_name));
+        if (v != null && (args == null || (inSchemaMode() && v instanceof ModalOperatorSV))) {
             return v;
         }
-        
-        // case 2: variable
-        v = (Operator) variables().lookup(new Name(varfunc_name));
-        if (v != null && (args == null || (inSchemaMode() && v instanceof ModalOperatorSV))) {
+
+        // case 2: program variable
+        v = (Operator) programVariables().lookup
+            (new ProgramElementName(varfunc_name));
+        if (v != null && args==null) {
             return v;
         }
         
@@ -1068,6 +1068,7 @@ options {
                          // and args.length=0 (e.g. 'c())' here 
             return v;
         }
+
         
         // case 4: instantiation of sort depending function
         int separatorIndex = varfunc_name.indexOf("::"); 
