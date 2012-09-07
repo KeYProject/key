@@ -181,7 +181,9 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         final Statement itinit = makeIteratorInit(expression, itVar);
 
-        final Expression itGuard = makeGuard(itVar);
+	// create the method call itVar.hasNext();
+	final Expression itGuard = KeYJavaASTFactory
+		.methodCall(HAS_NEXT, itVar);
 
         final StatementBlock block = makeBlock(itVar, valuesVar, lvd, body);
 
@@ -231,7 +233,9 @@ public class EnhancedForElimination extends ProgramTransformer {
     private Statement makeUpdate(ProgramVariable itVar,
             LocalVariableDeclaration lvd) {
 
-        final MethodReference methodCall = getItNext(itVar);
+	// create the method call itVar.next();
+	final MethodReference methodCall = KeYJavaASTFactory.methodCall(NEXT,
+		itVar);
 
         //
         // make local variable decl
@@ -246,27 +250,6 @@ public class EnhancedForElimination extends ProgramTransformer {
                 new LocalVariableDeclaration(tr, newSpec);
 
         return lvdNew;
-    }
-
-    /*
-     * "<it>.next()"
-     */
-    private MethodReference getItNext(ProgramVariable itVar) {
-        final ProgramElementName nextMeth = new ProgramElementName(NEXT);
-        final MethodReference methodCall =
-                new MethodReference(new ImmutableArray<Expression>(), nextMeth, itVar);
-        return methodCall;
-    }
-
-    /*
-     * "<it>.hasNext()"
-     */
-    private Expression makeGuard(ProgramVariable itVar) {
-        final ProgramElementName hasNextMeth = new ProgramElementName(HAS_NEXT);
-        final MethodReference methodCall =
-                new MethodReference(new ImmutableArray<Expression>(), hasNextMeth, itVar);
-
-        return methodCall;
     }
 
     /*
