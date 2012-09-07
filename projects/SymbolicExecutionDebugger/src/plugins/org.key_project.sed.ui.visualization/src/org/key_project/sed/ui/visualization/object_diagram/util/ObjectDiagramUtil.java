@@ -45,6 +45,27 @@ public final class ObjectDiagramUtil {
    }
    
    /**
+    * Checks if the given {@link Diagram} also has an {@link ODModel}.
+    * @param diagram The {@link Diagram} to check.
+    * @return {@code true} has model, {@code false} has no model.
+    */
+   public static boolean hasModel(Diagram diagram) {
+      if (diagram != null && diagram.eResource() != null) {
+         List<EObject> content = diagram.eResource().getContents();
+         EObject modelCandidate = CollectionUtil.search(content, new IFilter<EObject>() {
+            @Override
+            public boolean select(EObject element) {
+               return element instanceof ODModel;
+            }
+         });
+         return modelCandidate != null;
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
     * Returns the {@link ODModel} which contains all business objects of
     * the given object diagram. If no one is available a new {@link ODModel} 
     * instance is created and add to the resource of the diagram.

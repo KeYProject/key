@@ -1,81 +1,56 @@
-package org.key_project.sed.ui.visualization.execution_tree.wizard;
+package org.key_project.sed.ui.visualization.object_diagram.wizard;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
- * A new wizard to save existing Symbolic Execution Tree Diagrams in an additional resource.
+ * A new wizard to save existing Object Diagrams in an additional resource.
  * @author Martin Hentschel
  */
-public class SaveAsExecutionTreeDiagramWizard extends AbstractExecutionTreeDiagramSaveAsWizard {
+public class SaveAsObjectDiagramWizard extends AbstractObjectDiagramSaveAsWizard {
    /**
     * The {@link IDiagramTypeProvider} which contains the {@link Diagram} to save as.
     */
    private IDiagramTypeProvider diagramTypeProvider;
-
+   
    /**
     * Constructor.
     * @param diagramTypeProvider The {@link IDiagramTypeProvider} which contains the {@link Diagram} to save as.
     */
-   public SaveAsExecutionTreeDiagramWizard(IDiagramTypeProvider diagramTypeProvider) {
-      super();
+   public SaveAsObjectDiagramWizard(IDiagramTypeProvider diagramTypeProvider) {
       this.diagramTypeProvider = diagramTypeProvider;
    }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected ISEDDebugTarget[] getDebugTargetsToSave() {
-      Assert.isNotNull(diagramTypeProvider);
-      Assert.isNotNull(diagramTypeProvider.getFeatureProvider());
-      return ExecutionTreeUtil.getAllDebugTargets(diagramTypeProvider);
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   protected Diagram getDiagramToSave() {
-      Assert.isNotNull(diagramTypeProvider);
-      Diagram diagram = diagramTypeProvider.getDiagram();
-      return EcoreUtil.copy(diagram); // Return a copy because it is modified during save process (URL to domain file)
-   }
-
+   
    /**
     * {@inheritDoc}
     */
    @Override
    protected String getInitialWindowTitle() {
-      return "Save Symbolic Execution Tree Diagram";
+      return "Save Object Diagram as";
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected String getDiagramPageTitle() {
-      return "Save Symbolic Execution Tree Diagram";
+   protected String getDiagramAndModelPageTitle() {
+      return "Save Object Diagram as";
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected String getModelPageTitle() {
-      return "Save Symbolic Execution Tree Domain Model";
+   protected Diagram getDiagramToSave(String fileName) {
+      return diagramTypeProvider.getDiagram();
    }
-   
+
    /**
     * Opens the wizard.
     * @param parentShell The parent {@link Shell}.
@@ -83,7 +58,7 @@ public class SaveAsExecutionTreeDiagramWizard extends AbstractExecutionTreeDiagr
     * @return The wizard result.
     */
    public static int openWizard(Shell parentShell, IDiagramTypeProvider diagramTypeProvider) {
-      SaveAsExecutionTreeDiagramWizard wizard = new SaveAsExecutionTreeDiagramWizard(diagramTypeProvider);
+      SaveAsObjectDiagramWizard wizard = new SaveAsObjectDiagramWizard(diagramTypeProvider);
       IFile file = diagramTypeProvider != null ? GraphitiUtil.getFile(diagramTypeProvider.getDiagram()) : null;
       wizard.init(PlatformUI.getWorkbench(), SWTUtil.createSelection(file));
       WizardDialog dialog = new WizardDialog(parentShell, wizard);

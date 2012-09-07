@@ -23,6 +23,7 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStep
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeStepReturnFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeSuspendFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeTerminateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.DebugNodeVisualizeStateFeature;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -63,6 +64,8 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
       else {
          IContextButtonPadData data = super.getContextButtonPad(context);
          data.getGenericContextButtons().clear();
+         data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeVisualizeStateFeature(getFeatureProvider()), context, "Visualize State", null, IExecutionTreeImageConstants.IMG_VISUALIZE_STATE));
+
          data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeStepReturnFeature(getFeatureProvider()), context, "Step Return", null, IExecutionTreeImageConstants.IMG_STEP_RETURN));
          data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeStepOverFeature(getFeatureProvider()), context, "Step Over", null, IExecutionTreeImageConstants.IMG_STEP_OVER));
          data.getGenericContextButtons().add(createCustomContextButtonEntry(new DebugNodeStepIntoFeature(getFeatureProvider()), context, "Step Into", null, IExecutionTreeImageConstants.IMG_STEP_INTO));
@@ -108,6 +111,8 @@ public class ExecutionTreeToolBehaviorProvider extends DefaultToolBehaviorProvid
          result.add(createCustomContextMenuEntry(new DebugNodeStepOverFeature(getFeatureProvider()), context, "Step Over", null, IExecutionTreeImageConstants.IMG_STEP_OVER));
          result.add(createCustomContextMenuEntry(new DebugNodeStepIntoFeature(getFeatureProvider()), context, "Step Into", null, IExecutionTreeImageConstants.IMG_STEP_INTO));
          result.add(createCustomContextMenuEntry(new DebugNodeStepReturnFeature(getFeatureProvider()), context, "Step Return", null, IExecutionTreeImageConstants.IMG_STEP_RETURN));
+
+         result.add(createCustomContextMenuEntry(new DebugNodeVisualizeStateFeature(getFeatureProvider()), context, "Visualize State", null, IExecutionTreeImageConstants.IMG_VISUALIZE_STATE));
          return result.toArray(new IContextMenuEntry[result.size()]);
       }
       else {

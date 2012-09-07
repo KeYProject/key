@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.draw2d.TextUtilities;
 import org.eclipse.draw2d.geometry.Dimension;
@@ -16,6 +17,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.datatypes.IDimension;
+import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.internal.datatypes.impl.DimensionImpl;
 import org.eclipse.graphiti.internal.services.impl.GaServiceImpl;
 import org.eclipse.graphiti.mm.StyleContainer;
@@ -42,6 +44,13 @@ import org.key_project.util.java.thread.IRunnableWithResult;
  */
 @SuppressWarnings("restriction")
 public final class GraphitiUtil {
+   /**
+    * Property which is used in {@link IContext} instances to define
+    * an {@link IProgressMonitor} used during feature execution. It is
+    * accessible via {@link IContext#getProperty(Object)}.
+    */
+   public static final String CONTEXT_PROPERTY_MONITOR = "org.key_project.sed.ui.visualization.feature.property.monitor";
+   
    /**
     * Forbid instances.
     */

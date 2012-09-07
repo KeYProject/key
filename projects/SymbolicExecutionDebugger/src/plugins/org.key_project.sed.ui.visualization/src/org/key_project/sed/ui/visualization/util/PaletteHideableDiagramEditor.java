@@ -5,6 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.SnapToGrid;
@@ -29,6 +33,8 @@ import org.eclipse.graphiti.ui.internal.editor.DiagramEditorInternal;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchPart;
+import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
+import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
 import org.key_project.util.eclipse.view.editorInView.GlobalEnablementWrapperAction;
 import org.key_project.util.eclipse.view.editorInView.IGlobalEnablement;
@@ -88,6 +94,33 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
       }
       childGlobalEnablements.clear();
       super.dispose();
+   }
+   
+   /**
+    * Executes the given {@link IFeature} with the given {@link IContext}.
+    * @param feature The {@link IFeature} to execute.
+    * @param context the {@link IContext} to use.
+    */
+   public void executeFeatureInJob(String jobName, 
+                                   final IFeature feature, 
+                                   final IContext context) {
+      new AbstractWorkbenchPartJob(jobName, this) {
+         @Override
+         protected IStatus run(IProgressMonitor monitor) {
+            try {
+               SWTUtil.checkCanceled(monitor);
+               context.putProperty(GraphitiUtil.CONTEXT_PROPERTY_MONITOR, monitor);
+               executeFeature(feature, context);
+               return Status.OK_STATUS;
+            }
+            catch (OperationCanceledException e) {
+               return Status.CANCEL_STATUS;
+            }
+            catch (Exception e) {
+               return LogUtil.getLogger().createErrorStatus(e);
+            }
+         }
+      }.schedule();
    }
    
    /**
@@ -424,5 +457,18 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
    @Override
    public IConfigurationProvider getConfigurationProvider() {
       return super.getConfigurationProvider();
+   }
+   
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Overwritten to ignore warnings.
+    * </p>
+    */   
+   @Override
+   protected void configureGraphicalViewer() {
+      super.configureGraphicalViewer();
    }
 }

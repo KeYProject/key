@@ -15,6 +15,11 @@ public class ObjectDiagramTypeProvider extends AbstractDiagramTypeProvider {
    public static final String TYPE = "objectDiagram";
 
    /**
+    * The provider ID of this {@link IDiagramTypeProvider}.
+    */
+   public static final String PROVIDER_ID = "org.key_project.sed.ui.graphiti.ObjectDiagramTypeProvider";
+
+   /**
     * Contains the available {@link IToolBehaviorProvider}s which are instantiated
     * lazily via {@link #getAvailableToolBehaviorProviders()}.
     */
