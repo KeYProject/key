@@ -19,10 +19,12 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.ide.IDE;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.ui.visualization.object_diagram.editor.ReadonlyObjectDiagramEditor;
+import org.key_project.sed.ui.visualization.object_diagram.perspective.StateVisualizationPerspectiveFactory;
 import org.key_project.sed.ui.visualization.object_diagram.provider.ObjectDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.NonPersistableDiagramEditorInput;
+import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
@@ -86,6 +88,9 @@ public class VisualizeStateCommand extends AbstractHandler {
       IEditorPart editorPart = IDE.openEditor(activePage, 
                                               input, 
                                               ReadonlyObjectDiagramEditor.EDITOR_ID);
+      if (ObjectDiagramUtil.shouldSwitchToStateVisualizationPerspective(activePage)) {
+         WorkbenchUtil.openPerspective(StateVisualizationPerspectiveFactory.PERSPECTIVE_ID);
+      }
       Assert.isTrue(editorPart instanceof ReadonlyObjectDiagramEditor);
       ReadonlyObjectDiagramEditor readonlyEditor = (ReadonlyObjectDiagramEditor)editorPart;
       // Generate object diagram if not already available

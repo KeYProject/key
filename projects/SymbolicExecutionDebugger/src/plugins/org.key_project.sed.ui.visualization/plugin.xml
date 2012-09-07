@@ -407,4 +407,37 @@
         </command>
      </menuContribution>
   </extension>
+  <extension
+        point="org.eclipse.ui.perspectives">
+     <perspective
+           class="org.key_project.sed.ui.visualization.object_diagram.perspective.StateVisualizationPerspectiveFactory"
+           icon="icons/object_diagram.gif"
+           id="org.key_project.sed.ui.visualization.stateVisualizationPerspective"
+           name="State Visualization">
+     </perspective>
+  </extension>
+  <extension
+        point="org.eclipse.ui.perspectiveExtensions">
+     <perspectiveExtension
+           targetID="org.key_project.sed.ui.perspective">
+        <perspectiveShortcut
+              id="org.key_project.sed.ui.visualization.stateVisualizationPerspective">
+        </perspectiveShortcut>
+     </perspectiveExtension>
+  </extension>
+  <extension
+        point="org.eclipse.core.runtime.preferences">
+     <initializer
+           class="org.key_project.sed.ui.visualization.util.VisualizationPreferencesInitializer">
+     </initializer>
+  </extension>
+  <extension
+        point="org.eclipse.ui.preferencePages">
+     <page
+           category="org.key_project.sed.ui.preference.page.symbolic_debug"
+           class="org.key_project.sed.ui.visualization.preference.page.VisualizationPreferencePage"
+           id="org.key_project.sed.ui.visualization.preference.page.VisualizationPreferencePage"
+           name="Visualization">
+     </page>
+  </extension>
 </plugin>

@@ -6,10 +6,16 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.ui.IWorkbenchPage;
 import org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer;
 import org.key_project.sed.ui.visualization.model.od.ODFactory;
 import org.key_project.sed.ui.visualization.model.od.ODModel;
 import org.key_project.sed.ui.visualization.model.od.ODObject;
+import org.key_project.sed.ui.visualization.object_diagram.perspective.StateVisualizationPerspectiveFactory;
+import org.key_project.sed.ui.visualization.util.VisualizationPreferences;
+import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
 
@@ -127,5 +133,35 @@ public final class ObjectDiagramUtil {
          }
       }
       return result;
+   }
+
+   /**
+    * Checks if a perspective switch to the state visualization perspective should be done.
+    * @param activePage The currently active {@link IWorkbenchPage}.
+    * @return {@code true} switch to state visualization perspective, {@code false} stay in current perspective.
+    */
+   public static boolean shouldSwitchToStateVisualizationPerspective(IWorkbenchPage activePage) {
+      boolean switchPerspective = false;
+      // Check if a different perspective is currently opened.
+      if (!WorkbenchUtil.isPerspectiveOpen(StateVisualizationPerspectiveFactory.PERSPECTIVE_ID, activePage)) {
+         String option = VisualizationPreferences.getSwitchToStateVisualizationPerspective();
+         if (MessageDialogWithToggle.ALWAYS.equals(option)) {
+            switchPerspective = true;
+         }
+         else if (MessageDialogWithToggle.NEVER.equals(option)) {
+            switchPerspective = false;
+         }
+         else {
+            MessageDialogWithToggle dialog = MessageDialogWithToggle.openYesNoQuestion(activePage.getActivePart().getSite().getShell(), 
+                                                                                       "Confirm Perspective Switch", 
+                                                                                       "The state visualization is associated with the " + WorkbenchUtil.getPerspectiveName(StateVisualizationPerspectiveFactory.PERSPECTIVE_ID) + " perspective.\n\nDo you want to open this perspective now?", 
+                                                                                       null, 
+                                                                                       false, 
+                                                                                       VisualizationPreferences.getStore(), 
+                                                                                       VisualizationPreferences.SWITCH_TO_STATE_VISUALIZATION_PERSPECTIVE);
+            switchPerspective = (dialog.getReturnCode() == IDialogConstants.YES_ID);
+         }
+      }
+      return switchPerspective;
    }
 }
