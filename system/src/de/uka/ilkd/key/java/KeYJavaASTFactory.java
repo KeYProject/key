@@ -194,7 +194,29 @@ public abstract class KeYJavaASTFactory {
 						KeYJavaType kjt) {
 	return new LocationVariable(name, kjt);
     }
+    
+    /**
+     * Create a local variable with a unique name.
+     * 
+     * @param services
+     *            the {@link Services} whose {@link VariableNamer} is used
+     * @param name
+     *            the {@link String} on which the variable's unique name is
+     *            based
+     * @param type
+     *            the variable's static {@link KeYJavaType}
+     * @return a new {@link ProgramVariable} of static type <code>type</code>
+     *         and with a unique name based on <code>name</code>
+     */
+    public static ProgramVariable localVariable(final Services services,
+	    final String name, final KeYJavaType type) {
+	final ProgramElementName uniqueName = services.getVariableNamer()
+		.getTemporaryNameProposal(name);
+	final ProgramVariable variable = KeYJavaASTFactory.localVariable(
+		uniqueName, type);
 
+	return variable;
+    }
 
     /** 
      * create a catch clause
