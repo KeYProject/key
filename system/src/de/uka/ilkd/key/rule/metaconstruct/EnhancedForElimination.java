@@ -23,10 +23,7 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -129,10 +126,9 @@ public class EnhancedForElimination extends ProgramTransformer {
         assert expression instanceof ReferencePrefix : ""+expression+" is not an arrray reference.";
         // expected subtypes of ReferencePrefix are LocationVariable, VariableReference, etc.
         final ReferencePrefix arrayVar = (ReferencePrefix) expression;
-        final VariableNamer varNamer = services.getVariableNamer();
-        final ProgramElementName itName = varNamer.getTemporaryNameProposal("i");
         final KeYJavaType intType = ji.getPrimitiveKeYJavaType("int");
-        final ProgramVariable itVar = new LocationVariable(itName, intType);
+	final ProgramVariable itVar = KeYJavaASTFactory.localVariable("i",
+		intType);
 
 	final ILoopInit inits = KeYJavaASTFactory.loopInit(intType, itVar);
         final IGuard guard = KeYJavaASTFactory.lessThanArrayLengthGuard(ji, itVar, arrayVar);
@@ -162,15 +158,14 @@ public class EnhancedForElimination extends ProgramTransformer {
             Expression expression, Statement body) {
 
         // local variable "it"
-        final VariableNamer varNamer = services.getVariableNamer();
         final KeYJavaType iteratorType = services.getJavaInfo().getTypeByName(ITERATOR);
-        final ProgramElementName itName = varNamer.getTemporaryNameProposal(IT);
-        final ProgramVariable itVar = new LocationVariable(itName, iteratorType);
+	final ProgramVariable itVar = KeYJavaASTFactory.localVariable(services,
+		IT, iteratorType);
 
         // local variable "values"
-        final ProgramElementName valuesName = varNamer.getTemporaryNameProposal(VALUES);
         final KeYJavaType seqType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_SEQ);
-        final LocationVariable valuesVar = new LocationVariable(valuesName, seqType);
+	final ProgramVariable valuesVar = KeYJavaASTFactory.localVariable(
+		services, VALUES, seqType);
 
 	// ghost \seq values = \seq_empty
 	final Statement valuesInit = KeYJavaASTFactory.declare(new Ghost(),
@@ -201,7 +196,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * "; <body>"
      */
     private StatementBlock makeBlock(ProgramVariable itVar,
-	    LocationVariable valuesVar, LocalVariableDeclaration lvd,
+	    ProgramVariable valuesVar, LocalVariableDeclaration lvd,
 	    Statement body) {
 	// create the variable declaration <Type> lvd = itVar.next();
 	final VariableSpecification varSpec = lvd.getVariableSpecifications()
@@ -219,7 +214,7 @@ public class EnhancedForElimination extends ProgramTransformer {
     /*
      * <values> = \seq_concat(<values>, \seq_singleton(<lvd>)); 
      */
-    private Statement makeValuesUpdate(LocationVariable valuesVar, LocalVariableDeclaration lvd){
+    private Statement makeValuesUpdate(ProgramVariable valuesVar, LocalVariableDeclaration lvd){
         final VariableSpecification var = lvd.getVariables().get(0);
         final IProgramVariable element = var.getProgramVariable();
         assert element instanceof ProgramVariable :
