@@ -149,10 +149,8 @@ public class EnhancedForElimination extends ProgramTransformer {
         final Statement getNextElement = KeYJavaASTFactory.assignArrayField(lvdVar, arrayVar, itVar);
         final For forLoop = KeYJavaASTFactory.forLoop(inits, guard, updates, getNextElement, body);
 
-        // put everything together
-        final Statement[] complete = {declArrayElemVar,forLoop};
         setInvariant(enhancedFor, forLoop);
-        return new StatementBlock(complete);
+        return KeYJavaASTFactory.block(declArrayElemVar, forLoop);
     }
 
     // Methods to transform loops over Iterable
@@ -193,9 +191,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         final While whileGuard = new While(itGuard, block, null, new ExtList());
 
         // block
-        final Statement[] statements = 
-                new Statement[]{ itinit, valuesInit, whileGuard };
-        final StatementBlock outerBlock = new StatementBlock(statements);
+        final StatementBlock outerBlock = KeYJavaASTFactory.block(itinit, valuesInit, whileGuard);
         setInvariant(enhancedFor,whileGuard);
         return outerBlock;
 
