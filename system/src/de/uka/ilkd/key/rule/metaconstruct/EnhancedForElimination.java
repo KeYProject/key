@@ -204,15 +204,20 @@ public class EnhancedForElimination extends ProgramTransformer {
     /*
      * "; <body>"
      */
-    private StatementBlock makeBlock(ProgramVariable itVar, LocationVariable valuesVar,
-            LocalVariableDeclaration lvd, Statement body) {
+    private StatementBlock makeBlock(ProgramVariable itVar,
+	    LocationVariable valuesVar, LocalVariableDeclaration lvd,
+	    Statement body) {
+	// create the variable declaration <Type> lvd = itVar.next();
+	final VariableSpecification varSpec = lvd.getVariableSpecifications()
+		.get(0);
+	final LocalVariableDeclaration varDecl = KeYJavaASTFactory
+		.declareMethodCall(varSpec.getProgramVariable(), itVar, NEXT);
 
-        final Statement[] statements = 
-                // ATTENTION: in order for the invariant rule to work correctly,
-                // the update to values needs to appear at the _second_ entry of the loop
-                { makeUpdate(itVar, lvd), makeValuesUpdate(valuesVar, lvd), body };
-        final StatementBlock block = new StatementBlock(statements);
-        return block;
+	// ATTENTION: in order for the invariant rule to work correctly,
+	// the update to values needs to appear at the _second_ entry of the
+	// loop
+	return KeYJavaASTFactory.block(varDecl,
+		makeValuesUpdate(valuesVar, lvd), body);
     }
 
     /*
@@ -227,31 +232,6 @@ public class EnhancedForElimination extends ProgramTransformer {
         final Expression seqConcat = new SeqConcat(valuesVar, seqSingleton);
         final Statement assignment = new CopyAssignment(valuesVar, seqConcat);
         return assignment;
-    }
-
-    /*
-     * "<Type> <lvd> = <it>.next();"
-     */
-    private Statement makeUpdate(ProgramVariable itVar,
-            LocalVariableDeclaration lvd) {
-
-	// create the method call itVar.next();
-	final MethodReference methodCall = KeYJavaASTFactory.methodCall(NEXT,
-		itVar);
-
-        //
-        // make local variable decl
-        final VariableSpecification orgSpec =
-                lvd.getVariableSpecifications().get(0);
-        final VariableSpecification newSpec =
-                new VariableSpecification(orgSpec.getProgramVariable(),
-                        methodCall, orgSpec.getType());
-        final KeYJavaType keytype = (KeYJavaType) orgSpec.getType();
-        final TypeRef tr = new TypeRef(keytype);
-        final LocalVariableDeclaration lvdNew =
-                new LocalVariableDeclaration(tr, newSpec);
-
-        return lvdNew;
     }
 
     /**
