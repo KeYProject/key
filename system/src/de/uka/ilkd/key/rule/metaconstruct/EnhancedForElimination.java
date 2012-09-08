@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
@@ -179,7 +178,10 @@ public class EnhancedForElimination extends ProgramTransformer {
 	final Statement valuesInit = KeYJavaASTFactory.declare(new Ghost(),
 		valuesVar, EmptySeqLiteral.INSTANCE, seqType);
 
-        final Statement itinit = makeIteratorInit(expression, itVar);
+	// Iterator itVar = expression.iterator();
+	final Statement itinit = KeYJavaASTFactory.declareMethodCall(
+		iteratorType, itVar, new ParenthesizedExpression(expression),
+		ITERATOR_METH);
 
 	// create the method call itVar.hasNext();
 	final Expression itGuard = KeYJavaASTFactory
@@ -250,30 +252,6 @@ public class EnhancedForElimination extends ProgramTransformer {
                 new LocalVariableDeclaration(tr, newSpec);
 
         return lvdNew;
-    }
-
-    /*
-     * "Iterator <it> = expression.iterator();"
-     */
-    private Statement makeIteratorInit(Expression expression,
-            ProgramVariable itVar) {
-
-        //
-        // expression.iterator();
-        final MethodName iteratorMeth = new ProgramElementName(ITERATOR_METH);
-        final Expression methodcall =
-                new MethodReference(new ImmutableArray<Expression>(), iteratorMeth,
-                        new ParenthesizedExpression(expression));
-
-        //
-        // put together
-        final VariableSpecification spec =
-                new VariableSpecification(itVar, methodcall, itVar.getKeYJavaType());
-        final KeYJavaType iteratorType = services.getJavaInfo().getTypeByName(ITERATOR);
-        final TypeRef iteratorTyperef = new TypeRef(iteratorType);
-        final LocalVariableDeclaration init =
-                new LocalVariableDeclaration(iteratorTyperef, spec);
-        return init;
     }
 
     /**
