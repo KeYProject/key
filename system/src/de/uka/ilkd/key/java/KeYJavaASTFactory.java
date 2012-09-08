@@ -800,50 +800,51 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
-     * Create a method call on a variable.
+     * Create a method call.
      * 
      * <pre>
-     * variable.name(args);
+     * reference.name(args);
      * </pre>
      * 
      * @param args
      *            the argument {@link Expression}s to be passed to the method
      * @param name
      *            the method's name {@link String}
-     * @param variable
-     *            the {@link ProgramVariable} the method is called on
+     * @param reference
+     *            the {@link ReferencePrefix} the method is called on
      * @return a new {@link MethodReference} for call of method
-     *         <code>name</code> on <code>variable</code> with arguments
+     *         <code>name</code> on <code>reference</code> with arguments
      *         <code>args</code>
      */
     public static MethodReference methodCall(
 	    final ImmutableArray<? extends Expression> args, final String name,
-	    final ProgramVariable variable) {
+	    final ReferencePrefix reference) {
 	final ProgramElementName method = new ProgramElementName(name);
-	final MethodReference call = new MethodReference(args, method, variable);
+	final MethodReference call = new MethodReference(args, method,
+		reference);
 
 	return call;
     }
 
     /**
-     * Create a method call on a variable with no arguments.
+     * Create a method call with no arguments.
      * 
      * <pre>
-     * variable.name();
+     * reference.name();
      * </pre>
      * 
      * @param name
      *            the method's name {@link String}
-     * @param variable
-     *            the {@link ProgramVariable} the method is called on
+     * @param reference
+     *            the {@link ReferencePrefix} the method is called on
      * @return a new {@link MethodReference} for call of method
-     *         <code>name</code> on <code>variable</code> with no arguments
+     *         <code>name</code> on <code>reference</code> with no arguments
      */
     public static MethodReference methodCall(final String name,
-	    final ProgramVariable variable) {
+	    final ReferencePrefix reference) {
 	final ImmutableArray<Expression> args = new ImmutableArray<Expression>();
 	final MethodReference call = KeYJavaASTFactory.methodCall(args, name,
-		variable);
+		reference);
 
 	return call;
     }
