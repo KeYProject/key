@@ -401,6 +401,65 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a local variable declaration that assigns a method's return value
+     * initially.
+     * 
+     * <pre>
+     * type variable = reference.method();
+     * </pre>
+     * 
+     * @param type
+     *            the static {@link KeYJavaType} of <code>variable</code>
+     * @param variable
+     *            the named and typed {@link ProgramVariable} to be declared
+     * @param reference
+     *            the {@link ReferencePrefix} the method is called on
+     * @param method
+     *            the method's name {@link String}
+     * @return a new {@link LocalVariableDeclaration} of <code>variable</code>
+     *         with static type <code>type</code> and initial value
+     *         <code>reference.method()</code>
+     */
+    public static LocalVariableDeclaration declareMethodCall(
+	    final KeYJavaType type, final IProgramVariable variable,
+	    final ReferencePrefix reference, final String method) {
+	final MethodReference call = KeYJavaASTFactory.methodCall(method,
+		reference);
+
+	return KeYJavaASTFactory.declare(variable, call, type);
+    }
+
+    /**
+     * Create a local variable declaration that assigns a method's return value
+     * initially.
+     * 
+     * <pre>
+     * type variable = reference.method();
+     * </pre>
+     * 
+     * where <code>type</code> is variable's {@link KeYJavaType} as it is
+     * returned by {@link ProgramVariable.getKeYJavaType()}.
+     * 
+     * @param variable
+     *            the named and typed {@link ProgramVariable} to be declared
+     * @param reference
+     *            the {@link ReferencePrefix} the method is called on
+     * @param method
+     *            the method's name {@link String}
+     * @return a new {@link LocalVariableDeclaration} of <code>variable</code>
+     *         with static type <code>type</code> and initial value
+     *         <code>reference.method()</code>
+     */
+    public static LocalVariableDeclaration declareMethodCall(
+	    final IProgramVariable variable, final ReferencePrefix reference,
+	    final String method) {
+	final MethodReference call = KeYJavaASTFactory.methodCall(method,
+		reference);
+
+	return KeYJavaASTFactory.declare(variable, call);
+    }
+
+    /**
      * Create a loop initialization that consists of a single statement.
      * 
      * <pre>
