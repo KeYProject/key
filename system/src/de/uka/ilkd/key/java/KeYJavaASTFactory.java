@@ -874,8 +874,39 @@ public abstract class KeYJavaASTFactory {
 	    final IProgramVariable variable, final Expression init,
 	    final KeYJavaType type) {
 	final TypeRef typeRef = new TypeRef(type);
+	final LocalVariableDeclaration declaration = KeYJavaASTFactory.declare(
+		modifiers, variable, init, typeRef);
+
+	return declaration;
+    }
+
+    /**
+     * Create a local variable declaration with an arbitrary number of
+     * modifiers.
+     * 
+     * <pre>
+     * modifiers typeRef variable = init;
+     * </pre>
+     * 
+     * @param modifiers
+     *            the {@link Modifier}s
+     * @param variable
+     *            the named and typed {@link ProgramVariable} to be declared
+     * @param init
+     *            the {@link Expression} <code>variable</code> is initialized
+     *            with
+     * @param typeRef
+     *            the static {@link TypeRef} of <code>variable</code>
+     * @return a new {@link LocalVariableDeclaration} of <code>variable</code>
+     *         with static type <code>typeRef</code> and initial value
+     *         <code>init</code>
+     */
+    public static LocalVariableDeclaration declare(
+	    final ImmutableArray<Modifier> modifiers,
+	    final IProgramVariable variable, final Expression init,
+	    final TypeRef typeRef) {
 	final VariableSpecification varSpec = new VariableSpecification(
-		variable, init, type);
+		variable, init, typeRef.getKeYJavaType());
 	final LocalVariableDeclaration declaration = new LocalVariableDeclaration(
 		modifiers, typeRef, varSpec);
 
@@ -964,5 +995,45 @@ public abstract class KeYJavaASTFactory {
 		new ParenthesizedExpression(expression));
 
 	return reference;
+    }
+
+    /**
+     * Create a local array variable declaration with an arbitrary number of
+     * modifiers.
+     * 
+     * <pre>
+     * modifiers typePrefix.baseType[] variable = init;
+     * </pre>
+     * 
+     * @param modifiers
+     *            the {@link Modifiers}
+     * @param variable
+     *            the named and typed {@link ProgramVariable} to be declared
+     * @param init
+     *            the {@link Expression} <code>variable</code> is initialized
+     *            with
+     * @param typeName
+     *            the type's {@link ProgramElementName}
+     * @param dimensions
+     *            the type's dimensions
+     * @param typePrefix
+     *            the type's {@link ReferencePrefix}
+     * @param baseType
+     *            the base {@link KeYJavaType}
+     * @return a new {@link LocalVariableDeclaration} of <code>variable</code>
+     *         with static type <code>baseType[dimensions]</code> and initial
+     *         value <code>init</code>
+     */
+    public static ProgramElement declare(
+	    final ImmutableArray<Modifier> modifiers,
+	    final IProgramVariable variable, final Expression init,
+	    final ProgramElementName typeName, final int dimensions,
+	    final ReferencePrefix typePrefix, final KeYJavaType baseType) {
+	final TypeRef typeRef = new TypeRef(typeName, dimensions, typePrefix,
+		baseType);
+	final LocalVariableDeclaration declaration = KeYJavaASTFactory.declare(
+		modifiers, variable, init, typeRef);
+
+	return declaration;
     }
 }
