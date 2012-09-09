@@ -15,11 +15,13 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
 import de.uka.ilkd.key.java.reference.ArrayReference;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -928,5 +930,39 @@ public abstract class KeYJavaASTFactory {
 		reference);
 
 	return call;
+    }
+
+    /**
+     * Create a field access.
+     * 
+     * <pre>
+     * (expression).name
+     * </pre>
+     * 
+     * @param services
+     *            the {@link Services} to determine both <code>expression</code>
+     *            's {@link KeYJavaType} and the {@link ProgramVariable}
+     *            corresponding to the field <code>name</code>
+     * @param name
+     *            the to be accessed field's name {@link String}
+     * @param expression
+     *            the {@link Expression} on which the field is accessed
+     * @param context
+     *            the {@link ExecutionContext}, which is needed to determine
+     *            <code>expression</code>'s <code>KeYJavaType</code>
+     * @return a new {@link FieldReference} of field <code>name</code> on
+     *         <code>expression</code>
+     */
+    public static FieldReference fieldReference(final Services services,
+	    final String name, final Expression expression,
+	    final ExecutionContext context) {
+	final KeYJavaType classType = expression.getKeYJavaType(services,
+		context);
+	final ProgramVariable field = services.getJavaInfo().getAttribute(name,
+		classType);
+	final FieldReference reference = new FieldReference(field,
+		new ParenthesizedExpression(expression));
+
+	return reference;
     }
 }
