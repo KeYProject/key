@@ -514,7 +514,7 @@ public abstract class KeYJavaASTFactory {
      *         <code>variable</code> with static type <code>type</code> and
      *         initial value zero
      */
-    public static ILoopInit loopInit(final KeYJavaType type,
+    public static ILoopInit loopInitZero(final KeYJavaType type,
 	    final ProgramVariable variable) {
 	final LoopInitializer initializer = KeYJavaASTFactory.declareZero(type,
 		variable);

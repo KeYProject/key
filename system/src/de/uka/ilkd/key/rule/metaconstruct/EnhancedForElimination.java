@@ -130,7 +130,7 @@ public class EnhancedForElimination extends ProgramTransformer {
 	final ProgramVariable itVar = KeYJavaASTFactory.localVariable("i",
 		intType);
 
-	final ILoopInit inits = KeYJavaASTFactory.loopInit(intType, itVar);
+	final ILoopInit inits = KeYJavaASTFactory.loopInitZero(intType, itVar);
         final IGuard guard = KeYJavaASTFactory.lessThanArrayLengthGuard(ji, itVar, arrayVar);
         final IForUpdates updates = KeYJavaASTFactory.postIncrementForUpdates(itVar);
 
