@@ -9,6 +9,8 @@
 //
 package de.uka.ilkd.key.java;
 
+import java.util.List;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -677,6 +679,28 @@ public abstract class KeYJavaASTFactory {
      */
     public static StatementBlock block(final Statement... statements) {
 	final StatementBlock block = new StatementBlock(statements);
+
+	return block;
+    }
+
+    /**
+     * Create a block from an arbitrary number of statements.
+     * 
+     * <pre>
+     * {
+     *   statements;
+     * }
+     * </pre>
+     * 
+     * @param statements
+     *            the {@link Statement}s to appear in the block
+     * @return a new {@link StatementBlock} that consists of the given
+     *         <code>statements</code> in the very same order
+     */
+    public static StatementBlock block(final List<Statement> statements) {
+	final Statement[] s = new Statement[statements.size()];
+	final StatementBlock block = KeYJavaASTFactory.block(statements
+		.toArray(s));
 
 	return block;
     }
