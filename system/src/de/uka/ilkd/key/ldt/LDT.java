@@ -131,7 +131,7 @@ public abstract class LDT implements Named {
     }
 
     
-    public final boolean containsFunction(Function op) {
+    public boolean containsFunction(Function op) {
 	Named n=functions.lookup(op.name());
 	return (n==op);
     }
@@ -206,7 +206,7 @@ public abstract class LDT implements Named {
 
     public abstract boolean hasLiteralFunction(Function f);
 
-    public abstract Expression translateTerm(Term t, ExtList children);
+    public abstract Expression translateTerm(Term t, ExtList children, Services services);
     
     public abstract Type getType(Term t);
 }

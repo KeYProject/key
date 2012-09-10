@@ -279,6 +279,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     
     
     private Map<Term, Term> getReplaceMap(
+	    		      LocationVariable baseHeap,
 	    		      Term heapTerm,
 	    		      Term selfTerm, 
 	    		      ImmutableList<Term> paramTerms, 
@@ -293,7 +294,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	assert heapTerm.sort().equals(services.getTypeConverter()
 		                              .getHeapLDT()
 		                              .targetSort());
-	result.put(TB.getBaseHeap(services), heapTerm);
+	result.put(baseHeap != null ? TB.var(baseHeap) : TB.getBaseHeap(services), heapTerm);
 	
         //self
 	if(selfTerm != null) {
@@ -425,7 +426,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-	final Map<Term, Term> replaceMap = getReplaceMap(heapTerm, 
+	final Map<Term, Term> replaceMap = getReplaceMap(heap, heapTerm, 
 					     selfTerm, 
 					     paramTerms, 
 					     null, 
@@ -438,14 +439,14 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     
 
     public Term getPre(List<LocationVariable> heapContext,
-                       Term heapTerm,
+                       Map<LocationVariable,Term> heapTerms,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
                        Services services) {
        Term result = null;
        for(LocationVariable heap : heapContext) {
-          final Term p = getPre(heap, heapTerm, selfTerm, paramTerms, atPres, services);
+          final Term p = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
           if(result == null) {
             result = p;
           }else{
@@ -484,7 +485,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-	final Map<Term, Term> replaceMap = getReplaceMap(heapTerm, 
+	final Map<Term, Term> replaceMap = getReplaceMap(null, heapTerm, 
 					     selfTerm, 
 					     paramTerms, 
 					     null, 
@@ -733,7 +734,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert excTerm != null;
         assert atPres.size() != 0;
         assert services != null;
-	final Map<Term, Term> replaceMap = getReplaceMap(heapTerm,
+	final Map<Term, Term> replaceMap = getReplaceMap(heap, heapTerm,
 		                             selfTerm, 
                                              paramTerms, 
                                              resultTerm, 
@@ -745,7 +746,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     }    
 
     public Term getPost(List<LocationVariable> heapContext,
-                        Term heapTerm,
+                        Map<LocationVariable,Term> heapTerms,
 	                Term selfTerm, 
                         ImmutableList<Term> paramTerms, 
                         Term resultTerm, 
@@ -754,7 +755,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                         Services services) {
        Term result = null;
        for(LocationVariable heap : heapContext) {
-          final Term p = getPost(heap, heapTerm, selfTerm, paramTerms, resultTerm, excTerm, atPres, services);
+          final Term p = getPost(heap, heapTerms.get(heap), selfTerm, paramTerms, resultTerm, excTerm, atPres, services);
           if(result == null) {
             result = p;
           }else{
@@ -793,7 +794,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
        return getAnyMod(this.originalMods.get(heap), selfVar, paramVars, services);
     }
 
-    private Term getAnyMod(Term mod, Term heapTerm,
+    private Term getAnyMod(LocationVariable heap, Term mod, Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Services services) {
@@ -802,7 +803,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         assert paramTerms != null;
         assert paramTerms.size() == originalParamVars.size();
         assert services != null;
-	final Map<Term, Term> replaceMap = getReplaceMap(heapTerm,
+	final Map<Term, Term> replaceMap = getReplaceMap(heap, heapTerm,
 		                             selfTerm, 
                                              paramTerms, 
                                              null, 
@@ -823,7 +824,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Services services) {
-        return getAnyMod(this.originalMods.get(heap), heapTerm, selfTerm, paramTerms, services);
+        return getAnyMod(heap, this.originalMods.get(heap), heapTerm, selfTerm, paramTerms, services);
     }    
     
     @Override
