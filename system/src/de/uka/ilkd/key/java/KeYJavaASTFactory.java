@@ -31,6 +31,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -1059,5 +1060,47 @@ public abstract class KeYJavaASTFactory {
 		modifiers, variable, init, typeRef);
 
 	return declaration;
+    }
+
+    /**
+     * Create a method body shortcut.
+     * 
+     * Note that <code>classType</code> is also used as visibility context when
+     * looking for <code>methodName</code> in its definition.
+     * 
+     * @param model
+     *            the {@link JavaInfo} that contains
+     *            <code>classType.methodName</code>
+     * @param result
+     *            the {@link ProgramVariable} the return value is assigned to or
+     *            <code>null</code>
+     * @param reference
+     *            the {@link IProgramVariable} on which the method is called
+     * @param classType
+     *            the {@link KeYJavaType} in which the method is declared
+     * @param methodName
+     *            the method's {@link String} name
+     * @param arguments
+     *            the <code>ProgramVariable</code> and their static types the
+     *            method is called with
+     * @return a new {@link MethodBodyStatement} for
+     *         <code>classType.methodName</code> when called with
+     *         <code>arguments</code> or <code>null</code> when the former is
+     *         not defined
+     */
+    public static MethodBodyStatement methodBody(final JavaInfo model,
+	    final ProgramVariable result, final IProgramVariable reference,
+	    final KeYJavaType classType, final String methodName,
+	    final ProgramVariable[] arguments) {
+	final IProgramMethod method = model.getProgramMethod(classType,
+		methodName, arguments, classType);
+	MethodBodyStatement methodBody = null;
+
+	if (method != null) {
+	    methodBody = new MethodBodyStatement(method, result, reference,
+		    new ImmutableArray<Expression>(arguments));
+	}
+
+	return methodBody;
     }
 }
