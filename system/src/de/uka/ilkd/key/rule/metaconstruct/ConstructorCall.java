@@ -14,10 +14,10 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.expression.operator.New;
@@ -93,8 +93,7 @@ public class ConstructorCall extends ProgramTransformer {
 	final List<Statement> stmnts = constructorCallSequence(constructorReference,
                 classType, svInst, services);
     
-	return new StatementBlock(stmnts.toArray(new Statement[stmnts.size()]));
-    	
+	return KeYJavaASTFactory.block(stmnts);
     }
 
     /**
