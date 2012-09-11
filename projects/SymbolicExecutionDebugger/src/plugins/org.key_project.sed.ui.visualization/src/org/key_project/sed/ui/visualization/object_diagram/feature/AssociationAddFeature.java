@@ -70,7 +70,7 @@ public class AssociationAddFeature extends AbstractAddFeature {
       ConnectionDecorator textDecorator = peCreateService.createConnectionDecorator(connection, true, 0.5, true);
       Text text = gaService.createDefaultText(getDiagram(), textDecorator);
       text.setStyle(ObjectDiagramStyleUtil.getStyleForAssociationText(getDiagram()));
-      gaService.setLocation(text, 10, 0);
+      gaService.setLocation(text, 0, 0);
       // set reference name in the text decorator
       text.setValue(addedAssociation.getName());
       link(text.getPictogramElement(), addedAssociation);

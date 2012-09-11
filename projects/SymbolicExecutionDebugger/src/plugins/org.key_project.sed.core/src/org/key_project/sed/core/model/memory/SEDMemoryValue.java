@@ -31,6 +31,11 @@ public class SEDMemoryValue extends AbstractSEDValue {
    private boolean allocated;
    
    /**
+    * Is object or only an object attribute?
+    */
+   private boolean object;
+   
+   /**
     * The contained variables.
     */
    private List<IVariable> variables = new LinkedList<IVariable>();
@@ -105,5 +110,21 @@ public class SEDMemoryValue extends AbstractSEDValue {
     */
    public void setAllocated(boolean allocated) {
       this.allocated = allocated;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isObject() {
+      return object;
+   }
+
+   /**
+    * Defines if this value is an object or just an object attribute.
+    * @param object {@code true} is ojbect, {@code false} is object attribute.
+    */
+   public void setObject(boolean object) {
+      this.object = object;
    }
 }

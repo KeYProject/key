@@ -4,6 +4,8 @@ import org.eclipse.graphiti.datatypes.IDimension;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
+import org.eclipse.graphiti.features.context.impl.AddContext;
+import org.eclipse.graphiti.features.context.impl.AreaContext;
 import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
@@ -17,6 +19,7 @@ import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer;
+import org.key_project.sed.ui.visualization.model.od.ODValue;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramStyleUtil;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
@@ -26,6 +29,12 @@ import org.key_project.sed.ui.visualization.util.GraphitiUtil;
  * @author Martin Hentschel
  */
 public abstract class AbstractODValueContainerAddFeature<T extends AbstractODValueContainer> extends AbstractAddShapeFeature {
+   /**
+    * Property for an {@link Boolean} instance which indicates
+    * to update the size of the new created {@link PictogramElement}.
+    */
+   public static final String PROPERTY_UPDATE_SIZE = "updateSize";
+   
    /**
     * Constructor.
     * @param fp The {@link IFeatureProvider} which provides this {@link IAddFeature}.
@@ -64,7 +73,8 @@ public abstract class AbstractODValueContainerAddFeature<T extends AbstractODVal
       @SuppressWarnings("unchecked")
       T addedObject = (T)context.getNewObject();
       ContainerShape targetContainer = context.getTargetContainer();
-
+      boolean updateSize = Boolean.TRUE.equals(context.getProperty(PROPERTY_UPDATE_SIZE));
+      
       // CONTAINER SHAPE WITH ROUNDED RECTANGLE
       IPeCreateService peCreateService = Graphiti.getPeCreateService();
       ContainerShape containerShape = peCreateService.createContainerShape(targetContainer, true);
@@ -90,7 +100,8 @@ public abstract class AbstractODValueContainerAddFeature<T extends AbstractODVal
       text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
       // Compute text height
       IDimension textDimension = GraphitiUtil.calculateStringSize(text.getValue(), gaService.getFont(text, true));
-      final int textHeight = textDimension != null ? textDimension.getHeight() : 20;
+      int textHeight = textDimension != null ? textDimension.getHeight() : 20;
+      int optimalWidth = textDimension != null ? ObjectDiagramUtil.VERTICAL_OFFSET + textDimension.getWidth() + ObjectDiagramUtil.VERTICAL_OFFSET : width;
       // vertical alignment has as default value "center"
       gaService.setLocationAndSize(text, 0, ObjectDiagramUtil.VERTICAL_OFFSET, width, textHeight);
       // create link and wire it
@@ -105,7 +116,35 @@ public abstract class AbstractODValueContainerAddFeature<T extends AbstractODVal
       
       // add a chopbox anchor to the shape 
       peCreateService.createChopboxAnchor(containerShape);
+      
+      // add values
+      int optimalHeight = 0;
+      for (ODValue value : addedObject.getValues()) {
+         AddContext valueContext = new AddContext(new AreaContext(), value);
+         valueContext.setTargetContainer(containerShape);
+         PictogramElement valuePE = addGraphicalRepresentation(valueContext, value);
+         if (valuePE.getGraphicsAlgorithm() instanceof Text) {
+            Text valueText = (Text)valuePE.getGraphicsAlgorithm();
+            IDimension valueTextDimension = GraphitiUtil.calculateStringSize(valueText.getValue(), gaService.getFont(valueText, true));
+            if (valueTextDimension != null) {
+               int optimalValueWidth = ObjectDiagramUtil.HORIZONTAL_OFFSET + valueTextDimension.getWidth() + ObjectDiagramUtil.HORIZONTAL_OFFSET;
+               if (optimalValueWidth > optimalWidth) {
+                  optimalWidth = optimalValueWidth;
+               }
+            }
+            int maxValueY = valueText.getY() + valueText.getHeight() + ObjectDiagramUtil.HORIZONTAL_OFFSET;
+            if (maxValueY > optimalHeight) {
+               optimalHeight = maxValueY;
+            }
+         }
+      }
 
+      // update size to optimal size if requested
+      if (updateSize) {
+         containerShape.getGraphicsAlgorithm().setWidth(optimalWidth);
+         containerShape.getGraphicsAlgorithm().setHeight(optimalHeight < ObjectLayoutFeature.MIN_HEIGHT ? ObjectLayoutFeature.MIN_HEIGHT : optimalHeight);
+      }
+      
       // call the layout feature
       layoutPictogramElement(containerShape);
 
