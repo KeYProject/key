@@ -9,16 +9,20 @@ class PrefixSumRec {
     }
 
 
-/*@ public normal_behavior
-     ensures \result ==> (x % 2 == 0  && isPow2(x/2) || x == 1);
-     strictly_pure
-@*/
-private boolean isPow2(int x){
-  if (x==1) return true;
-  else 
-    if (x % 2 != 0 ) return false;
-  return isPow2(x/2);
-}
+    /*@ public normal_behavior
+      @  requires x > 0;
+      @  ensures \result ==> (x % 2 == 0  && isPow2(x/2) || x == 1);
+      @  measured_by x;
+      @  strictly_pure
+      @*/
+    private boolean isPow2(int x){
+      if (x==1) 
+          return true;
+      else if (x % 2 != 0 ) 
+          return false;
+      else 
+          return isPow2(x/2);
+    } // proof requires induction (hypothesis: isPow(pow(2,n)))
 
     /*@ public normal_behavior
           requires right > left;
