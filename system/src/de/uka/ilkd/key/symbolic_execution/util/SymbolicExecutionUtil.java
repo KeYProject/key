@@ -615,7 +615,9 @@ public final class SymbolicExecutionUtil {
     * @return The found {@link IProgramVariable} with the current {@code this}/{@code self} reference or {@code null} if no one is available.
     */
    public static IProgramVariable findSelfTerm(Node node) {
-      JavaBlock jb = node.getAppliedRuleApp().posInOccurrence().subTerm().javaBlock();
+      Term term = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      term = TermBuilder.DF.goBelowUpdates(term);
+      JavaBlock jb = term.javaBlock();
       Services services = node.proof().getServices();
       IExecutionContext context = JavaTools.getInnermostExecutionContext(jb, services);
       if (context instanceof ExecutionContext) {
@@ -626,15 +628,6 @@ public final class SymbolicExecutionUtil {
          return null;
       }
    }
-   
-//   /**
-//    * Checks if the given {@link Node} contains an applied rule.
-//    * @param node The {@link Node} to check.
-//    * @return {@code true} node has applied rule, {@code false} node has no rule or node is {@code null}.
-//    */
-//   public static boolean hasAppliedRule(Node node) {
-//      return node != null && node.getAppliedRuleApp() != null;
-//   }
    
    /**
     * Checks if the given node should be represented as method call.
