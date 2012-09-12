@@ -104,9 +104,19 @@ public class ExecutionNodeWriter {
    public static final String ATTRIBUTE_PATH_IN_TREE = "path";
 
    /**
-    * Attribute naem to store {@link IExecutionBranchCondition#isMergedBranchCondition()}.
+    * Attribute name to store {@link IExecutionBranchCondition#isMergedBranchCondition()}.
     */
    public static final String ATTRIBUTE_MERGED_BRANCH_CONDITION = "mergedBranchCondition";
+
+   /**
+    * Attribute name to store {@link IExecutionVariable#isValueAnObject()}.
+    */
+   public static final String ATTRIBUTE_IS_VALUE_AN_OBJECT = "isValueAnObject";
+
+   /**
+    * Attribute name to store {@link IExecutionVariable#isValueUnknown()}.
+    */
+   public static final String ATTRIBUTE_IS_VALUE_UNKNOWN = "isValueUnknown";
    
    /**
     * The default enconding.
@@ -540,6 +550,8 @@ public class ExecutionNodeWriter {
       attributeValues.put(ATTRIBUTE_VALUE_STRING, variable.getValueString());
       attributeValues.put(ATTRIBUTE_ARRAY_INDEX, variable.getArrayIndex() + "");
       attributeValues.put(ATTRIBUTE_IS_ARRAY_INDEX, variable.isArrayIndex() + "");
+      attributeValues.put(ATTRIBUTE_IS_VALUE_AN_OBJECT, variable.isValueAnObject() + "");
+      attributeValues.put(ATTRIBUTE_IS_VALUE_UNKNOWN, variable.isValueUnknown() + "");
       appendStartTag(level, TAG_VARIABLE, attributeValues, sb);
 
       IExecutionVariable[] childVariables = variable.getChildVariables();

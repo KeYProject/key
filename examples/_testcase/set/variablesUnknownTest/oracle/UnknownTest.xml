@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
+      <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+      </variable>
+      <statement name="previous=null;" pathCondition="true" pathConditionChanged="false">
+         <variable name="self" typeString="endless.UnknownTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
+            <variable name="next" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
+            </variable>
+            <variable name="previous" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
+            </variable>
+         </variable>
+         <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+         </variable>
+         <statement name="next=new UnknownTest ();" pathCondition="true" pathConditionChanged="false">
+            <variable name="self" typeString="endless.UnknownTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
+               <variable name="next" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
+               </variable>
+               <variable name="previous" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+               </variable>
+            </variable>
+            <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+            </variable>
+            <statement name="next.next=new UnknownTest ();" pathCondition="true" pathConditionChanged="false">
+               <variable name="self" typeString="endless.UnknownTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
+                  <variable name="next" typeString="endless.UnknownTest" valueString="u_2" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
+                     <variable name="next" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
+                     </variable>
+                     <variable name="previous" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                     </variable>
+                  </variable>
+                  <variable name="previous" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                  </variable>
+               </variable>
+               <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+               </variable>
+               <statement name="return next.next;" pathCondition="true" pathConditionChanged="false">
+                  <variable name="self" typeString="endless.UnknownTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
+                     <variable name="next" typeString="endless.UnknownTest" valueString="\if (u_2 = self)
+    \then (u_7)
+    \else (\if (u_7 = self)  \then (null)  \else (u_2))" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
+                        <variable name="next" typeString="endless.UnknownTest" valueString="\if (  \if (u_2 = self)
+           \then (u_7)
+           \else (\if (u_7 = self)
+                      \then (null)
+                      \else (u_2))
+     = u_2)
+    \then (u_7)
+    \else (\if (  u_2 = self
+                |   \if (u_7 = self)
+                        \then (null)
+                        \else (u_2)
+                  = u_7)
+               \then (null)
+               \else (\if (  \if (u_2 = self)
+                                 \then (u_7)
+                                 \else (\if (u_7 = self)
+                                            \then (null)
+                                            \else (u_2))
+                           = self)
+                          \then (u_2)
+                          \else (\if (  \if (u_2 = self)
+                                            \then (u_7)
+                                            \else (\if (  u_7
+                                                        = self)
+                                                       \then (null)
+                                                       \else (u_2))
+                                      = u_2)
+                                     \then (null)
+                                     \else (\if (  u_2
+                                                 = self)
+                                                \then (u_7)
+                                                \else (\if (  u_7
+                                                            = self)
+                                                           \then (null)
+                                                           \else (u_2)).next))))" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
+                           <variable name="next" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
+                           </variable>
+                           <variable name="previous" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
+                           </variable>
+                        </variable>
+                        <variable name="previous" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
+                        </variable>
+                     </variable>
+                     <variable name="previous" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                     </variable>
+                  </variable>
+                  <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                  </variable>
+                  <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;\if (  \if (u_2 = self)
+           \then (u_7)
+           \else (\if (u_7 = self)
+                      \then (null)
+                      \else (u_2))
+     = u_2)
+    \then (u_7)
+    \else (\if (  u_2 = self
+                |   \if (u_7 = self)
+                        \then (null)
+                        \else (u_2)
+                  = u_7)
+               \then (null)
+               \else (\if (  \if (u_2 = self)
+                                 \then (u_7)
+                                 \else (\if (u_7 = self)
+                                            \then (null)
+                                            \else (u_2))
+                           = self)
+                          \then (u_2)
+                          \else (\if (  \if (u_2 = self)
+                                            \then (u_7)
+                                            \else (\if (  u_7
+                                                        = self)
+                                                       \then (null)
+                                                       \else (u_2))
+                                      = u_2)
+                                     \then (null)
+                                     \else (\if (  u_2
+                                                 = self)
+                                                \then (u_7)
+                                                \else (\if (  u_7
+                                                            = self)
+                                                           \then (null)
+                                                           \else (u_2)).next))))&apos; as result of self.main();&gt;">
+                     <variable name="self" typeString="endless.UnknownTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
+                        <variable name="next" typeString="endless.UnknownTest" valueString="\if (u_2 = self)
+    \then (u_7)
+    \else (\if (u_7 = self)  \then (null)  \else (u_2))" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
+                           <variable name="next" typeString="endless.UnknownTest" valueString="\if (  \if (u_2 = self)
+           \then (u_7)
+           \else (\if (u_7 = self)
+                      \then (null)
+                      \else (u_2))
+     = u_2)
+    \then (u_7)
+    \else (\if (  u_2 = self
+                |   \if (u_7 = self)
+                        \then (null)
+                        \else (u_2)
+                  = u_7)
+               \then (null)
+               \else (\if (  \if (u_2 = self)
+                                 \then (u_7)
+                                 \else (\if (u_7 = self)
+                                            \then (null)
+                                            \else (u_2))
+                           = self)
+                          \then (u_2)
+                          \else (\if (  \if (u_2 = self)
+                                            \then (u_7)
+                                            \else (\if (  u_7
+                                                        = self)
+                                                       \then (null)
+                                                       \else (u_2))
+                                      = u_2)
+                                     \then (null)
+                                     \else (\if (  u_2
+                                                 = self)
+                                                \then (u_7)
+                                                \else (\if (  u_7
+                                                            = self)
+                                                           \then (null)
+                                                           \else (u_2)).next))))" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
+                              <variable name="next" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
+                              </variable>
+                              <variable name="previous" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
+                              </variable>
+                           </variable>
+                           <variable name="previous" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
+                           </variable>
+                        </variable>
+                        <variable name="previous" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                        </variable>
+                     </variable>
+                     <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                     </variable>
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                     </termination>
+                  </methodReturn>
+               </statement>
+            </statement>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>

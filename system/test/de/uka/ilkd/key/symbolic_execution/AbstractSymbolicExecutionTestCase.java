@@ -426,6 +426,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertEquals(expected.getName(), current.getName());
          assertEquals(expected.getTypeString(), current.getTypeString());
          assertTrue(expected.getValueString() + " does not match " + current.getValueString(), JavaUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
+         assertEquals(expected.isValueAnObject(), current.isValueAnObject());
+         assertEquals(expected.isValueUnknown(), current.isValueUnknown());
          // Compare parent
          if (compareParent) {
             assertVariable(expected.getParentVariable(), current.getParentVariable(), false, false);

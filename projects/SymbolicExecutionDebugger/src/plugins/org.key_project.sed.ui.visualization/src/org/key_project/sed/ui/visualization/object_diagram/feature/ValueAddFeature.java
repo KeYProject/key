@@ -20,6 +20,7 @@ import org.key_project.sed.ui.visualization.model.od.ODValue;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramStyleUtil;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * Implementation of {@link IAddFeature} for {@link ODValue}s.
@@ -66,7 +67,7 @@ public class ValueAddFeature extends AbstractAddShapeFeature {
       IGaService gaService = Graphiti.getGaService();
 
       // create and set text graphics algorithm
-      Text text = gaService.createText(containerShape, addedValue.getName() + " = " + addedValue.getValue());
+      Text text = gaService.createText(containerShape, addedValue.getName() + " = " + (addedValue.getValue() != null ? addedValue.getValue() : StringUtil.EMPTY_STRING));
       text.setStyle(ObjectDiagramStyleUtil.getStyleForValueText(getDiagram()));
       text.setHorizontalAlignment(Orientation.ALIGNMENT_LEFT);
       // vertical alignment has as default value "center"

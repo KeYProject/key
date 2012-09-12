@@ -45,7 +45,22 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * Default stop conditions of executed SET nodes.
     */
    private static final int[] DEFAULT_MAXIMAL_SET_NODES_PER_RUN = {ALL_IN_ONE_RUN, SINGLE_SET_NODE_RUN};
-
+   
+   /**
+    * Tests example: examples/_testcase/set/variablesUnknownTest
+    */
+   public void testVariablesUnknownTest() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/variablesUnknownTest/test/UnknownTest.java", 
+             "UnknownTest", 
+             "main", 
+             "examples/_testcase/set/variablesUnknownTest/oracle/UnknownTest.xml",
+             true,
+             false,
+             ALL_IN_ONE_RUN,
+             false);
+   }
+   
    /**
     * Tests example: examples/_testcase/set/variablesParameterAttributesChange
     */

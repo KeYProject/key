@@ -14,6 +14,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Position;
@@ -266,15 +267,8 @@ public final class SymbolicExecutionUtil {
       Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
       // Combine method frame with value formula in a modality.
       Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
-      // Get the updates from the return node which includes the value interested in.
-      Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
-      // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, modalityTerm);
-      // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
-      PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
-      Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
-      Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
+      // Create Sequent to prove with new succedent.
+      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, modalityTerm);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -298,16 +292,8 @@ public final class SymbolicExecutionUtil {
       Function newPredicate = new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, variable.sort());
       // Create formula which contains the value interested in.
       Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
-      // Combine method frame with value formula in a modality.
-      // Get the updates from the return node which includes the value interested in.
-      Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
-      // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, newTerm);
-      // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
-      PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
-      Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
-      Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
+      // Create Sequent to prove with new succedent.
+      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, newTerm);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -331,15 +317,8 @@ public final class SymbolicExecutionUtil {
       Function newPredicate = new Function(new Name(TermBuilder.DF.newName(services, "ResultPredicate")), Sort.FORMULA, term.sort());
       // Create formula which contains the value interested in.
       Term newTerm = TermBuilder.DF.func(newPredicate, term);
-      // Get the updates from the return node which includes the value interested in.
-      Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
-      // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, newTerm);
-      // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
-      PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
-      Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
-      Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
+      // Create Sequent to prove with new succedent.
+      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, newTerm);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -398,6 +377,19 @@ public final class SymbolicExecutionUtil {
     */
    public static ApplyStrategyInfo startSideProof(Proof proof,
                                                   Sequent sequentToProve) throws ProofInputException {
+      return startSideProof(proof, sequentToProve, StrategyProperties.SPLITTING_OFF);
+   }
+   
+   /**
+    * Starts a site proof for the given {@link Sequent}.
+    * @param proof The parent {@link Proof} of the site proof to do.
+    * @param sequentToProve The {@link Sequent} to prove.
+    * @return The proof result represented as {@link ApplyStrategyInfo} instance.
+    * @throws ProofInputException Occurred Exception
+    */
+   public static ApplyStrategyInfo startSideProof(Proof proof,
+                                                  Sequent sequentToProve,
+                                                  String splittingOption) throws ProofInputException {
       // Make sure that valid parameters are given
       assert sequentToProve != null;
       // Create ProofStarter
@@ -407,7 +399,7 @@ public final class SymbolicExecutionUtil {
       starter.init(sequentToProve, env);
       starter.setMaxRuleApplications(1000);
       StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); // Is a clone that can be modified
-      sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, StrategyProperties.SPLITTING_OFF); // Logical Splitting: Off is faster and avoids splits, but Normal allows to determine that two objects are different.
+      sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, splittingOption); // Logical Splitting: Off is faster and avoids splits, but Normal allows to determine that two objects are different.
       sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE); // Method Treatment: Off
       sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF); // Dependency Contracts: Off
       sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_OFF); // Query Treatment: Off
@@ -1103,6 +1095,63 @@ public final class SymbolicExecutionUtil {
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); 
          sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+      }
+   }
+
+   /**
+    * Checks if the given {@link Term} is not null in the {@link Sequent} of the given {@link Node}. 
+    * @param services The {@link Services} to use.
+    * @param node The {@link Node} which provides the original {@link Sequent}
+    * @param term The {@link Term} to check.
+    * @return {@code true} {@link Term} was evaluated to null, {@code false} {@link Term} was not evaluated to null.
+    * @throws ProofInputException Occurred Exception
+    */
+   public static boolean isNotNull(Services services, Node node, Term term) throws ProofInputException {
+      // Make sure that correct parameters are given
+      assert node != null;
+      assert term != null;
+      // Create Sequent to prove
+      Term isNull = TermBuilder.DF.equals(term, TermBuilder.DF.NULL(services));
+      Term isNotNull = TermBuilder.DF.not(isNull);
+      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, isNotNull);
+      // Execute proof in the current thread
+      ApplyStrategyInfo info = startSideProof(node.proof(), sequentToProve, StrategyProperties.SPLITTING_NORMAL);
+      return !info.getProof().openEnabledGoals().isEmpty();
+   }
+   
+   /**
+    * Creates a new {@link Sequent} which is a modification from the {@link Sequent}
+    * of the given {@link Node} which contains the same information but a different succedent.
+    * @param node The {@link Node} which provides the original {@link Sequent}.
+    * @param newSuccedent The new succedent.
+    * @return The created {@link Sequent}.
+    */
+   private static Sequent createSequentToProveWithNewSuccedent(Node node, Term newSuccedent) {
+      // Get the updates from the return node which includes the value interested in.
+      Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
+      // Combine method frame, formula with value predicate and the updates which provides the values
+      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, newSuccedent);
+      // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
+      PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
+      Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
+      Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
+      return sequentToProve;
+   }
+
+   /**
+    * Checks if the given {@link Sort} represents a {@code null} value in the given {@link Services}.
+    * @param sort The {@link Sort} to check.
+    * @param services The {@link Services} to use.
+    * @return {@code true} is Null-Sort, {@code false} is something else.
+    */
+   public static boolean isNullSort(Sort sort, Services services) {
+      if (sort != null && services != null) {
+         JavaInfo javaInfo = services.getJavaInfo();
+         return javaInfo.getKeYJavaType(sort) == javaInfo.getNullType();
+      }
+      else {
+         return false;
       }
    }
 }

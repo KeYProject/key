@@ -9,6 +9,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -16,6 +17,7 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -41,6 +43,11 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * The represented {@link IProgramVariable} which value is shown.
     */
    private IProgramVariable programVariable;
+   
+   /**
+    * Checks if a value is unknown or not.
+    */
+   private Boolean unknownValue;
    
    /**
     * The value.
@@ -140,16 +147,31 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          }
       }
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isValueUnknown() throws ProofInputException {
+      synchronized (this) {
+         if (unknownValue == null) {
+            lazyComputeValue();
+         }
+         return unknownValue.booleanValue();
+      }
+   }
 
    /**
     * {@inheritDoc}
     */
    @Override
    public Term getValue() throws ProofInputException {
-      if (value == null) {
-         lazyComputeValue();
+      synchronized (this) {
+         if (unknownValue == null) {
+            lazyComputeValue();
+         }
+         return value;
       }
-      return value;
    }
 
    /**
@@ -157,10 +179,31 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     */
    @Override
    public String getValueString() throws ProofInputException {
-      if (value == null) {
-         lazyComputeValue();
+      synchronized (this) {
+         if (unknownValue == null) {
+            lazyComputeValue();
+         }
+         return valueString;
       }
-      return valueString;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isValueAnObject() throws ProofInputException {
+      if (isValueUnknown()) {
+         return false;
+      }
+      else {
+         Term value = getValue();
+         Sort sort = value.sort();
+         KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
+         TypeConverter typeConverter = getServices().getTypeConverter();
+         return typeConverter.isReferenceType(kjt) && // Check if the value is a reference type
+                (!(kjt.getJavaType() instanceof TypeDeclaration) || // check if the value is a library class which should be ignored
+                !((TypeDeclaration)kjt.getJavaType()).isLibraryClass());
+      }
    }
    
    /**
@@ -171,9 +214,10 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    protected void lazyComputeValue() throws ProofInputException {
       // Start site proof to extract the value of the result variable.
       SiteProofVariableValueInput sequentToProve;
+      Term unknownCheckSelectTerm = null;
       if (getParentVariable() != null || isStaticVariable()) {
-         Term selectTerm = createSelectTerm();
-         sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), getProofNode(), selectTerm);
+         unknownCheckSelectTerm = createSelectTerm();
+         sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), getProofNode(), unknownCheckSelectTerm);
       }
       else {
          sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(getServices(), getProofNode(), getProgramVariable());
@@ -186,6 +230,23 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
       valueString = sb.toString();
       // Determine type
       typeString = value.sort().toString();
+      // Compute unknown flag if required
+      if (unknownCheckSelectTerm != null) {
+         if (SymbolicExecutionUtil.isNullSort(value.sort(), getServices())) { 
+            unknownValue = Boolean.FALSE; // Sort is NullSort, so information must exist in Sequent and value is not unknown
+         }
+         else {
+            unknownValue = Boolean.valueOf(SymbolicExecutionUtil.isNotNull(getServices(), getProofNode(), unknownCheckSelectTerm)); // Check if the symbolic value is not null, if it fails the value is treated as unknown
+            if (unknownValue.booleanValue()) {
+               value = null; // Reset value
+               valueString = null; // Reset value string
+               typeString = null; // Reset type
+            }
+         }
+      }
+      else {
+         unknownValue = Boolean.FALSE; // Local variable can't be unknown
+      }
    }
    
    /**
@@ -249,10 +310,12 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     */
    @Override
    public String getTypeString() throws ProofInputException {
-      if (value == null) {
-         lazyComputeValue();
+      synchronized (this) {
+         if (unknownValue == null) {
+            lazyComputeValue();
+         }
+         return typeString;
       }
-      return typeString;
    }
    
    /**
@@ -275,37 +338,40 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     */
    protected IExecutionVariable[] lazyComputeChildVariables() throws ProofInputException {
       List<IExecutionVariable> children = new LinkedList<IExecutionVariable>();
-      Sort valueSort = getValue().sort();
-      if (valueSort != getServices().getJavaInfo().getNullType().getSort()) {
-         KeYJavaType keyType = getServices().getJavaInfo().getKeYJavaType(valueSort);
-         Type javaType = keyType.getJavaType();
-         if (javaType instanceof ArrayDeclaration) {
-            // Array value
-            ArrayDeclaration ad = (ArrayDeclaration)javaType;
-            Set<IProgramVariable> pvs = getProgramVariables(ad.length());
-            if (pvs.size() == 1) {
-               ExecutionVariable lengthVariable = new ExecutionVariable(getMediator(), getProofNode(), this, pvs.iterator().next());
-               children.add(lengthVariable);
-               try {
-                  int length = Integer.valueOf(lengthVariable.getValueString());
-                  for (int i = 0; i < length; i++) {
-                     ExecutionVariable childI = new ExecutionVariable(getMediator(), getProofNode(), this, i);
-                     children.add(childI);
+      Term value = getValue();
+      if (value != null && !isValueUnknown()) { // Don't show children of unknown values
+         Sort valueSort = value.sort();
+         if (valueSort != getServices().getJavaInfo().getNullType().getSort()) {
+            KeYJavaType keyType = getServices().getJavaInfo().getKeYJavaType(valueSort);
+            Type javaType = keyType.getJavaType();
+            if (javaType instanceof ArrayDeclaration) {
+               // Array value
+               ArrayDeclaration ad = (ArrayDeclaration)javaType;
+               Set<IProgramVariable> pvs = getProgramVariables(ad.length());
+               if (pvs.size() == 1) {
+                  ExecutionVariable lengthVariable = new ExecutionVariable(getMediator(), getProofNode(), this, pvs.iterator().next());
+                  children.add(lengthVariable);
+                  try {
+                     int length = Integer.valueOf(lengthVariable.getValueString());
+                     for (int i = 0; i < length; i++) {
+                        ExecutionVariable childI = new ExecutionVariable(getMediator(), getProofNode(), this, i);
+                        children.add(childI);
+                     }
+                  }
+                  catch (NumberFormatException e) {
+                     // Symbolic value, nothing to do.
                   }
                }
-               catch (NumberFormatException e) {
-                  // Symbolic value, nothing to do.
-               }
             }
-         }
-         else if (javaType instanceof ClassType) {
-            // Normal value
-            ImmutableList<Field> fields = ((ClassType)javaType).getAllFields(getServices());
-            for (Field field : fields) {
-               ImmutableList<ProgramVariable> vars = getServices().getJavaInfo().getAllAttributes(field.getFullName(), keyType);
-               for (ProgramVariable var : vars) {
-                  if (!var.isImplicit() && !var.isStatic()) {
-                     children.add(new ExecutionVariable(getMediator(), getProofNode(), this, field.getProgramVariable()));
+            else if (javaType instanceof ClassType) {
+               // Normal value
+               ImmutableList<Field> fields = ((ClassType)javaType).getAllFields(getServices());
+               for (Field field : fields) {
+                  ImmutableList<ProgramVariable> vars = getServices().getJavaInfo().getAllAttributes(field.getFullName(), keyType);
+                  for (ProgramVariable var : vars) {
+                     if (!var.isImplicit() && !var.isStatic()) {
+                        children.add(new ExecutionVariable(getMediator(), getProofNode(), this, field.getProgramVariable()));
+                     }
                   }
                }
             }

@@ -50,14 +50,15 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
     */
    public static final String PROPERTY_NODE = "debugNode";
    
+   /**
+    * The horizontal distance between {@link ODObject} in a diagram.
+    */
    public static final int HORIZONTAL_OFFSET_BETWEEN_OBJECTS = 50;
 
-   public static final int VERTICAL_OFFSET_BETWEEN_OBJECTS = 50;
-
    /**
-    * Indicates how many {@link ODObject} instances are added to the model.
+    * The vertical distance between {@link ODObject} in a diagram.
     */
-   private int objectCounter = 0;
+   public static final int VERTICAL_OFFSET_BETWEEN_OBJECTS = 50;
    
    /**
     * Constructor.

@@ -7,11 +7,6 @@ import org.key_project.sed.core.model.impl.AbstractSEDValue;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.java.StringUtil;
 
-import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
@@ -137,13 +132,7 @@ public class KeYValue extends AbstractSEDValue {
    @Override
    public boolean isObject() throws DebugException {
       try {
-         Term value = getExecutionVariable().getValue();
-         Sort sort = value.sort();
-         KeYJavaType kjt = getExecutionVariable().getServices().getJavaInfo().getKeYJavaType(sort);
-         TypeConverter typeConverter = getExecutionVariable().getServices().getTypeConverter();
-         return typeConverter.isReferenceType(kjt) && // Check if the value is a reference type
-                (!(kjt.getJavaType() instanceof TypeDeclaration) || // check if the value is a library class which should be ignored
-                !((TypeDeclaration)kjt.getJavaType()).isLibraryClass());
+         return getExecutionVariable().isValueAnObject();
       }
       catch (ProofInputException e) {
          LogUtil.getLogger().logError(e);

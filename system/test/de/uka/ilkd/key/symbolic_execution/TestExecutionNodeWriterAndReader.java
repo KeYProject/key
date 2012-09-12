@@ -117,9 +117,9 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       bn.addCallStackEntry(root);
       bn.addCallStackEntry(bc);
       root.addChild(bn);
-      KeYlessVariable bnVar1 = new KeYlessVariable(null, true, 2, "myType", "myValue", "bnVar1");
+      KeYlessVariable bnVar1 = new KeYlessVariable(null, true, 2, "myType", "myValue", "bnVar1", true, false);
       bn.addVariable(bnVar1);
-      KeYlessVariable bnVar2 = new KeYlessVariable(null, false, -1, "myTypeAgain", "myValueAgain", "bnVar2");
+      KeYlessVariable bnVar2 = new KeYlessVariable(null, false, -1, "myTypeAgain", "myValueAgain", "bnVar2", false, true);
       bn.addVariable(bnVar2);
       KeYlessLoopNode ln = new KeYlessLoopNode(root, "ln", "pc6", true);
       root.addChild(ln);
@@ -133,17 +133,17 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       mc.addChild(mr);
       KeYlessStatement s = new KeYlessStatement(root, "s", "pc10", true);
       root.addChild(s);
-      KeYlessVariable sVar1 = new KeYlessVariable(null, true, 2, "myType", "myValue", "sVar1");
+      KeYlessVariable sVar1 = new KeYlessVariable(null, true, 2, "myType", "myValue", "sVar1", false, false);
       s.addVariable(sVar1);
-      KeYlessVariable sVar1_1 = new KeYlessVariable(sVar1, true, 2, "myType", "myValue", "sVar1_1");
+      KeYlessVariable sVar1_1 = new KeYlessVariable(sVar1, true, 2, "myType", "myValue", "sVar1_1", true, true);
       sVar1.addChildVariable(sVar1_1);
-      KeYlessVariable sVar1_1_1 = new KeYlessVariable(sVar1_1, true, 2, "myType", "myValue", "sVar1_1_1");
+      KeYlessVariable sVar1_1_1 = new KeYlessVariable(sVar1_1, true, 2, "myType", "myValue", "sVar1_1_1", true, false);
       sVar1_1.addChildVariable(sVar1_1_1);
-      KeYlessVariable sVar1_2 = new KeYlessVariable(sVar1, true, 2, "myType", "myValue", "sVar1_2");
+      KeYlessVariable sVar1_2 = new KeYlessVariable(sVar1, true, 2, "myType", "myValue", "sVar1_2", false, true);
       sVar1.addChildVariable(sVar1_2);
-      KeYlessVariable sVar1_2_1 = new KeYlessVariable(sVar1_2, true, 2, "myType", "myValue", "sVar1_2_1");
+      KeYlessVariable sVar1_2_1 = new KeYlessVariable(sVar1_2, true, 2, "myType", "myValue", "sVar1_2_1", false, false);
       sVar1_2.addChildVariable(sVar1_2_1);
-      KeYlessVariable sVar1_2_2 = new KeYlessVariable(sVar1_2, true, 2, "myType", "myValue", "sVar1_2_2");
+      KeYlessVariable sVar1_2_2 = new KeYlessVariable(sVar1_2, true, 2, "myType", "myValue", "sVar1_2_2", true, true);
       sVar1_2.addChildVariable(sVar1_2_2);
       return root;
    }

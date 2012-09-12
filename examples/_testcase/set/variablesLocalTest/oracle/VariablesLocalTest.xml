@@ -1,80 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
-      <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+      <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
       </variable>
       <statement name="int a = 2;" pathCondition="true" pathConditionChanged="false">
-         <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+         <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
          </variable>
-         <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+         <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
          </variable>
          <statement name="int b = 3;" pathCondition="true" pathConditionChanged="false">
-            <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+            <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
             </variable>
-            <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+            <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
             </variable>
-            <variable name="a" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
+            <variable name="a" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
             </variable>
             <statement name="int sum = sum(a,b);" pathCondition="true" pathConditionChanged="false">
-               <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+               <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
                </variable>
-               <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+               <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                </variable>
-               <variable name="a" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
+               <variable name="a" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                </variable>
-               <variable name="b" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false">
+               <variable name="b" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                </variable>
                <methodCall name="self.sum(a_1,b_1);" pathCondition="true" pathConditionChanged="false">
-                  <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
                   </variable>
-                  <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                   </variable>
-                  <variable name="a_1" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="a_1" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                   </variable>
-                  <variable name="b_1" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="b_1" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                   </variable>
                   <statement name="int result = a_1+b_1;" pathCondition="true" pathConditionChanged="false">
-                     <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
                      </variable>
-                     <variable name="a_1" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="a_1" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                      </variable>
-                     <variable name="b_1" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="b_1" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                      </variable>
-                     <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                      </variable>
                      <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
-                        <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
                         </variable>
-                        <variable name="a_1" typeString="int" valueString="a_1" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="a_1" typeString="int" valueString="a_1" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                         </variable>
-                        <variable name="b_1" typeString="int" valueString="b_1" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="b_1" typeString="int" valueString="b_1" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                         </variable>
-                        <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                         </variable>
-                        <variable name="result_1" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="result_1" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                         </variable>
                         <methodReturn name="&lt;return of self.sum(a_1,b_1);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;5&apos; as result of self.sum(a_1,b_1);&gt;">
-                           <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
                            </variable>
-                           <variable name="a_1" typeString="int" valueString="a_1" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="a_1" typeString="int" valueString="a_1" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                            </variable>
-                           <variable name="b_1" typeString="int" valueString="b_1" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="b_1" typeString="int" valueString="b_1" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                            </variable>
-                           <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                            </variable>
-                           <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
+                           <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                            </variable>
                            <statement name="return sum;" pathCondition="true" pathConditionChanged="false">
-                              <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
                               </variable>
-                              <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                               </variable>
-                              <variable name="sum" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
+                              <variable name="sum" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                               </variable>
                               <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;5&apos; as result of self.main();&gt;">
-                                 <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="self" typeString="VariablesLocalTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
                                  </variable>
-                                 <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+                                 <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
                                  </variable>
                                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
                                  </termination>

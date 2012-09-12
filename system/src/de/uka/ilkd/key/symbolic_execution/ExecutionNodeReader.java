@@ -288,7 +288,9 @@ public class ExecutionNodeReader {
                                  getArrayIndex(attributes), 
                                  getTypeString(attributes), 
                                  getValueString(attributes), 
-                                 getName(attributes));
+                                 getName(attributes),
+                                 isValueUnknown(attributes),
+                                 isValueAnObject(attributes));
    }
 
    /**
@@ -368,6 +370,24 @@ public class ExecutionNodeReader {
     */
    protected boolean isExceptionalTermination(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_EXCEPTIONAL_TERMINATION));
+   }
+
+   /**
+    * Returns the is value an object value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isValueAnObject(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_IS_VALUE_AN_OBJECT));
+   }
+
+   /**
+    * Returns the is value unknown value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isValueUnknown(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_IS_VALUE_UNKNOWN));
    }
 
    /**
@@ -1140,6 +1160,16 @@ public class ExecutionNodeReader {
       private String valueString;
       
       /**
+       * Is the value unknown?
+       */
+      private boolean valueUnknown;
+
+      /**
+       * Is the value an object?
+       */
+      private boolean valueAnObject;
+      
+      /**
        * The child variables.
        */
       private List<IExecutionVariable> childVariables = new LinkedList<IExecutionVariable>();
@@ -1152,19 +1182,25 @@ public class ExecutionNodeReader {
        * @param typeString The type string.
        * @param valueString The value string.
        * @param name The name.
+       * @param valueUnknown Is the value unknown?
+       * @param valueAnObject Is the value an object?
        */
       public KeYlessVariable(IExecutionVariable parentVariable, 
                              boolean isArrayIndex, 
                              int arrayIndex, 
                              String typeString, 
                              String valueString, 
-                             String name) {
+                             String name,
+                             boolean valueUnknown,
+                             boolean valueAnObject) {
          super(name);
          this.parentVariable = parentVariable;
          this.isArrayIndex = isArrayIndex;
          this.arrayIndex = arrayIndex;
          this.typeString = typeString;
          this.valueString = valueString;
+         this.valueUnknown = valueUnknown;
+         this.valueAnObject = valueAnObject;
       }
       
       /**
@@ -1221,6 +1257,22 @@ public class ExecutionNodeReader {
       @Override
       public boolean isArrayIndex() {
          return isArrayIndex;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isValueUnknown() throws ProofInputException {
+         return valueUnknown;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isValueAnObject() throws ProofInputException {
+         return valueAnObject;
       }
 
       /**

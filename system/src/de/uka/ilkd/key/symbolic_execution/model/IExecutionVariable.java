@@ -26,6 +26,35 @@ public interface IExecutionVariable extends IExecutionElement {
    public IProgramVariable getProgramVariable();
    
    /**
+    * <p>
+    * Checks if the value is unknown.
+    * </p>
+    * <p>
+    * Imagine the following class:
+    * <pre><code>
+    * public class A {
+    *    private A next;
+    *    
+    *    public int main() {
+    *       return 42; // breakpoint
+    *    }
+    * }
+    * </code></pre>
+    * If the main method is debugged symbolically and stopped at the statement
+    * marked with the comment {@code // breakpoint} the field {@code self.next}
+    * has the symbolic value {@code SVself.next}. And its field 
+    * {@code self.next.next} has again a symbolic value {@code SVself.next.next}.
+    * This chain is infinite deep. But on the other side the Sequent contains
+    * no information about {@code self.next} so the symbolic value can be
+    * {@code null} or a concrete object. Such symbolic values which are not
+    * founded in the Sequent are treated in the symbolic execution API as
+    * "unknown" to avoid infinite deep value hierarchies if they are not cyclic.
+    * </p>
+    * @return {@code true} value is unknown, {@code false} value is known.
+    */
+   public boolean isValueUnknown() throws ProofInputException;
+   
+   /**
     * Returns the value of the variable.
     * @return The value of the variable.
     */
@@ -36,6 +65,20 @@ public interface IExecutionVariable extends IExecutionElement {
     * @return The value of the variable as human readable string representation.
     */
    public String getValueString() throws ProofInputException;
+   
+   /**
+    * <p>
+    * Checks if the value represents an object or an attribute of the object 
+    * defined by the parent {@link IExecutionVariable}. 
+    * </p>
+    * <p>
+    * All values which are not a basic datatype (integer, boolean, ...) and
+    * not an instance of a library class will be treated as object.
+    * </p>
+    * @return {@code true} is an object, {@code false} is an attribute of the object defined by the parent {@link IExecutionVariable}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public boolean isValueAnObject() throws ProofInputException;
    
    /**
     * Returns the type of the variable as human readable string.
