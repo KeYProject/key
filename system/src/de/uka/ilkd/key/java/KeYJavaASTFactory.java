@@ -1143,4 +1143,17 @@ public abstract class KeYJavaASTFactory {
 
 	return frame;
     }
+
+    /**
+     * Create an integer literal.
+     * 
+     * @param value
+     *            the {@link Integer} to be turned into an literal
+     * @return a new {@link IntLiteral} representing <code>value</code>
+     */
+    public static IntLiteral intLiteral(final Integer value) {
+	final IntLiteral literal = new IntLiteral(value);
+
+	return literal;
+    }
 }
