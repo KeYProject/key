@@ -30,6 +30,7 @@ import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.SuperConstructorReference;
+import de.uka.ilkd.key.java.reference.ThisConstructorReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.*;
@@ -1299,6 +1300,26 @@ public abstract class KeYJavaASTFactory {
     public static SuperConstructorReference superConstructor(
 	    final ReferencePrefix referencePrefix, final Expression[] args) {
 	final SuperConstructorReference constructor = new SuperConstructorReference(
+		args);
+
+	return constructor;
+    }
+
+    /**
+     * Create a call to a constructor of the current class.
+     * 
+     * <pre>
+     * this(args)
+     * </pre>
+     * 
+     * @param args
+     *            the {@link Expression} arguments to be passed to constructor
+     * @return a new {@link ThisConstructorReference} parameterized with
+     *         <code>args</code>
+     */
+    public static ThisConstructorReference thisConstructor(
+	    final Expression[] args) {
+	final ThisConstructorReference constructor = new ThisConstructorReference(
 		args);
 
 	return constructor;
