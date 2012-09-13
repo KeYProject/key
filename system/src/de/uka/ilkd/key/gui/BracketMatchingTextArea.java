@@ -225,7 +225,8 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
                 } else {
                     theHighlight = theSameParensHighlight;
                 }
-                getHighlighter().changeHighlight(theHighlight, begin, end);
+                // yes! begin/end are juxtaposed
+                getHighlighter().changeHighlight(theHighlight, end, begin);
             } else {
                 resetHighlights();
             }

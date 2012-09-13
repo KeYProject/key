@@ -180,7 +180,7 @@ public final class SeqLDT extends LDT {
 
     
     @Override
-    public Expression translateTerm(Term t, ExtList children) {
+    public Expression translateTerm(Term t, ExtList children, Services services) {
 	if(t.op().equals(seqEmpty)) {
 	    return EmptySeqLiteral.INSTANCE;
 	}

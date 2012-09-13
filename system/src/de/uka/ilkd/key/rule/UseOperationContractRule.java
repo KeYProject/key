@@ -592,14 +592,18 @@ public final class UseOperationContractRule implements BuiltInRule {
         	= inst.pm.isConstructor() || resultVar == null 
         	  ? null 
                   : TB.var(resultVar);
+        Map<LocationVariable, Term> heapTerms = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable h : heapContext) {
+           heapTerms.put(h, TB.var(h));
+        }
         final Term pre  = contract.getPre(heapContext,
-                                          TB.getBaseHeap(services), 
+                                          heapTerms, 
         				  contractSelf, 
         				  contractParams,
                                           atPres,
         				  services);
         final Term post = contract.getPost(heapContext,
-                                           TB.getBaseHeap(services),
+                                           heapTerms,
         	                               contractSelf, 
         				                   contractParams, 
                                            contractResult, 
