@@ -167,7 +167,7 @@ public abstract class KeYJavaASTFactory {
      */
     public static ParameterDeclaration parameterDeclaration(JavaInfo javaInfo,
 							    KeYJavaType kjt, 
-							    ProgramVariable var) {
+							    IProgramVariable var) {
 	return new ParameterDeclaration
 	    (new Modifier[0], javaInfo.createTypeReference(kjt), 
 	     new VariableSpecification(var), false);
@@ -520,7 +520,7 @@ public abstract class KeYJavaASTFactory {
      *         initial value zero
      */
     public static ILoopInit loopInitZero(final KeYJavaType type,
-	    final ProgramVariable variable) {
+	    final IProgramVariable variable) {
 	final LoopInitializer initializer = KeYJavaASTFactory.declareZero(type,
 		variable);
 
