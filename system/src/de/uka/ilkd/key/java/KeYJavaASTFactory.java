@@ -1177,7 +1177,7 @@ public abstract class KeYJavaASTFactory {
      *            the {@link ProgramVariable} the return value is assigned to or
      *            <code>null</code>
      * @param reference
-     *            the {@link IProgramVariable} on which the method is called
+     *            the {@link ReferencePrefix} invocation target
      * @param classType
      *            the {@link KeYJavaType} in which the method is declared
      * @param methodName
@@ -1191,7 +1191,7 @@ public abstract class KeYJavaASTFactory {
      *         not defined
      */
     public static MethodBodyStatement methodBody(final JavaInfo model,
-	    final ProgramVariable result, final IProgramVariable reference,
+	    final ProgramVariable result, final ReferencePrefix reference,
 	    final KeYJavaType classType, final String methodName,
 	    final ProgramVariable[] arguments) {
 	final IProgramMethod method = model.getProgramMethod(classType,
@@ -1199,7 +1199,7 @@ public abstract class KeYJavaASTFactory {
 	MethodBodyStatement methodBody = null;
 
 	if (method != null) {
-	    methodBody = new MethodBodyStatement(method, result, reference,
+	    methodBody = new MethodBodyStatement(method, reference, result,
 		    new ImmutableArray<Expression>(arguments));
 	}
 
