@@ -178,7 +178,7 @@ public class EnhancedForElimination extends ProgramTransformer {
 
 	// create the method call itVar.hasNext();
 	final Expression itGuard = KeYJavaASTFactory
-		.methodCall(HAS_NEXT, itVar);
+		.methodCall(itVar, HAS_NEXT);
 
         final StatementBlock block = makeBlock(itVar, valuesVar, lvd, body);
 

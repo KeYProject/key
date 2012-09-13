@@ -51,6 +51,6 @@ public class CreateObject extends ProgramTransformer {
   	}	
  	
 	return KeYJavaASTFactory.methodCall(
-		CreateObjectBuilder.IMPLICIT_OBJECT_CREATE, classReference);
+		classReference, CreateObjectBuilder.IMPLICIT_OBJECT_CREATE);
     }
 }
