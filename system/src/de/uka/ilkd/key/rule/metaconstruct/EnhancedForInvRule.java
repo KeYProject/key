@@ -23,7 +23,6 @@ import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.statement.EnhancedFor;
 import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -336,9 +335,8 @@ public final class EnhancedForInvRule extends AbstractTermTransformer {
             ProgramVariable varname =
                     (ProgramVariable) formalParam.getProgramVariable();
             Type type = formalParam.getType();
-            ArrayReference ar =
-                    new ArrayReference((ReferencePrefix) arrayexp,
-                            new Expression[] { (ProgramVariable) counter.op() });
+	    ArrayReference ar = KeYJavaASTFactory.arrayFieldAccess(
+		    (ReferencePrefix) arrayexp, (ProgramVariable) counter.op());
 
             LocalVariableDeclaration decl =
                     KeYJavaASTFactory.declare(varname, ar,
@@ -349,21 +347,19 @@ public final class EnhancedForInvRule extends AbstractTermTransformer {
         //
         // make statement block, possibly within a method frame
         stmnt.add((Statement) w.result());
-        StatementBlock s =
-                new StatementBlock(
-                        stmnt.toArray(new Statement[stmnt.size()]));
+	StatementBlock s = KeYJavaASTFactory.block(stmnt);
         Statement resSta;
         if (svInst.getExecutionContext() != null)
-            resSta = new MethodFrame(null, svInst.getExecutionContext(), s);
+	    resSta = KeYJavaASTFactory.methodFrame(
+		    svInst.getExecutionContext(), s);
         else
             resSta = s;
 
         Modality loopBodyModality = modality;
 
-        final Term resultTerm =
-                TB.prog(loopBodyModality,
-                       JavaBlock.createJavaBlock(new StatementBlock(resSta)),
-                       result);
+	final Term resultTerm = TB.prog(loopBodyModality,
+		JavaBlock.createJavaBlock(KeYJavaASTFactory.block(resSta)),
+		result);
 
         if (FORMALPARAM_AS_STATEMENT) {
             return resultTerm;
