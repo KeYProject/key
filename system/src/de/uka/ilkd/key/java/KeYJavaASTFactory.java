@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.expression.operator.PostIncrement;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
@@ -958,8 +959,8 @@ public abstract class KeYJavaASTFactory {
     public static MethodReference methodCall(final ReferencePrefix reference,
 	    final String name, final ImmutableArray<? extends Expression> args) {
 	final ProgramElementName method = new ProgramElementName(name);
-	final MethodReference call = new MethodReference(args, method,
-		reference);
+	final MethodReference call = KeYJavaASTFactory.methodCall(reference,
+		method, args);
 
 	return call;
     }
@@ -1010,6 +1011,58 @@ public abstract class KeYJavaASTFactory {
 		args);
 	final MethodReference call = KeYJavaASTFactory.methodCall(reference,
 		name, a);
+
+	return call;
+    }
+    
+    /**
+     * Create a method call.
+     * 
+     * <pre>
+     * reference.name(args);
+     * </pre>
+     * 
+     * @param reference
+     *            the {@link ReferencePrefix} the method is called on
+     * @param name
+     *            the {@link MethodName}
+     * @param args
+     *            the argument {@link Expression}s to be passed to the method
+     * @return a new {@link MethodReference} for call of method
+     *         <code>name</code> on <code>reference</code> with arguments
+     *         <code>args</code>
+     */
+    public static MethodReference methodCall(final ReferencePrefix reference,
+	    final MethodName name, final Expression... args) {
+	final ImmutableArray<Expression> a = new ImmutableArray<Expression>(
+		args);
+	final MethodReference call = KeYJavaASTFactory.methodCall(reference,
+		name, a);
+
+	return call;
+    }
+
+    /**
+     * Create a method call.
+     * 
+     * <pre>
+     * reference.name(args);
+     * </pre>
+     * 
+     * @param reference
+     *            the {@link ReferencePrefix} the method is called on
+     * @param name
+     *            the {@link MethodName}
+     * @param args
+     *            the argument {@link Expression}s to be passed to the method
+     * @return a new {@link MethodReference} for call of method
+     *         <code>name</code> on <code>reference</code> with arguments
+     *         <code>args</code>
+     */
+    public static MethodReference methodCall(final ReferencePrefix reference,
+	    final MethodName name,
+	    final ImmutableArray<? extends Expression> args) {
+	final MethodReference call = new MethodReference(args, name, reference);
 
 	return call;
     }
