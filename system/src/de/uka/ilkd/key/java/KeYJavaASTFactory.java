@@ -1103,4 +1103,44 @@ public abstract class KeYJavaASTFactory {
 
 	return methodBody;
     }
+
+    /**
+     * Create a method call substitution.
+     * 
+     * @param executionContext
+     *            the <code>block</code>'s {@link ExecutionContext}
+     * @param block
+     *            the {@link StatementBlock} to be put in <code>executionContext</code>
+     * @return a new {@link MethodFrame} that associates <code>block</code> with
+     *         <code>executionContext</code>
+     */
+    public static MethodFrame methodFrame(
+	    final ExecutionContext executionContext, final StatementBlock block) {
+	final MethodFrame frame = KeYJavaASTFactory.methodFrame(null,
+		executionContext, block);
+
+	return frame;
+    }
+
+    /**
+     * Create a method call substitution with a return value assignment.
+     * 
+     * @param result
+     *            the {@link IProgramVariable} <code>block</code>'s return value
+     *            is assigned to
+     * @param executionContext
+     *            the <code>block</code>'s {@link ExecutionContext}
+     * @param block
+     *            the {@link StatementBlock} to be put in
+     *            <code>executionContext</code>
+     * @return a new {@link MethodFrame} that associates <code>block</code> with
+     *         <code>executionContext</code>
+     */
+    public static MethodFrame methodFrame(final IProgramVariable result,
+	    final ExecutionContext executionContext, final StatementBlock block) {
+	final MethodFrame frame = new MethodFrame(result, executionContext,
+		block);
+
+	return frame;
+    }
 }
