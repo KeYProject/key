@@ -9,6 +9,7 @@
 //
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
@@ -71,7 +72,9 @@ public final class EnumConstantValue extends AbstractTermTransformer {
                     throw new IllegalArgumentException(term + " is not an enum constant");
             }
 
-            term = services.getTypeConverter().convertToLogicElement(new IntLiteral(value));
+	    final IntLiteral valueLiteral = KeYJavaASTFactory.intLiteral(value);
+	    term = services.getTypeConverter().convertToLogicElement(
+		    valueLiteral);
         }   
 
         return term;
