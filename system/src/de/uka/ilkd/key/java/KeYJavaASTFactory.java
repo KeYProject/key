@@ -92,7 +92,7 @@ public abstract class KeYJavaASTFactory {
      * </pre>
      * 
      * @param var
-     *            the named and typed {@link ProgramVariable} to be declared
+     *            the named and typed {@link IProgramVariable} to be declared
      * @param init
      *            the {@link Expression} <code>var</code> is initialized with
      * @param type
@@ -113,7 +113,7 @@ public abstract class KeYJavaASTFactory {
      * </pre>
      * 
      * @param var
-     *            the named and typed {@link ProgramVariable} to be declared
+     *            the named and typed {@link IProgramVariable} to be declared
      * @param type
      *            the static {@link KeYJavaType} of <code>var</code>
      * @return a {@link LocalVariableDeclaration} of <code>var</code> with
@@ -160,7 +160,7 @@ public abstract class KeYJavaASTFactory {
      * @param kjt
      *            the static {@link KeYJavaType} of <code>var</code>
      * @param var
-     *            the named and typed {@link ProgramVariable} to be declared as
+     *            the named and typed {@link IProgramVariable} to be declared as
      *            parameter
      * @return a {@link ParameterDeclaration} of <code>var</code> with static
      *         type <code>kjt</code>
@@ -418,7 +418,7 @@ public abstract class KeYJavaASTFactory {
      * @param type
      *            the static {@link KeYJavaType} of <code>variable</code>
      * @param variable
-     *            the named and typed {@link ProgramVariable} to be declared
+     *            the named and typed {@link IProgramVariable} to be declared
      * @return a new {@link LocalVariableDeclaration} of <code>variable</code>
      *         with static type <code>type</code> and initial value zero
      */
@@ -438,7 +438,7 @@ public abstract class KeYJavaASTFactory {
      * @param type
      *            the static {@link KeYJavaType} of <code>variable</code>
      * @param variable
-     *            the named and typed {@link ProgramVariable} to be declared
+     *            the named and typed {@link IProgramVariable} to be declared
      * @param reference
      *            the {@link ReferencePrefix} the method is called on
      * @param method
@@ -465,10 +465,10 @@ public abstract class KeYJavaASTFactory {
      * </pre>
      * 
      * where <code>type</code> is variable's {@link KeYJavaType} as it is
-     * returned by {@link ProgramVariable.getKeYJavaType()}.
+     * returned by {@link IProgramVariable#getKeYJavaType()}.
      * 
      * @param variable
-     *            the named and typed {@link ProgramVariable} to be declared
+     *            the named and typed {@link IProgramVariable} to be declared
      * @param reference
      *            the {@link ReferencePrefix} the method is called on
      * @param method
@@ -514,7 +514,7 @@ public abstract class KeYJavaASTFactory {
      * @param type
      *            the static {@link KeYJavaType} of <code>variable</code>
      * @param variable
-     *            the named and typed {@link ProgramVariable} to be declared
+     *            the named and typed {@link IProgramVariable} to be declared
      * @return a new {@link ILoopInit} that declares variable
      *         <code>variable</code> with static type <code>type</code> and
      *         initial value zero
@@ -770,10 +770,10 @@ public abstract class KeYJavaASTFactory {
      * </pre>
      * 
      * where <code>type</code> is <code>variable</code>'s {@link KeYJavaType} as
-     * it is returned by {@link ProgramVariable#getKeYJavaType()}.
+     * it is returned by {@link IProgramVariable#getKeYJavaType()}.
      * 
      * @param variable
-     *            the named and typed {@link ProgramVariable} to be declared
+     *            the named and typed {@link IProgramVariable} to be declared
      * @return a new {@link LocalVariableDeclaration} of <code>variable</code>
      */
     public static LocalVariableDeclaration declare(
@@ -792,10 +792,10 @@ public abstract class KeYJavaASTFactory {
      * </pre>
      * 
      * where <code>type</code> is <code>variable</code>'s {@link KeYJavaType} as
-     * it is returned by {@link ProgramVariable#getKeYJavaType()}.
+     * it is returned by {@link IProgramVariable#getKeYJavaType()}.
      * 
      * @param variable
-     *            the named and typed {@link ProgramVariable} to be declared
+     *            the named and typed {@link IProgramVariable} to be declared
      * @param init
      *            the {@link Expression} <code>variable</code> is initialized
      *            with
@@ -820,7 +820,7 @@ public abstract class KeYJavaASTFactory {
      * @param modifier
      *            the {@link Modifier}
      * @param variable
-     *            the named and typed {@link ProgramVariable} to be declared
+     *            the named and typed {@link IProgramVariable} to be declared
      * @param init
      *            the {@link Expression} <code>variable</code> is initialized
      *            with
@@ -852,7 +852,7 @@ public abstract class KeYJavaASTFactory {
      * @param modifiers
      *            the {@link Modifier}s
      * @param variable
-     *            the named and typed {@link ProgramVariable} to be declared
+     *            the named and typed {@link IProgramVariable} to be declared
      * @param init
      *            the {@link Expression} <code>variable</code> is initialized
      *            with
@@ -884,7 +884,7 @@ public abstract class KeYJavaASTFactory {
      * @param modifiers
      *            the {@link Modifier}s
      * @param variable
-     *            the named and typed {@link ProgramVariable} to be declared
+     *            the named and typed {@link IProgramVariable} to be declared
      * @param init
      *            the {@link Expression} <code>variable</code> is initialized
      *            with
@@ -916,7 +916,7 @@ public abstract class KeYJavaASTFactory {
      * @param modifiers
      *            the {@link Modifier}s
      * @param variable
-     *            the named and typed {@link ProgramVariable} to be declared
+     *            the named and typed {@link IProgramVariable} to be declared
      * @param init
      *            the {@link Expression} <code>variable</code> is initialized
      *            with
@@ -1033,7 +1033,7 @@ public abstract class KeYJavaASTFactory {
      * @param modifiers
      *            the {@link Modifiers}
      * @param variable
-     *            the named and typed {@link ProgramVariable} to be declared
+     *            the named and typed {@link IProgramVariable} to be declared
      * @param init
      *            the {@link Expression} <code>variable</code> is initialized
      *            with
