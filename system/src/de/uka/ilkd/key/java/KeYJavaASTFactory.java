@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
+import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -1254,5 +1255,29 @@ public abstract class KeYJavaASTFactory {
 	final IntLiteral literal = new IntLiteral(value);
 
 	return literal;
+    }
+
+    /**
+     * Create an object allocation.
+     * 
+     * <pre>
+     * new referencePrefix.typeReference(args)
+     * </pre>
+     * 
+     * @param referencePrefix
+     *            the <code>typeReference</code>'s {@link ReferencePrefix}
+     * @param typeReference
+     *            a {@link TypeReference} to the class type that is instantiated
+     * @param args
+     *            the {@link Expression} arguments to be passed to the
+     *            constructor
+     * @return a new {@link New} operator that allocates a new instance of
+     *         <code>typeReference</code> parameterized with <code>args</code>
+     */
+    public static New newOperator(final ReferencePrefix referencePrefix,
+	    final TypeReference typeReference, final Expression[] args) {
+	final New operator = new New(args, typeReference, referencePrefix);
+
+	return operator;
     }
 }
