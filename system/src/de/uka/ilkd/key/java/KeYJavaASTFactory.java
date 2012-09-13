@@ -70,7 +70,27 @@ public abstract class KeYJavaASTFactory {
 				  typeRef.getKeYJavaType())));
     }
 
+    /**
+     * Create a local variable declaration without initialization.
+     * 
+     * <pre>
+     * type name;
+     * </pre>
+     * 
+     * @param name
+     *            the {@link ProgramElementName} of the variable to be declared
+     * @param type
+     *            the static {@link KeYJavaType} of the variable to be declared
+     * @return a new {@link LocalVariableDeclaration} of a variable with static
+     *         type <code>type</code> and name <code>name</code>
+     */
+    public static LocalVariableDeclaration declare(
+	    final ProgramElementName name, final KeYJavaType type) {
+	final LocalVariableDeclaration declaration = KeYJavaASTFactory.declare(
+		name, null, type);
 
+	return declaration;
+    }
 
     /**
      * create a local variable declaration <br></br>
