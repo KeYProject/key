@@ -65,6 +65,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.IFilter;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 
@@ -470,6 +471,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
+      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       ui.startAndWaitForProof(proof);
       // Update symbolic execution tree 
       builder.analyse();
@@ -503,6 +505,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
+      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       ui.startAndWaitForProof(proof);
       // Update symbolic execution tree 
       builder.analyse();
@@ -534,6 +537,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP);
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
+      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       ui.startAndWaitForProof(proof);
       // Update symbolic execution tree 
       builder.analyse();
@@ -563,6 +567,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
+      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       ui.startAndWaitForProof(proof);
       // Update symbolic execution tree 
       builder.analyse();

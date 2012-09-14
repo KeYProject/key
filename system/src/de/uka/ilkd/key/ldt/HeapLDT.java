@@ -10,8 +10,8 @@
 
 package de.uka.ilkd.key.ldt;
 
-import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
@@ -19,7 +19,10 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
@@ -28,8 +31,10 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.ExtList;
 
 
@@ -384,6 +389,16 @@ public final class HeapLDT extends LDT {
         return result;
     }
 
+    @Override
+    public final boolean containsFunction(Function op) {
+    	if (super.containsFunction(op)) {
+    		return true;
+    	}
+    	if (op instanceof SortDependingFunction) {
+    		return ((SortDependingFunction) op).isSimilar(select);
+    	}
+    	return op.isUnique() && op.sort() == getFieldSort();
+    }
     
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
@@ -436,9 +451,24 @@ public final class HeapLDT extends LDT {
 
     
     @Override
-    public Expression translateTerm(Term t, ExtList children) {
-	assert false;
-	return null;
+    public Expression translateTerm(Term t, ExtList children, Services services) {
+    	if (t.op() instanceof SortDependingFunction && 
+    			((SortDependingFunction)t.op()).isSimilar(select)) {
+    		ProgramVariable heap = (ProgramVariable) children.remove(0);
+    		if (heap != getHeap()) {
+    			throw new IllegalArgumentException("Can only translate field access to base heap.");
+    		}
+    		ReferencePrefix prefix = (ReferencePrefix) children.remove(0);
+    		ProgramVariable field = (ProgramVariable) children.remove(0);
+    		
+    		if (prefix instanceof NullLiteral) {
+    			return new FieldReference(field, null);
+    		}
+    		return new FieldReference(field, prefix);
+    	} else if (t.sort() == getFieldSort() && t.op() instanceof Function && ((Function) t.op()).isUnique()) {
+    		return services.getJavaInfo().getAttribute(getPrettyFieldName(t.op()), getClassName((Function) t.op()));
+    	}
+    	throw new IllegalArgumentException("Could not translate " + ProofSaver.printTerm(t, null) + " to program.");
     }
     
     

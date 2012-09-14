@@ -523,17 +523,17 @@ options {
     private Named lookup(Name n) {
        if(isProblemParser()) {
           final Namespace[] lookups = {
-            normalConfig.namespaces().functions(), 
-            schemaConfig.namespaces().functions(), 
+            schemaConfig.namespaces().programVariables(),
             normalConfig.namespaces().variables(), 
             schemaConfig.namespaces().variables(), 
-            schemaConfig.namespaces().programVariables()
+            normalConfig.namespaces().functions(), 
+            schemaConfig.namespaces().functions(), 
           };
           return doLookup(n,lookups);
        } else {
           final Namespace[] lookups = {
-              functions(), variables(), 
-              programVariables()
+              programVariables(), variables(),
+              functions()
           };
           return doLookup(n,lookups);
        }
@@ -1018,7 +1018,7 @@ options {
      * If the sort is not found for the first time, the name is expanded with "java.lang." 
      * and the look up restarts
      */
-     private Sort lookupSort(String name) throws SemanticException {        
+     private Sort lookupSort(String name) throws SemanticException {
 	Sort result = (Sort) sorts().lookup(new Name(name));
 	if (result == null) {
 	    if(name.equals(NullSort.NAME.toString())) {
@@ -1048,25 +1048,27 @@ options {
      */
     private Operator lookupVarfuncId(String varfunc_name, Term[] args) 
         throws NotDeclException, SemanticException {
+
         // case 1: variable
         Operator v = (Operator) variables().lookup(new Name(varfunc_name));
         if (v != null && (args == null || (inSchemaMode() && v instanceof ModalOperatorSV))) {
             return v;
         }
-        
-        // case 2: function
-        v = (Operator) functions().lookup(new Name(varfunc_name));
-        if (v != null) { // we allow both args==null (e.g. `c')
-                         // and args.length=0 (e.g. 'c())' here 
-            return v;
-        }
-        
-        // case 3: program variable
+
+        // case 2: program variable
         v = (Operator) programVariables().lookup
             (new ProgramElementName(varfunc_name));
         if (v != null && args==null) {
             return v;
         }
+        
+        // case 3: function
+        v = (Operator) functions().lookup(new Name(varfunc_name));
+        if (v != null) { // we allow both args==null (e.g. `c')
+                         // and args.length=0 (e.g. 'c())' here 
+            return v;
+        }
+
         
         // case 4: instantiation of sort depending function
         int separatorIndex = varfunc_name.indexOf("::"); 
@@ -1387,21 +1389,21 @@ decls :
            if(parse_includes) return;
            activatedChoices = DefaultImmutableSet.<Choice>nil();  
 	}
-        (options_choice)? { if(onlyWith) return; }
+        (options_choice)? 
         (
-            option_decls
+            {!onlyWith}? option_decls
         |    
-            sort_decls
+            {!onlyWith}? sort_decls
         |
-            prog_var_decls
+            {!onlyWith}? prog_var_decls
         |
-            schema_var_decls
+            {!onlyWith}? schema_var_decls
         |
             pred_decls
         |
             func_decls
         |
-            ruleset_decls
+            {!onlyWith}? ruleset_decls
 
         ) *
     ;
@@ -1677,9 +1679,9 @@ prog_var_decls
                   if (name != null ) {
 		    // commented out as pv do not have unique name (at the moment)
 		    //  throw new AmbigiousDeclException
-     		    //  	(var_name, getFilename(), getLine(), getColumn()); 
-		    if(name instanceof ProgramVariable && 
-			    !((ProgramVariable)name).getKeYJavaType().equals(kjt)) { 
+     		    //  	(var_name, getFilename(), getLine(), getColumn());
+		    if(!(name instanceof ProgramVariable) || (name instanceof ProgramVariable && 
+			    !((ProgramVariable)name).getKeYJavaType().equals(kjt))) { 
                       namespaces().programVariables().add(new LocationVariable
                         (pvName, kjt));
 		    }
@@ -1901,15 +1903,17 @@ pred_decl
                     		     whereToBind,
                     		     false);
                 }
-                
 		if (lookup(p.name()) != null) {
-		    throw new AmbigiousDeclException(p.name().toString(), 
-		                                     getFilename(), 
-		                                     getLine(), 
-		                                     getColumn());
-		}
-		
-                addFunction(p);         
+		    if(!isProblemParser()) {
+		        throw new AmbigiousDeclException(p.name().toString(), 
+		                                         getFilename(), 
+		                                         getLine(), 
+		                                         getColumn());
+		                                     
+		    }
+		}else{
+                  addFunction(p);         
+                }
             } 
         }
         SEMI
@@ -1999,15 +2003,16 @@ func_decl
 	                             whereToBind,
 	                             unique);                    
 	        }
-	        
 		if (lookup(f.name()) != null) {
-		    throw new AmbigiousDeclException(f.name().toString(), 
+		    if(!isProblemParser()) {
+		      throw new AmbigiousDeclException(f.name().toString(), 
 		                                     getFilename(), 
 		                                     getLine(), 
 		                                     getColumn());
-		}
-	        
-	        addFunction(f);
+		    }
+		}else{
+	    	    addFunction(f);
+	        }
             } 
         }
         SEMI
@@ -2171,13 +2176,16 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
                 name = PrimitiveType.JAVA_BIGINT.getName();
             }
             
-            Sort s = lookupSort(name);
-            if(checkSort && s == null) {
-                throw new NotDeclException("sort", 
+            Sort s = null;
+            if(checkSort) {
+                s = lookupSort(name);
+                if(s == null) {
+                  throw new NotDeclException("sort", 
                                            name, 
                                            getFilename(), 
                                            getLine(),  
-                                           getColumn());
+                                           getColumn()); 
+                }
             }
             
             result = new Pair<Sort,Type>(s, t);
@@ -4231,17 +4239,20 @@ problem returns [ Term a = null ]
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.mark(); }
         
+
+
         string = bootClassPath
         // the result is of no importance here (strange enough)        
         
         stlist = classPaths 
-
         string = javaSource
+
         decls
         { 
             if(parse_includes || onlyWith) return null;
             switchToNormalMode();
         }
+
         // WATCHOUT: choices is always going to be an empty set here,
 	// isn't it?
 	( contracts )*

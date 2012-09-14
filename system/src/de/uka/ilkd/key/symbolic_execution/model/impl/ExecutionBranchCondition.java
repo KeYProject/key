@@ -63,12 +63,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     */
    @Override
    protected String lazyComputeName() throws ProofInputException {
-      if (isMergedBranchCondition()) {
-         return getFormatedBranchCondition();
-      }
-      else {
-         return getProofNodeInfo().getBranchLabel();
-      }
+      return getFormatedBranchCondition();
    }
 
    /**

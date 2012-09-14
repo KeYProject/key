@@ -86,7 +86,7 @@ public final class DoubleLDT extends LDT {
 
     
     @Override
-    public Expression translateTerm(Term t, ExtList children) {
+    public Expression translateTerm(Term t, ExtList children, Services services) {
 	return null;
     }
     

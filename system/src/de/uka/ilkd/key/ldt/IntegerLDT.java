@@ -576,7 +576,7 @@ public final class IntegerLDT extends LDT {
     
     
     @Override
-    public Expression translateTerm(Term t, ExtList children) {
+    public Expression translateTerm(Term t, ExtList children, Services services) {
         if(!containsFunction((Function) t.op())) {
             return null;
         }
