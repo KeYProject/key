@@ -12,7 +12,7 @@ CLASSPATH=./binary/
 
 for i in $key_ext_jars $key_dev_jars; do
     current_jar="$KEY_LIB/$i"
-    if [ ! -f $current_jar ]
+    if [ ! -f "$current_jar" ]
     then
        echo "Cannot find $current_jar."
        echo Copy or link the file into the
@@ -24,4 +24,4 @@ for i in $key_ext_jars $key_dev_jars; do
 done
 
 export CLASSPATH
-echo "CLASSPATH=$CLASSPATH" > Makefile.mk
+echo "CLASSPATH=\"$CLASSPATH\"" > Makefile.mk
