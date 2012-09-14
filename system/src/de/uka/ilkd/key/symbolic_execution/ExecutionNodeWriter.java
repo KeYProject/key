@@ -22,6 +22,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.util.LinkedHashMap;
@@ -172,6 +173,11 @@ public class ExecutionNodeWriter {
     * Tag name to store {@link IExecutionVariable}s.
     */
    public static final String TAG_VARIABLE = "variable";
+
+   /**
+    * Tag name to store {@link IExecutionValue}s.
+    */
+   public static final String TAG_VALUE = "value";
 
    /**
     * Tag name to store one entry of {@link IExecutionNode#getCallStack()}.
@@ -546,19 +552,36 @@ public class ExecutionNodeWriter {
    protected void appendVariable(int level, IExecutionVariable variable, StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, variable.getName());
-      attributeValues.put(ATTRIBUTE_TYPE_STRING, variable.getTypeString());
-      attributeValues.put(ATTRIBUTE_VALUE_STRING, variable.getValueString());
       attributeValues.put(ATTRIBUTE_ARRAY_INDEX, variable.getArrayIndex() + "");
       attributeValues.put(ATTRIBUTE_IS_ARRAY_INDEX, variable.isArrayIndex() + "");
-      attributeValues.put(ATTRIBUTE_IS_VALUE_AN_OBJECT, variable.isValueAnObject() + "");
-      attributeValues.put(ATTRIBUTE_IS_VALUE_UNKNOWN, variable.isValueUnknown() + "");
       appendStartTag(level, TAG_VARIABLE, attributeValues, sb);
 
-      IExecutionVariable[] childVariables = variable.getChildVariables();
+      appendValue(level + 1, variable.getValue(), sb);
+
+      appendEndTag(level, TAG_VARIABLE, sb);
+   }
+
+   /**
+    * Appends the given {@link IExecutionValue} with its children to the given {@link StringBuffer}.
+    * @param level The level to use.
+    * @param value The {@link IExecutionValue} to append.
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendValue(int level, IExecutionValue value, StringBuffer sb) throws ProofInputException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_NAME, value.getName());
+      attributeValues.put(ATTRIBUTE_TYPE_STRING, value.getTypeString());
+      attributeValues.put(ATTRIBUTE_VALUE_STRING, value.getValueString());
+      attributeValues.put(ATTRIBUTE_IS_VALUE_AN_OBJECT, value.isValueAnObject() + "");
+      attributeValues.put(ATTRIBUTE_IS_VALUE_UNKNOWN, value.isValueUnknown() + "");
+      appendStartTag(level, TAG_VALUE, attributeValues, sb);
+
+      IExecutionVariable[] childVariables = value.getChildVariables();
       for (IExecutionVariable childVariable : childVariables) {
          appendVariable(level + 1, childVariable, sb);
       }
-      appendEndTag(level, TAG_VARIABLE, sb);
+      appendEndTag(level, TAG_VALUE, sb);
    }
 
    /**

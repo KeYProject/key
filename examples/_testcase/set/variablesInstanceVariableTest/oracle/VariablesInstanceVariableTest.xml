@@ -1,162 +1,310 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main(param);" pathCondition="true" pathConditionChanged="false">
-      <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+         <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+         </value>
       </variable>
       <statement name="int x = 5;" pathCondition="true" pathConditionChanged="false">
-         <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-            <variable name="a" typeString="int" valueString="self.a" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-            </variable>
-            <variable name="b" typeString="int" valueString="self.b" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-            </variable>
-            <variable name="wrapper" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
-            </variable>
+         <variable name="self" arrayIndex="-1" isArrayIndex="false">
+            <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+               <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                  <value name="Value of a" typeString="int" valueString="self.a" isValueAnObject="false" isValueUnknown="false">
+                  </value>
+               </variable>
+               <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                  <value name="Value of b" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false">
+                  </value>
+               </variable>
+               <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
+                  <value name="Value of wrapper" isValueAnObject="false" isValueUnknown="true">
+                  </value>
+               </variable>
+            </value>
          </variable>
-         <variable name="param" typeString="IntWrapper" valueString="param" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-            <variable name="value" typeString="int" valueString="param.value" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-            </variable>
+         <variable name="param" arrayIndex="-1" isArrayIndex="false">
+            <value name="Value of param" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false">
+               <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                  <value name="Value of value" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false">
+                  </value>
+               </variable>
+            </value>
          </variable>
-         <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+            </value>
          </variable>
          <statement name="a=x;" pathCondition="true" pathConditionChanged="false">
-            <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-               <variable name="a" typeString="int" valueString="self.a" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-               </variable>
-               <variable name="b" typeString="int" valueString="self.b" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-               </variable>
-               <variable name="wrapper" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
-               </variable>
+            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+               <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                  <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                     <value name="Value of a" typeString="int" valueString="self.a" isValueAnObject="false" isValueUnknown="false">
+                     </value>
+                  </variable>
+                  <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                     <value name="Value of b" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false">
+                     </value>
+                  </variable>
+                  <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
+                     <value name="Value of wrapper" isValueAnObject="false" isValueUnknown="true">
+                     </value>
+                  </variable>
+               </value>
             </variable>
-            <variable name="param" typeString="IntWrapper" valueString="param" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-               <variable name="value" typeString="int" valueString="param.value" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-               </variable>
+            <variable name="param" arrayIndex="-1" isArrayIndex="false">
+               <value name="Value of param" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false">
+                  <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                     <value name="Value of value" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false">
+                     </value>
+                  </variable>
+               </value>
             </variable>
-            <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+               </value>
             </variable>
-            <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+            <variable name="x" arrayIndex="-1" isArrayIndex="false">
+               <value name="Value of x" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+               </value>
             </variable>
             <statement name="b=3;" pathCondition="true" pathConditionChanged="false">
-               <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                  <variable name="a" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                  </variable>
-                  <variable name="b" typeString="int" valueString="self.b" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                  </variable>
-                  <variable name="wrapper" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
-                  </variable>
+               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                     <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                        <value name="Value of a" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                        </value>
+                     </variable>
+                     <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                        <value name="Value of b" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false">
+                        </value>
+                     </variable>
+                     <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
+                        <value name="Value of wrapper" isValueAnObject="false" isValueUnknown="true">
+                        </value>
+                     </variable>
+                  </value>
                </variable>
-               <variable name="param" typeString="IntWrapper" valueString="param" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                  <variable name="value" typeString="int" valueString="param.value" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                  </variable>
+               <variable name="param" arrayIndex="-1" isArrayIndex="false">
+                  <value name="Value of param" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false">
+                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                        <value name="Value of value" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false">
+                        </value>
+                     </variable>
+                  </value>
                </variable>
-               <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                  </value>
                </variable>
-               <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+               <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                  <value name="Value of x" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                  </value>
                </variable>
                <statement name="param=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
-                  <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                     <variable name="a" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                     </variable>
-                     <variable name="b" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                     </variable>
-                     <variable name="wrapper" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
-                     </variable>
+                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                        <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                           <value name="Value of a" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                           </value>
+                        </variable>
+                        <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                           <value name="Value of b" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false">
+                           </value>
+                        </variable>
+                        <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
+                           <value name="Value of wrapper" isValueAnObject="false" isValueUnknown="true">
+                           </value>
+                        </variable>
+                     </value>
                   </variable>
-                  <variable name="param" typeString="IntWrapper" valueString="param" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                     <variable name="value" typeString="int" valueString="param.value" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                     </variable>
+                  <variable name="param" arrayIndex="-1" isArrayIndex="false">
+                     <value name="Value of param" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false">
+                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                           <value name="Value of value" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false">
+                           </value>
+                        </variable>
+                     </value>
                   </variable>
-                  <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                     </value>
                   </variable>
-                  <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                  <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                     <value name="Value of x" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                     </value>
                   </variable>
                   <statement name="param.value=1;" pathCondition="true" pathConditionChanged="false">
-                     <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                        <variable name="a" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                        </variable>
-                        <variable name="b" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                        </variable>
-                        <variable name="wrapper" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
-                        </variable>
+                     <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                           <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                              <value name="Value of a" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                              </value>
+                           </variable>
+                           <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                              <value name="Value of b" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false">
+                              </value>
+                           </variable>
+                           <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
+                              <value name="Value of wrapper" isValueAnObject="false" isValueUnknown="true">
+                              </value>
+                           </variable>
+                        </value>
                      </variable>
-                     <variable name="param" typeString="IntWrapper" valueString="i_2" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                        <variable name="value" typeString="int" valueString="0" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                        </variable>
+                     <variable name="param" arrayIndex="-1" isArrayIndex="false">
+                        <value name="Value of param" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false">
+                           <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                              <value name="Value of value" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false">
+                              </value>
+                           </variable>
+                        </value>
                      </variable>
-                     <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        </value>
                      </variable>
-                     <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                     <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                        <value name="Value of x" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                        </value>
                      </variable>
                      <statement name="wrapper=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
-                        <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                           <variable name="a" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                           </variable>
-                           <variable name="b" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                           </variable>
-                           <variable name="wrapper" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="true">
-                           </variable>
+                        <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                           <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                              <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="Value of a" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                                 </value>
+                              </variable>
+                              <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="Value of b" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false">
+                                 </value>
+                              </variable>
+                              <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="Value of wrapper" isValueAnObject="false" isValueUnknown="true">
+                                 </value>
+                              </variable>
+                           </value>
                         </variable>
-                        <variable name="param" typeString="IntWrapper" valueString="i_2" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                           <variable name="value" typeString="int" valueString="1" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                           </variable>
+                        <variable name="param" arrayIndex="-1" isArrayIndex="false">
+                           <value name="Value of param" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false">
+                              <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="Value of value" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false">
+                                 </value>
+                              </variable>
+                           </value>
                         </variable>
-                        <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                           </value>
                         </variable>
-                        <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                        <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                           <value name="Value of x" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                           </value>
                         </variable>
                         <statement name="wrapper.value=4;" pathCondition="true" pathConditionChanged="false">
-                           <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                              <variable name="a" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                              </variable>
-                              <variable name="b" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                              </variable>
-                              <variable name="wrapper" typeString="IntWrapper" valueString="i_5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                                 <variable name="value" typeString="int" valueString="0" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                           <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                              <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                                 <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="Value of a" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                                    </value>
                                  </variable>
-                              </variable>
+                                 <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="Value of b" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false">
+                                    </value>
+                                 </variable>
+                                 <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="Value of wrapper" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false">
+                                       <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                          <value name="Value of value" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false">
+                                          </value>
+                                       </variable>
+                                    </value>
+                                 </variable>
+                              </value>
                            </variable>
-                           <variable name="param" typeString="IntWrapper" valueString="i_2" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                              <variable name="value" typeString="int" valueString="\if (i_5 = i_2)  \then (0)  \else (1)" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                              </variable>
+                           <variable name="param" arrayIndex="-1" isArrayIndex="false">
+                              <value name="Value of param" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false">
+                                 <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="Value of value" typeString="int" valueString="\if (i_5 = i_2)  \then (0)  \else (1)" isValueAnObject="false" isValueUnknown="false">
+                                    </value>
+                                 </variable>
+                              </value>
                            </variable>
-                           <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                              </value>
                            </variable>
-                           <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                           <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                              <value name="Value of x" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                              </value>
                            </variable>
                            <statement name="return a+b+x+wrapper.value+param.value;" pathCondition="true" pathConditionChanged="false">
-                              <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                                 <variable name="a" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                                 </variable>
-                                 <variable name="b" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                                 </variable>
-                                 <variable name="wrapper" typeString="IntWrapper" valueString="i_5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                                    <variable name="value" typeString="int" valueString="4" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                                    <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="Value of a" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                                       </value>
                                     </variable>
-                                 </variable>
+                                    <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="Value of b" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false">
+                                       </value>
+                                    </variable>
+                                    <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="Value of wrapper" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false">
+                                          <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                             <value name="Value of value" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false">
+                                             </value>
+                                          </variable>
+                                       </value>
+                                    </variable>
+                                 </value>
                               </variable>
-                              <variable name="param" typeString="IntWrapper" valueString="i_2" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                                 <variable name="value" typeString="int" valueString="\if (i_5 = i_2)  \then (4)  \else (1)" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                                 </variable>
+                              <variable name="param" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="Value of param" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false">
+                                    <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="Value of value" typeString="int" valueString="\if (i_5 = i_2)  \then (4)  \else (1)" isValueAnObject="false" isValueUnknown="false">
+                                       </value>
+                                    </variable>
+                                 </value>
                               </variable>
-                              <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                              <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                                 </value>
                               </variable>
-                              <variable name="x" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                              <variable name="x" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="Value of x" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                                 </value>
                               </variable>
                               <methodReturn name="&lt;return of self.main(param);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;17 + \if (i_5 = i_2)  \then (4)  \else (1)&apos; as result of self.main(param);&gt;">
-                                 <variable name="self" typeString="VariablesInstanceVariableTest" valueString="self" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                                    <variable name="a" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                                    </variable>
-                                    <variable name="b" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                                    </variable>
-                                    <variable name="wrapper" typeString="IntWrapper" valueString="i_5" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                                       <variable name="value" typeString="int" valueString="4" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                                 <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                                       <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                                          <value name="Value of a" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                                          </value>
                                        </variable>
-                                    </variable>
+                                       <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                                          <value name="Value of b" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false">
+                                          </value>
+                                       </variable>
+                                       <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
+                                          <value name="Value of wrapper" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false">
+                                             <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                                <value name="Value of value" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false">
+                                                </value>
+                                             </variable>
+                                          </value>
+                                       </variable>
+                                    </value>
                                  </variable>
-                                 <variable name="param" typeString="IntWrapper" valueString="i_2" arrayIndex="-1" isArrayIndex="false" isValueAnObject="true" isValueUnknown="false">
-                                    <variable name="value" typeString="int" valueString="\if (i_5 = i_2)  \then (4)  \else (1)" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
-                                    </variable>
+                                 <variable name="param" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="Value of param" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false">
+                                       <variable name="value" arrayIndex="-1" isArrayIndex="false">
+                                          <value name="Value of value" typeString="int" valueString="\if (i_5 = i_2)  \then (4)  \else (1)" isValueAnObject="false" isValueUnknown="false">
+                                          </value>
+                                       </variable>
+                                    </value>
                                  </variable>
-                                 <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false" isValueAnObject="false" isValueUnknown="false">
+                                 <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                                    </value>
                                  </variable>
                                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
                                  </termination>

@@ -2,6 +2,7 @@ package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +25,8 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -1153,5 +1156,30 @@ public final class SymbolicExecutionUtil {
       else {
          return false;
       }
+   }
+
+   /**
+    * Checks if the given {@link IProgramVariable} is static or not.
+    * @return {@code true} is static, {@code false} is not static or is array cell.
+    */
+   public static boolean isStaticVariable(IProgramVariable programVariable) {
+      return programVariable instanceof ProgramVariable &&
+             ((ProgramVariable)programVariable).isStatic();
+   }
+   
+   /**
+    * Collects all {@link IProgramVariable}s of the given {@link FieldDeclaration}.
+    * @param fd The given {@link FieldDeclaration}.
+    * @return The found {@link IProgramVariable}s for the given {@link FieldDeclaration}.
+    */
+   public static Set<IProgramVariable> getProgramVariables(FieldDeclaration fd) {
+      Set<IProgramVariable> result = new HashSet<IProgramVariable>();
+      if (fd != null) {
+         ImmutableArray<FieldSpecification> specifications = fd.getFieldSpecifications();
+         for (FieldSpecification spec : specifications) {
+            result.add(spec.getProgramVariable());
+         }
+      }
+      return result;
    }
 }

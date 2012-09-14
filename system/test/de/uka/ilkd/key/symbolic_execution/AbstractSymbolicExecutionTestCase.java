@@ -54,6 +54,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
@@ -424,13 +425,45 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertEquals(expected.isArrayIndex(), current.isArrayIndex());
          assertEquals(expected.getArrayIndex(), current.getArrayIndex());
          assertEquals(expected.getName(), current.getName());
+         // Compare parent
+         if (compareParent) {
+            assertValue(expected.getParentValue(), current.getParentValue(), false, false);
+         }
+         // Compare children
+         if (compareChildren) {
+            IExecutionValue expectedValue = expected.getValue();
+            IExecutionValue currentValue = current.getValue();
+            assertValue(expectedValue, currentValue, compareParent, compareChildren);
+         }
+      }
+      else {
+         assertNull(current);
+      }
+   }
+
+   /**
+    * Makes sure that the given values are the same.
+    * @param expected The expected variable.
+    * @param current The current variable.
+    * @param compareParent Compare parent?
+    * @param compareChildren Compare children?
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertValue(IExecutionValue expected, 
+                                     IExecutionValue current,
+                                     boolean compareParent, 
+                                     boolean compareChildren) throws ProofInputException {
+      if (expected != null) {
+         assertNotNull(current);
+         // Compare variable
+         assertEquals(expected.getName(), current.getName());
          assertEquals(expected.getTypeString(), current.getTypeString());
          assertTrue(expected.getValueString() + " does not match " + current.getValueString(), JavaUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
          assertEquals(expected.isValueAnObject(), current.isValueAnObject());
          assertEquals(expected.isValueUnknown(), current.isValueUnknown());
          // Compare parent
          if (compareParent) {
-            assertVariable(expected.getParentVariable(), current.getParentVariable(), false, false);
+            assertVariable(expected.getVariable(), current.getVariable(), false, false);
          }
          // Compare children
          if (compareChildren) {

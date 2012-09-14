@@ -8,6 +8,7 @@ import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
@@ -17,9 +18,9 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
  */
 public class KeYValue extends AbstractSEDValue {
    /**
-    * The {@link IExecutionVariable} to represent in debug model.
+    * The {@link IExecutionValue} to represent in debug model.
     */
-   private IExecutionVariable executionVariable;
+   private IExecutionValue executionValue;
    
    /**
     * The contained child {@link KeYVariable}s.
@@ -29,12 +30,12 @@ public class KeYValue extends AbstractSEDValue {
    /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this element is contained.
-    * @param executionVariable The {@link IExecutionVariable} to represent in debug model.
+    * @param executionValue The {@link IExecutionValue} to represent in debug model.
     */
-   public KeYValue(KeYDebugTarget target, IExecutionVariable executionVariable) {
+   public KeYValue(KeYDebugTarget target, IExecutionValue executionValue) {
       super(target);
-      Assert.isNotNull(executionVariable);
-      this.executionVariable = executionVariable;
+      Assert.isNotNull(executionValue);
+      this.executionValue = executionValue;
    }
    
    /**
@@ -51,7 +52,7 @@ public class KeYValue extends AbstractSEDValue {
    @Override
    public String getReferenceTypeName() throws DebugException {
       try {
-         String typeName = executionVariable.getTypeString();
+         String typeName = executionValue.getTypeString();
          return typeName != null ? typeName : StringUtil.EMPTY_STRING;
       }
       catch (ProofInputException e) {
@@ -66,7 +67,7 @@ public class KeYValue extends AbstractSEDValue {
    @Override
    public String getValueString() throws DebugException {
       try {
-         return executionVariable.getValueString();
+         return executionValue.getValueString();
       }
       catch (Exception e) {
          LogUtil.getLogger().logError(e);
@@ -82,7 +83,7 @@ public class KeYValue extends AbstractSEDValue {
       synchronized (this) {
          try {
             if (variables == null) {
-               IExecutionVariable[] executionVariables = executionVariable.getChildVariables();
+               IExecutionVariable[] executionVariables = executionValue.getChildVariables();
                if (executionVariables != null) {
                   variables = new KeYVariable[executionVariables.length];
                   for (int i = 0; i < executionVariables.length; i++) {
@@ -119,11 +120,11 @@ public class KeYValue extends AbstractSEDValue {
    }
 
    /**
-    * Returns the represented {@link IExecutionVariable}.
-    * @return The represented {@link IExecutionVariable}.
+    * Returns the represented {@link IExecutionValue}.
+    * @return The represented {@link IExecutionValue}.
     */
-   public IExecutionVariable getExecutionVariable() {
-      return executionVariable;
+   public IExecutionValue getExecutionValue() {
+      return executionValue;
    }
 
    /**
@@ -132,7 +133,7 @@ public class KeYValue extends AbstractSEDValue {
    @Override
    public boolean isObject() throws DebugException {
       try {
-         return getExecutionVariable().isValueAnObject();
+         return getExecutionValue().isValueAnObject();
       }
       catch (ProofInputException e) {
          LogUtil.getLogger().logError(e);

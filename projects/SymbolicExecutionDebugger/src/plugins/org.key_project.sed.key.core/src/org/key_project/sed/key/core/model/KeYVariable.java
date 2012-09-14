@@ -65,14 +65,18 @@ public class KeYVariable extends AbstractSEDVariable {
    @Override
    public String getReferenceTypeName() throws DebugException {
       try {
-         String typeName = executionVariable.getTypeString();
-         return typeName != null ? typeName : StringUtil.EMPTY_STRING;
+         if (executionVariable.getValue() != null) {
+            String typeName = executionVariable.getValue().getTypeString();
+            return typeName != null ? typeName : StringUtil.EMPTY_STRING;
+         }
+         else {
+            return StringUtil.EMPTY_STRING;
+         }
       }
       catch (ProofInputException e) {
          LogUtil.getLogger().logError(e);
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute reference type name.", e));
       }
-
    }
 
    /**
@@ -88,10 +92,17 @@ public class KeYVariable extends AbstractSEDVariable {
     */
    @Override
    public IValue getValue() throws DebugException {
-      if (value == null) {
-         value = new KeYValue(getDebugTarget(), executionVariable);
+      try {
+         if (value == null) {
+            Assert.isNotNull(executionVariable.getValue(), "An IExecutionVariable must provide an IExecutionValue!");
+            value = new KeYValue(getDebugTarget(), executionVariable.getValue());
+         }
+         return value;
       }
-      return value;
+      catch (ProofInputException e) {
+         LogUtil.getLogger().logError(e);
+         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute value.", e));
+      }
    }
 
    /**
