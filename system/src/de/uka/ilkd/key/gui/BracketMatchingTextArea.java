@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
+// The KeY system is protected by the GNU General Public License.
 // See LICENSE.TXT for details.
 //
 //
@@ -30,17 +30,17 @@ import javax.swing.text.Highlighter.HighlightPainter;
  * The Class BracketMatchingTextArea provides a GUI TextArea component which
  * automatically highlights matching pairs of parentheses. It behaves like a
  * {@link JTextArea} object in every other respect.
- * 
+ *
  * <ul>
  * <li>The following characters are considered as opening parenthesis:
  * <code>( { &lt; [</code>
  * <li>The following characters are considered as closing parenthesis:
  * <code>) } &gt; ]</code>
  * </ul>
- * 
+ *
  * It is not checked whether the parenthesis are of the same type. Therefore,
  * <code>{x)</code> is highlighted as well.
- * 
+ *
  * @author mulbrich
  */
 public class BracketMatchingTextArea extends JTextArea implements CaretListener {
@@ -49,7 +49,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * The Constant serialVersionUID needed for serialisation reasons
      */
     private static final long serialVersionUID = 1649172317561172229L;
-    
+
     /**
      * The Constant HIGHLIGHT_COLOR holds the color to be used for the highlighting frame, if
      * the matching parentheses are of the same kind
@@ -61,31 +61,31 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * if the matching parentheses are of different kind.
      */
     private static final Color HIGHLIGHT_COLOR_DIFFERENT_PARENS = Color.RED;
-    
+
     /**
      * The Constant PAINTER is the painter which is used to draw the highlighting for
      * matching parens of same kind.
      */
-    private static final HighlightPainter SAME_PAINTER = 
+    private static final HighlightPainter SAME_PAINTER =
             new BorderPainter(HIGHLIGHT_COLOR_SAME_PARENS);
 
     /**
      * The Constant PAINTER is the painter which is used to draw the highlighting for
      * matching parens of different kind.
      */
-    private static final HighlightPainter DIFF_PAINTER = 
+    private static final HighlightPainter DIFF_PAINTER =
             new BorderPainter(HIGHLIGHT_COLOR_DIFFERENT_PARENS);
 
     /**
      * The Constant OPENING_PARENS holds the characters which serve as opening parenthesis
      */
     private static final String OPENING_PARENS = "({[";
-    
+
     /**
      * The Constant CLOSING_PARENS holds the characters which serve as closing parenthesis.
      */
     private static final String CLOSING_PARENS = ")}]";
-    
+
     /**
      * The highlighter stores the highlights in an object which is used to denote the highlighting.
      */
@@ -95,8 +95,8 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * The highlighter stores the highlights in an object which is used to denote the highlighting.
      */
     private Object theDiffParensHighlight;
-    
-    
+
+
     /**
      * Constructs a new TextArea.  A default model is set, the initial string
      * is null, and rows/columns are set to 0.
@@ -181,7 +181,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      */
     private void init() {
         addCaretListener(this);
-        
+
         DefaultHighlighter highlight = new DefaultHighlighter();
         // highlight.setDrawsLayeredHighlights(false);
         setHighlighter(highlight);
@@ -194,9 +194,9 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
         }
     }
 
-    /* 
+    /*
      * check if the caret is on a paren and if so, find the corresponding partner.
-     * update the highlighting if such a partner exists. 
+     * update the highlighting if such a partner exists.
      */
     public void caretUpdate(CaretEvent e) {
         Object theHighlight = theSameParensHighlight;
@@ -207,26 +207,29 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
             char charBefore = dot == 0 ? 0 : text.charAt(dot-1);
             int begin = -1;
             int end = -1;
-            
+
             if(OPENING_PARENS.indexOf(charOn) != -1) {
-                begin = findMatchingClose(dot);
-                if(begin > 0)
-                    begin++;
-                end = dot;
-            } else if(CLOSING_PARENS.indexOf(charBefore) != -1) {
+                end = findMatchingClose(dot);
+                if(end > 0)
+                    end++;
                 begin = dot;
-                end = findMatchingOpen(dot-1);
+            } else if(CLOSING_PARENS.indexOf(charBefore) != -1) {
+                end = dot;
+                begin = findMatchingOpen(dot-1);
             }
-            
-            if(begin != -1 && end != -1) {                
-                if (CLOSING_PARENS.indexOf(text.charAt(begin > 0 ? begin - 1 : begin)) !=
-                      OPENING_PARENS.indexOf(text.charAt(end))) {
+
+            if(end != -1 && begin != -1) {
+                assert begin < end : "begin=" + begin + " end=" + end;
+                assert end > 0;
+
+                if (CLOSING_PARENS.indexOf(text.charAt(end - 1)) !=
+                      OPENING_PARENS.indexOf(text.charAt(begin))) {
                     theHighlight = theDiffParensHighlight;
                 } else {
                     theHighlight = theSameParensHighlight;
                 }
-                // yes! begin/end are juxtaposed
-                getHighlighter().changeHighlight(theHighlight, end, begin);
+
+                getHighlighter().changeHighlight(theHighlight, begin, end);
             } else {
                 resetHighlights();
             }
@@ -242,7 +245,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
     }
 
     /**
-     * resets both highlights 
+     * resets both highlights
      * @throws BadLocationException if the caret is invalid
      */
     protected void resetHighlights() throws BadLocationException {
@@ -252,10 +255,10 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
 
     /**
      * Find matching close paren.
-     * 
+     *
      * Go through the string and find the closing partner. There may be other
      * open/close parens in between
-     * 
+     *
      * @param dot
      *                position to start search from (must be an opening paren)
      * @return either the index of the closing partner or -1 if it does not
@@ -264,16 +267,16 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
     private int findMatchingClose(int dot) {
         int count = 0;
         String text = getText();
-        
+
         do {
             if(OPENING_PARENS.indexOf(text.charAt(dot)) != -1)
                 count ++;
             else if(CLOSING_PARENS.indexOf(text.charAt(dot)) != -1)
                 count --;
-        
+
             if(count == 0)
                 return dot;
-            
+
             dot ++;
         } while(dot < text.length());
         return -1;
@@ -281,10 +284,10 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
 
     /**
      * Find matching open paren.
-     * 
+     *
      * Go backward through the string and find the opening partner. There may be
      * other open/close parens in between
-     * 
+     *
      * @param dot
      *                position to start search from (must be a closing paren)
      * @return either the index of the opening partner or -1 if it does not
@@ -293,22 +296,22 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
     private int findMatchingOpen(int dot) {
         int count = 0;
         String text = getText();
-        
+
         do {
             if(OPENING_PARENS.indexOf(text.charAt(dot)) != -1)
                 count --;
             else if(CLOSING_PARENS.indexOf(text.charAt(dot)) != -1)
                 count ++;
-        
+
             if(count == 0)
                 return dot;
-            
+
             dot --;
         } while(dot >= 0);
         return -1;
     }
-    
-    /* 
+
+    /*
      * for testing
      */
     public static void main(String[] args) {
@@ -318,15 +321,15 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
         f.setVisible(true);
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
-    
+
     /**
      * The Class BorderPainter is a simple highlight painter that just draws a rectangle around the selection.
-     * 
+     *
      */
-    static private class BorderPainter implements HighlightPainter {        
+    static private class BorderPainter implements HighlightPainter {
 
         private final Color highlightColor;
-        
+
         public BorderPainter(Color highlightColor) {
             this.highlightColor = highlightColor;
         }
@@ -336,11 +339,11 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
          */
         public void paint(Graphics g, int offs0, int offs1, Shape bounds,
                 JTextComponent c) {
-            
+
             // dont render if empty
             if(offs0 == offs1)
                 return;
-            
+
             Rectangle alloc = bounds.getBounds();
             try {
                 // --- determine locations ---
@@ -349,7 +352,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
                 Rectangle p1 = mapper.modelToView(c, offs1);
 
                 g.setColor(highlightColor);
-                
+
                 if (p0.y == p1.y) {
                     // same line, render a rectangle
                     Rectangle r = p0.union(p1);
@@ -359,7 +362,7 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
                     int p0ToMarginWidth = alloc.x + alloc.width - p0.x;
                     g.drawRect(p0.x, p0.y, p0ToMarginWidth, p0.height);
                     if ((p0.y + p0.height) != p1.y) {
-                        g.drawRect(alloc.x, p0.y + p0.height, alloc.width-1, 
+                        g.drawRect(alloc.x, p0.y + p0.height, alloc.width-1,
                                    p1.y - (p0.y + p0.height)-1);
                     }
                     g.drawRect(alloc.x, p1.y, (p1.x - alloc.x)-1, p1.height-1);
