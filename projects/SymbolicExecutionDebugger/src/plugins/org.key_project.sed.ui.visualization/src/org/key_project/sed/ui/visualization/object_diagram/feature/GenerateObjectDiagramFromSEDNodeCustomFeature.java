@@ -1,7 +1,9 @@
 package org.key_project.sed.ui.visualization.object_diagram.feature;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -136,12 +138,14 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
          // Create state's PictogramElement
          PictogramElement statePE = addNodeToDiagram(state, 0, 0, 100, 100);
          // Instantiate child objects
+         Map<String, PictogramElement> existingObjectsMap = new HashMap<String, PictogramElement>();
          analyzeVariables(objectVariables, 
                           state, 
                           statePE,
                           model, 
                           statePE.getGraphicsAlgorithm().getWidth() + HORIZONTAL_OFFSET_BETWEEN_OBJECTS,
                           statePE.getGraphicsAlgorithm().getY(),
+                          existingObjectsMap,
                           monitor);
       }
       else {
@@ -196,6 +200,7 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
                                   ODModel model, 
                                   int xForNewObjects,
                                   int yForNewObjects,
+                                  Map<String, PictogramElement> existingObjectsMap,
                                   IProgressMonitor monitor) throws DebugException {
       int y = yForNewObjects;
       int maxWidth = 0;
@@ -203,41 +208,55 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
          SWTUtil.checkCanceled(monitor);
          // Create object
          if (variable.getValue() != null) {
-            ODObject object = ODFactory.eINSTANCE.createODObject();
-            object.setName(StringUtil.toSingleLinedString(variable.getValue().getValueString()));
-            object.setType(variable.getReferenceTypeName());
-            model.getObjects().add(object);
-            monitor.subTask(object.getName());
-            // Add values to object
-            List<IVariable> childObjectVariables = fillValueContainer(variable.getValue().getVariables(), object, monitor);
-            // Create object's PictogramElement
-            PictogramElement objectPE = addNodeToDiagram(object, 
-                                                         xForNewObjects, 
-                                                         y, 
-                                                         100, 
-                                                         100);
-            y += objectPE.getGraphicsAlgorithm().getHeight() + VERTICAL_OFFSET_BETWEEN_OBJECTS;
-            if (objectPE.getGraphicsAlgorithm().getWidth() > maxWidth) {
-               maxWidth = objectPE.getGraphicsAlgorithm().getWidth();
+            // Get object name
+            String objectName = variable.getValue().getValueString();
+            PictogramElement objectPE = existingObjectsMap.get(objectName);
+            if (objectPE != null) {
+               // Create association
+               ODAssociation association = ODFactory.eINSTANCE.createODAssociation();
+               association.setName(StringUtil.toSingleLinedString(variable.getName()));
+               association.setTarget((ODObject)getBusinessObjectForPictogramElement(objectPE));
+               toFill.getAssociations().add(association);
+               addConnectionToDiagram(association, toFillPE, objectPE);
             }
-            // Create association
-            ODAssociation association = ODFactory.eINSTANCE.createODAssociation();
-            association.setName(StringUtil.toSingleLinedString(variable.getName()));
-            association.setTarget(object);
-            toFill.getAssociations().add(association);
-            addConnectionToDiagram(association, toFillPE, objectPE);
-            
-            // Instantiate child objects
-            int maxYChildren = analyzeVariables(childObjectVariables, 
-                                                object, 
-                                                objectPE,
-                                                model, 
-                                                xForNewObjects + maxWidth + HORIZONTAL_OFFSET_BETWEEN_OBJECTS, 
-                                                objectPE.getGraphicsAlgorithm().getY(),
-                                                monitor);
-            if (maxYChildren > y) {
-               y = maxYChildren;
-            }
+            else {
+               ODObject object = ODFactory.eINSTANCE.createODObject();
+               object.setName(StringUtil.toSingleLinedString(objectName));
+               object.setType(variable.getReferenceTypeName());
+               model.getObjects().add(object);
+               monitor.subTask(object.getName());
+               // Add values to object
+               List<IVariable> childObjectVariables = fillValueContainer(variable.getValue().getVariables(), object, monitor);
+               // Create object's PictogramElement
+               objectPE = addNodeToDiagram(object, 
+                                           xForNewObjects, 
+                                           y, 
+                                           100, 
+                                           100);
+               existingObjectsMap.put(objectName, objectPE);
+               y += objectPE.getGraphicsAlgorithm().getHeight() + VERTICAL_OFFSET_BETWEEN_OBJECTS;
+               if (objectPE.getGraphicsAlgorithm().getWidth() > maxWidth) {
+                  maxWidth = objectPE.getGraphicsAlgorithm().getWidth();
+               }
+               // Create association
+               ODAssociation association = ODFactory.eINSTANCE.createODAssociation();
+               association.setName(StringUtil.toSingleLinedString(variable.getName()));
+               association.setTarget(object);
+               toFill.getAssociations().add(association);
+               addConnectionToDiagram(association, toFillPE, objectPE);
+               // Instantiate child objects
+               int maxYChildren = analyzeVariables(childObjectVariables, 
+                                                   object, 
+                                                   objectPE,
+                                                   model, 
+                                                   xForNewObjects + maxWidth + HORIZONTAL_OFFSET_BETWEEN_OBJECTS, 
+                                                   objectPE.getGraphicsAlgorithm().getY(),
+                                                   existingObjectsMap,
+                                                   monitor);
+               if (maxYChildren > y) {
+                  y = maxYChildren;
+               }
+            }            
          }
          monitor.worked(1);
       }
