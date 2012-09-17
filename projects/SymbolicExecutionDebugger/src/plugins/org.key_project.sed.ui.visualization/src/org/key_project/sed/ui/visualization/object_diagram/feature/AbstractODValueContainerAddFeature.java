@@ -99,7 +99,7 @@ public abstract class AbstractODValueContainerAddFeature<T extends AbstractODVal
       text.setStyle(ObjectDiagramStyleUtil.getStyleForObjectText(getDiagram()));
       text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
       // Compute text height
-      IDimension textDimension = GraphitiUtil.calculateStringSize(text.getValue(), gaService.getFont(text, true));
+      IDimension textDimension = GraphitiUtil.calculateTextSize(text.getValue(), gaService.getFont(text, true));
       int textHeight = textDimension != null ? textDimension.getHeight() : 20;
       int optimalWidth = textDimension != null ? ObjectDiagramUtil.VERTICAL_OFFSET + textDimension.getWidth() + ObjectDiagramUtil.VERTICAL_OFFSET : width;
       // vertical alignment has as default value "center"
@@ -125,7 +125,7 @@ public abstract class AbstractODValueContainerAddFeature<T extends AbstractODVal
          PictogramElement valuePE = addGraphicalRepresentation(valueContext, value);
          if (valuePE.getGraphicsAlgorithm() instanceof Text) {
             Text valueText = (Text)valuePE.getGraphicsAlgorithm();
-            IDimension valueTextDimension = GraphitiUtil.calculateStringSize(valueText.getValue(), gaService.getFont(valueText, true));
+            IDimension valueTextDimension = GraphitiUtil.calculateTextSize(valueText.getValue(), gaService.getFont(valueText, true));
             if (valueTextDimension != null) {
                int optimalValueWidth = ObjectDiagramUtil.HORIZONTAL_OFFSET + valueTextDimension.getWidth() + ObjectDiagramUtil.HORIZONTAL_OFFSET;
                if (optimalValueWidth > optimalWidth) {

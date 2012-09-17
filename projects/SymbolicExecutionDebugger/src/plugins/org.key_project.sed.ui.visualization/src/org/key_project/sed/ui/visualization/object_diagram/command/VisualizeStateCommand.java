@@ -26,6 +26,7 @@ import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.NonPersistableDiagramEditorInput;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * This {@link IHandler} visualizes the state of each selected
@@ -78,7 +79,7 @@ public class VisualizeStateCommand extends AbstractHandler {
                                      IWorkbenchPage activePage) throws Exception {
       // Create empty diagram
       Diagram diagram = Graphiti.getPeCreateService().createDiagram(ObjectDiagramTypeProvider.TYPE, 
-                                                                    node.getName(), 
+                                                                    StringUtil.toSingleLinedString(node.getName()), 
                                                                     true);
       // Create editing domain and resource that contains the diagram
       URI uri = URI.createURI(node.getId() + ObjectDiagramUtil.DIAGRAM_AND_MODEL_FILE_EXTENSION_WITH_DOT);

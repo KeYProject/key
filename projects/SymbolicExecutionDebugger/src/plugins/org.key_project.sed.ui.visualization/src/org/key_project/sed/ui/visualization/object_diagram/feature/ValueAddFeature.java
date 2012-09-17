@@ -72,7 +72,7 @@ public class ValueAddFeature extends AbstractAddShapeFeature {
       text.setHorizontalAlignment(Orientation.ALIGNMENT_LEFT);
       // vertical alignment has as default value "center"
       final int width = targetContainer.getGraphicsAlgorithm().getWidth() - (ObjectDiagramUtil.HORIZONTAL_OFFSET * 2);
-      IDimension textDimension = GraphitiUtil.calculateStringSize(text.getValue(), gaService.getFont(text, true));
+      IDimension textDimension = GraphitiUtil.calculateTextSize(text.getValue(), gaService.getFont(text, true));
       final int height = textDimension != null ? textDimension.getHeight() : 20;
       gaService.setLocationAndSize(text, ObjectDiagramUtil.HORIZONTAL_OFFSET, getYForNewValue(targetContainer), width, height);
 

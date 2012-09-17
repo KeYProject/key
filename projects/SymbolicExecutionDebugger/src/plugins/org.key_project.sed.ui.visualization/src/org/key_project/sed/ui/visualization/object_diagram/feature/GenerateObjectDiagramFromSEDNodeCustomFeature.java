@@ -36,7 +36,6 @@ import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.StringUtil;
 
 /**
  * An {@link ICustomFeature} that generates an object diagram based
@@ -126,7 +125,7 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
       monitor.beginTask("Generating model and diagram.", IProgressMonitor.UNKNOWN);
       // Create sate
       ODState state = ODFactory.eINSTANCE.createODState();
-      state.setName(StringUtil.toSingleLinedString(node.getName()));
+      state.setName(node.getName());
       model.getStates().add(state);
       monitor.subTask(state.getName());
       // Fill state and instantiate objects
@@ -183,9 +182,9 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
    protected ODValue createValue(IVariable variable, AbstractODValueContainer toFill) throws DebugException {
       if (!isObject(variable)) {
          ODValue value = ODFactory.eINSTANCE.createODValue();
-         value.setName(StringUtil.toSingleLinedString(variable.getName()));
+         value.setName(variable.getName());
          value.setType(variable.getReferenceTypeName());
-         value.setValue(StringUtil.toSingleLinedString(variable.getValue().getValueString()));
+         value.setValue(variable.getValue().getValueString());
          toFill.getValues().add(value);
          return value;
       }
@@ -213,15 +212,11 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
             PictogramElement objectPE = existingObjectsMap.get(objectName);
             if (objectPE != null) {
                // Create association
-               ODAssociation association = ODFactory.eINSTANCE.createODAssociation();
-               association.setName(StringUtil.toSingleLinedString(variable.getName()));
-               association.setTarget((ODObject)getBusinessObjectForPictogramElement(objectPE));
-               toFill.getAssociations().add(association);
-               addConnectionToDiagram(association, toFillPE, objectPE);
+               createAssociation(toFill, toFillPE, variable, (ODObject)getBusinessObjectForPictogramElement(objectPE), objectPE);
             }
             else {
                ODObject object = ODFactory.eINSTANCE.createODObject();
-               object.setName(StringUtil.toSingleLinedString(objectName));
+               object.setName(objectName);
                object.setType(variable.getReferenceTypeName());
                model.getObjects().add(object);
                monitor.subTask(object.getName());
@@ -239,11 +234,7 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
                   maxWidth = objectPE.getGraphicsAlgorithm().getWidth();
                }
                // Create association
-               ODAssociation association = ODFactory.eINSTANCE.createODAssociation();
-               association.setName(StringUtil.toSingleLinedString(variable.getName()));
-               association.setTarget(object);
-               toFill.getAssociations().add(association);
-               addConnectionToDiagram(association, toFillPE, objectPE);
+               createAssociation(toFill, toFillPE, variable, object, objectPE);
                // Instantiate child objects
                int maxYChildren = analyzeVariables(childObjectVariables, 
                                                    object, 
@@ -261,6 +252,27 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
          monitor.worked(1);
       }
       return y;
+   }
+   
+   /**
+    * Creates a new {@link ODAssociation} and adds it to the diagram.
+    * @param toFill The {@link AbstractODValueContainer} to fill.
+    * @param toFillPE The {@link PictogramElement} of the {@link AbstractODValueContainer}.
+    * @param variable The {@link IVariable} to represent as {@link ODAssociation}.
+    * @param object The target {@link ODObject}.
+    * @param objectPE The {@link PictogramElement} of the target {@link ODObject}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected void createAssociation(AbstractODValueContainer toFill, 
+                                    PictogramElement toFillPE, 
+                                    IVariable variable, 
+                                    ODObject object,
+                                    PictogramElement objectPE) throws DebugException {
+      ODAssociation association = ODFactory.eINSTANCE.createODAssociation();
+      association.setName(variable.getName());
+      association.setTarget(object);
+      toFill.getAssociations().add(association);
+      addConnectionToDiagram(association, toFillPE, objectPE);
    }
    
    /**

@@ -1,5 +1,6 @@
 package org.key_project.sed.ui.visualization.object_diagram.feature;
 
+import org.eclipse.graphiti.datatypes.IDimension;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
@@ -16,6 +17,7 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.key_project.sed.ui.visualization.model.od.ODAssociation;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramStyleUtil;
+import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 
 /**
  * Implementation of {@link IAddFeature} for {@link ODAssociation}s.
@@ -68,16 +70,22 @@ public class AssociationAddFeature extends AbstractAddFeature {
 
       // add dynamic text decorator for the association name
       ConnectionDecorator textDecorator = peCreateService.createConnectionDecorator(connection, true, 0.5, true);
-      Text text = gaService.createDefaultText(getDiagram(), textDecorator);
+      Text text = gaService.createDefaultText(getDiagram(), textDecorator, addedAssociation.getName());
       text.setStyle(ObjectDiagramStyleUtil.getStyleForAssociationText(getDiagram()));
-      gaService.setLocation(text, 0, 0);
+      IDimension textDimension = GraphitiUtil.calculateTextSize(text.getValue(), gaService.getFont(text, true));
+      if (textDimension != null) {
+         gaService.setLocationAndSize(text, 0, 0, textDimension.getWidth(), textDimension.getHeight());
+      }
+      else {
+         gaService.setLocation(text, 0, 0);
+      }
       // set reference name in the text decorator
-      text.setValue(addedAssociation.getName());
       link(text.getPictogramElement(), addedAssociation);
 
       // add static graphical decorator (composition and navigable)
       ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
       createArrow(cd);
+      
       return connection;
    }
    

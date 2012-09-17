@@ -11,6 +11,7 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.ui.visualization.object_diagram.feature.GenerateObjectDiagramFromSEDNodeCustomFeature;
 import org.key_project.sed.ui.visualization.object_diagram.wizard.SaveAsObjectDiagramWizard;
 import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
+import org.key_project.util.java.StringUtil;
 
 /**
  * {@link DiagramEditor} for Object Diagrams.
@@ -58,7 +59,7 @@ public class ObjectDiagramEditor extends PaletteHideableDiagramEditor {
          IFeature feature = new GenerateObjectDiagramFromSEDNodeCustomFeature(featureProvider);
          ICustomContext context = new CustomContext();
          context.putProperty(GenerateObjectDiagramFromSEDNodeCustomFeature.PROPERTY_NODE, node);
-         executeFeatureInJob("Generating Object Diagram for \"" + node.getName() + "\"", feature, context);
+         executeFeatureInJob("Generating Object Diagram for \"" + StringUtil.toSingleLinedString(node.getName()) + "\"", feature, context);
       }
    }
 }
