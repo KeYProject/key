@@ -46,8 +46,8 @@ public interface IExecutionVariable extends IExecutionElement {
    public IExecutionValue getParentValue();
    
    /**
-    * Returns the value of this {@link IExecutionVariable}.
-    * @return The value of this {@link IExecutionVariable}.
+    * Returns the possible values of this {@link IExecutionVariable}.
+    * @return The possible values of this {@link IExecutionVariable}.
     */
-   public IExecutionValue getValue() throws ProofInputException;
+   public IExecutionValue[] getValues() throws ProofInputException;
 }

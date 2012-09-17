@@ -13,7 +13,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
  * Implementation of {@link ISEDValue} for the symbolic execution debugger (SED)
- * based on KeY.
+ * based on KeY which represents one {@link IExecutionValue}.
  * @author Martin Hentschel
  */
 public class KeYValue extends AbstractSEDValue {
@@ -139,5 +139,13 @@ public class KeYValue extends AbstractSEDValue {
          LogUtil.getLogger().logError(e);
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't check is object.", e));
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isMultiValued() throws DebugException {
+      return false;
    }
 }

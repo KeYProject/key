@@ -157,18 +157,37 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
       List<IVariable> objectVariables = new LinkedList<IVariable>();
       for (IVariable variable : variables) {
          SWTUtil.checkCanceled(monitor);
-         if (!isObject(variable)) {
-            ODValue value = ODFactory.eINSTANCE.createODValue();
-            value.setName(StringUtil.toSingleLinedString(variable.getName()));
-            value.setType(variable.getReferenceTypeName());
-            value.setValue(StringUtil.toSingleLinedString(variable.getValue().getValueString()));
-            toFill.getValues().add(value);
+         if (isMultiValued(variable)) {
+            IVariable[] multiValuedVariables = variable.getValue().getVariables();
+            for (IVariable multiValuedVariable : multiValuedVariables) {
+               ODValue value = createValue(multiValuedVariable, toFill);
+               if (value == null) {
+                  objectVariables.add(multiValuedVariable);
+               }
+            }
          }
          else {
-            objectVariables.add(variable);
+            ODValue value = createValue(variable, toFill);
+            if (value == null) {
+               objectVariables.add(variable);
+            }
          }
       }
       return objectVariables;
+   }
+   
+   protected ODValue createValue(IVariable variable, AbstractODValueContainer toFill) throws DebugException {
+      if (!isObject(variable)) {
+         ODValue value = ODFactory.eINSTANCE.createODValue();
+         value.setName(StringUtil.toSingleLinedString(variable.getName()));
+         value.setType(variable.getReferenceTypeName());
+         value.setValue(StringUtil.toSingleLinedString(variable.getValue().getValueString()));
+         toFill.getValues().add(value);
+         return value;
+      }
+      else {
+         return null;
+      }
    }
    
    protected int analyzeVariables(List<IVariable> objectVariables, 
@@ -223,6 +242,17 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
          monitor.worked(1);
       }
       return y;
+   }
+   
+   /**
+    * Checks if the given {@link IVariable} is multi valued.
+    * @param variable The {@link IVariable} to check.
+    * @return {@code true} is multi valued, {@code false} is single valued.
+    * @throws DebugException Occurred Exception.
+    */
+   protected boolean isMultiValued(IVariable variable) throws DebugException {
+      return variable.getValue() instanceof ISEDValue &&
+             ((ISEDValue)variable.getValue()).isMultiValued();
    }
    
    /**

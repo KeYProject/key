@@ -201,7 +201,7 @@ public class ExecutionNodeReader {
                throw new SAXException("Can't add value to parent variable.");
             }
             KeYlessValue value = createValue((KeYlessVariable)parentValue, uri, localName, qName, attributes);
-            ((KeYlessVariable)parentValue).setValue(value);
+            ((KeYlessVariable)parentValue).addValue(value);
             parentVariableValueStack.addFirst(value);
          }
          else if (isCallStackEntry(uri, localName, qName)) {
@@ -332,7 +332,8 @@ public class ExecutionNodeReader {
                               getValueString(attributes), 
                               getName(attributes),
                               isValueUnknown(attributes),
-                              isValueAnObject(attributes));
+                              isValueAnObject(attributes),
+                              getConditionString(attributes));
    }
 
    /**
@@ -439,6 +440,15 @@ public class ExecutionNodeReader {
     */
    protected String getValueString(Attributes attributes) {
       return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_VALUE_STRING);
+   }
+
+   /**
+    * Returns the value condition string value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getConditionString(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_CONDITION_STRING);
    }
 
    /**
@@ -1192,9 +1202,9 @@ public class ExecutionNodeReader {
       private int arrayIndex;
       
       /**
-       * The value
+       * The contained values.
        */
-      private IExecutionValue value;
+      private List<IExecutionValue> values = new LinkedList<IExecutionValue>();
       
       /**
        * Constructor.
@@ -1212,6 +1222,14 @@ public class ExecutionNodeReader {
          this.isArrayIndex = isArrayIndex;
          this.arrayIndex = arrayIndex;
       }
+      
+      /**
+       * Adds the given child {@link IExecutionValue}.
+       * @param variable The child {@link IExecutionValue} to add.
+       */
+      public void addValue(IExecutionValue variable) {
+         values.add(variable);
+      }
 
       /**
        * {@inheritDoc}
@@ -1225,16 +1243,8 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public IExecutionValue getValue() {
-         return value;
-      }
-
-      /**
-       * Sets the {@link IExecutionValue}.
-       * @param value The {@link IExecutionValue} to set.
-       */
-      public void setValue(IExecutionValue value) {
-         this.value = value;
+      public IExecutionValue[] getValues() {
+         return values.toArray(new IExecutionValue[values.size()]);
       }
 
       /**
@@ -1305,6 +1315,11 @@ public class ExecutionNodeReader {
        * The child variables.
        */
       private List<IExecutionVariable> childVariables = new LinkedList<IExecutionVariable>();
+
+      /**
+       * The condition as {@link String}.
+       */
+      private String conditionString;
       
       /**
        * Constructor.
@@ -1314,19 +1329,22 @@ public class ExecutionNodeReader {
        * @param name The name.
        * @param valueUnknown Is the value unknown?
        * @param valueAnObject Is the value an object?
+       * @param conditionString The condition as human readable {@link String}.
        */
       public KeYlessValue(IExecutionVariable variable, 
                           String typeString, 
                           String valueString, 
                           String name,
                           boolean valueUnknown,
-                          boolean valueAnObject) {
+                          boolean valueAnObject,
+                          String conditionString) {
          super(name);
          this.variable = variable;
          this.typeString = typeString;
          this.valueString = valueString;
          this.valueUnknown = valueUnknown;
          this.valueAnObject = valueAnObject;
+         this.conditionString = conditionString;
       }
       
       /**
@@ -1351,6 +1369,14 @@ public class ExecutionNodeReader {
       @Override
       public String getTypeString() {
          return typeString;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getConditionString() throws ProofInputException {
+         return conditionString;
       }
 
       /**
@@ -1399,6 +1425,14 @@ public class ExecutionNodeReader {
       @Override
       public String getElementType() {
          return "Value";
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getCondition() throws ProofInputException {
+         return null;
       }
    }
 }

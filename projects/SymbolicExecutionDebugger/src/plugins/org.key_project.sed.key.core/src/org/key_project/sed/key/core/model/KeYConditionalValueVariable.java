@@ -14,14 +14,15 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
  * Implementation of {@link ISEDVariable} for the symbolic execution debugger (SED)
- * based on KeY.
+ * based on KeY which represents an conditional {@link IExecutionValue} instead
+ * of a real variable ({@link IExecutionVariable}).
  * @author Martin Hentschel
  */
-public class KeYVariable extends AbstractSEDVariable {
+public class KeYConditionalValueVariable extends AbstractSEDVariable {
    /**
-    * The {@link IExecutionVariable} to represent in debug model.
+    * The conditional {@link IExecutionValue} to represent in debug model.
     */
-   private IExecutionVariable executionVariable;
+   private IExecutionValue executionValue;
    
    /**
     * The contained {@link IValue}.
@@ -31,12 +32,12 @@ public class KeYVariable extends AbstractSEDVariable {
    /**
     * Constructor.
     * @param target The {@link KeYDebugTarget} in that this element is contained.
-    * @param executionVariable The {@link IExecutionVariable} to represent in debug model.
+    * @param executionValue The conditional {@link IExecutionValue} to represent in debug model.
     */
-   public KeYVariable(KeYDebugTarget target, IExecutionVariable executionVariable) {
+   public KeYConditionalValueVariable(KeYDebugTarget target, IExecutionValue executionValue) {
       super(target);
-      Assert.isNotNull(executionVariable);
-      this.executionVariable = executionVariable;
+      Assert.isNotNull(executionValue);
+      this.executionValue = executionValue;
    }
    
    /**
@@ -53,7 +54,7 @@ public class KeYVariable extends AbstractSEDVariable {
    @Override
    public String getName() throws DebugException {
       try {
-         return executionVariable.getName();
+         return executionValue.getName();
       }
       catch (ProofInputException e) {
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute name.", e));
@@ -88,33 +89,18 @@ public class KeYVariable extends AbstractSEDVariable {
    @Override
    public IValue getValue() throws DebugException {
       synchronized (this) {
-         try {
-            if (value == null) {
-               IExecutionValue[] values = executionVariable.getValues();
-               if (values.length == 0) {
-                  throw new DebugException(LogUtil.getLogger().createErrorStatus("An IExecutionVariable must provide at least one IExecutionValue."));
-               }
-               else if (values.length == 1) {
-                  value = new KeYValue(getDebugTarget(), values[0]);
-               }
-               else {
-                  value = new KeYConditionalValues(getDebugTarget(), values);
-               }
-            }
-            return value;
+         if (value == null) {
+            value = new KeYValue(getDebugTarget(), executionValue);
          }
-         catch (ProofInputException e) {
-            LogUtil.getLogger().logError(e);
-            throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute value.", e));
-         }
+         return value;
       }
    }
 
    /**
-    * Returns the represented {@link IExecutionVariable}.
-    * @return The represented {@link IExecutionVariable}.
+    * Returns the represented {@link IExecutionValue}.
+    * @return The represented {@link IExecutionValue}.
     */
-   public IExecutionVariable getExecutionVariable() {
-      return executionVariable;
+   public IExecutionValue getExecutionValue() {
+      return executionValue;
    }
 }

@@ -2,218 +2,468 @@
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main(param);" pathCondition="true" pathConditionChanged="false">
       <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-         <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+         <value name="exc {param = null | !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
          </value>
       </variable>
       <statement name="int x = 5;" pathCondition="true" pathConditionChanged="false">
          <variable name="self" arrayIndex="-1" isArrayIndex="false">
-            <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+            <value name="self {param = null | !param = null}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="param = null | !param = null">
                <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                  <value name="Value of a" typeString="int" valueString="self.a" isValueAnObject="false" isValueUnknown="false">
+                  <value name="a {param = null | !param = null}" typeString="int" valueString="self.a" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                   </value>
                </variable>
                <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                  <value name="Value of b" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false">
+                  <value name="b {param = null | !param = null}" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                   </value>
                </variable>
                <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                  <value name="Value of wrapper" isValueAnObject="false" isValueUnknown="true">
+                  <value name="wrapper {  param = null &amp; self.wrapper = null
+| param = null
+&amp; !self.wrapper = null
+| !param = null
+&amp; self.wrapper = null
+| !param = null
+&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
+| param = null
+&amp; !self.wrapper = null
+| !param = null
+&amp; self.wrapper = null
+| !param = null
+&amp; !self.wrapper = null">
                   </value>
                </variable>
             </value>
          </variable>
          <variable name="param" arrayIndex="-1" isArrayIndex="false">
-            <value name="Value of param" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false">
+            <value name="param {param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null">
+            </value>
+            <value name="param {!param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null">
                <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                  <value name="Value of value" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false">
+                  <value name="value {true}" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
             </value>
          </variable>
          <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-            <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+            <value name="exc {param = null | !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
             </value>
          </variable>
          <statement name="a=x;" pathCondition="true" pathConditionChanged="false">
             <variable name="self" arrayIndex="-1" isArrayIndex="false">
-               <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+               <value name="self {param = null | !param = null}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="param = null | !param = null">
                   <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                     <value name="Value of a" typeString="int" valueString="self.a" isValueAnObject="false" isValueUnknown="false">
+                     <value name="a {param = null | !param = null}" typeString="int" valueString="self.a" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                      </value>
                   </variable>
                   <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                     <value name="Value of b" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false">
+                     <value name="b {param = null | !param = null}" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                      </value>
                   </variable>
                   <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                     <value name="Value of wrapper" isValueAnObject="false" isValueUnknown="true">
+                     <value name="wrapper {  param = null &amp; self.wrapper = null
+| param = null
+&amp; !self.wrapper = null
+| !param = null
+&amp; self.wrapper = null
+| !param = null
+&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
+| param = null
+&amp; !self.wrapper = null
+| !param = null
+&amp; self.wrapper = null
+| !param = null
+&amp; !self.wrapper = null">
                      </value>
                   </variable>
                </value>
             </variable>
             <variable name="param" arrayIndex="-1" isArrayIndex="false">
-               <value name="Value of param" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false">
+               <value name="param {param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null">
+               </value>
+               <value name="param {!param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null">
                   <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                     <value name="Value of value" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false">
+                     <value name="value {true}" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
                </value>
             </variable>
             <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-               <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+               <value name="exc {param = null | !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                </value>
             </variable>
             <variable name="x" arrayIndex="-1" isArrayIndex="false">
-               <value name="Value of x" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+               <value name="x {param = null | !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                </value>
             </variable>
             <statement name="b=3;" pathCondition="true" pathConditionChanged="false">
                <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                  <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                  <value name="self {param = null | !param = null}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="param = null | !param = null">
                      <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                        <value name="Value of a" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                        <value name="a {param = null | !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                         </value>
                      </variable>
                      <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                        <value name="Value of b" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false">
+                        <value name="b {param = null | !param = null}" typeString="int" valueString="self.b" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                         </value>
                      </variable>
                      <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                        <value name="Value of wrapper" isValueAnObject="false" isValueUnknown="true">
+                        <value name="wrapper {  param = null &amp; self.wrapper = null
+| param = null
+&amp; !self.wrapper = null
+| !param = null
+&amp; self.wrapper = null
+| !param = null
+&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
+| param = null
+&amp; !self.wrapper = null
+| !param = null
+&amp; self.wrapper = null
+| !param = null
+&amp; !self.wrapper = null">
                         </value>
                      </variable>
                   </value>
                </variable>
                <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                  <value name="Value of param" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false">
+                  <value name="param {param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null">
+                  </value>
+                  <value name="param {!param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null">
                      <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                        <value name="Value of value" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false">
+                        <value name="value {true}" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
                   </value>
                </variable>
                <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                  <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                  <value name="exc {param = null | !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                   </value>
                </variable>
                <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                  <value name="Value of x" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                  <value name="x {param = null | !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                   </value>
                </variable>
                <statement name="param=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
                   <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                     <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                     <value name="self {param = null | !param = null}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="param = null | !param = null">
                         <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                           <value name="Value of a" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                           <value name="a {param = null | !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                            </value>
                         </variable>
                         <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                           <value name="Value of b" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false">
+                           <value name="b {param = null | !param = null}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                            </value>
                         </variable>
                         <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                           <value name="Value of wrapper" isValueAnObject="false" isValueUnknown="true">
+                           <value name="wrapper {  param = null &amp; self.wrapper = null
+| param = null
+&amp; !self.wrapper = null
+| !param = null
+&amp; self.wrapper = null
+| !param = null
+&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
+| param = null
+&amp; !self.wrapper = null
+| !param = null
+&amp; self.wrapper = null
+| !param = null
+&amp; !self.wrapper = null">
                            </value>
                         </variable>
                      </value>
                   </variable>
                   <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                     <value name="Value of param" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false">
+                     <value name="param {param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null">
+                     </value>
+                     <value name="param {!param = null}" typeString="IntWrapper" valueString="param" isValueAnObject="true" isValueUnknown="false" conditionString="!param = null">
                         <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                           <value name="Value of value" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false">
+                           <value name="value {true}" typeString="int" valueString="param.value" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
                      </value>
                   </variable>
                   <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                     <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                     <value name="exc {param = null | !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                      </value>
                   </variable>
                   <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                     <value name="Value of x" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                     <value name="x {param = null | !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                      </value>
                   </variable>
                   <statement name="param.value=1;" pathCondition="true" pathConditionChanged="false">
                      <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                        <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                        <value name="self {  param = null &amp; !i_2.&lt;created&gt; = TRUE
+| !param = null
+&amp; !i_2.&lt;created&gt; = TRUE}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; !i_2.&lt;created&gt; = TRUE
+| !param = null
+&amp; !i_2.&lt;created&gt; = TRUE">
                            <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                              <value name="Value of a" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                              <value name="a {  !i_2.&lt;created&gt; = TRUE &amp; param = null
+| !i_2.&lt;created&gt; = TRUE
+&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  !i_2.&lt;created&gt; = TRUE &amp; param = null
+| !i_2.&lt;created&gt; = TRUE
+&amp; !param = null">
                               </value>
                            </variable>
                            <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                              <value name="Value of b" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false">
+                              <value name="b {  !i_2.&lt;created&gt; = TRUE &amp; param = null
+| !i_2.&lt;created&gt; = TRUE
+&amp; !param = null}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="  !i_2.&lt;created&gt; = TRUE &amp; param = null
+| !i_2.&lt;created&gt; = TRUE
+&amp; !param = null">
                               </value>
                            </variable>
                            <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                              <value name="Value of wrapper" isValueAnObject="false" isValueUnknown="true">
+                              <value name="wrapper {    !i_2.&lt;created&gt; = TRUE
+  &amp; (param = null &amp; self.wrapper = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (param = null &amp; !self.wrapper = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (!param = null &amp; self.wrapper = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (!param = null &amp; !self.wrapper = null)}" isValueAnObject="false" isValueUnknown="true" conditionString="    !i_2.&lt;created&gt; = TRUE
+  &amp; (param = null &amp; self.wrapper = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (param = null &amp; !self.wrapper = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (!param = null &amp; self.wrapper = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (!param = null &amp; !self.wrapper = null)">
                               </value>
                            </variable>
                         </value>
                      </variable>
                      <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                        <value name="Value of param" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false">
+                        <value name="param {  param = null &amp; !i_2.&lt;created&gt; = TRUE
+| !param = null
+&amp; !i_2.&lt;created&gt; = TRUE}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; !i_2.&lt;created&gt; = TRUE
+| !param = null
+&amp; !i_2.&lt;created&gt; = TRUE">
                            <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                              <value name="Value of value" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false">
+                              <value name="value {  !i_2.&lt;created&gt; = TRUE &amp; param = null
+| !i_2.&lt;created&gt; = TRUE
+&amp; !param = null}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="  !i_2.&lt;created&gt; = TRUE &amp; param = null
+| !i_2.&lt;created&gt; = TRUE
+&amp; !param = null">
                               </value>
                            </variable>
                         </value>
                      </variable>
                      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                        <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                        <value name="exc {  !i_2.&lt;created&gt; = TRUE &amp; param = null
+| !i_2.&lt;created&gt; = TRUE
+&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !i_2.&lt;created&gt; = TRUE &amp; param = null
+| !i_2.&lt;created&gt; = TRUE
+&amp; !param = null">
                         </value>
                      </variable>
                      <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                        <value name="Value of x" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                        <value name="x {  !i_2.&lt;created&gt; = TRUE &amp; param = null
+| !i_2.&lt;created&gt; = TRUE
+&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  !i_2.&lt;created&gt; = TRUE &amp; param = null
+| !i_2.&lt;created&gt; = TRUE
+&amp; !param = null">
                         </value>
                      </variable>
                      <statement name="wrapper=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
                         <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                           <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                           <value name="self {  param = null &amp; !i_2.&lt;created&gt; = TRUE
+| !param = null
+&amp; !i_2.&lt;created&gt; = TRUE}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; !i_2.&lt;created&gt; = TRUE
+| !param = null
+&amp; !i_2.&lt;created&gt; = TRUE">
                               <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="Value of a" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="a {param = null | !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                                  </value>
                               </variable>
                               <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="Value of b" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="b {param = null | !param = null}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                                  </value>
                               </variable>
                               <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="Value of wrapper" isValueAnObject="false" isValueUnknown="true">
+                                 <value name="wrapper {  param = null &amp; self.wrapper = null
+| param = null
+&amp; !self.wrapper = null
+| !param = null
+&amp; self.wrapper = null
+| !param = null
+&amp; !self.wrapper = null}" isValueAnObject="false" isValueUnknown="true" conditionString="  param = null &amp; self.wrapper = null
+| param = null
+&amp; !self.wrapper = null
+| !param = null
+&amp; self.wrapper = null
+| !param = null
+&amp; !self.wrapper = null">
                                  </value>
                               </variable>
                            </value>
                         </variable>
                         <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                           <value name="Value of param" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false">
+                           <value name="param {  param = null &amp; !i_2.&lt;created&gt; = TRUE
+| !param = null
+&amp; !i_2.&lt;created&gt; = TRUE}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="  param = null &amp; !i_2.&lt;created&gt; = TRUE
+| !param = null
+&amp; !i_2.&lt;created&gt; = TRUE">
                               <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="Value of value" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="value {param = null | !param = null}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="param = null | !param = null">
                                  </value>
                               </variable>
                            </value>
                         </variable>
                         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                           <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                           <value name="exc {  !i_2.&lt;created&gt; = TRUE &amp; param = null
+| !i_2.&lt;created&gt; = TRUE
+&amp; !param = null}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !i_2.&lt;created&gt; = TRUE &amp; param = null
+| !i_2.&lt;created&gt; = TRUE
+&amp; !param = null">
                            </value>
                         </variable>
                         <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                           <value name="Value of x" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                           <value name="x {  !i_2.&lt;created&gt; = TRUE &amp; param = null
+| !i_2.&lt;created&gt; = TRUE
+&amp; !param = null}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  !i_2.&lt;created&gt; = TRUE &amp; param = null
+| !i_2.&lt;created&gt; = TRUE
+&amp; !param = null">
                            </value>
                         </variable>
                         <statement name="wrapper.value=4;" pathCondition="true" pathConditionChanged="false">
                            <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                              <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                              <value name="self {    !i_2.&lt;created&gt; = TRUE
+  &amp; (  wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1))
+     &amp; param = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1))
+   &amp; !param = null)}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="    !i_2.&lt;created&gt; = TRUE
+  &amp; (  wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1))
+     &amp; param = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1))
+   &amp; !param = null)">
                                  <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="Value of a" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                                    <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                                  <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="Value of b" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false">
+                                    <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                                  <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="Value of wrapper" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false">
+                                    <value name="wrapper {true}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="Value of value" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false">
+                                          <value name="value {    !i_2.&lt;created&gt; = TRUE
+  &amp; (  param = null
+     &amp; wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1)))
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  !param = null
+   &amp; wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1)))}" typeString="int" valueString="0" isValueAnObject="false" isValueUnknown="false" conditionString="    !i_2.&lt;created&gt; = TRUE
+  &amp; (  param = null
+     &amp; wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1)))
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  !param = null
+   &amp; wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1)))">
                                           </value>
                                        </variable>
                                     </value>
@@ -221,36 +471,342 @@
                               </value>
                            </variable>
                            <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                              <value name="Value of param" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false">
+                              <value name="param {    !i_2.&lt;created&gt; = TRUE
+  &amp; (  wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1))
+     &amp; param = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1))
+   &amp; !param = null)}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="    !i_2.&lt;created&gt; = TRUE
+  &amp; (  wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1))
+     &amp; param = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1))
+   &amp; !param = null)">
                                  <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="Value of value" typeString="int" valueString="\if (i_5 = i_2)  \then (0)  \else (1)" isValueAnObject="false" isValueUnknown="false">
+                                    <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                     </value>
                                  </variable>
                               </value>
                            </variable>
                            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                              <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                              <value name="exc {    wellFormed(store(store(create(store(store(heap,
+                                              self,
+                                              a,
+                                              5),
+                                        self,
+                                        b,
+                                        3),
+                                  i_2),
+                           i_2,
+                           &lt;initialized&gt;,
+                           TRUE),
+                     i_2,
+                     value,
+                     1))
+  &amp; (param = null &amp; !i_2.&lt;created&gt; = TRUE)
+| wellFormed(store(store(create(store(store(heap,
+                                            self,
+                                            a,
+                                            5),
+                                      self,
+                                      b,
+                                      3),
+                                i_2),
+                         i_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   i_2,
+                   value,
+                   1))
+&amp; (!param = null &amp; !i_2.&lt;created&gt; = TRUE)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="    wellFormed(store(store(create(store(store(heap,
+                                              self,
+                                              a,
+                                              5),
+                                        self,
+                                        b,
+                                        3),
+                                  i_2),
+                           i_2,
+                           &lt;initialized&gt;,
+                           TRUE),
+                     i_2,
+                     value,
+                     1))
+  &amp; (param = null &amp; !i_2.&lt;created&gt; = TRUE)
+| wellFormed(store(store(create(store(store(heap,
+                                            self,
+                                            a,
+                                            5),
+                                      self,
+                                      b,
+                                      3),
+                                i_2),
+                         i_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   i_2,
+                   value,
+                   1))
+&amp; (!param = null &amp; !i_2.&lt;created&gt; = TRUE)">
                               </value>
                            </variable>
                            <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                              <value name="Value of x" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                              <value name="x {    param = null
+  &amp; (  !i_2.&lt;created&gt; = TRUE
+     &amp; wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1)))
+| !param = null
+&amp; (  !i_2.&lt;created&gt; = TRUE
+   &amp; wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1)))}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="    param = null
+  &amp; (  !i_2.&lt;created&gt; = TRUE
+     &amp; wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1)))
+| !param = null
+&amp; (  !i_2.&lt;created&gt; = TRUE
+   &amp; wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1)))">
                               </value>
                            </variable>
                            <statement name="return a+b+x+wrapper.value+param.value;" pathCondition="true" pathConditionChanged="false">
                               <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                                 <value name="self {    !i_2.&lt;created&gt; = TRUE
+  &amp; (  param = null
+     &amp; wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1)))
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  !param = null
+   &amp; wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1)))}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="    !i_2.&lt;created&gt; = TRUE
+  &amp; (  param = null
+     &amp; wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1)))
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  !param = null
+   &amp; wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1)))">
                                     <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="Value of a" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                                       <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                     <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="Value of b" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false">
+                                       <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                     <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="Value of wrapper" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false">
+                                       <value name="wrapper {true}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                           <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                             <value name="Value of value" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false">
+                                             <value name="value {    !i_2.&lt;created&gt; = TRUE
+  &amp; (  wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1))
+     &amp; param = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1))
+   &amp; !param = null)}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="    !i_2.&lt;created&gt; = TRUE
+  &amp; (  wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1))
+     &amp; param = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1))
+   &amp; !param = null)">
                                              </value>
                                           </variable>
                                        </value>
@@ -258,36 +814,342 @@
                                  </value>
                               </variable>
                               <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="Value of param" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false">
+                                 <value name="param {    !i_2.&lt;created&gt; = TRUE
+  &amp; (  param = null
+     &amp; wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1)))
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  !param = null
+   &amp; wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1)))}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="    !i_2.&lt;created&gt; = TRUE
+  &amp; (  param = null
+     &amp; wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1)))
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  !param = null
+   &amp; wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1)))">
                                     <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="Value of value" typeString="int" valueString="\if (i_5 = i_2)  \then (4)  \else (1)" isValueAnObject="false" isValueUnknown="false">
+                                       <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                        </value>
                                     </variable>
                                  </value>
                               </variable>
                               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="exc {    !i_2.&lt;created&gt; = TRUE
+  &amp; (  wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1))
+     &amp; param = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1))
+   &amp; !param = null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="    !i_2.&lt;created&gt; = TRUE
+  &amp; (  wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1))
+     &amp; param = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1))
+   &amp; !param = null)">
                                  </value>
                               </variable>
                               <variable name="x" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="Value of x" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                                 <value name="x {    param = null
+  &amp; (  wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1))
+     &amp; !i_2.&lt;created&gt; = TRUE)
+| !param = null
+&amp; (  wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1))
+   &amp; !i_2.&lt;created&gt; = TRUE)}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="    param = null
+  &amp; (  wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1))
+     &amp; !i_2.&lt;created&gt; = TRUE)
+| !param = null
+&amp; (  wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1))
+   &amp; !i_2.&lt;created&gt; = TRUE)">
                                  </value>
                               </variable>
                               <methodReturn name="&lt;return of self.main(param);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;17 + \if (i_5 = i_2)  \then (4)  \else (1)&apos; as result of self.main(param);&gt;">
                                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="Value of self" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false">
+                                    <value name="self {    wellFormed(store(store(create(store(store(heap,
+                                              self,
+                                              a,
+                                              5),
+                                        self,
+                                        b,
+                                        3),
+                                  i_2),
+                           i_2,
+                           &lt;initialized&gt;,
+                           TRUE),
+                     i_2,
+                     value,
+                     1))
+  &amp; (param = null &amp; !i_2.&lt;created&gt; = TRUE)
+| wellFormed(store(store(create(store(store(heap,
+                                            self,
+                                            a,
+                                            5),
+                                      self,
+                                      b,
+                                      3),
+                                i_2),
+                         i_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   i_2,
+                   value,
+                   1))
+&amp; (!param = null &amp; !i_2.&lt;created&gt; = TRUE)}" typeString="VariablesInstanceVariableTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="    wellFormed(store(store(create(store(store(heap,
+                                              self,
+                                              a,
+                                              5),
+                                        self,
+                                        b,
+                                        3),
+                                  i_2),
+                           i_2,
+                           &lt;initialized&gt;,
+                           TRUE),
+                     i_2,
+                     value,
+                     1))
+  &amp; (param = null &amp; !i_2.&lt;created&gt; = TRUE)
+| wellFormed(store(store(create(store(store(heap,
+                                            self,
+                                            a,
+                                            5),
+                                      self,
+                                      b,
+                                      3),
+                                i_2),
+                         i_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   i_2,
+                   value,
+                   1))
+&amp; (!param = null &amp; !i_2.&lt;created&gt; = TRUE)">
                                        <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="Value of a" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false">
+                                          <value name="a {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                        <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="Value of b" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false">
+                                          <value name="b {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                        <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="Value of wrapper" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false">
+                                          <value name="wrapper {true}" typeString="IntWrapper" valueString="i_5" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                              <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                                <value name="Value of value" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false">
+                                                <value name="value {    !i_2.&lt;created&gt; = TRUE
+  &amp; (  wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1))
+     &amp; param = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1))
+   &amp; !param = null)}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="    !i_2.&lt;created&gt; = TRUE
+  &amp; (  wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1))
+     &amp; param = null)
+| !i_2.&lt;created&gt; = TRUE
+&amp; (  wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1))
+   &amp; !param = null)">
                                                 </value>
                                              </variable>
                                           </value>
@@ -295,15 +1157,135 @@
                                     </value>
                                  </variable>
                                  <variable name="param" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="Value of param" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false">
+                                    <value name="param {    wellFormed(store(store(create(store(store(heap,
+                                              self,
+                                              a,
+                                              5),
+                                        self,
+                                        b,
+                                        3),
+                                  i_2),
+                           i_2,
+                           &lt;initialized&gt;,
+                           TRUE),
+                     i_2,
+                     value,
+                     1))
+  &amp; (param = null &amp; !i_2.&lt;created&gt; = TRUE)
+| wellFormed(store(store(create(store(store(heap,
+                                            self,
+                                            a,
+                                            5),
+                                      self,
+                                      b,
+                                      3),
+                                i_2),
+                         i_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   i_2,
+                   value,
+                   1))
+&amp; (!param = null &amp; !i_2.&lt;created&gt; = TRUE)}" typeString="IntWrapper" valueString="i_2" isValueAnObject="true" isValueUnknown="false" conditionString="    wellFormed(store(store(create(store(store(heap,
+                                              self,
+                                              a,
+                                              5),
+                                        self,
+                                        b,
+                                        3),
+                                  i_2),
+                           i_2,
+                           &lt;initialized&gt;,
+                           TRUE),
+                     i_2,
+                     value,
+                     1))
+  &amp; (param = null &amp; !i_2.&lt;created&gt; = TRUE)
+| wellFormed(store(store(create(store(store(heap,
+                                            self,
+                                            a,
+                                            5),
+                                      self,
+                                      b,
+                                      3),
+                                i_2),
+                         i_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   i_2,
+                   value,
+                   1))
+&amp; (!param = null &amp; !i_2.&lt;created&gt; = TRUE)">
                                        <variable name="value" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="Value of value" typeString="int" valueString="\if (i_5 = i_2)  \then (4)  \else (1)" isValueAnObject="false" isValueUnknown="false">
+                                          <value name="value {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                           </value>
                                        </variable>
                                     </value>
                                  </variable>
                                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="Value of exc" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false">
+                                    <value name="exc {    param = null
+  &amp; (  wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1))
+     &amp; !i_2.&lt;created&gt; = TRUE)
+| !param = null
+&amp; (  wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1))
+   &amp; !i_2.&lt;created&gt; = TRUE)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="    param = null
+  &amp; (  wellFormed(store(store(create(store(store(heap,
+                                                 self,
+                                                 a,
+                                                 5),
+                                           self,
+                                           b,
+                                           3),
+                                     i_2),
+                              i_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        i_2,
+                        value,
+                        1))
+     &amp; !i_2.&lt;created&gt; = TRUE)
+| !param = null
+&amp; (  wellFormed(store(store(create(store(store(heap,
+                                               self,
+                                               a,
+                                               5),
+                                         self,
+                                         b,
+                                         3),
+                                   i_2),
+                            i_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      i_2,
+                      value,
+                      1))
+   &amp; !i_2.&lt;created&gt; = TRUE)">
                                     </value>
                                  </variable>
                                  <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">

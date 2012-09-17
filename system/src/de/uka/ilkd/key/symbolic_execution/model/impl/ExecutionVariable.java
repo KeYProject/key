@@ -1,18 +1,28 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
-import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -23,6 +33,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil.SiteProofVa
  * @author Martin Hentschel
  */
 public class ExecutionVariable extends AbstractExecutionElement implements IExecutionVariable {
+   /**
+    * The parent {@link IExecutionStateNode} which provides this {@link ExecutionVariable}.
+    */
+   private IExecutionStateNode<?> parentNode;
+   
    /**
     * The represented {@link IProgramVariable} which value is shown.
     */
@@ -37,48 +52,60 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * The index in the parent array.
     */
    private int arrayIndex;
+   
+   /**
+    * The {@link ExecutionValue} from which the array length was computed.
+    */
+   private ExecutionValue lengthValue;
 
    /**
-    * The child {@link IExecutionValue}.
+    * The possible values of this {@link IExecutionValue}.
     */
-   private ExecutionValue value;
+   private ExecutionValue[] values;
 
    /**
     * Constructor for a "normal" value.
-    * @param mediator The used {@link KeYMediator} during proof.
-    * @param proofNodeThe {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
+    * @param parentNode The parent {@link IExecutionStateNode} which provides this {@link ExecutionVariable}.
     * @param programVariable The represented {@link IProgramVariable} which value is shown.
     */
-   public ExecutionVariable(KeYMediator mediator, Node proofNode, IProgramVariable programVariable) {
-      this(mediator, proofNode, null, programVariable);
+   public ExecutionVariable(IExecutionStateNode<?> parentNode,
+                            IProgramVariable programVariable) {
+      this(parentNode, null, programVariable);
    }
    
    /**
     * Constructor for a "normal" child value.
-    * @param mediator The used {@link KeYMediator} during proof.
-    * @param proofNodeThe {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
+    * @param parentNode The parent {@link IExecutionStateNode} which provides this {@link ExecutionVariable}.
     * @param parentValue The parent {@link ExecutionValue} or {@code null} if not available.
     * @param programVariable The represented {@link IProgramVariable} which value is shown.
     */
-   public ExecutionVariable(KeYMediator mediator, Node proofNode, ExecutionValue parentValue, IProgramVariable programVariable) {
-      super(mediator, proofNode);
+   public ExecutionVariable(IExecutionStateNode<?> parentNode,
+                            ExecutionValue parentValue, 
+                            IProgramVariable programVariable) {
+      super(parentNode.getMediator(), parentNode.getProofNode());
       assert programVariable != null;
+      this.parentNode = parentNode;
       this.parentValue = parentValue;
       this.programVariable = programVariable;
       this.arrayIndex = -1;
    }
-   
+
    /**
     * Constructor for an array cell value.
-    * @param mediator The used {@link KeYMediator} during proof.
-    * @param proofNodeThe {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
+    * @param parentNode The parent {@link IExecutionStateNode} which provides this {@link ExecutionVariable}.
     * @param parentValue The parent {@link ExecutionValue} or {@code null} if not available.
     * @param arrayIndex The index in the parent array.
+    * @param lengthValue The {@link ExecutionValue} from which the array length was computed.
     */
-   public ExecutionVariable(KeYMediator mediator, Node proofNode, ExecutionValue parentValue, int arrayIndex) {
-      super(mediator, proofNode);
+   public ExecutionVariable(IExecutionStateNode<?> parentNode,
+                            ExecutionValue parentValue, 
+                            int arrayIndex,
+                            ExecutionValue lengthValue) {
+      super(parentNode.getMediator(), parentNode.getProofNode());
+      this.parentNode = parentNode;
       this.parentValue = parentValue;
       this.arrayIndex = arrayIndex;
+      this.lengthValue = lengthValue;
    }
 
    /**
@@ -115,61 +142,159 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
     * {@inheritDoc}
     */
    @Override
-   public ExecutionValue getValue() throws ProofInputException {
+   public ExecutionValue[] getValues() throws ProofInputException {
       synchronized (this) {
-         if (value == null) {
-            value = lazyComputeValue();
+         if (values == null) {
+            values = lazyComputeValues();
          }
-         return value;
+         return values;
       }
    }
    
    /**
-    * Computes the value for {@link #getValue()}
+    * Computes the value for {@link #getValues()}
     * lazily when the method is called the first time.
     * @throws ProofInputException Occurred Exception.
     */
-   protected ExecutionValue lazyComputeValue() throws ProofInputException {
+   protected ExecutionValue[] lazyComputeValues() throws ProofInputException {
       // Start site proof to extract the value of the result variable.
       SiteProofVariableValueInput sequentToProve;
-      Term unknownCheckSelectTerm = null;
+      Term siteProofSelectTerm = null;
+      Term siteProofCondition = parentNode.getPathCondition();
       if (getParentValue() != null || SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
-         unknownCheckSelectTerm = createSelectTerm();
-         sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), getProofNode(), unknownCheckSelectTerm);
+         siteProofSelectTerm = createSelectTerm();
+         if (getParentValue() != null) { // Is null at static variables
+            siteProofCondition = TermBuilder.DF.and(siteProofCondition, getParentValue().getCondition());
+         }
+         if (lengthValue != null) {
+            siteProofCondition = TermBuilder.DF.and(siteProofCondition, lengthValue.getCondition());
+         }
+         sequentToProve = SymbolicExecutionUtil.createExtractTermSequent(getServices(), getProofNode(), siteProofCondition, siteProofSelectTerm); 
       }
       else {
-         sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(getServices(), getProofNode(), getProgramVariable());
+         sequentToProve = SymbolicExecutionUtil.createExtractVariableValueSequent(getServices(), getProofNode(), siteProofCondition, getProgramVariable());
       }
-      ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequentToProve.getSequentToProve());
-      Term value = SymbolicExecutionUtil.extractOperatorValue(info, sequentToProve.getOperator());
-      assert value != null;
-      // Format return vale
-      StringBuffer sb = ProofSaver.printTerm(value, getServices(), true);
-      String valueString = sb.toString();
-      // Determine type
-      String typeString = value.sort().toString();
-      // Compute unknown flag if required
-      boolean unknownValue = false;
-      if (unknownCheckSelectTerm != null) {
-         if (SymbolicExecutionUtil.isNullSort(value.sort(), getServices())) { 
-            unknownValue = false; // Sort is NullSort, so information must exist in Sequent and value is not unknown
+      ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequentToProve.getSequentToProve(), StrategyProperties.SPLITTING_DELAYED);
+      List<ExecutionValue> result = new ArrayList<ExecutionValue>(info.getProof().openGoals().size());
+      // Group values of the branches
+      Map<Term, List<Goal>> valueMap = new HashMap<Term, List<Goal>>();
+      List<Goal> unknownValues = new LinkedList<Goal>();
+      groupGoalsByValue(info.getProof().openGoals(), sequentToProve.getOperator(), siteProofSelectTerm, siteProofCondition, valueMap, unknownValues);
+      // Instantiate child values
+      for (Entry<Term, List<Goal>> valueEntry : valueMap.entrySet()) {
+         Term value = valueEntry.getKey();
+         // Format return vale
+         StringBuffer sb = ProofSaver.printTerm(value, getServices(), true);
+         String valueString = sb.toString();
+         // Determine type
+         String typeString = value.sort().toString();
+         // Compute value condition
+         Term condition = computeValueCondition(valueEntry.getValue());
+         String conditionString = null;
+         if (condition != null) {
+            StringBuffer conditionSB = ProofSaver.printTerm(condition, getServices(), true);
+            conditionString = conditionSB.toString();
          }
-         else {
-            unknownValue = SymbolicExecutionUtil.isNotNull(getServices(), getProofNode(), unknownCheckSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
-            if (unknownValue) {
-               value = null; // Reset value
-               valueString = null; // Reset value string
-               typeString = null; // Reset type
+         // Update result
+         result.add(new ExecutionValue(getMediator(),
+                                       getProofNode(),
+                                       this,
+                                       false,
+                                       value,
+                                       valueString,
+                                       typeString,
+                                       condition,
+                                       conditionString));
+      }
+      // Instantiate unknown child values
+      if (!unknownValues.isEmpty()) {
+         // Compute value condition
+         Term condition = computeValueCondition(unknownValues);
+         String conditionString = null;
+         if (condition != null) {
+            StringBuffer conditionSB = ProofSaver.printTerm(condition, getServices(), true);
+            conditionString = conditionSB.toString();
+         }
+         // Update result
+         result.add(new ExecutionValue(getMediator(),
+                                       getProofNode(),
+                                       this,
+                                       true,
+                                       null,
+                                       null,
+                                       null,
+                                       condition,
+                                       conditionString));
+      }
+      // Return child values as result
+      return result.toArray(new ExecutionValue[result.size()]);
+   }
+
+   /**
+    * Groups all {@link Goal}s which provides the same value.
+    * @param goals All available {@link Goal}s to group.
+    * @param operator The {@link Operator} of the {@link Term} which provides the value.
+    */
+   protected void groupGoalsByValue(ImmutableList<Goal> goals, 
+                                    Operator operator, 
+                                    Term siteProofSelectTerm,
+                                    Term siteProofCondition,
+                                    Map<Term, List<Goal>> valueMap,
+                                    List<Goal> unknownValues) throws ProofInputException {
+      for (Goal goal : goals) {
+         // Extract value
+         Term value = SymbolicExecutionUtil.extractOperatorValue(goal, operator);
+         assert value != null;
+         // Compute unknown flag if required
+         boolean unknownValue = false;
+         if (siteProofSelectTerm != null) {
+            if (SymbolicExecutionUtil.isNullSort(value.sort(), getServices())) { 
+               unknownValue = SymbolicExecutionUtil.isNull(getServices(), getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
+            }
+            else {
+               unknownValue = SymbolicExecutionUtil.isNotNull(getServices(), getProofNode(), siteProofCondition, siteProofSelectTerm); // Check if the symbolic value is not null, if it fails the value is treated as unknown
             }
          }
+         // Add to result list
+         if (unknownValue) {
+            unknownValues.add(goal);
+         }
+         else {
+            List<Goal> valueList = valueMap.get(value);
+            if (valueList == null) {
+               valueList = new LinkedList<Goal>();
+               valueMap.put(value, valueList);
+            }
+            valueList.add(goal);
+         }
       }
-      return new ExecutionValue(getMediator(), 
-                                getProofNode(), 
-                                this, 
-                                unknownValue, 
-                                value, 
-                                valueString, 
-                                typeString);
+   }
+   
+   /**
+    * Computes the combined path condition of all {@link Goal}s which is the
+    * or combination of each path condition per {@link Goal}.
+    * @param valueGoals The {@link Goal}s to compute combined path condition for.
+    * @return The combined path condition.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected Term computeValueCondition(List<Goal> valueGoals) throws ProofInputException {
+      final boolean SIMPLIFY = false; // TODO: Enable simlification if identified why it sometimes simplifies to false
+      if (!valueGoals.isEmpty()) {
+         List<Term> pathConditions = new LinkedList<Term>();
+         Proof proof = null;
+         for (Goal valueGoal : valueGoals) {
+            pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), SIMPLIFY));
+            proof = valueGoal.node().proof();
+         }
+         Term comboundPathCondition = TermBuilder.DF.or(pathConditions);
+         if (SIMPLIFY) {
+            comboundPathCondition = SymbolicExecutionUtil.simplify(proof, comboundPathCondition);
+         }
+         return comboundPathCondition;
+      }
+      else {
+         return TermBuilder.DF.tt();
+      }
    }
    
    /**
@@ -249,5 +374,13 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    @Override
    public ExecutionValue getParentValue() {
       return parentValue;
+   }
+   
+   /**
+    * Returns the parent {@link IExecutionStateNode} which provides this {@link ExecutionVariable}.
+    * @return The parent {@link IExecutionStateNode} which provides this {@link ExecutionVariable}.
+    */
+   public IExecutionStateNode<?> getParentNode() {
+      return parentNode;
    }
 }

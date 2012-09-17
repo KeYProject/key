@@ -65,6 +65,7 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDValue;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.LaunchUtil;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
@@ -1101,6 +1102,10 @@ public final class TestSedCoreUtil {
          TestCase.assertEquals(expected.isAllocated(), current.isAllocated());
          TestCase.assertEquals(expected.getReferenceTypeName(), current.getReferenceTypeName());
          TestCase.assertTrue(expected.getValueString() + " does not match " + current.getValueString(), StringUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
+         if (expected instanceof ISEDValue) {
+            TestCase.assertTrue(current instanceof ISEDValue);
+            TestCase.assertEquals(((ISEDValue)expected).isMultiValued(), ((ISEDValue)current).isMultiValued());
+         }
          compareDebugElement(expected, current, true, compareVariables);
          // Compare variables
          TestCase.assertEquals(expected.hasVariables(), current.hasVariables());

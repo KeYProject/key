@@ -23,4 +23,11 @@ public interface ISEDValue extends IValue, ISEDDebugElement {
     * @throws DebugException Occurred Exception.
     */
    public boolean isObject() throws DebugException;
+   
+   /**
+    * Checks if this value is single or multi valued (case of multiple conditional values).
+    * @return {@code true} multi valued, {@code false} single valued.
+    * @throws DebugException Occurred Exception.
+    */
+   public boolean isMultiValued() throws DebugException;
 }

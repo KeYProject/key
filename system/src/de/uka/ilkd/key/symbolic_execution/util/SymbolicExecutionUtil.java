@@ -271,7 +271,7 @@ public final class SymbolicExecutionUtil {
       // Combine method frame with value formula in a modality.
       Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
       // Create Sequent to prove with new succedent.
-      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, modalityTerm);
+      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, null, modalityTerm);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -282,11 +282,13 @@ public final class SymbolicExecutionUtil {
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
     * @param node The original {@link Node} which provides the sequent to extract from.
+    * @param additionalConditions Optional additional conditions.
     * @param variable The {@link IProgramVariable} of the value which is interested.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
    public static SiteProofVariableValueInput createExtractVariableValueSequent(Services services,
                                                                                Node node,
+                                                                               Term additionalConditions,
                                                                                IProgramVariable variable) {
       // Make sure that correct parameters are given
       assert node != null;
@@ -296,7 +298,7 @@ public final class SymbolicExecutionUtil {
       // Create formula which contains the value interested in.
       Term newTerm = TermBuilder.DF.func(newPredicate, TermBuilder.DF.var((ProgramVariable)variable));
       // Create Sequent to prove with new succedent.
-      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, newTerm);
+      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, additionalConditions, newTerm);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -307,11 +309,13 @@ public final class SymbolicExecutionUtil {
     * sequent of the given {@link Node}.
     * @param services The {@link Services} to use.
     * @param node The original {@link Node} which provides the sequent to extract from.
-    * @param variable The {@link IProgramVariable} of the value which is interested.
+    * @param additionalConditions Additional conditions to add to the antecedent.
+    * @param term The new succedent term.
     * @return The created {@link SiteProofVariableValueInput} with the created sequent and the predicate which will contain the value.
     */
    public static SiteProofVariableValueInput createExtractTermSequent(Services services,
                                                                       Node node,
+                                                                      Term additionalConditions,
                                                                       Term term) {
       // Make sure that correct parameters are given
       assert node != null;
@@ -321,7 +325,7 @@ public final class SymbolicExecutionUtil {
       // Create formula which contains the value interested in.
       Term newTerm = TermBuilder.DF.func(newPredicate, term);
       // Create Sequent to prove with new succedent.
-      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, newTerm);
+      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, additionalConditions, newTerm);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -421,16 +425,39 @@ public final class SymbolicExecutionUtil {
     * @return The value of the formula with the given {@link Operator}.
     * @throws ProofInputException Occurred Exception.
     */
-   public static Term extractOperatorValue(ApplyStrategyInfo info, final Operator operator) throws ProofInputException {
+   public static Term extractOperatorValue(ApplyStrategyInfo info, Operator operator) throws ProofInputException {
       // Make sure that valid parameters are given
       assert info != null;
       if (info.getProof().openGoals().size() != 1) {
          throw new ProofInputException("Assumption that return value extraction has one goal does not hold because " + info.getProof().openGoals().size() + " goals are available.");
       }
       // Get node of open goal
-      Node goalNode = info.getProof().openGoals().head().node();
+      return extractOperatorValue(info.getProof().openGoals().head(), operator);
+   }
+
+   /**
+    * Extracts the value for the formula with the given {@link Operator}
+    * from the given {@link Goal}.
+    * @param goal The {@link Goal} to search the {@link Operator} in.
+    * @param operator The {@link Operator} for the formula which should be extracted.
+    * @return The value of the formula with the given {@link Operator}.
+    */
+   public static Term extractOperatorValue(Goal goal, final Operator operator) {
+      assert goal != null;
+      return extractOperatorValue(goal.node(), operator);
+   }
+
+   /**
+    * Extracts the value for the formula with the given {@link Operator}
+    * from the given {@link Node}.
+    * @param node The {@link Node} to search the {@link Operator} in.
+    * @param operator The {@link Operator} for the formula which should be extracted.
+    * @return The value of the formula with the given {@link Operator}.
+    */
+   public static Term extractOperatorValue(Node node, final Operator operator) {
+      assert node != null;
       // Search formula with the given operator in sequent
-      SequentFormula sf = JavaUtil.search(goalNode.sequent(), new IFilter<SequentFormula>() {
+      SequentFormula sf = JavaUtil.search(node.sequent(), new IFilter<SequentFormula>() {
          @Override
          public boolean select(SequentFormula element) {
             return JavaUtil.equals(element.formula().op(), operator);
@@ -502,7 +529,7 @@ public final class SymbolicExecutionUtil {
          IExecutionVariable[] result = new IExecutionVariable[variables.size()];
          int i = 0;
          for (IProgramVariable var : variables) {
-            result[i] = new ExecutionVariable(node.getMediator(), proofNode, var);
+            result[i] = new ExecutionVariable(node, var);
             i++;
          }
          return result;
@@ -995,10 +1022,11 @@ public final class SymbolicExecutionUtil {
    /**
     * Computes the branch condition of the given {@link Node}.
     * @param node The {@link Node} to compute its branch condition.
+    * @param simplify {@code true} simplify result, {@code false} keep computed non simplified result.
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
-   public static Term computeBranchCondition(Node node) throws ProofInputException {
+   public static Term computeBranchCondition(Node node, boolean simplify) throws ProofInputException {
       // Get applied taclet on parent proof node
       Node parent = node.parent();
       assert parent.getAppliedRuleApp() instanceof TacletApp; // Splits of built in rules are currently not supported.
@@ -1011,23 +1039,30 @@ public final class SymbolicExecutionUtil {
       SVInstantiations instantiations = app.instantiations();
       ImmutableList<Term> antecedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().antecedent());
       ImmutableList<Term> succedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().succedent());
-      // Construct branch condition from created antecedent and succedent terms as new implication 
-      Term left = TermBuilder.DF.and(antecedents);
-      Term right = TermBuilder.DF.or(succedents);
-      Term implication = TermBuilder.DF.imp(left, right);
-      Term result;
-      // Check if an update context is available
-      if (!instantiations.getUpdateContext().isEmpty()) {
-         // Append update context because otherwise the formula is evaluated in wrong state
-         result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), implication);
-         // Simplify branch condition
-         result = SymbolicExecutionUtil.simplify(node.proof(), result);
+      if (antecedents.isEmpty() && succedents.isEmpty()) {  // TODO: Discuss with richard if the treatment of rules which removes only something like andRight or orLeft is implemented correctly.
+         return TermBuilder.DF.tt(); // Some rules like andRight or orLeft removes only something and replaces nothing. Ignore these rules in branch conditions.
       }
       else {
-         // No update context, just use the implication as branch condition
-         result = implication;
+         // Construct branch condition from created antecedent and succedent terms as new implication 
+         Term left = TermBuilder.DF.and(antecedents);
+         Term right = TermBuilder.DF.or(succedents);
+         Term implication = TermBuilder.DF.imp(left, right);
+         Term result;
+         // Check if an update context is available
+         if (!instantiations.getUpdateContext().isEmpty()) {
+            // Append update context because otherwise the formula is evaluated in wrong state
+            result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), implication);
+            // Simplify branch condition if required
+            if (simplify) {
+               result = SymbolicExecutionUtil.simplify(node.proof(), result);
+            }
+         }
+         else {
+            // No update context, just use the implication as branch condition
+            result = implication;
+         }
+         return result;
       }
-      return result;
    }
 
    /**
@@ -1102,21 +1137,59 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the given {@link Term} is not null in the {@link Sequent} of the given {@link Node}. 
+    * Checks if the given {@link Term} is null in the {@link Sequent} of the given {@link Node}. 
     * @param services The {@link Services} to use.
     * @param node The {@link Node} which provides the original {@link Sequent}
-    * @param term The {@link Term} to check.
+    * @param additionalAntecedent An additional antecedent.
+    * @param newSuccedent The {@link Term} to check.
     * @return {@code true} {@link Term} was evaluated to null, {@code false} {@link Term} was not evaluated to null.
     * @throws ProofInputException Occurred Exception
     */
-   public static boolean isNotNull(Services services, Node node, Term term) throws ProofInputException {
+   public static boolean isNull(Services services, 
+                                Node node, 
+                                Term additionalAntecedent, 
+                                Term newSuccedent) throws ProofInputException {
+      return checkNull(services, node, additionalAntecedent, newSuccedent, true);
+   }
+
+   /**
+    * Checks if the given {@link Term} is not null in the {@link Sequent} of the given {@link Node}. 
+    * @param services The {@link Services} to use.
+    * @param node The {@link Node} which provides the original {@link Sequent}
+    * @param additionalAntecedent An additional antecedent.
+    * @param newSuccedent The {@link Term} to check.
+    * @return {@code true} {@link Term} was evaluated to not null, {@code false} {@link Term} was not evaluated to not null.
+    * @throws ProofInputException Occurred Exception
+    */
+   public static boolean isNotNull(Services services, 
+                                   Node node, 
+                                   Term additionalAntecedent, 
+                                   Term newSuccedent) throws ProofInputException {
+      return checkNull(services, node, additionalAntecedent, newSuccedent, false);
+   }
+   
+   /**
+    * Checks if the given {@link Term} is null or not in the {@link Sequent} of the given {@link Node}.
+    * @param services The {@link Services} to use.
+    * @param node The {@link Node} which provides the original {@link Sequent}
+    * @param additionalAntecedent An additional antecedent.
+    * @param newSuccedent The {@link Term} to check.
+    * @param nullExpected {@code true} expect that {@link Term} is null, {@code false} expect that term is not null.
+    * @return {@code true} term is null value matches the expected nullExpected value, {@code false} otherwise.
+    * @throws ProofInputException Occurred Exception
+    */
+   private static boolean checkNull(Services services, 
+                                    Node node, 
+                                    Term additionalAntecedent, 
+                                    Term newSuccedent,
+                                    boolean nullExpected) throws ProofInputException {
       // Make sure that correct parameters are given
       assert node != null;
-      assert term != null;
+      assert newSuccedent != null;
       // Create Sequent to prove
-      Term isNull = TermBuilder.DF.equals(term, TermBuilder.DF.NULL(services));
+      Term isNull = TermBuilder.DF.equals(newSuccedent, TermBuilder.DF.NULL(services));
       Term isNotNull = TermBuilder.DF.not(isNull);
-      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, isNotNull);
+      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, additionalAntecedent, nullExpected ? isNull : isNotNull);
       // Execute proof in the current thread
       ApplyStrategyInfo info = startSideProof(node.proof(), sequentToProve, StrategyProperties.SPLITTING_NORMAL);
       return !info.getProof().openEnabledGoals().isEmpty();
@@ -1126,10 +1199,13 @@ public final class SymbolicExecutionUtil {
     * Creates a new {@link Sequent} which is a modification from the {@link Sequent}
     * of the given {@link Node} which contains the same information but a different succedent.
     * @param node The {@link Node} which provides the original {@link Sequent}.
+    * @param additionalAntecedent An optional additional antecedent.
     * @param newSuccedent The new succedent.
     * @return The created {@link Sequent}.
     */
-   private static Sequent createSequentToProveWithNewSuccedent(Node node, Term newSuccedent) {
+   private static Sequent createSequentToProveWithNewSuccedent(Node node, 
+                                                               Term additionalAntecedent,
+                                                               Term newSuccedent) {
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
       ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
@@ -1139,6 +1215,9 @@ public final class SymbolicExecutionUtil {
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
       Sequent sequentToProve = originalSequentWithoutMethodFrame.addFormula(new SequentFormula(newSuccedentToProve), false, true).sequent();
+      if (additionalAntecedent != null) {
+         sequentToProve = sequentToProve.addFormula(new SequentFormula(additionalAntecedent), true, false).sequent();
+      }
       return sequentToProve;
    }
 
@@ -1181,5 +1260,39 @@ public final class SymbolicExecutionUtil {
          }
       }
       return result;
+   }
+
+   /**
+    * Computes the path condition of the given {@link Node}.
+    * @param node The {@link Node} to compute its path condition.
+    * @param simplify {@code true} simplify result, {@code false} keep computed non simplified result.
+    * @return The computed path condition.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public static Term computePathCondition(Node node, boolean simplify) throws ProofInputException {
+      if (node != null) {
+         Proof proof = node.proof();
+         Term pathCondition = TermBuilder.DF.tt();
+         while (node != null) {
+            Node parent = node.parent();
+            if (parent != null && parent.childrenCount() >= 2) {
+               if (parent.getAppliedRuleApp() instanceof TacletApp) {
+                  Term branchCondition = computeBranchCondition(node, simplify);
+                  pathCondition = TermBuilder.DF.and(branchCondition, pathCondition);
+               }
+               else {
+                  System.out.println("Ignored rule (parent child count: " + parent.childrenCount() + ") in path condition: " + parent.getAppliedRuleApp()); // TODO: Add non taclet rules to path condition
+               }
+            }
+            node = parent;
+         }
+         if (simplify) {
+            pathCondition = simplify(proof, pathCondition);
+         }
+         return pathCondition;
+      }
+      else {
+         return null;
+      }
    }
 }

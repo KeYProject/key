@@ -75,6 +75,11 @@ public class ExecutionNodeWriter {
    public static final String ATTRIBUTE_VALUE_STRING = "valueString";
 
    /**
+    * Attribute name to store {@link IExecutionValue#getConditionString()}.
+    */
+   public static final String ATTRIBUTE_CONDITION_STRING = "conditionString";
+
+   /**
     * Attribute name to store {@link IExecutionVariable#getArrayIndex()}.
     */
    public static final String ATTRIBUTE_ARRAY_INDEX = "arrayIndex";
@@ -555,10 +560,22 @@ public class ExecutionNodeWriter {
       attributeValues.put(ATTRIBUTE_ARRAY_INDEX, variable.getArrayIndex() + "");
       attributeValues.put(ATTRIBUTE_IS_ARRAY_INDEX, variable.isArrayIndex() + "");
       appendStartTag(level, TAG_VARIABLE, attributeValues, sb);
-
-      appendValue(level + 1, variable.getValue(), sb);
-
+      appendValues(level + 1, variable, sb);
       appendEndTag(level, TAG_VARIABLE, sb);
+   }
+
+   /**
+    * Appends the contained {@link IExecutionValue}s to the given {@link StringBuffer}.
+    * @param level The level to use.
+    * @param variable The {@link IExecutionVariable} which provides the {@link IExecutionValue}s.
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendValues(int level, IExecutionVariable variable, StringBuffer sb) throws ProofInputException {
+      IExecutionValue[] values = variable.getValues();
+      for (IExecutionValue value : values) {
+         appendValue(level, value, sb);
+      }
    }
 
    /**
@@ -575,6 +592,7 @@ public class ExecutionNodeWriter {
       attributeValues.put(ATTRIBUTE_VALUE_STRING, value.getValueString());
       attributeValues.put(ATTRIBUTE_IS_VALUE_AN_OBJECT, value.isValueAnObject() + "");
       attributeValues.put(ATTRIBUTE_IS_VALUE_UNKNOWN, value.isValueUnknown() + "");
+      attributeValues.put(ATTRIBUTE_CONDITION_STRING, value.getConditionString());
       appendStartTag(level, TAG_VALUE, attributeValues, sb);
 
       IExecutionVariable[] childVariables = value.getChildVariables();

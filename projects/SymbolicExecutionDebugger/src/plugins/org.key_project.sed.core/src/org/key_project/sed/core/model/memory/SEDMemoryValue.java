@@ -36,6 +36,11 @@ public class SEDMemoryValue extends AbstractSEDValue {
    private boolean object;
    
    /**
+    * Is multi valued?
+    */
+   private boolean multiValued;
+
+   /**
     * The contained variables.
     */
    private List<IVariable> variables = new LinkedList<IVariable>();
@@ -78,6 +83,14 @@ public class SEDMemoryValue extends AbstractSEDValue {
    @Override
    public IVariable[] getVariables() throws DebugException {
       return variables.toArray(new IVariable[variables.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isMultiValued() throws DebugException {
+      return multiValued;
    }
 
    /**
@@ -126,5 +139,13 @@ public class SEDMemoryValue extends AbstractSEDValue {
     */
    public void setObject(boolean object) {
       this.object = object;
+   }
+   
+   /**
+    * Defines if this value is multi valued.
+    * @param multiValued Multi valued?
+    */
+   public void setMultiValued(boolean multiValued) {
+      this.multiValued = multiValued;
    }
 }

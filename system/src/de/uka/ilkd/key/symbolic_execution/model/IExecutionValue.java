@@ -20,6 +20,22 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionValue;
  */
 public interface IExecutionValue extends IExecutionElement {
    /**
+    * Returns the condition under which the variable ({@link #getVariable()})
+    * has this value.
+    * @return The condition.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public Term getCondition() throws ProofInputException;
+   
+   /**
+    * Returns the condition under which the variable ({@link #getVariable()})
+    * has this value as human readable {@link String}.
+    * @return The condition as human readable {@link String}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public String getConditionString() throws ProofInputException;
+   
+   /**
     * <p>
     * Checks if the value is unknown.
     * </p>

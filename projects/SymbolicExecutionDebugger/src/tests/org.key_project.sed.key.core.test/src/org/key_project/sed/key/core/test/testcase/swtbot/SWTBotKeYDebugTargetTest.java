@@ -33,6 +33,11 @@ import de.uka.ilkd.key.proof.Proof;
  */
 public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
    /**
+    * If the fast mode is enabled the step wise creation of models is disabled.
+    */
+   private static final boolean FAST_MODE = true;
+   
+   /**
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
@@ -762,7 +767,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                                IMethodSelector selector,
                                                String expectedModelPathInBundle) throws Exception {
       assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false);
-      assertSEDModel(projectName + "stepInto", pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, true);
+      if (!FAST_MODE) {
+         assertSEDModel(projectName + "stepInto", pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, true);
+      }
    }
    
    /**
@@ -785,7 +792,9 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
                                                boolean includeCallStack,
                                                boolean mergeBranchConditions) throws Exception {
       assertSEDModel(projectName, pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, false, false, mergeBranchConditions);
-      assertSEDModel(projectName + "stepInto", pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, true, false, mergeBranchConditions);
+      if (!FAST_MODE) {
+         assertSEDModel(projectName + "stepInto", pathInBundle, clearProofListInKeYBeforeResume, selector, expectedModelPathInBundle, false, 8, false, includeCallStack, true, false, mergeBranchConditions);
+      }
    }
    
    /**

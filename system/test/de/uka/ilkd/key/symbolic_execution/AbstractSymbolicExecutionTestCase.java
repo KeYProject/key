@@ -431,9 +431,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          }
          // Compare children
          if (compareChildren) {
-            IExecutionValue expectedValue = expected.getValue();
-            IExecutionValue currentValue = current.getValue();
-            assertValue(expectedValue, currentValue, compareParent, compareChildren);
+            IExecutionValue[] expectedValues = expected.getValues();
+            IExecutionValue[] currentValues = current.getValues();
+            assertEquals(expectedValues.length, currentValues.length);
+            for (int i = 0; i < expectedValues.length; i++) {
+               assertValue(expectedValues[i], currentValues[i], true, true);
+            }
          }
       }
       else {
@@ -456,11 +459,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       if (expected != null) {
          assertNotNull(current);
          // Compare variable
-         assertEquals(expected.getName(), current.getName());
+         assertTrue(expected.getName() + " does not match " + current.getName(), JavaUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
          assertEquals(expected.getTypeString(), current.getTypeString());
          assertTrue(expected.getValueString() + " does not match " + current.getValueString(), JavaUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
          assertEquals(expected.isValueAnObject(), current.isValueAnObject());
          assertEquals(expected.isValueUnknown(), current.isValueUnknown());
+         assertTrue(expected.getConditionString() + " does not match " + current.getConditionString(), JavaUtil.equalIgnoreWhiteSpace(expected.getConditionString(), current.getConditionString()));
          // Compare parent
          if (compareParent) {
             assertVariable(expected.getVariable(), current.getVariable(), false, false);
