@@ -1,13 +1,22 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.util;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-//import nonnull.NonNull;
 
 /**
  * A small framework to handle command lines.
@@ -58,14 +67,61 @@ public final class CommandLine {
     private static final String MINUS = "-";
 
     /**
-     * Option is a data only structure to capture a single cmd-line option.
-     * Its description as well as its value
+     * Help elements are messages which can appear in usage pages, here: Options
+     * and AdditionalHelpTexts.
      */
-    private static class Option {
+    private static abstract class HelpElement {
+        protected abstract void print(PrintStream ps, int descriptionCol);
+    }
+
+    /**
+     * Option is a data-only structure to capture a single cmd-line option,
+     * its description as well as its value, if set.
+     *
+     * It carries also the information for printing the usage message.
+     * Additional help text which does not belong to this option directly
+     * may be referenced to by the option.
+     */
+    private class Option extends HelpElement {
         private String description;
         private String image;
         private String value;
         private String parameter;
+
+        @Override
+        protected void print(PrintStream stream, int descriptionCol) {
+            String s = image;
+            if(parameter != null) {
+                s += " " + parameter;
+            }
+
+            indent(stream, indentSize);
+            stream.print(s);
+            indent(stream, descriptionCol - s.length());
+
+            printIndentedMessage(stream, description,
+                    descriptionCol + indentSize);
+        }
+
+    }
+
+    /**
+     * Text that should appear in usage pages. You can decide about the
+     * indentation of the text (beginning of line or description column).
+     */
+    private class AdditionalHelpText extends HelpElement {
+        private String description;
+        private boolean indentToDescriptionColumn;
+
+        @Override
+        protected void print(PrintStream ps, int descriptionCol) {
+            int indent = indentSize;
+            if(indentToDescriptionColumn) {
+                indent += descriptionCol;
+            }
+            indent(ps, indent);
+            printIndentedMessage(ps, description, indent);
+        }
     }
 
     /**
@@ -76,7 +132,12 @@ public final class CommandLine {
     /**
      * The options that have been defined. Mapped from their image.
      */
-    private final Map<String, Option> options = new LinkedHashMap<String, Option>();
+    private final Map<String, Option> options = new HashMap<String, Option>();
+
+    /**
+     * The collected list of elements to be printed on the usage page.
+     */
+    private final List<HelpElement> helpElements = new ArrayList<HelpElement>();
 
     /**
      * The additional arguments which do not belong to an option.
@@ -84,10 +145,16 @@ public final class CommandLine {
     private final List<String> arguments = new LinkedList<String>();
 
     /**
-     * the line length to be used for printing out usage.
-     * Break lines which are longer
+     * This is the number of characters printed in one line when printing the
+     * usage page. Longer lines are broken at spaces (if possible).
      */
-    private final int lineLength = DEFAULT_LINE_LENGTH;
+    private int lineLength = DEFAULT_LINE_LENGTH;
+
+    /**
+     * the number of spaces to indent the lines when printing the help
+     * screen. By default lines are not indented;
+     */
+    private int indentSize = 0;
 
     /**
      * Instantiates a new command line handling object.
@@ -99,12 +166,12 @@ public final class CommandLine {
      * Adds a command line option to this handler.
      *
      * @param image
-     *                the image of the option (e.g. {@code -help}
+     *            the image of the option (e.g. {@code -help})
      * @param parameter
-     *                simple description of the argument, null if there is no
-     *                argument for this option
+     *            simple description/name of the argument, null if there is no
+     *            argument for this option (e.g. {@code <file>, time, path}, ...
      * @param description
-     *                the description of the option
+     *            the description of the option
      */
     public void addOption(String image, String parameter, String description) {
 
@@ -121,6 +188,26 @@ public final class CommandLine {
         o.parameter = parameter;
         o.description = description;
         options.put(image, o);
+        helpElements.add(o);
+    }
+
+    /**
+     * Adds an additional help text to be printed on the usage page.
+     *
+     * Calling this method has no influence of the parsing of command line
+     * arguments.
+     *
+     * @param description
+     *            the text to be displayed
+     * @param identToDescriptionColumn
+     *            if <code>true</code>, the code is printed underneath the
+     *            remaining descriptions, otherwise it has the full length.
+     */
+    public void addText(String description, boolean identToDescriptionColumn) {
+        AdditionalHelpText text = new AdditionalHelpText();
+        text.description = description;
+        text.indentToDescriptionColumn = identToDescriptionColumn;
+        helpElements.add(text);
     }
 
     /**
@@ -251,61 +338,161 @@ public final class CommandLine {
     }
 
     /**
-     * Prints the usage for this command line.
+     * Gets the value of a long integer command line option.
+     *
+     * If not present, a default value is returned. If the argument cannot be
+     * parsed as a (positive or negative) integer, a
+     * {@link CommandLineException} is thrown.
+     *
+     * @param param
+     *            the option to retrieve
+     * @param defaultValue
+     *            the default value to use if no value specified
+     *
+     * @return either the set option or defaultValue if not set.
+     *
+     * @throws CommandLineException
+     *             if the argument is ill-formatted.
+     */
+    public long getLong(String param, long defaultValue) throws CommandLineException {
+        Option option = options.get(param);
+        assert option != null : param + " is unknown option";
+
+        String value = option.value;
+        if(value == null) {
+            return defaultValue;
+        }
+
+        try {
+            return Long.decode(value);
+        } catch (NumberFormatException e) {
+            throw new CommandLineException(param + " expects a long integer argument, but received: "
+                                            + option.value);
+        }
+    }
+
+    /**
+     * Prints the usage page for this command line.
+     *
+     * <p>
+     * Every of the page is indented to the level set by
+     * {@link #setIndentation(int)} (default is 0). The options and help texts
+     * appear in the order of definition (by
+     * {@link #addOption(String, String, String)} and
+     * {@link #addText(String, boolean)}) The descriptions of the options All
+     * option descriptions commence in the same column.
+     *
+     * <p>
+     * Descriptions which would result in lines longer than
+     * {@link #getLineLength()} characters are broken at spaces (if that is
+     * possible).
      *
      * @param stream
-     *                the stream to print to (typically System.out)
+     *            the stream to print to (typically System.out)
      */
     public void printUsage(PrintStream stream) {
-        int maxlen = 0;
+        int descriptionCol = 0;
 
         for (Option option : options.values()) {
             int len = option.image.length();
             if(option.parameter != null) {
                 len += 1 + option.parameter.length();
             }
-            maxlen = Math.max(len, maxlen);
+            descriptionCol = Math.max(len, descriptionCol);
         }
 
-        maxlen += 2;
+        descriptionCol += 2;
 
-        int descLength = lineLength - maxlen;
-
-        for (Option option : options.values()) {
-            String s = option.image;
-            if(option.parameter != null) {
-                s += " " + option.parameter;
-            }
-            stream.print(s);
-            indent(stream, maxlen - s.length());
-
-            String message = option.description;
-
-            while (message.length() > descLength) {
-                int p = message.lastIndexOf(' ', descLength);
-
-                if (p > 0) {
-                    stream.println(message.substring(0, p));
-                    message = message.substring(p + 1);
-                } else {
-                    stream.println(message);
-                    message = "";
-                }
-
-                indent(stream, maxlen);
-            }
-
-            stream.println(message);
+        for (HelpElement element : helpElements) {
+            element.print(stream, descriptionCol);
         }
 
         stream.flush();
     }
 
+    /*
+     * insert a number of spaces to the output stream
+     */
     private void indent(PrintStream stream, int len) {
         for (int i = len; i > 0; i--) {
             stream.print(" ");
         }
     }
 
+    /*
+     * Used by the Help elements to print text, potentially broken.
+     * The current lines is assumed to be indented to "indentionLevel".
+     * At most textWidth charcters of text are printed, the line broken,
+     * indented to indentationLevel, ...
+     * Repeated till the text is completely rendered.
+     * Output ends with a line break;
+     */
+    private void printIndentedMessage(PrintStream stream, String text, int indentationLevel) {
+        int textWidth = getLineLength() - indentationLevel;
+        while (text.length() > textWidth) {
+            int p = text.lastIndexOf(' ', textWidth);
+
+            if (p > 0) {
+                stream.println(text.substring(0, p));
+                text = text.substring(p + 1);
+            } else {
+                stream.println(text);
+                text = "";
+            }
+
+            indent(stream, indentationLevel);
+        }
+
+        stream.println(text);
+    }
+
+    /**
+     * Gets the indentation depth.
+     *
+     * This is the number of spaces which is put in front of the options when
+     * printing the help screen.
+     *
+     * @return a non-negative number
+     */
+    public int getIndentation() {
+        return indentSize;
+    }
+
+    /**
+     * Sets the indentation depth to the argument.
+     *
+     * This is the number of spaces which is put in front of the options when
+     * printing the usage page.
+     *
+     * @param indentSize
+     *            a non-negative number
+     */
+    public void setIndentation(int indentSize) {
+        this.indentSize = indentSize;
+    }
+
+    /**
+     * Gets the line length used for the usage page.
+     *
+     * This is the number of characters printed in one line when printing the
+     * usage page. Longer lines are broken at spaces (if possible).
+     *
+     * @return the line length
+     */
+    public int getLineLength() {
+        return lineLength;
+    }
+
+    /**
+     * Sets the line length used for the usage page.
+     *
+     * This is the number of characters printed in one line when printing the
+     * usage page. Longer lines are broken at spaces (if possible).
+     *
+     * @return the line length
+     */
+    public void setLineLength(int lineLength) {
+        this.lineLength = lineLength;
+    }
 }
 
