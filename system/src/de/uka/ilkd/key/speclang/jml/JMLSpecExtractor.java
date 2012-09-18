@@ -15,10 +15,7 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -32,16 +29,11 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.InitiallyClause;
-import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.SpecExtractor;
-import de.uka.ilkd.key.speclang.SpecificationElement;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassAxiom;
@@ -56,6 +48,9 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
+
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * Extracts JML class invariants and operation contracts from JML comments. 
@@ -464,6 +459,75 @@ public final class JMLSpecExtractor implements SpecExtractor {
         }
 
         return result;
+    }
+    
+    
+    @Override
+    public ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method, final StatementBlock block) throws SLTranslationException
+    {
+        return createBlockContracts(method, new LinkedList<Label>(), block, block.getComments());
+    }
+
+    @Override
+    public ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method, final LabeledStatement labeled) throws SLTranslationException
+    {
+        final List<Label> labels = new LinkedList<Label>();
+        labels.add(labeled.getLabel());
+        Statement nextNonLabeled = labeled.getBody();
+        while (nextNonLabeled instanceof LabeledStatement) {
+            final LabeledStatement currentLabeled = (LabeledStatement) nextNonLabeled;
+            labels.add(currentLabeled.getLabel());
+            nextNonLabeled = currentLabeled.getBody();
+        }
+        if (nextNonLabeled instanceof StatementBlock) {
+            return createBlockContracts(method, labels, (StatementBlock) nextNonLabeled, labeled.getComments());
+        }
+        else {
+            return DefaultImmutableSet.nil();
+        }
+    }
+
+    private ImmutableSet<BlockContract> createBlockContracts(final IProgramMethod method,
+                                                             final List<Label> labels,
+                                                             final StatementBlock block,
+                                                             final Comment[] comments)
+            throws SLTranslationException
+    {
+        ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
+        // For some odd reason every comment block appears twice; thus we remove duplicates.
+        final TextualJMLConstruct[] constructs = parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
+        for (int i = constructs.length - 1; i >= 0 && constructs[i] instanceof TextualJMLSpecCase; i--) {
+            final TextualJMLSpecCase specificationCase = (TextualJMLSpecCase) constructs[i];
+            try {
+                result = result.union(jsf.createJMLBlockContracts(method, labels, block, specificationCase));
+            }
+            catch (final SLWarningException exception) {
+                warnings = warnings.add(exception.getWarning());
+            }
+        }
+        return result;
+    }
+
+    private String getFileName(final IProgramMethod method) {
+        final TypeDeclaration type = (TypeDeclaration) method.getContainerType().getJavaType();
+        return type.getPositionInfo().getFileName();
+    }
+
+    private TextualJMLConstruct[] parseMethodLevelComments(final Comment[] comments, final String fileName) throws SLTranslationException {
+        if (comments.length == 0) {
+            return new TextualJMLConstruct[0];
+        }
+        final String concatenatedComment = concatenate(comments);
+        final Position position = comments[0].getStartPosition();
+        final KeYJMLPreParser preParser = new KeYJMLPreParser(concatenatedComment, fileName, position);
+        final ImmutableList<TextualJMLConstruct> constructs = preParser.parseMethodlevelComment();
+        warnings = warnings.union(preParser.getWarnings());
+        return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
+    }
+
+    private Comment[] removeDuplicates(final Comment[] comments) {
+        final Set<Comment> uniqueComments = new LinkedHashSet<Comment>(Arrays.asList(comments));
+        return uniqueComments.toArray(new Comment[uniqueComments.size()]);
     }
 
     

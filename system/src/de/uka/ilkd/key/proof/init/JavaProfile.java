@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.GoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
+import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.QueryExpand;
@@ -59,6 +60,7 @@ public class JavaProfile extends AbstractProfile {
         ImmutableList<BuiltInRule> builtInRules = super.initBuiltInRules();
         
         builtInRules = builtInRules.prepend(WhileInvariantRule.INSTANCE)
+                                   .prepend(BlockContractRule.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
                                    .prepend(getInitialOneStepSimpilifier())
         			   //.prepend(PullOutConditionalsRule.INSTANCE)  // rule at the moment unsound

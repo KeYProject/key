@@ -18,10 +18,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -39,14 +36,12 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.JavaReduxFileCollection;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Recoder2KeY;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -301,6 +296,25 @@ public final class SLEnvInput extends AbstractEnvInput {
                         			(LoopStatement) loop);
                     if(inv != null) {
                         specRepos.setLoopInvariant(inv);
+                    }
+                }
+                
+                //block contracts
+                final JavaASTCollector blockCollector = new JavaASTCollector(pm.getBody(), StatementBlock.class);
+                blockCollector.start();
+                for (ProgramElement block : blockCollector.getNodes()) {
+                    final ImmutableSet<BlockContract> blockContracts = specExtractor.extractBlockContracts(pm, (StatementBlock) block);
+                    for (BlockContract specification : blockContracts) {
+                    	specRepos.addBlockContract(specification);
+                    }
+                }
+
+                final JavaASTCollector labeledCollector = new JavaASTCollector(pm.getBody(), LabeledStatement.class);
+                labeledCollector.start();
+                for (ProgramElement labeled : labeledCollector.getNodes()) {
+                    final ImmutableSet<BlockContract> blockContracts = specExtractor.extractBlockContracts(pm, (LabeledStatement) labeled);
+                    for (BlockContract specification : blockContracts) {
+                        specRepos.addBlockContract(specification);
                     }
                 }
             }

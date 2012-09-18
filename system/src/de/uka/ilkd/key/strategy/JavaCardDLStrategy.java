@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SetRuleFilter;
+import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -186,6 +187,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             loopInvF = loopInvFeature(inftyConst());
         }
         
+        final Feature blockFeature;
+        final String blockProperty = strategyProperties.getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
+        if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT)) {
+        	blockFeature = blockContractFeature(longConst(Long.MIN_VALUE));
+        }
+        else {
+        	blockFeature = blockContractFeature(inftyConst());
+        }
+        
         final Feature oneStepSimplificationF 
         	= oneStepSimplificationFeature(longConst(-11000));
       //  final Feature smtF = smtFeature(inftyConst());
@@ -203,12 +213,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
               queryF,
               depSpecF,
               loopInvF,
+              blockFeature,
               ifMatchedF});
     }
     
     private Feature loopInvFeature(Feature cost) {
 	SetRuleFilter filter = new SetRuleFilter();
 	filter.addRuleToSet(WhileInvariantRule.INSTANCE);
+	return ConditionalFeature.createConditional(filter, cost);
+    }
+    
+    private Feature blockContractFeature(Feature cost) {
+	SetRuleFilter filter = new SetRuleFilter();
+	filter.addRuleToSet(BlockContractRule.INSTANCE);
 	return ConditionalFeature.createConditional(filter, cost);
     }
 
@@ -375,6 +392,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         boolean useLoopExpand = strategyProperties.getProperty(
                 StrategyProperties.LOOP_OPTIONS_KEY).
                     equals(StrategyProperties.LOOP_EXPAND);
+        /*boolean useBlockExpand = strategyProperties.getProperty(
+                StrategyProperties.BLOCK_OPTIONS_KEY).
+                    equals(StrategyProperties.BLOCK_EXPAND);*/
         boolean programsToRight = true;//XXX
         
         final String methProp
@@ -409,6 +429,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "loop_expand",
                       useLoopExpand ? longConst ( 0 )
                                     : inftyConst () );
+        
+        /*bindRuleSet ( d, "block_expand",
+                      useBlockExpand ? longConst ( 0 )
+                                     : inftyConst () );*/
         
         // delete cast
         bindRuleSet ( d, "cast_deletion",

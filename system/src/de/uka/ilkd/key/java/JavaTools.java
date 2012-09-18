@@ -40,7 +40,6 @@ public final class JavaTools {
     }
 
 
-    
     /**
      * Returns the passed java block without its active statement.
      */

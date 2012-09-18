@@ -57,7 +57,19 @@ public final class MiscTools {
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
-    
+
+
+    // TODO Is rp always a program variable?
+    public static ProgramVariable getSelf(MethodFrame mf) {
+        ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
+        ReferencePrefix rp = ec.getRuntimeInstance();
+        if(!(rp instanceof TypeReference) && rp != null) {
+            return (ProgramVariable) rp;
+        } else {
+            return null;
+        }
+    }
+
     
     /**
      * Returns the receiver term of the passed method frame, or null if
