@@ -86,8 +86,8 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
             return this;
         }
         final Services services = goal.proof().getServices();
-        final BlockContractRule.Instantiation instantiation = BlockContractRule.instantiate(posInOccurrence().subTerm(), services);
-        final ImmutableSet<BlockContract> contracts = BlockContractRule.getApplicableContracts(instantiation, services);
+        final BlockContractRule.Instantiation instantiation = BlockContractRule.instantiate(posInOccurrence().subTerm(), goal, services);
+        final ImmutableSet<BlockContract> contracts = BlockContractRule.getApplicableContracts(instantiation, goal, services);
         block = instantiation.block;
         contract = SimpleBlockContract.combine(contracts, services);
         heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());

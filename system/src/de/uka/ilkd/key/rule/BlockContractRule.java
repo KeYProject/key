@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.ExtList;
@@ -34,41 +35,79 @@ public class BlockContractRule implements BuiltInRule {
     private static Term lastFocusTerm;
     private static Instantiation lastInstantiation;
 
-    public static Instantiation instantiate(final Term formula, final Services services)
-    {
+    public static Instantiation instantiate(final Term formula,
+                                            final Goal goal,
+                                            final Services services) {
         if (formula == lastFocusTerm) {
             return lastInstantiation;
         }
         else {
-            final Instantiation result = new Instantiator(formula, services).instantiate();
+            final Instantiation result =
+                    new Instantiator(formula, goal, services).instantiate();
             lastFocusTerm = formula;
             lastInstantiation = result;
             return result;
         }
     }
 
-    public static ImmutableSet<BlockContract> getApplicableContracts(final Instantiation instantiation, final Services services)
-    {
+    public static ImmutableSet<BlockContract> getApplicableContracts(final Instantiation instantiation,
+                                                                     final Goal goal,
+                                                                     final Services services) {
         if (instantiation == null) {
             return DefaultImmutableSet.nil();
         }
-        return getApplicableContracts(services.getSpecificationRepository(), instantiation.block, instantiation.modality);
+        return getApplicableContracts(services.getSpecificationRepository(),
+                                      instantiation.block,
+                                      instantiation.modality, goal);
     }
 
     private static ImmutableSet<BlockContract> getApplicableContracts(final SpecificationRepository specifications,
                                                                       final StatementBlock block,
-                                                                      final Modality modality)
+                                                                      final Modality modality,
+                                                                      final Goal goal)
     {
-        ImmutableSet<BlockContract> result = specifications.getBlockContracts(block, modality);
+        ImmutableSet<BlockContract> collectedContracts = specifications.getBlockContracts(block, modality);
         if (modality == Modality.BOX) {
-            result = result.union(specifications.getBlockContracts(block, Modality.DIA));
+            collectedContracts = collectedContracts.union(specifications.getBlockContracts(block, Modality.DIA));
         }
         else if (modality == Modality.BOX_TRANSACTION) {
-            result = result.union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
+            collectedContracts = collectedContracts.union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
+        }
+        return filterAppliedContracts(collectedContracts, block, goal);
+    }
+    
+    private static ImmutableSet<BlockContract> filterAppliedContracts(final ImmutableSet<BlockContract> collectedContracts,
+                                                                      final StatementBlock block,
+                                                                      final Goal goal)
+    {
+        ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
+        for (BlockContract contract : collectedContracts) {
+            if (!contractApplied(contract, goal)) {
+                result = result.add(contract);
+            };
         }
         return result;
     }
 
+    // This seems to be inefficient...
+    private static boolean contractApplied(final BlockContract contract,
+                                           final Goal goal)
+    {
+        Node selfOrParentNode = goal.node();
+        while (selfOrParentNode != null) {
+            RuleApp app = selfOrParentNode.getAppliedRuleApp();
+            if (app instanceof BlockContractBuiltInRuleApp) {
+                BlockContractBuiltInRuleApp blockRuleApp =
+                        (BlockContractBuiltInRuleApp)app;
+                if (blockRuleApp.getBlock().equals(contract.getBlock())) {
+                    return true;
+                };
+            }
+            selfOrParentNode = selfOrParentNode.parent();
+        }
+        return false;
+    }
+    
     private BlockContractRule() {
     }
 
@@ -78,11 +117,13 @@ public class BlockContractRule implements BuiltInRule {
         if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
-        final Instantiation instantiation = instantiate(occurrence.subTerm(), goal.proof().getServices());
+        final Instantiation instantiation =
+                instantiate(occurrence.subTerm(), goal, goal.proof().getServices());
         if (instantiation == null) {
             return false;
         }
-        final ImmutableSet<BlockContract> contracts = getApplicableContracts(instantiation, goal.proof().getServices());
+        final ImmutableSet<BlockContract> contracts =
+                getApplicableContracts(instantiation, goal, goal.proof().getServices());
         return !contracts.isEmpty();
     }
 
@@ -100,7 +141,8 @@ public class BlockContractRule implements BuiltInRule {
 
     private ImmutableList<Goal> apply(final Goal goal, final Services services, final BlockContractBuiltInRuleApp application) throws RuleAbortException
     {
-        final Instantiation instantiation = instantiate(application.posInOccurrence().subTerm(), services);
+        final Instantiation instantiation =
+                instantiate(application.posInOccurrence().subTerm(), goal, services);
         final BlockContract contract = application.getContract();
         assert contract.getBlock().equals(instantiation.block);
         final Term contextUpdate = instantiation.update;
@@ -223,11 +265,14 @@ public class BlockContractRule implements BuiltInRule {
     private static final class Instantiator {
 
         private final Term formula;
+        private final Goal goal;
         private final Services services;
 
-        public Instantiator(final Term formula, final Services services)
-        {
+        public Instantiator(final Term formula,
+                            final Goal goal,
+                            final Services services) {
             this.formula = formula;
+            this.goal = goal;
             this.services = services;
         }
 
@@ -239,7 +284,10 @@ public class BlockContractRule implements BuiltInRule {
                 return null;
             }
             final Modality modality = (Modality) target.op();
-            final StatementBlock block = getFirstBlockInPrefixWithAtLeastOneApplicableContract(modality, target.javaBlock());
+            final StatementBlock block =
+                    getFirstBlockInPrefixWithAtLeastOneApplicableContract(modality,
+                                                                          target.javaBlock(),
+                                                                          goal);
             if (block == null) {
                 return null;
             }
@@ -285,12 +333,14 @@ public class BlockContractRule implements BuiltInRule {
             return (ExecutionContext) frame.getExecutionContext();
         }
 
-        private StatementBlock getFirstBlockInPrefixWithAtLeastOneApplicableContract(final Modality modality, final JavaBlock java)
-        {
+        private StatementBlock getFirstBlockInPrefixWithAtLeastOneApplicableContract(final Modality modality,
+                                                                                     final JavaBlock java,
+                                                                                     final Goal goal) {
             SourceElement element = java.program().getFirstElement();
             while ((element instanceof ProgramPrefix || element instanceof CatchAllStatement)
                     && !(element instanceof StatementBlock && ((StatementBlock) element).isEmpty())) {
-                if (element instanceof StatementBlock && hasApplicableContracts((StatementBlock) element, modality)) {
+                if (element instanceof StatementBlock
+                        && hasApplicableContracts((StatementBlock) element, modality, goal)) {
                     return (StatementBlock) element;
                 }
                 else if (element instanceof StatementContainer) {
@@ -303,9 +353,11 @@ public class BlockContractRule implements BuiltInRule {
             return null;
         }
 
-        private boolean hasApplicableContracts(final StatementBlock block, final Modality modality)
-        {
-            return !getApplicableContracts(services.getSpecificationRepository(), block, modality).isEmpty();
+        private boolean hasApplicableContracts(final StatementBlock block,
+                                               final Modality modality,
+                                               Goal goal) {
+            return !getApplicableContracts(services.getSpecificationRepository(),
+                                           block, modality, goal).isEmpty();
         }
 
     }
