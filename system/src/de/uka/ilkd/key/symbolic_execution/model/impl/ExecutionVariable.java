@@ -129,12 +129,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
          }
       }
       else {
-         if (parentValue != null && parentValue.getVariable() != null) {
-            return parentValue.getVariable().getName() + "[" + arrayIndex + "]";
-         }
-         else {
-            return null;
-         }
+         return "[" + arrayIndex + "]";
       }
    }
 

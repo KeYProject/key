@@ -29,8 +29,8 @@
                      <value name="length {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <variable name="multiArray[0]" arrayIndex="0" isArrayIndex="true">
-                     <value name="multiArray[0] {  \exists int _var0;
+                  <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                     <value name="[0] {  \exists int _var0;
     (_var0 = 0 &amp; _var0 &gt;= 0 &amp; _var0 &lt;= 2)
 | !\exists int _var0;
      (_var0 = 0 &amp; _var0 &gt;= 0 &amp; _var0 &lt;= 2)
@@ -47,8 +47,8 @@
 &amp; !x_arr_arr_2[0] = null">
                      </value>
                   </variable>
-                  <variable name="multiArray[1]" arrayIndex="1" isArrayIndex="true">
-                     <value name="multiArray[1] {  \exists int _var0;
+                  <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                     <value name="[1] {  \exists int _var0;
     (_var0 = 1 &amp; _var0 &gt;= 0 &amp; _var0 &lt;= 2)
 | !\exists int _var0;
      (_var0 = 1 &amp; _var0 &gt;= 0 &amp; _var0 &lt;= 2)
@@ -172,8 +172,8 @@
                         <value name="length {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                         </value>
                      </variable>
-                     <variable name="multiArray[0]" arrayIndex="0" isArrayIndex="true">
-                        <value name="multiArray[0] {true}" typeString="int[]" valueString="x_arr_4" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                        <value name="[0] {true}" typeString="int[]" valueString="x_arr_4" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="length" arrayIndex="-1" isArrayIndex="false">
                               <value name="length {wellFormed(store(memset(store(store(store(create(heap,
                                                  x_arr_arr_2),
@@ -208,18 +208,18 @@
                  TRUE))">
                               </value>
                            </variable>
-                           <variable name="multiArray[0][0]" arrayIndex="0" isArrayIndex="true">
-                              <value name="multiArray[0][0] {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                              <value name="[0] {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
-                           <variable name="multiArray[0][1]" arrayIndex="1" isArrayIndex="true">
-                              <value name="multiArray[0][1] {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                              <value name="[1] {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
                            </variable>
                         </value>
                      </variable>
-                     <variable name="multiArray[1]" arrayIndex="1" isArrayIndex="true">
-                        <value name="multiArray[1] {  \exists int _var1;
+                     <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                        <value name="[1] {  \exists int _var1;
     (_var1 = 1 &amp; _var1 &gt;= 0 &amp; _var1 &lt;= 2)
 | !\exists int _var1;
      (_var1 = 1 &amp; _var1 &gt;= 0 &amp; _var1 &lt;= 2)
@@ -607,8 +607,8 @@
                            <value name="length {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="multiArray[0]" arrayIndex="0" isArrayIndex="true">
-                           <value name="multiArray[0] {true}" typeString="int[]" valueString="x_arr_4" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                           <value name="[0] {true}" typeString="int[]" valueString="x_arr_4" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="length" arrayIndex="-1" isArrayIndex="false">
                                  <value name="length {  wellFormed(store(memset(store(store(store(create(heap,
                                                    x_arr_arr_2),
@@ -731,18 +731,18 @@
                    x_arr_4))">
                                  </value>
                               </variable>
-                              <variable name="multiArray[0][0]" arrayIndex="0" isArrayIndex="true">
-                                 <value name="multiArray[0][0] {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                                 <value name="[0] {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <variable name="multiArray[0][1]" arrayIndex="1" isArrayIndex="true">
-                                 <value name="multiArray[0][1] {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                                 <value name="[1] {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
                         </variable>
-                        <variable name="multiArray[1]" arrayIndex="1" isArrayIndex="true">
-                           <value name="multiArray[1] {true}" typeString="int[]" valueString="x_arr_9" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                           <value name="[1] {true}" typeString="int[]" valueString="x_arr_9" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                               <variable name="length" arrayIndex="-1" isArrayIndex="false">
                                  <value name="length {  wellFormed(store(store(store(store(memset(store(store(store(create(store(memset(store(store(store(create(heap,
                                                                                                            x_arr_arr_2),
@@ -865,16 +865,16 @@
                    TRUE))">
                                  </value>
                               </variable>
-                              <variable name="multiArray[1][0]" arrayIndex="0" isArrayIndex="true">
-                                 <value name="multiArray[1][0] {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                                 <value name="[0] {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <variable name="multiArray[1][1]" arrayIndex="1" isArrayIndex="true">
-                                 <value name="multiArray[1][1] {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                                 <value name="[1] {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
-                              <variable name="multiArray[1][2]" arrayIndex="2" isArrayIndex="true">
-                                 <value name="multiArray[1][2] {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              <variable name="[2]" arrayIndex="2" isArrayIndex="true">
+                                 <value name="[2] {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                                  </value>
                               </variable>
                            </value>
