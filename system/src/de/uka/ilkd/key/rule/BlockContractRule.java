@@ -29,7 +29,7 @@ public class BlockContractRule implements BuiltInRule {
     public static final BlockContractRule INSTANCE = new BlockContractRule();
 
     private static final Name NAME = new Name("Block Contract");
-    private static final String ANONYMISATION_SUFFIX = "AnonBlock";
+    private static final String ANONYMISATION_PREFIX = "anon_";
     private static final TermBuilder TB = TermBuilder.DF;
 
     private static Term lastFocusTerm;
@@ -198,9 +198,10 @@ public class BlockContractRule implements BuiltInRule {
     {
         Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>();
         for (LocationVariable variable : variables) {
-            final String anonymisationName = TB.newName(services, variable.name() + ANONYMISATION_SUFFIX);
+            final String anonymisationName = TB.newName(services, ANONYMISATION_PREFIX + variable.name());
             final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort());
             services.getNamespaces().functions().addSafely(anonymisationFunction);
+            result.put(variable, anonymisationFunction);
         }
         return result;
     }
@@ -466,7 +467,7 @@ public class BlockContractRule implements BuiltInRule {
             Term result = skip();
             final Collection<LocationVariable> localOutVariables = variables.remembranceLocalVariables.keySet();
             for (LocationVariable variable : localOutVariables) {
-                final String anonymisationName = newName(variable.name() + ANONYMISATION_SUFFIX);
+                final String anonymisationName = newName(ANONYMISATION_PREFIX + variable.name());
                 final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort());
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 final Term elementaryUpdate = elementary(variable, func(anonymisationFunction));
