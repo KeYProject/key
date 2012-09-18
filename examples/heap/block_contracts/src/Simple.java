@@ -9,8 +9,7 @@ public class Simple {
       @ assignable \nothing;
       @*/
     public int addAbsoluteValues(int i, int j) {
-        /*@ ensures \old(i) <  0 ==> i == -\old(i);
-          @ ensures \old(i) >= 0 ==> i ==  \old(i);
+        /*@ ensures i >= 0 && (i == \old(i) || i == -\old(i));
           @ signals_only \nothing;
           @ assignable \nothing;
           @*/
@@ -18,8 +17,7 @@ public class Simple {
             if (i < 0) i = -i;
         }
         /*@ normal_behavior
-          @ ensures \old(j) <  0 ==> j == -\old(j);
-          @ ensures \old(j) >= 0 ==> j ==  \old(j);
+          @ ensures j >= 0 && (j == \old(j) || j == -\old(j));
           @ diverges false;
           @ assignable \nothing;
           @*/
