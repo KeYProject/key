@@ -1,7 +1,6 @@
 public class Simple {
 
-    // Automatically provable with block contracts on (except in validity goals of block contracts)
-    // and basic arithmetics.
+    // Automatically provable with block contracts on and basic arithmetics.
     /*@ public normal_behavior
       @ ensures i <  0 && j <  0 ==> \result == (-i) + (-j);
       @ ensures i <  0 && j >= 0 ==> \result == (-i) +   j;
@@ -31,7 +30,7 @@ public class Simple {
         return i + j;
     }
 
-    // Automatically provable with block contracts on (except in validity goals of block contracts),
+    // Automatically provable with block contracts on,
     // loop invariants on and basic arithmetics.
     /*@ requires x >= 0;
       @ ensures \result == x * x;
