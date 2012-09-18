@@ -524,9 +524,12 @@ public class BlockContractRule implements BuiltInRule {
 
         public Term buildReachableOutCondition(final ImmutableSet<ProgramVariable> localOutVariables)
         {
+            final Term reachableResult =
+                    (variables.result != null) ?
+                    reachableValue(variables.result) : TB.tt();
             return and(
                 buildReachableCondition(localOutVariables),
-                reachableValue(variables.result),
+                reachableResult,
                 reachableValue(variables.exception)
             );
         }
