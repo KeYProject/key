@@ -114,9 +114,9 @@ while [ $# -ne 0 ]; do
             shift
             continue;;
 
-        -*)  keysysprops="${keysysprops}${1} "
-            shift
-            continue;;
+#         -*)  keysysprops="${keysysprops}${1} "
+#             shift
+#             continue;;
 
         *)  break;;
     esac

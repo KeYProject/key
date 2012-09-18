@@ -81,7 +81,7 @@ public class BatchMode {
     /** 
      * used when in batch mode to write out some statistic data
      * @param file the String with the filename where to write the statistic data
-     * @param result the Object encapsulating informtation about the result, e.g.
+     * @param result the Object encapsulating information about the result, e.g.
      * String "Error" if an error has occurred. 
      * @param time the long giving the needed time in ms 
      * @param appliedRules the int giving the number of applied rules
