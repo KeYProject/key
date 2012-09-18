@@ -2,7 +2,9 @@
 // and adapted.
 public class GreatestCommonDivisor {
 
-    // Automatically provable with options: 'Block treatment': Contract; 'Arithmetic treatment': DefOps.
+    // Automatically provable with options:
+    //  'Block treatment': Contract;
+    //  'Arithmetic treatment': DefOps.
     /*@ public normal_behavior
       @ requires a != 0 || b != 0;
       @ ensures (a % \result == 0 && b % \result == 0 &&
