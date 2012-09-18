@@ -19,7 +19,6 @@ import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
@@ -110,7 +109,13 @@ public class EnhancedForElimination extends ProgramTransformer {
         Statement body = enhancedFor.getBody();
         
 
-        ProgramElement result = iterable(expression)? makeIterableForLoop(lvd, expression, body) : makeArrayForLoop(lvd, expression, body);
+        ProgramElement result;
+        if(iterable(expression)) {
+            result = makeIterableForLoop(lvd, expression, body);
+        } else {
+            result = makeArrayForLoop(lvd, expression, body);
+        }
+        
         return result;
     }
 
@@ -124,13 +129,16 @@ public class EnhancedForElimination extends ProgramTransformer {
     /** Transform an enhanced for-loop over an array to a regular for-loop. */
     private ProgramElement makeArrayForLoop(LocalVariableDeclaration lvd,
             Expression expression, Statement body) {
+        assert expression instanceof ReferencePrefix : ""+expression+" is not an arrray reference.";
+        // expected subtypes of ReferencePrefix are LocationVariable, VariableReference, etc.
+        final ReferencePrefix arrayVar = (ReferencePrefix) expression;
         final VariableNamer varNamer = services.getVariableNamer();
         final ProgramElementName itName = varNamer.getTemporaryNameProposal("i");
         final KeYJavaType intType = ji.getPrimitiveKeYJavaType("int");
         final ProgramVariable itVar = new LocationVariable(itName, intType);
 
         final ILoopInit inits = makeForInit(intType, itVar);
-        final IGuard guard = makeGuard(expression, itVar);
+        final IGuard guard = makeGuard(arrayVar, itVar);
         final IForUpdates updates = makeUpdates(itVar);
 
         // there may be only one variable iterated over (see Language Specification Sect. 14.14.2)
@@ -140,7 +148,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         final ProgramVariable lvdVar = (ProgramVariable)programVariable;
         final Statement declArrayElemVar = makeElemDecl(lvdVar);
 
-        final For forLoop = makeLoop(body, itVar, inits, guard, updates, expression,lvdVar);
+        final For forLoop = makeLoop(body, itVar, inits, guard, updates, arrayVar, lvdVar);
 
         // put everything together
         final Statement[] complete = {declArrayElemVar,forLoop};
@@ -160,13 +168,12 @@ public class EnhancedForElimination extends ProgramTransformer {
     /** Loop statement including assignment to the iterated element. */
     private For makeLoop(Statement body, ProgramVariable itVar,
             ILoopInit inits, IGuard guard, IForUpdates updates,
-            Expression array, ProgramVariable lvdVar) {
+            ReferencePrefix array, ProgramVariable lvdVar) {
         final Expression[] arrayAccess = {itVar};
-        final Expression nextElement = new ArrayReference(new PassiveExpression(array), arrayAccess);
-        final VariableReference lhs = new VariableReference(lvdVar);
-        final Statement getNextElement = new CopyAssignment(lhs, nextElement);
+        final Expression nextElement = new ArrayReference(array, arrayAccess);
+        final Statement getNextElement = new CopyAssignment(lvdVar, nextElement);
         final Statement[] newBlock = {getNextElement,body};
-        body = new StatementBlock(newBlock);      
+        body = new StatementBlock(newBlock);
         final For forLoop = new For(inits, guard, updates, body);
         return forLoop;
     }
@@ -179,8 +186,9 @@ public class EnhancedForElimination extends ProgramTransformer {
     }
 
     /** For-loop guard (i < a.length). */
-    private IGuard makeGuard(Expression expression, ProgramVariable itVar) {
-        final Expression lengthExpr = new ArrayLengthReference(new PassiveExpression(expression));
+    private IGuard makeGuard(ReferencePrefix expression, ProgramVariable itVar) {
+        final ProgramVariable length = ji.getArrayLength();
+        final Expression lengthExpr = new FieldReference(length,expression);
         final IGuard guard = new Guard(new LessThan(itVar,lengthExpr));
         return guard;
     }

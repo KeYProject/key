@@ -69,7 +69,7 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        Services services);
 
     public Term getPost(List<LocationVariable> heapContext,
-                        Term heapTerm,
+                        Map<LocationVariable,Term> heapTerms,
 	                Term selfTerm, 
 	    	        ImmutableList<Term> paramTerms, 
 	    	        Term resultTerm, 

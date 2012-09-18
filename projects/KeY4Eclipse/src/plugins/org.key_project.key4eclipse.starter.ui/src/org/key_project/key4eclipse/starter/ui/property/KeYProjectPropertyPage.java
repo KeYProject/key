@@ -476,7 +476,7 @@ public class KeYProjectPropertyPage extends PropertyPage implements IWorkbenchPr
                                                          "Select a file.", 
                                                          true, 
                                                          null,
-                                                         Collections.singleton(new FileExtensionViewerFilter(new String[] {"jar", "zip"})));
+                                                         Collections.singleton(new FileExtensionViewerFilter(false, new String[] {"jar", "zip"})));
         if (result != null) {
             List<KeYClassPathEntry> toSelect = new ArrayList<KeYClassPathEntry>(result.length);
             for (IFile file : result) {

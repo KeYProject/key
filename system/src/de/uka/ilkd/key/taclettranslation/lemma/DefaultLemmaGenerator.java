@@ -44,10 +44,6 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         // logical variable.
         private HashMap<SchemaVariable, Term> mapping = new HashMap<SchemaVariable, Term>();
        
-        
-
-        
-        
         @Override
         public TacletFormula translate(Taclet taclet, Services services) {
                 String result = checkTaclet(taclet);
@@ -65,8 +61,6 @@ class DefaultLemmaGenerator implements LemmaGenerator {
                 return new LemmaFormula(taclet, formula);
         }
         
-
-
         private Term replace(Taclet taclet, Term term, Services services) {
                 if (term.op() instanceof SchemaVariable) {
                         return getInstantiation(taclet,

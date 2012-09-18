@@ -166,9 +166,10 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                               ImmutableList<Goal> goals, 
                               boolean stepOver,
                               boolean stepReturn) {
+      Proof proof = environment.getBuilder().getProof();
       // Set strategy to use
       StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, true);
-      environment.getBuilder().getProof().setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(environment.getBuilder().getProof(), strategyProperties));
+      proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
       // Update stop condition
       CompoundStopCondition stopCondition = new CompoundStopCondition();
       stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));
@@ -178,9 +179,10 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       if (stepReturn) {
          stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
       }
-      environment.getBuilder().getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
+      proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
-      environment.getUi().startAutoMode(environment.getBuilder().getProof(), goals);
+      SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
+      environment.getUi().startAutoMode(proof, goals);
    }
 
    /**
@@ -238,19 +240,21 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     */
    @Override
    public void terminate() throws DebugException {
-      // Remove auto mode listener
-      environment.getBuilder().getMediator().removeAutoModeListener(autoModeListener);
-      // Suspend first to stop the automatic mode
-      if (!isSuspended()) {
-         suspend();
-         environment.getUi().waitWhileAutoMode();
+      if (!isTerminated()) {
+         // Remove auto mode listener
+         environment.getBuilder().getMediator().removeAutoModeListener(autoModeListener);
+         // Suspend first to stop the automatic mode
+         if (!isSuspended()) {
+            suspend();
+            environment.getUi().waitWhileAutoMode();
+         }
+         // Remove proof from user interface
+         environment.getUi().removeProof(environment.getProof());
+         // Clear cache
+         environment.getBuilder().dispose();
+         environment = null;
+         executionToDebugMapping.clear();
       }
-      // Remove proof from user interface
-      environment.getUi().removeProof(environment.getProof());
-      // Clear cache
-      environment.getBuilder().dispose();
-      environment = null;
-      executionToDebugMapping.clear();
       // Inform UI that the process is terminated
       super.terminate();
    }

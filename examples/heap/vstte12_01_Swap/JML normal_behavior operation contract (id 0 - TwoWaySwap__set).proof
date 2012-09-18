@@ -1,0 +1,115 @@
+\settings {
+"#Proof-Settings-Config-File
+#Wed Nov 09 11:04:21 CET 2011
+[SMTSettings]maxGenericSorts=2
+[SMTSettings]instantiateHierarchyAssumptions=true
+[SMTSettings]UseBuiltUniqueness=false
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[Strategy]Timeout=-1
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[Choice]DefaultChoices=assertions-assertions\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , initialisation-initialisation\\:disableStaticInitialisation , runtimeExceptions-runtimeExceptions\\:ban
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[View]HideIntermediateProofsteps=false
+[View]HideClosedSubtrees=false
+[General]UseOCL=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[View]ShowWholeTaclet=false
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]integersMinimum=-2147483645
+[General]StupidMode=true
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
+[General]OneStepSimplification=true
+[General]UseJML=true
+[SMTSettings]integersMaximum=2147483645
+[General]DnDDirectionSensitive=true
+[View]FontIndex=4
+[View]UseSystemLookAndFeel=false
+[SMTSettings]useUninterpretedMultiplication=true
+[Strategy]MaximumNumberOfAutomaticApplications=10000
+[View]MaxTooltipLines=40
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_NONE
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_INVARIANT
+[SMTSettings]explicitTypeHierarchy=false
+"
+}
+
+\javaSource ".";
+
+\chooseContract "JML normal_behavior operation contract [id: 0 / TwoWaySwap::set]";
+
+\proof {
+(keyLog "0" (keyUser "bubel" ) (keyVersion "90bb886cd7b78027c8f6703803461f09e5699bb9"))
+
+(autoModeTime "1143")
+
+(branch "dummy ID"
+(rule "impRight" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "3"))
+(rule "andLeft" (formula "1"))
+(rule "notLeft" (formula "5"))
+(rule "andLeft" (formula "1"))
+(rule "andLeft" (formula "1"))
+(rule "notLeft" (formula "2"))
+(rule "assignment" (formula "8") (term "1"))
+(builtin "One Step Simplification" (formula "8"))
+(rule "eqSymm" (formula "8") (term "1,0,0,1,0,1"))
+(rule "replace_known_right" (formula "4") (term "1") (ifseqformula "7"))
+(builtin "One Step Simplification" (formula "4"))
+(rule "elementOfSingleton" (formula "8") (term "0,0,0,0,1,0,1"))
+(rule "Class_invariant_axiom_for_TwoWaySwap" (formula "5") (inst "sk=sk_0") (ifseqformula "3"))
+(branch "Use Axiom"
+   (rule "notLeft" (formula "5"))
+   (rule "methodBodyExpand" (formula "8") (term "1") (newnames "heapBefore_set,savedHeapBefore_set"))
+   (builtin "One Step Simplification" (formula "8"))
+   (rule "assignment" (formula "8") (term "1"))
+   (builtin "One Step Simplification" (formula "8"))
+   (rule "methodCallEmpty" (formula "8") (term "1"))
+   (rule "tryEmpty" (formula "8") (term "1"))
+   (rule "emptyModality" (formula "8") (term "1"))
+   (builtin "One Step Simplification" (formula "8"))
+   (rule "eqSymm" (formula "8") (term "1,0,0,1"))
+   (rule "selectOfStore" (formula "8") (term "0,0,0"))
+   (builtin "One Step Simplification" (formula "8"))
+   (rule "castDel" (formula "8") (term "0,0,0"))
+   (builtin "One Step Simplification" (formula "8"))
+   (rule "selectOfStore" (formula "8") (term "0,1,0,0,1"))
+   (builtin "One Step Simplification" (formula "8"))
+   (rule "eqSymm" (formula "8") (term "1,0,0,1,0,0,1"))
+   (rule "eqSymm" (formula "8") (term "0,0,0,1,0,0,1"))
+   (rule "castDel" (formula "8") (term "1,0,1,0,0,1"))
+   (rule "Class_invariant_axiom_for_TwoWaySwap" (formula "8") (term "0") (inst "sk=sk_1") (ifseqformula "3"))
+   (branch "Use Axiom"
+      (rule "selectOfStore" (formula "8") (term "0,0,0"))
+      (builtin "One Step Simplification" (formula "8"))
+      (rule "castDel" (formula "8") (term "0,0,0"))
+      (rule "replace_known_right" (formula "8") (term "0,0") (ifseqformula "7"))
+      (builtin "One Step Simplification" (formula "8"))
+      (rule "allRight" (formula "8") (inst "sk=f_0"))
+      (rule "allRight" (formula "8") (inst "sk=o_0"))
+      (rule "orRight" (formula "8"))
+      (rule "orRight" (formula "8"))
+      (rule "replace_known_right" (formula "10") (term "0,0") (ifseqformula "8"))
+      (builtin "One Step Simplification" (formula "10"))
+      (rule "closeTrue" (formula "10"))
+   )
+   (branch "Show Axiom Satisfiability"
+      (builtin "One Step Simplification" (formula "8"))
+      (rule "closeTrue" (formula "8"))
+   )
+)
+(branch "Show Axiom Satisfiability"
+   (builtin "One Step Simplification" (formula "6"))
+   (rule "closeTrue" (formula "6"))
+)
+)
+
+}

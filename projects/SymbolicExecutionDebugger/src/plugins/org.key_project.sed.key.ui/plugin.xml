@@ -84,6 +84,26 @@
                       </test>
                    </with>
                 </and>
+                <with
+                      variable="selection">
+                   <and>
+                      <count
+                            value="1">
+                      </count>
+                      <iterate
+                            ifEmpty="false"
+                            operator="and">
+                         <instanceof
+                               value="org.eclipse.core.resources.IFile">
+                         </instanceof>
+                         <test
+                               forcePluginActivation="true"
+                               property="org.eclipse.core.resources.extension"
+                               value="proof">
+                         </test>
+                      </iterate>
+                   </and>
+                </with>
              </or>
           </enablement></contextualLaunch>
       </shortcut>

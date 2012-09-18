@@ -75,7 +75,7 @@ public interface Contract extends SpecificationElement {
 	    	       Services services);    
 
     public Term getPre(List<LocationVariable> heapContext,
-                       Term heapTerm,
+                       Map<LocationVariable,Term> heapTerms,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
