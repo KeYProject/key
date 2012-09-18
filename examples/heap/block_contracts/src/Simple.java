@@ -203,4 +203,33 @@ public class Simple {
         }
     }
 
+    
+    /*@ normal_behavior
+      @     ensures     \result != null;
+      @     ensures     \fresh(\result);
+      @     assignable  \nothing;
+      @*/
+    public byte[] generateByteArray() {
+        int len = getLength();
+        /*@ normal_behavior
+          @ ensures     len >= 0;
+          @ assignable  \nothing;
+          @*/
+        {len = (len < 0 ? 0 : len);}
+        byte[] array = null;
+        /*@ normal_behavior
+          @ ensures     array != null;
+          @ ensures     \fresh(array);
+          @ assignable  \nothing;
+          @*/
+        {array = new byte[len];}
+        return array;
+    }
+    
+    /*@ normal_behavior
+      @     assignable  \nothing;
+      @*/
+    private int getLength() {
+        return 17;
+    }
 }
