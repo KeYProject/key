@@ -4,16 +4,30 @@ import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICreateConnectionFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
+import org.eclipse.graphiti.features.IDeleteFeature;
+import org.eclipse.graphiti.features.IDirectEditingFeature;
+import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
 import org.eclipse.graphiti.features.IMoveShapeFeature;
+import org.eclipse.graphiti.features.IPasteFeature;
 import org.eclipse.graphiti.features.IReconnectionFeature;
+import org.eclipse.graphiti.features.IRemoveFeature;
 import org.eclipse.graphiti.features.IResizeShapeFeature;
+import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
+import org.eclipse.graphiti.features.context.ICustomContext;
+import org.eclipse.graphiti.features.context.IDeleteContext;
+import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
+import org.eclipse.graphiti.features.context.IPasteContext;
+import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.features.context.IReconnectionContext;
+import org.eclipse.graphiti.features.context.IRemoveContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
+import org.eclipse.graphiti.features.context.IUpdateContext;
+import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 import org.key_project.sed.ui.visualization.model.od.ODAssociation;
@@ -41,6 +55,11 @@ import org.key_project.sed.ui.visualization.object_diagram.feature.ValueResizeFe
  */
 public class ObjectDiagramFeatureProvider extends DefaultFeatureProvider {
    /**
+    * Indicates that the diagram is read-only or editable.
+    */
+   private boolean readOnly = false;
+   
+   /**
     * Constructor.
     * @param dtp The diagram type provider for that this {@link IFeatureProvider} is used.
     */
@@ -53,9 +72,14 @@ public class ObjectDiagramFeatureProvider extends DefaultFeatureProvider {
     */
    @Override
    public ICreateFeature[] getCreateFeatures() {
-      return new ICreateFeature[] { new StateCreateFeature(this),
-                                    new ObjectCreateFeature(this),
-                                    new ValueCreateFeature(this) };
+      if (!isReadOnly()) {
+         return new ICreateFeature[] { new StateCreateFeature(this),
+               new ObjectCreateFeature(this),
+               new ValueCreateFeature(this) };
+      }
+      else {
+         return new ICreateFeature[0];
+      }
    }
 
    /**
@@ -136,7 +160,12 @@ public class ObjectDiagramFeatureProvider extends DefaultFeatureProvider {
     */
    @Override
    public ICreateConnectionFeature[] getCreateConnectionFeatures() {
-      return new ICreateConnectionFeature[] { new AssociationCreateFeature(this) };
+      if (!isReadOnly()) {
+         return new ICreateConnectionFeature[] { new AssociationCreateFeature(this) };
+      }
+      else {
+         return new ICreateConnectionFeature[0];
+      }
    }
    
    /**
@@ -145,5 +174,107 @@ public class ObjectDiagramFeatureProvider extends DefaultFeatureProvider {
    @Override
    public IReconnectionFeature getReconnectionFeature(IReconnectionContext context) {
        return new AssociationReconnectionFeature(this);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDeleteFeature getDeleteFeature(IDeleteContext context) {
+      if (!isReadOnly()) {
+         return super.getDeleteFeature(context);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IRemoveFeature getRemoveFeature(IRemoveContext context) {
+      if (!isReadOnly()) {
+         return super.getRemoveFeature(context);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IUpdateFeature getUpdateFeature(IUpdateContext context) {
+      return null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ICustomFeature[] getCustomFeatures(ICustomContext context) {
+      if (!isReadOnly()) {
+         return super.getCustomFeatures(context);
+      }
+      else {
+         return new ICustomFeature[0];
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IPasteFeature getPasteFeature(IPasteContext context) {
+      if (!isReadOnly()) {
+         return super.getPasteFeature(context);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IDirectEditingFeature getDirectEditingFeature(IDirectEditingContext context) {
+      if (!isReadOnly()) {
+         return super.getDirectEditingFeature(context);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IFeature[] getDragAndDropFeatures(IPictogramElementContext context) {
+      if (!isReadOnly()) {
+         return super.getDragAndDropFeatures(context);
+      }
+      else {
+         return new IFeature[0];
+      }
+   }
+
+   /**
+    * Checks if the diagram is read-only or editable.
+    * @return {@code true} read-only, {@code false} editable.
+    */
+   public boolean isReadOnly() {
+      return readOnly;
+   }
+
+   /**
+    * Defines if the diagram is read-only or editable.
+    * @param readOnly {@code true} read-only, {@code false} editable.
+    */
+   public void setReadOnly(boolean readOnly) {
+      this.readOnly = readOnly;
    }
 }

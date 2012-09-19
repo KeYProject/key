@@ -2,7 +2,10 @@ package org.key_project.sed.ui.visualization.object_diagram.provider;
 
 import org.eclipse.graphiti.dt.AbstractDiagramTypeProvider;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.graphiti.tb.IToolBehaviorProvider;
+import org.key_project.sed.ui.visualization.object_diagram.editor.ReadonlyObjectDiagramEditor;
 
 /**
  * {@link IDiagramTypeProvider} specific implementation for object diagrams.
@@ -32,6 +35,22 @@ public class ObjectDiagramTypeProvider extends AbstractDiagramTypeProvider {
       super();
       setFeatureProvider(new ObjectDiagramFeatureProvider(this));
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void init(Diagram diagram, IDiagramEditor diagramEditor) {
+      // Make sure that the editor is compatible with this diagram
+      if (diagramEditor instanceof ReadonlyObjectDiagramEditor) {
+         getFeatureProvider().setReadOnly(true);
+         for (ObjectDiagramToolBehaviorProvider behaviorProvider : getAvailableToolBehaviorProviders()) {
+            behaviorProvider.setReadOnly(true);
+         }
+      }
+      // Initialize type provider
+      super.init(diagram, diagramEditor);
+   }
 
    /**
     * {@inheritDoc}
@@ -42,5 +61,13 @@ public class ObjectDiagramTypeProvider extends AbstractDiagramTypeProvider {
          toolBehaviorProviders = new ObjectDiagramToolBehaviorProvider[] {new ObjectDiagramToolBehaviorProvider(this)};
       }
       return toolBehaviorProviders;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ObjectDiagramFeatureProvider getFeatureProvider() {
+      return (ObjectDiagramFeatureProvider)super.getFeatureProvider();
    }
 }
