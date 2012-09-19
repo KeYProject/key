@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.PlatformUI;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.monkey.product.ui.model.MonKeYProof;
@@ -366,7 +367,7 @@ public class MonKeYComposite extends Composite {
         // Buttons
         Composite buttonComposite = new Composite(proofGroup, SWT.NONE);
         buttonComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        buttonComposite.setLayout(new GridLayout(5, false));
+        buttonComposite.setLayout(new GridLayout(6, false));
         Button openKeYButton = new Button(buttonComposite, SWT.PUSH);
         openKeYButton.setText("&Open KeY");
         openKeYButton.addSelectionListener(new SelectionAdapter() {
@@ -406,6 +407,14 @@ public class MonKeYComposite extends Composite {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 exportProofs();
+            }
+        });
+        Button helpButton = new Button(buttonComposite, SWT.PUSH);
+        helpButton.setText("&Help");
+        helpButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/org.key_project.monkey.help/help/tutorial/Tutorial.htm");
             }
         });
     }
