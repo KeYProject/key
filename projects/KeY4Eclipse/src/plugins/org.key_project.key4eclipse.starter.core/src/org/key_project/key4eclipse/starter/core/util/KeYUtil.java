@@ -578,32 +578,70 @@ public final class KeYUtil {
      * @param proof The {@link Proof} to close.
      * @param goals The {@link Goal}s to work with.
      */
-    public static void runProofInAutomaticModeWithoutResultDialog(Proof proof,
-                                                                  ImmutableList<Goal> goals) {
-       // Make sure that main window is available.
-       Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
-       MainWindow main = MainWindow.getInstance();
-       Assert.isNotNull(main, "KeY main window is not available.");
-       // Run proof
-       NotificationTask task = null;
+    public static void runProofInAutomaticModeWithoutResultDialog(final Proof proof,
+                                                                  final ImmutableList<Goal> goals) {
        try {
-          // Deactivate proof closed dialog
-          task = main.getNotificationManager().getNotificationTask(NotificationEventID.PROOF_CLOSED);
-          if (task != null) {
-             main.getNotificationManager().removeNotificationTask(task);
-          }
-          // Start interactive proof automatically
-          main.getMediator().setProof(proof);
-          main.getMediator().startAutoMode(goals);
-          // Wait for interactive prover
-          KeYUtil.waitWhileMainWindowIsFrozen(main);
+         runWithoutResultDialog(new IRunnableWithMainWindow() {
+             @Override
+             public void run(MainWindow main) {
+                // Start interactive proof automatically
+                main.getMediator().setProof(proof);
+                main.getMediator().startAutoMode(goals);
+                // Wait for interactive prover
+                KeYUtil.waitWhileMainWindowIsFrozen(main);
+             }
+          });
        }
-       finally {
-          if (task != null) {
-             main.getNotificationManager().addNotificationTask(task);
+       catch (Exception e) {
+          throw new RuntimeException(e); // Should never happen because run throws no exception
+       }
+    }
+    
+    /**
+     * Disables the result dialog of KeY's MainWindow, 
+     * executes the given {@link IRunnableWithMainWindow} and
+     * finally enables the result dialog again. 
+     * @param run The {@link IRunnableWithMainWindow} to execute.
+     * @throws Exception Occurred Exception.
+     */
+    public static void runWithoutResultDialog(IRunnableWithMainWindow run) throws Exception {
+       if (run != null) {
+          // Make sure that main window is available.
+          Assert.isTrue(MainWindow.hasInstance(), "KeY main window is not available.");
+          MainWindow main = MainWindow.getInstance();
+          Assert.isNotNull(main, "KeY main window is not available.");
+          // Run proof
+          NotificationTask task = null;
+          try {
+             // Deactivate proof closed dialog
+             task = main.getNotificationManager().getNotificationTask(NotificationEventID.PROOF_CLOSED);
+             if (task != null) {
+                main.getNotificationManager().removeNotificationTask(task);
+             }
+             // Execute runnable.
+             run.run(main);
+          }
+          finally {
+             if (task != null) {
+                main.getNotificationManager().addNotificationTask(task);
+             }
           }
        }
-    }  
+    }
+    
+    /**
+     * Implementation provides some code which should be executed via
+     * {@link KeYUtil#runWithoutResultDialog(IRunnableWithMainWindow)}.
+     * @author Martin Hentschel
+     */
+    public static interface IRunnableWithMainWindow {
+       /**
+        * The code to execute.
+        * @param main The {@link MainWindow} to use.
+        * @throws Exception Occurred Exception.
+        */
+       public void run(MainWindow main) throws Exception;
+    }
    
    /**
     * Checks if the {@link Proof} exists in the user interface.
