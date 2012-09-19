@@ -463,4 +463,12 @@ public class MonKeYProof extends Bean {
         }
       }
    }
+
+   /**
+    * Checks if the proof was reused or not.
+    * @return {@code true} proof was successfully reused, {@code false} proof reuse failed or was not tried.
+    */
+   public boolean isReused() {
+      return "Loaded Proof".equals(getReuseStatus());
+   }
 }
