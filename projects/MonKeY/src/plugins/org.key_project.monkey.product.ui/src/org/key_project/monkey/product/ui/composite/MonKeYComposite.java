@@ -564,13 +564,32 @@ public class MonKeYComposite extends Composite {
                 }
                 boolean goOn = true;
                 if (!existingFiles.isEmpty()) {
-                   goOn = MessageDialog.openQuestion(getShell(), "Replace existing files?", "Replace the following existing files?\n" + CollectionUtil.toString(existingFiles));
+                   goOn = MessageDialog.openQuestion(getShell(), "Replace existing files?", "Replace the following existing files?\n" + CollectionUtil.toString(existingFiles, ",\n"));
                 }
                 if (goOn) {
                    // Save proofs
-                   for (MonKeYProof proof : proofs) {
-                      proof.save(proofDirectory);
-                   }
+                   new AbstractKeYMainWindowJob("Saving proofs") {
+                      @Override
+                      protected IStatus run(IProgressMonitor monitor) {
+                          try {
+                              SWTUtil.checkCanceled(monitor);
+                              monitor.beginTask("Saving proofs", proofs.size());
+                              for (MonKeYProof proof : proofs) {
+                                 proof.save(proofDirectory);
+                              }
+                              return Status.OK_STATUS;
+                          }
+                          catch (OperationCanceledException e) {
+                              return Status.CANCEL_STATUS;
+                          }
+                          catch (Exception e) {
+                              return LogUtil.getLogger().createErrorStatus(e);
+                          }
+                          finally {
+                              monitor.done();
+                          }
+                      }
+                  }.schedule();
                 }
              }
           }
@@ -601,7 +620,7 @@ public class MonKeYComposite extends Composite {
                    protected IStatus run(IProgressMonitor monitor) {
                        try {
                            SWTUtil.checkCanceled(monitor);
-                           monitor.beginTask("Loading", proofs.size());
+                           monitor.beginTask("Loading proofs", proofs.size());
                            for (MonKeYProof proof : proofs) {
                               proof.loadProof(proofDirectory, bootClassPath);
                               monitor.worked(1);
