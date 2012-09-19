@@ -82,6 +82,7 @@ public final class ObjectDiagramStyleUtil {
          style = gaService.createStyle(getStyleForObject(diagram), STYLE_ID);
          // "overwrites" values from parent style
          style.setForeground(gaService.manageColor(diagram, OBJECT_TEXT_FOREGROUND));
+         style.setFont(GraphitiUtil.getDefaultFont(diagram));
       }
       return style;
    }
@@ -101,6 +102,7 @@ public final class ObjectDiagramStyleUtil {
          style = gaService.createStyle(getStyleForObject(diagram), STYLE_ID);
          // "overwrites" values from parent style
          style.setForeground(gaService.manageColor(diagram, VALUE_TEXT_FOREGROUND));
+         style.setFont(GraphitiUtil.getDefaultFont(diagram));
       }
       return style;
    }
@@ -119,6 +121,7 @@ public final class ObjectDiagramStyleUtil {
          IGaService gaService = Graphiti.getGaService();
          style = gaService.createStyle(getStyleForObject(diagram), STYLE_ID);
          // "overwrites" values from parent style
+         gaService.setRenderingStyle(style, PredefinedColoredAreas.getCopperWhiteGlossAdaptions());
          style.setForeground(gaService.manageColor(diagram, ASSOCIATION_FOREGROUND));
          style.setFont(GraphitiUtil.getDefaultFont(diagram));
       }
@@ -140,6 +143,7 @@ public final class ObjectDiagramStyleUtil {
          style = gaService.createStyle(getStyleForObject(diagram), STYLE_ID);
          // "overwrites" values from parent style
          style.setForeground(gaService.manageColor(diagram, ASSOCIATION_TEXT_FOREGROUND));
+         style.setFont(GraphitiUtil.getDefaultFont(diagram));
       }
       return style;
    }

@@ -1,15 +1,25 @@
 package org.key_project.sed.ui.visualization.util;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.TextUtilities;
 import org.eclipse.draw2d.geometry.Dimension;
+import org.eclipse.draw2d.geometry.Insets;
+import org.eclipse.draw2d.graph.CompoundDirectedGraph;
+import org.eclipse.draw2d.graph.CompoundDirectedGraphLayout;
+import org.eclipse.draw2d.graph.Edge;
+import org.eclipse.draw2d.graph.EdgeList;
+import org.eclipse.draw2d.graph.Node;
+import org.eclipse.draw2d.graph.NodeList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
@@ -17,14 +27,23 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.datatypes.IDimension;
+import org.eclipse.graphiti.datatypes.ILocation;
+import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.LayoutContext;
 import org.eclipse.graphiti.internal.datatypes.impl.DimensionImpl;
+import org.eclipse.graphiti.internal.datatypes.impl.LocationImpl;
 import org.eclipse.graphiti.internal.services.impl.GaServiceImpl;
 import org.eclipse.graphiti.mm.StyleContainer;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.styles.Font;
 import org.eclipse.graphiti.mm.algorithms.styles.Style;
+import org.eclipse.graphiti.mm.pictograms.Anchor;
+import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
+import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.ui.editor.DiagramEditorFactory;
@@ -283,5 +302,204 @@ public final class GraphitiUtil {
       else {
          return null;
       }
+   }
+
+   /**
+    * <p>
+    * Layouts the nodes and connections directly contained at top level 
+    * in the given {@link Diagram}.
+    * </p>
+    * <p>
+    * The code was copied from the Snippet of Graphiti's FAQ page:
+    * <a href="http://www.eclipse.org/graphiti/developers/resources/TutorialLayoutDiagramFeature.java">http://www.eclipse.org/graphiti/developers/resources/TutorialLayoutDiagramFeature.java</a>
+    * </p>
+    * @param fp The {@link IFeatureProvider} to use to layout resized elements.
+    * @param diagram The {@link Diagram} to layout.
+    * @param padding The padding to use, default is {@code 30}.
+    * @param eastDirectionInsteadOfSouth Layout to the east instead of south.
+    * @param allowResizing Allow resizing of elements?
+    * @param monitor The {@link IProgressMonitor} to use.
+    */
+   public static void layoutTopLevelElements(IFeatureProvider fp,
+                                             Diagram diagram, 
+                                             int padding, 
+                                             boolean eastDirectionInsteadOfSouth,
+                                             boolean allowResizing,
+                                             IProgressMonitor monitor) {
+      if (diagram != null) {
+         CompoundDirectedGraph graph = mapDiagramToGraph(diagram, monitor);
+         monitor.setTaskName("Executing GEF layouter.");
+         graph.setDefaultPadding(new Insets(padding));
+         graph.setDirection(eastDirectionInsteadOfSouth ? PositionConstants.EAST : PositionConstants.SOUTH);
+         new CompoundDirectedGraphLayout().visit(graph);
+         monitor.worked(1);
+         mapGraphCoordinatesToDiagram(fp, graph, allowResizing, monitor);
+         monitor.done();
+      }
+   }
+
+   /**
+    * <p>
+    * Utility method for {@link #layout(Diagram, int)} which maps the
+    * elements and connections of Graphiti's {@link Diagram} into
+    * a {@link CompoundDirectedGraph} of GEF.
+    * </p>
+    * <p>
+    * The code was copied from the Snippet of Graphiti's FAQ page:
+    * <a href="http://www.eclipse.org/graphiti/developers/resources/TutorialLayoutDiagramFeature.java">http://www.eclipse.org/graphiti/developers/resources/TutorialLayoutDiagramFeature.java</a>
+    * </p>
+    * @param diagram The {@link Diagram} to convert.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @return The result of the conversion.
+    */
+   @SuppressWarnings("unchecked")
+   private static CompoundDirectedGraph mapDiagramToGraph(Diagram diagram, 
+                                                          IProgressMonitor monitor) {
+      Map<AnchorContainer, Node> shapeToNode = new HashMap<AnchorContainer, Node>();
+      CompoundDirectedGraph dg = new CompoundDirectedGraph();
+      EdgeList edgeList = new EdgeList();
+      NodeList nodeList = new NodeList();
+      monitor.beginTask("Layouting diagram", edgeList.size() * 2 + nodeList.size() * 2 + 1);
+      monitor.setTaskName("Generating model for GEF layouter.");
+      List<Shape> children = diagram.getChildren();
+      for (Shape shape : children) {
+         Node node = new Node();
+         GraphicsAlgorithm ga = shape.getGraphicsAlgorithm();
+         node.x = ga.getX();
+         node.y = ga.getY();
+         node.width = ga.getWidth();
+         node.height = ga.getHeight();
+         node.data = shape;
+         shapeToNode.put(shape, node);
+         nodeList.add(node);
+         monitor.worked(1);
+      }
+      List<Connection> connections = diagram.getConnections();
+      for (Connection connection : connections) {
+         AnchorContainer source = connection.getStart().getParent();
+         AnchorContainer target = connection.getEnd().getParent();
+         Edge edge = new Edge(shapeToNode.get(source), shapeToNode.get(target));
+         edge.data = connection;
+         edgeList.add(edge);
+         monitor.worked(1);
+      }
+      dg.nodes = nodeList;
+      dg.edges = edgeList;
+      return dg;
+   }
+   
+   /**
+    * <p>
+    * Utility method for {@link #layout(Diagram, int)} which writes the
+    * coordinates of the given GEF {@link CompoundDirectedGraph}
+    * back to the elements and connections of Graphiti's {@link Diagram}.
+    * </p>
+    * <p>
+    * The code was copied from the Snippet of Graphiti's FAQ page:
+    * <a href="http://www.eclipse.org/graphiti/developers/resources/TutorialLayoutDiagramFeature.java">http://www.eclipse.org/graphiti/developers/resources/TutorialLayoutDiagramFeature.java</a>
+    * </p>
+    * @param fp The {@link IFeatureProvider} to use to layout resized elements.
+    * @param graph The {@link CompoundDirectedGraph} which provides the new location and sizes
+    * @param allowResizing Allow resizing of elements?
+    * @param monitor The {@link IProgressMonitor} to use.
+    */
+   @SuppressWarnings("unchecked")
+   private static void mapGraphCoordinatesToDiagram(IFeatureProvider fp,
+                                                    CompoundDirectedGraph graph, 
+                                                    boolean allowResizing,
+                                                    IProgressMonitor monitor) {
+      monitor.setTaskName("Updating diagram with data from GEF layouter.");
+      NodeList myNodes = new NodeList();
+      myNodes.addAll(graph.nodes);
+      myNodes.addAll(graph.subgraphs);
+      for (Object object : myNodes) {
+         Node node = (Node) object;
+         Shape shape = (Shape) node.data;
+         if (allowResizing) {
+            shape.getGraphicsAlgorithm().setX(node.x);
+            shape.getGraphicsAlgorithm().setY(node.y);
+            shape.getGraphicsAlgorithm().setWidth(node.width);
+            shape.getGraphicsAlgorithm().setHeight(node.height);
+            if (fp != null) {
+               fp.layoutIfPossible(new LayoutContext(shape));
+            }
+         }
+         else {
+            // Center element in suggested size
+            ILocation centered = center(new LocationImpl(node.x, node.y), 
+                                        shape.getGraphicsAlgorithm(), 
+                                        new LocationImpl(node.x + node.width, node.y + node.height));
+            shape.getGraphicsAlgorithm().setX(centered.getX());
+            shape.getGraphicsAlgorithm().setY(centered.getY());
+         }
+         monitor.worked(1);
+      }
+   }
+   
+   /**
+    * Returns the center location of the given {@link Anchor}'s parent.
+    * @param anchor The {@link Anchor} for which the center location is requested.
+    * @return The center location of {@link Anchor}'s parent or {@code null} if not available.
+    */
+   public static ILocation getCenterLocation(Anchor anchor) {
+      ILocation centerLocation = null;
+      ILocation location = getLocation(anchor);
+      if (location != null) {
+         IDimension dimension = getDimension(anchor);
+         if (dimension != null) {
+            centerLocation = new LocationImpl(location.getX() + dimension.getWidth() / 2,
+                                              location.getY() + dimension.getHeight() / 2);
+         }
+      }
+      return centerLocation;
+   }
+   
+   /**
+    * Returns the location of the given {@link Anchor}'s parent.
+    * @param anchor The {@link Anchor} for which the location is requested.
+    * @return The location of {@link Anchor}'s parent or {@code null} if not available.
+    */
+   public static ILocation getLocation(Anchor anchor) {
+      ILocation result = null;
+      if (anchor != null && anchor.getParent() != null) {
+         GraphicsAlgorithm ga = anchor.getParent().getGraphicsAlgorithm();
+         if (ga != null) {
+            result = new LocationImpl(ga.getX(), ga.getY());
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Returns the dimension of the given {@link Anchor}'s parent.
+    * @param anchor The {@link Anchor} for which the dimension is requested.
+    * @return The dimension of {@link Anchor}'s parent or {@code null} if not available.
+    */
+   public static IDimension getDimension(Anchor anchor) {
+      IDimension result = null;
+      if (anchor != null && anchor.getParent() != null) {
+         GraphicsAlgorithm ga = anchor.getParent().getGraphicsAlgorithm();
+         if (ga != null) {
+            result = new DimensionImpl(ga.getWidth(), ga.getHeight());
+         }
+      }
+      return result;
+   }
+
+   /**
+    * Computes an {@link ILocation} for the given {@link GraphicsAlgorithm}
+    * which centers it exactly between the given start and end {@link ILocation}.
+    * @param startLocation The start {@link ILocation}.
+    * @param ga The {@link GraphicsAlgorithm} to center between start and end {@link ILocation}.
+    * @param endLocation The end {@link ILocation}.
+    * @return The {@link ILocation} which centers the given {@link GraphicsAlgorithm} between start and end {@link ILocation} or {@code null} if not available.
+    */
+   public static ILocation center(ILocation startLocation, GraphicsAlgorithm ga, ILocation endLocation) {
+      ILocation result = null;
+      if (startLocation != null && ga != null && endLocation != null) {
+         result = new LocationImpl(((startLocation.getX() + endLocation.getX()) / 2) - (ga.getWidth() / 2),
+                                   ((startLocation.getY() + endLocation.getY()) / 2) - (ga.getHeight() / 2));
+      }
+      return result;
    }
 }

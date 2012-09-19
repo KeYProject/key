@@ -22,6 +22,7 @@ import org.key_project.sed.ui.visualization.model.od.ODState;
 import org.key_project.sed.ui.visualization.model.od.ODValue;
 import org.key_project.sed.ui.visualization.object_diagram.feature.AssociationAddFeature;
 import org.key_project.sed.ui.visualization.object_diagram.feature.AssociationCreateFeature;
+import org.key_project.sed.ui.visualization.object_diagram.feature.AssociationLayoutFeature;
 import org.key_project.sed.ui.visualization.object_diagram.feature.AssociationReconnectionFeature;
 import org.key_project.sed.ui.visualization.object_diagram.feature.ObjectAddFeature;
 import org.key_project.sed.ui.visualization.object_diagram.feature.ObjectCreateFeature;
@@ -91,6 +92,9 @@ public class ObjectDiagramFeatureProvider extends DefaultFeatureProvider {
       }
       else if (bo instanceof ODState) {
          return new StateLayoutFeature(this);
+      }
+      else if (bo instanceof ODAssociation) {
+         return new AssociationLayoutFeature(this);
       }
       else {
          return super.getLayoutFeature(context);

@@ -21,6 +21,7 @@ import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDValue;
@@ -107,6 +108,8 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
             if (model.getStates().isEmpty()) {
                // Create new model
                createState(model, node, monitor);
+               // Improve diagram layout
+               improveLayout(monitor);
             }
          }
       }
@@ -121,6 +124,13 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
       }
    }
 
+   /**
+    * Creates the {@link ODState}.
+    * @param model The {@link ODModel} to fill.
+    * @param node The {@link ISEDDebugNode} to visualize its state. 
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @throws DebugException Occurred Exception.
+    */
    protected void createState(ODModel model, ISEDDebugNode node, IProgressMonitor monitor) throws DebugException {
       monitor.beginTask("Generating model and diagram.", IProgressMonitor.UNKNOWN);
       // Create sate
@@ -135,25 +145,34 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
          IVariable[] variables = frame.getVariables();
          List<IVariable> objectVariables = fillValueContainer(variables, state, monitor);
          // Create state's PictogramElement
-         PictogramElement statePE = addNodeToDiagram(state, 0, 0, 100, 100);
+         PictogramElement statePE = addNodeToDiagram(state, 0, 0);
          // Instantiate child objects
          Map<String, PictogramElement> existingObjectsMap = new HashMap<String, PictogramElement>();
          analyzeVariables(objectVariables, 
                           state, 
                           statePE,
                           model, 
-                          statePE.getGraphicsAlgorithm().getWidth() + HORIZONTAL_OFFSET_BETWEEN_OBJECTS,
                           statePE.getGraphicsAlgorithm().getY(),
                           existingObjectsMap,
                           monitor);
       }
       else {
          // Create state's PictogramElement
-         addNodeToDiagram(state, 0, 0, 100, 100);
+         addNodeToDiagram(state, 0, 0);
       }
       monitor.done();
    }
    
+   /**
+    * Fills the given {@link AbstractODValueContainer} with the content
+    * of {@link IVariable} which represents no object. {@link IVariable} which
+    * represents objects are collected and returned as result.
+    * @param variables The {@link IVariable}s to analyze.
+    * @param toFill The {@link AbstractODValueContainer} to fill.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @return Skipped {@link IVariable}s which represents objects.
+    * @throws DebugException Occurred Exception.
+    */
    protected List<IVariable> fillValueContainer(IVariable[] variables, 
                                                 AbstractODValueContainer toFill,
                                                 IProgressMonitor monitor) throws DebugException {
@@ -179,6 +198,13 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
       return objectVariables;
    }
    
+   /**
+    * Creates an {@link ODValue} with the content provided by the given {@link IVariable}.
+    * @param variable The {@link IVariable} which provides the content.
+    * @param toFill The parent {@link AbstractODValueContainer} to add new {@link ODValue} to.
+    * @return The created {@link ODValue}.
+    * @throws DebugException Occurred Exception.
+    */
    protected ODValue createValue(IVariable variable, AbstractODValueContainer toFill) throws DebugException {
       if (!isObject(variable)) {
          ODValue value = ODFactory.eINSTANCE.createODValue();
@@ -193,16 +219,28 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
       }
    }
    
+   /**
+    * Iterates recursive over the given {@link IVariable}s which represents
+    * objects and adds them to the {@link Diagram}. This method visualizes
+    * on this way the complete visible heap.
+    * @param objectVariables The {@link IVariable} which represents objects to instantiate {@link ODObject}s for.
+    * @param toFill The parent {@link AbstractODValueContainer} to fill with {@link ODAssociation}s.
+    * @param toFillPE The graphical representation of the parent {@link AbstractODValueContainer}.
+    * @param model The {@link ODModel} to fill.
+    * @param yForNewObjects The y coordinate for new objects.
+    * @param existingObjectsMap A map which contains already visualized {@link ODObject}s.
+    * @param monitor The {@link IProgressMonitor} to use.
+    * @return The y coordinate for new child objects.
+    * @throws DebugException Occurred Exception.
+    */
    protected int analyzeVariables(List<IVariable> objectVariables, 
                                   AbstractODValueContainer toFill, 
                                   PictogramElement toFillPE,
-                                  ODModel model, 
-                                  int xForNewObjects,
+                                  ODModel model,
                                   int yForNewObjects,
                                   Map<String, PictogramElement> existingObjectsMap,
                                   IProgressMonitor monitor) throws DebugException {
       int y = yForNewObjects;
-      int maxWidth = 0;
       for (IVariable variable : objectVariables) {
          SWTUtil.checkCanceled(monitor);
          // Create object
@@ -212,7 +250,7 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
             PictogramElement objectPE = existingObjectsMap.get(objectName);
             if (objectPE != null) {
                // Create association
-               createAssociation(toFill, toFillPE, variable, (ODObject)getBusinessObjectForPictogramElement(objectPE), objectPE);
+               createAssociation(toFill, toFillPE, variable.getName(), (ODObject)getBusinessObjectForPictogramElement(objectPE), objectPE);
             }
             else {
                ODObject object = ODFactory.eINSTANCE.createODObject();
@@ -224,23 +262,17 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
                List<IVariable> childObjectVariables = fillValueContainer(variable.getValue().getVariables(), object, monitor);
                // Create object's PictogramElement
                objectPE = addNodeToDiagram(object, 
-                                           xForNewObjects, 
-                                           y, 
-                                           100, 
-                                           100);
+                                           toFillPE.getGraphicsAlgorithm().getX() + toFillPE.getGraphicsAlgorithm().getWidth() + HORIZONTAL_OFFSET_BETWEEN_OBJECTS, 
+                                           y);
                existingObjectsMap.put(objectName, objectPE);
                y += objectPE.getGraphicsAlgorithm().getHeight() + VERTICAL_OFFSET_BETWEEN_OBJECTS;
-               if (objectPE.getGraphicsAlgorithm().getWidth() > maxWidth) {
-                  maxWidth = objectPE.getGraphicsAlgorithm().getWidth();
-               }
                // Create association
-               createAssociation(toFill, toFillPE, variable, object, objectPE);
+               createAssociation(toFill, toFillPE, variable.getName(), object, objectPE);
                // Instantiate child objects
                int maxYChildren = analyzeVariables(childObjectVariables, 
                                                    object, 
                                                    objectPE,
                                                    model, 
-                                                   xForNewObjects + maxWidth + HORIZONTAL_OFFSET_BETWEEN_OBJECTS, 
                                                    objectPE.getGraphicsAlgorithm().getY(),
                                                    existingObjectsMap,
                                                    monitor);
@@ -258,21 +290,21 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
     * Creates a new {@link ODAssociation} and adds it to the diagram.
     * @param toFill The {@link AbstractODValueContainer} to fill.
     * @param toFillPE The {@link PictogramElement} of the {@link AbstractODValueContainer}.
-    * @param variable The {@link IVariable} to represent as {@link ODAssociation}.
+    * @param associationName The The name of the association.
     * @param object The target {@link ODObject}.
     * @param objectPE The {@link PictogramElement} of the target {@link ODObject}.
-    * @throws DebugException Occurred Exception.
     */
-   protected void createAssociation(AbstractODValueContainer toFill, 
-                                    PictogramElement toFillPE, 
-                                    IVariable variable, 
-                                    ODObject object,
-                                    PictogramElement objectPE) throws DebugException {
+   protected PictogramElement createAssociation(AbstractODValueContainer toFill, 
+                                                PictogramElement toFillPE, 
+                                                String associationName, 
+                                                ODObject object,
+                                                PictogramElement objectPE) {
       ODAssociation association = ODFactory.eINSTANCE.createODAssociation();
-      association.setName(variable.getName());
+      association.setName(associationName);
       association.setTarget(object);
       toFill.getAssociations().add(association);
-      addConnectionToDiagram(association, toFillPE, objectPE);
+      PictogramElement associationPE = addConnectionToDiagram(association, toFillPE, objectPE);
+      return associationPE;
    }
    
    /**
@@ -302,15 +334,12 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
     * @param bo The business object to add.
     * @param x The x coordinate.
     * @param y The y coordinate.
-    * @param width The width of the graphical representation.
-    * @param height The height of the graphical representation.
     * @return The created {@link PictogramElement}.
     */
-   protected PictogramElement addNodeToDiagram(Object bo, int x, int y, int width, int height) {
+   protected PictogramElement addNodeToDiagram(Object bo, int x, int y) {
       AddContext context = new AddContext(new AreaContext(), bo);
       context.setTargetContainer(getDiagram());
       context.setLocation(x, y);
-      context.setSize(width, height);
       context.putProperty(AbstractODValueContainerAddFeature.PROPERTY_UPDATE_SIZE, Boolean.TRUE);
       return getFeatureProvider().addIfPossible(context);
    }
@@ -330,5 +359,13 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
       AddConnectionContext context = new AddConnectionContext(sourceAnchor, targetAnchor);
       context.setNewObject(bo);
       return getFeatureProvider().addIfPossible(context);
+   }
+
+   /**
+    * Improves the layout of the {@link Diagram}.
+    * @param monitor The {@link IProgressMonitor} to use.
+    */
+   protected void improveLayout(IProgressMonitor monitor) {
+      GraphitiUtil.layoutTopLevelElements(getFeatureProvider(), getDiagram(), 30, true, false, monitor);
    }
 }

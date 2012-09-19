@@ -1,6 +1,7 @@
 package org.key_project.sed.ui.visualization.object_diagram.feature;
 
 import org.eclipse.graphiti.datatypes.IDimension;
+import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
@@ -8,9 +9,13 @@ import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddFeature;
 import org.eclipse.graphiti.mm.GraphicsAlgorithmContainer;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
+import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
+import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
+import org.eclipse.graphiti.mm.pictograms.ChopboxAnchor;
 import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
+import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
@@ -24,6 +29,11 @@ import org.key_project.sed.ui.visualization.util.GraphitiUtil;
  * @author Martin Hentschel
  */
 public class AssociationAddFeature extends AbstractAddFeature {
+   /**
+    * The margin used in the text label.
+    */
+   public static final int LABEL_MARGIN = 5;
+
    /**
     * Constructor.
     * @param fp The {@link IFeatureProvider} which provides this {@link IAddFeature}.
@@ -55,38 +65,56 @@ public class AssociationAddFeature extends AbstractAddFeature {
       IAddConnectionContext addConContext = (IAddConnectionContext) context;
       ODAssociation addedAssociation = (ODAssociation)context.getNewObject();
       IPeCreateService peCreateService = Graphiti.getPeCreateService();
-
-      // CONNECTION WITH POLYLINE
-      Connection connection = peCreateService.createFreeFormConnection(getDiagram());
-      connection.setStart(addConContext.getSourceAnchor());
-      connection.setEnd(addConContext.getTargetAnchor());
-
       IGaService gaService = Graphiti.getGaService();
-      Polyline polyline = gaService.createPolyline(connection);
-      polyline.setStyle(ObjectDiagramStyleUtil.getStyleForAssociation(getDiagram()));
 
-      // create link and wire it
-      link(connection, addedAssociation);
-
-      // add dynamic text decorator for the association name
-      ConnectionDecorator textDecorator = peCreateService.createConnectionDecorator(connection, true, 0.5, true);
-      Text text = gaService.createDefaultText(getDiagram(), textDecorator, addedAssociation.getName());
+      ContainerShape containerShape = peCreateService.createContainerShape(getDiagram(), true);
+      // create and set graphics algorithm
+      Rectangle rectangle = gaService.createRectangle(containerShape);
+      rectangle.setStyle(ObjectDiagramStyleUtil.getStyleForAssociation(getDiagram()));
+      Text text = gaService.createDefaultText(getDiagram(), rectangle, addedAssociation.getName());
+      text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
       text.setStyle(ObjectDiagramStyleUtil.getStyleForAssociationText(getDiagram()));
       IDimension textDimension = GraphitiUtil.calculateTextSize(text.getValue(), gaService.getFont(text, true));
-      if (textDimension != null) {
-         gaService.setLocationAndSize(text, 0, 0, textDimension.getWidth(), textDimension.getHeight());
-      }
-      else {
-         gaService.setLocation(text, 0, 0);
-      }
-      // set reference name in the text decorator
-      link(text.getPictogramElement(), addedAssociation);
+      gaService.setLocationAndSize(text, 0, 0, LABEL_MARGIN + textDimension.getWidth() + LABEL_MARGIN, textDimension.getHeight());
+      // center rectangle in the middle of start and end anchor
+      gaService.setSize(rectangle, text.getWidth(), text.getHeight());
+      ILocation startLocation = GraphitiUtil.getCenterLocation(addConContext.getSourceAnchor());
+      ILocation endLocation = GraphitiUtil.getCenterLocation(addConContext.getTargetAnchor());
+      ILocation centeredLocation =  GraphitiUtil.center(startLocation, rectangle, endLocation);
+      gaService.setLocation(rectangle, centeredLocation.getX(), centeredLocation.getY());
+      // create link and wire it
+      link(containerShape, addedAssociation);
+      ChopboxAnchor containerAnchor = peCreateService.createChopboxAnchor(containerShape);
+      
+      
+      // START CONNECTION WITH POLYLINE
+      Connection startConnection = peCreateService.createFreeFormConnection(getDiagram());
+      startConnection.setStart(addConContext.getSourceAnchor());
+      startConnection.setEnd(containerAnchor);
 
+      Polyline startPolyline = gaService.createPolyline(startConnection);
+      startPolyline.setStyle(ObjectDiagramStyleUtil.getStyleForAssociation(getDiagram()));
+
+      // create link and wire it
+      link(startConnection, addedAssociation);
+      
+      
+      // END CONNECTION WITH POLYLINE
+      Connection endConnection = peCreateService.createFreeFormConnection(getDiagram());
+      endConnection.setStart(containerAnchor);
+      endConnection.setEnd(addConContext.getTargetAnchor());
+
+      Polyline endPolyline = gaService.createPolyline(endConnection);
+      endPolyline.setStyle(ObjectDiagramStyleUtil.getStyleForAssociation(getDiagram()));
+
+      // create link and wire it
+      link(endConnection, addedAssociation);
+      
       // add static graphical decorator (composition and navigable)
-      ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);
+      ConnectionDecorator cd = peCreateService.createConnectionDecorator(endConnection, false, 1.0, true);
       createArrow(cd);
       
-      return connection;
+      return null;
    }
    
    /**
