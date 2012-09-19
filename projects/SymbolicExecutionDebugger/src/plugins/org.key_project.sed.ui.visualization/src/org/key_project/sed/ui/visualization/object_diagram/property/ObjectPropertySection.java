@@ -40,7 +40,7 @@ public class ObjectPropertySection extends AbstractObjectDiagramPropertySection<
       
       Composite composite = factory.createFlatFormComposite(parent);
 
-      nameText = factory.createText(composite, StringUtil.EMPTY_STRING);
+      nameText = factory.createText(composite, StringUtil.EMPTY_STRING, SWT.MULTI);
       nameText.setEditable(false);
       FormData data = new FormData();
       data.left = new FormAttachment(0, AbstractPropertySection.STANDARD_LABEL_WIDTH);
@@ -52,7 +52,7 @@ public class ObjectPropertySection extends AbstractObjectDiagramPropertySection<
       data = new FormData();
       data.left = new FormAttachment(0, 0);
       data.right = new FormAttachment(nameText, -ITabbedPropertyConstants.HSPACE);
-      data.top = new FormAttachment(nameText, 0, SWT.CENTER);
+      data.top = new FormAttachment(nameText, 0, SWT.TOP);
       nameLabel.setLayoutData(data);
 
       typeText = factory.createText(composite, StringUtil.EMPTY_STRING);
