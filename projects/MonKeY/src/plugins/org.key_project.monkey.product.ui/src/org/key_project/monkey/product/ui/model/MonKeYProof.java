@@ -25,6 +25,7 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Represents a MonKeY proof which simplifies the automation of
@@ -370,9 +371,12 @@ public class MonKeYProof extends Bean {
     * Returns a unique file name in which this proof should be saved.
     * @return The unique file name to save proof in or {@code null} if no proof is already instantiated.
     */
-   public String getProofFileName() {
-      return getTypeName() + "_" + getTargetName() + "_" + getContractName() + "." + KeYUtil.PROOF_FILE_EXTENSION;
-   }
+    public String getProofFileName() {
+        String name = contract.getName().toString() + "." + KeYUtil.PROOF_FILE_EXTENSION;
+        return MiscTools.toValidFileName(name);
+        // return getTypeName() + "_" + getTargetName() + "_" +
+        // getContractName() + "." + KeYUtil.PROOF_FILE_EXTENSION;
+    }
 
    /**
     * Checks if a proof instance in KeY is available.
