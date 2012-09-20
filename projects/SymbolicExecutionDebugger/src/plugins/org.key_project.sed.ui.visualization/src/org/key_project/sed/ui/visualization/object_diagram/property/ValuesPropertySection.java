@@ -1,5 +1,10 @@
 package org.key_project.sed.ui.visualization.object_diagram.property;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -13,11 +18,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.ISection;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.key_project.sed.ui.visualization.model.od.AbstractODValueContainer;
+import org.key_project.sed.ui.visualization.model.od.ODAssociation;
 import org.key_project.sed.ui.visualization.model.od.ODValue;
+import org.key_project.sed.ui.visualization.object_diagram.provider.IObjectDiagramImageConstants;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
- * {@link ISection} implementation to show properties of {@link AbstractODValueContainer}s.
+ * {@link ISection} implementation to show values and association of {@link AbstractODValueContainer}s.
  * @author Martin Hentschel
  */
 public class ValuesPropertySection extends AbstractObjectDiagramPropertySection<AbstractODValueContainer> {
@@ -64,6 +71,14 @@ public class ValuesPropertySection extends AbstractObjectDiagramPropertySection<
                   default : return null;
                }
             }
+            else if (element instanceof ODAssociation) {
+               switch (columnIndex) {
+                  case 0 : return ((ODAssociation)element).getName();
+                  case 1 : return ((ODAssociation)element).getTarget().getName();
+                  case 2 : return ((ODAssociation)element).getTarget().getType();
+                  default : return null;
+               }
+            }
             else {
                return null;
             }
@@ -71,7 +86,20 @@ public class ValuesPropertySection extends AbstractObjectDiagramPropertySection<
          
          @Override
          public Image getColumnImage(Object element, int columnIndex) {
-            return null;
+            if (columnIndex == 0) {
+               if (element instanceof ODValue) {
+                  return GraphitiUi.getImageService().getImageForId(IObjectDiagramImageConstants.IMG_VALUE);
+               }
+               else if (element instanceof ODAssociation) {
+                  return GraphitiUi.getImageService().getImageForId(IObjectDiagramImageConstants.IMG_ASSOCIATION);
+               }
+               else {
+                  return null;
+               }
+            }
+            else {
+               return null;
+            }
          }
          
          @Override
@@ -100,7 +128,10 @@ public class ValuesPropertySection extends AbstractObjectDiagramPropertySection<
     */
    @Override
    public void refresh() {
-      viewer.setInput(getBusinessObject().getValues());
+      List<EObject> input = new LinkedList<EObject>();
+      input.addAll(getBusinessObject().getValues());
+      input.addAll(getBusinessObject().getAssociations());
+      viewer.setInput(input);
    }
 
    /**
