@@ -107,9 +107,11 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
             // Make sure that the model was not already generated
             if (model.getStates().isEmpty()) {
                // Create new model
-               createState(model, node, monitor);
+               PictogramElement statePE = createState(model, node, monitor);
                // Improve diagram layout
                improveLayout(monitor);
+               // Select statePE
+               GraphitiUtil.select(getFeatureProvider(), statePE);
             }
          }
       }
@@ -129,9 +131,10 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
     * @param model The {@link ODModel} to fill.
     * @param node The {@link ISEDDebugNode} to visualize its state. 
     * @param monitor The {@link IProgressMonitor} to use.
+    * @return The {@link PictogramElement} of the created state.
     * @throws DebugException Occurred Exception.
     */
-   protected void createState(ODModel model, ISEDDebugNode node, IProgressMonitor monitor) throws DebugException {
+   protected PictogramElement createState(ODModel model, ISEDDebugNode node, IProgressMonitor monitor) throws DebugException {
       monitor.beginTask("Generating model and diagram.", IProgressMonitor.UNKNOWN);
       // Create sate
       ODState state = ODFactory.eINSTANCE.createODState();
@@ -139,13 +142,14 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
       model.getStates().add(state);
       monitor.subTask(state.getName());
       // Fill state and instantiate objects
+      PictogramElement statePE;
       if (node instanceof IStackFrame) {
          // Add values to state
          IStackFrame frame = (IStackFrame)node;
          IVariable[] variables = frame.getVariables();
          List<IVariable> objectVariables = fillValueContainer(variables, state, monitor);
          // Create state's PictogramElement
-         PictogramElement statePE = addNodeToDiagram(state, 0, 0);
+         statePE = addNodeToDiagram(state, 0, 0);
          // Instantiate child objects
          Map<String, PictogramElement> existingObjectsMap = new HashMap<String, PictogramElement>();
          analyzeVariables(objectVariables, 
@@ -158,9 +162,10 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
       }
       else {
          // Create state's PictogramElement
-         addNodeToDiagram(state, 0, 0);
+         statePE = addNodeToDiagram(state, 0, 0);
       }
       monitor.done();
+      return statePE;
    }
    
    /**

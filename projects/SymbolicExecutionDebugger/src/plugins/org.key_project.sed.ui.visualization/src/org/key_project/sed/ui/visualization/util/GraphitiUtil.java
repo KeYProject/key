@@ -28,6 +28,7 @@ import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.datatypes.IDimension;
 import org.eclipse.graphiti.datatypes.ILocation;
+import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.impl.LayoutContext;
@@ -44,6 +45,7 @@ import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
+import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.ui.editor.DiagramEditorFactory;
@@ -501,5 +503,22 @@ public final class GraphitiUtil {
                                    ((startLocation.getY() + endLocation.getY()) / 2) - (ga.getHeight() / 2));
       }
       return result;
+   }
+
+   /**
+    * Selects the given {@link PictogramElement} in the editor if available.
+    * @param featureProvider The {@link IFeatureProvider} used to find the editor.
+    * @param pe The {@link PictogramElement} to select.
+    */
+   public static void select(IFeatureProvider featureProvider, PictogramElement pe) {
+      if (featureProvider != null) {
+         IDiagramTypeProvider typeProvider = featureProvider.getDiagramTypeProvider(); 
+         if (typeProvider != null) {
+            IDiagramEditor editor = typeProvider.getDiagramEditor();
+            if (editor != null) {
+               editor.setPictogramElementForSelection(pe);
+            }
+         }
+      }
    }
 }
