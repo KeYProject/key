@@ -457,7 +457,7 @@ public class MonKeYProof extends Bean {
         proofStartTime = System.currentTimeMillis();
         SwingUtil.invokeAndWait(run);
         if (run.getException() != null) {
-            setReuseStatus(run.getException().toString());
+            setReuseStatus(run.getException().getMessage());
         }
         else {
            setReuseStatus("Loaded Proof");
