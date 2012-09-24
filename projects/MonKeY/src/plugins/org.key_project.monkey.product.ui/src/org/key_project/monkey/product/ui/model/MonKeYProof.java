@@ -460,9 +460,19 @@ public class MonKeYProof extends Bean {
             setReuseStatus(run.getException().getMessage());
         }
         else {
-           setReuseStatus("Loaded Proof");
-           setResult(MonKeYProofResult.CLOSED);
            proof = run.getResult();
+           setReuseStatus("Loaded Proof");
+           if(proof.closed()) {
+               setResult(MonKeYProofResult.CLOSED);
+           } else {
+               setResult(MonKeYProofResult.OPEN);
+               proof.addProofTreeListener(new ProofTreeAdapter() {
+                   @Override
+                   public void proofClosed(ProofTreeEvent e) {
+                       handleProofClosed(e);
+                   }
+               });
+           }
            updateStatistics();
         }
       }

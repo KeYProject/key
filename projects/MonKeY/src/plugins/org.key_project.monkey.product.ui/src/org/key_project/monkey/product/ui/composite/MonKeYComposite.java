@@ -2,6 +2,7 @@ package org.key_project.monkey.product.ui.composite;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -377,7 +379,7 @@ public class MonKeYComposite extends Composite {
             }
         });
         Button loadProofsButton = new Button(buttonComposite, SWT.PUSH);
-        loadProofsButton.setText("L&oad Proofs");
+        loadProofsButton.setText("L&oad selected Proofs");
         loadProofsButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -385,7 +387,7 @@ public class MonKeYComposite extends Composite {
             }
         });
         Button startProofsButton = new Button(buttonComposite, SWT.PUSH);
-        startProofsButton.setText("&Start all proofs");
+        startProofsButton.setText("&Start selected proofs");
         startProofsButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         startProofsButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -394,7 +396,7 @@ public class MonKeYComposite extends Composite {
             }
         });
         Button saveProofsButton = new Button(buttonComposite, SWT.PUSH);
-        saveProofsButton.setText("Sa&ve Proofs");
+        saveProofsButton.setText("Sa&ve selected Proofs");
         saveProofsButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -510,7 +512,9 @@ public class MonKeYComposite extends Composite {
     public void startProofs() {
         if (proofViewer.getInput() instanceof List<?>) {
             setProofSearchStrategyOptionsEnabled(false);
-            final List<?> input = (List<?>)proofViewer.getInput();
+            // Get selected proofs
+            final IStructuredSelection selection = (IStructuredSelection)proofViewer.getSelection();
+            // Get strategy properties
             final boolean expandMethods = methodTreatmentExpandButton.getSelection();
             final boolean useDependencyContracts = dependencyContractsOnButton.getSelection();
             final boolean useQuery = queryTreatmentOnButton.getSelection();
@@ -520,9 +524,11 @@ public class MonKeYComposite extends Composite {
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
                         SWTUtil.checkCanceled(monitor);
-                        monitor.beginTask("Proving", input.size());
-                        for (Object obj : input) {
+                        monitor.beginTask("Proving", selection.size());
+                        Iterator<?> selectionIt = selection.iterator();
+                        while (selectionIt.hasNext()) {
                             SWTUtil.checkCanceled(monitor);
+                            final Object obj = selectionIt.next();
                             if (obj instanceof MonKeYProof) {
                                 ((MonKeYProof)obj).startProof(expandMethods, useDependencyContracts, useQuery, useDefOps);
                             }
@@ -555,7 +561,9 @@ public class MonKeYComposite extends Composite {
     */
    public void saveProofs() {
       try {
-         // Select directory
+          // Get selected proofs
+          final IStructuredSelection selection = (IStructuredSelection)proofViewer.getSelection();
+          // Select directory
           DirectoryDialog dialog = new DirectoryDialog(getShell());
           dialog.setFilterPath(proofDirectory);
           dialog.setText("Save proofs");
@@ -566,10 +574,15 @@ public class MonKeYComposite extends Composite {
              if (proofs != null) {
                 // Check for existing files
                 List<String> existingFiles = new LinkedList<String>();
-                for (MonKeYProof proof : proofs) {
-                   if (proof.hasProofInKeY() && proof.existsProofFile(proofDirectory)) {
-                      existingFiles.add(proof.getProofFileName());
-                   }
+                Iterator<?> selectionIt = selection.iterator();
+                while (selectionIt.hasNext()) {
+                    final Object obj = selectionIt.next();
+                    if (obj instanceof MonKeYProof) {
+                        MonKeYProof proof = (MonKeYProof)obj;
+                        if (proof.hasProofInKeY() && proof.existsProofFile(proofDirectory)) {
+                            existingFiles.add(proof.getProofFileName());
+                        }
+                    }
                 }
                 boolean goOn = true;
                 if (!existingFiles.isEmpty()) {
@@ -582,9 +595,14 @@ public class MonKeYComposite extends Composite {
                       protected IStatus run(IProgressMonitor monitor) {
                           try {
                               SWTUtil.checkCanceled(monitor);
-                              monitor.beginTask("Saving proofs", proofs.size());
-                              for (MonKeYProof proof : proofs) {
-                                 proof.save(proofDirectory);
+                              monitor.beginTask("Saving proofs", selection.size());
+                              Iterator<?> selectionIt = selection.iterator();
+                              while (selectionIt.hasNext()) {
+                                  final Object obj = selectionIt.next();
+                                  if (obj instanceof MonKeYProof) {
+                                      ((MonKeYProof)obj).save(proofDirectory);
+                                  }
+                                  monitor.worked(1);
                               }
                               return Status.OK_STATUS;
                           }
@@ -614,6 +632,8 @@ public class MonKeYComposite extends Composite {
     */
    public void loadProofs() {
       try {
+          // Get selected proofs
+          final IStructuredSelection selection = (IStructuredSelection)proofViewer.getSelection();
           // Select directory
           DirectoryDialog dialog = new DirectoryDialog(getShell());
           dialog.setFilterPath(proofDirectory);
@@ -629,10 +649,14 @@ public class MonKeYComposite extends Composite {
                    protected IStatus run(IProgressMonitor monitor) {
                        try {
                            SWTUtil.checkCanceled(monitor);
-                           monitor.beginTask("Loading proofs", proofs.size());
-                           for (MonKeYProof proof : proofs) {
-                              proof.loadProof(proofDirectory, bootClassPath);
-                              monitor.worked(1);
+                           monitor.beginTask("Loading proofs", selection.size());
+                           Iterator<?> selectionIt = selection.iterator();
+                           while (selectionIt.hasNext()) {
+                               final Object obj = selectionIt.next();
+                               if (obj instanceof MonKeYProof) {
+                                   ((MonKeYProof)obj).loadProof(proofDirectory, bootClassPath);
+                               }
+                               monitor.worked(1);
                            }
                            return Status.OK_STATUS;
                        }
