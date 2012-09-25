@@ -1,9 +1,11 @@
 package org.key_project.monkey.product.ui.batch;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.key_project.util.java.StringUtil;
@@ -65,6 +67,11 @@ public class MonKeYBatchModeParameters {
    public static final String PARAM_ROUNDS = "-rounds";
    
    /**
+    * Parameter for {@link #getLocationLoadDirectory(int)}.
+    */
+   public static final String PARAM_LOAD_PREFIX = "-load";
+   
+   /**
     * Show help?
     */
    private boolean showHelp;
@@ -118,6 +125,11 @@ public class MonKeYBatchModeParameters {
     * The unparsed number of rounds.
     */
    private String numberOfRoundsText;
+   
+   /**
+    * Maps the index of a location of {@link #locations} to a directory which provide proof files to load.
+    */
+   private Map<Integer, String> locationLoadDirectories = new HashMap<Integer, String>();
    
    /**
     * Checks if help should be shown.
@@ -329,6 +341,9 @@ public class MonKeYBatchModeParameters {
                else if (PARAM_ROUNDS.equals(param)) {
                   previousParam = param;
                }
+               else if (param.startsWith(PARAM_LOAD_PREFIX)) {
+                  previousParam = param;
+               }
                else {
                   result.getLocations().add(param);
                }
@@ -346,6 +361,10 @@ public class MonKeYBatchModeParameters {
                   result.numberOfRoundsText = param;
                   previousParam = null;
                }
+               else if (previousParam.startsWith(PARAM_LOAD_PREFIX)) {
+                  result.locationLoadDirectories.put(Integer.valueOf(previousParam.substring(PARAM_LOAD_PREFIX.length())), param);
+                  previousParam = null;
+               }
                else {
                   Assert.isTrue(false, "Unsupported previous parameter \"" + previousParam + "\".");
                }
@@ -356,5 +375,14 @@ public class MonKeYBatchModeParameters {
          result.showHelp = true;
       }
       return result;
+   }
+   
+   /**
+    * Returns the location which provides proof files to load for the given location index.
+    * @param locationIndex The location index.
+    * @return The location load directory if available.
+    */
+   public String getLocationLoadDirectory(int locationIndex) {
+      return locationLoadDirectories.get(Integer.valueOf(locationIndex));
    }
 }

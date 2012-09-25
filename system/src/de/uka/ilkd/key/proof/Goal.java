@@ -306,6 +306,16 @@ public final class Goal  {
 	setSequent(sequent().addFormula(cf, inAntec, first));
     }
 
+    public void addFormulaToAntecedent(SequentFormula formula, boolean first)
+    {
+        addFormula(formula, true, first);
+    }
+
+    public void addFormulaToSuccedent(SequentFormula formula, boolean first)
+    {
+        addFormula(formula, false, first);
+    }
+
     /** returns set of rules applied at this branch 
      * @return IList<RuleApp> applied rule applications
      */

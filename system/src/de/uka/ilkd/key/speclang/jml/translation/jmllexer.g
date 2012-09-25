@@ -51,6 +51,10 @@ tokens {
     
     NULLABLE        = "nullable";
     NON_NULL        = "non_null";
+
+    BREAKS          = "breaks";
+    CONTINUES       = "continues";
+    RETURNS         = "returns";
 }
 
 AND : "&";

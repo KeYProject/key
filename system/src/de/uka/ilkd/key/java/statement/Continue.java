@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java.statement;
 
+import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.util.ExtList;
@@ -32,7 +33,7 @@ public class Continue extends LabelJumpStatement {
      *      Continue.
      *      @param label an identifier.
      */
-    public Continue(de.uka.ilkd.key.logic.ProgramElementName label) {
+    public Continue(Label label) {
         super(label);
     }
 

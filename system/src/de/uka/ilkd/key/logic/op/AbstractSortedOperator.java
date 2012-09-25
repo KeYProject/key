@@ -12,6 +12,7 @@ package de.uka.ilkd.key.logic.op;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sorted;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -21,7 +22,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * Abstract sorted operator class offering some common functionality.
  */
 public abstract class AbstractSortedOperator extends AbstractOperator 
-                                      implements SortedOperator {
+                                      implements SortedOperator, Sorted {
     
     private static final ImmutableArray<Sort> EMPTY_SORT_LIST 
     	= new ImmutableArray<Sort>();

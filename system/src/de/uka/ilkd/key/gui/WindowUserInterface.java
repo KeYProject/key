@@ -48,6 +48,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 	        completions.add(new FunctionalOperationContractCompletion());
 		completions.add(new DependencyContractCompletion());
 		completions.add(new LoopInvariantRuleCompletion());
+		completions.add(new BlockContractCompletion());
 	}
 
 	public void loadProblem(File file, List<File> classPath,
