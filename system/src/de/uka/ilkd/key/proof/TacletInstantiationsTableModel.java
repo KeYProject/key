@@ -373,20 +373,6 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
         String instantiation = (String) getValueAt(irow, 1);
         SchemaVariable sv = (SchemaVariable)getValueAt(irow, 0);
 
-        if(! varNamer.isUniqueNameForSchemaVariable(
-                        instantiation,
-                        sv,
-                        originalApp.posInOccurrence(),
-                        originalApp.instantiations().getContextInstantiation()
-                                            .prefix())) {
-            throw new SVInstantiationParserException(instantiation,
-                                                     irow,
-                                                     0,
-                                                     "Name is already in use.",
-                                                     false);
-        }
-
-
         ContextInstantiationEntry contextInstantiation = 
             originalApp.instantiations().getContextInstantiation();
         
