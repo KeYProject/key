@@ -10,13 +10,50 @@ import javax.swing.JMenuItem;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 
+/**
+ * This class provides the user interface to the macro extensions.
+ * 
+ * <p>
+ * It provides a menu with all macros which are applicable in a given context.
+ * The check of of applicability is done using
+ * {@link ProofMacro#canApplyTo(KeYMediator, PosInOccurrence)}.
+ * 
+ * <p>
+ * The menu items bear the name returned by {@link ProofMacro#getName()} and the
+ * tooltip is set to {@link ProofMacro#getDescription()}.
+ * 
+ * <p>
+ * There are applicable macros iff {@link #isEmpty()} returns <code>false</code>.
+ * 
+ * @see ProofMacro
+ * @see ServiceLoader
+ * @author mattias ulbrich
+ */
+
 @SuppressWarnings("serial")
 public class ProofMacroMenu extends JMenu {
 
+    /**
+     * The loader used to access the providers for macros.
+     */
     private static ServiceLoader<ProofMacro> loader = ServiceLoader.load(ProofMacro.class);
 
+    /**
+     * The number of defined macros.
+     */
     private final int numberOfMacros;
 
+    /**
+     * Instantiates a new proof macro menu.
+     * 
+     * Only applicable macros are added as menu items.
+     * 
+     * @param mediator
+     *            the mediator of the current proof.
+     * @param posInOcc
+     *            the pos in occurrence, can be <code>null</code> if not
+     *            available.
+     */
     public ProofMacroMenu(KeYMediator mediator, PosInOccurrence posInOcc) {
         super("Strategy macros");
 
@@ -49,6 +86,11 @@ public class ProofMacroMenu extends JMenu {
     }
 
 
+    /**
+     * Checks if the menu is empty.
+     * 
+     * @return <code>true</code>, if there are no applicable macros.
+     */
     public boolean isEmpty() {
         return numberOfMacros == 0;
     }

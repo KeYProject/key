@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.gui.macros;
 
 import de.uka.ilkd.key.gui.AutoModeListener;
+import de.uka.ilkd.key.gui.InteractiveProver;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -8,6 +9,15 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+/**
+ * The Class TryCloseMacro tries to close goals. Goals are either closed or left
+ * untouched.
+ * 
+ * This uses the code provided by Michael in {@link InteractiveProver}
+ * .AutoWorker
+ * 
+ * @author mattias ulbrich
+ */
 public class TryCloseMacro implements ProofMacro {
 
     @Override 
