@@ -5,16 +5,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.InteractiveProver;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.ProverTaskListener;
-import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
-import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCostCollector;
+import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 /**
  * The Class AbstractPropositionalExpansionMacro applies purely propositional
@@ -28,41 +28,7 @@ import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
  * 
  * @author mattias ulbrich
  */
-public abstract class AbstractPropositionalExpansionMacro implements ProofMacro {
-
-    /**
-     * When a prove run is finished, we need to reset the goals' rule
-     * application managers using this listener.
-     */
-    private static class StopListener implements ProverTaskListener {
-
-        private final InteractiveProver interactiveProver;
-
-        public StopListener(InteractiveProver interactiveProver) {
-            this.interactiveProver = interactiveProver;
-        }
-
-        @Override
-        public void taskStarted(String message, int size) {
-        }
-
-        @Override 
-        public void taskProgress(int position) {
-        }
-
-        @Override 
-        public void taskFinished(TaskFinishedInfo info) {
-            for (final Goal goal : interactiveProver.getProof().openGoals()) {
-                AutomatedRuleApplicationManager manager = goal.getRuleAppManager();
-                while(manager.getDelegate() != null) {
-                    manager = manager.getDelegate();
-                }
-                manager.clearCache();
-                goal.setRuleAppManager(manager);
-            }
-            interactiveProver.removeProverTaskListener(this);
-        }
-    }
+public abstract class AbstractPropositionalExpansionMacro extends StrategyProofMacro {
 
     /*
      * convert a string array to a set of strings 
@@ -78,91 +44,47 @@ public abstract class AbstractPropositionalExpansionMacro implements ProofMacro 
      */
     protected abstract Set<String> getAdmittedRuleNames();
 
-    /** 
-     * {@inheritDoc}
-     * 
-     * This macro can always be applied (does not change anything perhaps)
-     * 
-     * TODO make this only applicable if it has an impact.
-     * 
-     */
-    @Override 
-    public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        return true;
-    }
-
-    /*
-     * Set a new rule app manager similar to the focussed mode.
-     * Then run automation mode and in the end reset the managers.
-     */
-    @Override 
-    public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
-        InteractiveProver interactiveProver = mediator.getInteractiveProver();
-        Goal goal = mediator.getSelectedGoal();
-
-        AutomatedRuleApplicationManager realManager = goal.getRuleAppManager();
-        AutomatedRuleApplicationManager manager = realManager;
-        if(posInOcc != null) {
-            manager = new FocussedRuleApplicationManager(manager, goal, posInOcc);
-        }
-
-        manager = new FilterAppManager(manager, getAdmittedRuleNames());
-        goal.setRuleAppManager (manager);
-
-        interactiveProver.addProverTaskListener(new StopListener(interactiveProver));
-
-        interactiveProver.startAutoMode(
-                ImmutableSLList.<Goal>nil().prepend(goal));
+    protected PropExpansionStrategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
+        return new PropExpansionStrategy(getAdmittedRuleNames());
     }
 
     /**
-     * The Class FilterAppManager is a special rule app manager which filters
-     * the rule applications by taclet name.
+     * This strategy accepts all rule apps for which the rule name is in the
+     * admitted set and rejects everything else.
      */
-    private static class FilterAppManager implements AutomatedRuleApplicationManager {
+    private static class PropExpansionStrategy implements Strategy {
+
+        private static final Name NAME = new Name(PropExpansionStrategy.class.getSimpleName());
 
         private final Set<String> admittedRuleNames;
-        private final AutomatedRuleApplicationManager delegate;
 
-        public FilterAppManager(AutomatedRuleApplicationManager delegate,
-                Set<String> admittedRuleNames) {
-            this.delegate = delegate;
+        public PropExpansionStrategy(Set<String> admittedRuleNames) {
             this.admittedRuleNames = admittedRuleNames;
         }
 
-        public void ruleAdded(RuleApp ruleApp, PosInOccurrence pos) {
-            assert ruleApp.rule() != null : "the rule in a ruleapp should not be null";
+        @Override 
+        public Name name() {
+            return NAME;
+        }
+
+        @Override 
+        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
             if(admittedRuleNames.contains(name)) {
-                delegate.ruleAdded(ruleApp, pos);
-//                System.err.println("Accepted rule: " + name);
+                return LongRuleAppCost.ZERO_COST;
             } else {
-//                System.err.println("Rejected rule: " + name);
+                return TopRuleAppCost.INSTANCE;
             }
         }
 
-        public void clearCache() {
-            delegate.clearCache();
+        @Override 
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+            return true;
         }
 
-        public RuleApp peekNext() {
-            return delegate.peekNext();
-        }
-
-        public RuleApp next() {
-            return delegate.next();
-        }
-
-        public void setGoal(Goal p_goal) {
-            delegate.setGoal(p_goal);
-        }
-
-        public AutomatedRuleApplicationManager copy() {
-            return new FilterAppManager(delegate.copy(), admittedRuleNames);
-        }
-
-        public AutomatedRuleApplicationManager getDelegate() {
-            return delegate;
+        @Override 
+        public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
+                RuleAppCostCollector collector) {
         }
 
     }
