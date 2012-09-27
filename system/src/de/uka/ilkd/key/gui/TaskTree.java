@@ -93,19 +93,7 @@ public class TaskTree extends JPanel {
         setVisible(true);
     }
 
-    public boolean removeTask(TaskTreeNode tn) {
-
-        boolean removalConfirmed = mediator.getUI().confirmTaskRemoval("Are you sure?"); 
-        		
-
-        if (removalConfirmed) {
-	    removeTaskWithoutInteraction(tn);
-	    return true;
-        }
-        return false;
-    }
-
-    public void removeTaskWithoutInteraction(TaskTreeNode tn) {
+    public void removeTask(TaskTreeNode tn) {
         model.removeTask(tn);
 	    mediator.notify(new AbandonTaskEvent());
 	    for (int i=0; i<tn.allProofs().length; i++) {
@@ -232,7 +220,7 @@ public class TaskTree extends JPanel {
                 if (child instanceof TaskTreeNode) {
                    TaskTreeNode taskChild = (TaskTreeNode)child;
                    if (taskChild.proof() == proof) {
-                      removeTaskWithoutInteraction(taskChild);
+                      removeTask(taskChild);
                    }
                 }
              }

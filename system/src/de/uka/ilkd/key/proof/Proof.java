@@ -98,15 +98,22 @@ public class Proof implements Named {
     
     private Strategy activeStrategy;
     
+    private final SettingsListener settingsListener;
+    
 
     /** constructs a new empty proof with name */
     private Proof(Name name, Services services, ProofSettings settings) {
         this.name = name;
         assert services != null : "Tried to create proof without valid services.";
 	this.services = services.copyProofSpecific(this);
-        this.settings = settings;
-
-        addStrategyListener ();
+        settingsListener =
+                new SettingsListener () {
+                    @Override
+                    public void settingsChanged ( GUIEvent config ) {
+                        updateStrategyOnGoals();
+                    }
+                };
+        setSettings(settings);
     }
 
     /**
@@ -308,14 +315,7 @@ public class Proof implements Named {
         while ( it.hasNext () )
             it.next ().setGoalStrategy(ourStrategy);
     }
-    private void addStrategyListener () {
-        getSettings().getStrategySettings()
-            .addSettingsListener ( new SettingsListener () {
-                public void settingsChanged ( GUIEvent config ) {
-                    updateStrategyOnGoals();
-                }
-            });
-    }
+    
 
     public void clearAndDetachRuleAppIndexes () {
         // Taclet indices of the particular goals have to
@@ -364,9 +364,16 @@ public class Proof implements Named {
     }
     
     
-    public void setSettings(ProofSettings newSettings) {
+    public final void setSettings(ProofSettings newSettings) {
+        if (settings != null ){
+            // deregister settings listener
+            settings.getStrategySettings().removeSettingsListener(settingsListener);
+        }
         settings = newSettings;
-        addStrategyListener ();
+        if (settings != null ){
+            // register settings listener
+            settings.getStrategySettings().addSettingsListener (settingsListener);
+        }
     }
     
     

@@ -983,7 +983,7 @@ public final class MainWindow extends JFrame  {
         if (proof != null) {
             final TaskTreeNode rootTask = 
                 proof.getBasicTask().getRootTask();     
-            proofList.removeTaskWithoutInteraction(rootTask);   
+            proofList.removeTask(rootTask);   
             proof.getServices().getSpecificationRepository().removeProof(proof);
             proof.mgt().removeProofListener();
             proofTreeView.removeProofs(rootTask.allProofs());
