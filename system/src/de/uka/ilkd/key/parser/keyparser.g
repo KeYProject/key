@@ -333,6 +333,10 @@ options {
 	}
     }
 
+    public void recover( RecognitionException ex, BitSet tokenSet ) throws TokenStreamException {
+     consume();
+     consumeUntil( tokenSet );
+    }
 
     public String getChooseContract() {
       return chooseContract;
