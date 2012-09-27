@@ -24,9 +24,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -69,6 +71,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
@@ -397,6 +400,20 @@ public final class SymbolicExecutionUtil {
    public static ApplyStrategyInfo startSideProof(Proof proof,
                                                   Sequent sequentToProve,
                                                   String splittingOption) throws ProofInputException {
+      ProofStarter starter = createSideProof(proof, sequentToProve);
+      return startSideProof(proof, starter, splittingOption);
+   }
+   
+   /**
+    * Creates a new {@link ProofStarter} which contains a new site proof
+    * of the given {@link Proof}.
+    * @param proof The given {@link Proof}.
+    * @param sequentToProve The {@link Sequent} to proof in a new site proof.
+    * @return The created {@link ProofStarter} with the site proof.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public static ProofStarter createSideProof(Proof proof,
+                                              Sequent sequentToProve) throws ProofInputException {
       // Make sure that valid parameters are given
       assert sequentToProve != null;
       // Create ProofStarter
@@ -404,6 +421,18 @@ public final class SymbolicExecutionUtil {
       // Configure ProofStarter
       ProofEnvironment env = SymbolicExecutionUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(proof); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
       starter.init(sequentToProve, env);
+      return starter;
+   }
+   
+   /**
+    * Starts a site proof.
+    * @param proof The original {@link Proof}.
+    * @param starter The {@link ProofStarter} with the site proof.
+    * @param splittingOption The splitting option to use.
+    * @return The site proof result.
+    */
+   public static ApplyStrategyInfo startSideProof(Proof proof, ProofStarter starter, String splittingOption) {
+      assert starter != null;
       starter.setMaxRuleApplications(1000);
       StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); // Is a clone that can be modified
       sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, splittingOption); // Logical Splitting: Off is faster and avoids splits, but Normal allows to determine that two objects are different.
@@ -1029,7 +1058,9 @@ public final class SymbolicExecutionUtil {
    public static Term computeBranchCondition(Node node, boolean simplify) throws ProofInputException {
       // Get applied taclet on parent proof node
       Node parent = node.parent();
-      assert parent.getAppliedRuleApp() instanceof TacletApp; // Splits of built in rules are currently not supported.
+      if (!(parent.getAppliedRuleApp() instanceof TacletApp)) { // Splits of built in rules are currently not supported.
+         throw new ProofInputException("Only TacletApp are allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found."); 
+      }
       TacletApp app = (TacletApp)parent.getAppliedRuleApp();
       // Find goal template which has created the represented proof node
       int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
@@ -1037,32 +1068,67 @@ public final class SymbolicExecutionUtil {
       // Apply instantiations of schema variables to sequent of goal template
       Services services = node.proof().getServices();
       SVInstantiations instantiations = app.instantiations();
+      // List additions
       ImmutableList<Term> antecedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().antecedent());
       ImmutableList<Term> succedents = listSemisequentTerms(services, instantiations, goalTemplate.sequent().succedent());
-      if (antecedents.isEmpty() && succedents.isEmpty()) {  // TODO: Discuss with richard if the treatment of rules which removes only something like andRight or orLeft is implemented correctly.
-         return TermBuilder.DF.tt(); // Some rules like andRight or orLeft removes only something and replaces nothing. Ignore these rules in branch conditions.
-      }
-      else {
-         // Construct branch condition from created antecedent and succedent terms as new implication 
-         Term left = TermBuilder.DF.and(antecedents);
-         Term right = TermBuilder.DF.or(succedents);
-         Term implication = TermBuilder.DF.imp(left, right);
-         Term result;
-         // Check if an update context is available
-         if (!instantiations.getUpdateContext().isEmpty()) {
-            // Append update context because otherwise the formula is evaluated in wrong state
-            result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), implication);
-            // Simplify branch condition if required
-            if (simplify) {
-               result = SymbolicExecutionUtil.simplify(node.proof(), result);
+      // List replacements
+      if (!NodeInfo.isSymbolicExecution(app.taclet())) {
+         if (goalTemplate.replaceWithExpressionAsObject() instanceof Sequent) {
+            antecedents = antecedents.append(listSemisequentTerms(services, instantiations, ((Sequent)goalTemplate.replaceWithExpressionAsObject()).antecedent()));
+            succedents = succedents.append(listSemisequentTerms(services, instantiations, ((Sequent)goalTemplate.replaceWithExpressionAsObject()).succedent()));
+         }
+         else if (goalTemplate.replaceWithExpressionAsObject() instanceof Term) {
+            // Make sure that an PosTacletApp was applied
+            if (!(app instanceof PosTacletApp)) {
+               throw new ProofInputException("Only PosTacletApp are allowed with a replace term in branch computation but rule \"" + app + "\" was found."); 
             }
+            // Create new lists
+            ImmutableList<Term> newAntecedents = ImmutableSLList.nil();
+            ImmutableList<Term> newSuccedents = ImmutableSLList.nil();
+            // Apply updates on antecedents and add result to new antecedents list
+            for (Term a : antecedents) {
+               newAntecedents = newAntecedents.append(TermBuilder.DF.applySequential(app.instantiations().getUpdateContext(), a));
+            }
+            // Apply updates on succedents and add result to new succedents list
+            for (Term suc : succedents) {
+               newSuccedents = newSuccedents.append(TermBuilder.DF.applySequential(app.instantiations().getUpdateContext(), suc));
+            }
+            // Add additional equivalenz term to antecedent with the replace object which must be equal to the find term 
+            Term replaceTerm = (Term)goalTemplate.replaceWithExpressionAsObject();
+            replaceTerm = TermBuilder.DF.equals(replaceTerm, ((PosTacletApp)app).posInOccurrence().subTerm());
+            replaceTerm = TermBuilder.DF.applySequential(app.instantiations().getUpdateContext(), replaceTerm);
+            newAntecedents = newAntecedents.append(replaceTerm);
+            // Replace old with new lists
+            antecedents = newAntecedents;
+            succedents = newSuccedents;
          }
          else {
-            // No update context, just use the implication as branch condition
+            throw new ProofInputException("Expected replacement as Sequent during branch condition computation but is \"" + goalTemplate.replaceWithExpressionAsObject() + "\".");
+         }
+      }
+      // Construct branch condition from created antecedent and succedent terms as new implication 
+      Term left = TermBuilder.DF.and(antecedents);
+      Term right = TermBuilder.DF.or(succedents);
+      Term implication = TermBuilder.DF.imp(left, right);
+      Term result;
+      // Check if an update context is available
+      if (!instantiations.getUpdateContext().isEmpty()) {
+         // Simplify branch condition if required
+         if (simplify) {
+            // Append update context because otherwise the formula is evaluated in wrong state
+            result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), implication);
+            // Execute simplification
+            result = SymbolicExecutionUtil.simplify(node.proof(), result);
+         }
+         else {
             result = implication;
          }
-         return result;
       }
+      else {
+         // No update context, just use the implication as branch condition
+         result = implication;
+      }
+      return result;
    }
 
    /**
@@ -1276,13 +1342,8 @@ public final class SymbolicExecutionUtil {
          while (node != null) {
             Node parent = node.parent();
             if (parent != null && parent.childrenCount() >= 2) {
-               if (parent.getAppliedRuleApp() instanceof TacletApp) {
-                  Term branchCondition = computeBranchCondition(node, simplify);
-                  pathCondition = TermBuilder.DF.and(branchCondition, pathCondition);
-               }
-               else {
-                  System.out.println("Ignored rule (parent child count: " + parent.childrenCount() + ") in path condition: " + parent.getAppliedRuleApp()); // TODO: Add non taclet rules to path condition
-               }
+               Term branchCondition = computeBranchCondition(node, simplify);
+               pathCondition = TermBuilder.DF.and(branchCondition, pathCondition);
             }
             node = parent;
          }
@@ -1294,5 +1355,26 @@ public final class SymbolicExecutionUtil {
       else {
          return null;
       }
+   }
+
+   /**
+    * Checks if the {@link Sort} of the given {@link Term} is a reference type.
+    * @param services The {@link Services} to use.
+    * @param term The {@link Term} to check.
+    * @return {@code true} is reference sort, {@code false} is no reference sort.
+    */
+   public static boolean hasReferenceSort(Services services, Term term) {
+      boolean referenceSort = false;
+      if (services != null && term != null) {
+         Sort sort = term.sort();
+         KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
+         if (kjt != null) {
+            TypeConverter typeConverter = services.getTypeConverter();
+            referenceSort = typeConverter.isReferenceType(kjt) && // Check if the value is a reference type
+                            (!(kjt.getJavaType() instanceof TypeDeclaration) || // check if the value is a library class which should be ignored
+                            !((TypeDeclaration)kjt.getJavaType()).isLibraryClass());
+         }
+      }
+      return referenceSort;
    }
 }

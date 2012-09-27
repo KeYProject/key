@@ -6,13 +6,11 @@ import java.util.Set;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
-import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -142,12 +140,7 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
       }
       else {
          Term value = getValue();
-         Sort sort = value.sort();
-         KeYJavaType kjt = getServices().getJavaInfo().getKeYJavaType(sort);
-         TypeConverter typeConverter = getServices().getTypeConverter();
-         return typeConverter.isReferenceType(kjt) && // Check if the value is a reference type
-                (!(kjt.getJavaType() instanceof TypeDeclaration) || // check if the value is a library class which should be ignored
-                !((TypeDeclaration)kjt.getJavaType()).isLibraryClass());
+         return SymbolicExecutionUtil.hasReferenceSort(getServices(), value);
       }
    }
 

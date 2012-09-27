@@ -18,6 +18,11 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
  */
 public class KeYValue extends AbstractSEDValue {
    /**
+    * The constant name which is shown to a user if the value is unknown.
+    */
+   public static final String UNKNOWN_VALUE = "<unknown value>";
+
+   /**
     * The {@link IExecutionValue} to represent in debug model.
     */
    private IExecutionValue executionValue;
@@ -67,7 +72,9 @@ public class KeYValue extends AbstractSEDValue {
    @Override
    public String getValueString() throws DebugException {
       try {
-         return executionValue.getValueString();
+         return !executionValue.isValueUnknown() ? 
+                executionValue.getValueString() : 
+                UNKNOWN_VALUE;
       }
       catch (Exception e) {
          LogUtil.getLogger().logError(e);
