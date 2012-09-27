@@ -259,29 +259,21 @@
                               </value>
                            </variable>
                            <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
-                              <value name="wrapper {    !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
-  &amp; (  (!param = null -&gt; param = null)
-     &amp; (!self.wrapper = null -&gt; self.wrapper = null))
-| !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
-&amp; (  (!param = null -&gt; param = null)
-   &amp; !(self.wrapper = null &amp; self.wrapper = null))
-| !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
-&amp; (  !(param = null &amp; param = null)
-   &amp; (!self.wrapper = null -&gt; self.wrapper = null))
-| !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
-&amp; (  !(param = null &amp; param = null)
-   &amp; !(self.wrapper = null &amp; self.wrapper = null))}" isValueAnObject="false" isValueUnknown="true" conditionString="    !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
-  &amp; (  (!param = null -&gt; param = null)
-     &amp; (!self.wrapper = null -&gt; self.wrapper = null))
-| !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
-&amp; (  (!param = null -&gt; param = null)
-   &amp; !(self.wrapper = null &amp; self.wrapper = null))
-| !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
-&amp; (  !(param = null &amp; param = null)
-   &amp; (!self.wrapper = null -&gt; self.wrapper = null))
-| !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
-&amp; (  !(param = null &amp; param = null)
-   &amp; !(self.wrapper = null &amp; self.wrapper = null))">
+                              <value name="wrapper {    (!param = null -&gt; param = null)
+  &amp; (!self.wrapper = null -&gt; self.wrapper = null)
+| (!param = null -&gt; param = null)
+&amp; !(self.wrapper = null &amp; self.wrapper = null)
+| !(param = null &amp; param = null)
+&amp; (!self.wrapper = null -&gt; self.wrapper = null)
+| !(param = null &amp; param = null)
+&amp; !(self.wrapper = null &amp; self.wrapper = null)}" isValueAnObject="false" isValueUnknown="true" conditionString="    (!param = null -&gt; param = null)
+  &amp; (!self.wrapper = null -&gt; self.wrapper = null)
+| (!param = null -&gt; param = null)
+&amp; !(self.wrapper = null &amp; self.wrapper = null)
+| !(param = null &amp; param = null)
+&amp; (!self.wrapper = null -&gt; self.wrapper = null)
+| !(param = null &amp; param = null)
+&amp; !(self.wrapper = null &amp; self.wrapper = null)">
                               </value>
                            </variable>
                         </value>
@@ -332,15 +324,23 @@
 | !(param = null &amp; param = null)
 &amp; !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)">
                               <variable name="a" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="a {  (!param = null -&gt; param = null)
-| !(param = null &amp; param = null)}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="  (!param = null -&gt; param = null)
-| !(param = null &amp; param = null)">
+                                 <value name="a {    !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
+  &amp; (!param = null -&gt; param = null)
+| !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
+&amp; !(param = null &amp; param = null)}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="    !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
+  &amp; (!param = null -&gt; param = null)
+| !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
+&amp; !(param = null &amp; param = null)">
                                  </value>
                               </variable>
                               <variable name="b" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="b {  (!param = null -&gt; param = null)
-| !(param = null &amp; param = null)}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="  (!param = null -&gt; param = null)
-| !(param = null &amp; param = null)">
+                                 <value name="b {    !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
+  &amp; (!param = null -&gt; param = null)
+| !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
+&amp; !(param = null &amp; param = null)}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="    !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
+  &amp; (!param = null -&gt; param = null)
+| !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
+&amp; !(param = null &amp; param = null)">
                                  </value>
                               </variable>
                               <variable name="wrapper" arrayIndex="-1" isArrayIndex="false">
@@ -2574,7 +2574,8 @@
                                 i_2,
                                 value,
                                 1)))))
-  &amp; (  (   !wellFormed(store(store(create(store(store(heap,
+  &amp; (  (!param = null -&gt; param = null)
+     &amp; (   !wellFormed(store(store(create(store(store(heap,
                                                       self,
                                                       a,
                                                       5),
@@ -2601,8 +2602,7 @@
                                   TRUE),
                             i_2,
                             value,
-                            1)))
-     &amp; (!param = null -&gt; param = null))
+                            1))))
 | !(  !i_2.&lt;created&gt; = TRUE
     &amp; (  (!param = null -&gt; param = null)
        &amp; (   !wellFormed(store(store(create(store(store(heap,
@@ -2690,7 +2690,8 @@
                                 i_2,
                                 value,
                                 1)))))
-  &amp; (  (   !wellFormed(store(store(create(store(store(heap,
+  &amp; (  (!param = null -&gt; param = null)
+     &amp; (   !wellFormed(store(store(create(store(store(heap,
                                                       self,
                                                       a,
                                                       5),
@@ -2717,8 +2718,7 @@
                                   TRUE),
                             i_2,
                             value,
-                            1)))
-     &amp; (!param = null -&gt; param = null))
+                            1))))
 | !(  !i_2.&lt;created&gt; = TRUE
     &amp; (  (!param = null -&gt; param = null)
        &amp; (   !wellFormed(store(store(create(store(store(heap,
@@ -3524,7 +3524,8 @@
                                 i_2,
                                 value,
                                 1)))))
-  &amp; (  (   !wellFormed(store(store(create(store(store(heap,
+  &amp; (  (!param = null -&gt; param = null)
+     &amp; (   !wellFormed(store(store(create(store(store(heap,
                                                       self,
                                                       a,
                                                       5),
@@ -3551,8 +3552,7 @@
                                   TRUE),
                             i_2,
                             value,
-                            1)))
-     &amp; (!param = null -&gt; param = null))
+                            1))))
 | !(  !i_2.&lt;created&gt; = TRUE
     &amp; (  (!param = null -&gt; param = null)
        &amp; (   !wellFormed(store(store(create(store(store(heap,
@@ -3640,7 +3640,8 @@
                                 i_2,
                                 value,
                                 1)))))
-  &amp; (  (   !wellFormed(store(store(create(store(store(heap,
+  &amp; (  (!param = null -&gt; param = null)
+     &amp; (   !wellFormed(store(store(create(store(store(heap,
                                                       self,
                                                       a,
                                                       5),
@@ -3667,8 +3668,7 @@
                                   TRUE),
                             i_2,
                             value,
-                            1)))
-     &amp; (!param = null -&gt; param = null))
+                            1))))
 | !(  !i_2.&lt;created&gt; = TRUE
     &amp; (  (!param = null -&gt; param = null)
        &amp; (   !wellFormed(store(store(create(store(store(heap,
@@ -4360,8 +4360,7 @@
                              value,
                              1)))
       &amp; (!param = null &amp; !i_2.&lt;created&gt; = TRUE))
-  &amp; (  (!param = null -&gt; param = null)
-     &amp; (   !wellFormed(store(store(create(store(store(heap,
+  &amp; (  (   !wellFormed(store(store(create(store(store(heap,
                                                       self,
                                                       a,
                                                       5),
@@ -4388,7 +4387,8 @@
                                   TRUE),
                             i_2,
                             value,
-                            1))))
+                            1)))
+     &amp; (!param = null -&gt; param = null))
 | !(  (   !wellFormed(store(store(create(store(store(heap,
                                                      self,
                                                      a,
@@ -4475,8 +4475,7 @@
                              value,
                              1)))
       &amp; (!param = null &amp; !i_2.&lt;created&gt; = TRUE))
-  &amp; (  (!param = null -&gt; param = null)
-     &amp; (   !wellFormed(store(store(create(store(store(heap,
+  &amp; (  (   !wellFormed(store(store(create(store(store(heap,
                                                       self,
                                                       a,
                                                       5),
@@ -4503,7 +4502,8 @@
                                   TRUE),
                             i_2,
                             value,
-                            1))))
+                            1)))
+     &amp; (!param = null -&gt; param = null))
 | !(  (   !wellFormed(store(store(create(store(store(heap,
                                                      self,
                                                      a,
@@ -4594,8 +4594,7 @@
                              value,
                              1)))
       &amp; (!param = null &amp; !i_2.&lt;created&gt; = TRUE))
-  &amp; (  (!param = null -&gt; param = null)
-     &amp; (   !wellFormed(store(store(create(store(store(heap,
+  &amp; (  (   !wellFormed(store(store(create(store(store(heap,
                                                       self,
                                                       a,
                                                       5),
@@ -4622,7 +4621,8 @@
                                   TRUE),
                             i_2,
                             value,
-                            1))))
+                            1)))
+     &amp; (!param = null -&gt; param = null))
 | !(  (   !wellFormed(store(store(create(store(store(heap,
                                                      self,
                                                      a,
@@ -4709,8 +4709,7 @@
                              value,
                              1)))
       &amp; (!param = null &amp; !i_2.&lt;created&gt; = TRUE))
-  &amp; (  (!param = null -&gt; param = null)
-     &amp; (   !wellFormed(store(store(create(store(store(heap,
+  &amp; (  (   !wellFormed(store(store(create(store(store(heap,
                                                       self,
                                                       a,
                                                       5),
@@ -4737,7 +4736,8 @@
                                   TRUE),
                             i_2,
                             value,
-                            1))))
+                            1)))
+     &amp; (!param = null -&gt; param = null))
 | !(  (   !wellFormed(store(store(create(store(store(heap,
                                                      self,
                                                      a,
@@ -4855,36 +4855,35 @@
                              i_2,
                              value,
                              1))))
-  &amp; (  (!param = null -&gt; param = null)
-     &amp; (  !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
-        &amp; (   !wellFormed(store(store(create(store(store(heap,
-                                                         self,
-                                                         a,
-                                                         5),
-                                                   self,
-                                                   b,
-                                                   3),
-                                             i_2),
-                                      i_2,
-                                      &lt;initialized&gt;,
-                                      TRUE),
-                                i_2,
-                                value,
-                                1))
-           -&gt; wellFormed(store(store(create(store(store(heap,
-                                                        self,
-                                                        a,
-                                                        5),
-                                                  self,
-                                                  b,
-                                                  3),
-                                            i_2),
-                                     i_2,
-                                     &lt;initialized&gt;,
-                                     TRUE),
-                               i_2,
-                               value,
-                               1)))))
+  &amp; (  !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
+     &amp; (   !wellFormed(store(store(create(store(store(heap,
+                                                      self,
+                                                      a,
+                                                      5),
+                                                self,
+                                                b,
+                                                3),
+                                          i_2),
+                                   i_2,
+                                   &lt;initialized&gt;,
+                                   TRUE),
+                             i_2,
+                             value,
+                             1))
+        -&gt; wellFormed(store(store(create(store(store(heap,
+                                                     self,
+                                                     a,
+                                                     5),
+                                               self,
+                                               b,
+                                               3),
+                                         i_2),
+                                  i_2,
+                                  &lt;initialized&gt;,
+                                  TRUE),
+                            i_2,
+                            value,
+                            1))))
 | !(  !(  (   !wellFormed(store(store(create(store(store(heap,
                                                          self,
                                                          a,
@@ -4914,8 +4913,7 @@
                                value,
                                1)))
         &amp; (!param = null &amp; !i_2.&lt;created&gt; = TRUE))
-    &amp; (  (!param = null -&gt; param = null)
-       &amp; (   !wellFormed(store(store(create(store(store(heap,
+    &amp; (  (   !wellFormed(store(store(create(store(store(heap,
                                                         self,
                                                         a,
                                                         5),
@@ -4942,37 +4940,37 @@
                                     TRUE),
                               i_2,
                               value,
-                              1)))))
-&amp; (  !(param = null &amp; param = null)
-   &amp; (  !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
-      &amp; (   !wellFormed(store(store(create(store(store(heap,
-                                                       self,
-                                                       a,
-                                                       5),
-                                                 self,
-                                                 b,
-                                                 3),
-                                           i_2),
-                                    i_2,
-                                    &lt;initialized&gt;,
-                                    TRUE),
-                              i_2,
-                              value,
-                              1))
-         -&gt; wellFormed(store(store(create(store(store(heap,
-                                                      self,
-                                                      a,
-                                                      5),
-                                                self,
-                                                b,
-                                                3),
-                                          i_2),
-                                   i_2,
-                                   &lt;initialized&gt;,
-                                   TRUE),
-                             i_2,
-                             value,
-                             1)))))}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="    !(  !(  (   !wellFormed(store(store(create(store(store(heap,
+                              1)))
+       &amp; (!param = null -&gt; param = null)))
+&amp; (  !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
+   &amp; (   !wellFormed(store(store(create(store(store(heap,
+                                                    self,
+                                                    a,
+                                                    5),
+                                              self,
+                                              b,
+                                              3),
+                                        i_2),
+                                 i_2,
+                                 &lt;initialized&gt;,
+                                 TRUE),
+                           i_2,
+                           value,
+                           1))
+      -&gt; wellFormed(store(store(create(store(store(heap,
+                                                   self,
+                                                   a,
+                                                   5),
+                                             self,
+                                             b,
+                                             3),
+                                       i_2),
+                                i_2,
+                                &lt;initialized&gt;,
+                                TRUE),
+                          i_2,
+                          value,
+                          1))))}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="    !(  !(  (   !wellFormed(store(store(create(store(store(heap,
                                                            self,
                                                            a,
                                                            5),
@@ -5030,36 +5028,35 @@
                              i_2,
                              value,
                              1))))
-  &amp; (  (!param = null -&gt; param = null)
-     &amp; (  !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
-        &amp; (   !wellFormed(store(store(create(store(store(heap,
-                                                         self,
-                                                         a,
-                                                         5),
-                                                   self,
-                                                   b,
-                                                   3),
-                                             i_2),
-                                      i_2,
-                                      &lt;initialized&gt;,
-                                      TRUE),
-                                i_2,
-                                value,
-                                1))
-           -&gt; wellFormed(store(store(create(store(store(heap,
-                                                        self,
-                                                        a,
-                                                        5),
-                                                  self,
-                                                  b,
-                                                  3),
-                                            i_2),
-                                     i_2,
-                                     &lt;initialized&gt;,
-                                     TRUE),
-                               i_2,
-                               value,
-                               1)))))
+  &amp; (  !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
+     &amp; (   !wellFormed(store(store(create(store(store(heap,
+                                                      self,
+                                                      a,
+                                                      5),
+                                                self,
+                                                b,
+                                                3),
+                                          i_2),
+                                   i_2,
+                                   &lt;initialized&gt;,
+                                   TRUE),
+                             i_2,
+                             value,
+                             1))
+        -&gt; wellFormed(store(store(create(store(store(heap,
+                                                     self,
+                                                     a,
+                                                     5),
+                                               self,
+                                               b,
+                                               3),
+                                         i_2),
+                                  i_2,
+                                  &lt;initialized&gt;,
+                                  TRUE),
+                            i_2,
+                            value,
+                            1))))
 | !(  !(  (   !wellFormed(store(store(create(store(store(heap,
                                                          self,
                                                          a,
@@ -5089,8 +5086,7 @@
                                value,
                                1)))
         &amp; (!param = null &amp; !i_2.&lt;created&gt; = TRUE))
-    &amp; (  (!param = null -&gt; param = null)
-       &amp; (   !wellFormed(store(store(create(store(store(heap,
+    &amp; (  (   !wellFormed(store(store(create(store(store(heap,
                                                         self,
                                                         a,
                                                         5),
@@ -5117,37 +5113,37 @@
                                     TRUE),
                               i_2,
                               value,
-                              1)))))
-&amp; (  !(param = null &amp; param = null)
-   &amp; (  !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
-      &amp; (   !wellFormed(store(store(create(store(store(heap,
-                                                       self,
-                                                       a,
-                                                       5),
-                                                 self,
-                                                 b,
-                                                 3),
-                                           i_2),
-                                    i_2,
-                                    &lt;initialized&gt;,
-                                    TRUE),
-                              i_2,
-                              value,
-                              1))
-         -&gt; wellFormed(store(store(create(store(store(heap,
-                                                      self,
-                                                      a,
-                                                      5),
-                                                self,
-                                                b,
-                                                3),
-                                          i_2),
-                                   i_2,
-                                   &lt;initialized&gt;,
-                                   TRUE),
-                             i_2,
-                             value,
-                             1)))))">
+                              1)))
+       &amp; (!param = null -&gt; param = null)))
+&amp; (  !(i_2.&lt;created&gt; = TRUE &amp; i_2.&lt;created&gt; = TRUE)
+   &amp; (   !wellFormed(store(store(create(store(store(heap,
+                                                    self,
+                                                    a,
+                                                    5),
+                                              self,
+                                              b,
+                                              3),
+                                        i_2),
+                                 i_2,
+                                 &lt;initialized&gt;,
+                                 TRUE),
+                           i_2,
+                           value,
+                           1))
+      -&gt; wellFormed(store(store(create(store(store(heap,
+                                                   self,
+                                                   a,
+                                                   5),
+                                             self,
+                                             b,
+                                             3),
+                                       i_2),
+                                i_2,
+                                &lt;initialized&gt;,
+                                TRUE),
+                          i_2,
+                          value,
+                          1))))">
                                                 </value>
                                              </variable>
                                           </value>
@@ -5304,8 +5300,7 @@
                              value,
                              1)))
       &amp; (!param = null &amp; !i_2.&lt;created&gt; = TRUE))
-  &amp; (  (!param = null -&gt; param = null)
-     &amp; (   !wellFormed(store(store(create(store(store(heap,
+  &amp; (  (   !wellFormed(store(store(create(store(store(heap,
                                                       self,
                                                       a,
                                                       5),
@@ -5332,7 +5327,8 @@
                                   TRUE),
                             i_2,
                             value,
-                            1))))
+                            1)))
+     &amp; (!param = null -&gt; param = null))
 | !(  (   !wellFormed(store(store(create(store(store(heap,
                                                      self,
                                                      a,
@@ -5419,8 +5415,7 @@
                              value,
                              1)))
       &amp; (!param = null &amp; !i_2.&lt;created&gt; = TRUE))
-  &amp; (  (!param = null -&gt; param = null)
-     &amp; (   !wellFormed(store(store(create(store(store(heap,
+  &amp; (  (   !wellFormed(store(store(create(store(store(heap,
                                                       self,
                                                       a,
                                                       5),
@@ -5447,7 +5442,8 @@
                                   TRUE),
                             i_2,
                             value,
-                            1))))
+                            1)))
+     &amp; (!param = null -&gt; param = null))
 | !(  (   !wellFormed(store(store(create(store(store(heap,
                                                      self,
                                                      a,
