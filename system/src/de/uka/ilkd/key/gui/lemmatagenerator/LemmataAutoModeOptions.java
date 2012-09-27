@@ -7,6 +7,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.util.CommandLine;
+import de.uka.ilkd.key.util.CommandLineException;
 
 public class LemmataAutoModeOptions {
         private static final int DEFAULT_TIMEOUT = -1;
@@ -22,14 +24,20 @@ public class LemmataAutoModeOptions {
         private static final String SAVE_RESULTS_TO_FILE = KEY_PREFIX + "saveProofToFile";
         private static final String FILE_FOR_AXIOMS = KEY_PREFIX + "axioms";
         private static final String FILE_FOR_DEFINITION = KEY_PREFIX +"signature";
-
+        private static final String JUSTIFY_RULES ="-justify_rules";
         private static final String PROOF_POSTFIX = ".key.proof";
 
         /**
          * The path of the file containing the rules that should be proven.
          * */
         private String pathOfRuleFile;
-
+        
+        /**
+         * CommandLine object, where all options are parsed already
+         */
+        
+        private CommandLine cl;
+        
         private Collection<String> filesForAxioms = new LinkedList<String>();
 
         /**
@@ -67,33 +75,51 @@ public class LemmataAutoModeOptions {
         private boolean saveResultsToFile = false;
 
         private String homePath;
-
-        public LemmataAutoModeOptions(String pathRuleFile, int timeout,
-                        int maxRules, String pathResult, String internalVersion) {
+//        public LemmataAutoModeOptions(String pathRuleFile, int timeout,
+//        		-                        int maxRules, String pathResult, String internalVersion) {
+        public LemmataAutoModeOptions(CommandLine cl, String internalVersion) {
                 super();
-                this.pathOfRuleFile = pathRuleFile;
-                this.timeout = timeout;
-                this.maxRules = maxRules;
-                this.pathOfResult = generatePath(pathResult, pathRuleFile);
+                try{
+                	if(cl.isSet(PATH_OF_RULE_FILE)){
+                		this.pathOfRuleFile = cl.getString(PATH_OF_RULE_FILE, null);
+                	
+                	}
+                	if(cl.isSet(TIMEOUT)){
+                		this.timeout = cl.getLong(TIMEOUT, DEFAULT_TIMEOUT);
+                	}
+                	if(cl.isSet(MAX_RULES)){
+                		this.maxRules =  cl.getInteger(MAX_RULES, DEFAULT_MAXRULES);
+                	}
+                	if(cl.isSet(PATH_OF_RESULT) && cl.isSet(PATH_OF_RULE_FILE)){
+                		this.pathOfResult = generatePath(cl.getString(PATH_OF_RESULT, null), pathOfRuleFile);
+                	}
+                	}catch(CommandLineException cle){
+                		System.out.println("There was a problem reading the command line options");
+                	
+                	}
                 this.internalVersion = internalVersion;
                 checkForValidity();// throws an exception if a parameter is not
                                    // valid.
         }
 
-        public LemmataAutoModeOptions(LinkedList<String> options,
+        public LemmataAutoModeOptions(CommandLine cl,
                         String internalVersion, String homePath) {
                 this.internalVersion = internalVersion;
-                if (options.isEmpty()) {
-                    printUsage();
-                    throwError("No parameters were specified");
+                
+                if(cl.isSet(JUSTIFY_RULES)){
+                	//if cascade
                 }
-                if (!options.getFirst().equals(PATH_OF_RULE_FILE)) {
-                        options.addFirst(PATH_OF_RULE_FILE);
-                }
-                analyzeParameters(options);
-                pathOfResult = generatePath(pathOfResult, pathOfRuleFile);
-                this.homePath = homePath;
-                checkForValidity();
+//                if (options.isEmpty()) {
+//                    printUsage();
+//                    throwError("No parameters were specified");
+//                }
+//                if (!options.getFirst().equals(PATH_OF_RULE_FILE)) {
+//                        options.addFirst(PATH_OF_RULE_FILE);
+//                }
+//                analyzeParameters(options);
+//                pathOfResult = generatePath(pathOfResult, pathOfRuleFile);
+//                this.homePath = homePath;
+//                checkForValidity();
         }
 
         private void analyzeParameters(LinkedList<String> options) {
@@ -233,21 +259,21 @@ public class LemmataAutoModeOptions {
         }
 
         public static void printUsage() {
-            System.out.println("The 'justifyrules' command has a number options you can set.");
-            System.out.println("Provide the option name and the value as separate arguments.");
-            System.out.println(" ?print           where to send output (use 'terminal' or 'disable')");
-            System.out.println(" ?maxRules        the maximum number of rule application to perform ");
-            System.out.println("                    (default: " + DEFAULT_MAXRULES + ")");
-            System.out.println(" ?pathOfRuleFile  the file to load the rules from");
-            System.out.println(" ?pathOfResult    the folder to store proofs to");
-            System.out.println(" ?timeout         the timeout in ms (default: " + DEFAULT_TIMEOUT +")");
-            System.out.println(" ?saveProofToFile flag to save or drop proofs (use 'true'/'false'),"); 
-            System.out.println("                    (then stored to path given by ?pathOfResult)");
-            System.out.println(" ?signature       file to read definitions from");
-            System.out.println();
-            System.out.println("If first argument does not start with '?', an implicit leading");
-            System.out.println("?pathOfRuleFile is assumed. For further information see the help");
-            System.out.println("for the dialog reached under \"File > Prove > Userdefined Taclets\"");
+//            System.out.println("The 'justifyrules' command has a number options you can set.");
+//            System.out.println("Provide the option name and the value as separate arguments.");
+//            System.out.println(" ?print           where to send output (use 'terminal' or 'disable')");
+//            System.out.println(" ?maxRules        the maximum number of rule application to perform ");
+//            System.out.println("                    (default: " + DEFAULT_MAXRULES + ")");
+//            System.out.println(" ?pathOfRuleFile  the file to load the rules from");
+//            System.out.println(" ?pathOfResult    the folder to store proofs to");
+//            System.out.println(" ?timeout         the timeout in ms (default: " + DEFAULT_TIMEOUT +")");
+//            System.out.println(" ?saveProofToFile flag to save or drop proofs (use 'true'/'false'),"); 
+//            System.out.println("                    (then stored to path given by ?pathOfResult)");
+//            System.out.println(" ?signature       file to read definitions from");
+//            System.out.println();
+//            System.out.println("If first argument does not start with '?', an implicit leading");
+//            System.out.println("?pathOfRuleFile is assumed. For further information see the help");
+//            System.out.println("for the dialog reached under \"File > Prove > Userdefined Taclets\"");
         }
 
 }

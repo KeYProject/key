@@ -39,20 +39,31 @@ import de.uka.ilkd.key.util.CommandLine;
  * This has been extracted from MainWindow to keep GUI and control further apart.
  */
 public class Main {
-    public static final String CHELP = "-help";
-    public static final String CAUTO = "-auto";
-    public static final String CAUTO_LOADONLY = "-auto_loadonly";
-    public static final String CDEBUG = "-debug";
-    public static final String CNO_DEBUG = "-no_debug";
-    public static final String CASSERTION = "-assertion";
-    public static final String CNO_ASSERTION = "-no_assertion";
-    public static final String CNO_JMLSPECS = "-no_jmlspecs";
-    public static final String CJUSTIFY_RULES ="-justify_rules";
-    public static final String CPRINT_STATISTICS ="-print_statistics";
-    public static final String CTIMEOUT ="-timeout";
-    public static final String CEXAMPLES = "-examples"; 
-
-    
+    public static final String HELP = "-help";
+    public static final String AUTO = "-auto";
+    public static final String AUTO_LOADONLY = "-auto_loadonly";
+    public static final String DEBUG = "-debug";
+    public static final String NO_DEBUG = "-no_debug";
+    public static final String ASSERTION = "-assertion";
+    public static final String NO_ASSERTION = "-no_assertion";
+    public static final String NO_JMLSPECS = "-no_jmlspecs";
+    public static final String JUSTIFY_RULES ="-justify_rules";
+    public static final String PRINT_STATISTICS ="-print_statistics";
+    public static final String TIMEOUT ="-timeout";
+    public static final String EXAMPLES = "-examples"; 
+    private static final String JPRINT_TERMINAL = "terminal";
+    private static final String JPRINT_DISABLE = "disable";
+    private static final String JKEY_PREFIX = "-jr-";
+    private static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
+    private static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
+    private static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
+    private static final String JTIMEOUT = JKEY_PREFIX + "timeout";
+    private static final String JPRINT = JKEY_PREFIX + "print";
+    private static final String JSAVE_RESULTS_TO_FILE = JKEY_PREFIX + "saveProofToFile";
+    private static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
+    private static final String JFILE_FOR_DEFINITION = JKEY_PREFIX +"signature";
+    private static final int DEFAULT_TIMEOUT = -1;
+    private static final int DEFAULT_MAXRULES = 10000;
     public static final String INTERNAL_VERSION =
             KeYResourceManager.getManager().getSHA1();
 
@@ -72,6 +83,7 @@ public class Main {
 
     private static String fileNameOnStartUp = null;
     private static CommandLine cl;
+    
 
     
     /**
@@ -130,14 +142,28 @@ public class Main {
     }
     private static CommandLine createCommandLine(){
     	CommandLine cl= new CommandLine();
-    	cl.addOption(CHELP, null, "display this text");
-    	cl.addOption(CAUTO, null, "start prove procedure after initialisation");
-    	cl.addOption(CAUTO_LOADONLY, null, "");
-    	cl.addOption(CNO_JMLSPECS, null, "disables parsing JML specifications");
-    	cl.addOption(CEXAMPLES, "<examplefiles>", "loads directory with example files on startup");
-    	cl.addOption(CJUSTIFY_RULES, "<options>", "autoprove taclets (add '?help' for instructions)" );
-    	cl.addOption(CPRINT_STATISTICS, "<filename>",  "in auto mode, output nr. of rule applications and time spent");
-    	cl.addOption(CTIMEOUT, "<timeout>", "");
+    	cl.setIndentation(3);
+    	cl.addText("Options for the KeY-Prover", false);
+    	cl.addText("\n", true);
+    	cl.addOption(HELP, null, "display this text");
+    	cl.addOption(AUTO, null, "start prove procedure after initialisation");
+    	cl.addOption(AUTO_LOADONLY, null, "");
+    	cl.addOption(NO_JMLSPECS, null, "disables parsing JML specifications");
+    	cl.addOption(EXAMPLES, "<examplefiles>", "loads directory with example files on startup");
+    	cl.addOption(JUSTIFY_RULES, "<options>", "autoprove taclets (add '?help' for instructions)" );
+    	cl.addOption(PRINT_STATISTICS, "<filename>",  "in auto mode, output nr. of rule applications and time spent");
+    	cl.addOption(TIMEOUT, "<timeout>", "the timeout in ms (default: " + DEFAULT_TIMEOUT +")");
+       	cl.addText("\n", true);
+    	cl.addText("Options for justify rules", false);
+       	cl.addText("\n", true);
+    	cl.addOption(JMAX_RULES, "<max. number of rule applications>","the maximum number of rule application to perform (default: " + DEFAULT_MAXRULES +")");
+    	cl.addOption(JPATH_OF_RULE_FILE, "<path>","the file to load the rules from");
+    	cl.addOption(JPATH_OF_RESULT, "<path>", "the folder to store proofs to");
+    	cl.addOption(JTIMEOUT, "<timeout>", "the timeout in ms (default: " + DEFAULT_TIMEOUT +")");
+    	cl.addOption(JPRINT, "<filename>", "where to send output (use 'terminal' or 'disable')");
+    	cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "flag to save or drop proofs (then stored to path given by "+ JPATH_OF_RESULT + ")");
+    	cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "file to read axioms from");
+    	cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "file to read definitions from");
     	return cl;
     }
     public static UserInterface evaluateOptions(CommandLine cl) {
@@ -148,14 +174,14 @@ public class Main {
         String uiMode = "INTERACTIVE";
 
         
-        if(cl.isSet(CAUTO)){
+        if(cl.isSet(AUTO)){
         	uiMode="AUTO";
         }
-        if(cl.isSet(CAUTO_LOADONLY)){
+        if(cl.isSet(AUTO_LOADONLY)){
         	uiMode="AUTO_LOADONLY";
         }
         
-        if(cl.isSet(CHELP)){
+        if(cl.isSet(HELP)){
         	printUsageAndExit(false, null);	
         }
 //        if(cl.isSet(DEBUG)){
@@ -170,21 +196,21 @@ public class Main {
 //        if(cl.isSet(NO_ASSERTION)){
 //        	de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = false;
 //        }
-        if(cl.isSet(CNO_JMLSPECS)){
+        if(cl.isSet(NO_JMLSPECS)){
         	GeneralSettings.disableSpecs = true;
         }
 
-        if(cl.isSet(CPRINT_STATISTICS)){
-        	statisticsFile = cl.getString(CPRINT_STATISTICS, null);
+        if(cl.isSet(PRINT_STATISTICS)){
+        	statisticsFile = cl.getString(PRINT_STATISTICS, null);
         	if(statisticsFile.equals(null)){
         		printUsageAndExit(true,null);
         	}
         }
-        if(cl.isSet(CTIMEOUT)){
+        if(cl.isSet(TIMEOUT)){
            System.out.println("Timeout is set");
            long timeout = -1;
            try {
-               timeout = (long)(cl.getInteger(CTIMEOUT, -1));
+               timeout = cl.getLong(TIMEOUT, -1);
                System.out.println("Timeout is: "+ timeout);
            } catch (NumberFormatException nfe) {
                System.out.println("Illegal timeout (must be a number >=-1).");
@@ -198,8 +224,8 @@ public class Main {
            }
            ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
         }
-        if(cl.isSet(CEXAMPLES)){
-        	examplesDir = cl.getString(CEXAMPLES, null);
+        if(cl.isSet(EXAMPLES)){
+        	examplesDir = cl.getString(EXAMPLES, null);
         	if (examplesDir.equals(null)){
         		printUsageAndExit(true, null);
         	}
@@ -211,19 +237,29 @@ public class Main {
 			System.out.println("Hier:"+string);
 		}
      	//-jr-
-        if(cl.isSet(CJUSTIFY_RULES)){
+        if(cl.isSet(JUSTIFY_RULES)){
             LinkedList<String> options = new LinkedList<String>();
-            if (cl.getString(CJUSTIFY_RULES, null) != null){
-             options.add(cl.getString(CJUSTIFY_RULES, null));
+            String currentopt = cl.getString(JUSTIFY_RULES, null);
+            if (currentopt != null && currentopt.startsWith("-jr-")){
+             currentopt = currentopt.replace("-jr-", "");
+//             options.add(currentopt);
+             System.out.println(currentopt);
              if(!fileArguments.isEmpty()){
-            	 //while()
+            	 currentopt = iter.next().toString();
+            	 while(iter.hasNext() && currentopt.startsWith("-jr-")){
+                     currentopt = currentopt.replace("-jr-", "");
+//                   options.add(currentopt);
+                   System.out.println(currentopt);
+            	 }
+            	 System.out.println("No new Args");
              }
             }
             
 //          for(int i = index+1; i < opt.length; i++){
 //              options.add(opt[i]);
 //          }
-        	evaluateLemmataOptions(options);
+            evaluateLemmataOptions(cl);
+//        	evaluateLemmataOptions(options);
         }
 //        
         
@@ -333,7 +369,7 @@ public class Main {
         return ui;
     }
 
-    private static void evaluateLemmataOptions(LinkedList<String> options){
+    private static void evaluateLemmataOptions(CommandLine options){
 
         LemmataAutoModeOptions opt;
         try {
@@ -347,6 +383,7 @@ public class Main {
             e.printStackTrace();
             System.exit(1);
             return;
+            
         }
 
 
@@ -405,52 +442,52 @@ public class Main {
         return fileNameOnStartUp;
     }
     
-    /** All possible command line options must be entered here. 
-     * @author bruns
-     */
-    private static enum CommandLineOption {
-    	TEST (null,null),
-        AUTO ('a',
-                "  auto            : start prove procedure after initialisation"),
-        AUTO_LOADONLY (null,null),
-        DEBUG ('d',
-                "  debug           : enables debug mode"),
-        NO_DEBUG ('x',
-                "  no_debug        : disables debug mode (*)"),
-        ASSERTION (null,
-                "  assertion       : enables assertions (*)"),
-        NO_ASSERTION ('n',
-                "  no_assertion    : disables assertions"),
-        NO_JMLSPECS (null,
-                "  no_jmlspecs     : disables parsing JML specifications"),
-        JUSTIFY_RULES ('r',
-                "  justify_rules    : autoprove taclets (add '?help' for instructions)"),
-        PRINT_STATISTICS ('p',
-                "  print_statistics <filename>\n" +
-                "                  : in auto mode, output nr. of rule applications and time spent"),
-        TIMEOUT ('t',
-                "  timeout <time in ms>\n"+
-                "                  : set maximal time for rule " +
-                "application in ms (-1 disables timeout)"),
-        EXAMPLES (null,null),
-        HELP ('h',
-                "  help            : display this text");
-        
-        Character shortName;
-        String message;
-        
-        /**
-         * @param shortName one-letter option, <code>null</code> if not defined
-         * @param message help text, <code>null</code> to show no help text
-         */
-        CommandLineOption(Character shortName, String message){
-            this.shortName = shortName;
-            this.message = message;
-        }
-        
-        @Override
-        public String toString() {
-            return super.toString().toLowerCase();
-        }
-    }
+//    /** All possible command line options must be entered here. 
+//     * @author bruns
+//     */
+//    private static enum CommandLineOption {
+//    	TEST (null,null),
+//        AUTO ('a',
+//                "  auto            : start prove procedure after initialisation"),
+//        AUTO_LOADONLY (null,null),
+//        DEBUG ('d',
+//                "  debug           : enables debug mode"),
+//        NO_DEBUG ('x',
+//                "  no_debug        : disables debug mode (*)"),
+//        ASSERTION (null,
+//                "  assertion       : enables assertions (*)"),
+//        NO_ASSERTION ('n',
+//                "  no_assertion    : disables assertions"),
+//        NO_JMLSPECS (null,
+//                "  no_jmlspecs     : disables parsing JML specifications"),
+//        JUSTIFY_RULES ('r',
+//                "  justify_rules    : autoprove taclets (add '?help' for instructions)"),
+//        PRINT_STATISTICS ('p',
+//                "  print_statistics <filename>\n" +
+//                "                  : in auto mode, output nr. of rule applications and time spent"),
+//        TIMEOUT ('t',
+//                "  timeout <time in ms>\n"+
+//                "                  : set maximal time for rule " +
+//                "application in ms (-1 disables timeout)"),
+//        EXAMPLES (null,null),
+//        HELP ('h',
+//                "  help            : display this text");
+//        
+//        Character shortName;
+//        String message;
+//        
+//        /**
+//         * @param shortName one-letter option, <code>null</code> if not defined
+//         * @param message help text, <code>null</code> to show no help text
+//         */
+//        CommandLineOption(Character shortName, String message){
+//            this.shortName = shortName;
+//            this.message = message;
+//        }
+//        
+//        @Override
+//        public String toString() {
+//            return super.toString().toLowerCase();
+//        }
+//    }
 }
