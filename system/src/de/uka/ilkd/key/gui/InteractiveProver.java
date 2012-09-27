@@ -46,10 +46,12 @@ public class InteractiveProver {
     private final ProverTaskListener focussedAutoModeTaskListener =
         new FocussedAutoModeTaskListener ();
 
-    /** list of proof listeners and interactive proof listeners */
-    private List<AutoModeListener> listenerList = 
-        Collections.synchronizedList(new ArrayList<AutoModeListener>(10));
-
+    /**
+     * list of proof listeners and interactive proof listeners. We use an
+     * immutable list to store listeners to allow for addition/removal within
+     * listener code
+     */
+    private ImmutableList<AutoModeListener> listenerList = ImmutableSLList.nil();
 
     /** listens to the current selected proof and node */
     private KeYSelectionListener selListener;
@@ -87,38 +89,28 @@ public class InteractiveProver {
 	proof = p;
     }
     
-    public void addAutoModeListener(AutoModeListener p) { 
-	synchronized(listenerList) {
-	    listenerList.add(p);
-	}
+    public void addAutoModeListener(AutoModeListener p) {
+        listenerList = listenerList.prepend(p);
     }
 
-    public void removeAutoModeListener(AutoModeListener p) { 
-	synchronized(listenerList) {	
-	    listenerList.remove(p);
-	}
+    public void removeAutoModeListener(AutoModeListener p) {
+        listenerList = listenerList.removeAll(p);
     }
 
     /** fires the event that automatic execution has started */
     protected void fireAutoModeStarted(ProofEvent e) {
-	synchronized(listenerList) {
         for (AutoModeListener aListenerList : listenerList) {
-            aListenerList.
-                    autoModeStarted(e);
+            aListenerList.autoModeStarted(e);
         }
-	}
     }
 
     /** fires the event that automatic execution has stopped */
     public void fireAutoModeStopped(ProofEvent e) {
-	synchronized(listenerList) {
         for (AutoModeListener aListenerList : listenerList) {
-            aListenerList.
-                    autoModeStopped(e);
+            aListenerList.autoModeStopped(e);
         }
-	}
     }
-    
+
     void setResumeAutoMode(boolean b) {
        resumeAutoMode = b;
     }
@@ -188,7 +180,7 @@ public class InteractiveProver {
                         
             final AutomatedRuleApplicationManager realManager = goal.getRuleAppManager ();
             goal.setRuleAppManager ( null );
-            final FocussedRuleApplicationManager focusManager =
+            final AutomatedRuleApplicationManager focusManager =
                 new FocussedRuleApplicationManager ( realManager, goal, focus );
             goal.setRuleAppManager ( focusManager );
         }
@@ -203,8 +195,8 @@ public class InteractiveProver {
             // remove any filtering rule app managers that are left in the proof
             // goals
             if (goal.getRuleAppManager() instanceof FocussedRuleApplicationManager) {
-                final FocussedRuleApplicationManager focusManager =
-                        (FocussedRuleApplicationManager) goal.getRuleAppManager();
+                final AutomatedRuleApplicationManager focusManager =
+                        (AutomatedRuleApplicationManager) goal.getRuleAppManager();
                 goal.setRuleAppManager(null);
                 final AutomatedRuleApplicationManager realManager =
                         focusManager.getDelegate();

@@ -9,6 +9,12 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
         return "Propositional expansion (w/ splits)";
     }
     
+    @Override 
+    public String getDescription() {
+        return "Apply rules to decompose propositional toplevel formulas; " +
+                "splits the goal if necessary";
+    }
+    
     private static final String[] ADMITTED_RULES = {
         "andLeft", "orRight", "impRight", "notLeft", "notRight", "close",
         "andRight", "orLeft", "impLeft"

@@ -20,14 +20,10 @@ public abstract class AbstractPropositionalExpansionMacro implements ProofMacro 
 
     private static class StopListener implements ProverTaskListener {
 
-        private final Goal goal;
-        private final AutomatedRuleApplicationManager realManager;
         private final InteractiveProver interactiveProver;
 
-        public StopListener(InteractiveProver interactiveProver, Goal goal, AutomatedRuleApplicationManager realManager) {
+        public StopListener(InteractiveProver interactiveProver) {
             this.interactiveProver = interactiveProver;
-            this.goal = goal;
-            this.realManager = realManager;
         }
 
         @Override
@@ -40,7 +36,14 @@ public abstract class AbstractPropositionalExpansionMacro implements ProofMacro 
 
         @Override 
         public void taskFinished(TaskFinishedInfo info) {
-            goal.setRuleAppManager(realManager);
+            for (final Goal goal : interactiveProver.getProof().openGoals()) {
+                AutomatedRuleApplicationManager manager = goal.getRuleAppManager();
+                while(manager.getDelegate() != null) {
+                    manager = manager.getDelegate();
+                }
+                manager.clearCache();
+                goal.setRuleAppManager(manager);
+            }
             interactiveProver.removeProverTaskListener(this);
         }
     }
@@ -49,11 +52,6 @@ public abstract class AbstractPropositionalExpansionMacro implements ProofMacro 
         return Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(strings)));
     }
 
-    @Override 
-    public String getDescription() {
-        return "Closer description";
-    }
-    
     protected abstract Set<String> getAdmittedRuleNames();
 
     @Override 
@@ -75,8 +73,7 @@ public abstract class AbstractPropositionalExpansionMacro implements ProofMacro 
         manager = new FilterAppManager(manager, getAdmittedRuleNames());
         goal.setRuleAppManager (manager);
 
-        interactiveProver.addProverTaskListener(
-                new StopListener(interactiveProver, goal, realManager));
+        interactiveProver.addProverTaskListener(new StopListener(interactiveProver));
 
         interactiveProver.startAutoMode(
                 ImmutableSLList.<Goal>nil().prepend(goal));
@@ -98,6 +95,9 @@ public abstract class AbstractPropositionalExpansionMacro implements ProofMacro 
             String name = ruleApp.rule().name().toString();
             if(admittedRuleNames.contains(name)) {
                 delegate.ruleAdded(ruleApp, pos);
+//                System.err.println("Accepted rule: " + name);
+            } else {
+//                System.err.println("Rejected rule: " + name);
             }
         }
 
@@ -119,6 +119,10 @@ public abstract class AbstractPropositionalExpansionMacro implements ProofMacro 
 
         public AutomatedRuleApplicationManager copy() {
             return new FilterAppManager(delegate.copy(), admittedRuleNames);
+        }
+
+        public AutomatedRuleApplicationManager getDelegate() {
+            return delegate;
         }
 
     }
