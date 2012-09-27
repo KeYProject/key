@@ -8,6 +8,7 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
@@ -19,6 +20,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.ui.AbstractUserInterface;
@@ -273,11 +275,27 @@ public class WindowUserInterface extends AbstractUserInterface {
       return mainWindow.getProofList().containsProof(proof);
    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public void removeProof(Proof proof) {
-      mainWindow.getProofList().removeProof(proof);
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void removeProof(Proof proof) {
+        // The following was copied from AbandonTaskAction when I redirected
+        // the abandon method there to this method.
+        // The code seems to be important...
+        final TaskTreeNode rootTask = proof.getBasicTask().getRootTask();
+        mainWindow.getProofList().removeTask(rootTask);
+        final Proof[] rootTaskProofs = rootTask.allProofs();
+        for (Proof p : rootTaskProofs) {
+            //In a previous revision the following statement was performed only
+            //on one proof object, namely on: mediator.getProof()
+            p.getServices().getSpecificationRepository().removeProof(p);
+            p.mgt().removeProofListener();
+            // remove setting listener from settings
+            p.setSettings(null);
+        }
+        mainWindow.getProofView().removeProofs(rootTaskProofs);
+        // The original code of this method. Neccessary?
+        mainWindow.getProofList().removeProof(proof);
+    }
 }
