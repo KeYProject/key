@@ -128,7 +128,7 @@ while [ $# -ne 0 ]; do
 	-Khelp)
 # 	    set ${1#--} #removes the minus from the option, s.t. it can be passed to key as option
 	    list_help
-	    shift;
+	    shift
 	    keyoptions="-help "
 	    break;;
         -Kkeydebug) keysysprops="${keysysprops}-DKeyDebugFlag=on "
@@ -140,6 +140,9 @@ while [ $# -ne 0 ]; do
 
 	-Kdebugprefix) keysysprops="${keysysprops}-Dkey.debug.prefix=${2}"
 	    shift
+	    shift
+	    continue;;
+	-kassertionflag) keysysprops="${keysysprops}-KeyAssertionFlag=true "
 	    shift
 	    continue;;
 
