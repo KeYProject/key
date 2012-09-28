@@ -508,7 +508,7 @@ public final class KeYUtil {
              for (int j = 0; j < envChild.getChildCount(); j++) {
                 Object envTaskChild = envChild.getChildAt(j);
                 if (envTaskChild instanceof TaskTreeNode) {
-                   main.getProofList().removeTaskWithoutInteraction((TaskTreeNode)envTaskChild);
+                   main.getProofList().removeTask((TaskTreeNode)envTaskChild);
                 }
              }
           }
