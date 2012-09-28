@@ -67,7 +67,7 @@ public class Proof implements Named {
     private String problemHeader = "";
 
     /** the java information object: JavaInfo+TypeConverter */
-    private final Services services;
+    private Services services;
 
     /** maps the Abbreviations valid for this proof to their corresponding terms.*/
     private AbbrevMap abbreviations = new AbbrevMap();
@@ -98,7 +98,13 @@ public class Proof implements Named {
     
     private Strategy activeStrategy;
     
-    private final SettingsListener settingsListener;
+    private SettingsListener settingsListener;
+    
+    /**
+     * Set to true if the proof has been abandoned and the dispose method has
+     * been called on this object.
+     */
+    private boolean disposed = false;
     
 
     /** constructs a new empty proof with name */
@@ -224,6 +230,42 @@ public class Proof implements Named {
     }
          
 
+    /**
+     * Cut off all reference such that it does not lead to a big memory leak
+     * if someone still holds a refernce to this proof object. 
+     */
+    public void dispose() {
+        // remove setting listener from settings
+        setSettings(null);
+        // set every reference (except the name) to null
+        root = null;
+        listenerList = null;
+        openGoals = null;
+        problemHeader = null;
+        services = null;
+        abbreviations = null;
+        proofEnv = null;
+        localMgt = null;
+        task = null;
+        settings = null;
+        userLog = null;
+        keyVersionLog = null;
+        activeStrategy = null;
+        settingsListener = null;
+        disposed = true;
+    }
+    
+    
+    /**
+     * Returns true if the proof has been abandoned and the dispose method has
+     * been called on this object. Should be asserted before proof object is
+     * accessed.
+     */
+    public boolean isDisposed() {
+        return disposed;
+    }
+    
+            
     /** 
      * returns the name of the proof. Describes in short what has to be proved.     
      * @return the name of the proof
