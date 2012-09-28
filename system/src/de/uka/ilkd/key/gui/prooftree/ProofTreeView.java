@@ -33,6 +33,7 @@ import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
+import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -834,6 +835,11 @@ public class ProofTreeView extends JPanel {
 	    // enable goals
 	    this.add(new SetGoalsBelowEnableStatus(true));
 
+	    ProofMacroMenu macroMenu = new ProofMacroMenu(mediator, null);
+	    if(!macroMenu.isEmpty()) {
+	        this.add(new JSeparator());
+	        this.add(macroMenu);
+	    }
 
 //	    if (branch != path) {
 //                this.add(new JSeparator());

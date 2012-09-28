@@ -642,6 +642,7 @@ public class MonKeYComposite extends Composite {
                            SWTUtil.checkCanceled(monitor);
                            monitor.beginTask("Loading proofs", selectedProofs.size());
                            for (Object obj : selectedProofs) {
+                               SWTUtil.checkCanceled(monitor);
                                if (obj instanceof MonKeYProof) {
                                    ((MonKeYProof)obj).loadProof(proofDirectory, bootClassPath);
                                }
