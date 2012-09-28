@@ -15,7 +15,7 @@ public class LemmataAutoModeOptions {
         private static final int DEFAULT_MAXRULES = 10000;
         private static final String PRINT_TERMINAL = "terminal";
         private static final String PRINT_DISABLE = "disable";
-        private static final String KEY_PREFIX = "?";
+        private static final String KEY_PREFIX = "-jr-";
         private static final String MAX_RULES = KEY_PREFIX + "maxRules";
         private static final String PATH_OF_RULE_FILE = KEY_PREFIX + "pathOfRuleFile";
         private static final String PATH_OF_RESULT = KEY_PREFIX + "pathOfResult";
@@ -86,6 +86,7 @@ public class LemmataAutoModeOptions {
                 	}
                 	if(cl.isSet(TIMEOUT)){
                 		this.timeout = cl.getLong(TIMEOUT, DEFAULT_TIMEOUT);
+                		System.out.println("We are in cons 1 and timeout is "+timeout);
                 	}
                 	if(cl.isSet(MAX_RULES)){
                 		this.maxRules =  cl.getInteger(MAX_RULES, DEFAULT_MAXRULES);
@@ -94,7 +95,8 @@ public class LemmataAutoModeOptions {
                 		this.pathOfResult = generatePath(cl.getString(PATH_OF_RESULT, null), pathOfRuleFile);
                 	}
                 	}catch(CommandLineException cle){
-                		System.out.println("There was a problem reading the command line options");
+                		System.out.println("There was a problem reading the command line options. An argument is missing either for option "+TIMEOUT+ " or "+MAX_RULES+".");
+                		
                 	
                 	}
                 this.internalVersion = internalVersion;
@@ -107,8 +109,10 @@ public class LemmataAutoModeOptions {
                 this.internalVersion = internalVersion;
                 
                 if(cl.isSet(JUSTIFY_RULES)){
-                	//if cascade
+                	this.pathOfRuleFile = cl.getString(JUSTIFY_RULES, null); 
                 }
+                System.out.println("We are in cons 2");
+                read(cl);
 //                if (options.isEmpty()) {
 //                    printUsage();
 //                    throwError("No parameters were specified");
@@ -118,57 +122,72 @@ public class LemmataAutoModeOptions {
 //                }
 //                analyzeParameters(options);
 //                pathOfResult = generatePath(pathOfResult, pathOfRuleFile);
-//                this.homePath = homePath;
-//                checkForValidity();
+                this.homePath = homePath;
+                checkForValidity();
         }
 
-        private void analyzeParameters(LinkedList<String> options) {
-                Iterator<String> it = options.iterator();
-                while (it.hasNext()) {
-                        String option = it.next();
-                        if (option.startsWith(KEY_PREFIX)) {
-                                if (it.hasNext()) {
-                                        read(option, it.next());
-                                } else {
-                                        throwError("There is no parameter specified for option "
-                                                        + option);
-                                }
-                        } else {
-                                rules.add(option);
-                        }
-                }
-        }
+//        private void analyzeParameters(LinkedList<String> options) {
+//                Iterator<String> it = options.iterator();
+//                while (it.hasNext()) {
+//                        String option = it.next();
+//                        if (option.startsWith(KEY_PREFIX)) {
+//                                if (it.hasNext()) {
+//                                        read(option, it.next());
+//                                } else {
+//                                        throwError("There is no parameter specified for option "
+//                                                        + option);
+//                                }
+//                        } else {
+//                                rules.add(option);
+//                        }
+//                }
+//        }
 
-        private void read(String key, String value) {
-                if (key.equals(MAX_RULES)) {
-                        maxRules = Integer.parseInt(value);
+      //  private void read(String key, String value) {
+        private void read(CommandLine cl) {
+                if (cl.isSet(MAX_RULES)) {
+//                        maxRules = Integer.parseInt(value);
+                		try {
+							cl.getInteger(MAX_RULES, DEFAULT_MAXRULES);
+						} catch (CommandLineException e) {
+							System.out.println("Commandline argument for option "+MAX_RULES+"is missing.");
+						}
                 }
-                if (key.equals(PATH_OF_RESULT)) {
-                        pathOfResult = value;
+                if (cl.isSet(PATH_OF_RESULT)) {
+                     //   pathOfResult = value;
+                	pathOfResult = cl.getString(PATH_OF_RESULT, null);
                 }
-                if (key.equals(PATH_OF_RULE_FILE)) {
-                        pathOfRuleFile = value;
+                if (cl.isSet(PATH_OF_RULE_FILE)) {
+//                        pathOfRuleFile = value;
+                	pathOfRuleFile = cl.getString(PATH_OF_RULE_FILE, null);
                 }
-                if (key.equals(TIMEOUT)) {
-                        timeout = Long.parseLong(value);
+                if (cl.isSet(TIMEOUT)) {
+//                        timeout = Long.parseLong(value);
+                	try {
+						timeout = cl.getLong(TIMEOUT, DEFAULT_TIMEOUT);
+						System.out.println("Timeout2 is :"+timeout);
+					} catch (CommandLineException e) {
+						System.out.println("Commandline argument for "+TIMEOUT+" is missing.");
+					}
                 }
-                if (key.equals(PRINT)) {
-                        if (value.equals(PRINT_TERMINAL)) {
+                if (cl.isSet(PRINT)) {
+                        if (cl.getString(PRINT, PRINT_TERMINAL).equals(PRINT_TERMINAL)) {
                                 printStream = System.out;
                         }
-                        if (value.equals(PRINT_DISABLE)) {
+                        if (cl.getString(PRINT, PRINT_TERMINAL).equals(PRINT_DISABLE)) {
                                 printStream = null;
                         }
                 }
-                if (key.equals(SAVE_RESULTS_TO_FILE)) {
-                        saveResultsToFile = readBoolean(value,
-                                        saveResultsToFile);
+                if (cl.isSet(SAVE_RESULTS_TO_FILE)) {
+//                        saveResultsToFile = readBoolean(value,
+  //                                      saveResultsToFile);
+                		saveResultsToFile = readBoolean(cl.getString(SAVE_RESULTS_TO_FILE, "false"), saveResultsToFile);
                 }
-                if (key.equals(FILE_FOR_AXIOMS)) {
-                        filesForAxioms.add(value);
+                if (cl.isSet(FILE_FOR_AXIOMS)) {
+                        filesForAxioms.add(cl.getString(FILE_FOR_AXIOMS, null));
                 }
-                if (key.equals(FILE_FOR_DEFINITION)) {
-                        pathOfDefinitionFile = value;
+                if (cl.isSet(FILE_FOR_DEFINITION)) {
+                        pathOfDefinitionFile = cl.getString(FILE_FOR_DEFINITION, null);
                 }
         }
 
@@ -217,6 +236,7 @@ public class LemmataAutoModeOptions {
         }
 
         private void checkForValidity() {
+        		
                 File test = new File(pathOfRuleFile);
                 if (!test.isFile()) {
                         throwError("Error while setting the file containing the rules:\n"

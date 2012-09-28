@@ -39,25 +39,25 @@ import de.uka.ilkd.key.util.CommandLine;
  * This has been extracted from MainWindow to keep GUI and control further apart.
  */
 public class Main {
-    public static final String HELP = "-help";
-    public static final String AUTO = "-auto";
-    public static final String AUTO_LOADONLY = "-auto_loadonly";
-    public static final String DEBUG = "-debug";
-    public static final String NO_DEBUG = "-no_debug";
-    public static final String ASSERTION = "-assertion";
-    public static final String NO_ASSERTION = "-no_assertion";
-    public static final String NO_JMLSPECS = "-no_jmlspecs";
-    public static final String JUSTIFY_RULES ="-justify_rules";
-    public static final String PRINT_STATISTICS ="-print_statistics";
-    public static final String TIMEOUT ="-timeout";
-    public static final String EXAMPLES = "-examples"; 
-    private static final String JPRINT_TERMINAL = "terminal";
-    private static final String JPRINT_DISABLE = "disable";
+    private static final String HELP = "-help";
+    private static final String AUTO = "-auto";
+    private static final String AUTO_LOADONLY = "-auto_loadonly";
+    private static final String DEBUG = "-debug";
+    private static final String NO_DEBUG = "-no_debug";
+    private static final String ASSERTION = "-assertion";
+    private static final String NO_ASSERTION = "-no_assertion";
+    private static final String NO_JMLSPECS = "-no_jmlspecs";
+    private static final String JUSTIFY_RULES ="-justify_rules";
+    private static final String PRINT_STATISTICS ="-print_statistics";
+    private static final String TIMEOUT ="-timeout";
+    private static final String EXAMPLES = "-examples"; 
+    private static final String JPRINT_TERMINAL = "-terminal";
+    private static final String JPRINT_DISABLE = "-disable";
     private static final String JKEY_PREFIX = "-jr-";
     private static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
     private static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
     private static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
-    private static final String JTIMEOUT = JKEY_PREFIX + "timeout";
+    private static final String JTIMEOUT =  "-jr-timeout";
     private static final String JPRINT = JKEY_PREFIX + "print";
     private static final String JSAVE_RESULTS_TO_FILE = JKEY_PREFIX + "saveProofToFile";
     private static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
@@ -150,12 +150,13 @@ public class Main {
     	cl.addOption(AUTO_LOADONLY, null, "");
     	cl.addOption(NO_JMLSPECS, null, "disables parsing JML specifications");
     	cl.addOption(EXAMPLES, "<examplefiles>", "loads directory with example files on startup");
-    	cl.addOption(JUSTIFY_RULES, "<options>", "autoprove taclets (add '?help' for instructions)" );
+    	cl.addOption(JUSTIFY_RULES, "<options>", "autoprove taclets (options always with prefix -jr)" );
     	cl.addOption(PRINT_STATISTICS, "<filename>",  "in auto mode, output nr. of rule applications and time spent");
     	cl.addOption(TIMEOUT, "<timeout>", "the timeout in ms (default: " + DEFAULT_TIMEOUT +")");
        	cl.addText("\n", true);
-    	cl.addText("Options for justify rules", false);
-       	cl.addText("\n", true);
+    	cl.addText("The 'justifyrules' command has a number options you can set.\n", false);
+    	cl.addText("Provide the option name and the value as separate arguments.\n", false);
+    	cl.addText("\n", true);
     	cl.addOption(JMAX_RULES, "<max. number of rule applications>","the maximum number of rule application to perform (default: " + DEFAULT_MAXRULES +")");
     	cl.addOption(JPATH_OF_RULE_FILE, "<path>","the file to load the rules from");
     	cl.addOption(JPATH_OF_RESULT, "<path>", "the folder to store proofs to");
@@ -164,6 +165,9 @@ public class Main {
     	cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "flag to save or drop proofs (then stored to path given by "+ JPATH_OF_RESULT + ")");
     	cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "file to read axioms from");
     	cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "file to read definitions from");
+    	cl.addText("If first argument does not start with '-jr-', an implicit leading", false);
+    	cl.addText("pathOfRuleFile is assumed. For further information see the help", false);
+    	cl.addText("for the dialog reached under \"File > Prove > Userdefined Taclets\"", false);
     	return cl;
     }
     public static UserInterface evaluateOptions(CommandLine cl) {
@@ -237,31 +241,16 @@ public class Main {
 			System.out.println("Hier:"+string);
 		}
      	//-jr-
-        if(cl.isSet(JUSTIFY_RULES)){
-            LinkedList<String> options = new LinkedList<String>();
-            String currentopt = cl.getString(JUSTIFY_RULES, null);
-            if (currentopt != null && currentopt.startsWith("-jr-")){
-             currentopt = currentopt.replace("-jr-", "");
-//             options.add(currentopt);
-             System.out.println(currentopt);
-             if(!fileArguments.isEmpty()){
-            	 currentopt = iter.next().toString();
-            	 while(iter.hasNext() && currentopt.startsWith("-jr-")){
-                     currentopt = currentopt.replace("-jr-", "");
-//                   options.add(currentopt);
-                   System.out.println(currentopt);
-            	 }
-            	 System.out.println("No new Args");
-             }
-            }
-            
-//          for(int i = index+1; i < opt.length; i++){
-//              options.add(opt[i]);
-//          }
-            evaluateLemmataOptions(cl);
-//        	evaluateLemmataOptions(options);
-        }
-//        
+        if(cl.isSet(JUSTIFY_RULES)||
+        		cl.isSet(JFILE_FOR_AXIOMS)|| 
+        		cl.isSet(JFILE_FOR_DEFINITION)||
+        		cl.isSet(JMAX_RULES)||
+        		cl.isSet(JPATH_OF_RESULT)||
+        		cl.isSet(JPATH_OF_RULE_FILE)||
+        		cl.isSet(JPRINT)||
+        		cl.isSet(JSAVE_RESULTS_TO_FILE)||
+        		cl.isSet(JTIMEOUT))
+        {evaluateLemmataOptions(cl);}
         
         //arguments not assigned to a command line option may be files
      
@@ -406,11 +395,12 @@ public class Main {
         if (exitWithError) 
             ps.println("File not found or unrecognized option" +
                     (offending != null? ": "+offending: ".")+"\n");
-        ps.println("Possible parameters are (* = default): ");
+        //ps.println("Possible parameters are (* = default): ");
+        ps.println("  <filename>      : loads a .key file");
         cl.printUsage(ps);
 //        for (CommandLineOption clo: CommandLineOption.values())
 //            if (clo.message != null) ps.println(clo.message);
-        ps.println("  <filename>      : loads a .key file");
+       
         System.exit(exitWithError? -1: 0);
     }
 
