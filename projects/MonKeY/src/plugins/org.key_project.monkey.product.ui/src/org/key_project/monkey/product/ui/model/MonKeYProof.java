@@ -2,6 +2,7 @@ package org.key_project.monkey.product.ui.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.Assert;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
@@ -262,9 +263,9 @@ public class MonKeYProof extends Bean {
      * {@link #getNodes()}, {@link #getBranches()} and {@link #getTime()}.
      */
     protected void updateStatistics() {
-        setTime(proof != null ? getTime() + (System.currentTimeMillis() - proofStartTime) : 0l);
-        setNodes(proof != null ? proof.countNodes() : 0);
-        setBranches(proof != null ? proof.countBranches() : 0);
+        setTime((proof != null && !proof.isDisposed()) ? getTime() + (System.currentTimeMillis() - proofStartTime) : 0l);
+        setNodes((proof != null && !proof.isDisposed()) ? proof.countNodes() : 0);
+        setBranches((proof != null && !proof.isDisposed()) ? proof.countBranches() : 0);
     }
 
     /**
@@ -458,6 +459,7 @@ public class MonKeYProof extends Bean {
         SwingUtil.invokeAndWait(run);
         if (run.getException() != null) {
             setReuseStatus(run.getException().getMessage());
+            removeProof(run.getResult());
         }
         else {
            proof = run.getResult();
@@ -473,11 +475,35 @@ public class MonKeYProof extends Bean {
                    }
                });
            }
-           updateStatistics();
         }
+        updateStatistics();
+        removeProof(proof);
       }
    }
 
+   private void removeProof(Proof proof) throws InterruptedException, InvocationTargetException {
+       final Proof tmp = proof;
+       IRunnableWithResult<Proof> abandonProof = new AbstractRunnableWithResult<Proof>() {
+           @Override
+           public void run() {
+               try {
+                   KeYUtil.runWithoutResultDialog(new KeYUtil.IRunnableWithMainWindow() {
+                      @Override
+                      public void run(MainWindow main) throws Exception {
+                         main.getUserInterface().removeProof(tmp);
+                      }
+                   });
+               }
+               catch (Exception e) {
+                   setException(e);
+               }
+           }
+       };
+       SwingUtil.invokeAndWait(abandonProof);
+       // release proof object for garbage collection (it is disposed anyway)
+       this.proof = null;
+   }
+   
    /**
     * Checks if the proof was reused or not.
     * @return {@code true} proof was successfully reused, {@code false} proof reuse failed or was not tried.
