@@ -409,6 +409,30 @@ public abstract class KeYJavaASTFactory {
 	return new EmptyStatement();
     }
 
+    /**
+     * Create an execution context.
+     * 
+     * @param classType
+     *            the enclosing class {@link KeYJavaType}
+     * @param method
+     *            the enclosing {@link IProgramMethod} defined in
+     *            <code>classType</code>
+     * @param reference
+     *            the {@link ReferencePrefix} <code>method</code> is called on
+     * @return a new {@link ExecutionContext} for calls on
+     *         <code>reference</code> to <code>method</code> from
+     *         <code>classType</code>
+     */
+    public static ExecutionContext executionContext(
+	    final KeYJavaType classType, final IProgramMethod method,
+	    final ReferencePrefix reference) {
+	final TypeRef type = new TypeRef(classType);
+	final ExecutionContext context = new ExecutionContext(type, method,
+		reference);
+
+	return context;
+    }
+
     /** inserts the given statements at the begin of the block 
      * @param stmnt array of Statement those have to be inserted
      * @param b the Statementblock where to insert
