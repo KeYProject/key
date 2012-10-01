@@ -1373,6 +1373,27 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a labeled statement.
+     * 
+     * <pre>
+     * label: statement
+     * </pre>
+     * 
+     * @param label
+     *            the {@link Label}
+     * @param statement
+     *            the {@link Statement} to be labeled
+     * @return a new {@link LabeledStatement} that adds <code>label</code> to
+     *         <code>statement</code>
+     */
+    public static Statement labeledStatement(final Label label,
+	    final Statement statement) {
+	final LabeledStatement labeled = new LabeledStatement(label, statement);
+
+	return labeled;
+    }
+
+    /**
      * Create an object allocation.
      * 
      * <pre>
