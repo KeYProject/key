@@ -338,6 +338,52 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a while loop.
+     * 
+     * <pre>
+     * while (condition)
+     *     body
+     * </pre>
+     * 
+     * @param condition
+     *            the loop condition {@link Expression}
+     * @param body
+     *            the loop body {@link Statement}
+     * @return a new {@link While} loop defined by <code>condition</code> and
+     *         <code>body</code>
+     */
+    public static Statement whileLoop(final Expression condition,
+	    final Statement body) {
+	final While loop = new While(condition, body);
+
+	return loop;
+    }
+
+    /**
+     * Create a while loop at a specific source position.
+     * 
+     * <pre>
+     * while (condition)
+     *     body
+     * </pre>
+     * 
+     * @param condition
+     *            the loop condition {@link Expression}
+     * @param body
+     *            the loop body {@link Statement}
+     * @param position
+     *            the new source element's {@link PositionInfo}
+     * @return a new {@link While} loop defined by <code>condition</code> and
+     *         <code>body</code>, and positioned at <code>position</code>
+     */
+    public static Statement whileLoop(final Expression condition,
+	    final Statement body, final PositionInfo position) {
+	final While loop = new While(condition, body, position);
+
+	return loop;
+    }
+
+    /**
      * Create a return clause.
      * 
      * <pre>
