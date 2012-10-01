@@ -883,7 +883,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       AutoModeFinishListener listener = new AutoModeFinishListener();
       ui.getMediator().addAutoModeListener(listener);
       try {
-         final int TIMEOUT = 10 * 1000;
+         final int TIMEOUT = 20 * 1000;
          long startTime = System.currentTimeMillis();
          while (!listener.hasAutoModeStopped()) {
             try {

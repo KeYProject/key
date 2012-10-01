@@ -466,10 +466,14 @@ public class Node {
     /** marks a node as closed */
     Node close() {
 	closed = true;
-	if (parent != null && parent.isCloseable()) {
-	    return parent.close();
-	}	
-	return this;
+        Node tmp = parent;
+        Node result = this;
+        while (tmp != null && tmp.isCloseable()) {
+            tmp.closed = true;
+            result = tmp;
+            tmp = tmp.parent();
+        }
+        return result;
     }
 
     /** checks if an inner node is closeable */

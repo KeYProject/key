@@ -2,12 +2,14 @@ package org.key_project.monkey.product.ui.composite;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -22,12 +24,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.PlatformUI;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.monkey.product.ui.model.MonKeYProof;
@@ -38,6 +41,7 @@ import org.key_project.monkey.product.ui.util.MonKeYUtil;
 import org.key_project.monkey.product.ui.util.MonKeYUtil.MonKeYProofSums;
 import org.key_project.monkey.product.ui.view.MonKeYView;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.StringUtil;
 
 /**
@@ -80,6 +84,11 @@ public class MonKeYComposite extends Composite {
      * Key to store the use arithmetic treatment option in an {@link IMemento}.
      */
     public static final String MEMENTO_KEY_USE_DEF_OPS = "useDefOps";
+
+    /**
+     * Key to store the proof directory value in an {@link IMemento}.
+     */
+    public static final String MEMENTO_KEY_PROOF_DIRECTORY = "proofDirectory";
     
     /**
      * Defines the location.
@@ -120,6 +129,11 @@ public class MonKeYComposite extends Composite {
           handleLabelProviderChanged(event);
        }
     };
+    
+    /**
+     * {@link TableViewerColumn} of {@link #proofViewer} which shows the proof reuse status.
+     */
+    private TableViewerColumn proofReuseColumn;
     
     /**
      * {@link TableViewerColumn} of {@link #proofViewer} which shows the proof result.
@@ -200,6 +214,11 @@ public class MonKeYComposite extends Composite {
      * Shows accumulated values.
      */
     private Text sumText;
+    
+    /**
+     * The path to a directory which provides *.proof files or to save such files in.
+     */
+    private String proofDirectory;
     
     /**
      * Constructor.
@@ -309,6 +328,10 @@ public class MonKeYComposite extends Composite {
         contractColumn.getColumn().setText("Contract");
         contractColumn.getColumn().setMoveable(true);
         proofViewerLayout.setColumnData(contractColumn.getColumn(), new ColumnWeightData(35));
+        proofReuseColumn = new TableViewerColumn(proofViewer, style);
+        proofReuseColumn.getColumn().setText("Proof Reuse");
+        proofReuseColumn.getColumn().setMoveable(true);
+        proofViewerLayout.setColumnData(proofReuseColumn.getColumn(), new ColumnWeightData(15));
         proofResultColumn = new TableViewerColumn(proofViewer, style);
         proofResultColumn.getColumn().setText("Proof Result");
         proofResultColumn.getColumn().setMoveable(true);
@@ -343,17 +366,25 @@ public class MonKeYComposite extends Composite {
         // Buttons
         Composite buttonComposite = new Composite(proofGroup, SWT.NONE);
         buttonComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        buttonComposite.setLayout(new GridLayout(3, false));
-        Button exportButton = new Button(buttonComposite, SWT.PUSH);
-        exportButton.setText("&Export");
-        exportButton.addSelectionListener(new SelectionAdapter() {
+        buttonComposite.setLayout(new GridLayout(6, false));
+        Button openKeYButton = new Button(buttonComposite, SWT.PUSH);
+        openKeYButton.setText("&Open KeY");
+        openKeYButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                exportProofs();
+                openKeY();
+            }
+        });
+        Button loadProofsButton = new Button(buttonComposite, SWT.PUSH);
+        loadProofsButton.setText("L&oad selected Proofs");
+        loadProofsButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                loadProofs();
             }
         });
         Button startProofsButton = new Button(buttonComposite, SWT.PUSH);
-        startProofsButton.setText("&Start all proofs");
+        startProofsButton.setText("&Start selected proofs");
         startProofsButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         startProofsButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -361,12 +392,28 @@ public class MonKeYComposite extends Composite {
                 startProofs();
             }
         });
-        Button openKeYButton = new Button(buttonComposite, SWT.PUSH);
-        openKeYButton.setText("&Open KeY");
-        openKeYButton.addSelectionListener(new SelectionAdapter() {
+        Button saveProofsButton = new Button(buttonComposite, SWT.PUSH);
+        saveProofsButton.setText("Sa&ve selected Proofs");
+        saveProofsButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                openKeY();
+                saveProofs();
+            }
+        });
+        Button exportButton = new Button(buttonComposite, SWT.PUSH);
+        exportButton.setText("&Export Proofs");
+        exportButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                exportProofs();
+            }
+        });
+        Button helpButton = new Button(buttonComposite, SWT.PUSH);
+        helpButton.setText("&Help");
+        helpButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                PlatformUI.getWorkbench().getHelpSystem().displayHelpResource("/org.key_project.monkey.help/help/tutorial/Tutorial.htm");
             }
         });
     }
@@ -462,7 +509,9 @@ public class MonKeYComposite extends Composite {
     public void startProofs() {
         if (proofViewer.getInput() instanceof List<?>) {
             setProofSearchStrategyOptionsEnabled(false);
-            final List<?> input = (List<?>)proofViewer.getInput();
+            // Get selected proofs
+            final List<?> selectedProofs = SWTUtil.toList(proofViewer.getSelection());
+            // Get strategy properties
             final boolean expandMethods = methodTreatmentExpandButton.getSelection();
             final boolean useDependencyContracts = dependencyContractsOnButton.getSelection();
             final boolean useQuery = queryTreatmentOnButton.getSelection();
@@ -472,8 +521,8 @@ public class MonKeYComposite extends Composite {
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
                         SWTUtil.checkCanceled(monitor);
-                        monitor.beginTask("Proving", input.size());
-                        for (Object obj : input) {
+                        monitor.beginTask("Proving", selectedProofs.size());
+                        for (Object obj : selectedProofs) {
                             SWTUtil.checkCanceled(monitor);
                             if (obj instanceof MonKeYProof) {
                                 ((MonKeYProof)obj).startProof(expandMethods, useDependencyContracts, useQuery, useDefOps);
@@ -490,7 +539,7 @@ public class MonKeYComposite extends Composite {
                     }
                     finally {
                         monitor.done();
-                        Display.getDefault().syncExec(new Runnable() {
+                        getDisplay().syncExec(new Runnable() {
                            @Override
                            public void run() {
                               setProofSearchStrategyOptionsEnabled(true);
@@ -501,6 +550,125 @@ public class MonKeYComposite extends Composite {
             }.schedule();
         }
     }
+
+   /**
+    * Saves all proofs in a user defined directory.
+    */
+   public void saveProofs() {
+      try {
+          // Get selected proofs
+          final List<?> selectedProofs = SWTUtil.toList(proofViewer.getSelection());
+          // Select directory
+          DirectoryDialog dialog = new DirectoryDialog(getShell());
+          dialog.setFilterPath(proofDirectory);
+          dialog.setText("Save proofs");
+          dialog.setMessage("Select a directory to save proofs in.\nIt is recommended to select an empty directory.");
+          String selectedPath = dialog.open();
+          if (selectedPath != null) {
+             proofDirectory = selectedPath;
+             if (proofs != null) {
+                // Check for existing files
+                List<String> existingFiles = new LinkedList<String>();
+                for (Object obj : selectedProofs) {
+                    if (obj instanceof MonKeYProof) {
+                        MonKeYProof proof = (MonKeYProof)obj;
+                        if (proof.hasProofInKeY() && proof.existsProofFile(proofDirectory)) {
+                            existingFiles.add(proof.getProofFileName());
+                        }
+                    }
+                }
+                boolean goOn = true;
+                if (!existingFiles.isEmpty()) {
+                   goOn = MessageDialog.openQuestion(getShell(), "Replace existing files?", "Replace the following existing files?\n" + CollectionUtil.toString(existingFiles, ",\n"));
+                }
+                if (goOn) {
+                   // Save proofs
+                   new AbstractKeYMainWindowJob("Saving proofs") {
+                      @Override
+                      protected IStatus run(IProgressMonitor monitor) {
+                          try {
+                              SWTUtil.checkCanceled(monitor);
+                              monitor.beginTask("Saving proofs", selectedProofs.size());
+                              for (Object obj : selectedProofs) {
+                                  if (obj instanceof MonKeYProof) {
+                                      ((MonKeYProof)obj).save(proofDirectory);
+                                  }
+                                  monitor.worked(1);
+                              }
+                              return Status.OK_STATUS;
+                          }
+                          catch (OperationCanceledException e) {
+                              return Status.CANCEL_STATUS;
+                          }
+                          catch (Exception e) {
+                              return LogUtil.getLogger().createErrorStatus(e);
+                          }
+                          finally {
+                              monitor.done();
+                          }
+                      }
+                  }.schedule();
+                }
+             }
+          }
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+      }
+   }
+
+   /**
+    * Loads available proofs.
+    */
+   public void loadProofs() {
+      try {
+          // Get selected proofs
+          final List<?> selectedProofs = SWTUtil.toList(proofViewer.getSelection());
+          // Select directory
+          DirectoryDialog dialog = new DirectoryDialog(getShell());
+          dialog.setFilterPath(proofDirectory);
+          dialog.setText("Load proofs");
+          dialog.setMessage("Select a directory to load proofs from.");
+          String selectedPath = dialog.open();
+          if (selectedPath != null) {
+             proofDirectory = selectedPath;
+             if (proofs != null) {
+                final String bootClassPath = bootClassPathText.getText();
+                new AbstractKeYMainWindowJob("Loading proofs") {
+                   @Override
+                   protected IStatus run(IProgressMonitor monitor) {
+                       try {
+                           SWTUtil.checkCanceled(monitor);
+                           monitor.beginTask("Loading proofs", selectedProofs.size());
+                           for (Object obj : selectedProofs) {
+                               SWTUtil.checkCanceled(monitor);
+                               if (obj instanceof MonKeYProof) {
+                                   ((MonKeYProof)obj).loadProof(proofDirectory, bootClassPath);
+                               }
+                               monitor.worked(1);
+                           }
+                           return Status.OK_STATUS;
+                       }
+                       catch (OperationCanceledException e) {
+                           return Status.CANCEL_STATUS;
+                       }
+                       catch (Exception e) {
+                           return LogUtil.getLogger().createErrorStatus(e);
+                       }
+                       finally {
+                           monitor.done();
+                       }
+                   }
+               }.schedule();
+             }
+          }
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getShell(), e);
+      }
+   }
 
     /**
      * Exports the proof table content into a CSV file.
@@ -545,7 +713,7 @@ public class MonKeYComposite extends Composite {
                                }
                             }
                             // Unload old source
-                            Display.getDefault().syncExec(new Runnable() {
+                            getDisplay().syncExec(new Runnable() {
                                @Override
                                public void run() {
                                   proofs = null;
@@ -572,6 +740,13 @@ public class MonKeYComposite extends Composite {
                                     }
                                 });
                             }
+                            // Select all proofs
+                            getDisplay().syncExec(new Runnable() {
+                               @Override
+                               public void run() {
+                                  proofViewer.getTable().selectAll();
+                               }
+                            });
                             return Status.OK_STATUS;
                         }
                         catch (OperationCanceledException e) {
@@ -627,6 +802,7 @@ public class MonKeYComposite extends Composite {
             Boolean useDefOpy = memento.getBoolean(MEMENTO_KEY_USE_DEF_OPS);
             arithmeticTreatmentBaseButton.setSelection(useDefOpy != null && !useDefOpy.booleanValue());
             arithmeticTreatmentDefOpsButton.setSelection(useDefOpy == null || useDefOpy.booleanValue());
+            proofDirectory = memento.getString(MEMENTO_KEY_PROOF_DIRECTORY);
         }
     }
 
@@ -643,6 +819,7 @@ public class MonKeYComposite extends Composite {
             memento.putBoolean(MEMENTO_KEY_USE_DEPENDENCY_CONTRACTS, dependencyContractsOnButton.getSelection());
             memento.putBoolean(MEMENTO_KEY_USE_QUERY, queryTreatmentOnButton.getSelection());
             memento.putBoolean(MEMENTO_KEY_USE_DEF_OPS, arithmeticTreatmentDefOpsButton.getSelection());
+            memento.putString(MEMENTO_KEY_PROOF_DIRECTORY, proofDirectory);
         }
     }
 }

@@ -1,0 +1,28 @@
+<html>
+   <head>
+      <title>MonKeY Tutorial</title>
+   </head>
+   <body>
+      <h1>MonKeY Tutorial</h1>
+      <p>
+         This tutorial describes how to use the user interface of MonKeY.
+      </p>
+      <p>
+         To verify all proof obligations of a system follow the default workflow described by the following steps:
+         <ol>
+            <li>Define the "Location" which is the path to the directory that contains the whole Java source code with JML specifications.</li>
+            <li>Optionally define the "Boot Class Path" which is a directory that contains Java source code signatures with JML specifications for Java system classes.</li>
+            <li>Click on "Load" to list all available proof obligations of the defined location.</li>
+            <li>
+               Optionally, if existing proofs in form of *.proof files exist click on "Load Proofs" and follow the UI instructions.<br>
+               Column "Proof Reuse" will show if a proof file exists for the proof obligation if it was possible to reuse the proof or the error message otherwise. 
+            </li>
+            <li>Optionally define settings for KeY's auto mode in groups "Method Treatment", "Dependency Contracts", "Query Treatment", "Arithmetic Treatment".</li>
+            <li>Click on "Start all proofs" to instantiate proofs in KeY's main window for all proofs which where not successfully loaded. The auto mode is also started for each proof that has not the proof result "Closed".</li>
+            <li>Optionally, if proofs are not closed automatically, use the instantiated proofs in KeY's main window to close it manually. The table in MonKeY will be updated if the proof is closed.</li>
+            <li>Click on "Save Proofs" and follow the instructions to save all proofs as *.proof files in a selected directory. It is later possible to load them again via "Load Proofs" as described in this tutorial.</li>
+            <li>Click on "Export Proofs" to save the table with the proof statistics as CSV file.</li>
+         </ol>
+      </p>
+   </body>
+</html>

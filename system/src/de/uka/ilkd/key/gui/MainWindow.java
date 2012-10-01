@@ -974,20 +974,6 @@ public final class MainWindow extends JFrame  {
         }
     }
     
-    // FIXME DOES NOT DO THE SAME AS THE ONE ONE ABOVE
-    @Deprecated
-    public void closeTaskWithoutInteraction() {
-        final Proof proof = mediator.getProof();
-        if (proof != null) {
-            final TaskTreeNode rootTask = 
-                proof.getBasicTask().getRootTask();     
-            proofList.removeTaskWithoutInteraction(rootTask);   
-            proof.getServices().getSpecificationRepository().removeProof(proof);
-            proof.mgt().removeProofListener();
-            proofTreeView.removeProofs(rootTask.allProofs());
-        }
-    }
-    
     /**
      * brings window in front and request focus
      */
