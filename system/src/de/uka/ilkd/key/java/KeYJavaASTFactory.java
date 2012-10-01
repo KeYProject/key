@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
@@ -323,6 +324,17 @@ public abstract class KeYJavaASTFactory {
      */
     public static Throw throwClause(Expression e) {
 	return new Throw(e);
+    }
+
+    /**
+     * Create a <code>true</code> condition.
+     * 
+     * @return a new {@link Guard} with expression <code>true</code>
+     */
+    public static Guard trueGuard() {
+	final Guard guard = new Guard(BooleanLiteral.TRUE);
+
+	return guard;
     }
 
     /**
