@@ -1,9 +1,6 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.math.BigInteger;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
