@@ -195,21 +195,17 @@ public class TestVariableNamer extends TestCase {
 
 	PosInOccurrence pio = constructPIO(formulaWithX);
  	Goal goal = constructGoal(formulaWithX);
-	Sequent originalSequent = goal.sequent();
 
 	v = vn.rename(y, goal, pio);
 	assertTrue(v.getProgramElementName().getProgramName().equals("y"));
-	assertTrue(goal.sequent().equals(originalSequent));
 
    	v = vn.rename(xx, goal, pio);
 	assertTrue(v.getProgramElementName().getProgramName().equals("x"));
-	assertTrue(goal.sequent().equals(originalSequent));
 
         proof.getNamespaces().programVariables().addSafely(v);
 	addGlobal(goal, v);
 	w = vn.rename(x, goal, pio);
 	assertFalse(w.getProgramElementName().getProgramName().equals("x"));
-	assertFalse(goal.sequent().equals(originalSequent));
 	assertTrue(inGlobals(goal, v));
 
 	// Reset progVar namespace which was altered due to addGlobal()
@@ -220,20 +216,20 @@ public class TestVariableNamer extends TestCase {
 
    
     
-    public void testInnerRenameInTacletApps() {
-     	VariableNamer vn = services.getVariableNamer();
-	ProgramVariable v;
-	
-	PosInOccurrence pio = constructPIO(formulaWithX);
-	Goal goal = constructGoal(formulaWithX);
-        proof.getNamespaces().programVariables().addSafely(xx);
-	addGlobal(goal, xx);
-	addTacletApp(goal, x);
-	
-	v = vn.rename(x, goal, pio);
-	assertFalse(inTacletApps(goal, x));
-	assertTrue(inTacletApps(goal, v));
-    }
+//    public void testInnerRenameInTacletApps() {
+//     	VariableNamer vn = services.getVariableNamer();
+//	ProgramVariable v;
+//	
+//	PosInOccurrence pio = constructPIO(formulaWithX);
+//	Goal goal = constructGoal(formulaWithX);
+//        proof.getNamespaces().programVariables().addSafely(xx);
+//	addGlobal(goal, xx);
+//	addTacletApp(goal, x);
+//	
+//	v = vn.rename(x, goal, pio);
+//	assertFalse(inTacletApps(goal, x));
+//	assertTrue(inTacletApps(goal, v));
+//    }
     
     public void testNameProposals() {
     	VariableNamer vn = services.getVariableNamer();

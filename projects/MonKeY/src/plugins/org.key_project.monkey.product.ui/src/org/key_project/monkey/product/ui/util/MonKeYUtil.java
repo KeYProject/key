@@ -113,6 +113,7 @@ public final class MonKeYUtil {
       long nodes = 0;
       long time = 0;
       int closedCount = 0;
+      int reusedProofsCount = 0;
       for (MonKeYProof proof : proofs) {
          branches += proof.getBranches();
          nodes += proof.getNodes();
@@ -120,8 +121,11 @@ public final class MonKeYUtil {
          if (MonKeYProofResult.CLOSED.equals(proof.getResult())) {
             closedCount ++;
          }
+         if (proof.isReused()) {
+            reusedProofsCount ++;
+         }
       }
-      return new MonKeYProofSums(branches, nodes, time, closedCount, proofs.size());
+      return new MonKeYProofSums(branches, nodes, time, closedCount, proofs.size(), reusedProofsCount);
    }
    
    /**
@@ -155,23 +159,31 @@ public final class MonKeYUtil {
       private int proofsCount;
       
       /**
+       * The number of reused proofs.
+       */
+      private int reusedProofsCount;
+      
+      /**
        * Constructor.
        * @param branches The accumulated number of branches.
        * @param nodes The accumulated number of nodes.
        * @param time The accumulated time.
        * @param closedCount The number of closed proofs.
        * @param proofsCount The number of proofs.
+       * @param reusedProofsCount The number of reused proofs.
        */
       public MonKeYProofSums(long branches, 
                              long nodes, 
                              long time, 
                              int closedCount, 
-                             int proofsCount) {
+                             int proofsCount,
+                             int reusedProofsCount) {
          this.branches = branches;
          this.nodes = nodes;
          this.time = time;
          this.closedCount = closedCount;
          this.proofsCount = proofsCount;
+         this.reusedProofsCount = reusedProofsCount;
       }
 
       /**
@@ -212,6 +224,14 @@ public final class MonKeYUtil {
        */
       public int getProofsCount() {
          return proofsCount;
+      }
+
+      /**
+       * Returns the number of reused proofs.
+       * @return The number of reused proofs.
+       */
+      public int getReusedProofsCount() {
+         return reusedProofsCount;
       }
    }
 }

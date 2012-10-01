@@ -19,7 +19,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 
 /**
  * A JML specification case (i.e., more or less an operation contract) in 
- * textual form.
+ * textual form. Is also used for block contracts.
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
    
@@ -36,6 +36,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private ImmutableList<PositionedString> diverges =
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> depends =
+            ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> breaks =
+            ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> continues =
+            ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> returns =
             ImmutableSLList.<PositionedString>nil();
 
     private Map<String, ImmutableList<PositionedString>>
@@ -145,6 +151,36 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         depends = depends.append(ps);
     }
 
+    
+    public void addBreaks(PositionedString ps) {
+        breaks = breaks.append(ps);
+    }
+
+
+    public void addBreaks(ImmutableList<PositionedString> l) {
+        breaks = breaks.append(l);
+    }
+
+
+    public void addContinues(PositionedString ps) {
+        continues = continues.append(ps);
+    }
+
+
+    public void addContinues(ImmutableList<PositionedString> l) {
+        continues = continues.append(l);
+    }
+
+
+    public void addReturns(PositionedString ps) {
+        returns = returns.append(ps);
+    }
+
+
+    public void addReturns(ImmutableList<PositionedString> l) {
+        returns = returns.append(l);
+    }
+
 
     public Behavior getBehavior() {
         return behavior;
@@ -216,6 +252,21 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
+    public ImmutableList<PositionedString> getBreaks() {
+        return breaks;
+    }
+
+
+    public ImmutableList<PositionedString> getContinues() {
+        return continues;
+    }
+
+
+    public ImmutableList<PositionedString> getReturns() {
+        return returns;
+    }
+
+
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
@@ -260,6 +311,18 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("depends: ").append(it.next()).append("\n");
         }
+        it = breaks.iterator();
+        while (it.hasNext()) {
+            sb.append("breaks: ").append(it.next()).append("\n");
+        }
+        it = continues.iterator();
+        while (it.hasNext()) {
+            sb.append("continues: ").append(it.next()).append("\n");
+        }
+        it = returns.iterator();
+        while (it.hasNext()) {
+            sb.append("returns: ").append(it.next()).append("\n");
+        }
         return sb.toString();
     }
 
@@ -279,7 +342,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && signals.equals(sc.signals)
                && signalsOnly.equals(sc.signalsOnly)
                && diverges.equals(sc.diverges)
-               && depends.equals(sc.depends);
+               && depends.equals(sc.depends)
+               && breaks.equals(sc.breaks)
+               && continues.equals(sc.continues)
+               && returns.equals(sc.returns);
     }
 
 
@@ -294,6 +360,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + signals.hashCode()
                + signalsOnly.hashCode()
                + diverges.hashCode()
-               + depends.hashCode();
+               + depends.hashCode()
+               + breaks.hashCode()
+               + continues.hashCode()
+               + returns.hashCode();
     }
 }

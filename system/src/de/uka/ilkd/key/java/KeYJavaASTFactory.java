@@ -396,6 +396,10 @@ public abstract class KeYJavaASTFactory {
 	return new Break(l);
     }
 
+    public static Continue continueStatement(Label label) {
+        return new Continue(label);
+    }
+
     /**
      * Create an empty statement.
      * 

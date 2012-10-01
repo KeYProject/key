@@ -361,4 +361,13 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         
         System.out.println ( message );
     }
+
+
+    /**
+     * this rule app manager has no manager to delegate to
+     * but is the "base" manager.
+     */
+    public AutomatedRuleApplicationManager getDelegate() {
+        return null;
+    }
 }

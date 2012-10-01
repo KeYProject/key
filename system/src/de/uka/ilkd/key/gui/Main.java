@@ -60,6 +60,7 @@ public class Main {
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
 
     public static void main(String[] args) {
+
         System.out.println("\nKeY Version " + VERSION);
         System.out.println(COPYRIGHT + "\nKeY is protected by the " +
                 "GNU General Public License\n");
@@ -288,7 +289,8 @@ public class Main {
                 "  timeout <time in ms>\n"+
                 "                  : set maximal time for rule " +
                 "application in ms (-1 disables timeout)"),
-        EXAMPLES (null,null),
+        EXAMPLES (null,
+                "  examples <dir>  : open examples dialog for the given directory"),
         HELP ('h',
                 "  help            : display this text");
         
