@@ -1310,9 +1310,60 @@ public abstract class KeYJavaASTFactory {
 	MethodBodyStatement methodBody = null;
 
 	if (method != null) {
-	    methodBody = new MethodBodyStatement(method, reference, result,
-		    new ImmutableArray<Expression>(arguments));
+	    methodBody = KeYJavaASTFactory.methodBody(result, reference,
+		    method, arguments);
 	}
+
+	return methodBody;
+    }
+
+    /**
+     * Create a method body shortcut.
+     * 
+     * @param result
+     *            the {@link ProgramVariable} the return value is assigned to or
+     *            <code>null</code>
+     * @param reference
+     *            the {@link ReferencePrefix} invocation target
+     * @param method
+     *            the {@link IProgramMethod} reference
+     * @param arguments
+     *            the <code>Expression</code>s and their static types the method
+     *            is called with
+     * @return a new {@link MethodBodyStatement} for <code>method</code> when
+     *         called with <code>arguments</code>
+     */
+    public static MethodBodyStatement methodBody(final ProgramVariable result,
+	    final ReferencePrefix reference, final IProgramMethod method,
+	    final Expression[] arguments) {
+	final MethodBodyStatement methodBody = KeYJavaASTFactory.methodBody(
+		result, reference, method, new ImmutableArray<Expression>(
+			arguments));
+
+	return methodBody;
+    }
+
+    /**
+     * Create a method body shortcut.
+     * 
+     * @param result
+     *            the {@link ProgramVariable} the return value is assigned to or
+     *            <code>null</code>
+     * @param reference
+     *            the {@link ReferencePrefix} invocation target
+     * @param method
+     *            the {@link IProgramMethod} reference
+     * @param arguments
+     *            the <code>Expression</code>s and their static types the method
+     *            is called with
+     * @return a new {@link MethodBodyStatement} for <code>method</code> when
+     *         called with <code>arguments</code>
+     */
+    public static MethodBodyStatement methodBody(final ProgramVariable result,
+	    final ReferencePrefix reference, final IProgramMethod method,
+	    final ImmutableArray<Expression> arguments) {
+	final MethodBodyStatement methodBody = new MethodBodyStatement(method,
+		reference, result, arguments);
 
 	return methodBody;
     }
