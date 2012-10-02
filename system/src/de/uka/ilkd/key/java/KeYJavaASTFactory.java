@@ -492,6 +492,27 @@ public abstract class KeYJavaASTFactory {
 	return context;
     }
 
+    /**
+     * Insert a statement in a block of statements.
+     * 
+     * @param statement
+     *            the {@link Statement} to be inserted into <code>block</code>
+     * @param block
+     *            the {@link StatementBlock} <code>statement</code> is inserted
+     *            into
+     * @return a new <code>StatementBlock</code> that contains both the
+     *         <code>Statement</code>s from <code>block</code> and
+     *         <code>statement</code>
+     */
+    public static StatementBlock insertStatementInBlock(
+	    final Statement statement, final StatementBlock block) {
+	final Statement[] statements = new Statement[] { statement };
+	final StatementBlock statementBlock = KeYJavaASTFactory
+		.insertStatementInBlock(statements, block);
+
+	return statementBlock;
+    }
+
     /** inserts the given statements at the begin of the block 
      * @param stmnt array of Statement those have to be inserted
      * @param b the Statementblock where to insert
