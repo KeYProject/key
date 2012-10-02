@@ -253,10 +253,11 @@ public class ClashFreeSubst {
 	return true;
     }
 
-
+    // This helper is used in other places as well. Perhaps make it toplevel one
+    // day.
     /** A Visitor class to collect all (not just the free) variables 
      * occurring in a term. */
-    protected static class VariableCollectVisitor extends Visitor {
+    public static class VariableCollectVisitor extends Visitor {
 	/** the collected variables */
 	private ImmutableSet<QuantifiableVariable> vars;
 
