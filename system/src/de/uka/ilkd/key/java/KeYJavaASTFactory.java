@@ -13,6 +13,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -1606,5 +1607,29 @@ public abstract class KeYJavaASTFactory {
      */
     public static BooleanLiteral falseLiteral() {
 	return BooleanLiteral.FALSE;
+    }
+
+    /**
+     * Create a variable specification.
+     * 
+     * @param variable
+     *            the {@link IProgramVariable} to be specified
+     * @param dimensions
+     *            the number of dimensions
+     * @param initializer
+     *            the initializer {@link Expression}
+     * @param type
+     *            the {@link Type}
+     * @return a new {@link VariableSpecification} for <code>variable</code> of
+     *         type <code>type[dimensions]</code>, initialized to
+     *         <code>initializer</code>
+     */
+    public static VariableSpecification variableSpecification(
+	    final IProgramVariable variable, final int dimensions,
+	    final Expression initializer, final Type type) {
+	final VariableSpecification specification = new VariableSpecification(
+		variable, dimensions, initializer, type);
+
+	return specification;
     }
 }
