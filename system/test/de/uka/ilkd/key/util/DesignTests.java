@@ -18,13 +18,17 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Iterator;
 import java.util.LinkedList;
+import junit.framework.TestCase;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
+
 
 /** 
  * This class tests, if design principles have been hurt. Therefore it
  * makes use of reflection.
  */
 
-public class DesignTests {
+public class DesignTests extends TestCase {
 
     private static final File binaryPath = 
 	new File(System.getProperty("key.home")+File.separator+"system"+
@@ -39,6 +43,10 @@ public class DesignTests {
      * hurt.
      */
     public DesignTests() {
+    }
+
+    public void setUp() {
+	allClasses = getAllClasses(binaryPath);
     }
 
     /** 
@@ -121,20 +129,22 @@ public class DesignTests {
     }
 
     /** prints an enumeration of of those classes that hurt a design principle */
-    private void printBadClasses(LinkedList badClasses) {
+    private String printBadClasses(LinkedList badClasses) {
+	StringBuilder sb = new StringBuilder();
 	Iterator it = badClasses.iterator();	
 	if (it.hasNext()) {
-	    System.out.println("Bad classes:");
+	    sb.append("Bad classes:");
 	    while (it.hasNext()) {	    
-		System.out.println("\t"+it.next());
+		sb.append("\t"+it.next());
 	    }	
 	}
-    }
+	return sb.toString();
+   }
 
     /**
      * subclass of Term must be private or package private
      */
-    public LinkedList testTermSubclassVisibility() {
+    public void testTermSubclassVisibility() {
 	LinkedList badClasses = new LinkedList();
 	for (int i = 0; i<allClasses.length; i++) {
  	    if (allClasses[i] != de.uka.ilkd.key.logic.Term.class &&
@@ -147,15 +157,16 @@ public class DesignTests {
  		}
  	    }
 	}
-	if (badClasses.size()>0) {
+	if ( badClasses.size() > 0 ) {
 	    message = "Visibility of subclasses of Term  ";
 	    message += "must be package private or private.\n";
+	    message += printBadClasses(badClasses);
 	}
-	return badClasses;
+	assertTrue(message, badClasses.size() == 0);
     }
 
     /** does not test if GUI is used within methods */
-    public LinkedList testGuiSep() {
+    public void testGuiSep() {
         LinkedList badClasses = new LinkedList();
         for (int i = 0; i<allClasses.length; i++) {
             if (de.uka.ilkd.key.rule.Rule.class.isAssignableFrom(allClasses[i]) ||
@@ -189,8 +200,10 @@ public class DesignTests {
         }
         if (badClasses.size()>0) {
             message = "No GUI is allowd in the packages and there sub packages";
+	    message += printBadClasses(badClasses);
         }
-        return badClasses;
+
+	assertTrue(message, badClasses.size() == 0);
     }
 
 
@@ -212,7 +225,6 @@ public class DesignTests {
 		    System.out.print(message);
 		    testcases++;
 		    failures += badClasses.size() > 0 ? 1 : 0;
-		    printBadClasses(badClasses);
 		} catch (Exception e) {
 		    e.printStackTrace();
 		    System.err.println("Could not invoke method "+meth[i]);
