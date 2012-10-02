@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
@@ -516,6 +517,30 @@ public abstract class KeYJavaASTFactory {
 	    stmnts[i]=stmnt.getStatementAt(i);
 	return  
 	    insertStatementInBlock(stmnts, b);
+    }
+
+    /**
+     * Create an instance of operator.
+     * 
+     * <pre>
+     * expression instance of type
+     * </pre>
+     * 
+     * @param expression
+     *            the {@link Expression} operand, whose runtime type is to be
+     *            checked
+     * @param type
+     *            the {@link KeYJavaType} operand <code>expression</code>'s type
+     *            is checked against
+     * @return a new {@link Instanceof} for checking <code>expression</code>'s
+     *         type against <code>type</code>
+     */
+    public static Instanceof instanceOf(final Expression expression,
+	    final KeYJavaType type) {
+	final TypeRef typeRef = new TypeRef(type);
+	final Instanceof instanceOf = new Instanceof(expression, typeRef);
+
+	return instanceOf;
     }
 
     /**
