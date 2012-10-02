@@ -603,6 +603,25 @@ public abstract class TacletApp implements RuleApp {
 	return app;
     }
 
+    /**
+     * Collect names which would result in a clash for a new logical variable.
+     * 
+     * The clashing names include the names of the bound and unbound variables
+     * of "notFreeIn" clauses. Additionally, equally-named program variables are
+     * avoided.
+     * 
+     * While this analysis is not strictly necessary (two different variables
+     * may bear the same name), it is vital not to cause confusion with the
+     * user.
+     * 
+     * @param sv
+     *            the schema variable to instantiate with a fresh variable, not
+     *            <code>null</code>
+     * @param services
+     *            the services object, not <code>null</code>
+     * @return a fresh created collection of strings in which a freshly created
+     *         variable name should not fall.
+     */
     private Collection<String> collectClashNames(SchemaVariable sv, Services services) {
         Collection<String> result = new HashSet<String>();
         VariableCollectVisitor vcv = new VariableCollectVisitor();
