@@ -1458,4 +1458,24 @@ public abstract class KeYJavaASTFactory {
 
 	return constructor;
     }
+
+    /**
+     * Create a literal for the truth value <code>true</code>.
+     * 
+     * @return a {@link BooleanLiteral} that represents the value
+     *         <code>true</code>
+     */
+    public static BooleanLiteral trueLiteral() {
+	return BooleanLiteral.TRUE;
+    }
+
+    /**
+     * Create a literal for the truth value <code>false</code>.
+     * 
+     * @return a {@link BooleanLiteral} that represents the value
+     *         <code>true</code>
+     */
+    public static BooleanLiteral falseLiteral() {
+	return BooleanLiteral.FALSE;
+    }
 }
