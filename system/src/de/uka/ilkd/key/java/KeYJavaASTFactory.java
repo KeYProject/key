@@ -445,6 +445,38 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create an if clause.
+     * 
+     * <pre>
+     * if (guard)
+     *    thenStatement
+     * else
+     *    elseStatement
+     * </pre>
+     * 
+     * @param guard
+     *            the if clause condition {@link Expression}
+     * 
+     * @param thenStatement
+     *            the if clause then branch {@link Statement}
+     * 
+     * @param elseStatement
+     *            the if clause else branch <code>Statement</code>
+     * 
+     * @return a new {@link If} with condition <code>guard</code>, then branch
+     *         <code>thenStatement</code> and else branch
+     *         <code>elseStatement</code>
+     */
+    public static Statement ifElse(final Expression guard,
+	    final Statement thenStatement, final Statement elseStatement) {
+	final Then then = new Then(thenStatement);
+	final Else els = new Else(elseStatement);
+	final If ifElse = KeYJavaASTFactory.ifElse(guard, then, els);
+
+	return ifElse;
+    }
+
+    /**
      * Create a break statement.
      * 
      * @param l
