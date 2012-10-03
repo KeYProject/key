@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
@@ -714,6 +715,21 @@ public abstract class KeYJavaASTFactory {
 		variable);
 
 	return KeYJavaASTFactory.loopInit(initializer);
+    }
+
+    /**
+     * Create an array initializer.
+     * 
+     * @param expressions
+     *            the initial value {@link Expression}s
+     * @return a new {@link ArrayInitializer} which contains
+     *         <code>expressions</code>
+     */
+    public static ArrayInitializer arrayInitializer(
+	    final Expression[] expressions) {
+	final ArrayInitializer initializer = new ArrayInitializer(expressions);
+
+	return initializer;
     }
 
     /**
