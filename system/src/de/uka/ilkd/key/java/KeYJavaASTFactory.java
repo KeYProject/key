@@ -1118,7 +1118,7 @@ public abstract class KeYJavaASTFactory {
     public static LocalVariableDeclaration declare(
 	    final ImmutableArray<Modifier> modifiers,
 	    final IProgramVariable variable, final Expression init,
-	    final TypeRef typeRef) {
+	    final TypeReference typeRef) {
 	final VariableSpecification varSpec = KeYJavaASTFactory
 		.variableSpecification(variable, init, typeRef.getKeYJavaType());
 	final LocalVariableDeclaration declaration = KeYJavaASTFactory.declare(
