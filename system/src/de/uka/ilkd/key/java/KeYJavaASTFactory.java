@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.expression.operator.Equals;
 import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.expression.operator.LogicalAnd;
@@ -48,6 +49,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.util.ExtList;
 
 
 /**
@@ -643,6 +645,43 @@ public abstract class KeYJavaASTFactory {
      */
     public static EmptyStatement emptyStatement() {
 	return new EmptyStatement();
+    }
+
+    /**
+     * Create an equals operator.
+     * 
+     * <pre>
+     * left == right
+     * </pre>
+     * 
+     * @param left
+     *            the left operand {@link Expression}
+     * @param right
+     *            the right operand <code>Expression</code>
+     * @return a new {@link Equals} of <code>left</code> and <code>right</code>
+     */
+    public static Equals equalsOperator(final Expression left,
+	    final Expression right) {
+	final Equals statement = new Equals(left, right);
+
+	return statement;
+    }
+
+    /**
+     * Create an equals operator.
+     * 
+     * <pre>
+     * operand{1} == operand{2}
+     * </pre>
+     * 
+     * @param operands
+     *            the operands {@link ExtList}
+     * @return a new {@link Equals} of <code>operands</code>
+     */
+    public static Equals equalsOperator(final ExtList operands) {
+	final Equals statement = new Equals(operands);
+
+	return statement;
     }
 
     /**
