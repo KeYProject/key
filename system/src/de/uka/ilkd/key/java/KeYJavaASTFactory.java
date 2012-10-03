@@ -897,6 +897,46 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create an else block.
+     * 
+     * <pre>
+     * else
+     *     statement
+     * </pre>
+     * 
+     * @param statement
+     *            the {@link Statement} to be executed
+     * @return a new {@link Else} block consisting of <code>statement</code>
+     *         solely
+     */
+    public static Else elseBlock(final Statement statement) {
+	final Else block = new Else(statement);
+
+	return block;
+    }
+
+    /**
+     * Create an else block.
+     * 
+     * <pre>
+     * else {
+     *     statements
+     * }
+     * </pre>
+     * 
+     * @param statements
+     *            the {@link Statement}s to be executed
+     * @return a new {@link Else} block consisting of <code>statements</code>
+     *         solely
+     */
+    public static Else elseBlock(final Statement[] statements) {
+	final StatementBlock statement = KeYJavaASTFactory.block(statements);
+	final Else block = KeYJavaASTFactory.elseBlock(statement);
+
+	return block;
+    }
+
+    /**
      * Create a loop initialization that consists of a single statement.
      * 
      * <pre>
