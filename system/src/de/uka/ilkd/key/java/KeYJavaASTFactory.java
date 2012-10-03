@@ -1121,8 +1121,36 @@ public abstract class KeYJavaASTFactory {
 	    final TypeRef typeRef) {
 	final VariableSpecification varSpec = new VariableSpecification(
 		variable, init, typeRef.getKeYJavaType());
-	final LocalVariableDeclaration declaration = new LocalVariableDeclaration(
+	final LocalVariableDeclaration declaration = KeYJavaASTFactory.declare(
 		modifiers, typeRef, varSpec);
+
+	return declaration;
+    }
+
+    /**
+     * Create a local variable declaration.
+     * 
+     * <pre>
+     * modifiers typeRef specification
+     * </pre>
+     * 
+     * @param modifiers
+     *            the {@link Modifier}s
+     * @param typeRef
+     *            the static {@link TypeRef} of the variable to be declared
+     * @param specification
+     *            the {@link VariableSpecification} of the variable to be
+     *            declared
+     * @return a new {@link LocalVariableDeclaration} of the variable specified
+     *         by <code>specification</code> with static type
+     *         <code>typeRef</code>
+     */
+    public static LocalVariableDeclaration declare(
+	    final ImmutableArray<Modifier> modifiers,
+	    final TypeReference typeRef,
+	    final VariableSpecification specification) {
+	final LocalVariableDeclaration declaration = new LocalVariableDeclaration(
+		modifiers, typeRef, specification);
 
 	return declaration;
     }
