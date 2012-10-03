@@ -35,7 +35,9 @@ import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.SuperConstructorReference;
+import de.uka.ilkd.key.java.reference.SuperReference;
 import de.uka.ilkd.key.java.reference.ThisConstructorReference;
+import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.*;
@@ -1810,6 +1812,17 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a reference to <code>super</code>.
+     * 
+     * @return a new {@link SuperReference}
+     */
+    public static SuperReference superReference() {
+	final SuperReference reference = new SuperReference();
+
+	return reference;
+    }
+
+    /**
      * Create a call to a constructor of the current class.
      * 
      * <pre>
@@ -1827,6 +1840,17 @@ public abstract class KeYJavaASTFactory {
 		args);
 
 	return constructor;
+    }
+
+    /**
+     * Create a reference to <code>this</code>.
+     * 
+     * @return a new {@link ThisReference}
+     */
+    public static ThisReference thisReference() {
+	final ThisReference reference = new ThisReference();
+
+	return reference;
     }
 
     /**
