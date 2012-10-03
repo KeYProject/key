@@ -1119,8 +1119,8 @@ public abstract class KeYJavaASTFactory {
 	    final ImmutableArray<Modifier> modifiers,
 	    final IProgramVariable variable, final Expression init,
 	    final TypeRef typeRef) {
-	final VariableSpecification varSpec = new VariableSpecification(
-		variable, init, typeRef.getKeYJavaType());
+	final VariableSpecification varSpec = KeYJavaASTFactory
+		.variableSpecification(variable, init, typeRef.getKeYJavaType());
 	final LocalVariableDeclaration declaration = KeYJavaASTFactory.declare(
 		modifiers, typeRef, varSpec);
 
@@ -1657,6 +1657,27 @@ public abstract class KeYJavaASTFactory {
 	    final Expression initializer, final Type type) {
 	final VariableSpecification specification = new VariableSpecification(
 		variable, dimensions, initializer, type);
+
+	return specification;
+    }
+
+    /**
+     * Create a variable specification.
+     * 
+     * @param variable
+     *            the {@link IProgramVariable} to be specified
+     * @param initializer
+     *            the initializer {@link Expression}
+     * @param keyJavaType
+     *            the {@link KeYJavaType}
+     * @return a new {@link VariableSpecification} for <code>variable</code> of
+     *         type <code>type</code>, initialized to <code>initializer</code>
+     */
+    public static VariableSpecification variableSpecification(
+	    final IProgramVariable variable, final Expression initializer,
+	    final KeYJavaType keyJavaType) {
+	final VariableSpecification specification = new VariableSpecification(
+		variable, initializer, keyJavaType);
 
 	return specification;
     }
