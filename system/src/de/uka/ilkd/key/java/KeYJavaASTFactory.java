@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
@@ -246,6 +247,20 @@ public abstract class KeYJavaASTFactory {
 	     new VariableSpecification(localVariable(name, kjt)), false);
     }
 
+    /**
+     * Create an inactive expression.
+     * 
+     * @param expression
+     *            the {@link Expression} to be marked inactive
+     * @return a new {@link PassiveExpression} version of
+     *         <code>expression</code>
+     */
+    public static PassiveExpression passiveExpression(
+	    final Expression expression) {
+	final PassiveExpression passive = new PassiveExpression(expression);
+
+	return passive;
+    }
 
 
     /** 
