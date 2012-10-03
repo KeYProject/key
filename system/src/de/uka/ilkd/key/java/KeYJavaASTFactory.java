@@ -338,6 +338,30 @@ public abstract class KeYJavaASTFactory {
      * Create a catch clause.
      * 
      * <pre>
+     * catch (parameter) {
+     *     statements
+     * }
+     * </pre>
+     * 
+     * @param parameter
+     *            the to be caught {@link ParameterDeclaration}
+     * @param statements
+     *            the body {@link Statement}s
+     * @return a new {@link Catch} clause for execution of
+     *         <code>statements</code> in case of <code>parameter</code>
+     */
+    public static Catch catchClause(final ParameterDeclaration parameter,
+	    final Statement[] statements) {
+	final StatementBlock body = KeYJavaASTFactory.block(statements);
+	final Catch clause = KeYJavaASTFactory.catchClause(parameter, body);
+
+	return clause;
+    }
+
+    /**
+     * Create a catch clause.
+     * 
+     * <pre>
      * catch (kjt param)
      *    body
      * </pre>
