@@ -859,6 +859,44 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a default block.
+     * 
+     * <pre>
+     * default
+     *     statement
+     * </pre>
+     * 
+     * @param statement
+     *            the to be executed {@link Statement}
+     * @return a new {@link Default} that contains <code>statement</code>
+     */
+    public static Default defaultBlock(final Statement statement) {
+	final Statement[] statements = new Statement[] { statement };
+	final Default block = KeYJavaASTFactory.defaultBlock(statements);
+
+	return block;
+    }
+
+    /**
+     * Create a default block.
+     * 
+     * <pre>
+     * default {
+     *     statements
+     * }
+     * </pre>
+     * 
+     * @param statements
+     *            the to be executed {@link Statement}s
+     * @return a new {@link Default} that contains <code>statements</code>
+     */
+    public static Default defaultBlock(final Statement[] statements) {
+	final Default block = new Default(statements);
+
+	return block;
+    }
+
+    /**
      * Create a loop initialization that consists of a single statement.
      * 
      * <pre>
