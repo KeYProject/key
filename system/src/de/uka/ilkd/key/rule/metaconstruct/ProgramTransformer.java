@@ -16,7 +16,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Name;
@@ -229,7 +228,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * creates an assignment <code> lhs:=rhs </code>
      */
     protected final Statement assign(Expression lhs, Expression rhs) {
-	return new CopyAssignment(lhs, rhs);
+	return KeYJavaASTFactory.assign(lhs, rhs);
     }
 
     /**
@@ -237,7 +236,7 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      */
     protected final Expression attribute(ReferencePrefix prefix, 
 					 ProgramVariable field) {
-	return new FieldReference(field, prefix);
+	return KeYJavaASTFactory.fieldReference(prefix, field);
     }
     
     /**
