@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
+import de.uka.ilkd.key.java.expression.operator.LogicalAnd;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
@@ -300,6 +301,27 @@ public abstract class KeYJavaASTFactory {
 		uniqueName, type);
 
 	return variable;
+    }
+
+    /**
+     * Create a logical and operator.
+     * 
+     * <pre>
+     * left &amp; right
+     * </pre>
+     * 
+     * @param left
+     *            the left operand {@link Expression}
+     * @param right
+     *            the right operand <code>Expression</code>
+     * @return a new {@link LogicalAnd} of <code>left</code> and
+     *         <code>right</code>
+     */
+    public static LogicalAnd logicalAndOperator(final Expression left,
+	    final Expression right) {
+	final LogicalAnd operator = new LogicalAnd(left, right);
+
+	return operator;
     }
 
     /** 
