@@ -1389,8 +1389,30 @@ public abstract class KeYJavaASTFactory {
 		context);
 	final ProgramVariable field = services.getJavaInfo().getAttribute(name,
 		classType);
-	final FieldReference reference = new FieldReference(field,
-		new ParenthesizedExpression(expression));
+	final FieldReference reference = KeYJavaASTFactory.fieldReference(
+		new ParenthesizedExpression(expression), field);
+
+	return reference;
+    }
+
+    /**
+     * Create a field access.
+     * 
+     * <pre>
+     * prefix.field
+     * </pre>
+     * 
+     * @param prefix
+     *            the {@link ReferencePrefix} on which <code>field</code> is
+     *            accessed
+     * @param field
+     *            the {@link ProgramVariable} to be accessed
+     * @return a new {@link FieldReference} of <code>field</code> on
+     *         <code>prefix</code>
+     */
+    public static FieldReference fieldReference(final ReferencePrefix prefix,
+	    final ProgramVariable field) {
+	final FieldReference reference = new FieldReference(field, prefix);
 
 	return reference;
     }
