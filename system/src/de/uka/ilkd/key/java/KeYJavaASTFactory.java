@@ -586,6 +586,52 @@ public abstract class KeYJavaASTFactory {
 	return new Break(l);
     }
 
+    /**
+     * Create a case block.
+     * 
+     * <pre>
+     * case (expression)
+     *     statement
+     * </pre>
+     * 
+     * @param expression
+     *            the case {@link Expression}
+     * @param statement
+     *            the to be executed {@link Statement}
+     * @return a new {@link Case} for execution of <code>statement</code> in
+     *         case of <code>expression</code>
+     */
+    public static Case caseBlock(final Expression expression,
+	    final Statement statement) {
+	final Statement[] statements = new Statement[] { statement };
+	final Case block = KeYJavaASTFactory.caseBlock(expression, statements);
+
+	return block;
+    }
+
+    /**
+     * Create a case block.
+     * 
+     * <pre>
+     * case (expression) {
+     *     statements
+     * }
+     * </pre>
+     * 
+     * @param expression
+     *            the case {@link Expression}
+     * @param statements
+     *            the to be executed {@link Statement}s
+     * @return a new {@link Case} for execution of <code>statements</code> in
+     *         case of <code>expression</code>
+     */
+    public static Case caseBlock(final Expression expression,
+	    final Statement[] statements) {
+	final Case block = new Case(expression, statements);
+
+	return block;
+    }
+
     public static Continue continueStatement(Label label) {
         return new Continue(label);
     }
