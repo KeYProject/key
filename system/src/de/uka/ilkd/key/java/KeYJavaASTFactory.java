@@ -135,6 +135,39 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a local variable declaration with a unique name.
+     * 
+     * <pre>
+     * type name{unique} = initializer;
+     * </pre>
+     * 
+     * @param services
+     *            the {@link Services} whose {@link VariableNamer} is used to
+     *            determine a unique variable name
+     * @param name
+     *            the {@link String} on which the variable's unique name is
+     *            based
+     * @param initializer
+     *            the {@link Expression} the declared variable is initialized
+     *            with
+     * @param type
+     *            the static {@link KeYJavaType} of the to be declared variable
+     * @return a {@link LocalVariableDeclaration} of variable named uniquely
+     *         after <code>name</code> with static type <code>type</code> and
+     *         initial value <code>initializer</code>
+     */
+    public static LocalVariableDeclaration declare(final Services services,
+	    final String name, final Expression initializer,
+	    final KeYJavaType type) {
+	final ProgramElementName uniqueName = services.getVariableNamer()
+		.getTemporaryNameProposal(name);
+	final LocalVariableDeclaration declaration = KeYJavaASTFactory.declare(
+		uniqueName, initializer, type);
+
+	return declaration;
+    }
+
+    /**
      * Create a local variable declaration without initialization.
      * 
      * <pre>
