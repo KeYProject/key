@@ -2124,6 +2124,73 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create an object allocation.
+     * 
+     * <pre>
+     * new referencePrefix.type(args)
+     * </pre>
+     * 
+     * @param referencePrefix
+     *            the <code>type</code>'s {@link ReferencePrefix}
+     * @param type
+     *            the {@link KeYJavaType} to be instantiated
+     * @param args
+     *            the {@link Expression} arguments to be passed to the
+     *            constructor
+     * @return a new {@link New} operator that allocates a new instance of
+     *         <code>type</code> parameterized with <code>args</code>
+     */
+    public static New newOperator(final ReferencePrefix referencePrefix,
+	    final KeYJavaType type, final Expression[] args) {
+	final TypeReference typeRef = new TypeRef(type);
+	final New operator = KeYJavaASTFactory.newOperator(referencePrefix,
+		typeRef, args);
+
+	return operator;
+    }
+
+    /**
+     * Create an object allocation without arguments.
+     * 
+     * <pre>
+     * new referencePrefix.type()
+     * </pre>
+     * 
+     * @param referencePrefix
+     *            the <code>type</code>'s {@link ReferencePrefix}
+     * @param type
+     *            the {@link KeYJavaType} to be instantiated
+     * @return a new {@link New} operator that allocates a new instance of
+     *         <code>type</code>
+     */
+    public static New newOperator(final ReferencePrefix referencePrefix,
+	    final KeYJavaType type) {
+	final Expression[] args = new Expression[0];
+	final New operator = KeYJavaASTFactory.newOperator(referencePrefix,
+		type, args);
+
+	return operator;
+    }
+
+    /**
+     * Create an object allocation without arguments.
+     * 
+     * <pre>
+     * new type()
+     * </pre>
+     * 
+     * @param type
+     *            the {@link KeYJavaType} to be instantiated
+     * @return a new {@link New} operator that allocates a new instance of
+     *         <code>type</code>
+     */
+    public static New newOperator(final KeYJavaType type) {
+	final New operator = KeYJavaASTFactory.newOperator(null, type);
+
+	return operator;
+    }
+
+    /**
      * Create a call to the super constructor.
      * 
      * <pre>
