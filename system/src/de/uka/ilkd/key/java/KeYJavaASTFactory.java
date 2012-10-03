@@ -30,6 +30,7 @@ import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.expression.operator.LogicalAnd;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
+import de.uka.ilkd.key.java.expression.operator.NotEquals;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -2186,6 +2187,23 @@ public abstract class KeYJavaASTFactory {
      */
     public static New newOperator(final KeYJavaType type) {
 	final New operator = KeYJavaASTFactory.newOperator(null, type);
+
+	return operator;
+    }
+
+    /**
+     * Create an unequal operator.
+     * 
+     * <pre>
+     * operands{1} != operands{2}
+     * </pre>
+     * 
+     * @param operands
+     *            the operands {@link ExtList}
+     * @return a new {@link NotEquals} of <code>operands</code>
+     */
+    public static NotEquals notEqualsOperator(final ExtList operands) {
+	final NotEquals operator = new NotEquals(operands);
 
 	return operator;
     }
