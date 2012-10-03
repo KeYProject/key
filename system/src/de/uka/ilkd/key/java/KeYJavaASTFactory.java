@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.expression.operator.New;
+import de.uka.ilkd.key.java.expression.operator.NewArray;
 import de.uka.ilkd.key.java.expression.operator.PostIncrement;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -1565,6 +1566,63 @@ public abstract class KeYJavaASTFactory {
 	final LabeledStatement labeled = new LabeledStatement(label, statement);
 
 	return labeled;
+    }
+
+    /**
+     * Create an array instantiation.
+     * 
+     * <pre>
+     * new typeRef[sizes{1}]...[sizes{dimensions}] initializer
+     * </pre>
+     * 
+     * @param sizes
+     *            the size {@link Expression}s for each dimension
+     * @param typeRef
+     *            the static array base type
+     * @param keyJavaType
+     *            the array element type
+     * @param initializer
+     *            the {@link ArrayInitializer}
+     * @param dimensions
+     *            the number of dimensions
+     * @return a new {@link NewArray} for the instantiation of an array of base
+     *         type <code>typeRef</code> with <code>dimensions</code> dimensions
+     */
+    public static NewArray newArray(final TypeReference typeRef,
+	    final int dimensions, final Expression[] sizes,
+	    final ArrayInitializer initializer, final KeYJavaType keyJavaType) {
+	final NewArray newArray = new NewArray(sizes, typeRef, keyJavaType,
+		initializer, dimensions);
+
+	return newArray;
+    }
+
+    /**
+     * Create an array instantiation.
+     * 
+     * <pre>
+     * new typeRef[]...[] initializer
+     * </pre>
+     * 
+     * @param typeRef
+     *            the static array base type
+     * @param keyJavaType
+     *            the array element type
+     * @param initializer
+     *            the {@link ArrayInitializer}
+     * @param dimensions
+     *            the number of dimensions
+     * @return a new {@link NewArray} for the instantiation of an array of base
+     *         type <code>typeRef</code> with <code>dimensions</code> dimensions
+     */
+    public static NewArray newArray(final TypeReference typeRef,
+	    final int dimensions, final ArrayInitializer initializer,
+	    final KeYJavaType keyJavaType) {
+	final Expression[] sizes = new Expression[0];
+	final NewArray newArray = KeYJavaASTFactory.newArray(typeRef,
+		dimensions, sizes, initializer, keyJavaType);
+
+	return newArray;
     }
 
     /**
