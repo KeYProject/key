@@ -1694,6 +1694,66 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a finally block.
+     * 
+     * <pre>
+     * finally
+     *     statement
+     * </pre>
+     * 
+     * @param statement
+     *            the {@link Statement} to be executed
+     * @return a new {@link Finally} block consisting of <code>statement</code>
+     *         solely
+     */
+    public static Finally finallyBlock(final Statement statement) {
+	final StatementBlock body = KeYJavaASTFactory.block(statement);
+	final Finally block = KeYJavaASTFactory.finallyBlock(body);
+
+	return block;
+    }
+
+    /**
+     * Create a finally block.
+     * 
+     * <pre>
+     * finally {
+     *     statements
+     * }
+     * </pre>
+     * 
+     * @param statements
+     *            the {@link Statement}s to be executed
+     * @return a new {@link Finally} block consisting of <code>statements</code>
+     *         solely
+     */
+    public static Finally finallyBlock(final Statement[] statements) {
+	final StatementBlock body = KeYJavaASTFactory.block(statements);
+	final Finally block = KeYJavaASTFactory.finallyBlock(body);
+
+	return block;
+    }
+
+    /**
+     * Create a finally block.
+     * 
+     * <pre>
+     * finally
+     *     body
+     * </pre>
+     * 
+     * @param body
+     *            the {@link StatementBlock} to be executed
+     * @return a new {@link Finally} block consisting of <code>body</code>
+     *         solely
+     */
+    public static Finally finallyBlock(final StatementBlock body) {
+	final Finally block = new Finally(body);
+
+	return block;
+    }
+
+    /**
      * Create a local array variable declaration with an arbitrary number of
      * modifiers.
      * 
