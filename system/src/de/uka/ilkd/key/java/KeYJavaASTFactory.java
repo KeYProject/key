@@ -1634,6 +1634,61 @@ public abstract class KeYJavaASTFactory {
      * Create an array instantiation.
      * 
      * <pre>
+     * new typeRef[sizes{1}]...[sizes{dimensions}]
+     * </pre>
+     * 
+     * @param typeRef
+     *            the static array base type
+     * @param dimensions
+     *            the number of dimensions
+     * @param sizes
+     *            the size {@link Expression}s for each dimension
+     * @param keyJavaType
+     *            the array element type
+     * @return a new {@link NewArray} for the instantiation of an array of base
+     *         type <code>typeRef</code> with <code>dimensions</code> dimensions
+     */
+    public static NewArray newArray(final TypeReference typeRef,
+	    final int dimensions, final Expression[] sizes,
+	    final KeYJavaType keyJavaType) {
+	final NewArray newArray = KeYJavaASTFactory.newArray(typeRef,
+		dimensions, sizes, null, keyJavaType);
+
+	return newArray;
+    }
+
+    /**
+     * Create an array instantiation.
+     * 
+     * <pre>
+     * new typeRef[size]
+     * </pre>
+     * 
+     * @param typeRef
+     *            the static array base type
+     * @param dimensions
+     *            the number of dimensions
+     * @param size
+     *            the size {@link Expression} for the first dimension
+     * @param keyJavaType
+     *            the array element type
+     * @return a new {@link NewArray} for the instantiation of an array of base
+     *         type <code>typeRef</code> with <code>dimensions</code> dimensions
+     */
+    public static NewArray newArray(final TypeReference typeRef,
+	    final int dimensions, final Expression size,
+	    final KeYJavaType keyJavaType) {
+	final Expression[] sizes = new Expression[] { size };
+	final NewArray newArray = KeYJavaASTFactory.newArray(typeRef,
+		dimensions, sizes, null, keyJavaType);
+
+	return newArray;
+    }
+
+    /**
+     * Create an array instantiation.
+     * 
+     * <pre>
      * new typeRef[]...[] initializer
      * </pre>
      * 
