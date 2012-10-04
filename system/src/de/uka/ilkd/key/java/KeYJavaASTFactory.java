@@ -430,6 +430,19 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a transaction statement.
+     * 
+     * @param type
+     *            the transaction statement type
+     * @return a new {@link TransactionStatement} of type <code>type</code>
+     */
+    public static TransactionStatement transactionStatement(final int type) {
+	final TransactionStatement statement = new TransactionStatement(type);
+
+	return statement;
+    }
+
+    /**
      * Create a <code>true</code> condition.
      * 
      * @return a new {@link Guard} with expression <code>true</code>
