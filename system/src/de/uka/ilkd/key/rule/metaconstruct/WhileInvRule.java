@@ -220,24 +220,27 @@ public class WhileInvRule extends AbstractTermTransformer {
         Term result = createLongJunctorTerm(Junctor.AND, resultSubterms); 
         
         stmnt.add(w.result());
-        StatementBlock s = new StatementBlock
-        (stmnt.toArray(new Statement[stmnt.size()]));
+	StatementBlock s = KeYJavaASTFactory.block(stmnt
+		.toArray(new Statement[stmnt.size()]));
         Statement resSta;
         if (svInst.getExecutionContext() != null){
-            resSta = new MethodFrame(null, svInst.getExecutionContext(), s);
+	    resSta = KeYJavaASTFactory.methodFrame(
+		    svInst.getExecutionContext(), s);
         }else{
             resSta = s;
         }
         
         Modality loopBodyModality = modality;
         final boolean transaction = (loopBodyModality == Modality.DIA_TRANSACTION || loopBodyModality == Modality.BOX_TRANSACTION);
-        return TB.prog(loopBodyModality, 
-        	      JavaBlock.createJavaBlock(transaction ? 
-        	         new StatementBlock(new Statement[]{
-        	                  resSta, 
-        	                  new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)})
-        	      : new StatementBlock(resSta)), 
-        	      result); 
+	return TB
+		.prog(loopBodyModality,
+			JavaBlock
+				.createJavaBlock(transaction ? KeYJavaASTFactory.block(
+					resSta,
+					KeYJavaASTFactory
+						.transactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH))
+					: KeYJavaASTFactory.block(resSta)),
+			result);
     }
 
     /**
@@ -331,11 +334,10 @@ public class WhileInvRule extends AbstractTermTransformer {
                             KeYJavaType returnType,
                             ProgramVariable returnExpression,
                             Term post) {
-        Term executeReturn = TB.prog
-            (modality, 
-             addContext(root, new StatementBlock
-                        (KeYJavaASTFactory.returnClause(returnExpression))), 
-             post);
+	Term executeReturn = TB.prog(
+		modality,
+		addContext(root, KeYJavaASTFactory.block((KeYJavaASTFactory
+			.returnClause(returnExpression)))), post);
         
         return TB.imp( 
              TB.equals(typeConv.convertToLogicElement(returnFlag), 
@@ -360,11 +362,12 @@ public class WhileInvRule extends AbstractTermTransformer {
     private Term breakCase(ProgramVariable breakFlag,
                            Term post,
                            ArrayList<If> breakIfCascade) {
-        Term executeBreak = 
-            TB.prog(modality,
-             addContext(root, new StatementBlock
-                        (breakIfCascade.toArray(new Statement[breakIfCascade.size()]))),
-             post);
+	Term executeBreak = TB
+		.prog(modality,
+			addContext(root, KeYJavaASTFactory
+				.block((breakIfCascade
+					.toArray(new Statement[breakIfCascade
+						.size()])))), post);
         return TB.imp(TB.equals(typeConv.convertToLogicElement(breakFlag), 
                                 typeConv.getBooleanLDT().getTrueTerm()), 
                                 executeBreak); 
@@ -406,10 +409,10 @@ public class WhileInvRule extends AbstractTermTransformer {
     private Term throwCase(ProgramVariable excFlag,
                            ProgramVariable thrownException,
                            Term post) {
-        Term throwException = 
-            TB.prog(modality, 
-        	   addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException))), 
-                   post);
+	Term throwException = TB.prog(
+		modality,
+		addContext(root, KeYJavaASTFactory.block(KeYJavaASTFactory
+			.throwClause(thrownException))), post);
         return TB.imp( 
              TB.equals(typeConv.convertToLogicElement(excFlag), 
         	       typeConv.getBooleanLDT().getTrueTerm()), 
