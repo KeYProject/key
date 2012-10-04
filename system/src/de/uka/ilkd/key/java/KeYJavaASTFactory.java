@@ -990,6 +990,31 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a do loop.
+     * 
+     * <pre>
+     * do
+     *     statement
+     * while (condition);
+     * </pre>
+     * 
+     * @param condition
+     *            the do-loop condition {@link Expression}
+     * @param statement
+     *            the do-loop body {@link Statement}
+     * @param positionInfo
+     *            the new source element's {@link PositionInfo}
+     * @return a new {@link Do} that executes <code>statement</code> while
+     *         <code>condition</code> holds
+     */
+    public static Do doLoop(final Expression condition,
+	    final Statement statement, final PositionInfo positionInfo) {
+	final Do loop = new Do(condition, statement, positionInfo);
+
+	return loop;
+    }
+
+    /**
      * Create an else block.
      * 
      * @param parameters
