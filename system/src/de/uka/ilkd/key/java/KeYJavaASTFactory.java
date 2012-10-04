@@ -2514,6 +2514,21 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a synchronized block.
+     * 
+     * @param parameters
+     *            the synchronized block parameters (monitor, body) as
+     *            {@link ExtList}
+     * @return a new {@link SynchronizedBlock} as defined by
+     *         <code>parameters</code>
+     */
+    public static SynchronizedBlock synchronizedBlock(final ExtList parameters) {
+	final SynchronizedBlock block = new SynchronizedBlock(parameters);
+
+	return block;
+    }
+
+    /**
      * Create a then block.
      * 
      * @param parameters
