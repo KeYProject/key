@@ -696,6 +696,25 @@ public abstract class KeYJavaASTFactory {
     /**
      * Create a case block.
      * 
+     * @param parameters
+     *            the case block parameters (body) as {@link ExtList}
+     * @param expression
+     *            the case block {@link Expression}
+     * @param position
+     *            the new source element's {@link PositionInfo}
+     * @return a new {@link Case} as defined by <code>parameters</code> and
+     *         <code>expression</code>
+     */
+    public static Case caseBlock(final ExtList parameters,
+	    final Expression expression, final PositionInfo position) {
+	final Case block = new Case(parameters, expression, position);
+
+	return block;
+    }
+
+    /**
+     * Create a case block.
+     * 
      * <pre>
      * case (expression)
      *     statement
