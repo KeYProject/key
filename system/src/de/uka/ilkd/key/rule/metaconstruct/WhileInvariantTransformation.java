@@ -131,17 +131,17 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 returnOccurred = true;
                 Statement assignFlag =
                         KeYJavaASTFactory.assign(rtrn, BooleanLiteral.TRUE);
-                final Statement[] stmnts;
+		final StatementBlock stmnts;
                 if (returnExpr != null) {
                     Statement assignExpr =
                             KeYJavaASTFactory.assign(returnExpr,
                                     x.getExpression());
-                    stmnts =
-                            new Statement[] { assignFlag, assignExpr,
-                                    breakInnerLabel };
+		    stmnts = KeYJavaASTFactory.block(assignFlag, assignExpr,
+			    breakInnerLabel);
                 } else
-                    stmnts = new Statement[] { assignFlag, breakInnerLabel };
-                addChild(new StatementBlock(stmnts));
+		    stmnts = KeYJavaASTFactory.block(assignFlag,
+			    breakInnerLabel);
+		addChild(stmnts);
                 changed();
             }
         } else
@@ -158,8 +158,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             } else {
                 Statement assign =
                         KeYJavaASTFactory.assign(cont, BooleanLiteral.TRUE);
-                Statement[] stmnts = { assign, breakInnerLabel };
-                addChild(new StatementBlock(stmnts));
+		addChild(KeYJavaASTFactory.block(assign, breakInnerLabel));
                 changed();
             }
         } else {
@@ -179,7 +178,6 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 while (it.hasNext()) {
                     BreakToBeReplaced b = it.next();
                     if (x == b.getBreak()) {
-                        Statement[] stmnts;
                         Statement assignFlag =
                                 KeYJavaASTFactory.assign(brk,
                                         BooleanLiteral.TRUE);
@@ -187,9 +185,9 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                                 KeYJavaASTFactory.assign(
                                         b.getProgramVariable(),
                                         BooleanLiteral.TRUE);
-                        stmnts = new Statement[] { assignFlag, assign, breakInnerLabel };
                         replaced = true;
-                        addChild(new StatementBlock(stmnts));
+			addChild(KeYJavaASTFactory.block(assignFlag, assign,
+				breakInnerLabel));
                         changed();
                         break;
                     }
@@ -218,15 +216,16 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             body = KeYJavaASTFactory.ifThen(x.getGuardExpression(), body);
             if (breakInnerLabel != null) {
                 // an unlabeled continue needs to be handled with (replaced)
-                body = new LabeledStatement(breakInnerLabel.getLabel(), body);
+		body = KeYJavaASTFactory.labeledStatement(
+			breakInnerLabel.getLabel(), body);
             }
-            StatementBlock block = new StatementBlock(body);
+	    StatementBlock block = KeYJavaASTFactory.block(body);
             Statement newBody = block;
             if (breakOuterLabel != null) {
                 // an unlabeled break occurs in the
                 // while loop therefore we need a labeled statement
-                newBody =
-                        new LabeledStatement(breakOuterLabel.getLabel(), block);
+		newBody = KeYJavaASTFactory.labeledStatement(
+			breakOuterLabel.getLabel(), block);
 
             }
 
@@ -234,16 +233,14 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                     { KeYJavaASTFactory.assign(exc, BooleanLiteral.TRUE),
                             KeYJavaASTFactory.assign(thrownExc, excParam) };
 
-            Catch ctch =
-                    KeYJavaASTFactory.catchClause(
-                            KeYJavaASTFactory.parameterDeclaration(
-                                    javaInfo,
-                                    javaInfo.getKeYJavaType("java.lang.Throwable"),
-                                    excParam), new StatementBlock(
-                                    catchStatements));
+	    Catch ctch = KeYJavaASTFactory
+		    .catchClause(KeYJavaASTFactory.parameterDeclaration(
+			    javaInfo,
+			    javaInfo.getKeYJavaType("java.lang.Throwable"),
+			    excParam), catchStatements);
 
             Branch[] branch = { ctch };
-            Statement res = new Try(new StatementBlock(newBody), branch);
+	    Statement res = KeYJavaASTFactory.tryBlock(newBody, branch);
             addChild(res);
             changed();
         } else {
@@ -254,7 +251,8 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 Statement body =
                         (Statement) (changeList.isEmpty() ? null
                                 : changeList.removeFirst());
- 		addChild(new While(guard, body, x.getPositionInfo()));
+		addChild(KeYJavaASTFactory.whileLoop(guard, body,
+			x.getPositionInfo()));
                 changed();
             } else {
                 doDefaultAction(x);
@@ -295,7 +293,8 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             
             // label statement if there are returns / continue / breaks
             if (breakOuterLabel != null) {
-                body = new LabeledStatement(breakOuterLabel.getLabel(), body);
+		body = KeYJavaASTFactory.labeledStatement(
+			breakOuterLabel.getLabel(), body);
 
             }
             
@@ -303,17 +302,12 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                     { KeYJavaASTFactory.assign(exc, BooleanLiteral.TRUE),
                             KeYJavaASTFactory.assign(thrownExc, excParam) };
 
-            Catch ctch =
-                    KeYJavaASTFactory.catchClause(
-                            KeYJavaASTFactory.parameterDeclaration(
-                                    javaInfo,
-                                    javaInfo.getKeYJavaType("java.lang.Throwable"),
-                                    excParam), new StatementBlock(
-                                    catchStatements));
+	    Catch ctch = KeYJavaASTFactory.catchClause(KeYJavaASTFactory
+		    .parameterDeclaration(javaInfo,
+			    javaInfo.getKeYJavaType("java.lang.Throwable"),
+			    excParam), catchStatements);
 
-            Branch[] branch = { ctch };
-            Statement res = new Try(new StatementBlock(body), branch);
-            addChild(res);
+	    addChild(KeYJavaASTFactory.tryBlock(body, ctch));
             changed();
         } else {
             super.performActionOnEnhancedFor(x);
