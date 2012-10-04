@@ -2,7 +2,6 @@ package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -128,12 +127,18 @@ public final class SymbolicExecutionUtil {
       ApplyStrategyInfo info = startSideProof(parentProof, sequentToProve);
       // The simplified formula is the conjunction of all open goals
       ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
-      ImmutableList<Term> goalImplications = ImmutableSLList.nil(); 
-      for (Goal goal : openGoals) {
-         Term goalImplication = sequentToImplication(goal.sequent());
-         goalImplications = goalImplications.append(goalImplication);
+      if (openGoals.isEmpty()) {
+         return TermBuilder.DF.tt();
       }
-      return TermBuilder.DF.or(goalImplications);
+      else {
+         ImmutableList<Term> goalImplications = ImmutableSLList.nil(); 
+         for (Goal goal : openGoals) {
+            Term goalImplication = sequentToImplication(goal.sequent());
+            goalImplication = TermBuilder.DF.not(goalImplication);
+            goalImplications = goalImplications.append(goalImplication);
+         }
+         return TermBuilder.DF.not(TermBuilder.DF.or(goalImplications));
+      }
    }
    
    /**
@@ -274,7 +279,7 @@ public final class SymbolicExecutionUtil {
       // Combine method frame with value formula in a modality.
       Term modalityTerm = TermBuilder.DF.dia(newJavaBlock, newTerm);
       // Create Sequent to prove with new succedent.
-      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, null, modalityTerm);
+      Sequent sequentToProve = createSequentToProveWithNewSuccedent(node, modalityTerm);
       // Return created sequent and the used predicate to identify the value interested in.
       return new SiteProofVariableValueInput(sequentToProve, newPredicate);
    }
@@ -484,6 +489,48 @@ public final class SymbolicExecutionUtil {
     * @return The value of the formula with the given {@link Operator}.
     */
    public static Term extractOperatorValue(Node node, final Operator operator) {
+      Term operatorTerm = extractOperatorTerm(node, operator);
+      return operatorTerm != null ? operatorTerm.sub(0) : null;
+   }
+   
+   /**
+    * Extracts the operator term for the formula with the given {@link Operator}
+    * from the site proof result ({@link ApplyStrategyInfo}).
+    * @param info The site proof result.
+    * @param operator The {@link Operator} for the formula which should be extracted.
+    * @return The operator term of the formula with the given {@link Operator}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public static Term extractOperatorTerm(ApplyStrategyInfo info, Operator operator) throws ProofInputException {
+      // Make sure that valid parameters are given
+      assert info != null;
+      if (info.getProof().openGoals().size() != 1) {
+         throw new ProofInputException("Assumption that return value extraction has one goal does not hold because " + info.getProof().openGoals().size() + " goals are available.");
+      }
+      // Get node of open goal
+      return extractOperatorTerm(info.getProof().openGoals().head(), operator);
+   }
+
+   /**
+    * Extracts the operator term for the formula with the given {@link Operator}
+    * from the given {@link Goal}.
+    * @param goal The {@link Goal} to search the {@link Operator} in.
+    * @param operator The {@link Operator} for the formula which should be extracted.
+    * @return The operator term of the formula with the given {@link Operator}.
+    */
+   public static Term extractOperatorTerm(Goal goal, final Operator operator) {
+      assert goal != null;
+      return extractOperatorTerm(goal.node(), operator);
+   }
+
+   /**
+    * Extracts the operator term for the formula with the given {@link Operator}
+    * from the given {@link Node}.
+    * @param node The {@link Node} to search the {@link Operator} in.
+    * @param operator The {@link Operator} for the formula which should be extracted.
+    * @return The operator term of the formula with the given {@link Operator}.
+    */
+   public static Term extractOperatorTerm(Node node, final Operator operator) {
       assert node != null;
       // Search formula with the given operator in sequent
       SequentFormula sf = JavaUtil.search(node.sequent(), new IFilter<SequentFormula>() {
@@ -493,8 +540,7 @@ public final class SymbolicExecutionUtil {
          }
       });
       if (sf != null) {
-         // Extract value
-         return sf.formula().sub(0);
+         return sf.formula();
       }
       else {
          return null;
@@ -637,17 +683,9 @@ public final class SymbolicExecutionUtil {
             ImmutableArray<Term> subs = term.subs();
             if (subs.size() == 4) {
                Term locationTerm = subs.get(2);
-               if (locationTerm.op() instanceof Function) {
-                  Function function = (Function)locationTerm.op();
-                  String typeName = heapLDT.getClassName(function);
-                  KeYJavaType type = services.getJavaInfo().getKeYJavaType(typeName);
-                  if (type != null) {
-                     String fieldName = heapLDT.getPrettyFieldName(function);
-                     ProgramVariable attribute = services.getJavaInfo().getAttribute(fieldName, type);
-                     if (attribute != null && attribute.isStatic()) {
-                        result.add(attribute);
-                     }
-                  }
+               ProgramVariable attribute = getProgramVariable(services, heapLDT, locationTerm);
+               if (attribute != null && attribute.isStatic()) {
+                  result.add(attribute);
                }
             }
          }
@@ -658,6 +696,27 @@ public final class SymbolicExecutionUtil {
       for (Term sub : term.subs()) {
          internalCollectStaticProgramVariablesOnHeap(services, result, sub);
       }
+   }
+   
+   /**
+    * Returns the {@link ProgramVariable} defined by the given {@link Term}.
+    * @param services The {@link Services} to use.
+    * @param heapLDT The {@link HeapLDT} to use.
+    * @param locationTerm The {@link Term} to extract {@link ProgramVariable} from.
+    * @return The {@link Term}s {@link ProgramVariable} or {@code null} if not available.
+    */
+   public static ProgramVariable getProgramVariable(Services services, HeapLDT heapLDT, Term locationTerm) {
+      ProgramVariable result = null;
+      if (locationTerm.op() instanceof Function) {
+         Function function = (Function)locationTerm.op();
+         String typeName = heapLDT.getClassName(function);
+         KeYJavaType type = services.getJavaInfo().getKeYJavaType(typeName);
+         if (type != null) {
+            String fieldName = heapLDT.getPrettyFieldName(function);
+            result = services.getJavaInfo().getAttribute(fieldName, type);
+         }
+      }
+      return result;
    }
 
    /**
@@ -1064,7 +1123,7 @@ public final class SymbolicExecutionUtil {
       TacletApp app = (TacletApp)parent.getAppliedRuleApp();
       // Find goal template which has created the represented proof node
       int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
-      TacletGoalTemplate goalTemplate = app.taclet().goalTemplates().take(childIndex).head();
+      TacletGoalTemplate goalTemplate = app.taclet().goalTemplates().take(app.taclet().goalTemplates().size() - 1 - childIndex).head();
       // Apply instantiations of schema variables to sequent of goal template
       Services services = node.proof().getServices();
       SVInstantiations instantiations = app.instantiations();
@@ -1109,24 +1168,24 @@ public final class SymbolicExecutionUtil {
       // Construct branch condition from created antecedent and succedent terms as new implication 
       Term left = TermBuilder.DF.and(antecedents);
       Term right = TermBuilder.DF.or(succedents);
-      Term implication = TermBuilder.DF.imp(left, right);
+      Term leftAndRight = TermBuilder.DF.and(left, TermBuilder.DF.not(right));
       Term result;
       // Check if an update context is available
       if (!instantiations.getUpdateContext().isEmpty()) {
          // Simplify branch condition if required
          if (simplify) {
             // Append update context because otherwise the formula is evaluated in wrong state
-            result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), implication);
+            result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), leftAndRight);
             // Execute simplification
             result = SymbolicExecutionUtil.simplify(node.proof(), result);
          }
          else {
-            result = implication;
+            result = leftAndRight;
          }
       }
       else {
          // No update context, just use the implication as branch condition
-         result = implication;
+         result = leftAndRight;
       }
       return result;
    }
@@ -1265,18 +1324,47 @@ public final class SymbolicExecutionUtil {
     * Creates a new {@link Sequent} which is a modification from the {@link Sequent}
     * of the given {@link Node} which contains the same information but a different succedent.
     * @param node The {@link Node} which provides the original {@link Sequent}.
-    * @param additionalAntecedent An optional additional antecedent.
     * @param newSuccedent The new succedent.
     * @return The created {@link Sequent}.
     */
-   private static Sequent createSequentToProveWithNewSuccedent(Node node, 
-                                                               Term additionalAntecedent,
-                                                               Term newSuccedent) {
+   public static Sequent createSequentToProveWithNewSuccedent(Node node,
+                                                              Term newSuccedent) {
+      return createSequentToProveWithNewSuccedent(node, null, newSuccedent);
+   }
+
+   /**
+    * Creates a new {@link Sequent} which is a modification from the {@link Sequent}
+    * of the given {@link Node} which contains the same information but a different succedent.
+    * @param node The {@link Node} which provides the original {@link Sequent}.
+    * @param additionalAntecedent An optional additional antecedents.
+    * @param newSuccedent The new succedent.
+    * @return The created {@link Sequent}.
+    */
+   public static Sequent createSequentToProveWithNewSuccedent(Node node, 
+                                                              Term additionalAntecedent,
+                                                              Term newSuccedent) {
       // Get the updates from the return node which includes the value interested in.
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
       ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
+      // Create new sequent
+      return createSequentToProveWithNewSuccedent(node, additionalAntecedent, newSuccedent, originalUpdates);
+   }
+   
+   /**
+    * Creates a new {@link Sequent} which is a modification from the {@link Sequent}
+    * of the given {@link Node} which contains the same information but a different succedent.
+    * @param node The {@link Node} which provides the original {@link Sequent}.
+    * @param additionalAntecedent An optional additional antecedents.
+    * @param newSuccedent The new succedent.
+    * @param updates The updates to use.
+    * @return The created {@link Sequent}.
+    */
+   public static Sequent createSequentToProveWithNewSuccedent(Node node, 
+                                                              Term additionalAntecedent,
+                                                              Term newSuccedent,
+                                                              ImmutableList<Term> updates) {
       // Combine method frame, formula with value predicate and the updates which provides the values
-      Term newSuccedentToProve = TermBuilder.DF.applySequential(originalUpdates, newSuccedent);
+      Term newSuccedentToProve = TermBuilder.DF.applySequential(updates, newSuccedent);
       // Create new sequent with the original antecedent and the formulas in the succedent which were not modified by the applied rule
       PosInOccurrence pio = node.getAppliedRuleApp().posInOccurrence();
       Sequent originalSequentWithoutMethodFrame = node.sequent().removeFormula(pio).sequent();
@@ -1318,7 +1406,7 @@ public final class SymbolicExecutionUtil {
     * @return The found {@link IProgramVariable}s for the given {@link FieldDeclaration}.
     */
    public static Set<IProgramVariable> getProgramVariables(FieldDeclaration fd) {
-      Set<IProgramVariable> result = new HashSet<IProgramVariable>();
+      Set<IProgramVariable> result = new LinkedHashSet<IProgramVariable>();
       if (fd != null) {
          ImmutableArray<FieldSpecification> specifications = fd.getFieldSpecifications();
          for (FieldSpecification spec : specifications) {
@@ -1337,7 +1425,6 @@ public final class SymbolicExecutionUtil {
     */
    public static Term computePathCondition(Node node, boolean simplify) throws ProofInputException {
       if (node != null) {
-         Proof proof = node.proof();
          Term pathCondition = TermBuilder.DF.tt();
          while (node != null) {
             Node parent = node.parent();
@@ -1347,8 +1434,8 @@ public final class SymbolicExecutionUtil {
             }
             node = parent;
          }
-         if (simplify) {
-            pathCondition = simplify(proof, pathCondition);
+         if (TermBuilder.DF.ff().equals(pathCondition)) {
+            throw new ProofInputException("Path condition computation failed because the result is false.");
          }
          return pathCondition;
       }

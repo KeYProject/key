@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state>
+      <association programVariable="x" target="o1"/>
+   </state>
+   <object xml:id="o1" name="x">
+      <association programVariable="next" target="o2"/>
+   </object>
+   <object xml:id="o2" name="x.next">
+      <association programVariable="next" target="o3"/>
+   </object>
+   <object xml:id="o3" name="x.next.next">
+   </object>
+</model>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="SimpleLinkedOjbects.compute(x);" pathCondition="true" pathConditionChanged="false">
+      <statement name="x.value=1;" pathCondition="true" pathConditionChanged="false">
+         <statement name="x.next.value=2;" pathCondition="true" pathConditionChanged="false">
+            <statement name="x.next.next.value=3;" pathCondition="true" pathConditionChanged="false">
+               <statement name="return x.value+x.next.value+x.next.next.value;" pathCondition="true" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of SimpleLinkedOjbects.compute(x);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  3
++ \if (x.next.next = x)
+      \then (3)
+      \else (\if (x.next = x)  \then (2)  \else (1))
++ \if (x.next.next = x.next)  \then (3)  \else (2)&apos; as result of SimpleLinkedOjbects.compute(x);&gt;">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                     </termination>
+                  </methodReturn>
+               </statement>
+            </statement>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>
