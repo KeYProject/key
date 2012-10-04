@@ -1202,6 +1202,54 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a for loop with no initializer.
+     * 
+     * <pre>
+     * for (; guard; updates)
+     *     body
+     * </pre>
+     * 
+     * @param guard
+     *            the {@link IGuard} loop condition
+     * @param updates
+     *            the {@link IForUpdates} loop updates
+     * @param body
+     *            the body {@link Statement}
+     * @return a new {@link For} with condition <code>guard</code>, updates
+     *         <code>updates</code> and body <code>body</code>
+     */
+    public static For forLoop(final IGuard guard, final IForUpdates updates,
+	    final Statement body) {
+	final For loop = KeYJavaASTFactory.forLoop(null, guard, updates, body);
+
+	return loop;
+    }
+
+    /**
+     * Create a for loop with no initializer.
+     * 
+     * <pre>
+     * for (; guard; updates)
+     *     body
+     * </pre>
+     * 
+     * @param guard
+     *            the {@link IGuard} loop condition
+     * @param updates
+     *            the {@link IForUpdates} loop updates
+     * @param body
+     *            the body {@link Statement}s
+     * @return a new {@link For} with condition <code>guard</code>, updates
+     *         <code>updates</code> and body <code>body</code>
+     */
+    public static For forLoop(final IGuard guard, final IForUpdates updates,
+	    final Statement[] body) {
+	final For loop = KeYJavaASTFactory.forLoop(null, guard, updates, body);
+
+	return loop;
+    }
+
+    /**
      * Create a statement that assigns an array element to a variable.
      * 
      * <pre>
