@@ -560,7 +560,30 @@ public abstract class KeYJavaASTFactory {
      */
     public static If ifThen(Expression guard, 
 			    Statement then) {
-	return new If(guard, new Then(then));
+	final If statement = KeYJavaASTFactory.ifThen(guard, new Then(then));
+
+	return statement;
+    }
+
+    /**
+     * Create an if statement with no else branch.
+     * 
+     * <pre>
+     * if (guard)
+     *    then
+     * </pre>
+     * 
+     * @param guard
+     *            the if statement condition {@link Expression}
+     * @param then
+     *            the if statement then branch {@link Then}
+     * @return an {@link If} with expression <code>guard</code> and then branch
+     *         <code>then</code>
+     */
+    public static If ifThen(final Expression guard, final Then then) {
+	final If statement = new If(guard, then);
+
+	return statement;
     }
 
     /**
