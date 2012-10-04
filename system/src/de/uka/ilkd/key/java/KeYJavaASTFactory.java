@@ -2370,6 +2370,43 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a type reference.
+     * 
+     * <pre>
+     * type
+     * </pre>
+     * 
+     * @param type
+     *            the {@link KeYJavaType} to be referenced
+     * @return a new {@link TypeRef} that references <code>type</code>
+     */
+    public static TypeRef typeRef(final KeYJavaType type) {
+	final TypeRef typeRef = new TypeRef(type);
+
+	return typeRef;
+    }
+
+    /**
+     * Create a type reference.
+     * 
+     * <pre>
+     * type[]...[]
+     * </pre>
+     * 
+     * @param type
+     *            the base {@link KeYJavaType}
+     * @param dimensions
+     *            the number of dimensions
+     * @return a new {@link TypeRef} for <code>dimensions</code> dimensions of
+     *         <code>type</code>
+     */
+    public static TypeRef typeRef(final KeYJavaType type, final int dimensions) {
+	final TypeRef typeRef = new TypeRef(type, dimensions);
+
+	return typeRef;
+    }
+
+    /**
      * Create a literal for the truth value <code>false</code>.
      * 
      * @return a {@link BooleanLiteral} that represents the value
