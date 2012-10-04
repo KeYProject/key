@@ -2265,6 +2265,46 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a then block.
+     * 
+     * <pre>
+     * then
+     *     statement
+     * </pre>
+     * 
+     * @param statement
+     *            the to be executed {@link Statement}
+     * @return a new {@link Then} block that consists of <code>statement</code>
+     *         solely
+     */
+    public static Then thenBlock(final Statement statement) {
+	final Then block = new Then(statement);
+
+	return block;
+    }
+
+    /**
+     * Create a then block.
+     * 
+     * <pre>
+     * then {
+     *     statements
+     * }
+     * </pre>
+     * 
+     * @param statements
+     *            the to be executed {@link Statement}s
+     * @return a new {@link Then} block that consists of <code>statements</code>
+     *         solely
+     */
+    public static Then thenBlock(final Statement[] statements) {
+	final StatementBlock statement = KeYJavaASTFactory.block(statements);
+	final Then block = KeYJavaASTFactory.thenBlock(statement);
+
+	return block;
+    }
+
+    /**
      * Create a call to a constructor of the current class.
      * 
      * <pre>
