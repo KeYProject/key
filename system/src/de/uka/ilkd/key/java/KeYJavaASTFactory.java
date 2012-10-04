@@ -35,6 +35,7 @@ import de.uka.ilkd.key.java.expression.operator.PostIncrement;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -2150,14 +2151,14 @@ public abstract class KeYJavaASTFactory {
      * Create a method call substitution.
      * 
      * @param executionContext
-     *            the <code>block</code>'s {@link ExecutionContext}
+     *            the <code>block</code>'s {@link IExecutionContext}
      * @param block
      *            the {@link StatementBlock} to be put in <code>executionContext</code>
      * @return a new {@link MethodFrame} that associates <code>block</code> with
      *         <code>executionContext</code>
      */
     public static MethodFrame methodFrame(
-	    final ExecutionContext executionContext, final StatementBlock block) {
+	    final IExecutionContext executionContext, final StatementBlock block) {
 	final MethodFrame frame = KeYJavaASTFactory.methodFrame(null,
 		executionContext, block);
 
@@ -2171,7 +2172,7 @@ public abstract class KeYJavaASTFactory {
      *            the {@link IProgramVariable} <code>block</code>'s return value
      *            is assigned to
      * @param executionContext
-     *            the <code>block</code>'s {@link ExecutionContext}
+     *            the <code>block</code>'s {@link IExecutionContext}
      * @param block
      *            the {@link StatementBlock} to be put in
      *            <code>executionContext</code>
@@ -2179,7 +2180,7 @@ public abstract class KeYJavaASTFactory {
      *         <code>executionContext</code>
      */
     public static MethodFrame methodFrame(final IProgramVariable result,
-	    final ExecutionContext executionContext, final StatementBlock block) {
+	    final IExecutionContext executionContext, final StatementBlock block) {
 	final MethodFrame frame = new MethodFrame(result, executionContext,
 		block);
 
@@ -2194,7 +2195,7 @@ public abstract class KeYJavaASTFactory {
      *            the {@link IProgramVariable} <code>block</code>'s return value
      *            is assigned to
      * @param executionContext
-     *            the <code>block</code>'s {@link ExecutionContext}
+     *            the <code>block</code>'s {@link IExecutionContext}
      * @param block
      *            the {@link StatementBlock} to be put in
      *            <code>executionContext</code>
@@ -2205,7 +2206,7 @@ public abstract class KeYJavaASTFactory {
      *         <code>position</code>
      */
     public static MethodFrame methodFrame(final IProgramVariable result,
-	    final ExecutionContext executionContext,
+	    final IExecutionContext executionContext,
 	    final StatementBlock block, final PositionInfo position) {
 	final MethodFrame frame = new MethodFrame(result, executionContext,
 		block, position);
