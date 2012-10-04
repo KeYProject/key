@@ -2346,6 +2346,30 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a try block.
+     * 
+     * <pre>
+     * try
+     *     body
+     * branches
+     * </pre>
+     * 
+     * @param body
+     *            the {@link StatementBlock} to be executed
+     * @param branches
+     *            the try-catch {@link Branch}es
+     * @return a new {@link Try} block for the execution of
+     *         <code>branches</code> depending on the events during the
+     *         execution of <code>body</code>
+     */
+    public static Try tryBlock(final StatementBlock body,
+	    final Branch[] branches) {
+	final Try block = new Try(body, branches);
+
+	return block;
+    }
+
+    /**
      * Create a literal for the truth value <code>false</code>.
      * 
      * @return a {@link BooleanLiteral} that represents the value
