@@ -2224,6 +2224,31 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a labeled block of statements.
+     * 
+     * <pre>
+     * label: {
+     *     statements
+     * }
+     * </pre>
+     * 
+     * @param label
+     *            the {@link Label}
+     * @param statements
+     *            the {@link Statement}s to be labeled
+     * @return a new {@link LabeledStatement} that adds <code>label</code> to
+     *         <code>statements</code>
+     */
+    public static Statement labeledStatement(final Label label,
+	    final Statement[] statements) {
+	final StatementBlock block = KeYJavaASTFactory.block(statements);
+	final LabeledStatement labeled = KeYJavaASTFactory.labeledStatement(
+		label, block);
+
+	return labeled;
+    }
+
+    /**
      * Create an array instantiation.
      * 
      * <pre>
