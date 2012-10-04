@@ -2242,6 +2242,29 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a switch block.
+     * 
+     * <pre>
+     * switch (expression) {
+     *     branches
+     * }
+     * </pre>
+     * 
+     * @param expression
+     *            the to be evaluated {@link Expression}
+     * @param branches
+     *            the switch-case {@link Branch}es
+     * @return a new {@link Switch} block that executes <code>branches</code>
+     *         depending on the value of <code>expression</code>
+     */
+    public static Switch switchBlock(final Expression expression,
+	    final Branch[] branches) {
+	final Switch block = new Switch(expression, branches);
+
+	return block;
+    }
+
+    /**
      * Create a call to a constructor of the current class.
      * 
      * <pre>
