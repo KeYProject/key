@@ -30,6 +30,13 @@ public interface BlockContract extends SpecificationElement {
     public Variables getPlaceholderVariables();
     public boolean isTransactionApplicable();
     public boolean isReadOnly(Services services);
+    /**
+     * Returns <code>true</code> iff the method (according to the contract) does
+     * not modify the heap at all, i.e., iff it is "strictly pure."
+     * 
+     * @return whether this contract is strictly pure.
+     */
+    public boolean hasModifiesClause();
 
     // TODO Why do we need remembranceHeaps for the precondition? Do we also need remembranceLocalVariables?
     public Term getPrecondition(LocationVariable heap,
