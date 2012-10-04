@@ -2418,6 +2418,55 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a try block.
+     * 
+     * <pre>
+     * try
+     *     statement
+     * branches
+     * </pre>
+     * 
+     * @param statement
+     *            the {@link Statement} to be executed
+     * @param branches
+     *            the try-catch {@link Branch}es
+     * @return a new {@link Try} block for the execution of
+     *         <code>branches</code> depending on the events during the
+     *         execution of <code>statement</code>
+     */
+    public static Try tryBlock(final Statement statement,
+	    final Branch[] branches) {
+	final StatementBlock body = KeYJavaASTFactory.block(statement);
+	final Try tryBlock = KeYJavaASTFactory.tryBlock(body, branches);
+
+	return tryBlock;
+    }
+
+    /**
+     * Create a try block.
+     * 
+     * <pre>
+     * try
+     *     statement
+     * branch
+     * </pre>
+     * 
+     * @param statement
+     *            the {@link Statement} to be executed
+     * @param branches
+     *            the try-catch {@link Branch}
+     * @return a new {@link Try} block for the execution of <code>branch</code>
+     *         depending on the events during the execution of
+     *         <code>statement</code>
+     */
+    public static Try tryBlock(final Statement statement, final Branch branch) {
+	final Branch[] branches = new Branch[] { branch };
+	final Try tryBlock = KeYJavaASTFactory.tryBlock(statement, branches);
+
+	return tryBlock;
+    }
+
+    /**
      * Create a type reference.
      * 
      * <pre>
