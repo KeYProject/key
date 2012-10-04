@@ -66,6 +66,21 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create an assignment.
+     * 
+     * @param parameters
+     *            the assignment parameters (variable, expression) as
+     *            {@link ExtList}
+     * @return a new {@link CopyAssignment} as defined by
+     *         <code>parameters</code>
+     */
+    public static CopyAssignment assign(final ExtList parameters) {
+	final CopyAssignment assignment = new CopyAssignment(parameters);
+
+	return assignment;
+    }
+
+    /**
      * creates an attribute access <code>prefix.field </code>
      */
     public static Expression attribute(ReferencePrefix prefix, 
@@ -327,6 +342,20 @@ public abstract class KeYJavaASTFactory {
 	return operator;
     }
 
+    /**
+     * Create a catch clause.
+     * 
+     * @param parameters
+     *            the catch clause parameters (exception, body) as
+     *            {@link ExtList}
+     * @return a new {@link Catch} as defined by <code>parameters</code>
+     */
+    public static Catch catchClause(final ExtList parameters) {
+	final Catch clause = new Catch(parameters);
+
+	return clause;
+    }
+
     /** 
      * create a catch clause
      */
@@ -532,6 +561,20 @@ public abstract class KeYJavaASTFactory {
     public static If ifThen(Expression guard, 
 			    Statement then) {
 	return new If(guard, new Then(then));
+    }
+
+    /**
+     * Create an if statement.
+     * 
+     * @param parameters
+     *            the if statement parameters (guard, body, else branch) as
+     *            {@link ExtList}
+     * @return a new {@link If} as defined by <code>parameters</code>
+     */
+    public static If ifStatement(final ExtList parameters) {
+	final If statement = new If(parameters);
+
+	return statement;
     }
 
     /**
@@ -875,6 +918,19 @@ public abstract class KeYJavaASTFactory {
     /**
      * Create a default block.
      * 
+     * @param parameters
+     *            the default block parameters (body) as {@link ExtList}
+     * @return a new {@link Default} as defined by <code>parameters</code>
+     */
+    public static Default defaultBlock(final ExtList parameters) {
+	final Default block = new Default(parameters);
+
+	return block;
+    }
+
+    /**
+     * Create a default block.
+     * 
      * <pre>
      * default
      *     statement
@@ -906,6 +962,19 @@ public abstract class KeYJavaASTFactory {
      */
     public static Default defaultBlock(final Statement[] statements) {
 	final Default block = new Default(statements);
+
+	return block;
+    }
+
+    /**
+     * Create an else block.
+     * 
+     * @param parameters
+     *            the else block parameters (body) as {@link ExtList}
+     * @return a new {@link Else} as defined by <code>parameters</code>
+     */
+    public static Else elseBlock(final ExtList parameters) {
+	final Else block = new Else(parameters);
 
 	return block;
     }
@@ -1146,6 +1215,20 @@ public abstract class KeYJavaASTFactory {
     /**
      * Create a block from an arbitrary number of statements.
      * 
+     * @param statements
+     *            the block statements as {@link ExtList}
+     * @return a new {@link StatementBlock} consisting of
+     *         <code>statements</code>
+     */
+    public static StatementBlock block(final ExtList statements) {
+	final StatementBlock block = new StatementBlock(statements);
+
+	return block;
+    }
+
+    /**
+     * Create a block from an arbitrary number of statements.
+     * 
      * <pre>
      * {
      *   statements;
@@ -1183,6 +1266,20 @@ public abstract class KeYJavaASTFactory {
 		.toArray(s));
 
 	return block;
+    }
+
+    /**
+     * Create a for loop.
+     * 
+     * @param parameters
+     *            the loop definition parameters (initializer, guard, updates,
+     *            body) as {@link ExtList}
+     * @return a new {@link For} as defined by <code>parameters</code>
+     */
+    public static For forLoop(final ExtList parameters) {
+	final For loop = new For(parameters);
+
+	return loop;
     }
 
     /**
@@ -1287,6 +1384,22 @@ public abstract class KeYJavaASTFactory {
 		element);
 
 	return assignment;
+    }
+
+    /**
+     * Create a local variable declaration without initialization.
+     * 
+     * @param parameters
+     *            the declaration parameters (modifiers, type reference,
+     *            variable specifications) as {@link ExtList}
+     * @return a new {@link LocalVariableDeclaration} as defined by
+     *         <code>parameters</code>
+     */
+    public static LocalVariableDeclaration declare(final ExtList parameters) {
+	final LocalVariableDeclaration declaration = new LocalVariableDeclaration(
+		parameters);
+
+	return declaration;
     }
 
     /**
@@ -1753,6 +1866,19 @@ public abstract class KeYJavaASTFactory {
 	final FieldReference reference = new FieldReference(field, prefix);
 
 	return reference;
+    }
+
+    /**
+     * Create a finally block.
+     * 
+     * @param parameters
+     *            the finally block parameters (body) as {@link ExtList}
+     * @return a new {@link Finally} as defined by <code>parameters</code>
+     */
+    public static Finally finallyBlock(final ExtList parameters) {
+	final Finally block = new Finally(parameters);
+
+	return block;
     }
 
     /**
@@ -2326,6 +2452,33 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a switch block.
+     * 
+     * @param parameters
+     *            the switch-case parameters (guard, body, branches) as
+     *            {@link ExtList}
+     * @return a new {@link Switch} as defined by <code>parameters</code>
+     */
+    public static Switch switchBlock(final ExtList parameters) {
+	final Switch block = new Switch(parameters);
+
+	return block;
+    }
+
+    /**
+     * Create a then block.
+     * 
+     * @param parameters
+     *            the then block parameters (body) as {@link ExtList}
+     * @return a new {@link Then} as defined by <code>parameters</code>
+     */
+    public static Then thenBlock(final ExtList parameters) {
+	final Then block = new Then(parameters);
+
+	return block;
+    }
+
+    /**
      * Create a then block.
      * 
      * <pre>
@@ -2404,6 +2557,19 @@ public abstract class KeYJavaASTFactory {
      */
     public static BooleanLiteral trueLiteral() {
 	return BooleanLiteral.TRUE;
+    }
+
+    /**
+     * Create a try block.
+     * 
+     * @param parameters
+     *            the try-catch parameters (body, branches) as {@link ExtList}
+     * @return a new {@link Try} as defined by <code>parameters</code>
+     */
+    public static Try tryBlock(final ExtList parameters) {
+	final Try block = new Try(parameters);
+
+	return block;
     }
 
     /**
