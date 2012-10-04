@@ -2272,6 +2272,26 @@ public abstract class KeYJavaASTFactory {
     /**
      * Create a labeled statement.
      * 
+     * @param parameters
+     *            the parameters (statement) as {@link ExtList}
+     * @param label
+     *            the {@link Label}
+     * @param position
+     *            the new source element's {@link PositionInfo}
+     * @return a new {@link LabeledStatement} as defined by
+     *         <code>parameters</code> and <code>label</code>
+     */
+    public static LabeledStatement labeledStatement(final ExtList parameters,
+	    final Label label, final PositionInfo position) {
+	final LabeledStatement statement = new LabeledStatement(parameters,
+		label, position);
+
+	return statement;
+    }
+
+    /**
+     * Create a labeled statement.
+     * 
      * <pre>
      * label: statement
      * </pre>
