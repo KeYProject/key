@@ -2166,6 +2166,29 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a method call substitution at a specific source position.
+     * 
+     * @param executionContext
+     *            the <code>block</code>'s {@link IExecutionContext}
+     * @param block
+     *            the {@link StatementBlock} to be put in
+     *            <code>executionContext</code>
+     * @param position
+     *            the new source element's {@link PositionInfo}
+     * @return a new {@link MethodFrame} that associates <code>block</code> with
+     *         <code>executionContext</code> and positions it at
+     *         <code>position</code>
+     */
+    public static MethodFrame methodFrame(
+	    final IExecutionContext executionContext,
+	    final StatementBlock block, final PositionInfo position) {
+	final MethodFrame frame = KeYJavaASTFactory.methodFrame(null,
+		executionContext, block, position);
+
+	return frame;
+    }
+
+    /**
      * Create a method call substitution with a return value assignment.
      * 
      * @param result
