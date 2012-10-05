@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.expression.operator.Equals;
 import de.uka.ilkd.key.java.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.expression.operator.LogicalAnd;
+import de.uka.ilkd.key.java.expression.operator.LogicalOr;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
 import de.uka.ilkd.key.java.expression.operator.NotEquals;
@@ -340,6 +341,27 @@ public abstract class KeYJavaASTFactory {
     public static LogicalAnd logicalAndOperator(final Expression left,
 	    final Expression right) {
 	final LogicalAnd operator = new LogicalAnd(left, right);
+
+	return operator;
+    }
+
+    /**
+     * Create a logical or operator.
+     * 
+     * <pre>
+     * left | right
+     * </pre>
+     * 
+     * @param left
+     *            the left operand {@link Expression}
+     * @param right
+     *            the right operand {@link Expression}
+     * @return a new {@link LogicalOr} of <code>left</code> and
+     *         <code>right</code>
+     */
+    public static LogicalOr logicalOrOperator(final Expression left,
+	    final Expression right) {
+	final LogicalOr operator = new LogicalOr(left, right);
 
 	return operator;
     }
