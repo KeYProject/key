@@ -264,7 +264,8 @@ public class InitArrayCreation extends InitArray {
 	body[arrayLength] = KeYJavaASTFactory.assign(array,
 		createArrayCreation(na));
 	
-	createArrayAssignments(arrayLength + 1, body, vars,  array, na);
+	createArrayAssignments(arrayLength + 1, body, vars,
+		KeYJavaASTFactory.parenthesizedExpression(array), na);
 
 	return new StatementBlock ( body );
     }
