@@ -78,16 +78,13 @@ public class SwitchToIf extends ProgramTransformer {
 	    (new TypeRef(sw.getExpression().
 			 getKeYJavaType(services, ec)),
 	     exVSpec);
-	result = new StatementBlock(new ImmutableArray<Statement>(s));
-	result = 
-	    insertStatementInBlock(result,
-				   new Statement[]{new CopyAssignment(exV,
-								      sw.getExpression())});
+	result = KeYJavaASTFactory.block(s,
+		KeYJavaASTFactory.assign(exV, sw.getExpression()));
 
         // mulbrich: Added additional null check for enum constants
         if(!(sw.getExpression().getKeYJavaType(services, ec).getJavaType() instanceof PrimitiveType))
-            result = 
-                insertStatementInBlock(result, mkIfNullCheck(services, exV));
+	    result = KeYJavaASTFactory.insertStatementInBlock(result,
+		    mkIfNullCheck(services, exV));
 
 	extL.add(exV);
 	sw = changeBreaks(sw, newBreak);
@@ -113,7 +110,7 @@ public class SwitchToIf extends ProgramTransformer {
 	    }
 	    i++;
 	}
-	result = insertStatementInBlock(result, ifs);
+	result = KeYJavaASTFactory.insertStatementInBlock(result, ifs);
 	if(noNewBreak){
 	    return result;
 	}else{
@@ -137,25 +134,6 @@ public class SwitchToIf extends ProgramTransformer {
         final Expression cnd = new Equals(var, NullLiteral.NULL);
         
         return new Statement[] { new If(cnd, new Then(t)) };
-    }
-
-
-    /** inserts the given statements at the end of the block 
-     * @param b the Statementblock where to insert
-     * @param stmnt array of Statement those have to be inserted
-     */
-    private StatementBlock insertStatementInBlock(StatementBlock b,
-						  Statement[] stmnt) {
-	
-	Statement[] block = new Statement[b.getStatementCount()+
-					  stmnt.length];
-	for (int j = 0; j < b.getStatementCount(); j++) {
-	    block[j] = b.getStatementAt(j);
-	}
-	for (int i = 0; i < stmnt.length; i++) {
-	    block[i+b.getStatementCount()] = stmnt[i];
-	}
-	return new StatementBlock(new ImmutableArray<Statement>(block));	
     }
 
     /**
