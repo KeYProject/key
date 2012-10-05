@@ -47,23 +47,19 @@ public class Main {
     private static final String ASSERTION = "-assertion";
     private static final String NO_ASSERTION = "-no_assertion";
     private static final String NO_JMLSPECS = "-no_jmlspecs";
-    private static final String JUSTIFY_RULES ="-justify_rules";
+    public static final String JUSTIFY_RULES ="-justify_rules";
     private static final String PRINT_STATISTICS ="-print_statistics";
     private static final String TIMEOUT ="-timeout";
     private static final String EXAMPLES = "-examples"; 
-    private static final String JPRINT_TERMINAL = "-terminal";
-    private static final String JPRINT_DISABLE = "-disable";
-    private static final String JKEY_PREFIX = "-jr-";
-    private static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
-    private static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
-    private static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
-    private static final String JTIMEOUT =  "-jr-timeout";
-    private static final String JPRINT = JKEY_PREFIX + "print";
-    private static final String JSAVE_RESULTS_TO_FILE = JKEY_PREFIX + "saveProofToFile";
-    private static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
-    private static final String JFILE_FOR_DEFINITION = JKEY_PREFIX +"signature";
-    private static final int DEFAULT_TIMEOUT = -1;
-    private static final int DEFAULT_MAXRULES = 10000;
+    public static final String JKEY_PREFIX = "-jr-";
+    public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
+    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
+    public static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
+    public static final String JTIMEOUT = JKEY_PREFIX + "timeout";
+    public static final String JPRINT = JKEY_PREFIX + "print";
+    public static final String JSAVE_RESULTS_TO_FILE = JKEY_PREFIX + "saveProofToFile";
+    public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
+    public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX +"signature";
     public static final String INTERNAL_VERSION =
             KeYResourceManager.getManager().getSHA1();
 
@@ -115,13 +111,10 @@ public class Main {
 			UserInterface userInterface = evaluateOptions(cl);
 			loadCommandLineFile(userInterface);
 		} catch (CommandLineException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.out.println("Exception during Commandline");
+			System.out.println("Exception during parsing of commandline options");
 		}
         
-  //    UserInterface userInterface = evaluateOptions(args);
-  //    loadCommandLineFile(userInterface); 
     }
 
     public static void loadCommandLineFile(UserInterface ui) {
@@ -144,36 +137,33 @@ public class Main {
     	CommandLine cl= new CommandLine();
     	cl.setIndentation(3);
     	cl.addText("Options for the KeY-Prover", false);
-    	cl.addText("\n", true);
+    	cl.addText("\n", false);
+    	cl.addText("  <filename>      : loads a .key file", true);
     	cl.addOption(HELP, null, "display this text");
+    	cl.addText("-Khelp" ,false);
+    	cl.addText("displays help for technical/debug parameters", true);
     	cl.addOption(AUTO, null, "start prove procedure after initialisation");
     	cl.addOption(AUTO_LOADONLY, null, "");
     	cl.addOption(NO_JMLSPECS, null, "disables parsing JML specifications");
     	cl.addOption(EXAMPLES, "<examplefiles>", "loads directory with example files on startup");
-    	cl.addOption(JUSTIFY_RULES, "<options>", "autoprove taclets (options always with prefix -jr)" );
     	cl.addOption(PRINT_STATISTICS, "<filename>",  "in auto mode, output nr. of rule applications and time spent");
-    	cl.addOption(TIMEOUT, "<timeout>", "the timeout in ms (default: " + DEFAULT_TIMEOUT +")");
-       	cl.addText("\n", true);
-    	cl.addText("The 'justifyrules' command has a number options you can set.\n", false);
-    	cl.addText("Provide the option name and the value as separate arguments.\n", false);
+    	cl.addOption(TIMEOUT, "<timeout>", "the timeout in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +")");
+    	cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets (options always with prefix -jr) needs teh path to the rule file as argument" );
     	cl.addText("\n", true);
-    	cl.addOption(JMAX_RULES, "<max. number of rule applications>","the maximum number of rule application to perform (default: " + DEFAULT_MAXRULES +")");
-    	cl.addOption(JPATH_OF_RULE_FILE, "<path>","the file to load the rules from");
+    	cl.addText("The 'justifyrules' command has a number options you can set.", false);
+    	cl.addText("Provide the option name and the value as separate arguments.", false);
+    	cl.addText("\n", true);
+    	cl.addOption(JMAX_RULES, "<number>","the maximum number of rule application to perform (default: " + LemmataAutoModeOptions.DEFAULT_MAXRULES +")");
     	cl.addOption(JPATH_OF_RESULT, "<path>", "the folder to store proofs to");
-    	cl.addOption(JTIMEOUT, "<timeout>", "the timeout in ms (default: " + DEFAULT_TIMEOUT +")");
-    	cl.addOption(JPRINT, "<filename>", "where to send output (use 'terminal' or 'disable')");
+    	cl.addOption(JTIMEOUT, "<timeout>", "the timeout in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +")");
+    	cl.addOption(JPRINT, "<terminal/disable>", "where to send output (use 'terminal' or 'disable')");
     	cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "flag to save or drop proofs (then stored to path given by "+ JPATH_OF_RESULT + ")");
     	cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "file to read axioms from");
     	cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "file to read definitions from");
-    	cl.addText("If first argument does not start with '-jr-', an implicit leading", false);
-    	cl.addText("pathOfRuleFile is assumed. For further information see the help", false);
-    	cl.addText("for the dialog reached under \"File > Prove > Userdefined Taclets\"", false);
     	return cl;
     }
     public static UserInterface evaluateOptions(CommandLine cl) {
-//       public static UserInterface evaluateOptions(String[] opt) {
         UserInterface ui = null;
-//        int index = 0;
         ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
         String uiMode = "INTERACTIVE";
 
@@ -241,15 +231,7 @@ public class Main {
 			System.out.println("Hier:"+string);
 		}
      	//-jr-
-        if(cl.isSet(JUSTIFY_RULES)||
-        		cl.isSet(JFILE_FOR_AXIOMS)|| 
-        		cl.isSet(JFILE_FOR_DEFINITION)||
-        		cl.isSet(JMAX_RULES)||
-        		cl.isSet(JPATH_OF_RESULT)||
-        		cl.isSet(JPATH_OF_RULE_FILE)||
-        		cl.isSet(JPRINT)||
-        		cl.isSet(JSAVE_RESULTS_TO_FILE)||
-        		cl.isSet(JTIMEOUT))
+        if(cl.isSet(JUSTIFY_RULES))
         {evaluateLemmataOptions(cl);}
         
         //arguments not assigned to a command line option may be files
