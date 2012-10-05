@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.Equals;
 import de.uka.ilkd.key.java.expression.operator.Instanceof;
@@ -769,6 +770,26 @@ public abstract class KeYJavaASTFactory {
      */
     public static EmptyStatement emptyStatement() {
 	return new EmptyStatement();
+    }
+
+    /**
+     * Create an equality comparison with <code>null</code>.
+     * 
+     * <pre>
+     * expression == null
+     * </pre>
+     * 
+     * @param expression
+     *            the {@link Expression} to be compared against
+     *            <code>null</code>
+     * @return a new {@link Equals} that compares <code>expression</code>
+     *         against <code>null</code>
+     */
+    public static Equals equalsNullOperator(final Expression expression) {
+	final Equals operator = KeYJavaASTFactory.equalsOperator(expression,
+		NullLiteral.NULL);
+
+	return operator;
     }
 
     /**
