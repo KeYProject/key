@@ -41,12 +41,10 @@ public class VariableNameProposer implements InstantiationProposer {
     				= new VariableNameProposer();
 
     private static final String SKOLEMTERM_VARIABLE_NAME_POSTFIX = "_";
-    private static final String VARIABLE_NAME_PREFIX             = "_var";
     private static final String LABEL_NAME_PREFIX                = "_label";
 
     private static final String GENERALNAMECOUNTER_PREFIX   = "GenCnt";
     private static final String SKOLEMTERMVARCOUNTER_PREFIX = "DepVarCnt";
-    private static final String VARCOUNTER_NAME 	        = "VarCnt";
     private static final String LABELCOUNTER_NAME 	        = "LabelCnt";
 
 
@@ -69,7 +67,7 @@ public class VariableNameProposer implements InstantiationProposer {
 	    return getNameProposalForVariableSV(app,
 	    					var,
 						services,
-						undoAnchor);
+						previousProposals);
 	} else if(var.sort() == ProgramSVSort.LABEL) {
 	    return getNameProposalForLabel(app,
 	    				   var,
@@ -196,13 +194,29 @@ public class VariableNameProposer implements InstantiationProposer {
     /**
      * Generates a proposal for the instantiation of the given
      * schema variable, which is a variable SV.
+     * 
+     * The returned name is not necessarily globally unique, but that is not
+     * necessary for bound variables.
      */
     private String getNameProposalForVariableSV(TacletApp app,
 						SchemaVariable var,
 						Services services,
-						Node undoAnchor) {
-	return VARIABLE_NAME_PREFIX + services.getCounter(VARCOUNTER_NAME)
-	  				      .getCountPlusPlusWithParent(undoAnchor);
+						ImmutableList<String> previousProposals) {
+
+        String baseName = var.name().toString();
+        if(previousProposals == null || !previousProposals.contains(baseName)) {
+            return baseName;
+        }
+
+        for(int i = 1; i < Integer.MAX_VALUE; i++) {
+            String name = baseName + "_" + i;
+            if(!previousProposals.contains(name)) {
+                return name;
+            }
+        }
+
+        throw new Error("name proposer for " + baseName + " has run into infinite loop");
+
     }
 
 
