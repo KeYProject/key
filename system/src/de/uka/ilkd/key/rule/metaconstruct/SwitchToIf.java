@@ -10,19 +10,13 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -60,24 +54,17 @@ public class SwitchToIf extends ProgramTransformer {
 	StatementBlock result;
 	Expression defCond=null;
 	Label l = new ProgramElementName("_l"+(labelCount++));
-	Break newBreak = new Break(l);
+	Break newBreak = KeYJavaASTFactory.breakStatement(l);
 
 	VariableNamer varNamer = services.getVariableNamer();
 	ProgramElementName name = varNamer.getTemporaryNameProposal("_var");
 
 	Statement[] ifs = new Statement[sw.getBranchCount()];
 	final ExecutionContext ec = insts.getExecutionContext();
-	ProgramVariable exV = new LocationVariable
-		    (name,
-		     sw.getExpression().getKeYJavaType(services, ec));
-	VariableSpecification exVSpec 
-	    = new VariableSpecification(exV, 
-					sw.getExpression().
-					getKeYJavaType(services, ec));
-	Statement s = new LocalVariableDeclaration
-	    (new TypeRef(sw.getExpression().
-			 getKeYJavaType(services, ec)),
-	     exVSpec);
+	ProgramVariable exV = KeYJavaASTFactory.localVariable(name, sw
+		.getExpression().getKeYJavaType(services, ec));
+	Statement s = KeYJavaASTFactory.declare(name, sw.getExpression()
+		.getKeYJavaType(services, ec));
 	result = KeYJavaASTFactory.block(s,
 		KeYJavaASTFactory.assign(exV, sw.getExpression()));
 
@@ -91,22 +78,26 @@ public class SwitchToIf extends ProgramTransformer {
 	while(i<sw.getBranchCount()){
 	    if(sw.getBranchAt(i) instanceof Case){
 		extL.add(((Case) sw.getBranchAt(i)).getExpression());
-		ifs[i]=new If(new Equals(extL),
-			      new Then(collectStatements(sw, i)));
+		ifs[i] = KeYJavaASTFactory.ifThen(
+			KeYJavaASTFactory.equalsOperator(extL),
+			collectStatements(sw, i));
 		extL.remove(((Case)sw.getBranchAt(i)).getExpression());
 	    } else{
 		for(int j=0;j<sw.getBranchCount();j++){
 		    if(sw.getBranchAt(j) instanceof Case){
 			extL.add(((Case) sw.getBranchAt(j)).getExpression());
 			if(defCond != null){
-			    defCond = new LogicalAnd(defCond,new NotEquals(extL));
+			    defCond = KeYJavaASTFactory.logicalAndOperator(
+				    defCond,
+				    KeYJavaASTFactory.notEqualsOperator(extL));
 			}else{
-			    defCond = new NotEquals(extL);
+			    defCond = KeYJavaASTFactory.notEqualsOperator(extL);
 			}
 			extL.remove(((Case)sw.getBranchAt(j)).getExpression());
 		    }
 		}
-		ifs[i] = new If(defCond,new Then(collectStatements(sw, i)));
+		ifs[i] = KeYJavaASTFactory.ifThen(defCond,
+			collectStatements(sw, i));
 	    }
 	    i++;
 	}
@@ -114,7 +105,7 @@ public class SwitchToIf extends ProgramTransformer {
 	if(noNewBreak){
 	    return result;
 	}else{
-	    return new LabeledStatement(l, result);
+	    return KeYJavaASTFactory.labeledStatement(l, result);
 	}
     }
 
@@ -125,15 +116,14 @@ public class SwitchToIf extends ProgramTransformer {
      */
     
     private Statement[] mkIfNullCheck(Services services, ProgramVariable var) {
-        Throw t =
-                new Throw(new New(new Expression[0], 
-                        new TypeRef(
-                        services.getJavaInfo().getKeYJavaType(
-                                "java.lang.NullPointerException")), null));
+	final New exception = KeYJavaASTFactory
+		.newOperator(services.getJavaInfo().getKeYJavaType(
+			"java.lang.NullPointerException"));
+	Throw t = KeYJavaASTFactory.throwClause(exception);
         
-        final Expression cnd = new Equals(var, NullLiteral.NULL);
+	final Expression cnd = KeYJavaASTFactory.equalsNullOperator(var);
         
-        return new Statement[] { new If(cnd, new Then(t)) };
+	return new Statement[] { KeYJavaASTFactory.ifThen(cnd, t) };
     }
 
     /**
@@ -145,7 +135,7 @@ public class SwitchToIf extends ProgramTransformer {
 	for(int i=0; i<n; i++){
 	    branches[i] = (Branch)recChangeBreaks(sw.getBranchAt(i), b);
 	}
-	return new Switch(sw.getExpression(), branches);
+	return KeYJavaASTFactory.switchBlock(sw.getExpression(), branches);
     }
 
     private ProgramElement recChangeBreaks(ProgramElement p, Break b){
@@ -159,24 +149,32 @@ public class SwitchToIf extends ProgramTransformer {
 	    for(int i=0; i<((Branch)p).getStatementCount(); i++){
 		s[i]=(Statement)recChangeBreaks(((Branch)p).getStatementAt(i), b);
 	    }
-	    if(p instanceof Case) return new Case(((Case)p).getExpression(),s);
-	    if(p instanceof Default) return new Default(s);
-	    if(p instanceof Catch) return new Catch(((Catch)p).getParameterDeclaration(),
-						    new StatementBlock(new ImmutableArray<Statement>(s)));
-	    if(p instanceof Finally) return new Finally(new StatementBlock(new ImmutableArray<Statement>(s)));
-	    if(p instanceof Then) return new Then(new StatementBlock(new ImmutableArray<Statement>(s)));
-	    if(p instanceof Else) return new Else(new StatementBlock(new ImmutableArray<Statement>(s)));
+	    if (p instanceof Case)
+		return KeYJavaASTFactory.caseBlock(((Case) p).getExpression(),
+			s);
+	    if (p instanceof Default)
+		return KeYJavaASTFactory.defaultBlock(s);
+	    if (p instanceof Catch)
+		return KeYJavaASTFactory.catchClause(
+			((Catch) p).getParameterDeclaration(), s);
+	    if (p instanceof Finally)
+		return KeYJavaASTFactory.finallyBlock(s);
+	    if (p instanceof Then)
+		return KeYJavaASTFactory.thenBlock(s);
+	    if (p instanceof Else)
+		return KeYJavaASTFactory.elseBlock(s);
 	}
 	if(p instanceof If){
-	    return new If(((If)p).getExpression(),(Then)recChangeBreaks(((If)p).getThen(),b),
-			  (Else) recChangeBreaks(((If)p).getElse(),b));
+	    return KeYJavaASTFactory.ifElse(((If) p).getExpression(),
+		    (Then) recChangeBreaks(((If) p).getThen(), b),
+		    (Else) recChangeBreaks(((If) p).getElse(), b));
 	}
 	if(p instanceof StatementBlock){
 	    Statement[] s= new Statement[((StatementBlock)p).getStatementCount()];
 	    for(int i=0; i<((StatementBlock)p).getStatementCount(); i++){
 		s[i]=(Statement)recChangeBreaks(((StatementBlock)p).getStatementAt(i), b);
 	    }
-	    return new StatementBlock(new ImmutableArray<Statement>(s));
+	    return KeYJavaASTFactory.block(s);
 	}
 	if(p instanceof Try){
 	    int n=((Try) p).getBranchCount();
@@ -184,7 +182,9 @@ public class SwitchToIf extends ProgramTransformer {
 	    for(int i=0; i<n; i++){
 		branches[i] = (Branch)recChangeBreaks(((Try) p).getBranchAt(i), b);
 	    }
-	    return new Try((StatementBlock)recChangeBreaks(((Try) p).getBody(), b),branches);
+	    return KeYJavaASTFactory.tryBlock(
+		    (StatementBlock) recChangeBreaks(((Try) p).getBody(), b),
+		    branches);
 	}
 	return p;
     }
@@ -209,7 +209,7 @@ public class SwitchToIf extends ProgramTransformer {
 		k++;
 	    }
 	}
-	return new StatementBlock(new ImmutableArray<Statement>(stats));
+	return KeYJavaASTFactory.block(stats);
     }
 
 
