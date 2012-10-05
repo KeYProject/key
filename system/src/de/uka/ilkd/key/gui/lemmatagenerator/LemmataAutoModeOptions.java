@@ -6,25 +6,14 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 
 public class LemmataAutoModeOptions {
-        private static final int DEFAULT_TIMEOUT = -1;
-        private static final int DEFAULT_MAXRULES = 10000;
-        private static final String PRINT_TERMINAL = "terminal";
-        private static final String PRINT_DISABLE = "disable";
-        private static final String KEY_PREFIX = "-jr-";
-        private static final String MAX_RULES = KEY_PREFIX + "maxRules";
-        private static final String PATH_OF_RULE_FILE = KEY_PREFIX + "pathOfRuleFile";
-        private static final String PATH_OF_RESULT = KEY_PREFIX + "pathOfResult";
-        private static final String TIMEOUT = KEY_PREFIX + "timeout";
-        private static final String PRINT = KEY_PREFIX + "print";
-        private static final String SAVE_RESULTS_TO_FILE = KEY_PREFIX + "saveProofToFile";
-        private static final String FILE_FOR_AXIOMS = KEY_PREFIX + "axioms";
-        private static final String FILE_FOR_DEFINITION = KEY_PREFIX +"signature";
-        private static final String JUSTIFY_RULES ="-justify_rules";
+        public static final int DEFAULT_TIMEOUT = -1;
+        public static final int DEFAULT_MAXRULES = 10000;
         private static final String PROOF_POSTFIX = ".key.proof";
 
         /**
@@ -75,27 +64,25 @@ public class LemmataAutoModeOptions {
         private boolean saveResultsToFile = false;
 
         private String homePath;
-//        public LemmataAutoModeOptions(String pathRuleFile, int timeout,
-//        		-                        int maxRules, String pathResult, String internalVersion) {
         public LemmataAutoModeOptions(CommandLine cl, String internalVersion) {
                 super();
                 try{
-                	if(cl.isSet(PATH_OF_RULE_FILE)){
-                		this.pathOfRuleFile = cl.getString(PATH_OF_RULE_FILE, null);
+                	if(cl.isSet(Main.JPATH_OF_RULE_FILE)){
+                		this.pathOfRuleFile = cl.getString(Main.JPATH_OF_RULE_FILE, null);
                 	
                 	}
-                	if(cl.isSet(TIMEOUT)){
-                		this.timeout = cl.getLong(TIMEOUT, DEFAULT_TIMEOUT);
+                	if(cl.isSet(Main.JTIMEOUT)){
+                		this.timeout = cl.getLong(Main.JTIMEOUT, DEFAULT_TIMEOUT);
                 		System.out.println("We are in cons 1 and timeout is "+timeout);
                 	}
-                	if(cl.isSet(MAX_RULES)){
-                		this.maxRules =  cl.getInteger(MAX_RULES, DEFAULT_MAXRULES);
+                	if(cl.isSet(Main.JMAX_RULES)){
+                		this.maxRules =  cl.getInteger(Main.JMAX_RULES, DEFAULT_MAXRULES);
                 	}
-                	if(cl.isSet(PATH_OF_RESULT) && cl.isSet(PATH_OF_RULE_FILE)){
-                		this.pathOfResult = generatePath(cl.getString(PATH_OF_RESULT, null), pathOfRuleFile);
+                	if(cl.isSet(Main.JPATH_OF_RESULT) && cl.isSet(Main.JPATH_OF_RULE_FILE)){
+                		this.pathOfResult = generatePath(cl.getString(Main.JPATH_OF_RESULT, null), pathOfRuleFile);
                 	}
                 	}catch(CommandLineException cle){
-                		System.out.println("There was a problem reading the command line options. An argument is missing either for option "+TIMEOUT+ " or "+MAX_RULES+".");
+                		System.out.println("There was a problem reading the command line options. An argument is missing either for option "+Main.JTIMEOUT+ " or "+Main.JMAX_RULES+".");
                 		
                 	
                 	}
@@ -108,86 +95,53 @@ public class LemmataAutoModeOptions {
                         String internalVersion, String homePath) {
                 this.internalVersion = internalVersion;
                 
-                if(cl.isSet(JUSTIFY_RULES)){
-                	this.pathOfRuleFile = cl.getString(JUSTIFY_RULES, null); 
+                if(cl.isSet(Main.JUSTIFY_RULES)){
+                	this.pathOfRuleFile = cl.getString(Main.JUSTIFY_RULES, null); 
                 }
                 System.out.println("We are in cons 2");
                 read(cl);
-//                if (options.isEmpty()) {
-//                    printUsage();
-//                    throwError("No parameters were specified");
-//                }
-//                if (!options.getFirst().equals(PATH_OF_RULE_FILE)) {
-//                        options.addFirst(PATH_OF_RULE_FILE);
-//                }
-//                analyzeParameters(options);
-//                pathOfResult = generatePath(pathOfResult, pathOfRuleFile);
+                pathOfResult = generatePath(pathOfResult, pathOfRuleFile);
                 this.homePath = homePath;
                 checkForValidity();
         }
-
-//        private void analyzeParameters(LinkedList<String> options) {
-//                Iterator<String> it = options.iterator();
-//                while (it.hasNext()) {
-//                        String option = it.next();
-//                        if (option.startsWith(KEY_PREFIX)) {
-//                                if (it.hasNext()) {
-//                                        read(option, it.next());
-//                                } else {
-//                                        throwError("There is no parameter specified for option "
-//                                                        + option);
-//                                }
-//                        } else {
-//                                rules.add(option);
-//                        }
-//                }
-//        }
-
-      //  private void read(String key, String value) {
         private void read(CommandLine cl) {
-                if (cl.isSet(MAX_RULES)) {
-//                        maxRules = Integer.parseInt(value);
+                if (cl.isSet(Main.JMAX_RULES)) {
                 		try {
-							cl.getInteger(MAX_RULES, DEFAULT_MAXRULES);
+							cl.getInteger(Main.JMAX_RULES, DEFAULT_MAXRULES);
 						} catch (CommandLineException e) {
-							System.out.println("Commandline argument for option "+MAX_RULES+"is missing.");
+							System.out.println("Commandline argument for option "+Main.JMAX_RULES+"is missing.");
 						}
                 }
-                if (cl.isSet(PATH_OF_RESULT)) {
-                     //   pathOfResult = value;
-                	pathOfResult = cl.getString(PATH_OF_RESULT, null);
+                if (cl.isSet(Main.JPATH_OF_RESULT)) {
+                	pathOfResult = cl.getString(Main.JPATH_OF_RESULT, null);
                 }
-                if (cl.isSet(PATH_OF_RULE_FILE)) {
-//                        pathOfRuleFile = value;
-                	pathOfRuleFile = cl.getString(PATH_OF_RULE_FILE, null);
+                if (cl.isSet(Main.JPATH_OF_RULE_FILE)) {
+                	pathOfRuleFile = cl.getString(Main.JUSTIFY_RULES, null);
                 }
-                if (cl.isSet(TIMEOUT)) {
-//                        timeout = Long.parseLong(value);
+                if (cl.isSet(Main.JTIMEOUT)) {
                 	try {
-						timeout = cl.getLong(TIMEOUT, DEFAULT_TIMEOUT);
+						timeout = cl.getLong(Main.JTIMEOUT, DEFAULT_TIMEOUT);
 						System.out.println("Timeout2 is :"+timeout);
 					} catch (CommandLineException e) {
-						System.out.println("Commandline argument for "+TIMEOUT+" is missing.");
+						System.out.println("Commandline argument for "+Main.JTIMEOUT+" is missing.");
 					}
                 }
-                if (cl.isSet(PRINT)) {
-                        if (cl.getString(PRINT, PRINT_TERMINAL).equals(PRINT_TERMINAL)) {
+                if (cl.isSet(Main.JPRINT)) {
+                        if (cl.getString(Main.JPRINT, "terminal").equals("terminal")) {
                                 printStream = System.out;
                         }
-                        if (cl.getString(PRINT, PRINT_TERMINAL).equals(PRINT_DISABLE)) {
+                        if (cl.getString(Main.JPRINT, "terminal").equals("disable")) {
                                 printStream = null;
                         }
                 }
-                if (cl.isSet(SAVE_RESULTS_TO_FILE)) {
-//                        saveResultsToFile = readBoolean(value,
-  //                                      saveResultsToFile);
-                		saveResultsToFile = readBoolean(cl.getString(SAVE_RESULTS_TO_FILE, "false"), saveResultsToFile);
+                if (cl.isSet(Main.JSAVE_RESULTS_TO_FILE)) {
+                		saveResultsToFile = readBoolean(cl.getString(Main.JSAVE_RESULTS_TO_FILE, "false"), saveResultsToFile);
                 }
-                if (cl.isSet(FILE_FOR_AXIOMS)) {
-                        filesForAxioms.add(cl.getString(FILE_FOR_AXIOMS, null));
+                if (cl.isSet(Main.JFILE_FOR_AXIOMS)) {
+                        filesForAxioms.add(cl.getString(Main.JFILE_FOR_AXIOMS, null));
                 }
-                if (cl.isSet(FILE_FOR_DEFINITION)) {
-                        pathOfDefinitionFile = cl.getString(FILE_FOR_DEFINITION, null);
+                if (cl.isSet(Main.JFILE_FOR_DEFINITION)) {
+                        pathOfDefinitionFile = cl.getString(Main.JFILE_FOR_DEFINITION, null);
                 }
         }
 
@@ -278,22 +232,6 @@ public class LemmataAutoModeOptions {
                 return filesForAxioms;
         }
 
-        public static void printUsage() {
-//            System.out.println("The 'justifyrules' command has a number options you can set.");
-//            System.out.println("Provide the option name and the value as separate arguments.");
-//            System.out.println(" ?print           where to send output (use 'terminal' or 'disable')");
-//            System.out.println(" ?maxRules        the maximum number of rule application to perform ");
-//            System.out.println("                    (default: " + DEFAULT_MAXRULES + ")");
-//            System.out.println(" ?pathOfRuleFile  the file to load the rules from");
-//            System.out.println(" ?pathOfResult    the folder to store proofs to");
-//            System.out.println(" ?timeout         the timeout in ms (default: " + DEFAULT_TIMEOUT +")");
-//            System.out.println(" ?saveProofToFile flag to save or drop proofs (use 'true'/'false'),"); 
-//            System.out.println("                    (then stored to path given by ?pathOfResult)");
-//            System.out.println(" ?signature       file to read definitions from");
-//            System.out.println();
-//            System.out.println("If first argument does not start with '?', an implicit leading");
-//            System.out.println("?pathOfRuleFile is assumed. For further information see the help");
-//            System.out.println("for the dialog reached under \"File > Prove > Userdefined Taclets\"");
-        }
+
 
 }
