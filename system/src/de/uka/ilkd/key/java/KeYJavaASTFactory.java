@@ -270,6 +270,25 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a parenthesized expression.
+     * 
+     * <pre>
+     * (expression)
+     * </pre>
+     * 
+     * @param expression
+     *            the {@link Expression} to be parenthesized
+     * @return a new {@link ParenthesizedExpression} of <code>expression</code>
+     */
+    public static ParenthesizedExpression parenthesizedExpression(
+	    final Expression expression) {
+	final ParenthesizedExpression parenthesized = new ParenthesizedExpression(
+		expression);
+
+	return parenthesized;
+    }
+
+    /**
      * Create an inactive expression.
      * 
      * @param expression
