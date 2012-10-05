@@ -1283,6 +1283,26 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a less than zero operator.
+     * 
+     * <pre>
+     * expression &lt; 0
+     * </pre>
+     * 
+     * @param expression
+     *            the left operand {@link Expression}
+     * @return a new {@link LessThan} that compares <code>expression</code> less
+     *         than <code>0</code>
+     */
+    public static LessThan lessThanZeroOperator(final Expression expression) {
+	final IntLiteral zeroLiteral = KeYJavaASTFactory.zeroLiteral();
+	final LessThan operator = KeYJavaASTFactory.lessThanOperator(
+		expression, zeroLiteral);
+
+	return operator;
+    }
+
+    /**
      * Create a condition that compares a variable and an array length using the
      * less than operator.
      * 
