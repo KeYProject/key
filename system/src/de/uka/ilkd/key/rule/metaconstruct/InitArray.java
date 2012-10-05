@@ -16,17 +16,11 @@ import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
-import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.ExtList;
 
 /**
  * Split an array creation expression with explicit array initializer,
@@ -84,12 +78,10 @@ public abstract class InitArray extends ProgramTransformer {
 
 	KeYJavaType arrayType = p_creationExpression.getKeYJavaType();
 
-	ExtList children     = new ExtList ();
-	children.add ( new IntLiteral ( initializers.size () ) );
-	children.add(p_creationExpression.getTypeReference());
-
-	return new NewArray(children, arrayType, null,
-		p_creationExpression.getDimensions());
+	return KeYJavaASTFactory.newArray(
+		p_creationExpression.getTypeReference(),
+		p_creationExpression.getDimensions(),
+		KeYJavaASTFactory.intLiteral(initializers.size()), arrayType);
     }
 
 
@@ -115,16 +107,10 @@ public abstract class InitArray extends ProgramTransformer {
 
 	int               i   = initializers.size ();
 	ProgramVariable[] res = new ProgramVariable [ i ];
-	VariableNamer varNamer = services.getVariableNamer();
 
 	while ( i-- != 0 ) {
-	    ProgramElementName name 
-	    	= varNamer.getTemporaryNameProposal("_tmpArray");
-	    ProgramVariable var = new LocationVariable(name, elementType);
-	    p_stmnts [i] = KeYJavaASTFactory.
-		declare ( var,
-			  initializers.get ( i ),
-			  elementType);
+	    p_stmnts[i] = KeYJavaASTFactory.declare(services, "_tmpArray",
+		    initializers.get(i), elementType);
 	    res [i] = (ProgramVariable)
 		((LocalVariableDeclaration)p_stmnts[i]).
 		getVariables ().get ( 0 ).getProgramVariable ();
@@ -181,20 +167,13 @@ public abstract class InitArray extends ProgramTransformer {
 			       "Very strange are arrays of type " +
 			       p_elementType.getJavaType () );
 
-	    ExtList children = new ExtList ();
-	    children.add ( p_baseType );
-
-	    p_initializer =
-		new NewArray ( children,
-			       p_elementType,
-			       (ArrayInitializer)p_initializer,
-			       ((ArrayType)p_elementType.getJavaType ())
-			       .getDimension () );
+	    p_initializer = KeYJavaASTFactory.newArray(p_baseType,
+		    ((ArrayType) p_elementType.getJavaType()).getDimension(),
+		    (ArrayInitializer) p_initializer, p_elementType);
 	}
 
-	Expression indexExpr = new IntLiteral ( p_index );
-	Expression lhs = new ArrayReference(p_array,
-		new Expression[] { indexExpr });
+	Expression indexExpr = KeYJavaASTFactory.intLiteral(p_index);
+	Expression lhs = KeYJavaASTFactory.arrayFieldAccess(p_array, indexExpr);
 
 	return KeYJavaASTFactory.assign(lhs, p_initializer);
     }
