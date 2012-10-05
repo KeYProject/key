@@ -1262,6 +1262,27 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a less than operator.
+     * 
+     * <pre>
+     * left &lt; right
+     * </pre>
+     * 
+     * @param left
+     *            the left operand {@link Expression}
+     * @param right
+     *            the right operand {@link Expression}
+     * @return a new {@link LessThan} that compares <code>left</code> less than
+     *         <code>right</code>
+     */
+    public static LessThan lessThanOperator(final Expression left,
+	    final Expression right) {
+	final LessThan operator = new LessThan(left, right);
+
+	return operator;
+    }
+
+    /**
      * Create a condition that compares a variable and an array length using the
      * less than operator.
      * 
