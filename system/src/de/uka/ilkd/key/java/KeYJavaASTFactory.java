@@ -902,6 +902,30 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a block where the given statements come after the given block.
+     * 
+     * <pre>
+     * block
+     * statements
+     * </pre>
+     * 
+     * @param block
+     *            the original {@link StatementBlock}
+     * @param statements
+     *            the inserted {@link Statement}s
+     * @return a new <code>StatementBlock</code> that contains
+     *         <code>block</code> first and <code>statements</code> second
+     */
+    public static StatementBlock insertStatementInBlock(
+	    final StatementBlock block, Statement[] statements) {
+	final StatementBlock blockEnd = KeYJavaASTFactory.block(statements);
+	final StatementBlock blockComplete = KeYJavaASTFactory
+		.insertStatementInBlock(block, blockEnd);
+
+	return blockComplete;
+    }
+
+    /**
      * Create an instance of operator.
      * 
      * <pre>
