@@ -965,7 +965,9 @@ public abstract class KeYJavaASTFactory {
      */
     public static LocalVariableDeclaration declareZero(final KeYJavaType type,
 	    final IProgramVariable variable) {
-	return KeYJavaASTFactory.declare(variable, new IntLiteral(0), type);
+	final IntLiteral zeroLiteral = KeYJavaASTFactory.zeroLiteral();
+
+	return KeYJavaASTFactory.declare(variable, zeroLiteral, type);
     }
 
     /**
@@ -2955,5 +2957,21 @@ public abstract class KeYJavaASTFactory {
 		variable, initializer, keyJavaType);
 
 	return specification;
+    }
+
+    /**
+     * Create a literal for the integer zero.
+     * 
+     * <pre>
+     * 0
+     * </pre>
+     * 
+     * @return a new {@link IntLiteral} that represents the integer value
+     *         <code>0</code>
+     */
+    public static IntLiteral zeroLiteral() {
+	final IntLiteral literal = KeYJavaASTFactory.intLiteral(0);
+
+	return literal;
     }
 }
