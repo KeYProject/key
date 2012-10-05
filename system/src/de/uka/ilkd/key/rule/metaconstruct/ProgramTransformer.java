@@ -20,7 +20,6 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -220,23 +219,6 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
 
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
 	return getKeYJavaType();
-    }
-    
-    // helpers
-    
-    /** 
-     * creates an assignment <code> lhs:=rhs </code>
-     */
-    protected final Statement assign(Expression lhs, Expression rhs) {
-	return KeYJavaASTFactory.assign(lhs, rhs);
-    }
-
-    /**
-     * creates an attribute access
-     */
-    protected final Expression attribute(ReferencePrefix prefix, 
-					 ProgramVariable field) {
-	return KeYJavaASTFactory.fieldReference(prefix, field);
     }
     
     /**

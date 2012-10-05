@@ -142,7 +142,7 @@ public class InitArrayCreation extends InitArray {
 					 Services services) {
 	assert dimensions.length > 0;
 	bodyStmnts.add
-	    (assign(resultVar,
+	    (KeYJavaASTFactory.assign(resultVar,
 		    new MethodReference
 		    (new ImmutableArray<Expression>(dimensions[0]),
 		     new ProgramElementName(createArrayName),
@@ -179,7 +179,7 @@ public class InitArrayCreation extends InitArray {
 		new For(new LoopInitializer[]{forInit},
 			new LessThan(pv, dimensions[0]),
 			new Expression[]{new PostIncrement(pv)},			
-			assign(new ArrayReference
+			KeYJavaASTFactory.assign(new ArrayReference
 			       ((ReferencePrefix)resultVar, new Expression[]{pv}),
 			       new NewArray(baseDim, 
 				       	    baseTypeRef, 
@@ -261,8 +261,8 @@ public class InitArrayCreation extends InitArray {
 	final Statement[] body = new Statement[2*arrayLength+1];
 	final ProgramVariable[] vars = evaluateInitializers ( body, na, services );
 
-	body[arrayLength] = 
-	    assign ( array, createArrayCreation ( na ));
+	body[arrayLength] = KeYJavaASTFactory.assign(array,
+		createArrayCreation(na));
 	
 	createArrayAssignments(arrayLength + 1, body, vars,  array, na);
 

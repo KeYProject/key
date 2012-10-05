@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
@@ -47,6 +48,8 @@ public class PostWork extends ProgramTransformer {
 	final ProgramVariable initialized = services.getJavaInfo().getAttribute
 	    (ImplicitFieldAdder.IMPLICIT_INITIALIZED,  
              services.getJavaInfo().getJavaLangObject());
-	return assign(attribute(newObject, initialized), BooleanLiteral.TRUE);
+	return KeYJavaASTFactory.assign(
+		KeYJavaASTFactory.fieldReference(newObject, initialized),
+		BooleanLiteral.TRUE);
     }
 }

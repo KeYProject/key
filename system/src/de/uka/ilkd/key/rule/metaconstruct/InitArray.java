@@ -203,6 +203,6 @@ public abstract class InitArray extends ProgramTransformer {
 	    new ArrayReference ( (ReferencePrefix)p_array,
 				 new Expression[] { indexExpr } );
 
-	return assign ( lhs, p_initializer );
+	return KeYJavaASTFactory.assign(lhs, p_initializer);
     }
 }
