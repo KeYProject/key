@@ -387,7 +387,9 @@ public class ApplyStrategy {
     /** interrupted by the user? */
     private boolean autoModeActive = false;
 
-    private List<ProverTaskListener> proverTaskObservers = new ArrayList<ProverTaskListener> ();
+    /** We use an immutable list to store listeners to allow for 
+     * addition/removal within listener code */
+    private ImmutableList<ProverTaskListener> proverTaskObservers = ImmutableSLList.nil();
 
     /** time in ms after which rule application shall be aborted, -1 disables timeout */
     private long timeout = -1;
@@ -494,22 +496,20 @@ public class ApplyStrategy {
     }
 
     private synchronized void fireTaskStarted (int maxSteps) {
-        for (int i = 0, sz = proverTaskObservers.size(); i<sz; i++) {
-            proverTaskObservers.get(i)
-            .taskStarted(PROCESSING_STRATEGY, maxSteps);
+        for (ProverTaskListener ptl : proverTaskObservers) {
+            ptl.taskStarted(PROCESSING_STRATEGY, maxSteps);
         }
     }
 
     private synchronized void fireTaskProgress () {
-        for (int i = 0, sz = proverTaskObservers.size(); i<sz; i++) {
-            proverTaskObservers.get(i)
-            .taskProgress(countApplied);
+        for (ProverTaskListener ptl : proverTaskObservers) {
+            ptl.taskProgress(countApplied);
         }
     }
 
     private synchronized void fireTaskFinished (TaskFinishedInfo info) {
-        for (int i = 0, sz = proverTaskObservers.size(); i<sz; i++) {
-            proverTaskObservers.get(i).taskFinished(info);
+        for (ProverTaskListener ptl : proverTaskObservers) {
+            ptl.taskFinished(info);
         }
     }
 
@@ -658,11 +658,11 @@ public class ApplyStrategy {
        return chooser != null ? chooser : defaultGoalChooser;
     }
     public synchronized void addProverTaskObserver(ProverTaskListener observer) {
-        proverTaskObservers.add(observer);
+        proverTaskObservers = proverTaskObservers.prepend(observer);
     }
 
     public synchronized void removeProverTaskObserver(ProverTaskListener observer) {
-        proverTaskObservers.remove(observer);
+        proverTaskObservers = proverTaskObservers.removeAll(observer);
     }
 
 

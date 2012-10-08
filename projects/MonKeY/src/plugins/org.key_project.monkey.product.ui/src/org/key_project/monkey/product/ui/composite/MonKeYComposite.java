@@ -2,7 +2,6 @@ package org.key_project.monkey.product.ui.composite;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,7 +14,6 @@ import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -27,7 +25,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -513,7 +510,7 @@ public class MonKeYComposite extends Composite {
         if (proofViewer.getInput() instanceof List<?>) {
             setProofSearchStrategyOptionsEnabled(false);
             // Get selected proofs
-            final IStructuredSelection selection = (IStructuredSelection)proofViewer.getSelection();
+            final List<?> selectedProofs = SWTUtil.toList(proofViewer.getSelection());
             // Get strategy properties
             final boolean expandMethods = methodTreatmentExpandButton.getSelection();
             final boolean useDependencyContracts = dependencyContractsOnButton.getSelection();
@@ -524,11 +521,9 @@ public class MonKeYComposite extends Composite {
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
                         SWTUtil.checkCanceled(monitor);
-                        monitor.beginTask("Proving", selection.size());
-                        Iterator<?> selectionIt = selection.iterator();
-                        while (selectionIt.hasNext()) {
+                        monitor.beginTask("Proving", selectedProofs.size());
+                        for (Object obj : selectedProofs) {
                             SWTUtil.checkCanceled(monitor);
-                            final Object obj = selectionIt.next();
                             if (obj instanceof MonKeYProof) {
                                 ((MonKeYProof)obj).startProof(expandMethods, useDependencyContracts, useQuery, useDefOps);
                             }
@@ -544,7 +539,7 @@ public class MonKeYComposite extends Composite {
                     }
                     finally {
                         monitor.done();
-                        Display.getDefault().syncExec(new Runnable() {
+                        getDisplay().syncExec(new Runnable() {
                            @Override
                            public void run() {
                               setProofSearchStrategyOptionsEnabled(true);
@@ -562,7 +557,7 @@ public class MonKeYComposite extends Composite {
    public void saveProofs() {
       try {
           // Get selected proofs
-          final IStructuredSelection selection = (IStructuredSelection)proofViewer.getSelection();
+          final List<?> selectedProofs = SWTUtil.toList(proofViewer.getSelection());
           // Select directory
           DirectoryDialog dialog = new DirectoryDialog(getShell());
           dialog.setFilterPath(proofDirectory);
@@ -574,9 +569,7 @@ public class MonKeYComposite extends Composite {
              if (proofs != null) {
                 // Check for existing files
                 List<String> existingFiles = new LinkedList<String>();
-                Iterator<?> selectionIt = selection.iterator();
-                while (selectionIt.hasNext()) {
-                    final Object obj = selectionIt.next();
+                for (Object obj : selectedProofs) {
                     if (obj instanceof MonKeYProof) {
                         MonKeYProof proof = (MonKeYProof)obj;
                         if (proof.hasProofInKeY() && proof.existsProofFile(proofDirectory)) {
@@ -595,10 +588,8 @@ public class MonKeYComposite extends Composite {
                       protected IStatus run(IProgressMonitor monitor) {
                           try {
                               SWTUtil.checkCanceled(monitor);
-                              monitor.beginTask("Saving proofs", selection.size());
-                              Iterator<?> selectionIt = selection.iterator();
-                              while (selectionIt.hasNext()) {
-                                  final Object obj = selectionIt.next();
+                              monitor.beginTask("Saving proofs", selectedProofs.size());
+                              for (Object obj : selectedProofs) {
                                   if (obj instanceof MonKeYProof) {
                                       ((MonKeYProof)obj).save(proofDirectory);
                                   }
@@ -633,7 +624,7 @@ public class MonKeYComposite extends Composite {
    public void loadProofs() {
       try {
           // Get selected proofs
-          final IStructuredSelection selection = (IStructuredSelection)proofViewer.getSelection();
+          final List<?> selectedProofs = SWTUtil.toList(proofViewer.getSelection());
           // Select directory
           DirectoryDialog dialog = new DirectoryDialog(getShell());
           dialog.setFilterPath(proofDirectory);
@@ -649,10 +640,9 @@ public class MonKeYComposite extends Composite {
                    protected IStatus run(IProgressMonitor monitor) {
                        try {
                            SWTUtil.checkCanceled(monitor);
-                           monitor.beginTask("Loading proofs", selection.size());
-                           Iterator<?> selectionIt = selection.iterator();
-                           while (selectionIt.hasNext()) {
-                               final Object obj = selectionIt.next();
+                           monitor.beginTask("Loading proofs", selectedProofs.size());
+                           for (Object obj : selectedProofs) {
+                               SWTUtil.checkCanceled(monitor);
                                if (obj instanceof MonKeYProof) {
                                    ((MonKeYProof)obj).loadProof(proofDirectory, bootClassPath);
                                }
@@ -723,7 +713,7 @@ public class MonKeYComposite extends Composite {
                                }
                             }
                             // Unload old source
-                            Display.getDefault().syncExec(new Runnable() {
+                            getDisplay().syncExec(new Runnable() {
                                @Override
                                public void run() {
                                   proofs = null;
@@ -750,6 +740,13 @@ public class MonKeYComposite extends Composite {
                                     }
                                 });
                             }
+                            // Select all proofs
+                            getDisplay().syncExec(new Runnable() {
+                               @Override
+                               public void run() {
+                                  proofViewer.getTable().selectAll();
+                               }
+                            });
                             return Status.OK_STATUS;
                         }
                         catch (OperationCanceledException e) {

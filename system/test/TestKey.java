@@ -13,7 +13,7 @@ import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 @SuppressWarnings("unchecked")
-public class TestKey extends TestCase {
+public class TestKey extends TestSuite {
 
     static Class[] utilityTests = new Class[] {
 	de.uka.ilkd.key.collection.TestSetAsListOfString.class,

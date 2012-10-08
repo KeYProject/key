@@ -16,22 +16,22 @@
             <variable name="multiArray" typeString="int[][]" valueString="x_arr_arr_2" arrayIndex="-1" isArrayIndex="false">
                <variable name="length" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
                </variable>
-               <variable name="multiArray[0]" typeString="int[]" valueString="\if (\exists int _var0;
-       (_var0 = 0 &amp; _var0 &gt;= 0 &amp; _var0 &lt;= 2))
+               <variable name="multiArray[0]" typeString="int[]" valueString="\if (\exists int iv;
+       (iv = 0 &amp; iv &gt;= 0 &amp; iv &lt;= 2))
     \then (null)
     \else (x_arr_arr_2[0])" arrayIndex="0" isArrayIndex="true">
-                  <variable name="length" typeString="int" valueString="\if (\exists int _var0;
-       (_var0 = 0 &amp; _var0 &gt;= 0 &amp; _var0 &lt;= 2))
+                  <variable name="length" typeString="int" valueString="\if (\exists int iv;
+       (iv = 0 &amp; iv &gt;= 0 &amp; iv &lt;= 2))
     \then (null)
     \else (x_arr_arr_2[0]).length" arrayIndex="-1" isArrayIndex="false">
                   </variable>
                </variable>
-               <variable name="multiArray[1]" typeString="int[]" valueString="\if (\exists int _var0;
-       (_var0 = 1 &amp; _var0 &gt;= 0 &amp; _var0 &lt;= 2))
+               <variable name="multiArray[1]" typeString="int[]" valueString="\if (\exists int iv;
+       (iv = 1 &amp; iv &gt;= 0 &amp; iv &lt;= 2))
     \then (null)
     \else (x_arr_arr_2[1])" arrayIndex="1" isArrayIndex="true">
-                  <variable name="length" typeString="int" valueString="\if (\exists int _var0;
-       (_var0 = 1 &amp; _var0 &gt;= 0 &amp; _var0 &lt;= 2))
+                  <variable name="length" typeString="int" valueString="\if (\exists int iv;
+       (iv = 1 &amp; iv &gt;= 0 &amp; iv &lt;= 2))
     \then (null)
     \else (x_arr_arr_2[1]).length" arrayIndex="-1" isArrayIndex="false">
                   </variable>
@@ -49,12 +49,12 @@
                      <variable name="length" typeString="int" valueString="x_arr_4.length" arrayIndex="-1" isArrayIndex="false">
                      </variable>
                   </variable>
-                  <variable name="multiArray[1]" typeString="int[]" valueString="\if (\exists int _var1;
-       (_var1 = 1 &amp; _var1 &gt;= 0 &amp; _var1 &lt;= 2))
+                  <variable name="multiArray[1]" typeString="int[]" valueString="\if (\exists int iv;
+       (iv = 1 &amp; iv &gt;= 0 &amp; iv &lt;= 2))
     \then (null)
     \else (x_arr_arr_2[1])" arrayIndex="1" isArrayIndex="true">
-                     <variable name="length" typeString="int" valueString="\if (\exists int _var1;
-       (_var1 = 1 &amp; _var1 &gt;= 0 &amp; _var1 &lt;= 2))
+                     <variable name="length" typeString="int" valueString="\if (\exists int iv;
+       (iv = 1 &amp; iv &gt;= 0 &amp; iv &lt;= 2))
     \then (null)
     \else (x_arr_arr_2[1]).length" arrayIndex="-1" isArrayIndex="false">
                      </variable>

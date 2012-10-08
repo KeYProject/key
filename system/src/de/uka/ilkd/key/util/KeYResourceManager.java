@@ -236,4 +236,16 @@ public class KeYResourceManager {
     public URL getResourceFile(Object o, String resourcename) {
 	return getResourceFile(o.getClass(), resourcename);
     }
+
+    /**
+     * All KeY {@link de.uka.ilkd.key.ui.UserInterface}s should use a common
+     * title string when they require one, for instance for a GUI window title
+     * bar.
+     * 
+     * @return the title string to be used by the KeY
+     *         <code>UserInterfaces</code>
+     */
+    public String getUserInterfaceTitle() {
+	return "KeY " + this.getVersion();
+    }
 }
