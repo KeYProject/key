@@ -22,6 +22,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociationValueContainer;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
@@ -124,7 +125,7 @@ public class SymbolicConfigurationReader {
             if (!(parent instanceof KeYlessConfiguration)) {
                throw new SAXException("Found state in wrong hierarchy.");
             }
-            KeYlessState state = new KeYlessState();
+            KeYlessState state = new KeYlessState(getName(attributes));
             if (((KeYlessConfiguration)parent).getState() != null) {
                throw new SAXException("State found a second time.");
             }
@@ -135,7 +136,7 @@ public class SymbolicConfigurationReader {
             if (!(parent instanceof KeYlessConfiguration)) {
                throw new SAXException("Found object in wrong hierarchy.");
             }
-            KeYlessObject object = new KeYlessObject(getName(attributes));
+            KeYlessObject object = new KeYlessObject(getName(attributes), getTypeString(attributes));
             ((KeYlessConfiguration)parent).addObject(object);
             parentStack.addFirst(object);
             objectIdMapping.put(getId(attributes), object);
@@ -144,7 +145,7 @@ public class SymbolicConfigurationReader {
             if (!(parent instanceof AbstractKeYlessAssociationValueContainer)) {
                throw new SAXException("Found value in wrong hierarchy.");
             }
-            KeYlessValue value = new KeYlessValue(getProgramVariableString(attributes), getValueString(attributes));
+            KeYlessValue value = new KeYlessValue(getProgramVariableString(attributes), getValueString(attributes), getTypeString(attributes));
             ((AbstractKeYlessAssociationValueContainer)parent).addValue(value);
             parentStack.addFirst(value);
          }
@@ -294,6 +295,15 @@ public class SymbolicConfigurationReader {
     */
    protected String getValueString(Attributes attributes) {
       return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_VALUE);
+   }
+
+   /**
+    * Returns the type value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   public String getTypeString(Attributes attributes) {
+      return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_TYPE);
    }
 
    /**
@@ -476,6 +486,27 @@ public class SymbolicConfigurationReader {
     * @author Martin Hentschel
     */
    public static class KeYlessState extends AbstractKeYlessAssociationValueContainer implements ISymbolicState {
+      /**
+       * The name.
+       */
+      private String name;
+
+      /**
+       * Constructor.
+       * @param name The name.
+       */
+      public KeYlessState(String name) {
+         super();
+         this.name = name;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getName() {
+         return name;
+      }
    }
    
    /**
@@ -488,14 +519,21 @@ public class SymbolicConfigurationReader {
        * The name.
        */
       private String nameString;
+      
+      /**
+       * The type.
+       */
+      private String typeString;
 
       /**
        * Constructor.
        * @param nameString The name.
+       * @param typeString The type.
        */
-      public KeYlessObject(String nameString) {
+      public KeYlessObject(String nameString, String typeString) {
          super();
          this.nameString = nameString;
+         this.typeString = typeString;
       }
 
       /**
@@ -512,6 +550,22 @@ public class SymbolicConfigurationReader {
       @Override
       public String getNameString() {
          return nameString;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Sort getType() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getTypeString() {
+         return typeString;
       }
    }
    
@@ -532,14 +586,21 @@ public class SymbolicConfigurationReader {
       private String valueString;
 
       /**
+       * The type.
+       */
+      private String typeString;
+
+      /**
        * Constructor.
        * @param programVariableString The program variable-
        * @param valueString The value.
+       * @param typeString The type.
        */
-      public KeYlessValue(String programVariableString, String valueString) {
+      public KeYlessValue(String programVariableString, String valueString, String typeString) {
          super();
          this.programVariableString = programVariableString;
          this.valueString = valueString;
+         this.typeString = typeString;
       }
 
       /**
@@ -572,6 +633,22 @@ public class SymbolicConfigurationReader {
       @Override
       public String getValueString() {
          return valueString;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Sort getType() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getTypeString() {
+         return typeString;
       }
    }
    

@@ -13,4 +13,9 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicState;
  * @see SymbolicState
  */
 public interface ISymbolicState extends ISymbolicAssociationValueContainer {
+   /**
+    * Returns the name of this state.
+    * @return The name of this state.
+    */
+   public String getName();
 }

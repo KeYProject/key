@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IRemoveFeature;
@@ -111,14 +110,7 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
       }
       try {
          // Define monitor to use
-         IProgressMonitor monitor;
-         Object contextMonitor = context.getProperty(GraphitiUtil.CONTEXT_PROPERTY_MONITOR);
-         if (contextMonitor instanceof IProgressMonitor) {
-            monitor = (IProgressMonitor)contextMonitor;
-         }
-         else {
-            monitor = new NullProgressMonitor();
-         }
+         IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
          // Change connection
          Object obj = context.getProperty(PROPERTY_DEBUG_TARGETS);
          if (obj instanceof ISEDDebugTarget[]) {

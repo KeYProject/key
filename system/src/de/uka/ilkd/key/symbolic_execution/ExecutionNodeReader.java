@@ -52,6 +52,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
 
 /**
  * Allows to read XML files which contains an symbolic execution tree
@@ -900,7 +901,7 @@ public class ExecutionNodeReader {
                                       boolean pathConditionChanged) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
       }
-      
+
       /**
        * Adds the given {@link IExecutionVariable}.
        * @param variable The {@link IExecutionVariable} to add.
@@ -931,6 +932,30 @@ public class ExecutionNodeReader {
       @Override
       public IExecutionVariable[] getVariables() {
          return variables.toArray(new IExecutionVariable[variables.size()]);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public int getConfigurationsCount() throws ProofInputException {
+         return 0;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ISymbolicConfiguration getInitialConfiguration(int configurationIndex) throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ISymbolicConfiguration getCurrentConfiguration(int configurationIndex) throws ProofInputException {
+         return null;
       }
    }
    

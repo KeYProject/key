@@ -70,22 +70,22 @@ public class TestSymbolicConfigurationWriterAndReader extends TestCase {
       model.addEquivalenceClass(new KeYlessEquivalenceClass(ImmutableSLList.<String>nil().append("A", "B", "C"), "A"));
       model.addEquivalenceClass(new KeYlessEquivalenceClass(ImmutableSLList.<String>nil().append("1", "2", "3"), "63"));
       // state
-      KeYlessState state = new KeYlessState();
-      state.addValue(new KeYlessValue("v1", "v1Value"));
-      state.addValue(new KeYlessValue("v2", "v2Value"));
+      KeYlessState state = new KeYlessState("exampleState");
+      state.addValue(new KeYlessValue("v1", "v1Value", "t1"));
+      state.addValue(new KeYlessValue("v2", "v2Value", "t2"));
       model.setState(state);
       // o1
-      KeYlessObject o1 = new KeYlessObject("o1");
-      o1.addValue(new KeYlessValue("o1", "o1Value"));
+      KeYlessObject o1 = new KeYlessObject("o1", "t1");
+      o1.addValue(new KeYlessValue("o1", "o1Value", "t1"));
       model.addObject(o1);
       // o2
-      KeYlessObject o2 = new KeYlessObject("o2");
+      KeYlessObject o2 = new KeYlessObject("o2", "t2");
       model.addObject(o2);
       // o3
-      KeYlessObject o3 = new KeYlessObject("o3");
-      o3.addValue(new KeYlessValue("o1", "o1Value"));
-      o3.addValue(new KeYlessValue("o2", "o2Value"));
-      o3.addValue(new KeYlessValue("o3", "o3Value"));
+      KeYlessObject o3 = new KeYlessObject("o3", "t3");
+      o3.addValue(new KeYlessValue("o1", "o1Value", "t1"));
+      o3.addValue(new KeYlessValue("o2", "o2Value", "t2"));
+      o3.addValue(new KeYlessValue("o3", "o3Value", "t3"));
       model.addObject(o3);
       // associations
       state.addAssociation(new KeYlessAssociation("a1", o2));

@@ -4,29 +4,15 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.ide.IDE;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.ui.visualization.object_diagram.editor.ReadonlyObjectDiagramEditor;
-import org.key_project.sed.ui.visualization.object_diagram.perspective.StateVisualizationPerspectiveFactory;
-import org.key_project.sed.ui.visualization.object_diagram.provider.ObjectDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUtil;
-import org.key_project.sed.ui.visualization.util.GraphitiUtil;
-import org.key_project.sed.ui.visualization.util.NonPersistableDiagramEditorInput;
-import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.StringUtil;
 
 /**
  * This {@link IHandler} visualizes the state of each selected
@@ -77,23 +63,8 @@ public class VisualizeStateCommand extends AbstractHandler {
     */
    public static void visualizeState(ISEDDebugNode node,
                                      IWorkbenchPage activePage) throws Exception {
-      // Create empty diagram
-      Diagram diagram = Graphiti.getPeCreateService().createDiagram(ObjectDiagramTypeProvider.TYPE, 
-                                                                    StringUtil.toSingleLinedString(node.getName()), 
-                                                                    true);
-      // Create editing domain and resource that contains the diagram
-      URI uri = URI.createURI(node.getId() + ObjectDiagramUtil.DIAGRAM_AND_MODEL_FILE_EXTENSION_WITH_DOT);
-      TransactionalEditingDomain domain = GraphitiUtil.createDomainAndResource(diagram, uri);
-      IEditorInput input = NonPersistableDiagramEditorInput.createEditorInput(diagram, domain, ObjectDiagramTypeProvider.PROVIDER_ID, true);
       // Open editor
-      IEditorPart editorPart = IDE.openEditor(activePage, 
-                                              input, 
-                                              ReadonlyObjectDiagramEditor.EDITOR_ID);
-      if (ObjectDiagramUtil.shouldSwitchToStateVisualizationPerspective(activePage)) {
-         WorkbenchUtil.openPerspective(StateVisualizationPerspectiveFactory.PERSPECTIVE_ID);
-      }
-      Assert.isTrue(editorPart instanceof ReadonlyObjectDiagramEditor);
-      ReadonlyObjectDiagramEditor readonlyEditor = (ReadonlyObjectDiagramEditor)editorPart;
+      ReadonlyObjectDiagramEditor readonlyEditor = ReadonlyObjectDiagramEditor.openEditor(activePage, node.getName(), node.getId());
       // Generate object diagram if not already available
       if (!ObjectDiagramUtil.hasModel(readonlyEditor.getDiagramTypeProvider().getDiagram())) {
          readonlyEditor.generateObjectDiagram(node);

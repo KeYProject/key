@@ -48,6 +48,10 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //             "x != null & x.next != null & x.next.next != null & a != null & a.x == 42 & b != null");
 //   }
    
+//   /**
+//    * Tests "configurationExtractorSimpleLinkedOjbectsInsertion" without precondition.
+//    * @throws Exception Occurred Exception.
+//    */
 //   public void testSimpleLinkedOjbectsInsertion() throws Exception {
 //      doTest("examples/_testcase/set/configurationExtractorSimpleLinkedOjbectsInsertion/test/SimpleLinkedOjbectsInsertion.java",
 //             "SimpleLinkedOjbectsInsertion",
@@ -243,6 +247,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
    public static void assertState(ISymbolicState expected, ISymbolicState current) {
       if (expected != null) {
          assertNotNull(current);
+         assertEquals(expected.getName(), current.getName());
          assertValues(expected.getValues(), current.getValues());
          assertAssociations(expected.getAssociations(), current.getAssociations());
       }
@@ -279,6 +284,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
       if (expected != null) {
          assertNotNull(current);
          assertEquals(expected.getNameString(), current.getNameString());
+         assertEquals(expected.getTypeString(), current.getTypeString());
          assertValues(expected.getValues(), current.getValues());
          if (compareAssociations) {
             assertAssociations(expected.getAssociations(), current.getAssociations());
@@ -369,6 +375,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
          assertNotNull(current);
          assertEquals(expected.getProgramVariableString(), current.getProgramVariableString());
          assertEquals(expected.getValueString(), current.getValueString());
+         assertEquals(expected.getTypeString(), current.getTypeString());
       }
       else {
          assertNull(current);

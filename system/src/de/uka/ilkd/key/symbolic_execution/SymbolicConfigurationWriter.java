@@ -90,6 +90,12 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
    public static final String ATTRIBUTE_REPRESENTATIVE = "representativeTerm";
 
    /**
+    * Attribute name to store {@link ISymbolicValue#getTypeString()} and
+    * {@link ISymbolicObject#getTypeString()}.
+    */
+   public static final String ATTRIBUTE_TYPE = "type";
+
+   /**
     * Writes the given {@link ISymbolicConfiguration} as XML file.
     * @param model The {@link ISymbolicConfiguration} to save.
     * @param encoding The encoding to use.
@@ -184,6 +190,7 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
     */
    protected void appendState(int level, ISymbolicConfiguration model, ISymbolicState state, StringBuffer sb) {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_NAME, state.getName());
       appendStartTag(level, TAG_STATE, attributeValues, sb);
       for (ISymbolicValue value : state.getValues()) {
          appendValue(level + 1, value, sb);
@@ -205,6 +212,7 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_XML_ID, computeObjectId(model, object));
       attributeValues.put(ATTRIBUTE_NAME, object.getNameString());
+      attributeValues.put(ATTRIBUTE_TYPE, object.getTypeString());
       appendStartTag(level, TAG_OBJECT, attributeValues, sb);
       for (ISymbolicValue value : object.getValues()) {
          appendValue(level + 1, value, sb);
@@ -225,6 +233,7 @@ public class SymbolicConfigurationWriter extends AbstractWriter {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_PROGRAM_VARIABLE, value.getProgramVariableString());
       attributeValues.put(ATTRIBUTE_VALUE, value.getValueString());
+      attributeValues.put(ATTRIBUTE_TYPE, value.getTypeString());
       appendEmptyTag(level, TAG_VALUE, attributeValues, sb);
    }
 

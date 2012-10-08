@@ -7,4 +7,25 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
  * @author Martin Hentschel
  */
 public class SymbolicState extends AbstractSymbolicAssociationValueContainer implements ISymbolicState {
+   /**
+    * The name of this state.
+    */
+   private String name;
+
+   /**
+    * Constructor.
+    * @param name The name of this state.
+    */
+   public SymbolicState(String name) {
+      super();
+      this.name = name;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getName() {
+      return name;
+   }
 }

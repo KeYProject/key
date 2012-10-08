@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 
@@ -72,6 +73,23 @@ public class SymbolicValue implements ISymbolicValue {
    public String getValueString() {
       StringBuffer sb = ProofSaver.printTerm(value, services, true);
       return sb.toString();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Sort getType() {
+      return value != null ? value.sort() : null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getTypeString() {
+      Sort sort = getType();
+      return sort != null ? sort.toString() : null;
    }
 
    /**

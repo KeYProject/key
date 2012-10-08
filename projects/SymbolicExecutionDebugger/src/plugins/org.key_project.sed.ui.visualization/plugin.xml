@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="org.key_project.sed.ui.visualization.executionTree.contextMenuEntries" name="Execution Tree Context Menu Entries" schema="schema/org.key_project.sed.ui.visualization.executionTree.contextMenuEntries.exsd"/>
   <extension
       point="org.eclipse.graphiti.ui.diagramTypes">
     <diagramType

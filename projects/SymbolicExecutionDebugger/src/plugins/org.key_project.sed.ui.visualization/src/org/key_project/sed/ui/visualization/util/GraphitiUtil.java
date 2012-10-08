@@ -9,6 +9,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.TextUtilities;
@@ -445,7 +446,7 @@ public final class GraphitiUtil {
     */
    public static ILocation getCenterLocation(Anchor anchor) {
       ILocation centerLocation = null;
-      ILocation location = getLocation(anchor);
+      ILocation location = getLeftLocation(anchor);
       if (location != null) {
          IDimension dimension = getDimension(anchor);
          if (dimension != null) {
@@ -457,16 +458,34 @@ public final class GraphitiUtil {
    }
    
    /**
-    * Returns the location of the given {@link Anchor}'s parent.
+    * Returns the location of the given {@link Anchor}'s parent
+    * which is the top left corner.
     * @param anchor The {@link Anchor} for which the location is requested.
     * @return The location of {@link Anchor}'s parent or {@code null} if not available.
     */
-   public static ILocation getLocation(Anchor anchor) {
+   public static ILocation getLeftLocation(Anchor anchor) {
       ILocation result = null;
       if (anchor != null && anchor.getParent() != null) {
          GraphicsAlgorithm ga = anchor.getParent().getGraphicsAlgorithm();
          if (ga != null) {
             result = new LocationImpl(ga.getX(), ga.getY());
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Returns the location of the given {@link Anchor}'s parent
+    * which is the bottom right corner.
+    * @param anchor The {@link Anchor} for which the location is requested.
+    * @return The location of {@link Anchor}'s parent or {@code null} if not available.
+    */
+   public static ILocation getRightLocation(Anchor anchor) {
+      ILocation result = null;
+      if (anchor != null && anchor.getParent() != null) {
+         GraphicsAlgorithm ga = anchor.getParent().getGraphicsAlgorithm();
+         if (ga != null) {
+            result = new LocationImpl(ga.getX() + ga.getWidth(), ga.getY() + ga.getHeight());
          }
       }
       return result;
@@ -506,6 +525,22 @@ public final class GraphitiUtil {
    }
 
    /**
+    * Computes an {@link ILocation} which is the center of the two given {@link ILocation}s.
+    * @param startLocation The start {@link ILocation}.
+    * @param endLocation The end {@link ILocation}.
+    * @return The centered {@link ILocation} or {@code null} if one of the given {@link ILocation} is {@code null};
+    */
+   public static ILocation center(ILocation startLocation, ILocation endLocation) {
+      if (startLocation != null && endLocation != null) {
+         return new LocationImpl((startLocation.getX() + endLocation.getX()) / 2, 
+                                 (startLocation.getY() + endLocation.getY()) / 2);
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
     * Selects the given {@link PictogramElement} in the editor if available.
     * @param featureProvider The {@link IFeatureProvider} used to find the editor.
     * @param pe The {@link PictogramElement} to select.
@@ -519,6 +554,28 @@ public final class GraphitiUtil {
                editor.setPictogramElementForSelection(pe);
             }
          }
+      }
+   }
+   
+   /**
+    * Returns the {@link IProgressMonitor} defined in the given {@link IContext}.
+    * If the given {@link IContext} is {@code null} or if it contains no one
+    * a new {@link NullProgressMonitor} instance is returned.
+    * @param context The {@link IContext}.
+    * @return The defined {@link IProgressMonitor}.
+    */
+   public static IProgressMonitor getProgressMonitor(IContext context) {
+      if (context != null) {
+         Object contextMonitor = context.getProperty(CONTEXT_PROPERTY_MONITOR);
+         if (contextMonitor instanceof IProgressMonitor) {
+            return (IProgressMonitor)contextMonitor;
+         }
+         else {
+            return new NullProgressMonitor();
+         }
+      }
+      else {
+         return new NullProgressMonitor();
       }
    }
 }

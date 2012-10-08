@@ -2,6 +2,8 @@ package de.uka.ilkd.key.symbolic_execution.model;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
 
 /**
  * A special {@link IExecutionNode} for nodes in the symbolic execution tree
@@ -27,4 +29,10 @@ public interface IExecutionStateNode<S extends SourceElement> extends IExecution
     * @return The variable value pairs.
     */
    public IExecutionVariable[] getVariables();
+   
+   public int getConfigurationsCount() throws ProofInputException;
+   
+   public ISymbolicConfiguration getInitialConfiguration(int configurationIndex) throws ProofInputException;
+   
+   public ISymbolicConfiguration getCurrentConfiguration(int configurationIndex) throws ProofInputException;
 }

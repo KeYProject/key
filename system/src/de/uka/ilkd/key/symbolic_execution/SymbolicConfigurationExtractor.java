@@ -504,7 +504,7 @@ public class SymbolicConfigurationExtractor {
          result.addEquivalenceClass(ec);
       }
       // Create state
-      SymbolicState state = new SymbolicState();
+      SymbolicState state = new SymbolicState(node.name());
       result.setState(state);
       // Create objects
       Map<Term, SymbolicObject> objects = new HashMap<Term, SymbolicObject>();

@@ -5,22 +5,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IVariable;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
-import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
-import org.eclipse.graphiti.features.context.impl.AddContext;
-import org.eclipse.graphiti.features.context.impl.AreaContext;
-import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
-import org.eclipse.graphiti.mm.pictograms.Anchor;
-import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
@@ -36,7 +28,6 @@ import org.key_project.sed.ui.visualization.object_diagram.util.ObjectDiagramUti
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
-import org.key_project.util.java.CollectionUtil;
 
 /**
  * An {@link ICustomFeature} that generates an object diagram based
@@ -45,22 +36,12 @@ import org.key_project.util.java.CollectionUtil;
  * of the given {@link ICustomContext}.
  * @author Martin Hentschel
  */
-public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCustomFeature {
+public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractGenerateObjectDiagramCustomFeature {
    /**
     * Property for an {@link ISEDDebugNode} instance which provides
     * the state to visualize as object diagram.
     */
    public static final String PROPERTY_NODE = "debugNode";
-   
-   /**
-    * The horizontal distance between {@link ODObject} in a diagram.
-    */
-   public static final int HORIZONTAL_OFFSET_BETWEEN_OBJECTS = 50;
-
-   /**
-    * The vertical distance between {@link ODObject} in a diagram.
-    */
-   public static final int VERTICAL_OFFSET_BETWEEN_OBJECTS = 50;
    
    /**
     * Constructor.
@@ -69,14 +50,6 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
    public GenerateObjectDiagramFromSEDNodeCustomFeature(IFeatureProvider fp) {
       super(fp);
    }
-   
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean canExecute(ICustomContext context) {
-      return true;
-   }
 
    /**
     * {@inheritDoc}
@@ -84,14 +57,7 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
    @Override
    public void execute(ICustomContext context) {
       // Get monitor
-      IProgressMonitor monitor;
-      Object contextMonitor = context.getProperty(GraphitiUtil.CONTEXT_PROPERTY_MONITOR);
-      if (contextMonitor instanceof IProgressMonitor) {
-         monitor = (IProgressMonitor)contextMonitor;
-      }
-      else {
-         monitor = new NullProgressMonitor();
-      }
+      IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
       SWTUtil.checkCanceled(monitor);
       // Get node
       ISEDDebugNode node = null;
@@ -109,7 +75,7 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
                // Create new model
                PictogramElement statePE = createState(model, node, monitor);
                // Improve diagram layout
-               improveLayout(monitor);
+               improveLayout(model, monitor);
                // Select statePE
                GraphitiUtil.select(getFeatureProvider(), statePE);
             }
@@ -136,7 +102,7 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
     */
    protected PictogramElement createState(ODModel model, ISEDDebugNode node, IProgressMonitor monitor) throws DebugException {
       monitor.beginTask("Generating model and diagram.", IProgressMonitor.UNKNOWN);
-      // Create sate
+      // Create state
       ODState state = ODFactory.eINSTANCE.createODState();
       state.setName(node.getName());
       model.getStates().add(state);
@@ -332,45 +298,5 @@ public class GenerateObjectDiagramFromSEDNodeCustomFeature extends AbstractCusto
    protected boolean isObject(IVariable variable) throws DebugException {
       return variable.getValue() instanceof ISEDValue &&
              ((ISEDValue)variable.getValue()).isObject();
-   }
-   
-   /**
-    * Adds the given business object as new node to the diagram ({@link #getDiagram()}).
-    * @param bo The business object to add.
-    * @param x The x coordinate.
-    * @param y The y coordinate.
-    * @return The created {@link PictogramElement}.
-    */
-   protected PictogramElement addNodeToDiagram(Object bo, int x, int y) {
-      AddContext context = new AddContext(new AreaContext(), bo);
-      context.setTargetContainer(getDiagram());
-      context.setLocation(x, y);
-      context.putProperty(AbstractODValueContainerAddFeature.PROPERTY_UPDATE_SIZE, Boolean.TRUE);
-      return getFeatureProvider().addIfPossible(context);
-   }
-   
-   /**
-    * Adds the given business object as new connection to the diagram ({@link #getDiagram()}).
-    * @param bo The business object to add.
-    * @param source The source {@link PictogramElement} which must be an instance of {@link AnchorContainer}.
-    * @param target The target {@link PictogramElement} which must be an instance of {@link AnchorContainer}.
-    * @return The created {@link PictogramElement}.
-    */
-   protected PictogramElement addConnectionToDiagram(Object bo, PictogramElement source, PictogramElement target) {
-      Assert.isTrue(source instanceof AnchorContainer);
-      Assert.isTrue(target instanceof AnchorContainer);
-      Anchor sourceAnchor = CollectionUtil.getFirst(((AnchorContainer)source).getAnchors());
-      Anchor targetAnchor = CollectionUtil.getFirst(((AnchorContainer)target).getAnchors());
-      AddConnectionContext context = new AddConnectionContext(sourceAnchor, targetAnchor);
-      context.setNewObject(bo);
-      return getFeatureProvider().addIfPossible(context);
-   }
-
-   /**
-    * Improves the layout of the {@link Diagram}.
-    * @param monitor The {@link IProgressMonitor} to use.
-    */
-   protected void improveLayout(IProgressMonitor monitor) {
-      GraphitiUtil.layoutTopLevelElements(getFeatureProvider(), getDiagram(), 30, true, false, monitor);
    }
 }

@@ -2,6 +2,7 @@ package de.uka.ilkd.key.symbolic_execution.object_model;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicValue;
 
 /**
@@ -39,4 +40,16 @@ public interface ISymbolicValue {
     * @return The value of the represented variable as human readable {@link String}.
     */
    public String getValueString();
+   
+   /**
+    * Returns the type of the value.
+    * @return The type of the value.
+    */
+   public Sort getType();
+   
+   /**
+    * Returns the type of the value as human readable string.
+    * @return The type of the value as human readable string.
+    */
+   public String getTypeString();
 }
