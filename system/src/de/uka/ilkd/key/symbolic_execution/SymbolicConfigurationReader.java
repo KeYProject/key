@@ -793,5 +793,13 @@ public class SymbolicConfigurationReader {
       public String getRepresentativeString() {
          return representativeString;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean containsTerm(Term term) {
+         return false;
+      }
    }
 }

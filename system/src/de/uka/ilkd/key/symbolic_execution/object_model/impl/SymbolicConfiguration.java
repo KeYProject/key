@@ -25,7 +25,16 @@ public class SymbolicConfiguration implements ISymbolicConfiguration {
    /**
     * The contained {@link ISymbolicEquivalenceClass}.
     */
-   private ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses = ImmutableSLList.nil();
+   private ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses;
+
+   /**
+    * Constructor.
+    * @param equivalenceClasses The provided equivalence classes.
+    */
+   public SymbolicConfiguration(ImmutableList<ISymbolicEquivalenceClass> equivalenceClasses) {
+      assert equivalenceClasses != null;
+      this.equivalenceClasses = equivalenceClasses;
+   }
 
    /**
     * {@inheritDoc}
@@ -65,13 +74,5 @@ public class SymbolicConfiguration implements ISymbolicConfiguration {
    @Override
    public ImmutableList<ISymbolicEquivalenceClass> getEquivalenceClasses() {
       return equivalenceClasses;
-   }
-   
-   /**
-    * Adds a new {@link ISymbolicEquivalenceClass}.
-    * @param value The new {@link ISymbolicEquivalenceClass} to add.
-    */
-   public void addEquivalenceClass(ISymbolicEquivalenceClass ec) {
-      this.equivalenceClasses = equivalenceClasses.append(ec);
    }
 }

@@ -11,6 +11,7 @@ import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.services.Graphiti;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -25,6 +26,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.ide.IDE;
 import org.key_project.sed.key.core.model.IKeYSEDDebugNode;
 import org.key_project.sed.key.ui.util.LogUtil;
@@ -39,6 +41,7 @@ import org.key_project.sed.ui.visualization.util.NonPersistableDiagramEditorInpu
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -54,12 +57,6 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
     * The ID of this editor.
     */
    public static final String EDITOR_ID = "org.key_project.sed.key.ui.ConfigurationObjectDiagramEditor";
-
-   /**
-    * Slider to select configurations.
-    */
-   private Slider slider;
-   
    /**
     * Radio {@link Button} to show initial configurations.
     */
@@ -69,6 +66,16 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
     * Radio {@link Button} to show current configurations.
     */
    private Button currentConfiguration;
+
+   /**
+    * Slider to select configurations.
+    */
+   private Slider slider;
+   
+   /**
+    * {@link Button} to open a dialog to select a configuration.
+    */
+   private Button selectConfigurationButton;
    
    /**
     * Shows the equivalence classes of the current configuration.
@@ -102,7 +109,7 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
       // Create configurations controls
       Composite configurationComposite = new Composite(root, SWT.NONE);  
       configurationComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-      configurationComposite.setLayout(new GridLayout(4, false));
+      configurationComposite.setLayout(new GridLayout(5, false));
       initialConfiguration = new Button(configurationComposite, SWT.RADIO);
       initialConfiguration.setText("&Initial");
       initialConfiguration.setSelection(true);
@@ -131,6 +138,14 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
             showConfiguration(slider.getSelection(), initialConfiguration.getSelection());
          }
       });
+      selectConfigurationButton = new Button(configurationComposite, SWT.PUSH);
+      selectConfigurationButton.setText("&...");
+      selectConfigurationButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            openSelectConfigurationsDialog();
+         }
+      });
       equivalenceClassesText = new Text(configurationComposite, SWT.BORDER);
       equivalenceClassesText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       equivalenceClassesText.setEditable(false);
@@ -145,6 +160,7 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
       initialConfiguration.setEnabled(enabled);
       currentConfiguration.setEnabled(enabled);
       slider.setEnabled(enabled);
+      selectConfigurationButton.setEnabled(enabled);
    }
    
    /**
@@ -243,6 +259,34 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
             }
          }
       }.schedule();
+   }
+
+   /**
+    * Opens a dialog to select configurations.
+    */
+   public void openSelectConfigurationsDialog() {
+      try {
+         // Collect equivalence classes of configurations.
+         Object[] elements = new Object[node.getConfigurationsCount()];
+         for (int i = 0; i < elements.length; i++) {
+            elements[i] = node.getConfigurationsEquivalenceClasses(i);
+         }
+         // Open dialog
+         ElementListSelectionDialog dialog = new ElementListSelectionDialog(getSite().getShell(), new LabelProvider());
+         dialog.setTitle("Configuration Selection");
+         dialog.setMessage("Select a configuration.");
+         dialog.setElements(elements);
+         if (ElementListSelectionDialog.OK == dialog.open()) {
+            Object result = dialog.getFirstResult();
+            int index = ArrayUtil.indexOf(elements, result);
+            slider.setSelection(index);
+            showConfiguration(index, initialConfiguration.getSelection());
+         }
+      }
+      catch (Exception e) {
+         LogUtil.getLogger().logError(e);
+         LogUtil.getLogger().openErrorDialog(getSite().getShell(), e);
+      }
    }
 
    /**

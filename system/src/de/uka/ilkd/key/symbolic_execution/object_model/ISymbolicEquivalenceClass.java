@@ -16,6 +16,13 @@ public interface ISymbolicEquivalenceClass {
    public ImmutableList<Term> getTerms();
    
    /**
+    * Checks if a {@link Term} is contained.
+    * @param term The {@link Term} to check.
+    * @return {@code true} {@link Term} is contained, {@code false} {@link Term} is not contained.
+    */
+   public boolean containsTerm(Term term);
+   
+   /**
     * Returns the terms which represents the same {@link ISymbolicObject} as human readable {@link String}.
     * @return The terms which represents the same {@link ISymbolicObject} as human readable {@link String}.
     */

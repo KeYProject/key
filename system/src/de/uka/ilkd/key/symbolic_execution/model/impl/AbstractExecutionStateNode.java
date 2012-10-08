@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
@@ -10,6 +11,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 
 /**
  * Provides a basic implementation of {@link IExecutionStateNode}.
@@ -120,5 +122,13 @@ public abstract class AbstractExecutionStateNode<S extends SourceElement> extend
    @Override
    public ISymbolicConfiguration getCurrentConfiguration(int configurationIndex) throws ProofInputException {
       return getConfigurationExtractor().getCurrentConfiguration(configurationIndex);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ImmutableList<ISymbolicEquivalenceClass> getConfigurationsEquivalenceClasses(int configurationIndex) throws ProofInputException {
+      return getConfigurationExtractor().getEquivalenceClasses(configurationIndex);
    }
 }

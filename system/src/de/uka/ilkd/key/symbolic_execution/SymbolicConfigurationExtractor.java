@@ -46,6 +46,7 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.AbstractSymbolicAssociationValueContainer;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicConfiguration;
@@ -74,6 +75,8 @@ public class SymbolicConfigurationExtractor {
    private Set<ExtractValueParameter> initialLocations;
    
    private Term initialConfigurationTerm;
+   
+   private Map<Integer, ImmutableList<ISymbolicEquivalenceClass>> configurationsEquivalentClasses;
    
    private int preVariableIndex = 0;
    
@@ -109,6 +112,7 @@ public class SymbolicConfigurationExtractor {
             // Create configuration maps which are filled lazily
             initialConfigurations = new HashMap<Integer, ISymbolicConfiguration>(configurations.size());
             currentConfigurations = new HashMap<Integer, ISymbolicConfiguration>(configurations.size());
+            configurationsEquivalentClasses = new HashMap<Integer, ImmutableList<ISymbolicEquivalenceClass>>();
          }
       }
    }
@@ -134,6 +138,18 @@ public class SymbolicConfigurationExtractor {
       }
    }
    
+   public ImmutableList<ISymbolicEquivalenceClass> getEquivalenceClasses(int configurationIndex) {
+      synchronized (this) {
+         ImmutableList<ISymbolicEquivalenceClass> equivalentClasses = configurationsEquivalentClasses.get(Integer.valueOf(configurationIndex));
+         if (equivalentClasses == null) {
+            ImmutableSet<Term> configuration = configurations.get(configurationIndex);
+            equivalentClasses = computeEquivalenzClasses(configuration);
+            configurationsEquivalentClasses.put(Integer.valueOf(configurationIndex), equivalentClasses);
+         }
+         return equivalentClasses;
+      }
+   }
+   
    public ISymbolicConfiguration getInitialConfiguration(int configurationIndex) throws ProofInputException {
       return getConfiguration(getProof().root(), initialConfigurations, configurationIndex, initialConfigurationTerm, initialLocations);
    }
@@ -155,7 +171,8 @@ public class SymbolicConfigurationExtractor {
          if (result == null) {
             // Get configuration
             ImmutableSet<Term> configuration = configurations.get(configurationIndex);
-            result = computeConfiguration(node, configuration, configurationTerm, locations);
+            ImmutableList<ISymbolicEquivalenceClass> equivalentClasses = getEquivalenceClasses(configurationIndex);
+            result = computeConfiguration(node, configuration, configurationTerm, locations, equivalentClasses);
             confiurationsMap.put(Integer.valueOf(configurationIndex), result);
          }
          return result;
@@ -165,7 +182,8 @@ public class SymbolicConfigurationExtractor {
    protected ISymbolicConfiguration computeConfiguration(Node node,
                                                          ImmutableSet<Term> configuration, 
                                                          Term configurationTerm,
-                                                         Set<ExtractValueParameter> locations) throws ProofInputException {
+                                                         Set<ExtractValueParameter> locations,
+                                                         ImmutableList<ISymbolicEquivalenceClass> equivalentClasses) throws ProofInputException {
       // Get original updates
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
       ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
@@ -193,7 +211,6 @@ public class SymbolicConfigurationExtractor {
          pairs.add(pair);
       }
       // Create symbolic configuration
-      List<SymbolicEquivalenceClass> equivalentClasses = computeEquivalenzClasses(configuration);
       return createConfigurationFromExecutionVariableValuePairs(equivalentClasses, pairs);
    }
    
@@ -464,23 +481,23 @@ public class SymbolicConfigurationExtractor {
       return newTerm;
    }
 
-   protected List<SymbolicEquivalenceClass> computeEquivalenzClasses(ImmutableSet<Term> configuration) {
-      List<SymbolicEquivalenceClass> result = new LinkedList<SymbolicEquivalenceClass>();
+   protected ImmutableList<ISymbolicEquivalenceClass> computeEquivalenzClasses(ImmutableSet<Term> configuration) {
+      ImmutableList<ISymbolicEquivalenceClass> result = ImmutableSLList.nil();
       for (Term term : configuration) {
          if (Junctor.NOT != term.op()) {
             assert term.op() == Equality.EQUALS;
             final Iterator<Term> iter = term.subs().iterator();
-            SymbolicEquivalenceClass ec = null;
+            ISymbolicEquivalenceClass ec = null;
             while (ec == null && iter.hasNext()) {
                ec = findEquivalentClass(result, iter.next());
             }
             if (ec == null) {
                ec = new SymbolicEquivalenceClass(getServices());
-               result.add(ec); 
+               result = result.append(ec); 
             }
             for (Term sub : term.subs()) {
                if (!ec.containsTerm(sub)) {
-                  ec.addTerm(sub);
+                  ((SymbolicEquivalenceClass)ec).addTerm(sub);
                }
             }
          }
@@ -488,21 +505,17 @@ public class SymbolicConfigurationExtractor {
       return result;
    }
    
-   protected SymbolicEquivalenceClass findEquivalentClass(List<SymbolicEquivalenceClass> equivalentClasses, final Term term) {
-      return JavaUtil.search(equivalentClasses, new IFilter<SymbolicEquivalenceClass>() {
+   protected ISymbolicEquivalenceClass findEquivalentClass(ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, final Term term) {
+      return JavaUtil.search(equivalentClasses, new IFilter<ISymbolicEquivalenceClass>() {
          @Override
-         public boolean select(SymbolicEquivalenceClass element) {
+         public boolean select(ISymbolicEquivalenceClass element) {
             return element.containsTerm(term);
          }
       });
    }
    
-   protected ISymbolicConfiguration createConfigurationFromExecutionVariableValuePairs(List<SymbolicEquivalenceClass> equivalentClasses, Set<ExecutionVariableValuePair> pairs) {
-      SymbolicConfiguration result = new SymbolicConfiguration();
-      // Add equivalence classes
-      for (SymbolicEquivalenceClass ec : equivalentClasses) {
-         result.addEquivalenceClass(ec);
-      }
+   protected ISymbolicConfiguration createConfigurationFromExecutionVariableValuePairs(ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, Set<ExecutionVariableValuePair> pairs) {
+      SymbolicConfiguration result = new SymbolicConfiguration(equivalentClasses);
       // Create state
       SymbolicState state = new SymbolicState(node.name());
       result.setState(state);
@@ -513,7 +526,7 @@ public class SymbolicConfigurationExtractor {
          if (parent != null) {
             SymbolicObject object = objects.get(parent);
             if (object == null) {
-               SymbolicEquivalenceClass equivalentClass = findEquivalentClass(equivalentClasses, parent);
+               ISymbolicEquivalenceClass equivalentClass = findEquivalentClass(equivalentClasses, parent);
                if (equivalentClass == null || // New created object which is not part of the path condition
                    equivalentClass.getRepresentative() == parent) { // Representative object part of path condition
                   object = new SymbolicObject(getServices(), parent);
@@ -526,7 +539,7 @@ public class SymbolicConfigurationExtractor {
          if (value != null && SymbolicExecutionUtil.hasReferenceSort(getServices(), value)) {
             SymbolicObject object = objects.get(value);
             if (object == null) {
-               SymbolicEquivalenceClass equivalentClass = findEquivalentClass(equivalentClasses, value);
+               ISymbolicEquivalenceClass equivalentClass = findEquivalentClass(equivalentClasses, value);
                if (equivalentClass == null || // New created object which is not part of the path condition
                    equivalentClass.getRepresentative() == value) { // Representative object part of path condition
                   object = new SymbolicObject(getServices(), value);
