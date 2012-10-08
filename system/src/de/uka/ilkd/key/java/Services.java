@@ -250,15 +250,7 @@ public class Services{
         counters.put(name, c);
         return c;
     }
-    
-    
-    public void setBackCounters(Node n) {        
-        for (final Counter c : counters.values()) {
-            c.undo(n);
-        }
-    }
-    
-    
+
     /**
      * returns the namespaces for functions, predicates etc.
      * @return the proof specific namespaces
