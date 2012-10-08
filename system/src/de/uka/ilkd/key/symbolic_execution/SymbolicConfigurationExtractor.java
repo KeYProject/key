@@ -59,6 +59,10 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
 
+// TODO: Include known values from path conditions which are not part of updates, e.g. array length == 1 in SimpleArrayLength
+// TODO: Support array fields
+// TODO: Support static attributes
+// TODO: Support object creation
 public class SymbolicConfigurationExtractor {
    private Node node;
    
@@ -105,7 +109,8 @@ public class SymbolicConfigurationExtractor {
             configurations = computeInstanceConfigurationsFromGoals(equivalentClassesProofStarter.getProof());
             // Collect all symbolic objects used in updates
             initialLocations = objectsToLocations(symbolicObjectsInPathCondition);
-            currentLocations = collectLocationsFromUpdates(node.sequent());
+            currentLocations = new LinkedHashSet<ExtractValueParameter>(initialLocations);
+            collectLocationsFromUpdates(node.sequent(), currentLocations);
             // Create predicate required for state computation
             initialConfigurationTerm = createConfigurationPredicateAndTerm(initialLocations);
             currentConfigurationTerm = createConfigurationPredicateAndTerm(currentLocations);
@@ -191,10 +196,15 @@ public class SymbolicConfigurationExtractor {
       Term configurationCondition = TermBuilder.DF.and(configuration);
       ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
       for (Term originalUpdate : originalUpdates) {
-         if (UpdateJunctor.PARALLEL_UPDATE != originalUpdate.op()) {
-            throw new ProofInputException("Expected that update is a parallel update but found \"" + originalUpdate.op() + "\".");
+         if (UpdateJunctor.PARALLEL_UPDATE == originalUpdate.op()) {
+            additionalUpdates = additionalUpdates.append(originalUpdate.subs());
          }
-         additionalUpdates = additionalUpdates.append(originalUpdate.subs());
+         else if (originalUpdate.op() instanceof ElementaryUpdate) {
+            additionalUpdates = additionalUpdates.append(originalUpdate);
+         }
+         else {
+            throw new ProofInputException("Unexpected update operator \"" + originalUpdate.op() + "\".");
+         }
       }
       for (ExtractValueParameter evp : locations) {
          additionalUpdates = additionalUpdates.append(evp.computePreUpdate());
@@ -359,14 +369,17 @@ public class SymbolicConfigurationExtractor {
       for (Term obj : symbolicObjects) {
          if (obj.op() instanceof ProgramVariable) {
             ProgramVariable var = (ProgramVariable)obj.op();
-            result.add(new ExtractValueParameter(var, TermBuilder.DF.var(var)));
-         }
-         else if (heapLDT.getSortOfSelect(obj.op()) != null) {
-            ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, obj.sub(2));
-            result.add(new ExtractValueParameter(var, obj.sub(1), obj));
+            result.add(new ExtractValueParameter(var));
          }
          else {
-            throw new ProofInputException("Unsupported object operator \"" + obj.op() + "\".");
+            Sort sort = heapLDT.getSortOfSelect(obj.op());
+            if (sort != null) {
+               ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, obj.sub(2));
+               result.add(new ExtractValueParameter(var, obj.sub(1)));
+            }
+            else {
+               throw new ProofInputException("Unsupported object operator \"" + obj.op() + "\".");
+            }
          }
       }
       return result;
@@ -376,15 +389,13 @@ public class SymbolicConfigurationExtractor {
    // .SimpleLinkedOjbects::value(x),
    // .SimpleLinkedOjbects::value(.SimpleLinkedOjbects::next(x))
    // .SimpleLinkedOjbects::value(.SimpleLinkedOjbects::next(.SimpleLinkedOjbects::next(x)))
-   protected Set<ExtractValueParameter> collectLocationsFromUpdates(Sequent sequent) throws ProofInputException {
-      Set<ExtractValueParameter> result = new LinkedHashSet<ExtractValueParameter>();
+   protected void collectLocationsFromUpdates(Sequent sequent, Set<ExtractValueParameter> toFill) throws ProofInputException {
       Term updateApplication = findUpdates(sequent);
       if (updateApplication == null) {
          throw new ProofInputException("Can't find update application in \"" + sequent + "\".");
       }
       Term topUpdate = UpdateApplication.getUpdate(updateApplication);
-      fillLocations(topUpdate, result);
-      return result;
+      fillLocations(topUpdate, toFill);
    }
    
    protected Term findUpdates(Sequent sequent) {
@@ -414,7 +425,7 @@ public class SymbolicConfigurationExtractor {
          else if (eu.lhs() instanceof ProgramVariable) {
             ProgramVariable var = (ProgramVariable)eu.lhs();
             if (var.getContainerType() != null) { // Make sure that it is a location in the source code and not an internal one of the proof
-               toFill.add(new ExtractValueParameter(var, TermBuilder.DF.var(var)));
+               toFill.add(new ExtractValueParameter(var));
             }
          }
          else {
@@ -433,19 +444,18 @@ public class SymbolicConfigurationExtractor {
          Term selectArgument = term.sub(1);
          if (heapLDT.getSortOfSelect(selectArgument.op()) != null) {
             ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, selectArgument.sub(2));
-            toFill.add(new ExtractValueParameter(var, selectArgument.sub(1), selectArgument));
+            toFill.add(new ExtractValueParameter(var, selectArgument.sub(1)));
          }
          else if (selectArgument.op() instanceof IProgramVariable) {
             ProgramVariable var = (ProgramVariable)selectArgument.op();
-            toFill.add(new ExtractValueParameter(var, TermBuilder.DF.var(var)));
+            toFill.add(new ExtractValueParameter(var));
          }
          else {
             throw new ProofInputException("Unsupported operator in select argument of heap update \"" + selectArgument.op() + "\".");
          }
          // Add select value term to result
          ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
-         Term selectValueTerm = TermBuilder.DF.dot(getServices(), var.sort(), selectArgument, term.sub(2));
-         toFill.add(new ExtractValueParameter(var, term.sub(1), selectValueTerm));
+         toFill.add(new ExtractValueParameter(var, term.sub(1)));
          // Iterate over child heap modifications
          fillHeapLocations(term.sub(0), toFill);
       }
@@ -598,22 +608,19 @@ public class SymbolicConfigurationExtractor {
       
       private Term selectParentTerm;
       
-      private Term selectValueTerm;
-      
       private int selectParentTermIndexInStatePredicate;
 
       private int selectValueTermIndexInStatePredicate;
 
       private LocationVariable preVariable;
 
-      public ExtractValueParameter(ProgramVariable programVariable, Term selectValueTerm) throws ProofInputException {
-         this(programVariable, null, selectValueTerm);
+      public ExtractValueParameter(ProgramVariable programVariable) throws ProofInputException {
+         this(programVariable, null);
       }
       
-      public ExtractValueParameter(ProgramVariable programVariable, Term selectParentTerm, Term selectValueTerm) throws ProofInputException {
+      public ExtractValueParameter(ProgramVariable programVariable, Term selectParentTerm) throws ProofInputException {
          this.programVariable = programVariable;
          this.selectParentTerm = selectParentTerm;
-         this.selectValueTerm = selectValueTerm;
          this.preVariable = createLocationVariable("Pre" + preVariableIndex++, selectParentTerm != null ? selectParentTerm.sort() : programVariable.sort());
       }
       
@@ -628,8 +635,15 @@ public class SymbolicConfigurationExtractor {
       
       public Term computePreValueTerm() {
          if (selectParentTerm != null) {
-            Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)programVariable, getServices());
-            return TermBuilder.DF.dot(getServices(), programVariable.sort(), computePreParentTerm(), function);
+            if (getServices().getJavaInfo().getArrayLength() == getProgramVariable()) {
+               // Special handling for length attribute of arrays
+               Function function = getServices().getTypeConverter().getHeapLDT().getLength();
+               return TermBuilder.DF.func(function, computePreParentTerm());
+            }
+            else {
+               Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)programVariable, getServices());
+               return TermBuilder.DF.dot(getServices(), programVariable.sort(), computePreParentTerm(), function);
+            }
          }
          else {
             return TermBuilder.DF.var(programVariable);
@@ -642,10 +656,6 @@ public class SymbolicConfigurationExtractor {
 
       public Term getSelectParentTerm() {
          return selectParentTerm;
-      }
-
-      public Term getSelectValueTerm() {
-         return selectValueTerm;
       }
 
       public int getSelectParentTermIndexInStatePredicate() {
@@ -666,7 +676,7 @@ public class SymbolicConfigurationExtractor {
 
       @Override
       public String toString() {
-         return programVariable + (selectParentTerm != null ? " of " + selectParentTerm : "") + " is " + selectValueTerm;
+         return programVariable + (selectParentTerm != null ? " of " + selectParentTerm : "");
       }
    }
    

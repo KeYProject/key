@@ -63,6 +63,38 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //             ".xml",
 //             null);
 //   }
+
+//   /**
+//    * Tests "configurationExtractorSimpleLinkedArrays" without precondition.
+//    * @throws Exception Occurred Exception.
+//    */
+//   public void testSimpleLinkedArrays() throws Exception {
+//      doTest("examples/_testcase/set/configurationExtractorSimpleLinkedArrays/test/SimpleLinkedArrays.java",
+//             "SimpleLinkedArrays",
+//             "examples/_testcase/set/configurationExtractorSimpleLinkedArrays/oracle/",
+//             "SimpleLinkedArrays.xml",
+//             "testSimpleLinkedArrays_initial",
+//             ".xml",
+//             "testSimpleLinkedArrays_current",
+//             ".xml",
+//             null);
+//   }
+
+   /**
+    * Tests "configurationExtractorSimpleArrayLength" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testSimpleArrayLength() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorSimpleArrayLength/test/SimpleArrayLength.java",
+             "SimpleArrayLength",
+             "examples/_testcase/set/configurationExtractorSimpleArrayLength/oracle/",
+             "SimpleArrayLength.xml",
+             "testSimpleArrayLength_initial",
+             ".xml",
+             "testSimpleArrayLength_current",
+             ".xml",
+             null);
+   }
    
    /**
     * Tests "configurationExtractorSimpleLinkedOjbectsDeletion" without precondition.

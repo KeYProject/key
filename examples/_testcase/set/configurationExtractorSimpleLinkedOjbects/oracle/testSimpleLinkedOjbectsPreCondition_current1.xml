@@ -5,14 +5,14 @@
       <term term="x.next.next"/>
    </equivalenceClass>
    <state name="return x.value+x.next.value+x.next.next.value;">
-      <association programVariable="x" target="o2"/>
+      <association programVariable="x" target="o1"/>
    </state>
-   <object xml:id="o1" name="x.next" type="SimpleLinkedOjbects">
-      <value programVariable="value" value="3" type="int"/>
-      <association programVariable="next" target="o1"/>
-   </object>
-   <object xml:id="o2" name="x" type="SimpleLinkedOjbects">
+   <object xml:id="o1" name="x" type="SimpleLinkedOjbects">
       <value programVariable="value" value="1" type="int"/>
-      <association programVariable="next" target="o1"/>
+      <association programVariable="next" target="o2"/>
+   </object>
+   <object xml:id="o2" name="x.next" type="SimpleLinkedOjbects">
+      <value programVariable="value" value="3" type="int"/>
+      <association programVariable="next" target="o2"/>
    </object>
 </model>

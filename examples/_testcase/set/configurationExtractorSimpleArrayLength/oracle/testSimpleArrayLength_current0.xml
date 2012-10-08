@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state name="return 42;">
+      <association programVariable="array" target="o1"/>
+   </state>
+   <object xml:id="o1" name="array" type="java.lang.Object[]">
+   </object>
+</model>

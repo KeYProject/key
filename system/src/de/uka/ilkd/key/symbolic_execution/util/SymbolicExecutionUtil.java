@@ -709,11 +709,14 @@ public final class SymbolicExecutionUtil {
       ProgramVariable result = null;
       if (locationTerm.op() instanceof Function) {
          Function function = (Function)locationTerm.op();
-         String typeName = heapLDT.getClassName(function);
-         KeYJavaType type = services.getJavaInfo().getKeYJavaType(typeName);
-         if (type != null) {
-            String fieldName = heapLDT.getPrettyFieldName(function);
-            result = services.getJavaInfo().getAttribute(fieldName, type);
+         // Make sure that the function is not an array
+         if (heapLDT.getArr() != function) {
+            String typeName = heapLDT.getClassName(function);
+            KeYJavaType type = services.getJavaInfo().getKeYJavaType(typeName);
+            if (type != null) {
+               String fieldName = heapLDT.getPrettyFieldName(function);
+               result = services.getJavaInfo().getAttribute(fieldName, type);
+            }
          }
       }
       return result;
