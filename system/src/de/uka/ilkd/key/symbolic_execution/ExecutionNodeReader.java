@@ -1115,6 +1115,30 @@ public class ExecutionNodeReader {
       public String getElementType() {
          return "Method Call";
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isImplicitConstructor() {
+         return false;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public MethodReference getExplicitConstructorMethodReference() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IProgramMethod getExplicitConstructorProgramMethod() {
+         return null;
+      }
    }
 
    /**

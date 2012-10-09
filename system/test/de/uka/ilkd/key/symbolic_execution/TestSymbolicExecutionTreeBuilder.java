@@ -64,6 +64,36 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
+    * Tests example: examples/_testcase/set/complexConstructorTest
+    */
+   public void testComplexConstructorTest() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/complexConstructorTest/test/ComplexConstructorTest.java", 
+             "ComplexConstructorTest", 
+             "main", 
+             "examples/_testcase/set/complexConstructorTest/oracle/ComplexConstructorTest.xml",
+             false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/simpleConstructorTest
+    */
+   public void testSimpleConstructorTest() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/simpleConstructorTest/test/SimpleConstructorTest.java", 
+             "SimpleConstructorTest", 
+             "main", 
+             "examples/_testcase/set/simpleConstructorTest/oracle/SimpleConstructorTest.xml",
+             false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/variablesUnknownTest
     */
    public void testVariablesUnknownTest() throws Exception {

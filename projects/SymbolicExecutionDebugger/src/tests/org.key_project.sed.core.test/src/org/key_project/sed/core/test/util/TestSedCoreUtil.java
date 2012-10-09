@@ -889,7 +889,7 @@ public final class TestSedCoreUtil {
       if (expected != null) {
          // Compare node
          TestCase.assertNotNull(current);
-         TestCase.assertEquals(expected.getName(), current.getName());
+         TestCase.assertTrue(expected.getName() + " does not match " + current.getName(), StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
          TestCase.assertEquals(expected.getPathCondition(), current.getPathCondition());
          TestCase.assertEquals(expected.getNodeType(), current.getNodeType());
          compareDebugElement(expected, current, compareReferences, compareVariables);
@@ -1036,7 +1036,7 @@ public final class TestSedCoreUtil {
       if (expected != null) {
          TestCase.assertNotNull(current);
          // Compare stack frame
-         TestCase.assertEquals(expected.getName(), current.getName());
+         TestCase.assertTrue(expected.getName() + " does not match " + current.getName(), StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
          TestCase.assertEquals(expected.getName(), expected.getCharStart(), current.getCharStart());
          TestCase.assertEquals(expected.getName(), expected.getCharEnd(), current.getCharEnd());
          TestCase.assertEquals(expected.getName(), expected.getLineNumber(), current.getLineNumber());
@@ -1077,7 +1077,7 @@ public final class TestSedCoreUtil {
       if (expected != null) {
          TestCase.assertNotNull(current);
          // Compare variable
-         TestCase.assertEquals(expected.getName(), current.getName());
+         TestCase.assertTrue(expected.getName() + " does not match " + current.getName(), StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
          TestCase.assertEquals(expected.getName(), expected.getReferenceTypeName(), current.getReferenceTypeName());
          compareDebugElement(expected, current, true, compareVariables);
          // Compare value

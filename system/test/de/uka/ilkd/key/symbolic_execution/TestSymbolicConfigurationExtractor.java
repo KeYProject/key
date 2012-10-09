@@ -81,6 +81,22 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //   }
 
    /**
+    * Tests "configurationExtractorSimpleStaticAttributes" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testSimpleStaticAttributes() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorSimpleStaticAttributes/test/SimpleStaticAttributes.java",
+             "SimpleStaticAttributes",
+             "examples/_testcase/set/configurationExtractorSimpleStaticAttributes/oracle/",
+             "SimpleStaticAttributes.xml",
+             "testSimpleStaticAttributes_initial",
+             ".xml",
+             "testSimpleStaticAttributes_current",
+             ".xml",
+             null);
+   }
+   
+   /**
     * Tests "configurationExtractorSimpleArrayLength" without precondition.
     * @throws Exception Occurred Exception.
     */

@@ -41,6 +41,30 @@ public class SWTBotKeYDebugTargetTest extends AbstractKeYDebugTargetTestCase {
     * Tests the suspend/resume functionality on the {@link IDebugTarget}.
     */
    @Test
+   public void testComplexConstructorTest() throws Exception {
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testComplexConstructorTest",
+                                   "data/complexConstructorTest/test",
+                                   false,
+                                   createMethodSelector("ComplexConstructorTest", "main"),
+                                   "data/complexConstructorTest/oracle/ComplexConstructorTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
+   public void testSimpleConstructorTest() throws Exception {
+      assertSEDModelRunAndStepInto("SWTBotKeYDebugTargetSuspendResumeTest_testSimpleConstructorTest",
+                                   "data/simpleConstructorTest/test",
+                                   false,
+                                   createMethodSelector("SimpleConstructorTest", "main"),
+                                   "data/simpleConstructorTest/oracle/SimpleConstructorTest.xml");
+   }
+   
+   /**
+    * Tests the suspend/resume functionality on the {@link IDebugTarget}.
+    */
+   @Test
    public void testMagic42() throws Exception {
       assertSEDModel("SWTBotKeYDebugTargetSuspendResumeTest_testMagic42",
                      "data/magic42/test",

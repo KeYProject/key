@@ -2,6 +2,7 @@ package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -27,7 +28,9 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -770,7 +773,14 @@ public final class SymbolicExecutionUtil {
             else {
                MethodBodyStatement mbs = (MethodBodyStatement)statement;
                IProgramMethod pm = mbs.getProgramMethod(node.proof().getServices());
-               return !pm.isImplicit(); // Do not include implicit methods
+               if (isImplicitConstructor(pm)) {
+                  IProgramMethod explicitConstructor = findExplicitConstructor(node.proof().getServices(), pm);
+                  return explicitConstructor != null && 
+                         !isLibraryClass(explicitConstructor.getContainerType());
+               }
+               else {
+                  return !pm.isImplicit(); // Do not include implicit methods, but always constructors
+               }
             }
          }
          else {
@@ -779,6 +789,61 @@ public final class SymbolicExecutionUtil {
       }
       else {
          return false;
+      }
+   }
+   
+   /**
+    * Checks if the given {@link KeYJavaType} is a library class.
+    * @param kjt The {@link KeYJavaType} to check.
+    * @return {@code true} is library class, {@code false} is no library class.
+    */
+   public static boolean isLibraryClass(KeYJavaType kjt) {
+      return kjt != null && 
+             kjt.getJavaType() instanceof TypeDeclaration && 
+             ((TypeDeclaration)kjt.getJavaType()).isLibraryClass();
+   }
+   
+   /**
+    * Checks if the given {@link IProgramMethod} is an implicit constructor.
+    * @param pm The {@link IProgramMethod} to check.
+    * @return {@code true} is implicit constructor, {@code false} is no implicit constructor (e.g. method or explicit construcotr).
+    */
+   public static boolean isImplicitConstructor(IProgramMethod pm) {
+      return pm != null && ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER.equals(pm.getName());
+   }
+
+   /**
+    * Returns the {@link IProgramMethod} of the explicit constructor for
+    * the given implicit constructor.
+    * @param services The {@link Services} to use.
+    * @param implicitConstructor The implicit constructor.
+    * @return The found explicit constructor or {@code null} if not available.
+    */
+   public static IProgramMethod findExplicitConstructor(Services services, final IProgramMethod implicitConstructor) {
+      if (services != null && implicitConstructor != null) {
+         ImmutableList<IProgramMethod> pms = services.getJavaInfo().getConstructors(implicitConstructor.getContainerType());
+         return JavaUtil.search(pms, new IFilter<IProgramMethod>() {
+            @Override
+            public boolean select(IProgramMethod element) {
+               if (implicitConstructor.getParameterDeclarationCount() == element.getParameterDeclarationCount()) {
+                  Iterator<ParameterDeclaration> implicitIter = implicitConstructor.getParameters().iterator();
+                  Iterator<ParameterDeclaration> elementIter = element.getParameters().iterator();
+                  boolean sameTypes = true;
+                  while (sameTypes && implicitIter.hasNext() && elementIter.hasNext()) {
+                     ParameterDeclaration implicitNext = implicitIter.next();
+                     ParameterDeclaration elementNext = elementIter.next();
+                     sameTypes = implicitNext.getTypeReference().equals(elementNext.getTypeReference());
+                  }
+                  return sameTypes;
+               }
+               else {
+                  return false;
+               }
+            }
+         });
+      }
+      else {
+         return null;
       }
    }
    

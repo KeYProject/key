@@ -51,23 +51,15 @@
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <statement name="next.next=new UnknownTest ();" pathCondition="true" pathConditionChanged="false">
+            <methodCall name="UnknownTest();" pathCondition="true" pathConditionChanged="false">
                <variable name="self" arrayIndex="-1" isArrayIndex="false">
                   <value name="self {!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE">
                      <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                        <value name="next {true}" typeString="endless.UnknownTest" valueString="u_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
-                           <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                              <value name="next {  !u_2.&lt;created&gt; = TRUE
-&amp; !u_2.&lt;created&gt; = TRUE
-&amp; !u_2 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !u_2.&lt;created&gt; = TRUE
-&amp; !u_2.&lt;created&gt; = TRUE
-&amp; !u_2 = self">
-                              </value>
-                           </variable>
-                           <variable name="previous" arrayIndex="-1" isArrayIndex="false">
-                              <value name="previous {!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE">
-                              </value>
-                           </variable>
+                        <value name="next {  !u_2 = self &amp; (self.next = null &amp; self.next = null)
+| !u_2 = self
+&amp; (!self.next = null &amp; !self.next = null)}" isValueAnObject="false" isValueUnknown="true" conditionString="  !u_2 = self &amp; (self.next = null &amp; self.next = null)
+| !u_2 = self
+&amp; (!self.next = null &amp; !self.next = null)">
                         </value>
                      </variable>
                      <variable name="previous" arrayIndex="-1" isArrayIndex="false">
@@ -80,9 +72,761 @@
                   <value name="exc {!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE">
                   </value>
                </variable>
-               <statement name="return next.next;" pathCondition="true" pathConditionChanged="false">
-                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                     <value name="self {  !u_2.&lt;created&gt; = TRUE
+               <variable name="u" arrayIndex="-1" isArrayIndex="false">
+                  <value name="u {!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE}" typeString="endless.UnknownTest" valueString="u_2" isValueAnObject="true" isValueUnknown="false" conditionString="!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE">
+                     <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                        <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                     <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                        <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
+               </variable>
+               <methodReturn name="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of UnknownTest();&gt;">
+                  <variable name="u" arrayIndex="-1" isArrayIndex="false">
+                     <value name="u {!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE}" typeString="endless.UnknownTest" valueString="u_2" isValueAnObject="true" isValueUnknown="false" conditionString="!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE">
+                        <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                           <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                        <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                           <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
+                        </variable>
+                     </value>
+                  </variable>
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE">
+                     </value>
+                  </variable>
+                  <statement name="next.next=new UnknownTest ();" pathCondition="true" pathConditionChanged="false">
+                     <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <value name="self {!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE">
+                           <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                              <value name="next {true}" typeString="endless.UnknownTest" valueString="u_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                                 <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="next {  !u_2.&lt;created&gt; = TRUE
+&amp; !u_2.&lt;created&gt; = TRUE
+&amp; !u_2 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !u_2.&lt;created&gt; = TRUE
+&amp; !u_2.&lt;created&gt; = TRUE
+&amp; !u_2 = self">
+                                    </value>
+                                 </variable>
+                                 <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="previous {!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                              <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
+                     </variable>
+                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE">
+                        </value>
+                     </variable>
+                     <methodCall name="UnknownTest();" pathCondition="true" pathConditionChanged="false">
+                        <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                           <value name="self {  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)">
+                              <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="next {!u_7 = self}" typeString="endless.UnknownTest" valueString="u_2" isValueAnObject="true" isValueUnknown="false" conditionString="!u_7 = self">
+                                    <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="next {  !u_2.&lt;created&gt; = TRUE
+&amp; !u_2.&lt;created&gt; = TRUE
+&amp; (  wellFormed(store(store(store(store(create(store(heap,
+                                                     self,
+                                                     previous,
+                                                     null),
+                                               u_2),
+                                        u_2,
+                                        next,
+                                        null),
+                                  u_2,
+                                  previous,
+                                  null),
+                            u_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      self,
+                      next,
+                      u_2))
+   &amp; wellFormed(store(store(store(store(create(store(heap,
+                                                     self,
+                                                     previous,
+                                                     null),
+                                               u_2),
+                                        u_2,
+                                        next,
+                                        null),
+                                  u_2,
+                                  previous,
+                                  null),
+                            u_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      self,
+                      next,
+                      u_2))
+   &amp; !u_2 = self)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !u_2.&lt;created&gt; = TRUE
+&amp; !u_2.&lt;created&gt; = TRUE
+&amp; (  wellFormed(store(store(store(store(create(store(heap,
+                                                     self,
+                                                     previous,
+                                                     null),
+                                               u_2),
+                                        u_2,
+                                        next,
+                                        null),
+                                  u_2,
+                                  previous,
+                                  null),
+                            u_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      self,
+                      next,
+                      u_2))
+   &amp; wellFormed(store(store(store(store(create(store(heap,
+                                                     self,
+                                                     previous,
+                                                     null),
+                                               u_2),
+                                        u_2,
+                                        next,
+                                        null),
+                                  u_2,
+                                  previous,
+                                  null),
+                            u_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      self,
+                      next,
+                      u_2))
+   &amp; !u_2 = self)">
+                                       </value>
+                                    </variable>
+                                    <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="previous {  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)">
+                                       </value>
+                                    </variable>
+                                 </value>
+                              </variable>
+                              <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)">
+                           </value>
+                        </variable>
+                        <variable name="u_3" arrayIndex="-1" isArrayIndex="false">
+                           <value name="u_3 {  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)}" typeString="endless.UnknownTest" valueString="u_2" isValueAnObject="true" isValueUnknown="false" conditionString="  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)">
+                              <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="next {!u_2 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_2 = self">
+                                 </value>
+                              </variable>
+                              <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <variable name="u_5" arrayIndex="-1" isArrayIndex="false">
+                           <value name="u_5 {  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)}" typeString="endless.UnknownTest" valueString="u_7" isValueAnObject="true" isValueUnknown="false" conditionString="  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)">
+                              <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                        <methodReturn name="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of UnknownTest();&gt;">
+                           <variable name="u_5" arrayIndex="-1" isArrayIndex="false">
+                              <value name="u_5 {  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)}" typeString="endless.UnknownTest" valueString="u_7" isValueAnObject="true" isValueUnknown="false" conditionString="  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)">
+                                 <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="next {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                                 <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                              <value name="exc {  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)">
+                              </value>
+                           </variable>
+                           <variable name="u_3" arrayIndex="-1" isArrayIndex="false">
+                              <value name="u_3 {  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)}" typeString="endless.UnknownTest" valueString="u_2" isValueAnObject="true" isValueUnknown="false" conditionString="  wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; wellFormed(store(store(store(store(create(store(heap,
+                                                  self,
+                                                  previous,
+                                                  null),
+                                            u_2),
+                                     u_2,
+                                     next,
+                                     null),
+                               u_2,
+                               previous,
+                               null),
+                         u_2,
+                         &lt;initialized&gt;,
+                         TRUE),
+                   self,
+                   next,
+                   u_2))
+&amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)">
+                                 <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="next {!u_2 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_2 = self">
+                                    </value>
+                                 </variable>
+                                 <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                    </value>
+                                 </variable>
+                              </value>
+                           </variable>
+                           <statement name="return next.next;" pathCondition="true" pathConditionChanged="false">
+                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="self {  !u_2.&lt;created&gt; = TRUE
 &amp; !u_2.&lt;created&gt; = TRUE
 &amp; (  wellFormed(store(store(store(store(create(store(heap,
                                                      self,
@@ -153,10 +897,10 @@
                       self,
                       next,
                       u_2)))">
-                        <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                           <value name="next {!u_7 = self &amp; !u_2 = self}" typeString="endless.UnknownTest" valueString="u_2" isValueAnObject="true" isValueUnknown="false" conditionString="!u_7 = self &amp; !u_2 = self">
-                              <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="next {  !u_2.&lt;created&gt; = TRUE
+                                    <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="next {!u_7 = self &amp; !u_2 = self}" typeString="endless.UnknownTest" valueString="u_2" isValueAnObject="true" isValueUnknown="false" conditionString="!u_7 = self &amp; !u_2 = self">
+                                          <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                             <value name="next {  !u_2.&lt;created&gt; = TRUE
 &amp; !u_2.&lt;created&gt; = TRUE
 &amp; (  wellFormed(store(store(store(store(create(store(heap,
                                                      self,
@@ -227,18 +971,18 @@
                       self,
                       next,
                       u_2)))">
-                                    <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="next {!u_7 = self &amp; !u_2 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_7 = self &amp; !u_2 = self">
-                                       </value>
-                                    </variable>
-                                    <variable name="previous" arrayIndex="-1" isArrayIndex="false">
-                                       <value name="previous {!u_7 = self &amp; !u_2 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_7 = self &amp; !u_2 = self">
-                                       </value>
-                                    </variable>
-                                 </value>
-                              </variable>
-                              <variable name="previous" arrayIndex="-1" isArrayIndex="false">
-                                 <value name="previous {  !u_2.&lt;created&gt; = TRUE
+                                                <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                                   <value name="next {!u_7 = self &amp; !u_2 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_7 = self &amp; !u_2 = self">
+                                                   </value>
+                                                </variable>
+                                                <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                                   <value name="previous {!u_7 = self &amp; !u_2 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_7 = self &amp; !u_2 = self">
+                                                   </value>
+                                                </variable>
+                                             </value>
+                                          </variable>
+                                          <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                             <value name="previous {  !u_2.&lt;created&gt; = TRUE
 &amp; !u_2.&lt;created&gt; = TRUE
 &amp; (  wellFormed(store(store(store(store(create(store(heap,
                                                      self,
@@ -309,18 +1053,18 @@
                       self,
                       next,
                       u_2)))">
+                                             </value>
+                                          </variable>
+                                       </value>
+                                    </variable>
+                                    <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                       <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                       </value>
+                                    </variable>
                                  </value>
                               </variable>
-                           </value>
-                        </variable>
-                        <variable name="previous" arrayIndex="-1" isArrayIndex="false">
-                           <value name="previous {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
-                           </value>
-                        </variable>
-                     </value>
-                  </variable>
-                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                     <value name="exc {  wellFormed(store(store(store(store(create(store(heap,
+                              <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="exc {  wellFormed(store(store(store(store(create(store(heap,
                                                   self,
                                                   previous,
                                                   null),
@@ -389,9 +1133,9 @@
                    next,
                    u_2))
 &amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.&lt;created&gt; = TRUE)">
-                     </value>
-                  </variable>
-                  <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;\if (  \if (u_2 = self)
+                                 </value>
+                              </variable>
+                              <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;\if (  \if (u_2 = self)
            \then (u_7)
            \else (\if (u_7 = self)
                       \then (null)
@@ -426,8 +1170,8 @@
                                                             = self)
                                                            \then (null)
                                                            \else (u_2)).next))))&apos; as result of self.main();&gt;">
-                     <variable name="self" arrayIndex="-1" isArrayIndex="false">
-                        <value name="self {    !u_2 = self
+                                 <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="self {    !u_2 = self
   &amp; (  wellFormed(store(store(store(store(create(store(heap,
                                                        self,
                                                        previous,
@@ -578,8 +1322,8 @@
    &amp; (  !u_2.&lt;created&gt; = TRUE
       &amp; !u_2.&lt;created&gt; = TRUE
       &amp; (!u_2.next = null &amp; !u_2.next = null)))">
-                           <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                              <value name="next {    !u_2 = self
+                                       <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                          <value name="next {    !u_2 = self
   &amp; (  wellFormed(store(store(store(store(create(store(heap,
                                                        self,
                                                        previous,
@@ -654,8 +1398,8 @@
                       next,
                       u_2))
    &amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.next = null))">
-                                 <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="next {    !u_2 = self
+                                             <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                                <value name="next {    !u_2 = self
   &amp; (  wellFormed(store(store(store(store(create(store(heap,
                                                        self,
                                                        previous,
@@ -730,8 +1474,8 @@
                       next,
                       u_2))
    &amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.next = null))">
-                                       <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="next {    !u_2 = self
+                                                   <variable name="next" arrayIndex="-1" isArrayIndex="false">
+                                                      <value name="next {    !u_2 = self
   &amp; (  wellFormed(store(store(store(store(create(store(heap,
                                                        self,
                                                        previous,
@@ -806,6 +1550,166 @@
                       next,
                       u_2))
    &amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.next = null))">
+                                                      </value>
+                                                   </variable>
+                                                   <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                                      <value name="previous {    !u_2 = self
+  &amp; (  wellFormed(store(store(store(store(create(store(heap,
+                                                       self,
+                                                       previous,
+                                                       null),
+                                                 u_2),
+                                          u_2,
+                                          next,
+                                          null),
+                                    u_2,
+                                    previous,
+                                    null),
+                              u_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        self,
+                        next,
+                        u_2))
+     &amp; (!u_2.&lt;created&gt; = TRUE &amp; u_2.next = null))
+| !u_2 = self
+&amp; (  wellFormed(store(store(store(store(create(store(heap,
+                                                     self,
+                                                     previous,
+                                                     null),
+                                               u_2),
+                                        u_2,
+                                        next,
+                                        null),
+                                  u_2,
+                                  previous,
+                                  null),
+                            u_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      self,
+                      next,
+                      u_2))
+   &amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.next = null))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="    !u_2 = self
+  &amp; (  wellFormed(store(store(store(store(create(store(heap,
+                                                       self,
+                                                       previous,
+                                                       null),
+                                                 u_2),
+                                          u_2,
+                                          next,
+                                          null),
+                                    u_2,
+                                    previous,
+                                    null),
+                              u_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        self,
+                        next,
+                        u_2))
+     &amp; (!u_2.&lt;created&gt; = TRUE &amp; u_2.next = null))
+| !u_2 = self
+&amp; (  wellFormed(store(store(store(store(create(store(heap,
+                                                     self,
+                                                     previous,
+                                                     null),
+                                               u_2),
+                                        u_2,
+                                        next,
+                                        null),
+                                  u_2,
+                                  previous,
+                                  null),
+                            u_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      self,
+                      next,
+                      u_2))
+   &amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.next = null))">
+                                                      </value>
+                                                   </variable>
+                                                </value>
+                                             </variable>
+                                             <variable name="previous" arrayIndex="-1" isArrayIndex="false">
+                                                <value name="previous {    !u_2 = self
+  &amp; (  wellFormed(store(store(store(store(create(store(heap,
+                                                       self,
+                                                       previous,
+                                                       null),
+                                                 u_2),
+                                          u_2,
+                                          next,
+                                          null),
+                                    u_2,
+                                    previous,
+                                    null),
+                              u_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        self,
+                        next,
+                        u_2))
+     &amp; (!u_2.&lt;created&gt; = TRUE &amp; u_2.next = null))
+| !u_2 = self
+&amp; (  wellFormed(store(store(store(store(create(store(heap,
+                                                     self,
+                                                     previous,
+                                                     null),
+                                               u_2),
+                                        u_2,
+                                        next,
+                                        null),
+                                  u_2,
+                                  previous,
+                                  null),
+                            u_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      self,
+                      next,
+                      u_2))
+   &amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.next = null))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="    !u_2 = self
+  &amp; (  wellFormed(store(store(store(store(create(store(heap,
+                                                       self,
+                                                       previous,
+                                                       null),
+                                                 u_2),
+                                          u_2,
+                                          next,
+                                          null),
+                                    u_2,
+                                    previous,
+                                    null),
+                              u_2,
+                              &lt;initialized&gt;,
+                              TRUE),
+                        self,
+                        next,
+                        u_2))
+     &amp; (!u_2.&lt;created&gt; = TRUE &amp; u_2.next = null))
+| !u_2 = self
+&amp; (  wellFormed(store(store(store(store(create(store(heap,
+                                                     self,
+                                                     previous,
+                                                     null),
+                                               u_2),
+                                        u_2,
+                                        next,
+                                        null),
+                                  u_2,
+                                  previous,
+                                  null),
+                            u_2,
+                            &lt;initialized&gt;,
+                            TRUE),
+                      self,
+                      next,
+                      u_2))
+   &amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.next = null))">
+                                                </value>
+                                             </variable>
                                           </value>
                                        </variable>
                                        <variable name="previous" arrayIndex="-1" isArrayIndex="false">
@@ -888,168 +1792,8 @@
                                        </variable>
                                     </value>
                                  </variable>
-                                 <variable name="previous" arrayIndex="-1" isArrayIndex="false">
-                                    <value name="previous {    !u_2 = self
-  &amp; (  wellFormed(store(store(store(store(create(store(heap,
-                                                       self,
-                                                       previous,
-                                                       null),
-                                                 u_2),
-                                          u_2,
-                                          next,
-                                          null),
-                                    u_2,
-                                    previous,
-                                    null),
-                              u_2,
-                              &lt;initialized&gt;,
-                              TRUE),
-                        self,
-                        next,
-                        u_2))
-     &amp; (!u_2.&lt;created&gt; = TRUE &amp; u_2.next = null))
-| !u_2 = self
-&amp; (  wellFormed(store(store(store(store(create(store(heap,
-                                                     self,
-                                                     previous,
-                                                     null),
-                                               u_2),
-                                        u_2,
-                                        next,
-                                        null),
-                                  u_2,
-                                  previous,
-                                  null),
-                            u_2,
-                            &lt;initialized&gt;,
-                            TRUE),
-                      self,
-                      next,
-                      u_2))
-   &amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.next = null))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="    !u_2 = self
-  &amp; (  wellFormed(store(store(store(store(create(store(heap,
-                                                       self,
-                                                       previous,
-                                                       null),
-                                                 u_2),
-                                          u_2,
-                                          next,
-                                          null),
-                                    u_2,
-                                    previous,
-                                    null),
-                              u_2,
-                              &lt;initialized&gt;,
-                              TRUE),
-                        self,
-                        next,
-                        u_2))
-     &amp; (!u_2.&lt;created&gt; = TRUE &amp; u_2.next = null))
-| !u_2 = self
-&amp; (  wellFormed(store(store(store(store(create(store(heap,
-                                                     self,
-                                                     previous,
-                                                     null),
-                                               u_2),
-                                        u_2,
-                                        next,
-                                        null),
-                                  u_2,
-                                  previous,
-                                  null),
-                            u_2,
-                            &lt;initialized&gt;,
-                            TRUE),
-                      self,
-                      next,
-                      u_2))
-   &amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.next = null))">
-                                    </value>
-                                 </variable>
-                              </value>
-                           </variable>
-                           <variable name="previous" arrayIndex="-1" isArrayIndex="false">
-                              <value name="previous {    !u_2 = self
-  &amp; (  wellFormed(store(store(store(store(create(store(heap,
-                                                       self,
-                                                       previous,
-                                                       null),
-                                                 u_2),
-                                          u_2,
-                                          next,
-                                          null),
-                                    u_2,
-                                    previous,
-                                    null),
-                              u_2,
-                              &lt;initialized&gt;,
-                              TRUE),
-                        self,
-                        next,
-                        u_2))
-     &amp; (!u_2.&lt;created&gt; = TRUE &amp; u_2.next = null))
-| !u_2 = self
-&amp; (  wellFormed(store(store(store(store(create(store(heap,
-                                                     self,
-                                                     previous,
-                                                     null),
-                                               u_2),
-                                        u_2,
-                                        next,
-                                        null),
-                                  u_2,
-                                  previous,
-                                  null),
-                            u_2,
-                            &lt;initialized&gt;,
-                            TRUE),
-                      self,
-                      next,
-                      u_2))
-   &amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.next = null))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="    !u_2 = self
-  &amp; (  wellFormed(store(store(store(store(create(store(heap,
-                                                       self,
-                                                       previous,
-                                                       null),
-                                                 u_2),
-                                          u_2,
-                                          next,
-                                          null),
-                                    u_2,
-                                    previous,
-                                    null),
-                              u_2,
-                              &lt;initialized&gt;,
-                              TRUE),
-                        self,
-                        next,
-                        u_2))
-     &amp; (!u_2.&lt;created&gt; = TRUE &amp; u_2.next = null))
-| !u_2 = self
-&amp; (  wellFormed(store(store(store(store(create(store(heap,
-                                                     self,
-                                                     previous,
-                                                     null),
-                                               u_2),
-                                        u_2,
-                                        next,
-                                        null),
-                                  u_2,
-                                  previous,
-                                  null),
-                            u_2,
-                            &lt;initialized&gt;,
-                            TRUE),
-                      self,
-                      next,
-                      u_2))
-   &amp; (!u_2.&lt;created&gt; = TRUE &amp; !u_2.next = null))">
-                              </value>
-                           </variable>
-                        </value>
-                     </variable>
-                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
-                        <value name="exc {    !u_7 = self
+                                 <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                                    <value name="exc {    !u_7 = self
   &amp; (  !u_2 = self
      &amp; (  !u_2.&lt;created&gt; = TRUE
         &amp; !u_2.&lt;created&gt; = TRUE
@@ -1204,13 +1948,17 @@
                             next,
                             u_2))
          &amp; (!u_2.next = null &amp; !u_2.next = null))))">
-                        </value>
-                     </variable>
-                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
-                     </termination>
-                  </methodReturn>
-               </statement>
-            </statement>
+                                    </value>
+                                 </variable>
+                                 <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                                 </termination>
+                              </methodReturn>
+                           </statement>
+                        </methodReturn>
+                     </methodCall>
+                  </statement>
+               </methodReturn>
+            </methodCall>
          </statement>
       </statement>
    </methodCall>
