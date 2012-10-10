@@ -79,7 +79,7 @@
 
    <formatter type="xml"/>
 
-   <batchtest fork="no" todir="${test.reports}">
+   <batchtest fork="yes" todir="${test.reports}">
      <fileset dir="${test.dir}">
        <include name="TestKey.java"/>
      </fileset>

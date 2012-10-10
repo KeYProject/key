@@ -69,7 +69,7 @@ public class DesignTests extends TestCase {
 	for (int i = 0; i<classes.length; i++) {
 	    String absoluteName = classFiles[i].getAbsolutePath();
 	    String className = absoluteName.substring
-		(absoluteName.indexOf("de/")).replace(File.separatorChar, '.');
+		(absoluteName.indexOf("de"+File.separatorChar)).replace(File.separatorChar, '.');
 	    className = className.substring(0, className.indexOf(".class"));
 	    
 	    try {
