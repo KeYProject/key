@@ -232,6 +232,7 @@ provable: ./standard_key/instanceCreation/instanceCreation1.key
 provable: ./standard_key/instanceCreation/instanceCreation2.key
 provable: ./standard_key/instanceCreation/interfacesAndAbstractClassesHaveNoInstances.key
 provable: ./standard_key/instanceCreation/successiveCreatedObjectsAreDistinct.key
+provable: ./standard_key/instanceCreation/testOverloadingConstructors.key
 provable: ./standard_key/java_dl/SimpleAttributes.key
 provable: ./standard_key/java_dl/arrayMax.key
 provable: ./standard_key/java_dl/arrayUpdateSimp.key
