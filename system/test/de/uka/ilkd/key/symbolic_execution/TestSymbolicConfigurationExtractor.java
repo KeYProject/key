@@ -80,6 +80,24 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //             ".xml",
 //             null);
 //   }
+
+   /**
+    * Tests "configurationExtractorIsNullTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   // TODO: Is it really correct that the initial state contains the symbolic object which is not available in the current state?
+   public void testIsNullTest() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorIsNullTest/test/IsNullTest.java",
+             "IsNullTest",
+             "examples/_testcase/set/configurationExtractorIsNullTest/oracle/",
+             "NullInEquivalenceClass.xml",
+             "testIsNullTest_initial",
+             ".xml",
+             "testIsNullTest_current",
+             ".xml",
+             null,
+             1);
+   }
    
    /**
     * Tests "configurationExtractorSimpleLinkedOjbects" without precondition.

@@ -224,14 +224,26 @@ public class SymbolicConfigurationExtractor {
       return createConfigurationFromExecutionVariableValuePairs(equivalentClasses, pairs);
    }
    
-   protected Term removeImplicitSubTermsFromPathCondition(Term andTerm) {
-      List<Term> newTerms = new LinkedList<Term>();
-      for (Term sub : andTerm.subs()) {
-         if (!containsImplicitProgramVariable(sub)) {
-            newTerms.add(sub);
+   protected Term removeImplicitSubTermsFromPathCondition(Term term) {
+      if (Junctor.AND == term.op()) {
+         // Path condition with multiple terms combined via AND
+         List<Term> newTerms = new LinkedList<Term>();
+         for (Term sub : term.subs()) {
+            if (!containsImplicitProgramVariable(sub)) {
+               newTerms.add(sub);
+            }
+         }
+         return TermBuilder.DF.and(newTerms);
+      }
+      else {
+         // Only one term in path condition
+         if (!containsImplicitProgramVariable(term)) {
+            return term;
+         }
+         else {
+            return TermBuilder.DF.tt();
          }
       }
-      return TermBuilder.DF.and(newTerms);
    }
 
    protected boolean containsImplicitProgramVariable(Term t) {
