@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="return 1;">
-      <association programVariable="obj" target="o1"/>
+      <value programVariable="obj" value="null" type="Null"/>
    </state>
-   <object xml:id="o1" name="obj" type="IsNullTest">
-   </object>
 </model>

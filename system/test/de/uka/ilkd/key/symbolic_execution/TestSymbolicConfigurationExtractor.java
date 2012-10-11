@@ -80,7 +80,41 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //             ".xml",
 //             null);
 //   }
-
+   
+   /**
+    * Tests "configurationExtractorIntegerConditionTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testObjectConditionTest() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorObjectConditionTest/test/ObjectConditionTest.java",
+             "ObjectConditionTest",
+             "examples/_testcase/set/configurationExtractorObjectConditionTest/oracle/",
+             "ObjectConditionTest.xml",
+             "testObjectConditionTestt_initial",
+             ".xml",
+             "testObjectConditionTest_current",
+             ".xml",
+             null,
+             1);
+   }
+   
+   /**
+    * Tests "configurationExtractorIntegerConditionTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testIntegerConditionTest() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorIntegerConditionTest/test/IntegerConditionTest.java",
+             "IntegerConditionTest",
+             "examples/_testcase/set/configurationExtractorIntegerConditionTest/oracle/",
+             "IsInstanceTest.xml",
+             "testIntegerConditionTest_initial",
+             ".xml",
+             "testIntegerConditionTest_current",
+             ".xml",
+             null,
+             1);
+   }
+   
    /**
     * Tests "configurationExtractorIsInstanceTest" without precondition.
     * @throws Exception Occurred Exception.
@@ -102,7 +136,6 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
     * Tests "configurationExtractorIsNullTest" without precondition.
     * @throws Exception Occurred Exception.
     */
-   // TODO: Is it really correct that the initial state contains the symbolic object which is not available in the current state?
    public void testIsNullTest() throws Exception {
       doTest("examples/_testcase/set/configurationExtractorIsNullTest/test/IsNullTest.java",
              "IsNullTest",

@@ -4,5 +4,6 @@
       <association programVariable="array" target="o1"/>
    </state>
    <object xml:id="o1" name="array" type="java.lang.Object[]">
+      <value programVariable="length" value="1" type="int"/>
    </object>
 </model>

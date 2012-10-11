@@ -58,7 +58,6 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
 
-// TODO: Include known values from path conditions which are not part of updates, e.g. array length == 1 in SimpleArrayLength
 // TODO: Support array fields
 // TODO: Support object creation
 // TODO: Support null values in equivalence classes?
@@ -83,6 +82,8 @@ public class SymbolicConfigurationExtractor {
    
    private int preVariableIndex = 0;
    
+   private Term pathCondition;
+   
    public SymbolicConfigurationExtractor(Node node) {
       assert node != null;
       this.node = node;
@@ -92,12 +93,12 @@ public class SymbolicConfigurationExtractor {
       synchronized (this) {
          if (!isAnalysed()) {
             // Get path condition
-            Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, true);
-            Term pathConditionWithoutImplicits = removeImplicitSubTermsFromPathCondition(pathCondition);
+            pathCondition = SymbolicExecutionUtil.computePathCondition(node, true);
+            pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
             // Collect all symbolic objects mentioned in the path condition
-            Set<Term> symbolicObjectsInPathCondition = collectSymbolicObjectsFromPathCondition(pathConditionWithoutImplicits);
+            Set<Term> symbolicObjectsInPathCondition = collectSymbolicObjectsFromPathCondition(pathCondition);
             // Compute a sequent with the initial conditions of the proof without modality
-            Sequent initialConditionsSequent = computeInitialConditionsSequent(pathConditionWithoutImplicits);
+            Sequent initialConditionsSequent = computeInitialConditionsSequent(pathCondition);
             // Instantiate proof in which equivalent classes of symbolic objects in path conditions are computed
             ProofStarter equivalentClassesProofStarter = SymbolicExecutionUtil.createSideProof(getProof(), initialConditionsSequent);
             // Apply cut rules to compute equivalent classes
@@ -107,7 +108,7 @@ public class SymbolicConfigurationExtractor {
             // Compute the available instance configurations via the opened goals of the equivalent proof.
             configurations = computeInstanceConfigurationsFromGoals(equivalentClassesProofStarter.getProof());
             // Collect all symbolic objects used in updates
-            initialLocations = objectsToLocations(symbolicObjectsInPathCondition);
+            initialLocations = termToLocations(pathCondition);
             currentLocations = new LinkedHashSet<ExtractValueParameter>(initialLocations);
             collectLocationsFromUpdates(node.sequent(), currentLocations);
             // Create predicate required for state computation
@@ -155,18 +156,19 @@ public class SymbolicConfigurationExtractor {
    }
    
    public ISymbolicConfiguration getInitialConfiguration(int configurationIndex) throws ProofInputException {
-      return getConfiguration(getProof().root(), initialConfigurations, configurationIndex, initialConfigurationTerm, initialLocations);
+      return getConfiguration(getProof().root(), initialConfigurations, configurationIndex, initialConfigurationTerm, initialLocations, pathCondition);
    }
    
    public ISymbolicConfiguration getCurrentConfiguration(int configurationIndex) throws ProofInputException {
-      return getConfiguration(node, currentConfigurations, configurationIndex, currentConfigurationTerm, currentLocations);
+      return getConfiguration(node, currentConfigurations, configurationIndex, currentConfigurationTerm, currentLocations, null);
    }
    
    protected ISymbolicConfiguration getConfiguration(Node node,
                                                      Map<Integer, ISymbolicConfiguration> confiurationsMap, 
                                                      int configurationIndex,
                                                      Term configurationTerm,
-                                                     Set<ExtractValueParameter> locations) throws ProofInputException {
+                                                     Set<ExtractValueParameter> locations,
+                                                     Term pathCondition) throws ProofInputException {
       synchronized (this) {
          assert configurationIndex >= 0;
          assert configurationIndex < configurations.size();
@@ -176,7 +178,7 @@ public class SymbolicConfigurationExtractor {
             // Get configuration
             ImmutableSet<Term> configuration = configurations.get(configurationIndex);
             ImmutableList<ISymbolicEquivalenceClass> equivalentClasses = getEquivalenceClasses(configurationIndex);
-            result = computeConfiguration(node, configuration, configurationTerm, locations, equivalentClasses);
+            result = computeConfiguration(node, configuration, configurationTerm, locations, equivalentClasses, pathCondition);
             confiurationsMap.put(Integer.valueOf(configurationIndex), result);
          }
          return result;
@@ -187,12 +189,16 @@ public class SymbolicConfigurationExtractor {
                                                          ImmutableSet<Term> configuration, 
                                                          Term configurationTerm,
                                                          Set<ExtractValueParameter> locations,
-                                                         ImmutableList<ISymbolicEquivalenceClass> equivalentClasses) throws ProofInputException {
+                                                         ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
+                                                         Term pathCondition) throws ProofInputException {
       // Get original updates
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
       ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
       // Combine configuration with original updates
       Term configurationCondition = TermBuilder.DF.and(configuration);
+      if (pathCondition != null) {
+         configurationCondition = TermBuilder.DF.and(configurationCondition, pathCondition);
+      }
       ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
       for (Term originalUpdate : originalUpdates) {
          if (UpdateJunctor.PARALLEL_UPDATE == originalUpdate.op()) {
@@ -375,36 +381,48 @@ public class SymbolicConfigurationExtractor {
   }
    
 
-   
-   protected Set<ExtractValueParameter> objectsToLocations(Set<Term> symbolicObjects) throws ProofInputException {
-      final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
+
+   protected Set<ExtractValueParameter> termToLocations(Term term) throws ProofInputException {
       Set<ExtractValueParameter> result = new LinkedHashSet<ExtractValueParameter>();
-      for (Term obj : symbolicObjects) {
-         if (obj.op() instanceof ProgramVariable) {
-            ProgramVariable var = (ProgramVariable)obj.op();
-            if (!isImplicitProgramVariable(var)) {
-               result.add(new ExtractValueParameter(var, false));
-            }
+      fillLocationsFromTerm(result, term);
+      return result;
+   }
+   
+   protected void fillLocationsFromTerm(Set<ExtractValueParameter> toFill, Term term) throws ProofInputException {
+      final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
+      if (term.op() instanceof ProgramVariable) {
+         ProgramVariable var = (ProgramVariable)term.op();
+         if (!isImplicitProgramVariable(var)) {
+            toFill.add(new ExtractValueParameter(var, false));
          }
-         else {
-            Sort sort = heapLDT.getSortOfSelect(obj.op());
-            if (sort != null) {
-               ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, obj.sub(2));
-               if (!isImplicitProgramVariable(var)) {
-                  if (var.isStatic()) {
-                     result.add(new ExtractValueParameter(var, false));
+      }
+      else {
+         Sort sort = heapLDT.getSortOfSelect(term.op());
+         if (sort != null) {
+            ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
+            if (!isImplicitProgramVariable(var)) {
+               if (var.isStatic()) {
+                  toFill.add(new ExtractValueParameter(var, false));
+               }
+               else {
+                  Term selectTerm = term.sub(1);
+                  if (selectTerm.op() instanceof ProgramVariable) {
+                     toFill.add(new ExtractValueParameter((ProgramVariable)selectTerm.op(), false));
                   }
-                  else {
-                     result.add(new ExtractValueParameter(var, obj.sub(1), false));
-                  }
+                  toFill.add(new ExtractValueParameter(var, selectTerm, false));
                }
             }
-            else {
-               throw new ProofInputException("Unsupported object operator \"" + obj.op() + "\".");
+         }
+         else if (heapLDT.getLength() == term.op()) {
+            ProgramVariable var = getServices().getJavaInfo().getArrayLength();
+            toFill.add(new ExtractValueParameter(var, term.sub(0), false));
+         }
+         else {
+            for (Term sub : term.subs()) {
+               fillLocationsFromTerm(toFill, sub);
             }
          }
       }
-      return result;
    }
    
    // EXPECTED:

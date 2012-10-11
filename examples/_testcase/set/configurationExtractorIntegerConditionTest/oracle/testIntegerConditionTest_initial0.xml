@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state name="return 42;">
+      <value programVariable="a" value="1" type="int"/>
+      <value programVariable="IntegerConditionTest::y" value="3" type="int"/>
+      <association programVariable="self" target="o1"/>
+   </state>
+   <object xml:id="o1" name="self" type="IntegerConditionTest">
+      <value programVariable="x" value="1" type="int"/>
+   </object>
+</model>
