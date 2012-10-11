@@ -80,7 +80,24 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //             ".xml",
 //             null);
 //   }
-
+   
+   /**
+    * Tests "configurationExtractorSimpleLinkedOjbects" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testSimpleLinkedOjbectsInstanceVariable() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorSimpleLinkedOjbectsInstanceVariable/test/SimpleLinkedOjbectsInstanceVariable.java",
+             "SimpleLinkedOjbectsInstanceVariable",
+             "examples/_testcase/set/configurationExtractorSimpleLinkedOjbectsInstanceVariable/oracle/",
+             "SimpleLinkedOjbectsInstanceVariable.xml",
+             "testSimpleLinkedOjbectsInstanceVariable_initial",
+             ".xml",
+             "testSimpleLinkedOjbectsInstanceVariable_current",
+             ".xml",
+             null,
+             1);
+   }
+   
    /**
     * Tests "configurationExtractorSimpleStaticAttributes" without precondition.
     * @throws Exception Occurred Exception.

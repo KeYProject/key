@@ -62,8 +62,7 @@ import de.uka.ilkd.key.util.ProofStarter;
 // TODO: Include known values from path conditions which are not part of updates, e.g. array length == 1 in SimpleArrayLength
 // TODO: Support array fields
 // TODO: Support object creation
-// TODO: Support null values in equivalence classes
-// TODO: Test Simple objects as class attributes instead of method parameter. 
+// TODO: Support null values in equivalence classes?
 public class SymbolicConfigurationExtractor {
    private Node node;
    
@@ -601,14 +600,20 @@ public class SymbolicConfigurationExtractor {
          }
          // Check if a container was found, if not it is an less important equivalent object
          if (container != null) {
+            // Check if the term is in an equivalent class, in this case use the representative term instead of the term itself.
+            Term valueTerm = pair.getValue();
+            ISymbolicEquivalenceClass eq = findEquivalentClass(equivalentClasses, valueTerm);
+            if (eq != null) {
+               valueTerm = eq.getRepresentative();
+            }
             // Check if it is an association
-            SymbolicObject target = objects.get(pair.getValue());
+            SymbolicObject target = objects.get(valueTerm);
             if (target != null) {
                SymbolicAssociation association = new SymbolicAssociation(pair.getProgramVariable(), target);
                container.addAssociation(association);
             }
             else {
-               SymbolicValue value = new SymbolicValue(getServices(), pair.getProgramVariable(), pair.getValue());
+               SymbolicValue value = new SymbolicValue(getServices(), pair.getProgramVariable(), valueTerm);
                container.addValue(value);
             }
          }

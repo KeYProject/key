@@ -4,9 +4,12 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
+import de.uka.ilkd.key.symbolic_execution.util.IFilter;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 
 /**
  * Default implementation of {@link ISymbolicEquivalenceClass}.
@@ -83,7 +86,16 @@ public class SymbolicEquivalenceClass implements ISymbolicEquivalenceClass {
     */
    @Override
    public Term getRepresentative() {
-      return terms.head();
+      // Prefer terms which are a program variable
+      Term representative = JavaUtil.search(terms, new IFilter<Term>() {
+         @Override
+         public boolean select(Term element) {
+            return element.op() instanceof IProgramVariable;
+         }
+      });
+      return representative != null ? 
+             representative : // Return term with program variab le 
+             terms.head(); // Return the first term
    }
 
    /**
