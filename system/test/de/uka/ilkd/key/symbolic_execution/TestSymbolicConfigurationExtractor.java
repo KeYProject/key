@@ -82,6 +82,23 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //   }
 
    /**
+    * Tests "configurationExtractorIsInstanceTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testIsInstanceTest() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorIsInstanceTest/test/IsInstanceTest.java",
+             "IsInstanceTest",
+             "examples/_testcase/set/configurationExtractorIsInstanceTest/oracle/",
+             "IsInstanceTest.xml",
+             "testIsInstanceTest_initial",
+             ".xml",
+             "testIsInstanceTest_current",
+             ".xml",
+             null,
+             1);
+   }
+   
+   /**
     * Tests "configurationExtractorIsNullTest" without precondition.
     * @throws Exception Occurred Exception.
     */

@@ -20,7 +20,6 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.SemisequentChangeInfo;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -98,13 +97,13 @@ public class SymbolicConfigurationExtractor {
             // Collect all symbolic objects mentioned in the path condition
             Set<Term> symbolicObjectsInPathCondition = collectSymbolicObjectsFromPathCondition(pathConditionWithoutImplicits);
             // Compute a sequent with the initial conditions of the proof without modality
-            Sequent initialConditionsSequent = computeInitialConditionsSequent();
+            Sequent initialConditionsSequent = computeInitialConditionsSequent(pathConditionWithoutImplicits);
             // Instantiate proof in which equivalent classes of symbolic objects in path conditions are computed
             ProofStarter equivalentClassesProofStarter = SymbolicExecutionUtil.createSideProof(getProof(), initialConditionsSequent);
             // Apply cut rules to compute equivalent classes
             applyCutRules(equivalentClassesProofStarter, symbolicObjectsInPathCondition);
             // Finish proof automatically
-            runProof(equivalentClassesProofStarter);
+            SymbolicExecutionUtil.startSideProof(getProof(), equivalentClassesProofStarter, StrategyProperties.SPLITTING_NORMAL);
             // Compute the available instance configurations via the opened goals of the equivalent proof.
             configurations = computeInstanceConfigurationsFromGoals(equivalentClassesProofStarter.getProof());
             // Collect all symbolic objects used in updates
@@ -277,23 +276,25 @@ public class SymbolicConfigurationExtractor {
       return result;
    }
    
-   protected Sequent computeInitialConditionsSequent() { // DebuggerPO.setUp in old editor
+   protected Sequent computeInitialConditionsSequent(Term pathCondition) { // DebuggerPO.setUp in old editor
       // Get original sequent
       Sequent originalSequent = getProof().root().sequent();
+      // Add path condition to antecedent
+      Semisequent newAntecedent = originalSequent.antecedent();
+      newAntecedent = newAntecedent.insertLast(new SequentFormula(pathCondition)).semisequent();
       // Remove everything after modality from sequent
       Semisequent newSuccedent = Semisequent.EMPTY_SEMISEQUENT;
       for (SequentFormula sf : originalSequent.succedent()) {
          Term term = sf.formula();
          if (Junctor.IMP.equals(term.op())) {
-            SemisequentChangeInfo info = newSuccedent.insertLast(new SequentFormula(term.sub(0)));
-            newSuccedent = info.semisequent();
+            newSuccedent = newSuccedent.insertLast(new SequentFormula(term.sub(0))).semisequent();
             // TODO: Are updates required? Because TermBuilder.DF.apply(updates, true) is just true
          }
          else {
             newSuccedent.insertLast(sf);
          }
       }
-      return Sequent.createSequent(originalSequent.antecedent(), newSuccedent);
+      return Sequent.createSequent(newAntecedent, newSuccedent);
    }
    
    protected Sequent addPathCondition(Sequent initialConditionsSequent, Term pathCondition) { // DebuggerPO.setUp in old debugger
@@ -336,10 +337,6 @@ public class SymbolicConfigurationExtractor {
             starter.start(branches);
         }
       }
-   }
-
-   protected void runProof(ProofStarter proof) {
-      SymbolicExecutionUtil.startSideProof(getProof(), proof, StrategyProperties.SPLITTING_NORMAL);
    }
 
    protected List<ImmutableSet<Term>> computeInstanceConfigurationsFromGoals(Proof proof) {
@@ -394,7 +391,12 @@ public class SymbolicConfigurationExtractor {
             if (sort != null) {
                ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, obj.sub(2));
                if (!isImplicitProgramVariable(var)) {
-                  result.add(new ExtractValueParameter(var, obj.sub(1), false));
+                  if (var.isStatic()) {
+                     result.add(new ExtractValueParameter(var, false));
+                  }
+                  else {
+                     result.add(new ExtractValueParameter(var, obj.sub(1), false));
+                  }
                }
             }
             else {
