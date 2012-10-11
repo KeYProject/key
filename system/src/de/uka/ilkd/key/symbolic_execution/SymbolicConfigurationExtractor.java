@@ -61,8 +61,9 @@ import de.uka.ilkd.key.util.ProofStarter;
 
 // TODO: Include known values from path conditions which are not part of updates, e.g. array length == 1 in SimpleArrayLength
 // TODO: Support array fields
-// TODO: Support static attributes
 // TODO: Support object creation
+// TODO: Support null values in equivalence classes
+// TODO: Test Simple objects as class attributes instead of method parameter. 
 public class SymbolicConfigurationExtractor {
    private Node node;
    
@@ -217,7 +218,7 @@ public class SymbolicConfigurationExtractor {
       // Extract variable value pairs
       Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
       for (ExtractValueParameter param : locations) {
-         ExecutionVariableValuePair pair = new ExecutionVariableValuePair(param.getProgramVariable(), param.getSelectParentTerm(), resultTerm.sub(param.getSelectValueTermIndexInStatePredicate()));
+         ExecutionVariableValuePair pair = new ExecutionVariableValuePair(param.getProgramVariable(), param.getSelectParentTerm(), resultTerm.sub(param.getSelectValueTermIndexInStatePredicate()), param.isPartOfHeapUpdate());
          pairs.add(pair);
       }
       // Create symbolic configuration
@@ -235,7 +236,7 @@ public class SymbolicConfigurationExtractor {
    }
 
    protected boolean containsImplicitProgramVariable(Term t) {
-      if (t.op() instanceof ProgramVariable && ((ProgramVariable)t.op()).isImplicit()) {
+      if (t.op() instanceof ProgramVariable && isImplicitProgramVariable((ProgramVariable)t.op())) {
          return true;
       }
       for (int i = 0; i < t.arity(); i++) {
@@ -244,6 +245,10 @@ public class SymbolicConfigurationExtractor {
          }
       }
       return false;
+   }
+
+   protected boolean isImplicitProgramVariable(ProgramVariable var) {
+      return var != null && var.isImplicit();
    }
 
    // Expected result: {.SimpleLinkedOjbects::next(.SimpleLinkedOjbects::next(x)),null,x,.SimpleLinkedOjbects::next(x)}
@@ -369,13 +374,17 @@ public class SymbolicConfigurationExtractor {
       for (Term obj : symbolicObjects) {
          if (obj.op() instanceof ProgramVariable) {
             ProgramVariable var = (ProgramVariable)obj.op();
-            result.add(new ExtractValueParameter(var));
+            if (!isImplicitProgramVariable(var)) {
+               result.add(new ExtractValueParameter(var, false));
+            }
          }
          else {
             Sort sort = heapLDT.getSortOfSelect(obj.op());
             if (sort != null) {
                ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, obj.sub(2));
-               result.add(new ExtractValueParameter(var, obj.sub(1)));
+               if (!isImplicitProgramVariable(var)) {
+                  result.add(new ExtractValueParameter(var, obj.sub(1), false));
+               }
             }
             else {
                throw new ProofInputException("Unsupported object operator \"" + obj.op() + "\".");
@@ -424,8 +433,8 @@ public class SymbolicConfigurationExtractor {
          }
          else if (eu.lhs() instanceof ProgramVariable) {
             ProgramVariable var = (ProgramVariable)eu.lhs();
-            if (var.getContainerType() != null) { // Make sure that it is a location in the source code and not an internal one of the proof
-               toFill.add(new ExtractValueParameter(var));
+            if (var.getContainerType() != null && !isImplicitProgramVariable(var)) { // Make sure that it is a location in the source code and not an internal one of the proof
+               toFill.add(new ExtractValueParameter(var, false));
             }
          }
          else {
@@ -444,23 +453,38 @@ public class SymbolicConfigurationExtractor {
          Term selectArgument = term.sub(1);
          if (heapLDT.getSortOfSelect(selectArgument.op()) != null) {
             ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, selectArgument.sub(2));
-            toFill.add(new ExtractValueParameter(var, selectArgument.sub(1)));
+            if (!isImplicitProgramVariable(var)) {
+               toFill.add(new ExtractValueParameter(var, selectArgument.sub(1), true));
+            }
          }
          else if (selectArgument.op() instanceof IProgramVariable) {
             ProgramVariable var = (ProgramVariable)selectArgument.op();
-            toFill.add(new ExtractValueParameter(var));
+            if (!isImplicitProgramVariable(var)) {
+               toFill.add(new ExtractValueParameter(var, true));
+            }
+         }
+         else if (heapLDT.getNull() == selectArgument.op()) {
+            // Static fields have a null term as select argument.
          }
          else {
             throw new ProofInputException("Unsupported operator in select argument of heap update \"" + selectArgument.op() + "\".");
          }
          // Add select value term to result
          ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
-         toFill.add(new ExtractValueParameter(var, term.sub(1)));
+         if (!isImplicitProgramVariable(var)) {
+            if (var.isStatic()) {
+               toFill.add(new ExtractValueParameter(var, true));
+            }
+            else {
+               toFill.add(new ExtractValueParameter(var, term.sub(1), true));
+            }
+         }
          // Iterate over child heap modifications
          fillHeapLocations(term.sub(0), toFill);
       }
       else if (term.op() == heapLDT.getCreate()) {
-         // TODO: Really nothing to do?
+         // Iterate over child heap modifications
+         fillHeapLocations(term.sub(0), toFill);
       }
       else if (term.op() == heapLDT.getHeap()) {
          // Initial Heap, nothing to do
@@ -568,7 +592,12 @@ public class SymbolicConfigurationExtractor {
             container = objects.get(parent);
          }
          else {
-            container = state;
+            if (!pair.isPartOfHeapUpdate() || pair.getProgramVariable().isStatic()) {
+               container = state; // Add only updates of local variables to the  
+            }
+            else {
+               container = null;
+            }
          }
          // Check if a container was found, if not it is an less important equivalent object
          if (container != null) {
@@ -614,16 +643,23 @@ public class SymbolicConfigurationExtractor {
 
       private LocationVariable preVariable;
 
-      public ExtractValueParameter(ProgramVariable programVariable) throws ProofInputException {
-         this(programVariable, null);
+      private boolean partOfHeapUpdate;
+
+      public ExtractValueParameter(ProgramVariable programVariable, boolean partOfHeapUpdate) throws ProofInputException {
+         this(programVariable, null, partOfHeapUpdate);
       }
       
-      public ExtractValueParameter(ProgramVariable programVariable, Term selectParentTerm) throws ProofInputException {
+      public ExtractValueParameter(ProgramVariable programVariable, Term selectParentTerm, boolean partOfHeapUpdate) throws ProofInputException {
          this.programVariable = programVariable;
          this.selectParentTerm = selectParentTerm;
+         this.partOfHeapUpdate = partOfHeapUpdate;
          this.preVariable = createLocationVariable("Pre" + preVariableIndex++, selectParentTerm != null ? selectParentTerm.sort() : programVariable.sort());
       }
       
+      public boolean isPartOfHeapUpdate() {
+         return partOfHeapUpdate;
+      }
+
       public Term computePreUpdate() {
          Term originalTerm = selectParentTerm != null ? selectParentTerm : TermBuilder.DF.var(programVariable);
          return TermBuilder.DF.elementary(getServices(), preVariable, originalTerm);
@@ -635,7 +671,7 @@ public class SymbolicConfigurationExtractor {
       
       public Term computePreValueTerm() {
          if (selectParentTerm != null) {
-            if (getServices().getJavaInfo().getArrayLength() == getProgramVariable()) {
+            if (getServices().getJavaInfo().getArrayLength() == programVariable) {
                // Special handling for length attribute of arrays
                Function function = getServices().getTypeConverter().getHeapLDT().getLength();
                return TermBuilder.DF.func(function, computePreParentTerm());
@@ -646,7 +682,13 @@ public class SymbolicConfigurationExtractor {
             }
          }
          else {
-            return TermBuilder.DF.var(programVariable);
+            if (programVariable.isStatic()) {
+               Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)programVariable, getServices());
+               return TermBuilder.DF.staticDot(getServices(), programVariable.sort(), function);
+            }
+            else {
+               return TermBuilder.DF.var(programVariable);
+            }
          }
       }
 
@@ -681,19 +723,25 @@ public class SymbolicConfigurationExtractor {
    }
    
    protected static class ExecutionVariableValuePair {
-      private IProgramVariable programVariable;
+      private ProgramVariable programVariable;
       private Term parent;
       private Term value;
+      private boolean partOfHeapUpdate;
 
-      public ExecutionVariableValuePair(IProgramVariable programVariable, Term parent, Term value) {
+      public ExecutionVariableValuePair(ProgramVariable programVariable, Term parent, Term value, boolean partOfHeapUpdate) {
          assert programVariable != null;
          assert value != null;
          this.programVariable = programVariable;
          this.parent = parent;
          this.value = value;
+         this.partOfHeapUpdate = partOfHeapUpdate;
       }
 
-      public IProgramVariable getProgramVariable() {
+      public boolean isPartOfHeapUpdate() {
+         return partOfHeapUpdate;
+      }
+
+      public ProgramVariable getProgramVariable() {
          return programVariable;
       }
 

@@ -46,6 +46,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -1531,5 +1532,25 @@ public final class SymbolicExecutionUtil {
          }
       }
       return referenceSort;
+   }
+   
+   public static String getDisplayString(IProgramVariable pv) {
+      if (pv != null) {
+         if (pv.name() instanceof ProgramElementName) {
+            ProgramElementName name = (ProgramElementName)pv.name();
+            if (SymbolicExecutionUtil.isStaticVariable(pv)) {
+               return name.toString();
+            }
+            else {
+               return name.getProgramName();
+            }
+         }
+         else {
+            return pv.name().toString();
+         }
+      }
+      else {
+         return null;
+      }
    }
 }

@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.ApplyStrategy;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -115,18 +114,7 @@ public class ExecutionVariable extends AbstractExecutionElement implements IExec
    protected String lazyComputeName() throws ProofInputException {
       IProgramVariable pv = getProgramVariable();
       if (pv != null) {
-         if (pv.name() instanceof ProgramElementName) {
-            ProgramElementName name = (ProgramElementName)pv.name();
-            if (SymbolicExecutionUtil.isStaticVariable(getProgramVariable())) {
-               return name.toString();
-            }
-            else {
-               return name.getProgramName();
-            }
-         }
-         else {
-            return pv.name().toString();
-         }
+         return SymbolicExecutionUtil.getDisplayString(pv);
       }
       else {
          return "[" + arrayIndex + "]";

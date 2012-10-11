@@ -10,6 +10,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
@@ -93,7 +94,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              "testSimpleStaticAttributes_current",
              ".xml",
-             null);
+             null,
+             1);
    }
    
    /**
@@ -109,7 +111,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              "testSimpleArrayLength_current",
              ".xml",
-             null);
+             null,
+             1);
    }
    
    /**
@@ -125,7 +128,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              "testSimpleLinkedOjbectsDeletion_current",
              ".xml",
-             null);
+             null,
+             1);
    }
    
 
@@ -142,7 +146,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              "testSimpleLinkedOjbectsDeletionPreCondition_current",
              ".xml",
-             "x != null & x.next != null & x.next.next != null");
+             "x != null & x.next != null & x.next.next != null",
+             1);
    }
    
    /**
@@ -158,7 +163,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              "testSimpleLinkedOjbects_current",
              ".xml",
-             null);
+             null,
+             1);
    }
    
    /**
@@ -174,7 +180,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              "testSimpleLinkedOjbectsPreCondition_current",
              ".xml",
-             "x != null & x.next != null & x.next.next != null");
+             "x != null & x.next != null & x.next.next != null",
+             1);
    }
    
    /**
@@ -198,7 +205,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
                          String initialStatesOracleFileExtension,
                          String currentStatesOraclePrefix,
                          String currentStatesOracleFileExtension,
-                         String precondition) throws Exception {
+                         String precondition,
+                         int numberOfReturnNodeInMostLeftBranch) throws Exception {
       // Define test settings
       final String methodFullName = "compute";
       // Create proof environment for symbolic execution
@@ -207,12 +215,24 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
       resume(env.getUi(), env.getBuilder(), oraclePathInBaseDir + symbolicExecutionOracleFileName, keyRepDirectory);
       // Find most left method return node
       IExecutionNode returnNode = env.getBuilder().getStartNode();
-      while (!(returnNode instanceof IExecutionMethodReturn)) {
+      int foundReturnStatement = 0;
+      while (foundReturnStatement < numberOfReturnNodeInMostLeftBranch && returnNode.getChildren().length >= 1) {
          returnNode = returnNode.getChildren()[0];
+         if (returnNode instanceof IExecutionMethodReturn) {
+            foundReturnStatement++;
+         }
       }
       assertTrue(returnNode instanceof IExecutionMethodReturn);
       // Get the return statement which is returned in returnNode
       IExecutionNode returnStatement = returnNode.getParent();
+      while (!(returnStatement instanceof IExecutionStatement)) {
+         if (returnStatement instanceof IExecutionStatement) {
+            foundReturnStatement++;
+         }
+         returnStatement = returnStatement.getParent();
+      }
+      assertNotNull(returnStatement);
+      assertTrue(returnStatement.getName().startsWith("return"));
       // Extract possible heaps
       SymbolicConfigurationExtractor extractor = new SymbolicConfigurationExtractor(returnStatement.getProofNode());
       extractor.analyse();

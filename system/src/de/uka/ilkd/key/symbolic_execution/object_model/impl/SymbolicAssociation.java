@@ -1,9 +1,9 @@
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Default implementation of {@link ISymbolicAssociation}.
@@ -43,9 +43,7 @@ public class SymbolicAssociation implements ISymbolicAssociation {
     */
    @Override
    public String getProgramVariableString() {
-      return programVariable.name() instanceof ProgramElementName ?
-             ((ProgramElementName)programVariable.name()).getProgramName() :
-             programVariable.name().toString();
+      return SymbolicExecutionUtil.getDisplayString(programVariable);
    }
 
    /**

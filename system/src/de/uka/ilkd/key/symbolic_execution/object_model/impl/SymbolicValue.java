@@ -1,12 +1,12 @@
 package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * Default implementation of {@link ISymbolicValue}.
@@ -53,9 +53,7 @@ public class SymbolicValue implements ISymbolicValue {
     */
    @Override
    public String getProgramVariableString() {
-      return programVariable.name() instanceof ProgramElementName ?
-             ((ProgramElementName)programVariable.name()).getProgramName() :
-             programVariable.name().toString();
+      return SymbolicExecutionUtil.getDisplayString(programVariable);
    }
 
    /**

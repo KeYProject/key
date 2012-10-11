@@ -14,10 +14,10 @@ public class SimpleStaticAttributes {
 		this.x = x;
 	}
 	
-	public int compute() {
+	public static int compute(SimpleStaticAttributes newInstance) {
 		staticInt = 1;
 		if (finalStaticint == 42 && staticInt == 1) {
-			instance = new SimpleStaticAttributes(2);
+			instance = newInstance;
 			return instance.x + finalInstance.x + staticInt + finalStaticint;
 		}
 		else {
