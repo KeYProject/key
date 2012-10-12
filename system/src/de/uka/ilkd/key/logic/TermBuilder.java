@@ -501,26 +501,22 @@ public class TermBuilder {
     }
 
 
-//    public Term min(QuantifiableVariable qv, Term t, Services services) {
-//        Quantifier q =
-//                (Quantifier)services.getNamespaces().functions().lookup(
-//                    Quantifier.MIN_NAME);
-//        return tf.createTerm(q,
-//                           new ImmutableArray<Term>(t),
-//                           new ImmutableArray<QuantifiableVariable>(qv),
-//                           null);
-//    }
-//
-//
-//    public Term max(QuantifiableVariable qv, Term t, Services services) {
-//        Quantifier q =
-//                (Quantifier)services.getNamespaces().functions().lookup(
-//                    Quantifier.MAX_NAME);
-//        return tf.createTerm(q,
-//                           new ImmutableArray<Term>(t),
-//                           new ImmutableArray<QuantifiableVariable>(qv),
-//                           null);
-//    }
+    public Term min(QuantifiableVariable qv, Term t, Services services) {
+        Function min = services.getTypeConverter().getIntegerLDT().getMin();
+        return tf.createTerm(min,
+                           new ImmutableArray<Term>(t),
+                           new ImmutableArray<QuantifiableVariable>(qv),
+                           null);
+    }
+
+
+    public Term max(QuantifiableVariable qv, Term t, Services services) {
+        Function max = services.getTypeConverter().getIntegerLDT().getMax();
+        return tf.createTerm(max,
+                           new ImmutableArray<Term>(t),
+                           new ImmutableArray<QuantifiableVariable>(qv),
+                           null);
+    }
 
 
     public Term not(Term t) {
@@ -678,6 +674,21 @@ public class TermBuilder {
         }
     }
 
+    /** For a formula a, convert it to a boolean expression. */
+    public Term convertToBoolean(Term a, Services services){
+        BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
+        if (a.sort() == booleanLDT.targetSort()) {
+            return a;
+        } else if (a.sort() == Sort.FORMULA) {
+            if (a.op() == Equality.EQUALS && a.sub(1) == booleanLDT.getTrueTerm() ) {
+                return a.sub(0);
+            }
+            return ife(a, TRUE(services), FALSE(services));
+        } else {
+            throw new TermCreationException("Term " + a + " cannot be converted"
+                    + " into a boolean.");
+}
+    }
 
 
     //-------------------------------------------------------------------------

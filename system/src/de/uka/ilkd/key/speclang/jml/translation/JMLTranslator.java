@@ -393,6 +393,12 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 return TB.imp(t1, t2);
             }
+
+
+            @Override
+            protected boolean isGeneralized() {
+                return false;
+            }
         });
         translationMethods.put(JMLKeyWord.EXISTS,
                                new JMLQuantifierTranslationMethod() {
@@ -410,6 +416,12 @@ final class JMLTranslator {
                                                Term t2)
                     throws SLTranslationException {
                 return TB.and(t1, t2);
+            }
+
+
+            @Override
+            protected boolean isGeneralized() {
+                return false;
             }
         });
         translationMethods.put(JMLKeyWord.BSUM, new JMLTranslationMethod() {
@@ -471,7 +483,58 @@ final class JMLTranslator {
                 return TB.bprod(qv, lo, hi, body, services);
             }
         });
-        
+
+        translationMethods.put(JMLKeyWord.MIN,
+                               new JMLQuantifierTranslationMethod() {
+
+            @Override
+            public Term translateQuantifier(QuantifiableVariable qv,
+                                            Term t)
+                    throws SLTranslationException {
+                Term min = TB.min(qv, t, services);
+                return min;
+            }
+
+
+            @Override
+            public Term combineQuantifiedTerms(Term t1,
+                                               Term t2)
+                    throws SLTranslationException {
+                throw new SLTranslationException("Only terms of the form (\\min int i; t) are valid");
+            }
+
+
+            @Override
+            protected boolean isGeneralized() {
+                return true;
+            }
+        });
+        translationMethods.put(JMLKeyWord.MAX,
+                new JMLQuantifierTranslationMethod() {
+
+            @Override
+            public Term translateQuantifier(QuantifiableVariable qv,
+                    Term t)
+                            throws SLTranslationException {
+                Term max = TB.max(qv, t, services);
+                return max;
+            }
+
+
+            @Override
+            public Term combineQuantifiedTerms(Term t1,
+                    Term t2)
+                            throws SLTranslationException {
+                throw new SLTranslationException("Only terms of the form (\\max int i; t) are valid");
+            }
+
+
+            @Override
+            protected boolean isGeneralized() {
+                return true;
+            }
+        });
+
         translationMethods.put(JMLKeyWord.SEQ_DEF, new JMLTranslationMethod() {
 
             @Override
@@ -1552,7 +1615,9 @@ final class JMLTranslator {
                 }
             }
 
-            return translateQuantifiers(declVars, preTerm, bodyTerm);
+            Term res = isGeneralized()? translateGeneralizedQuantifiers(declVars,preTerm,bodyTerm)
+                    :translateQuantifiers(declVars, preTerm, bodyTerm);
+            return res;
         }
 
 
@@ -1568,6 +1633,16 @@ final class JMLTranslator {
             return result;
         }
 
+        public Term translateGeneralizedQuantifiers(Iterable<LogicVariable> qvs, Term t1, Term t2)
+        throws SLTranslationException {
+            Iterator<LogicVariable> it = qvs.iterator();
+            LogicVariable qv = it.next();
+            if (it.hasNext()) {
+                throw new SLTranslationException("Only one quantified variable is allowed in this context.");
+            }
+            Term cond = TB.convertToBoolean(TB.and(t1, t2),services);
+            return translateQuantifier(qv, cond);
+        }
 
         public abstract Term combineQuantifiedTerms(Term t1,
                                                     Term t2)
@@ -1578,6 +1653,7 @@ final class JMLTranslator {
                                                  Term t)
                 throws SLTranslationException;
      
+        protected abstract boolean isGeneralized ();
     }
     
     /**
@@ -1683,9 +1759,14 @@ final class JMLTranslator {
                                                            t2);
             }
         }
+        
+        @Override
+        protected boolean isGeneralized () {
+            return true;
+        }
 
-            /** Creates a term for a bounded numerical quantifier (e.g., sum).*/
-            public abstract Term translateBoundedNumericalQuantifier(QuantifiableVariable qv, Term lo, Term hi, Term body);
+        /** Creates a term for a bounded numerical quantifier (e.g., sum).*/
+        public abstract Term translateBoundedNumericalQuantifier(QuantifiableVariable qv, Term lo, Term hi, Term body);
 
 
         /** Should not be called. */
