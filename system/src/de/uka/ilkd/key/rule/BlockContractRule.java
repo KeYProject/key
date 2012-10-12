@@ -150,7 +150,8 @@ public class BlockContractRule implements BuiltInRule {
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables = MiscTools.getLocalIns(instantiation.block, services);
         final ImmutableSet<ProgramVariable> localOutVariables = MiscTools.getLocalOuts(instantiation.block, services);
-        final Map<LocationVariable, Function> anonymisationHeaps = createAndRegisterAnonymisationVariables(heaps, services);
+        final boolean isStrictlyPure = !application.getContract().hasModifiesClause();
+        final Map<LocationVariable, Function> anonymisationHeaps = createAndRegisterAnonymisationVariables(heaps, isStrictlyPure, services);
         //final Map<LocationVariable, Function> anonymisationLocalVariables = createAndRegisterAnonymisationVariables(localOutVariables, services);
 
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(
@@ -194,14 +195,16 @@ public class BlockContractRule implements BuiltInRule {
         return result;
     }
 
-    private Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables, final Services services)
+    private Map<LocationVariable, Function> createAndRegisterAnonymisationVariables(final Iterable<LocationVariable> variables, final boolean isStrictlyPure, final Services services)
     {
         Map<LocationVariable, Function> result = new LinkedHashMap<LocationVariable, Function>();
-        for (LocationVariable variable : variables) {
-            final String anonymisationName = TB.newName(services, ANONYMISATION_PREFIX + variable.name());
-            final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort());
-            services.getNamespaces().functions().addSafely(anonymisationFunction);
-            result.put(variable, anonymisationFunction);
+        if (!isStrictlyPure) {
+            for (LocationVariable variable : variables) {
+                final String anonymisationName = TB.newName(services, ANONYMISATION_PREFIX + variable.name());
+                final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort());
+                services.getNamespaces().functions().addSafely(anonymisationFunction);
+                result.put(variable, anonymisationFunction);
+            }
         }
         return result;
     }

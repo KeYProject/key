@@ -39,6 +39,8 @@ public final class SimpleBlockContract implements BlockContract {
     private final Variables variables;
 
     private final boolean transactionApplicable;
+    
+    private final boolean hasMod;
 
     public SimpleBlockContract(final StatementBlock block,
                                final List<Label> labels,
@@ -48,7 +50,8 @@ public final class SimpleBlockContract implements BlockContract {
                                final Map<LocationVariable, Term> postconditions,
                                final Map<LocationVariable, Term> modifiesClauses,
                                final Variables variables,
-                               final boolean transactionApplicable)
+                               final boolean transactionApplicable,
+                               final boolean hasMod)
     {
         assert block != null;
         assert labels != null;
@@ -71,6 +74,7 @@ public final class SimpleBlockContract implements BlockContract {
         this.modifiesClauses = modifiesClauses;
         this.variables = variables;
         this.transactionApplicable = transactionApplicable;
+        this.hasMod = hasMod;
     }
 
     @Override
@@ -122,6 +126,13 @@ public final class SimpleBlockContract implements BlockContract {
                 == services.getTypeConverter().getLocSetLDT().getEmpty();
     }
 
+    
+    @Override
+    public boolean hasModifiesClause() {
+        return hasMod;
+    }
+    
+    
     @Override
     public Term getPrecondition(final LocationVariable heap,
                                 final ProgramVariable self,
@@ -321,7 +332,7 @@ public final class SimpleBlockContract implements BlockContract {
                                 final Variables newVariables)
     {
         return new SimpleBlockContract(newBlock, labels, method, modality, newPreconditions, newPostconditions,
-                                       newModifiesClauses, newVariables, transactionApplicable);
+                                       newModifiesClauses, newVariables, transactionApplicable, hasMod);
     }
 
     // TODO Implement equals and hashCode properly.
@@ -483,6 +494,7 @@ public final class SimpleBlockContract implements BlockContract {
         private final Term diverges;
         private final Map<LocationVariable, Term> assignables;
         private final ImmutableArray<LocationVariable> heaps;
+        private final boolean hasMod;
 
         public Creator(final StatementBlock block,
                        final List<Label> labels,
@@ -498,6 +510,7 @@ public final class SimpleBlockContract implements BlockContract {
                        final Term signalsOnly,
                        final Term diverges,
                        final Map<LocationVariable, Term> assignables,
+                       final boolean hasMod,
                        final Services services)
         {
             super(services);
@@ -516,6 +529,7 @@ public final class SimpleBlockContract implements BlockContract {
             this.diverges = diverges;
             this.assignables = assignables;
             this.heaps = services.getTypeConverter().getHeapLDT().getAllHeaps();
+            this.hasMod = hasMod;
         }
 
         public ImmutableSet<BlockContract> create()
@@ -714,14 +728,14 @@ public final class SimpleBlockContract implements BlockContract {
                 new SimpleBlockContract(
                     block, labels, method, diverges.equals(ff()) ? Modality.DIA : Modality.BOX,
                     preconditions, postconditions, modifiesClauses,
-                    variables, transactionApplicable
+                    variables, transactionApplicable, hasMod
                 )
             );
             if (ifDivergesConditionCannotBeExpressedByAModality()) {
                 result = result.add(
                     new SimpleBlockContract(
                         block, labels, method, Modality.DIA, addNegatedDivergesConditionToPreconditions(preconditions),
-                        postconditions, modifiesClauses, variables, transactionApplicable
+                        postconditions, modifiesClauses, variables, transactionApplicable, hasMod
                     )
                 );
             }
@@ -794,8 +808,12 @@ public final class SimpleBlockContract implements BlockContract {
             for (BlockContract contract : contracts) {
                 addConditionsFrom(contract);
             }
+            boolean hasMod = false;
+            for (int i = 1; i < contracts.length && !hasMod; i++) {
+                hasMod = contracts[i].hasModifiesClause();
+            }
             return new SimpleBlockContract(head.getBlock(), head.getLabels(), head.getMethod(), head.getModality(), preconditions,
-                    postconditions, modifiesClauses, placeholderVariables, head.isTransactionApplicable());
+                    postconditions, modifiesClauses, placeholderVariables, head.isTransactionApplicable(), hasMod);
         }
 
         private void addConditionsFrom(final BlockContract contract)
