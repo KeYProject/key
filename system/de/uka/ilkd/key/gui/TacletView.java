@@ -96,7 +96,7 @@ public class TacletView implements ActionListener{
         if (node.getUserObject() instanceof Taclet) {
             tac = (Taclet) node.getUserObject();        
         } else return;
-        showTacletView(tac,false);
+        showTacletView(tac,true);
 
     }
 
