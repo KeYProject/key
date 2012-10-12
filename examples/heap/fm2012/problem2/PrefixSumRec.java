@@ -12,6 +12,8 @@ class PrefixSumRec {
     /*@ public normal_behavior
       @  requires x > 0;
       @  ensures \result ==> (x % 2 == 0  && isPow2(x/2) || x == 1);
+      @  ensures \result == ((\exists int b; 0 <= b; \result == 
+      @                     (\product int i; 0 <= i && i < b; 2)) || x == 1);
       @  measured_by x;
       @  strictly_pure
       @*/

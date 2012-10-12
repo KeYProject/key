@@ -487,6 +487,20 @@ public class TermBuilder {
     }
 
 
+
+    /** Constructs a bounded product comprehension expression. */
+    public Term bprod(QuantifiableVariable qv,
+                     Term a,
+                     Term b,
+                     Term t,
+                     Services services) {
+        Function bprod = services.getTypeConverter().getIntegerLDT().getBprod();
+        return func(bprod,
+                    new Term[]{a, b, t},
+                    new ImmutableArray<QuantifiableVariable>(qv));
+    }
+
+
 //    public Term min(QuantifiableVariable qv, Term t, Services services) {
 //        Quantifier q =
 //                (Quantifier)services.getNamespaces().functions().lookup(

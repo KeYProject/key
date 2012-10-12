@@ -458,6 +458,20 @@ final class JMLTranslator {
                 return TB.bsum(qv, lo, hi, body, services);
             }
         });
+
+        translationMethods.put(JMLKeyWord.PRODUCT,
+                new JMLBoundedNumericalQuantifierTranslationMethod() {
+
+            @Override
+            public Term translateBoundedNumericalQuantifier(
+                    QuantifiableVariable qv,
+                    Term lo,
+                    Term hi,
+                    Term body) {
+                return TB.bprod(qv, lo, hi, body, services);
+            }
+        });
+        
         translationMethods.put(JMLKeyWord.SEQ_DEF, new JMLTranslationMethod() {
 
             @Override
@@ -1596,7 +1610,7 @@ final class JMLTranslator {
 
     private abstract class JMLBoundedNumericalQuantifierTranslationMethod extends JMLQuantifierTranslationMethod {
             final static String notBounded = "Only numerical quantifier expressions of form (\\sum int i; l<=i && i<u; t) are permitted";
-            final static String notInt = "Bounded numerical quantifier variable must be of type int.";
+            final static String notInt = "Bounded numerical quantifier variable must be of types int or \\bigint.";
 
 
             private  boolean isBoundedNumerical(Term a, LogicVariable lv){
@@ -1644,8 +1658,10 @@ final class JMLTranslator {
                     checkParameters(params,
                                     Term.class, Term.class, KeYJavaType.class,
                                     ImmutableList.class, Boolean.class, Services.class);
-                    KeYJavaType declsType = (KeYJavaType) params[2];
-                    if (!declsType.getJavaType().equals(PrimitiveType.JAVA_INT))
+                    de.uka.ilkd.key.java.abstraction.Type declsType = 
+                            ((KeYJavaType) params[2]).getJavaType();
+                    if (!declsType.equals(PrimitiveType.JAVA_INT)
+                            && !declsType.equals(PrimitiveType.JAVA_BIGINT))
                             throw new SLTranslationException(notInt);
                     return super.translate(excManager, params);
             }
