@@ -533,7 +533,7 @@ breaksclause returns [Pair result=null] throws SLTranslationException
     Term pred = null;
 }
 :
-	breaks:BREAKS (LPAREN id:IDENT { label = id.getText(); } RPAREN)?
+	breaks:BREAKS LPAREN (id:IDENT { label = id.getText(); })? RPAREN
 	(pred = predornot)?
 	{
         result = translator.translate(breaks.getText(), Pair.class, pred, label, services);
@@ -547,7 +547,7 @@ continuesclause returns [Pair result=null] throws SLTranslationException
     Term pred = null;
 }
 :
-	continues:CONTINUES (LPAREN id:IDENT { label = id.getText(); } RPAREN)?
+	continues:CONTINUES LPAREN (id:IDENT { label = id.getText(); })? RPAREN
 	(pred = predornot)?
 	{
         result = translator.translate(continues.getText(), Pair.class, pred, label, services);
