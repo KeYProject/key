@@ -217,7 +217,7 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
    /**
     * Shows the configuration at the given index in the given mode.
     * @param index The configuration index.
-    * @param initial The configuration mode ({@code true} = initial, {@code false} = currrent).
+    * @param initial The configuration mode ({@code true} = initial, {@code false} = current).
     */
    protected void showConfiguration(final int index, final boolean initial) {
       new AbstractWorkbenchPartJob("Show " + (initial ? "initial" : "current") + " configuration " + index + ".", this) {

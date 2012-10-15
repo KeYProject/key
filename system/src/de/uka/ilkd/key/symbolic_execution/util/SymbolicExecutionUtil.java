@@ -1521,9 +1521,38 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is reference sort, {@code false} is no reference sort.
     */
    public static boolean hasReferenceSort(Services services, Term term) {
-      boolean referenceSort = false;
       if (services != null && term != null) {
-         Sort sort = term.sort();
+         return hasReferenceSort(services, term.sort());
+      }
+      else {
+         return false;
+      }
+   }
+
+   /**
+    * Checks if the {@link Sort} of the given {@link IProgramVariable} is a reference type.
+    * @param services The {@link Services} to use.
+    * @param var The {@link IProgramVariable} to check.
+    * @return {@code true} is reference sort, {@code false} is no reference sort.
+    */
+   public static boolean hasReferenceSort(Services services, IProgramVariable var) {
+      if (services != null && var != null) {
+         return hasReferenceSort(services, var.sort());
+      }
+      else {
+         return false;
+      }
+   }
+
+   /**
+    * Checks if the {@link Sort} is a reference type.
+    * @param services The {@link Services} to use.
+    * @param sort The {@link Sort} to check.
+    * @return {@code true} is reference sort, {@code false} is no reference sort.
+    */
+   public static boolean hasReferenceSort(Services services, Sort sort) {
+      boolean referenceSort = false;
+      if (services != null && sort != null) {
          KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
          if (kjt != null) {
             TypeConverter typeConverter = services.getTypeConverter();

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
+   <equivalenceClass representativeTerm="null">
+      <term term="obj"/>
+      <term term="null"/>
+   </equivalenceClass>
    <state name="return 1;">
       <value programVariable="obj" value="null" type="Null"/>
    </state>

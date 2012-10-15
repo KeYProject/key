@@ -3,6 +3,7 @@ package de.uka.ilkd.key.symbolic_execution.object_model.impl;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -86,16 +87,29 @@ public class SymbolicEquivalenceClass implements ISymbolicEquivalenceClass {
     */
    @Override
    public Term getRepresentative() {
-      // Prefer terms which are a program variable
-      Term representative = JavaUtil.search(terms, new IFilter<Term>() {
+      // Prefer null if contained in equivalence class
+      final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+      Term nullTerm = JavaUtil.search(terms, new IFilter<Term>() {
          @Override
          public boolean select(Term element) {
-            return element.op() instanceof IProgramVariable;
+            return element.op() == heapLDT.getNull();
          }
       });
-      return representative != null ? 
-             representative : // Return term with program variab le 
-             terms.head(); // Return the first term
+      if (nullTerm != null) {
+         return nullTerm;
+      }
+      else {
+         // Prefer terms which are a program variable
+         Term representative = JavaUtil.search(terms, new IFilter<Term>() {
+            @Override
+            public boolean select(Term element) {
+               return element.op() instanceof IProgramVariable;
+            }
+         });
+         return representative != null ? 
+                representative : // Return term with program variable 
+                terms.head(); // Return the first term
+      }
    }
 
    /**

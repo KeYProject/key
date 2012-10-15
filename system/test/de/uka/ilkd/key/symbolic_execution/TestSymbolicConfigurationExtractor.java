@@ -49,21 +49,6 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //             "x != null & x.next != null & x.next.next != null & a != null & a.x == 42 & b != null");
 //   }
    
-//   /**
-//    * Tests "configurationExtractorSimpleLinkedOjbectsInsertion" without precondition.
-//    * @throws Exception Occurred Exception.
-//    */
-//   public void testSimpleLinkedOjbectsInsertion() throws Exception {
-//      doTest("examples/_testcase/set/configurationExtractorSimpleLinkedOjbectsInsertion/test/SimpleLinkedOjbectsInsertion.java",
-//             "SimpleLinkedOjbectsInsertion",
-//             "examples/_testcase/set/configurationExtractorSimpleLinkedOjbectsInsertion/oracle/",
-//             "SimpleLinkedOjbectsInsertion.xml",
-//             "testSimpleLinkedOjbectsInsertion_initial",
-//             ".xml",
-//             "testSimpleLinkedOjbectsInsertion_current",
-//             ".xml",
-//             null);
-//   }
 
 //   /**
 //    * Tests "configurationExtractorSimpleLinkedArrays" without precondition.
@@ -82,6 +67,60 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //   }
    
    /**
+    * Tests "configurationExtractorOneAssignmentTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testOneAssignmentTest() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorOneAssignmentTest/test/OneAssignmentTest.java",
+             "OneAssignmentTest",
+             "examples/_testcase/set/configurationExtractorOneAssignmentTest/oracle/",
+             "OneAssignmentTest.xml",
+             "testOneAssignmentTest_initial",
+             ".xml",
+             "testOneAssignmentTest_current",
+             ".xml",
+             null,
+             1,
+             2);
+   }
+
+   /**
+    * Tests "configurationExtractorEmptyPathConditionAndNoUpdates" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testEmptyPathConditionAndNoUpdates() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorEmptyPathConditionAndNoUpdates/test/EmptyPathConditionAndNoUpdates.java",
+             "EmptyPathConditionAndNoUpdates",
+             "examples/_testcase/set/configurationExtractorEmptyPathConditionAndNoUpdates/oracle/",
+             "EmptyPathConditionAndNoUpdates.xml",
+             "testEmptyPathConditionAndNoUpdates_initial",
+             ".xml",
+             "testEmptyPathConditionAndNoUpdates_current",
+             ".xml",
+             null,
+             1,
+             1);
+   }
+   
+   /**
+    * Tests "configurationExtractorSimpleLinkedOjbectsInsertion" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testSimpleLinkedOjbectsInsertion() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorSimpleLinkedOjbectsInsertion/test/SimpleLinkedOjbectsInsertion.java",
+             "SimpleLinkedOjbectsInsertion",
+             "examples/_testcase/set/configurationExtractorSimpleLinkedOjbectsInsertion/oracle/",
+             "SimpleLinkedOjbectsInsertion.xml",
+             "testSimpleLinkedOjbectsInsertion_initial",
+             ".xml",
+             "testSimpleLinkedOjbectsInsertion_current",
+             ".xml",
+             null,
+             2,
+             4);
+   }
+   
+   /**
     * Tests "configurationExtractorIntegerConditionTest" without precondition.
     * @throws Exception Occurred Exception.
     */
@@ -95,6 +134,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              "testObjectConditionTest_current",
              ".xml",
              null,
+             1,
              1);
    }
    
@@ -112,6 +152,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              "testIntegerConditionTest_current",
              ".xml",
              null,
+             1,
              1);
    }
    
@@ -129,7 +170,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              "testIsInstanceTest_current",
              ".xml",
              null,
-             1);
+             1,
+             2);
    }
    
    /**
@@ -146,6 +188,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              "testIsNullTest_current",
              ".xml",
              null,
+             1,
              1);
    }
    
@@ -163,7 +206,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              "testSimpleLinkedOjbectsInstanceVariable_current",
              ".xml",
              null,
-             1);
+             1,
+             4);
    }
    
    /**
@@ -180,6 +224,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              "testSimpleStaticAttributes_current",
              ".xml",
              null,
+             1,
              1);
    }
    
@@ -197,6 +242,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              "testSimpleArrayLength_current",
              ".xml",
              null,
+             1,
              1);
    }
    
@@ -214,7 +260,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              "testSimpleLinkedOjbectsDeletion_current",
              ".xml",
              null,
-             1);
+             1,
+             4);
    }
    
 
@@ -232,7 +279,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              "testSimpleLinkedOjbectsDeletionPreCondition_current",
              ".xml",
              "x != null & x.next != null & x.next.next != null",
-             1);
+             1,
+             4);
    }
    
    /**
@@ -249,7 +297,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              "testSimpleLinkedOjbects_current",
              ".xml",
              null,
-             1);
+             1,
+             4);
    }
    
    /**
@@ -266,7 +315,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              "testSimpleLinkedOjbectsPreCondition_current",
              ".xml",
              "x != null & x.next != null & x.next.next != null",
-             1);
+             1,
+             4);
    }
    
    /**
@@ -291,7 +341,8 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
                          String currentStatesOraclePrefix,
                          String currentStatesOracleFileExtension,
                          String precondition,
-                         int numberOfReturnNodeInMostLeftBranch) throws Exception {
+                         int numberOfReturnNodeInMostLeftBranch,
+                         int expectedNumberOfConfigurations) throws Exception {
       // Define test settings
       final String methodFullName = "compute";
       // Create proof environment for symbolic execution
@@ -323,6 +374,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
       extractor.analyse();
       // Test the initial configurations (first time with lazy computation)
       List<ISymbolicConfiguration> initialConfigurationsFirstTime = new ArrayList<ISymbolicConfiguration>(extractor.getConfigurationsCount());
+      assertEquals(expectedNumberOfConfigurations, extractor.getConfigurationsCount());
       for (int i = 0; i < extractor.getConfigurationsCount(); i++) {
          ISymbolicConfiguration current = extractor.getInitialConfiguration(i);
          initialConfigurationsFirstTime.add(current);

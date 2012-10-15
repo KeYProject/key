@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <equivalenceClass representativeTerm="obj">
+   <equivalenceClass representativeTerm="null">
       <term term="IsInstanceTest.A"/>
       <term term="obj"/>
+      <term term="null"/>
    </equivalenceClass>
    <state name="return 1;">
-      <association programVariable="IsInstanceTest::A" target="o1"/>
-      <association programVariable="obj" target="o1"/>
+      <value programVariable="IsInstanceTest::A" value="null" type="Null"/>
+      <value programVariable="obj" value="null" type="Null"/>
    </state>
-   <object xml:id="o1" name="obj" type="IsInstanceTest">
-   </object>
 </model>

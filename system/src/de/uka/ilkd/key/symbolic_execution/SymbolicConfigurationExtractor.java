@@ -2,6 +2,7 @@ package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -58,10 +59,7 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
 
-// TODO: Show different state name in pre state which associates that it is the initial heap!
 // TODO: Support array fields
-// TODO: Support object creation
-// TODO: Support null values in equivalence classes?
 public class SymbolicConfigurationExtractor {
    private Node node;
    
@@ -96,8 +94,19 @@ public class SymbolicConfigurationExtractor {
             // Get path condition
             pathCondition = SymbolicExecutionUtil.computePathCondition(node, true);
             pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
-            // Collect all symbolic objects mentioned in the path condition
+            // Compute all locations used in path conditions and updates.
+            Set<Term> createdObjects = new HashSet<Term>();
+            Set<ExtractValueParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractValueParameter>();
+            collectLocationsFromUpdates(node.sequent(), temporaryCurrentLocations, createdObjects);
+            initialLocations = termToLocations(pathCondition, createdObjects);
+            currentLocations = new LinkedHashSet<ExtractValueParameter>(initialLocations);
+            currentLocations.addAll(temporaryCurrentLocations);
+            // Compute objects for equivalence check from path condition
             Set<Term> symbolicObjectsInPathCondition = collectSymbolicObjectsFromPathCondition(pathCondition);
+            symbolicObjectsInPathCondition = filterOutNewCreatedObjects(symbolicObjectsInPathCondition, createdObjects); // Remove created objects during symbolic execution
+            symbolicObjectsInPathCondition.add(TermBuilder.DF.NULL(getServices())); // Add null because it can happen that a object is null
+System.out.println("Symbolic objects in path condition");
+System.out.println(symbolicObjectsInPathCondition.size() + ": " + symbolicObjectsInPathCondition);
             // Compute a sequent with the initial conditions of the proof without modality
             Sequent initialConditionsSequent = computeInitialConditionsSequent(pathCondition);
             // Instantiate proof in which equivalent classes of symbolic objects in path conditions are computed
@@ -108,10 +117,7 @@ public class SymbolicConfigurationExtractor {
             SymbolicExecutionUtil.startSideProof(getProof(), equivalentClassesProofStarter, StrategyProperties.SPLITTING_NORMAL);
             // Compute the available instance configurations via the opened goals of the equivalent proof.
             configurations = computeInstanceConfigurationsFromGoals(equivalentClassesProofStarter.getProof());
-            // Collect all symbolic objects used in updates
-            initialLocations = termToLocations(pathCondition);
-            currentLocations = new LinkedHashSet<ExtractValueParameter>(initialLocations);
-            collectLocationsFromUpdates(node.sequent(), currentLocations);
+System.out.println("Number of configurations: " + configurations.size());            
             // Create predicate required for state computation
             initialConfigurationTerm = createConfigurationPredicateAndTerm(initialLocations);
             currentConfigurationTerm = createConfigurationPredicateAndTerm(currentLocations);
@@ -202,44 +208,50 @@ public class SymbolicConfigurationExtractor {
                                                          ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
                                                          Term pathCondition,
                                                          String stateName) throws ProofInputException {
-      // Get original updates
-      Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
-      ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
-      // Combine configuration with original updates
-      Term configurationCondition = TermBuilder.DF.and(configuration);
-      if (pathCondition != null) {
-         configurationCondition = TermBuilder.DF.and(configurationCondition, pathCondition);
-      }
-      ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
-      for (Term originalUpdate : originalUpdates) {
-         if (UpdateJunctor.PARALLEL_UPDATE == originalUpdate.op()) {
-            additionalUpdates = additionalUpdates.append(originalUpdate.subs());
+      if (!locations.isEmpty()) {
+         // Get original updates
+         Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+         ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
+         // Combine configuration with original updates
+         Term configurationCondition = TermBuilder.DF.and(configuration);
+         if (pathCondition != null) {
+            configurationCondition = TermBuilder.DF.and(configurationCondition, pathCondition);
          }
-         else if (originalUpdate.op() instanceof ElementaryUpdate) {
-            additionalUpdates = additionalUpdates.append(originalUpdate);
+         ImmutableList<Term> additionalUpdates = ImmutableSLList.nil();
+         for (Term originalUpdate : originalUpdates) {
+            if (UpdateJunctor.PARALLEL_UPDATE == originalUpdate.op()) {
+               additionalUpdates = additionalUpdates.append(originalUpdate.subs());
+            }
+            else if (originalUpdate.op() instanceof ElementaryUpdate) {
+               additionalUpdates = additionalUpdates.append(originalUpdate);
+            }
+            else {
+               throw new ProofInputException("Unexpected update operator \"" + originalUpdate.op() + "\".");
+            }
          }
-         else {
-            throw new ProofInputException("Unexpected update operator \"" + originalUpdate.op() + "\".");
+         for (ExtractValueParameter evp : locations) {
+            additionalUpdates = additionalUpdates.append(evp.computePreUpdate());
          }
+         ImmutableList<Term> newUpdates = ImmutableSLList.<Term>nil().append(TermBuilder.DF.parallel(additionalUpdates));
+         Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, configurationCondition, configurationTerm, newUpdates);
+         // Instantiate proof
+         ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequent, StrategyProperties.SPLITTING_DELAYED);
+         Term resultTerm = SymbolicExecutionUtil.extractOperatorTerm(info, configurationTerm.op());
+         // Extract variable value pairs
+         Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
+         for (ExtractValueParameter param : locations) {
+            ExecutionVariableValuePair pair = new ExecutionVariableValuePair(param.getProgramVariable(), param.getSelectParentTerm(), resultTerm.sub(param.getSelectValueTermIndexInStatePredicate()), param.isPartOfHeapUpdate());
+            pairs.add(pair);
+         }
+         // Create symbolic configuration
+         return createConfigurationFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
       }
-      for (ExtractValueParameter evp : locations) {
-         additionalUpdates = additionalUpdates.append(evp.computePreUpdate());
+      else {
+         // Create empty symbolic configuration
+         return createConfigurationFromExecutionVariableValuePairs(equivalentClasses, new LinkedHashSet<ExecutionVariableValuePair>(), stateName);
       }
-      ImmutableList<Term> newUpdates = ImmutableSLList.<Term>nil().append(TermBuilder.DF.parallel(additionalUpdates));
-      Sequent sequent = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, configurationCondition, configurationTerm, newUpdates);
-      // Instantiate proof
-      ApplyStrategy.ApplyStrategyInfo info = SymbolicExecutionUtil.startSideProof(getProof(), sequent);
-      Term resultTerm = SymbolicExecutionUtil.extractOperatorTerm(info, configurationTerm.op());
-      // Extract variable value pairs
-      Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
-      for (ExtractValueParameter param : locations) {
-         ExecutionVariableValuePair pair = new ExecutionVariableValuePair(param.getProgramVariable(), param.getSelectParentTerm(), resultTerm.sub(param.getSelectValueTermIndexInStatePredicate()), param.isPartOfHeapUpdate());
-         pairs.add(pair);
-      }
-      // Create symbolic configuration
-      return createConfigurationFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
    }
-   
+
    protected Term removeImplicitSubTermsFromPathCondition(Term term) {
       if (Junctor.AND == term.op()) {
          // Path condition with multiple terms combined via AND
@@ -292,6 +304,16 @@ public class SymbolicConfigurationExtractor {
       });
       return result;
    }
+
+   protected Set<Term> filterOutNewCreatedObjects(Set<Term> symbolicObjectsInPathCondition, Set<Term> createdObjects) throws ProofInputException {
+      Set<Term> result = new LinkedHashSet<Term>();
+      for (Term symbolicObject : symbolicObjectsInPathCondition) {
+         if (!createdObjects.contains(symbolicObject)) {
+            result.add(symbolicObject);
+         }
+      }
+      return result;
+   }
    
    protected Sequent computeInitialConditionsSequent(Term pathCondition) { // DebuggerPO.setUp in old editor
       // Get original sequent
@@ -304,11 +326,12 @@ public class SymbolicConfigurationExtractor {
       for (SequentFormula sf : originalSequent.succedent()) {
          Term term = sf.formula();
          if (Junctor.IMP.equals(term.op())) {
-            newSuccedent = newSuccedent.insertLast(new SequentFormula(term.sub(0))).semisequent();
+            Term newImplication = TermBuilder.DF.imp(term.sub(0), TermBuilder.DF.ff());
+            newSuccedent = newSuccedent.insertLast(new SequentFormula(newImplication)).semisequent();
             // TODO: Are updates required? Because TermBuilder.DF.apply(updates, true) is just true
          }
          else {
-            newSuccedent.insertLast(sf);
+            newSuccedent = newSuccedent.insertLast(sf).semisequent();
          }
       }
       return Sequent.createSequent(newAntecedent, newSuccedent);
@@ -393,17 +416,17 @@ public class SymbolicConfigurationExtractor {
    
 
 
-   protected Set<ExtractValueParameter> termToLocations(Term term) throws ProofInputException {
+   protected Set<ExtractValueParameter> termToLocations(Term term, Set<Term> createdObjects) throws ProofInputException {
       Set<ExtractValueParameter> result = new LinkedHashSet<ExtractValueParameter>();
-      fillLocationsFromTerm(result, term);
+      fillLocationsFromTerm(result, term, createdObjects);
       return result;
    }
    
-   protected void fillLocationsFromTerm(Set<ExtractValueParameter> toFill, Term term) throws ProofInputException {
+   protected void fillLocationsFromTerm(Set<ExtractValueParameter> toFill, Term term, Set<Term> createdObjects) throws ProofInputException {
       final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
       if (term.op() instanceof ProgramVariable) {
          ProgramVariable var = (ProgramVariable)term.op();
-         if (!isImplicitProgramVariable(var)) {
+         if (!isImplicitProgramVariable(var) && !createdObjects.contains(term)) {
             toFill.add(new ExtractValueParameter(var, false));
          }
       }
@@ -430,7 +453,7 @@ public class SymbolicConfigurationExtractor {
          }
          else {
             for (Term sub : term.subs()) {
-               fillLocationsFromTerm(toFill, sub);
+               fillLocationsFromTerm(toFill, sub, createdObjects);
             }
          }
       }
@@ -440,13 +463,13 @@ public class SymbolicConfigurationExtractor {
    // .SimpleLinkedOjbects::value(x),
    // .SimpleLinkedOjbects::value(.SimpleLinkedOjbects::next(x))
    // .SimpleLinkedOjbects::value(.SimpleLinkedOjbects::next(.SimpleLinkedOjbects::next(x)))
-   protected void collectLocationsFromUpdates(Sequent sequent, Set<ExtractValueParameter> toFill) throws ProofInputException {
+   protected void collectLocationsFromUpdates(Sequent sequent, Set<ExtractValueParameter> toFill, Set<Term> createdObjectsToFill) throws ProofInputException {
       Term updateApplication = findUpdates(sequent);
       if (updateApplication == null) {
          throw new ProofInputException("Can't find update application in \"" + sequent + "\".");
       }
       Term topUpdate = UpdateApplication.getUpdate(updateApplication);
-      fillLocations(topUpdate, toFill);
+      fillLocations(topUpdate, toFill, createdObjectsToFill);
    }
    
    protected Term findUpdates(Sequent sequent) {
@@ -462,16 +485,16 @@ public class SymbolicConfigurationExtractor {
       return result;
    }
 
-   protected void fillLocations(Term update, Set<ExtractValueParameter> toFill) throws ProofInputException {
+   protected void fillLocations(Term update, Set<ExtractValueParameter> toFill, Set<Term> createdObjectsToFill) throws ProofInputException {
       if (update.op() instanceof UpdateJunctor) {
          for (Term sub : update.subs()) {
-            fillLocations(sub, toFill);
+            fillLocations(sub, toFill, createdObjectsToFill);
          }
       }
       else if (update.op() instanceof ElementaryUpdate) {
          ElementaryUpdate eu = (ElementaryUpdate)update.op();
          if (SymbolicExecutionUtil.isHeapUpdate(getServices(), update)) {
-            fillHeapLocations(update.sub(0), toFill);
+            fillHeapLocations(update.sub(0), toFill, createdObjectsToFill);
          }
          else if (eu.lhs() instanceof ProgramVariable) {
             ProgramVariable var = (ProgramVariable)eu.lhs();
@@ -488,7 +511,7 @@ public class SymbolicConfigurationExtractor {
       }
    }
    
-   protected void fillHeapLocations(Term term, Set<ExtractValueParameter> toFill) throws ProofInputException {
+   protected void fillHeapLocations(Term term, Set<ExtractValueParameter> toFill, Set<Term> createdObjectsToFill) throws ProofInputException {
       final HeapLDT heapLDT = getServices().getTypeConverter().getHeapLDT();
       if (term.op() == heapLDT.getStore()) {
          // Add select object term to result
@@ -522,11 +545,12 @@ public class SymbolicConfigurationExtractor {
             }
          }
          // Iterate over child heap modifications
-         fillHeapLocations(term.sub(0), toFill);
+         fillHeapLocations(term.sub(0), toFill, createdObjectsToFill);
       }
       else if (term.op() == heapLDT.getCreate()) {
+         createdObjectsToFill.add(term.sub(1));
          // Iterate over child heap modifications
-         fillHeapLocations(term.sub(0), toFill);
+         fillHeapLocations(term.sub(0), toFill, createdObjectsToFill);
       }
       else if (term.op() == heapLDT.getHeap()) {
          // Initial Heap, nothing to do
