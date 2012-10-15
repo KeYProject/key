@@ -83,6 +83,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
@@ -1534,6 +1535,11 @@ public final class SymbolicExecutionUtil {
       return referenceSort;
    }
    
+   /**
+    * Returns the human readable name of the given {@link IProgramVariable}.
+    * @param pv The {@link IProgramVariable} to get its name.
+    * @return The human readable name of the given {@link IProgramVariable}.
+    */
    public static String getDisplayString(IProgramVariable pv) {
       if (pv != null) {
          if (pv.name() instanceof ProgramElementName) {
@@ -1548,6 +1554,23 @@ public final class SymbolicExecutionUtil {
          else {
             return pv.name().toString();
          }
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Returns the root of the given {@link IExecutionNode}.
+    * @param executionNode The {@link IExecutionNode} to get the root of its symbolic execution tree.
+    * @return The root of the given {@link IExecutionNode}.
+    */
+   public static IExecutionNode getRoot(IExecutionNode executionNode) {
+      if (executionNode != null) {
+         while (executionNode.getParent() != null) {
+            executionNode = executionNode.getParent();
+         }
+         return executionNode;
       }
       else {
          return null;

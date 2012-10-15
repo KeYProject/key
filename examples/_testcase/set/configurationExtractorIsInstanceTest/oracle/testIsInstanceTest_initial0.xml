@@ -4,7 +4,7 @@
       <term term="IsInstanceTest.A"/>
       <term term="obj"/>
    </equivalenceClass>
-   <state name="return 1;">
+   <state name="One Step Simplification resulting in return 1;">
       <association programVariable="IsInstanceTest::A" target="o1"/>
       <association programVariable="obj" target="o1"/>
    </state>

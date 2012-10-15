@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <state name="return this.value+this.next.value+this.next.next.value;">
+   <state name="One Step Simplification resulting in return this.value+this.next.value+this.next.next.value;">
       <association programVariable="self" target="o1"/>
    </state>
    <object xml:id="o1" name="self" type="SimpleLinkedOjbectsInstanceVariable">

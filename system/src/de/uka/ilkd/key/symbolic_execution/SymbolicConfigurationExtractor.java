@@ -58,6 +58,7 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
 
+// TODO: Show different state name in pre state which associates that it is the initial heap!
 // TODO: Support array fields
 // TODO: Support object creation
 // TODO: Support null values in equivalence classes?
@@ -156,19 +157,28 @@ public class SymbolicConfigurationExtractor {
    }
    
    public ISymbolicConfiguration getInitialConfiguration(int configurationIndex) throws ProofInputException {
-      return getConfiguration(getProof().root(), initialConfigurations, configurationIndex, initialConfigurationTerm, initialLocations, pathCondition);
+      return getConfiguration(getProof().root(), initialConfigurations, configurationIndex, initialConfigurationTerm, initialLocations, pathCondition, computeInitialStateName());
    }
-   
+
+   protected String computeInitialStateName() {
+      return getProof().root().name() + " resulting in " + computeCurrentStateName();
+   }
+
    public ISymbolicConfiguration getCurrentConfiguration(int configurationIndex) throws ProofInputException {
-      return getConfiguration(node, currentConfigurations, configurationIndex, currentConfigurationTerm, currentLocations, null);
+      return getConfiguration(node, currentConfigurations, configurationIndex, currentConfigurationTerm, currentLocations, null, computeCurrentStateName());
    }
    
+   protected String computeCurrentStateName() {
+      return node.name();
+   }
+
    protected ISymbolicConfiguration getConfiguration(Node node,
                                                      Map<Integer, ISymbolicConfiguration> confiurationsMap, 
                                                      int configurationIndex,
                                                      Term configurationTerm,
                                                      Set<ExtractValueParameter> locations,
-                                                     Term pathCondition) throws ProofInputException {
+                                                     Term pathCondition,
+                                                     String stateName) throws ProofInputException {
       synchronized (this) {
          assert configurationIndex >= 0;
          assert configurationIndex < configurations.size();
@@ -178,7 +188,7 @@ public class SymbolicConfigurationExtractor {
             // Get configuration
             ImmutableSet<Term> configuration = configurations.get(configurationIndex);
             ImmutableList<ISymbolicEquivalenceClass> equivalentClasses = getEquivalenceClasses(configurationIndex);
-            result = computeConfiguration(node, configuration, configurationTerm, locations, equivalentClasses, pathCondition);
+            result = computeConfiguration(node, configuration, configurationTerm, locations, equivalentClasses, pathCondition, stateName);
             confiurationsMap.put(Integer.valueOf(configurationIndex), result);
          }
          return result;
@@ -190,7 +200,8 @@ public class SymbolicConfigurationExtractor {
                                                          Term configurationTerm,
                                                          Set<ExtractValueParameter> locations,
                                                          ImmutableList<ISymbolicEquivalenceClass> equivalentClasses,
-                                                         Term pathCondition) throws ProofInputException {
+                                                         Term pathCondition,
+                                                         String stateName) throws ProofInputException {
       // Get original updates
       Term originalModifiedFormula = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
       ImmutableList<Term> originalUpdates = TermBuilder.DF.goBelowUpdates2(originalModifiedFormula).first;
@@ -226,7 +237,7 @@ public class SymbolicConfigurationExtractor {
          pairs.add(pair);
       }
       // Create symbolic configuration
-      return createConfigurationFromExecutionVariableValuePairs(equivalentClasses, pairs);
+      return createConfigurationFromExecutionVariableValuePairs(equivalentClasses, pairs, stateName);
    }
    
    protected Term removeImplicitSubTermsFromPathCondition(Term term) {
@@ -579,10 +590,12 @@ public class SymbolicConfigurationExtractor {
       });
    }
    
-   protected ISymbolicConfiguration createConfigurationFromExecutionVariableValuePairs(ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, Set<ExecutionVariableValuePair> pairs) {
+   protected ISymbolicConfiguration createConfigurationFromExecutionVariableValuePairs(ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, 
+                                                                                       Set<ExecutionVariableValuePair> pairs,
+                                                                                       String stateName) {
       SymbolicConfiguration result = new SymbolicConfiguration(equivalentClasses);
       // Create state
-      SymbolicState state = new SymbolicState(node.name());
+      SymbolicState state = new SymbolicState(stateName);
       result.setState(state);
       // Create objects
       Map<Term, SymbolicObject> objects = new HashMap<Term, SymbolicObject>();

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <state name="return x.value+x.next.value+x.next.next.value;">
+   <state name="One Step Simplification resulting in return x.value+x.next.value+x.next.next.value;">
       <association programVariable="x" target="o1"/>
    </state>
    <object xml:id="o1" name="x" type="SimpleLinkedOjbects">

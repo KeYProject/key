@@ -5,7 +5,7 @@
       <term term="x.next"/>
       <term term="x.next.next"/>
    </equivalenceClass>
-   <state name="return x.value+x.next.value+x.next.next.value;">
+   <state name="One Step Simplification resulting in return x.value+x.next.value+x.next.next.value;">
       <association programVariable="x" target="o1"/>
    </state>
    <object xml:id="o1" name="x" type="SimpleLinkedOjbects">

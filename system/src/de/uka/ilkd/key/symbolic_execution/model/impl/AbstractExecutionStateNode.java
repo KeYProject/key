@@ -6,7 +6,7 @@ import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.symbolic_execution.SymbolicConfigurationExtractor;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeSymbolicConfigurationExtractor;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
@@ -24,9 +24,9 @@ public abstract class AbstractExecutionStateNode<S extends SourceElement> extend
    private IExecutionVariable[] variables;
    
    /**
-    * The used {@link SymbolicConfigurationExtractor}.
+    * The used {@link ExecutionNodeSymbolicConfigurationExtractor}.
     */
-   private SymbolicConfigurationExtractor configurationExtractor;
+   private ExecutionNodeSymbolicConfigurationExtractor configurationExtractor;
    
    /**
     * Constructor.
@@ -75,11 +75,11 @@ public abstract class AbstractExecutionStateNode<S extends SourceElement> extend
    protected abstract IExecutionVariable[] lazyComputeVariables();
 
    /**
-    * Returns the used {@link SymbolicConfigurationExtractor}.
-    * @return The used {@link SymbolicConfigurationExtractor}.
+    * Returns the used {@link ExecutionNodeSymbolicConfigurationExtractor}.
+    * @return The used {@link ExecutionNodeSymbolicConfigurationExtractor}.
     * @throws ProofInputException Occurred Exception.
     */
-   public SymbolicConfigurationExtractor getConfigurationExtractor() throws ProofInputException {
+   public ExecutionNodeSymbolicConfigurationExtractor getConfigurationExtractor() throws ProofInputException {
       synchronized (this) {
          if (configurationExtractor == null) {
             configurationExtractor = lazyComputeConfigurationExtractor();
@@ -89,13 +89,13 @@ public abstract class AbstractExecutionStateNode<S extends SourceElement> extend
    }
 
    /**
-    * Instantiates the used {@link SymbolicConfigurationExtractor} lazily
+    * Instantiates the used {@link ExecutionNodeSymbolicConfigurationExtractor} lazily
     * when {@link #getConfigurationExtractor()} is called the first time.
-    * @return The created {@link SymbolicConfigurationExtractor}.
+    * @return The created {@link ExecutionNodeSymbolicConfigurationExtractor}.
     * @throws ProofInputException Occurred Exception.
     */
-   protected SymbolicConfigurationExtractor lazyComputeConfigurationExtractor() throws ProofInputException {
-      SymbolicConfigurationExtractor result = new SymbolicConfigurationExtractor(getProofNode());
+   protected ExecutionNodeSymbolicConfigurationExtractor lazyComputeConfigurationExtractor() throws ProofInputException {
+      ExecutionNodeSymbolicConfigurationExtractor result = new ExecutionNodeSymbolicConfigurationExtractor(this);
       result.analyse();
       return result;
    }
