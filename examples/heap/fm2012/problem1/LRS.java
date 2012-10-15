@@ -29,9 +29,13 @@ public class LRS {
       @ requires a.length >= 2;
       @ requires solStart == 0 && solLength == 0;
       @ ensures (\exists int i; 0 <= i && i < a.length && i != solStart;
-      @           (\forall int j; 0 <= j && j < solLength; a[solStart+j] == a[i+j]));
+      @         (\forall int j; 0 <= j && j < solLength; 
+      @              a[solStart+j] == a[i+j]))
+      @         // there is a repeated substring
+      @         || solLength == 0; // or not
       @ ensures !(\exists int i,k; 0 <= i && i < k && k < a.length;
       @           (\forall int j; 0 <= j && j < solLength+1; a[k+j] == a[i+j]));
+      @         // and it is maximal
       @*/
     public void doLRS() {
         SuffixArray sa = new SuffixArray(a);
@@ -41,11 +45,13 @@ public class LRS {
           @ maintaining 0 <= solLength && solLength < a.length;
           @ maintaining solStart+solLength-1 < a.length;
           @ maintaining 0 < l && l <= a.length;
-          @ maintaining (\exists int i; 0 <= i && i < l && i != solStart;
-          @           (\forall int j; 0 <= j && j < solLength; a[solStart+j] == a[i+j]))
+          @ maintaining (\forall int i; sa.suffixes[i]+1 == solStart;
+          @                 (\forall int j; 0 <= j && j < solLength; 
+          @                     a[solStart+j] == a[sa.suffixes[i]+j]))
           @             || solLength == 0;
-          @ maintaining !(\exists int i,k; 0 <= i && i < k && k < l;
-          @           (\forall int j; 0 <= j && j < solLength+1; a[k+j] == a[i+j]));
+          @ maintaining !(\exists int i,k; 0 <= i && i< k && k < l;
+          @                 (\forall int j; 0 <= j && j < solLength+1; 
+          @                      a[sa.suffixes[k]+j] == a[sa.suffixes[i]+j]));
           @ decreasing a.length-l;
           @ assignable solStart,solLength;
           @*/

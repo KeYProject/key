@@ -25,6 +25,20 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  * This has been extracted from MainWindow to keep GUI and control further apart.
  */
 public class Main {
+    /**
+     * The user interface modes KeY can operate in.
+     */
+    private enum UiMode {
+	/**
+	 * Interactive operation mode.
+	 */
+	INTERACTIVE,
+
+	/**
+	 * Auto operation mode.
+	 */
+	AUTO
+    }
 
     public static final String INTERNAL_VERSION =
             KeYResourceManager.getManager().getSHA1();
@@ -42,6 +56,23 @@ public class Main {
     private static String statisticsFile = null;
 
     private static String examplesDir = null;
+
+    /**
+     * Determines which {@link UserInterface} is to be used.
+     * 
+     * By specifying <code>AUTO</code> as command line argument this will be set
+     * to {@link UiMode#AUTO}, but {@link UiMode#INTERACTIVE} is the default.
+     */
+    private static UiMode uiMode = UiMode.INTERACTIVE;
+
+    /**
+     * Determines whether to actually prove or only load a problem when
+     * {@link Main#uiMode} is {@link UiMode#AUTO}.
+     * 
+     * This can be controlled from the command line by specifying the argument
+     * <code>AUTO_LOADONLY</code> instead of <code>AUTO</code>.
+     */
+    private static boolean loadOnly = false;
 
     private static String fileNameOnStartUp = null;
     
@@ -68,7 +99,8 @@ public class Main {
         // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar","true");
 
-        UserInterface userInterface = evaluateOptions(args);
+        evaluateOptions(args);
+        UserInterface userInterface = createUserInterface();
 
         loadCommandLineFile(userInterface);
     }
@@ -81,20 +113,9 @@ public class Main {
         }
     }
 
-    /**
-     * Returns the used title. This information is required in other
-     * projects which instantiates the {@link MainWindow} manually.
-     * @return The title of {@link MainWindow} to use.
-     */
-    public static String getMainWindowTitle() {
-        return "KeY " + KeYResourceManager.getManager().getVersion();
-    }
-
-    public static UserInterface evaluateOptions(String[] opt) {
-        UserInterface ui = null;
+    public static void evaluateOptions(String[] opt) {
         int index = 0;
         ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
-        String uiMode = "INTERACTIVE";
         while (opt.length > index) loop:{
             if ((new File(opt[index])).exists()) {
                 fileNameOnStartUp=opt[index];
@@ -103,9 +124,10 @@ public class Main {
                     String option = opt[index].toUpperCase();
                     CommandLineOption clo = CommandLineOption.valueOf(option);
                     switch (clo) {
-                    case AUTO:
                     case AUTO_LOADONLY:
-                        uiMode = option;
+                        loadOnly = true;
+                    case AUTO:
+                        uiMode = UiMode.AUTO;
                         break;
                     case DEBUG:
                         de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = true;
@@ -174,22 +196,36 @@ public class Main {
         } else {
             System.out.println("Not using assertions ...");
         }
+    }
 
-        if (uiMode.startsWith("AUTO")) {
-            BatchMode batch = new BatchMode(fileNameOnStartUp,
-                    uiMode.equals("AUTO_LOADONLY"));
-            ui = new ConsoleUserInterface(batch, VERBOSE_UI);
-        } else {
-            GuiUtilities.invokeAndWait(new Runnable() {
-                public void run() {
-                    MainWindow.createInstance(getMainWindowTitle());
-                    MainWindow key = MainWindow.getInstance();
-                    key.setVisible(true);
-                }
-            });
-            ui = MainWindow.getInstance().getUserInterface();
-        }
-        return ui;
+    /**
+     * Initializes the {@link UserInterface} to be used by KeY.
+     * 
+     * {@link ConsoleUserInterface} will be used if {@link Main#uiMode} is
+     * {@link UiMode#AUTO} and {@link WindowUserInterface} otherwise.
+     * 
+     * @return a <code>UserInterface</code> based on the value of
+     *         <code>uiMode</code>
+     */
+    private static UserInterface createUserInterface() {
+	UserInterface ui;
+
+	if (uiMode == UiMode.AUTO) {
+	    BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
+
+	    ui = new ConsoleUserInterface(batch, VERBOSE_UI);
+	} else {
+	    GuiUtilities.invokeAndWait(new Runnable() {
+		public void run() {
+		    MainWindow key = MainWindow.getInstance();
+		    key.setVisible(true);
+		}
+	    });
+
+	    ui = MainWindow.getInstance().getUserInterface();
+	}
+
+	return ui;
     }
 
     private static void evaluateLemmataOptions(LinkedList<String> options){

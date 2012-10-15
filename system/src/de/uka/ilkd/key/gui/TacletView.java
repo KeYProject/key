@@ -15,6 +15,7 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -83,7 +84,8 @@ public class TacletView implements ActionListener{
     
     
     public void showTacletView(Taclet tac, boolean modal){
-	frame.setModal(modal);
+        frame.setModalityType(modal? 
+                ModalityType.APPLICATION_MODAL: ModalityType.MODELESS);
         scrollPane.setBorder(BorderFactory.createTitledBorder
                 (getDisplayName(tac)));
         content.setText(getTacletByName(tac));
@@ -100,7 +102,7 @@ public class TacletView implements ActionListener{
         if (node.getUserObject() instanceof Taclet) {
             tac = (Taclet) node.getUserObject();        
         } else return;
-        showTacletView(tac,false);
+        showTacletView(tac,true);
 
     }
 

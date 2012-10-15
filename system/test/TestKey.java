@@ -135,6 +135,7 @@ public class TestKey extends TestSuite {
         suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
         suite.addTest(createSuite(smtTests, "Testing SMT backend"));
 	suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
+	suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));
         
 	return suite;
     }
