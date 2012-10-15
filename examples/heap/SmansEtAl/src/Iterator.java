@@ -7,9 +7,17 @@ class Iterator {
       @ assignable \nothing;
       @ ensures list() == l;
       @ ensures \fresh(footprint);
+      @ ensures_redundantly l.footprint == \old(l.footprint);   // The validity of this ensures clause follows already from
+      @                                                         // the validity of the assignable clause. The reason for its
+      @                                                         // introduction was (curiously) proof automatisation: the
+      @                                                         // clause introduces the term "ArrayList::$footprint(heap, l)"
+      @                                                         // to the sequent which is needed for the UseDependencyContract
+      @                                                         // rule to match. In this particular example older KeY-versions
+      @                                                         // introduced the term by accident by the right combination
+      @                                                         // of applications of other rules.
       @*/
     Iterator(ArrayList l) {
-	list = l;
+        list = l;
     }
     
     
