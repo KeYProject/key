@@ -25,7 +25,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -377,7 +376,7 @@ public class MonKeYComposite extends Composite {
             }
         });
         Button loadProofsButton = new Button(buttonComposite, SWT.PUSH);
-        loadProofsButton.setText("L&oad Proofs");
+        loadProofsButton.setText("L&oad selected Proofs");
         loadProofsButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -385,7 +384,7 @@ public class MonKeYComposite extends Composite {
             }
         });
         Button startProofsButton = new Button(buttonComposite, SWT.PUSH);
-        startProofsButton.setText("&Start all proofs");
+        startProofsButton.setText("&Start selected proofs");
         startProofsButton.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         startProofsButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -394,7 +393,7 @@ public class MonKeYComposite extends Composite {
             }
         });
         Button saveProofsButton = new Button(buttonComposite, SWT.PUSH);
-        saveProofsButton.setText("Sa&ve Proofs");
+        saveProofsButton.setText("Sa&ve selected Proofs");
         saveProofsButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -510,7 +509,9 @@ public class MonKeYComposite extends Composite {
     public void startProofs() {
         if (proofViewer.getInput() instanceof List<?>) {
             setProofSearchStrategyOptionsEnabled(false);
-            final List<?> input = (List<?>)proofViewer.getInput();
+            // Get selected proofs
+            final List<?> selectedProofs = SWTUtil.toList(proofViewer.getSelection());
+            // Get strategy properties
             final boolean expandMethods = methodTreatmentExpandButton.getSelection();
             final boolean useDependencyContracts = dependencyContractsOnButton.getSelection();
             final boolean useQuery = queryTreatmentOnButton.getSelection();
@@ -520,8 +521,8 @@ public class MonKeYComposite extends Composite {
                 protected IStatus run(IProgressMonitor monitor) {
                     try {
                         SWTUtil.checkCanceled(monitor);
-                        monitor.beginTask("Proving", input.size());
-                        for (Object obj : input) {
+                        monitor.beginTask("Proving", selectedProofs.size());
+                        for (Object obj : selectedProofs) {
                             SWTUtil.checkCanceled(monitor);
                             if (obj instanceof MonKeYProof) {
                                 ((MonKeYProof)obj).startProof(expandMethods, useDependencyContracts, useQuery, useDefOps);
@@ -538,7 +539,7 @@ public class MonKeYComposite extends Composite {
                     }
                     finally {
                         monitor.done();
-                        Display.getDefault().syncExec(new Runnable() {
+                        getDisplay().syncExec(new Runnable() {
                            @Override
                            public void run() {
                               setProofSearchStrategyOptionsEnabled(true);
@@ -555,7 +556,9 @@ public class MonKeYComposite extends Composite {
     */
    public void saveProofs() {
       try {
-         // Select directory
+          // Get selected proofs
+          final List<?> selectedProofs = SWTUtil.toList(proofViewer.getSelection());
+          // Select directory
           DirectoryDialog dialog = new DirectoryDialog(getShell());
           dialog.setFilterPath(proofDirectory);
           dialog.setText("Save proofs");
@@ -566,10 +569,13 @@ public class MonKeYComposite extends Composite {
              if (proofs != null) {
                 // Check for existing files
                 List<String> existingFiles = new LinkedList<String>();
-                for (MonKeYProof proof : proofs) {
-                   if (proof.hasProofInKeY() && proof.existsProofFile(proofDirectory)) {
-                      existingFiles.add(proof.getProofFileName());
-                   }
+                for (Object obj : selectedProofs) {
+                    if (obj instanceof MonKeYProof) {
+                        MonKeYProof proof = (MonKeYProof)obj;
+                        if (proof.hasProofInKeY() && proof.existsProofFile(proofDirectory)) {
+                            existingFiles.add(proof.getProofFileName());
+                        }
+                    }
                 }
                 boolean goOn = true;
                 if (!existingFiles.isEmpty()) {
@@ -582,9 +588,12 @@ public class MonKeYComposite extends Composite {
                       protected IStatus run(IProgressMonitor monitor) {
                           try {
                               SWTUtil.checkCanceled(monitor);
-                              monitor.beginTask("Saving proofs", proofs.size());
-                              for (MonKeYProof proof : proofs) {
-                                 proof.save(proofDirectory);
+                              monitor.beginTask("Saving proofs", selectedProofs.size());
+                              for (Object obj : selectedProofs) {
+                                  if (obj instanceof MonKeYProof) {
+                                      ((MonKeYProof)obj).save(proofDirectory);
+                                  }
+                                  monitor.worked(1);
                               }
                               return Status.OK_STATUS;
                           }
@@ -614,6 +623,8 @@ public class MonKeYComposite extends Composite {
     */
    public void loadProofs() {
       try {
+          // Get selected proofs
+          final List<?> selectedProofs = SWTUtil.toList(proofViewer.getSelection());
           // Select directory
           DirectoryDialog dialog = new DirectoryDialog(getShell());
           dialog.setFilterPath(proofDirectory);
@@ -629,10 +640,13 @@ public class MonKeYComposite extends Composite {
                    protected IStatus run(IProgressMonitor monitor) {
                        try {
                            SWTUtil.checkCanceled(monitor);
-                           monitor.beginTask("Loading proofs", proofs.size());
-                           for (MonKeYProof proof : proofs) {
-                              proof.loadProof(proofDirectory, bootClassPath);
-                              monitor.worked(1);
+                           monitor.beginTask("Loading proofs", selectedProofs.size());
+                           for (Object obj : selectedProofs) {
+                               SWTUtil.checkCanceled(monitor);
+                               if (obj instanceof MonKeYProof) {
+                                   ((MonKeYProof)obj).loadProof(proofDirectory, bootClassPath);
+                               }
+                               monitor.worked(1);
                            }
                            return Status.OK_STATUS;
                        }
@@ -699,7 +713,7 @@ public class MonKeYComposite extends Composite {
                                }
                             }
                             // Unload old source
-                            Display.getDefault().syncExec(new Runnable() {
+                            getDisplay().syncExec(new Runnable() {
                                @Override
                                public void run() {
                                   proofs = null;
@@ -726,6 +740,13 @@ public class MonKeYComposite extends Composite {
                                     }
                                 });
                             }
+                            // Select all proofs
+                            getDisplay().syncExec(new Runnable() {
+                               @Override
+                               public void run() {
+                                  proofViewer.getTable().selectAll();
+                               }
+                            });
                             return Status.OK_STATUS;
                         }
                         catch (OperationCanceledException e) {

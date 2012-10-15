@@ -1234,6 +1234,15 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);	
     }     
     
+    @Override
+    public void performActionOnSeqLength(SeqLength x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new SeqLength(changeList);
+            }
+        };
+        def.doAction(x);        
+    }
 
     /**
      * returns the position of pe2 in the virtual child array of pe1
