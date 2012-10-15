@@ -192,7 +192,7 @@ public class Weird {
         int z = 0;
         /*@ requires z == 0;
           @ ensures x == y;
-          @ breaks x > y;
+          @ breaks () x > y;
           @ continues x < y;
           @ returns x == 0 && y == 0;
           @ signals (Exception e) x + y == 0;
@@ -210,7 +210,7 @@ public class Weird {
         int x = 1;
         /*@ requires x == 0;
           @ ensures u == v;
-          @ breaks v > w;
+          @ breaks () v > w;
           @ continues w < v;
           @ returns v == 0 && u == 0;
           @ signals (Exception e) x + u == 0;
