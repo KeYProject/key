@@ -1110,7 +1110,7 @@ loop_specification[ImmutableList<String> mods]
             ps=loop_invariant       { ls.addInvariant(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); } 
-    )+
+    )*
 ;
 
 
