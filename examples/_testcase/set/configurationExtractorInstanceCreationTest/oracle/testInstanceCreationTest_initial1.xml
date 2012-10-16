@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="self">
+      <term term="self.next"/>
+      <term term="self"/>
+   </equivalenceClass>
+   <state name="One Step Simplification resulting in return classWrapper.value+instanceWrapper.value+next.instanceWrapper.value+localWrapper.value;">
+      <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+   </state>
+   <object xml:id="o1" name="self" type="InstanceCreationTest">
+      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+   </object>
+</model>

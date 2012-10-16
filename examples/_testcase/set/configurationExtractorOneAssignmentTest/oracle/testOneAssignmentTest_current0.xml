@@ -6,7 +6,9 @@
    </equivalenceClass>
    <state name="return first.value+second.value+tempX.value+tempY.value;">
       <value name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
+      <value name="tempX" programVariable="tempX" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="tempY" programVariable="tempY" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </state>
    <object xml:id="o1" name="self" type="OneAssignmentTest">
       <value name="first" programVariable="first" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>

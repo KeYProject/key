@@ -50,6 +50,60 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //   }
    
    /**
+    * Tests "configurationExtractorArrayInstanceCreationTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testArrayInstanceCreationTest() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorArrayInstanceCreationTest/test/ArrayInstanceCreationTest.java",
+             "ArrayInstanceCreationTest",
+             "examples/_testcase/set/configurationExtractorArrayInstanceCreationTest/oracle/",
+             "ArrayInstanceCreationTest.xml",
+             "testArrayInstanceCreationTest_initial",
+             ".xml",
+             "testArrayInstanceCreationTest_current",
+             ".xml",
+             null,
+             1,
+             2);
+   }
+   
+   /**
+    * Tests "configurationExtractorInstanceCreationTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testInstanceCreationTest() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorInstanceCreationTest/test/InstanceCreationTest.java",
+             "InstanceCreationTest",
+             "examples/_testcase/set/configurationExtractorInstanceCreationTest/oracle/",
+             "InstanceCreationTest.xml",
+             "testInstanceCreationTest_initial",
+             ".xml",
+             "testInstanceCreationTest_current",
+             ".xml",
+             null,
+             5,
+             2);
+   }
+   
+   /**
+    * Tests "configurationExtractorSimpleArrayCreation" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testSimpleArrayCreation() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorSimpleArrayCreation/test/SimpleArrayCreation.java",
+             "SimpleArrayCreation",
+             "examples/_testcase/set/configurationExtractorSimpleArrayCreation/oracle/",
+             "SimpleArrayCreation.xml",
+             "testSimpleArrayCreation_initial",
+             ".xml",
+             "testSimpleArrayCreation_current",
+             ".xml",
+             null,
+             1,
+             1);
+   }
+   
+   /**
     * Tests "configurationExtractorMultiArrayIndexReadWriteAccess" without precondition.
     * @throws Exception Occurred Exception.
     */
