@@ -112,7 +112,6 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
       configurationComposite.setLayout(new GridLayout(5, false));
       initialConfiguration = new Button(configurationComposite, SWT.RADIO);
       initialConfiguration.setText("&Initial");
-      initialConfiguration.setSelection(true);
       initialConfiguration.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
@@ -123,6 +122,7 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
       });
       currentConfiguration = new Button(configurationComposite, SWT.RADIO);
       currentConfiguration.setText("&Current");
+      currentConfiguration.setSelection(true);
       currentConfiguration.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
@@ -204,11 +204,11 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
          slider.getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
-               initialConfiguration.setSelection(true);
-               currentConfiguration.setSelection(false);
+               initialConfiguration.setSelection(false);
+               currentConfiguration.setSelection(true);
                slider.setValues(0, 0, configurationsCount, 1, 1, 1);
                setConfigurationControlsEnabled(true);
-               showConfiguration(0, true);
+               showConfiguration(0, false);
             }
          });
       }
@@ -234,6 +234,9 @@ public class ConfigurationObjectDiagramEditor extends ReadonlyObjectDiagramEdito
                      equivalenceClassesText.getDisplay().syncExec(new Runnable() {
                         @Override
                         public void run() {
+                           initialConfiguration.setSelection(initial);
+                           currentConfiguration.setSelection(!initial);
+                           slider.setSelection(index);
                            if (toShow != null && toShow.getEquivalenceClasses() != null) {
                               SWTUtil.setText(equivalenceClassesText, toShow.getEquivalenceClasses().toString());
                            }
