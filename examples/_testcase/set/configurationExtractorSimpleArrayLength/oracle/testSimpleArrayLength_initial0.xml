@@ -2,8 +2,11 @@
 <model>
    <state name="One Step Simplification resulting in return 42;">
       <association programVariable="array" target="o1"/>
+      <association programVariable="self" target="o2"/>
    </state>
    <object xml:id="o1" name="array" type="java.lang.Object[]">
       <value programVariable="length" value="1" type="int"/>
+   </object>
+   <object xml:id="o2" name="self" type="SimpleArrayLength">
    </object>
 </model>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="x">
+      <term term="x"/>
+      <term term="self.y"/>
+   </equivalenceClass>
+   <state name="One Step Simplification resulting in return first.value+second.value+tempX.value+tempY.value;">
+      <association programVariable="self" target="o1"/>
+      <association programVariable="x" target="o2"/>
+   </state>
+   <object xml:id="o1" name="self" type="OneAssignmentTest">
+      <association programVariable="y" target="o2"/>
+   </object>
+   <object xml:id="o2" name="x" type="OneAssignmentTestValueWrapper">
+   </object>
+</model>

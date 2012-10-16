@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
    <state name="return 42;">
+      <value programVariable="a" value="a" type="int"/>
       <association programVariable="self" target="o1"/>
       <association programVariable="ObjectConditionTest::instance" target="o4"/>
    </state>

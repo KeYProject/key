@@ -1,21 +1,23 @@
 
 public class OneAssignmentTest {
-	private int value;
+	private OneAssignmentTestValueWrapper y;
 
-	private OneAssignmentTest y;
+	private OneAssignmentTestValueWrapper first;
 
-	private OneAssignmentTest first;
-
-	private OneAssignmentTest second;
+	private OneAssignmentTestValueWrapper second;
 
 	/*@ requires x != null;
 	  @ ensures true;
 	  @*/
-	public int compute(/*@ nullable @*/ OneAssignmentTest x) {
-		OneAssignmentTest tempX = x;
-		OneAssignmentTest tempY = first;
+	public int compute(/*@ nullable @*/ OneAssignmentTestValueWrapper x) {
+		OneAssignmentTestValueWrapper tempX = x;
+		OneAssignmentTestValueWrapper tempY = y;
 		first = x;
 		second = y;
 		return first.value + second.value + tempX.value + tempY.value;
 	}
+}
+
+class OneAssignmentTestValueWrapper {
+	public int value;
 }

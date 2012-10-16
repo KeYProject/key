@@ -81,7 +81,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             2);
+             5);
    }
 
    /**
@@ -99,7 +99,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             1);
+             2);
    }
    
    /**
@@ -225,7 +225,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
              ".xml",
              null,
              1,
-             1);
+             2);
    }
    
    /**

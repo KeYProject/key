@@ -2,6 +2,7 @@
 <model>
    <state name="return instance.x+finalInstance.x+staticInt+finalStaticint;">
       <value programVariable="SimpleStaticAttributes::staticInt" value="1" type="int"/>
+      <association programVariable="newInstance" target="o1"/>
       <association programVariable="SimpleStaticAttributes::instance" target="o1"/>
    </state>
    <object xml:id="o1" name="newInstance" type="SimpleStaticAttributes">
