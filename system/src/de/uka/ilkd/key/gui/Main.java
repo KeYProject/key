@@ -227,9 +227,9 @@ public class Main {
         
      	List<String> fileArguments = cl.getArguments();
      	Iterator iter = fileArguments.iterator();
-     	for (String string : fileArguments) {
-			System.out.println("Hier:"+string);
-		}
+//     	for (String string : fileArguments) {
+//			System.out.println("Hier:"+string);
+//		}
      	//-jr-
         if(cl.isSet(JUSTIFY_RULES))
         {evaluateLemmataOptions(cl);}
