@@ -59,7 +59,6 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
 
-// TODO: Test self references of different classes
 public class SymbolicConfigurationExtractor {
    private Node node;
    
@@ -135,9 +134,31 @@ public class SymbolicConfigurationExtractor {
    
    protected Set<Term> computeInitialLocationsToIgnore() {
       Set<Term> result = new HashSet<Term>();
-      IProgramVariable excVar = SymbolicExecutionUtil.extractExceptionVariable(node.proof());
+      // Add exception variable to the ignore list because it is not part of the source code.
+      IProgramVariable excVar = SymbolicExecutionUtil.extractExceptionVariable(getProof());
       if (excVar instanceof ProgramVariable) {
          result.add(TermBuilder.DF.var((ProgramVariable)excVar));
+      }
+      // Add initial updates which are used as backup of the heap and method arguments. They are nto part of the source code and should be ignored.
+      Sequent sequent = getProof().root().sequent();
+      for (SequentFormula sf : sequent.succedent()) {
+         Term term = sf.formula();
+         if (Junctor.IMP.equals(term.op())) {
+            if (term.sub(1).op() instanceof UpdateApplication) {
+               Term updateApplcationTerm = term.sub(1);
+               Term updateTerm = UpdateApplication.getUpdate(updateApplcationTerm);
+               if (updateTerm.op() == UpdateJunctor.PARALLEL_UPDATE) {
+                  for (Term subUpdate : updateTerm.subs()) {
+                     if (subUpdate.op() instanceof ElementaryUpdate) {
+                        ElementaryUpdate eu = (ElementaryUpdate)subUpdate.op();
+                        if (eu.lhs() instanceof ProgramVariable) {
+                           result.add(TermBuilder.DF.var((ProgramVariable)eu.lhs()));
+                        }
+                     }
+                  }
+               }
+            }
+         }
       }
       return result;
    }
