@@ -17,6 +17,11 @@ public class SymbolicValue implements ISymbolicValue {
     * The {@link Services} to use.
     */
    private Services services;
+
+   /**
+    * The array index.
+    */
+   private int arrayIndex;
    
    /**
     * The {@link IProgramVariable}.
@@ -31,13 +36,59 @@ public class SymbolicValue implements ISymbolicValue {
    /**
     * Constructor.
     * @param services The {@link Services} to use.
+    * @param arrayIndex The array index.
+    * @param value The value {@link Term}.
+    */
+   public SymbolicValue(Services services, int arrayIndex, Term value) {
+      assert services != null;
+      assert arrayIndex >= 0;
+      this.services = services;
+      this.arrayIndex = arrayIndex;
+      this.value = value;
+   }
+
+   /**
+    * Constructor.
+    * @param services The {@link Services} to use.
     * @param programVariable The {@link IProgramVariable}.
     * @param value The value {@link Term}.
     */
    public SymbolicValue(Services services, IProgramVariable programVariable, Term value) {
+      assert services != null;
+      assert programVariable != null;
       this.services = services;
       this.programVariable = programVariable;
       this.value = value;
+      this.arrayIndex = -1;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getName() {
+      if (isArrayIndex()) {
+         return "[" + getArrayIndex() + "]";
+      }
+      else {
+         return getProgramVariableString();
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isArrayIndex() {
+      return arrayIndex >= 0;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getArrayIndex() {
+      return arrayIndex;
    }
 
    /**
@@ -95,6 +146,6 @@ public class SymbolicValue implements ISymbolicValue {
     */
    @Override
    public String toString() {
-      return "Value of " + getProgramVariableString() + " is " + getValueString();
+      return "Value of " + getName() + " is " + getValueString();
    }
 }

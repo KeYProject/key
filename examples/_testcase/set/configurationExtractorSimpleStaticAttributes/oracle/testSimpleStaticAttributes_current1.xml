@@ -5,8 +5,8 @@
       <term term="null"/>
    </equivalenceClass>
    <state name="return instance.x+finalInstance.x+staticInt+finalStaticint;">
-      <value programVariable="newInstance" value="null" type="Null"/>
-      <value programVariable="SimpleStaticAttributes::instance" value="null" type="Null"/>
-      <value programVariable="SimpleStaticAttributes::staticInt" value="1" type="int"/>
+      <value name="newInstance" programVariable="newInstance" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
+      <value name="SimpleStaticAttributes::instance" programVariable="SimpleStaticAttributes::instance" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
+      <value name="SimpleStaticAttributes::staticInt" programVariable="SimpleStaticAttributes::staticInt" isArrayIndex="false" arrayIndex="-1" value="1" type="int"/>
    </state>
 </model>

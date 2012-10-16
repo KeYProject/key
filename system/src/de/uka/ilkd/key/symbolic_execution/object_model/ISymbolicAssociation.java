@@ -16,6 +16,24 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicAssociation;
  */
 public interface ISymbolicAssociation {
    /**
+    * Returns a human readable name.
+    * @return A human readable name.
+    */
+   public String getName();
+   
+   /**
+    * Checks if an array index or a program variable is represented.
+    * @return {@code true} array index, {@code false} program variable.
+    */
+   public boolean isArrayIndex();
+   
+   /**
+    * Returns the represented array index or {@code -1} if a program variable is represented..
+    * @return The represented array index or {@code -1} if a program variable is represented..
+    */
+   public int getArrayIndex();
+   
+   /**
     * Returns the represented {@link IProgramVariable}.
     * @return The represented {@link IProgramVariable}.
     */

@@ -67,6 +67,42 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //   }
    
    /**
+    * Tests "configurationExtractorObjectArrayIndexReadAccess" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testObjectArrayIndexReadAccess() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorObjectArrayIndexReadAccess/test/ObjectArrayIndexReadAccess.java",
+             "ObjectArrayIndexReadAccess",
+             "examples/_testcase/set/configurationExtractorObjectArrayIndexReadAccess/oracle/",
+             "ObjectArrayIndexReadAccess.xml",
+             "testObjectArrayIndexReadAccess_initial",
+             ".xml",
+             "testObjectArrayIndexReadAccess_current",
+             ".xml",
+             null,
+             1,
+             1);
+   }
+   
+   /**
+    * Tests "configurationExtractorOneAssignmentTest" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testArrayIndexReadAccess() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorArrayIndexReadAccess/test/ArrayIndexReadAccess.java",
+             "ArrayIndexReadAccess",
+             "examples/_testcase/set/configurationExtractorArrayIndexReadAccess/oracle/",
+             "ArrayIndexReadAccess.xml",
+             "testArrayIndexReadAccess_initial",
+             ".xml",
+             "testArrayIndexReadAccess_current",
+             ".xml",
+             null,
+             1,
+             1);
+   }
+   
+   /**
     * Tests "configurationExtractorOneAssignmentTest" without precondition.
     * @throws Exception Occurred Exception.
     */
@@ -578,7 +614,10 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
    public static void assertValue(ISymbolicValue expected, ISymbolicValue current) {
       if (expected != null) {
          assertNotNull(current);
+         assertEquals(expected.getName(), current.getName());
          assertEquals(expected.getProgramVariableString(), current.getProgramVariableString());
+         assertEquals(expected.isArrayIndex(), current.isArrayIndex());
+         assertEquals(expected.getArrayIndex(), current.getArrayIndex());
          assertEquals(expected.getValueString(), current.getValueString());
          assertEquals(expected.getTypeString(), current.getTypeString());
       }
@@ -613,7 +652,10 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
    public static void assertAssociation(ISymbolicAssociation expected, ISymbolicAssociation current) {
       if (expected != null) {
          assertNotNull(current);
+         assertEquals(expected.getName(), current.getName());
          assertEquals(expected.getProgramVariableString(), current.getProgramVariableString());
+         assertEquals(expected.isArrayIndex(), current.isArrayIndex());
+         assertEquals(expected.getArrayIndex(), current.getArrayIndex());
          assertObject(expected.getTarget(), current.getTarget(), false);
       }
       else {

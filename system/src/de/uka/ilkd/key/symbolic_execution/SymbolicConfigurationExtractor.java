@@ -59,7 +59,9 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.ProofStarter;
 
-// TODO: Support array fields
+// TODO: Implement write access of array indices
+// TODO: Test array creation
+// TODO: Test self references of different classes
 public class SymbolicConfigurationExtractor {
    private Node node;
    
@@ -259,7 +261,13 @@ public class SymbolicConfigurationExtractor {
          // Extract variable value pairs
          Set<ExecutionVariableValuePair> pairs = new LinkedHashSet<ExecutionVariableValuePair>();
          for (ExtractValueParameter param : locations) {
-            ExecutionVariableValuePair pair = new ExecutionVariableValuePair(param.getProgramVariable(), param.getSelectParentTerm(), resultTerm.sub(param.getSelectValueTermIndexInStatePredicate()), param.isPartOfHeapUpdate());
+            ExecutionVariableValuePair pair;
+            if (param.isArrayIndex()) {
+               pair = new ExecutionVariableValuePair(param.getArrayIndex(), param.getSelectParentTerm(), resultTerm.sub(param.getSelectValueTermIndexInStatePredicate()));
+            }
+            else {
+               pair = new ExecutionVariableValuePair(param.getProgramVariable(), param.getSelectParentTerm(), resultTerm.sub(param.getSelectValueTermIndexInStatePredicate()));
+            }
             pairs.add(pair);
          }
          // Create symbolic configuration
@@ -462,29 +470,44 @@ public class SymbolicConfigurationExtractor {
       if (term.op() instanceof ProgramVariable) {
          ProgramVariable var = (ProgramVariable)term.op();
          if (heapLDT.getHeap() != term.op() && !isImplicitProgramVariable(var) && !updateCreatedObjects.contains(term)) {
-            toFill.add(new ExtractValueParameter(var, false));
+            toFill.add(new ExtractValueParameter(var));
          }
       }
       else {
          Sort sort = heapLDT.getSortOfSelect(term.op());
          if (sort != null) {
             ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
-            if (!isImplicitProgramVariable(var)) {
-               if (var.isStatic()) {
-                  toFill.add(new ExtractValueParameter(var, false));
+            if (var != null) {
+               if (!isImplicitProgramVariable(var)) {
+                  if (var.isStatic()) {
+                     toFill.add(new ExtractValueParameter(var));
+                  }
+                  else {
+                     Term selectTerm = term.sub(1);
+                     if (selectTerm.op() instanceof ProgramVariable) {
+                        toFill.add(new ExtractValueParameter((ProgramVariable)selectTerm.op()));
+                     }
+                     toFill.add(new ExtractValueParameter(var, selectTerm));
+                  }
                }
-               else {
+            }
+            else {
+               int arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
+               if (arrayIndex >= 0) {
                   Term selectTerm = term.sub(1);
                   if (selectTerm.op() instanceof ProgramVariable) {
-                     toFill.add(new ExtractValueParameter((ProgramVariable)selectTerm.op(), false));
+                     toFill.add(new ExtractValueParameter((ProgramVariable)selectTerm.op()));
                   }
-                  toFill.add(new ExtractValueParameter(var, selectTerm, false));
+                  toFill.add(new ExtractValueParameter(arrayIndex, selectTerm));
+               }
+               else {
+                  throw new ProofInputException("Unsupported select statement \"" + term + "\".");
                }
             }
          }
          else if (heapLDT.getLength() == term.op()) {
             ProgramVariable var = getServices().getJavaInfo().getArrayLength();
-            toFill.add(new ExtractValueParameter(var, term.sub(0), false));
+            toFill.add(new ExtractValueParameter(var, term.sub(0)));
          }
          else {
             for (Term sub : term.subs()) {
@@ -537,7 +560,7 @@ public class SymbolicConfigurationExtractor {
          else if (eu.lhs() instanceof ProgramVariable) {
             ProgramVariable var = (ProgramVariable)eu.lhs();
             if (var.getContainerType() != null && !isImplicitProgramVariable(var)) { // Make sure that it is a location in the source code and not an internal one of the proof
-               toFill.add(new ExtractValueParameter(var, false));
+               toFill.add(new ExtractValueParameter(var));
             }
             if (SymbolicExecutionUtil.hasReferenceSort(getServices(), update.sub(0))) {
                updateValueObjectsToFill.add(update.sub(0));
@@ -563,13 +586,13 @@ public class SymbolicConfigurationExtractor {
          if (heapLDT.getSortOfSelect(selectArgument.op()) != null) {
             ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, selectArgument.sub(2));
             if (!isImplicitProgramVariable(var)) {
-               toFill.add(new ExtractValueParameter(var, selectArgument.sub(1), true));
+               toFill.add(new ExtractValueParameter(var, selectArgument.sub(1)));
             }
          }
          else if (selectArgument.op() instanceof IProgramVariable) {
             ProgramVariable var = (ProgramVariable)selectArgument.op();
             if (!isImplicitProgramVariable(var)) {
-               toFill.add(new ExtractValueParameter(var, true));
+               toFill.add(new ExtractValueParameter(var));
             }
          }
          else if (heapLDT.getNull() == selectArgument.op()) {
@@ -582,10 +605,10 @@ public class SymbolicConfigurationExtractor {
          ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
          if (!isImplicitProgramVariable(var)) {
             if (var.isStatic()) {
-               toFill.add(new ExtractValueParameter(var, true));
+               toFill.add(new ExtractValueParameter(var));
             }
             else {
-               toFill.add(new ExtractValueParameter(var, term.sub(1), true));
+               toFill.add(new ExtractValueParameter(var, term.sub(1)));
             }
          }
          if (SymbolicExecutionUtil.hasReferenceSort(getServices(), term.sub(3)) && term.sub(3).op() instanceof ProgramVariable) {
@@ -725,11 +748,23 @@ public class SymbolicConfigurationExtractor {
             // Check if it is an association
             SymbolicObject target = objects.get(valueTerm);
             if (target != null) {
-               SymbolicAssociation association = new SymbolicAssociation(pair.getProgramVariable(), target);
+               SymbolicAssociation association;
+               if (pair.isArrayIndex()) {
+                  association = new SymbolicAssociation(pair.getArrayIndex(), target);
+               }
+               else {
+                  association = new SymbolicAssociation(pair.getProgramVariable(), target);
+               }
                container.addAssociation(association);
             }
             else {
-               SymbolicValue value = new SymbolicValue(getServices(), pair.getProgramVariable(), valueTerm);
+               SymbolicValue value;
+               if (pair.isArrayIndex()) {
+                  value = new SymbolicValue(getServices(), pair.getArrayIndex(), valueTerm);
+               }
+               else {
+                  value = new SymbolicValue(getServices(), pair.getProgramVariable(), valueTerm);
+               }
                container.addValue(value);
             }
          }
@@ -756,6 +791,8 @@ public class SymbolicConfigurationExtractor {
    protected class ExtractValueParameter {
       private ProgramVariable programVariable;
       
+      private int arrayIndex;
+      
       private Term selectParentTerm;
       
       private int selectParentTermIndexInStatePredicate;
@@ -764,21 +801,29 @@ public class SymbolicConfigurationExtractor {
 
       private LocationVariable preVariable;
 
-      private boolean partOfHeapUpdate;
-
-      public ExtractValueParameter(ProgramVariable programVariable, boolean partOfHeapUpdate) throws ProofInputException {
-         this(programVariable, null, partOfHeapUpdate);
+      public ExtractValueParameter(ProgramVariable programVariable) throws ProofInputException {
+         this(programVariable, null);
       }
-      
-      public ExtractValueParameter(ProgramVariable programVariable, Term selectParentTerm, boolean partOfHeapUpdate) throws ProofInputException {
+
+      public ExtractValueParameter(ProgramVariable programVariable, Term selectParentTerm) throws ProofInputException {
+         this.arrayIndex = -1;
          this.programVariable = programVariable;
          this.selectParentTerm = selectParentTerm;
-         this.partOfHeapUpdate = partOfHeapUpdate;
          this.preVariable = createLocationVariable("Pre" + preVariableIndex++, selectParentTerm != null ? selectParentTerm.sort() : programVariable.sort());
       }
       
-      public boolean isPartOfHeapUpdate() {
-         return partOfHeapUpdate;
+      public ExtractValueParameter(int arrayIndex, Term selectParentTerm) throws ProofInputException {
+         this.arrayIndex = arrayIndex;
+         this.selectParentTerm = selectParentTerm;
+         this.preVariable = createLocationVariable("Pre" + preVariableIndex++, selectParentTerm.sort());
+      }
+
+      public boolean isArrayIndex() {
+         return arrayIndex >= 0;
+      }
+      
+      public int getArrayIndex() {
+         return arrayIndex;
       }
 
       public Term computePreUpdate() {
@@ -792,14 +837,20 @@ public class SymbolicConfigurationExtractor {
       
       public Term computePreValueTerm() {
          if (selectParentTerm != null) {
-            if (getServices().getJavaInfo().getArrayLength() == programVariable) {
-               // Special handling for length attribute of arrays
-               Function function = getServices().getTypeConverter().getHeapLDT().getLength();
-               return TermBuilder.DF.func(function, computePreParentTerm());
+            if (arrayIndex >= 0) {
+               Term idx = TermBuilder.DF.zTerm(getServices(), "" + arrayIndex);
+               return TermBuilder.DF.dotArr(getServices(), selectParentTerm, idx);
             }
             else {
-               Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)programVariable, getServices());
-               return TermBuilder.DF.dot(getServices(), programVariable.sort(), computePreParentTerm(), function);
+               if (getServices().getJavaInfo().getArrayLength() == programVariable) {
+                  // Special handling for length attribute of arrays
+                  Function function = getServices().getTypeConverter().getHeapLDT().getLength();
+                  return TermBuilder.DF.func(function, computePreParentTerm());
+               }
+               else {
+                  Function function = getServices().getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)programVariable, getServices());
+                  return TermBuilder.DF.dot(getServices(), programVariable.sort(), computePreParentTerm(), function);
+               }
             }
          }
          else {
@@ -839,27 +890,36 @@ public class SymbolicConfigurationExtractor {
 
       @Override
       public String toString() {
-         return programVariable + (selectParentTerm != null ? " of " + selectParentTerm : "");
+         if (isArrayIndex()) {
+            return "[" + arrayIndex + "] " + (selectParentTerm != null ? " of " + selectParentTerm : "");
+         }
+         else {
+            return programVariable + (selectParentTerm != null ? " of " + selectParentTerm : "");
+         }
       }
    }
    
    protected static class ExecutionVariableValuePair {
+      private int arrayIndex;
       private ProgramVariable programVariable;
       private Term parent;
       private Term value;
-      private boolean partOfHeapUpdate;
 
-      public ExecutionVariableValuePair(ProgramVariable programVariable, Term parent, Term value, boolean partOfHeapUpdate) {
+      public ExecutionVariableValuePair(ProgramVariable programVariable, Term parent, Term value) {
          assert programVariable != null;
          assert value != null;
          this.programVariable = programVariable;
          this.parent = parent;
          this.value = value;
-         this.partOfHeapUpdate = partOfHeapUpdate;
+         this.arrayIndex = -1;
       }
 
-      public boolean isPartOfHeapUpdate() {
-         return partOfHeapUpdate;
+      public ExecutionVariableValuePair(int arrayIndex, Term parent, Term value) {
+         assert parent != null;
+         assert value != null;
+         this.arrayIndex = arrayIndex;
+         this.parent = parent;
+         this.value = value;
       }
 
       public ProgramVariable getProgramVariable() {
@@ -873,12 +933,20 @@ public class SymbolicConfigurationExtractor {
       public Term getValue() {
          return value;
       }
+      
+      public boolean isArrayIndex() {
+         return arrayIndex >= 0;
+      }
+
+      public int getArrayIndex() {
+         return arrayIndex;
+      }
 
       @Override
       public boolean equals(Object obj) {
          if (obj instanceof ExecutionVariableValuePair) {
             ExecutionVariableValuePair other = (ExecutionVariableValuePair)obj;
-            return getProgramVariable().equals(other.getProgramVariable()) &&
+            return isArrayIndex() ? getArrayIndex() == other.getArrayIndex() : getProgramVariable().equals(other.getProgramVariable()) &&
                    getParent() != null ? getParent().equals(other.getParent()) : other.getParent() == null &&
                    getValue().equals(other.getValue());
          }
@@ -889,16 +957,25 @@ public class SymbolicConfigurationExtractor {
 
       @Override
       public int hashCode() {
-         return getProgramVariable().hashCode() + 
-                (getParent() != null ? getParent().hashCode() : 0) +
-                getValue().hashCode();
+         int result = 17;
+         result = 31 * result + (isArrayIndex() ? getArrayIndex() : getProgramVariable().hashCode());
+         result = 31 * result + (getParent() != null ? getParent().hashCode() : 0);
+         result = 31 * result + getValue().hashCode();
+         return result;
       }
 
       @Override
       public String toString() {
-         return getProgramVariable() +
-                (getParent() != null ? " of " + getParent() : "") +
-                " is " + getValue();
+         if (isArrayIndex()) {
+            return "[" + getArrayIndex() + "]" +
+                   (getParent() != null ? " of " + getParent() : "") +
+                   " is " + getValue();
+         }
+         else {
+            return getProgramVariable() +
+                   (getParent() != null ? " of " + getParent() : "") +
+                   " is " + getValue();
+         }
       }
    }
 }

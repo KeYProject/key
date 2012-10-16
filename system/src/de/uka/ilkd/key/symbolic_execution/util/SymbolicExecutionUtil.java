@@ -71,6 +71,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -728,6 +729,30 @@ public final class SymbolicExecutionUtil {
          }
       }
       return result;
+   }
+
+   /**
+    * Returns the array index defined by the given {@link Term}.
+    * @param services The {@link Services} to use.
+    * @param heapLDT The {@link HeapLDT} to use.
+    * @param arrayIndexTerm The {@link Term} to extract the array index from.
+    * @return The array index or {@code -1} if the term defines no array index.
+    */
+   public static int getArrayIndex(Services services, HeapLDT heapLDT, Term arrayIndexTerm) {
+      // Make sure that the term is an array index
+      if (arrayIndexTerm.op() == heapLDT.getArr() && arrayIndexTerm.subs().size() == 1) {
+         Term sub = arrayIndexTerm.sub(0);
+         // Make sure that the defined index is an integer
+         if (services.getTypeConverter().getIntegerLDT().getNumberSymbol() == sub.op()) {
+            return Integer.parseInt(ProofSaver.printAnything(sub, services));
+         }
+         else {
+            return -1;
+         }
+      }
+      else {
+         return -1;
+      }
    }
 
    /**

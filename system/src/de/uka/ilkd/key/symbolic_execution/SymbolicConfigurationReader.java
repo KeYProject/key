@@ -145,7 +145,7 @@ public class SymbolicConfigurationReader {
             if (!(parent instanceof AbstractKeYlessAssociationValueContainer)) {
                throw new SAXException("Found value in wrong hierarchy.");
             }
-            KeYlessValue value = new KeYlessValue(getProgramVariableString(attributes), getValueString(attributes), getTypeString(attributes));
+            KeYlessValue value = new KeYlessValue(getName(attributes), getProgramVariableString(attributes), isArrayIndex(attributes), getArrayIndex(attributes), getValueString(attributes), getTypeString(attributes));
             ((AbstractKeYlessAssociationValueContainer)parent).addValue(value);
             parentStack.addFirst(value);
          }
@@ -153,7 +153,7 @@ public class SymbolicConfigurationReader {
             if (!(parent instanceof AbstractKeYlessAssociationValueContainer)) {
                throw new SAXException("Found association in wrong hierarchy.");
             }
-            KeYlessAssociation association = new KeYlessAssociation(getProgramVariableString(attributes));
+            KeYlessAssociation association = new KeYlessAssociation(getName(attributes), getProgramVariableString(attributes), isArrayIndex(attributes), getArrayIndex(attributes));
             ((AbstractKeYlessAssociationValueContainer)parent).addAssociation(association);
             parentStack.addFirst(association);
             associationTargetMapping.put(association, getTarget(attributes));
@@ -302,7 +302,7 @@ public class SymbolicConfigurationReader {
     * @param attributes The {@link Attributes} which provides the content.
     * @return The value.
     */
-   public String getTypeString(Attributes attributes) {
+   protected String getTypeString(Attributes attributes) {
       return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_TYPE);
    }
 
@@ -322,6 +322,24 @@ public class SymbolicConfigurationReader {
     */
    protected String getName(Attributes attributes) {
       return attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_NAME);
+   }
+   
+   /**
+    * Returns the array index value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected int getArrayIndex(Attributes attributes) {
+      return Integer.parseInt(attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_ARRAY_INDEX));
+   }
+
+   /**
+    * Returns the is array index flag.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isArrayIndex(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(SymbolicConfigurationWriter.ATTRIBUTE_IS_ARRAY_INDEX));
    }
 
    /**
@@ -591,14 +609,35 @@ public class SymbolicConfigurationReader {
       private String typeString;
 
       /**
+       * The name.
+       */
+      private String name;
+
+      /**
+       * The is array index flag.
+       */
+      private boolean isArrayIndex;
+
+      /**
+       * The array index.
+       */
+      private int arrayIndex;
+      
+      /**
        * Constructor.
-       * @param programVariableString The program variable-
+       * @param name The name.
+       * @param programVariableString The program variable.
+       * @param isArrayIndex The is array index flag.
+       * @param arrayIndex The array index.
        * @param valueString The value.
        * @param typeString The type.
        */
-      public KeYlessValue(String programVariableString, String valueString, String typeString) {
+      public KeYlessValue(String name, String programVariableString, boolean isArrayIndex, int arrayIndex, String valueString, String typeString) {
          super();
+         this.name = name;
          this.programVariableString = programVariableString;
+         this.isArrayIndex = isArrayIndex;
+         this.arrayIndex = arrayIndex;
          this.valueString = valueString;
          this.typeString = typeString;
       }
@@ -650,6 +689,30 @@ public class SymbolicConfigurationReader {
       public String getTypeString() {
          return typeString;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getName() {
+         return name;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isArrayIndex() {
+         return isArrayIndex;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public int getArrayIndex() {
+         return arrayIndex;
+      }
    }
    
    /**
@@ -669,21 +732,45 @@ public class SymbolicConfigurationReader {
       private ISymbolicObject target;
 
       /**
-       * Constructor.
-       * @param programVariableString The program variable.
+       * The name.
        */
-      public KeYlessAssociation(String programVariableString) {
-         this(programVariableString, null);
+      private String name;
+
+      /**
+       * The is array index flag.
+       */
+      private boolean isArrayIndex;
+
+      /**
+       * The array index.
+       */
+      private int arrayIndex;
+
+      /**
+       * Constructor.
+       * @param name The name.
+       * @param programVariableString The program variable.
+       * @param isArrayIndex The is array index flag.
+       * @param arrayIndex The array index.
+       */
+      public KeYlessAssociation(String name, String programVariableString, boolean isArrayIndex, int arrayIndex) {
+         this(name, programVariableString, isArrayIndex, arrayIndex, null);
       }
 
       /**
        * Constructor.
+       * @param name The name.
        * @param programVariableString The program variable.
+       * @param isArrayIndex The is array index flag.
+       * @param arrayIndex The array index.
        * @param target The target.
        */
-      public KeYlessAssociation(String programVariableString, ISymbolicObject target) {
+      public KeYlessAssociation(String name, String programVariableString, boolean isArrayIndex, int arrayIndex, ISymbolicObject target) {
          super();
+         this.name = name;
          this.programVariableString = programVariableString;
+         this.isArrayIndex = isArrayIndex;
+         this.arrayIndex = arrayIndex;
          this.target = target;
       }
 
@@ -717,6 +804,30 @@ public class SymbolicConfigurationReader {
       @Override
       public ISymbolicObject getTarget() {
          return target;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getName() {
+         return name;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isArrayIndex() {
+         return isArrayIndex;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public int getArrayIndex() {
+         return arrayIndex;
       }
    }
    

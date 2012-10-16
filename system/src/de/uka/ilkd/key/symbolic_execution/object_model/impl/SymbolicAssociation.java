@@ -11,6 +11,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  */
 public class SymbolicAssociation implements ISymbolicAssociation {
    /**
+    * The array index.
+    */
+   private int arrayIndex;
+   
+   /**
     * The {@link IProgramVariable}.
     */
    private IProgramVariable programVariable;
@@ -19,15 +24,57 @@ public class SymbolicAssociation implements ISymbolicAssociation {
     * The target {@link ISymbolicObject}.
     */
    private ISymbolicObject target;
-
+   /**
+    * Constructor.
+    * @param arrayIndex The array index.
+    * @param target The target {@link ISymbolicObject}.
+    */
+   public SymbolicAssociation(int arrayIndex, ISymbolicObject target) {
+      assert target != null;
+      this.arrayIndex = arrayIndex;
+      this.target = target;
+   }
+   
    /**
     * Constructor.
     * @param programVariable The {@link IProgramVariable}.
     * @param target The target {@link ISymbolicObject}.
     */
    public SymbolicAssociation(IProgramVariable programVariable, ISymbolicObject target) {
+      assert programVariable != null;
+      assert target != null;
       this.programVariable = programVariable;
       this.target = target;
+      this.arrayIndex = -1;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getName() {
+      if (isArrayIndex()) {
+         return "[" + getArrayIndex() + "]";
+      }
+      else {
+         return getProgramVariableString();
+      }
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isArrayIndex() {
+      return arrayIndex >= 0;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getArrayIndex() {
+      return arrayIndex;
    }
 
    /**
@@ -59,6 +106,6 @@ public class SymbolicAssociation implements ISymbolicAssociation {
     */
    @Override
    public String toString() {
-      return "Association " + getProgramVariableString() + " to " + getTarget();
+      return "Association " + getName() + " to " + getTarget();
    }
 }

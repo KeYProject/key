@@ -5,13 +5,13 @@
       <term term="null"/>
    </equivalenceClass>
    <state name="return first.value+second.value+tempX.value+tempY.value;">
-      <association programVariable="self" target="o1"/>
-      <association programVariable="x" target="o2"/>
+      <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </state>
    <object xml:id="o1" name="self" type="OneAssignmentTest">
-      <value programVariable="y" value="null" type="Null"/>
-      <value programVariable="second" value="null" type="Null"/>
-      <association programVariable="first" target="o2"/>
+      <value name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
+      <value name="second" programVariable="second" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
+      <association name="first" programVariable="first" isArrayIndex="false" arrayIndex="-1" target="o2"/>
    </object>
    <object xml:id="o2" name="x" type="OneAssignmentTestValueWrapper">
    </object>

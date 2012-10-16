@@ -187,7 +187,7 @@ public class GenerateObjectDiagramFromSymbolicConfigurationCustomFeature extends
    protected ODValue createValue(ISymbolicValue symbolicValue) {
       if (symbolicValue != null) {
          ODValue value = ODFactory.eINSTANCE.createODValue();
-         value.setName(symbolicValue.getProgramVariableString());
+         value.setName(symbolicValue.getName());
          value.setType(symbolicValue.getTypeString());
          value.setValue(symbolicValue.getValueString());
          return value;
@@ -231,7 +231,7 @@ public class GenerateObjectDiagramFromSymbolicConfigurationCustomFeature extends
                                              Map<ISymbolicObject, ODObject> objectMapping) {
       if (symbolicAssociation != null) {
          ODAssociation association = ODFactory.eINSTANCE.createODAssociation();
-         association.setName(symbolicAssociation.getProgramVariableString());
+         association.setName(symbolicAssociation.getName());
          ODObject target = objectMapping.get(symbolicAssociation.getTarget());
          Assert.isNotNull(target, "Symbolic model is inconsistent.");
          association.setTarget(target);

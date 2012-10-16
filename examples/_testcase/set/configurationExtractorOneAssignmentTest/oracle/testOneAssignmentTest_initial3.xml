@@ -6,10 +6,10 @@
       <term term="null"/>
    </equivalenceClass>
    <state name="One Step Simplification resulting in return first.value+second.value+tempX.value+tempY.value;">
-      <value programVariable="x" value="null" type="Null"/>
-      <association programVariable="self" target="o1"/>
+      <value name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
+      <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
    </state>
    <object xml:id="o1" name="self" type="OneAssignmentTest">
-      <value programVariable="y" value="null" type="Null"/>
+      <value name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
    </object>
 </model>
