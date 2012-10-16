@@ -585,8 +585,19 @@ public class SymbolicConfigurationExtractor {
          Term selectArgument = term.sub(1);
          if (heapLDT.getSortOfSelect(selectArgument.op()) != null) {
             ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, selectArgument.sub(2));
-            if (!isImplicitProgramVariable(var)) {
-               toFill.add(new ExtractValueParameter(var, selectArgument.sub(1)));
+            if (var != null) {
+               if (!isImplicitProgramVariable(var)) {
+                  toFill.add(new ExtractValueParameter(var, selectArgument.sub(1)));
+               }
+            }
+            else {
+               int arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, selectArgument.sub(2));
+               if (arrayIndex >= 0) {
+                  toFill.add(new ExtractValueParameter(arrayIndex, selectArgument.sub(1)));
+               }
+               else {
+                  throw new ProofInputException("Unsupported select statement \"" + term + "\".");
+               }
             }
          }
          else if (selectArgument.op() instanceof IProgramVariable) {
@@ -603,12 +614,23 @@ public class SymbolicConfigurationExtractor {
          }
          // Add select value term to result
          ProgramVariable var = SymbolicExecutionUtil.getProgramVariable(getServices(), heapLDT, term.sub(2));
-         if (!isImplicitProgramVariable(var)) {
-            if (var.isStatic()) {
-               toFill.add(new ExtractValueParameter(var));
+         if (var != null) {
+            if (!isImplicitProgramVariable(var)) {
+               if (var.isStatic()) {
+                  toFill.add(new ExtractValueParameter(var));
+               }
+               else {
+                  toFill.add(new ExtractValueParameter(var, term.sub(1)));
+               }
+            }
+         }
+         else {
+            int arrayIndex = SymbolicExecutionUtil.getArrayIndex(getServices(), heapLDT, term.sub(2));
+            if (arrayIndex >= 0) {
+               toFill.add(new ExtractValueParameter(arrayIndex, term.sub(1)));
             }
             else {
-               toFill.add(new ExtractValueParameter(var, term.sub(1)));
+               throw new ProofInputException("Unsupported select statement \"" + term + "\".");
             }
          }
          if (SymbolicExecutionUtil.hasReferenceSort(getServices(), term.sub(3)) && term.sub(3).op() instanceof ProgramVariable) {
@@ -806,13 +828,15 @@ public class SymbolicConfigurationExtractor {
       }
 
       public ExtractValueParameter(ProgramVariable programVariable, Term selectParentTerm) throws ProofInputException {
-         this.arrayIndex = -1;
+         assert programVariable != null;
          this.programVariable = programVariable;
          this.selectParentTerm = selectParentTerm;
          this.preVariable = createLocationVariable("Pre" + preVariableIndex++, selectParentTerm != null ? selectParentTerm.sort() : programVariable.sort());
+         this.arrayIndex = -1;
       }
       
       public ExtractValueParameter(int arrayIndex, Term selectParentTerm) throws ProofInputException {
+         assert selectParentTerm != null;
          this.arrayIndex = arrayIndex;
          this.selectParentTerm = selectParentTerm;
          this.preVariable = createLocationVariable("Pre" + preVariableIndex++, selectParentTerm.sort());
@@ -837,7 +861,7 @@ public class SymbolicConfigurationExtractor {
       
       public Term computePreValueTerm() {
          if (selectParentTerm != null) {
-            if (arrayIndex >= 0) {
+            if (isArrayIndex()) {
                Term idx = TermBuilder.DF.zTerm(getServices(), "" + arrayIndex);
                return TermBuilder.DF.dotArr(getServices(), selectParentTerm, idx);
             }

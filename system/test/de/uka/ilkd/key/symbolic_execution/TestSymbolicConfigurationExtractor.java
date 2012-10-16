@@ -49,22 +49,77 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //             "x != null & x.next != null & x.next.next != null & a != null & a.x == 42 & b != null");
 //   }
    
+   /**
+    * Tests "configurationExtractorMultiArrayIndexReadWriteAccess" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testMultiArrayIndexReadWriteAccess() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorMultiArrayIndexReadWriteAccess/test/MultiArrayIndexReadWriteAccess.java",
+             "MultiArrayIndexReadWriteAccess",
+             "examples/_testcase/set/configurationExtractorMultiArrayIndexReadWriteAccess/oracle/",
+             "MultiArrayIndexReadWriteAccess.xml",
+             "testMultiArrayIndexReadWriteAccess_initial",
+             ".xml",
+             "testMultiArrayIndexReadWriteAccess_current",
+             ".xml",
+             null,
+             1,
+             1);
+   }
 
-//   /**
-//    * Tests "configurationExtractorSimpleLinkedArrays" without precondition.
-//    * @throws Exception Occurred Exception.
-//    */
-//   public void testSimpleLinkedArrays() throws Exception {
-//      doTest("examples/_testcase/set/configurationExtractorSimpleLinkedArrays/test/SimpleLinkedArrays.java",
-//             "SimpleLinkedArrays",
-//             "examples/_testcase/set/configurationExtractorSimpleLinkedArrays/oracle/",
-//             "SimpleLinkedArrays.xml",
-//             "testSimpleLinkedArrays_initial",
-//             ".xml",
-//             "testSimpleLinkedArrays_current",
-//             ".xml",
-//             null);
-//   }
+   /**
+    * Tests "configurationExtractorSimpleLinkedArrays" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testSimpleLinkedArrays() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorSimpleLinkedArrays/test/SimpleLinkedArrays.java",
+             "SimpleLinkedArrays",
+             "examples/_testcase/set/configurationExtractorSimpleLinkedArrays/oracle/",
+             "SimpleLinkedArrays.xml",
+             "testSimpleLinkedArrays_initial",
+             ".xml",
+             "testSimpleLinkedArrays_current",
+             ".xml",
+             null,
+             1,
+             5);
+   }
+   
+   /**
+    * Tests "configurationExtractorObjectArrayIndexWriteAccess" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testObjectArrayIndexWriteAccess() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorObjectArrayIndexWriteAccess/test/ObjectArrayIndexWriteAccess.java",
+             "ObjectArrayIndexWriteAccess",
+             "examples/_testcase/set/configurationExtractorObjectArrayIndexWriteAccess/oracle/",
+             "ObjectArrayIndexWriteAccess.xml",
+             "testObjectArrayIndexWriteAccess_initial",
+             ".xml",
+             "testObjectArrayIndexWriteAccess_current",
+             ".xml",
+             null,
+             2,
+             1);
+   }
+   
+   /**
+    * Tests "configurationExtractorArrayIndexWriteAccess" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testArrayIndexWriteAccess() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorArrayIndexWriteAccess/test/ArrayIndexWriteAccess.java",
+             "ArrayIndexWriteAccess",
+             "examples/_testcase/set/configurationExtractorArrayIndexWriteAccess/oracle/",
+             "ArrayIndexWriteAccess.xml",
+             "testArrayIndexWriteAccess_initial",
+             ".xml",
+             "testArrayIndexWriteAccess_current",
+             ".xml",
+             null,
+             1,
+             1);
+   }
    
    /**
     * Tests "configurationExtractorObjectArrayIndexReadAccess" without precondition.

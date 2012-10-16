@@ -294,7 +294,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       int i = 0;
       IExecutionNode[] children = parentToSearchIn.getChildren();
       while (result == null && i < children.length) {
-         if (children[i].getName().equals(directChildToSearch.getName()) &&
+         if (JavaUtil.equalIgnoreWhiteSpace(children[i].getName(), directChildToSearch.getName()) &&
              children[i].getElementType().equals(directChildToSearch.getElementType())) {
             result = children[i];
          }
@@ -323,12 +323,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Compare nodes
       assertNotNull(expected);
       assertNotNull(current);
-      assertEquals(expected.getName(), current.getName());
+      assertTrue("Expected \"" + expected.getName() + "\" but is \"" + current.getName() + "\".", JavaUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
       assertEquals(expected.isPathConditionChanged(), current.isPathConditionChanged());
       assertTrue("Expected \"" + expected.getFormatedPathCondition() + "\" but is \"" + current.getFormatedPathCondition() + "\".", JavaUtil.equalIgnoreWhiteSpace(expected.getFormatedPathCondition(), current.getFormatedPathCondition()));
       if (expected instanceof IExecutionBranchCondition) {
          assertTrue("Expected IExecutionBranchCondition but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchCondition);
-         assertEquals(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition());
+         assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getFormatedBranchCondition() + "\" but is \"" + ((IExecutionBranchCondition)current).getFormatedBranchCondition() + "\".", JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition()));
          assertEquals(((IExecutionBranchCondition)expected).isMergedBranchCondition(), ((IExecutionBranchCondition)current).isMergedBranchCondition());
       }
       else if (expected instanceof IExecutionStartNode) {
