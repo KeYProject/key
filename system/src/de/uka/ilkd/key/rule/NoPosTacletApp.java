@@ -414,7 +414,7 @@ public class NoPosTacletApp extends TacletApp {
 				  RenameTable.EMPTY_TABLE);
         
 	if ( taclet() instanceof RewriteTaclet ) {
-	    mc = ((RewriteTaclet)taclet ()).checkUpdatePrefix ( pos,
+	    mc = ((RewriteTaclet)taclet ()).checkPrefix ( pos,
 								mc,
 								services );
 	    if (mc==null) {
