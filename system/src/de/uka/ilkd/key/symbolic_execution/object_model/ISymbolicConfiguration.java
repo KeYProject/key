@@ -11,7 +11,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicConfiguratio
  * This interface represents the root element of a symbolic configuration.
  * </p>
  * <p>
- * A symbolic configuration defines how a heap looks like and which objects
+ * A symbolic configuration defines how a heap and stack looks like and which objects
  * are the same (equivalent classes). Such configurations can be created
  * automatically via a {@link SymbolicConfigurationExtractor} and saved/loaded
  * via {@link SymbolicConfigurationWriter}/{@link SymbolicConfigurationReader}.
