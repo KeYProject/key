@@ -1,6 +1,8 @@
 package org.key_project.sed.core.test.util;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -73,6 +75,8 @@ import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
@@ -1054,16 +1058,46 @@ public final class TestSedCoreUtil {
             if (expected.hasVariables()) {
                IVariable[] expectedVariables = expected.getVariables();
                IVariable[] currentVariables = current.getVariables();
-               TestCase.assertEquals(expected.getName(), expectedVariables.length, currentVariables.length);
-               for (int i = 0; i < expectedVariables.length; i++) {
-                  compareVariable(expectedVariables[i], currentVariables[i], compareVariables);
-               }
+               compareVariables(expectedVariables, currentVariables, compareVariables);
             }
          }
       }
       else {
          TestCase.assertNull(current);
       }
+   }
+   
+   /**
+    * Compares the given {@link IVariable}s with each other. The order is not relevant.
+    * @param expected The expected {@link IVariable}s.
+    * @param current The current {@link IVariable}s.
+    * @param compareVariables Compare variables?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareVariables(IVariable[] expected, IVariable[] current, boolean compareVariables) throws DebugException {
+      TestCase.assertEquals(expected.length, current.length);
+      // Compare ignore order
+      List<IVariable> availableCurrentVariables = new LinkedList<IVariable>();
+      CollectionUtil.addAll(availableCurrentVariables, current);
+      for (int i = 0; i < expected.length; i++) {
+         final IVariable expectedVariable = expected[i];
+         // Find current variable with same name
+         IVariable currentVariable = CollectionUtil.searchAndRemove(availableCurrentVariables, new IFilter<IVariable>() {
+            @Override
+            public boolean select(IVariable element) {
+               try {
+                  return element.getName().equalsIgnoreCase(expectedVariable.getName());
+               }
+               catch (DebugException e) {
+                  throw new RuntimeException(e);
+               }
+            }
+         });
+         TestCase.assertNotNull(currentVariable);
+         // Compare variables
+         compareVariable(expectedVariable, currentVariable, compareVariables);
+      }
+      TestCase.assertTrue(availableCurrentVariables.isEmpty());
    }
    
    /**
@@ -1112,10 +1146,7 @@ public final class TestSedCoreUtil {
          if (expected.hasVariables()) {
             IVariable[] expectedVariables = expected.getVariables();
             IVariable[] currentVariables = current.getVariables();
-            TestCase.assertEquals(expectedVariables.length, currentVariables.length);
-            for (int i = 0; i < expectedVariables.length; i++) {
-               compareVariable(expectedVariables[i], currentVariables[i], compareVariables);
-            }
+            compareVariables(expectedVariables, currentVariables, compareVariables);
          }
       }
       else {
