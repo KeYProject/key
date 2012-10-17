@@ -20,26 +20,16 @@
                                                       <statement name="this.value=var_3;" pathCondition="!self.next = null" pathConditionChanged="false">
                                                          <methodReturn name="&lt;return of InstanceCreationTestWrapper(var_3);&gt;" pathCondition="!self.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of InstanceCreationTestWrapper(var_3);&gt;">
                                                             <statement name="return classWrapper.value+instanceWrapper.value+next.instanceWrapper.value+localWrapper.value;" pathCondition="!self.next = null" pathConditionChanged="false">
-                                                               <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="!self.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  4
-+ \if (i_14 = i_11)  \then (4)  \else (3)
-+ \if (i_2 = i_14)
-      \then (4)
-      \else (\if (i_2 = i_11)
-                 \then (3)
-                 \else (\if (i_6 = i_2)
-                            \then (2)
-                            \else (1)))
+                                                               <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="!self.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  8
 + \if (  \if (self.next = self)
              \then (i_11)
              \else (i_6)
        = i_14)
       \then (4)
-      \else (\if (i_6 = i_11 | self.next = self)
+      \else (\if (self.next = self)
                  \then (3)
-                 \else (\if (  i_6 = i_11
-                             | !self.next = self)
-                            \then (2)
-                            \else (\if (  \if (  self.next
+                 \else (\if (self.next = self)
+                            \then (\if (  \if (  self.next
                                                = self)
                                               \then (i_11)
                                               \else (i_6)
@@ -48,7 +38,8 @@
                                        \else (\if (  self.next
                                                    = self)
                                                   \then (i_11)
-                                                  \else (i_6).value))))&apos; as result of self.compute();&gt;">
+                                                  \else (i_6).value))
+                            \else (2)))&apos; as result of self.compute();&gt;">
                                                                   <termination name="&lt;end&gt;" pathCondition="!self.next = null" pathConditionChanged="false" exceptionalTermination="false">
                                                                   </termination>
                                                                </methodReturn>

@@ -14,6 +14,19 @@
 # It is used by bin/runAllProofs.pl.
 #
 
+# Tests for block contracts:
+provable: ./heap/block_contracts/Simple__add.key
+provable: ./heap/block_contracts/Simple__addAbsoluteValues.key
+provable: ./heap/block_contracts/Simple__addWithJump.key
+provable: ./heap/block_contracts/Simple__addWithTwoBlockContracts.key
+provable: ./heap/block_contracts/Simple__generateByteArray.key
+provable: ./heap/block_contracts/Simple__getLength.key
+provable: ./heap/block_contracts/Simple__square.key
+provable: ./heap/block_contracts/Simple__unnecessaryBlockContract.key
+provable: ./heap/block_contracts/Simple__unnecessaryLoopInvariant.key
+provable: ./heap/block_contracts/GreatestCommonDivisor.key
+
+# Other tests:
 provable: ./heap/information_flow/ArrayList_contains.key
 provable: ./heap/information_flow/ArrayList_get.key
 provable: ./heap/information_flow/ArrayList_size.key
@@ -219,6 +232,7 @@ provable: ./standard_key/instanceCreation/instanceCreation1.key
 provable: ./standard_key/instanceCreation/instanceCreation2.key
 provable: ./standard_key/instanceCreation/interfacesAndAbstractClassesHaveNoInstances.key
 provable: ./standard_key/instanceCreation/successiveCreatedObjectsAreDistinct.key
+provable: ./standard_key/instanceCreation/testOverloadingConstructors.key
 provable: ./standard_key/java_dl/SimpleAttributes.key
 provable: ./standard_key/java_dl/arrayMax.key
 provable: ./standard_key/java_dl/arrayUpdateSimp.key

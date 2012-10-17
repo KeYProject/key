@@ -196,6 +196,10 @@ public abstract class KeYJavaASTFactory {
 	return new Break(l);
     }
 
+    public static Continue continueStatement(Label label) {
+        return new Continue(label);
+    }
+
     public static EmptyStatement emptyStatement() {
 	return new EmptyStatement();
     }

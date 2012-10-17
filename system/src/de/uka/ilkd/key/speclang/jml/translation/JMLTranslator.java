@@ -17,6 +17,7 @@ import java.util.Map;
 import antlr.Token;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -24,13 +25,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermCreationException;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -109,7 +104,10 @@ final class JMLTranslator {
         SUBTRACT ("-"),
         SHIFT_LEFT ("<<"),
         SHIFT_RIGHT (">>"),
-        UNSIGNED_SHIFT_RIGHT (">>>");
+        UNSIGNED_SHIFT_RIGHT (">>>"),
+        BREAKS ("breaks"),
+        CONTINUES ("continues"),
+        RETURNS ("returns");
 
         private final String jmlName;
         JMLKeyWord(String name) {
@@ -336,6 +334,44 @@ final class JMLTranslator {
                 }
 
                 return result;
+            }
+        });
+        translationMethods.put(JMLKeyWord.BREAKS, new JMLTranslationMethod() {
+
+            @Override
+            public Pair<Label, Term> translate(SLTranslationExceptionManager excManager, Object... params) throws SLTranslationException {
+                checkParameters(params, Term.class, String.class, Services.class);
+                Term term = (Term) params[0];
+                String label = (String) params[1];
+                Services services = (Services) params[2];
+                Term formula = term == null ? TB.tt() : TB.convertToFormula(term, services);
+                return new Pair<Label, Term>(label == null ? null : new ProgramElementName(label), formula);
+            }
+        });
+        translationMethods.put(JMLKeyWord.CONTINUES, new JMLTranslationMethod() {
+
+            @Override
+            public Pair<Label, Term> translate(SLTranslationExceptionManager excManager,
+                                  Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, Term.class, String.class, Services.class);
+                Term term = (Term) params[0];
+                String label = (String) params[1];
+                Services services = (Services) params[2];
+                Term formula = term == null ? TB.tt() : TB.convertToFormula(term, services);
+                return new Pair<Label, Term>(label == null ? null : new ProgramElementName(label), formula);
+            }
+        });     
+        translationMethods.put(JMLKeyWord.RETURNS, new JMLTranslationMethod() {
+
+            @Override
+            public Term translate(SLTranslationExceptionManager excManager,
+                                  Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, Term.class, Services.class);
+                Term term = (Term) params[0];
+                Services services = (Services) params[1];
+                return term == null ? TB.tt() : TB.convertToFormula(term, services);
             }
         });
 

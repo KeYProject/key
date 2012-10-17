@@ -166,7 +166,7 @@ dist:	branding all
 	@mkdir -p dist/key/
 	@cp -r $(BINARYPATH)/* dist/key/
 	@cp -r $(RESOURCEPATH)/* dist/key/
-	@cp -r ../examples dist/key/
+	@jar cMf dist/key/examples-heap.jar -C ../examples/heap .
 # for setup.jar
 	@mkdir -p dist/setup/de/uka/ilkd/key/util/
 	@cp -r $(BINARYPATH)/de/uka/ilkd/key/util/* dist/setup/de/uka/ilkd/key/util/

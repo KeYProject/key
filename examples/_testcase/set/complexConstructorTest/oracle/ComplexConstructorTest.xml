@@ -148,25 +148,7 @@
                                                                                                                                                 <callStackEntry path="/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0/0"/>
                                                                                                                                                 <statement name="return dc.x+ec.x+ecws.x+a.a+aCustom.a+b.a+b.a+bCustomB.a+bCustomIB.a;" pathCondition="true" pathConditionChanged="false">
                                                                                                                                                    <callStackEntry path="/0"/>
-                                                                                                                                                   <methodReturn name="&lt;return of ComplexConstructorTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  11
-+ \if (b_3 = b_10)  \then (11)  \else (42) * 2
-+ \if (b_7 = b_10)  \then (11)  \else (42)
-+ \if (a_7 = b_10)
-      \then (11)
-      \else (\if (a_7 = b_7)
-                 \then (42)
-                 \else (\if (a_7 = b_3)
-                            \then (42)
-                            \else (12)))
-+ \if (a_3 = b_10)
-      \then (11)
-      \else (\if (a_3 = b_7)
-                 \then (42)
-                 \else (\if (a_3 = b_3)
-                            \then (42)
-                            \else (\if (a_7 = a_3)
-                                       \then (12)
-                                       \else (42))))&apos; as result of ComplexConstructorTest.main();&gt;">
+                                                                                                                                                   <methodReturn name="&lt;return of ComplexConstructorTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;191&apos; as result of ComplexConstructorTest.main();&gt;">
                                                                                                                                                       <callStackEntry path="/0"/>
                                                                                                                                                       <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
                                                                                                                                                       </termination>

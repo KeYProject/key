@@ -5,6 +5,7 @@
 *~
 system/genSrc
 system/binary
+system/lib
 *#*
 system/key.jar
 system/setup.jar
@@ -37,6 +38,8 @@ tags
 /netbeans/eclipse/nbproject/private/
 /netbeans/eclipse/dist/
 *.class
+
+smt-solvers
 
 /projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.toc
 /projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.aux

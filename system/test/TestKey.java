@@ -13,7 +13,7 @@ import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 @SuppressWarnings("unchecked")
-public class TestKey extends TestCase {
+public class TestKey extends TestSuite {
 
     static Class[] utilityTests = new Class[] {
 	de.uka.ilkd.key.collection.TestSetAsListOfString.class,
@@ -137,6 +137,7 @@ public class TestKey extends TestCase {
         suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
         suite.addTest(createSuite(smtTests, "Testing SMT backend"));
 	suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
+	suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));
         
 	return suite;
     }

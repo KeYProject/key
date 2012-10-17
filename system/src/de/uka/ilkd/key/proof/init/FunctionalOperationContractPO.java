@@ -246,7 +246,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                                Map<LocationVariable,LocationVariable> atPreVars) {
        Term update = null;
        for(LocationVariable heap : atPreVars.keySet()) {
-          final Term u = TB.elementary(services, atPreVars.get(heap), TB.getBaseHeap(services));
+          final Term u = TB.elementary(services, atPreVars.get(heap), heap == getSavedHeap() ? TB.getBaseHeap(services) : TB.var(heap));
           if(update == null) {
              update = u;
           }else{

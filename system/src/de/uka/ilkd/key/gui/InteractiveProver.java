@@ -10,10 +10,7 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -26,8 +23,18 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.RuleAppIndex;
+import de.uka.ilkd.key.proof.TacletFilter;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -46,10 +53,12 @@ public class InteractiveProver {
     private final ProverTaskListener focussedAutoModeTaskListener =
         new FocussedAutoModeTaskListener ();
 
-    /** list of proof listeners and interactive proof listeners */
-    private List<AutoModeListener> listenerList = 
-        Collections.synchronizedList(new ArrayList<AutoModeListener>(10));
-
+    /**
+     * list of proof listeners and interactive proof listeners. We use an
+     * immutable list to store listeners to allow for addition/removal within
+     * listener code
+     */
+    private ImmutableList<AutoModeListener> listenerList = ImmutableSLList.nil();
 
     /** listens to the current selected proof and node */
     private KeYSelectionListener selListener;
@@ -87,38 +96,28 @@ public class InteractiveProver {
 	proof = p;
     }
     
-    public void addAutoModeListener(AutoModeListener p) { 
-	synchronized(listenerList) {
-	    listenerList.add(p);
-	}
+    public void addAutoModeListener(AutoModeListener p) {
+        listenerList = listenerList.prepend(p);
     }
 
-    public void removeAutoModeListener(AutoModeListener p) { 
-	synchronized(listenerList) {	
-	    listenerList.remove(p);
-	}
+    public void removeAutoModeListener(AutoModeListener p) {
+        listenerList = listenerList.removeAll(p);
     }
 
     /** fires the event that automatic execution has started */
     protected void fireAutoModeStarted(ProofEvent e) {
-	synchronized(listenerList) {
         for (AutoModeListener aListenerList : listenerList) {
-            aListenerList.
-                    autoModeStarted(e);
+            aListenerList.autoModeStarted(e);
         }
-	}
     }
 
     /** fires the event that automatic execution has stopped */
     public void fireAutoModeStopped(ProofEvent e) {
-	synchronized(listenerList) {
         for (AutoModeListener aListenerList : listenerList) {
-            aListenerList.
-                    autoModeStopped(e);
+            aListenerList.autoModeStopped(e);
         }
-	}
     }
-    
+
     void setResumeAutoMode(boolean b) {
        resumeAutoMode = b;
     }
@@ -188,7 +187,7 @@ public class InteractiveProver {
                         
             final AutomatedRuleApplicationManager realManager = goal.getRuleAppManager ();
             goal.setRuleAppManager ( null );
-            final FocussedRuleApplicationManager focusManager =
+            final AutomatedRuleApplicationManager focusManager =
                 new FocussedRuleApplicationManager ( realManager, goal, focus );
             goal.setRuleAppManager ( focusManager );
         }
@@ -203,8 +202,8 @@ public class InteractiveProver {
             // remove any filtering rule app managers that are left in the proof
             // goals
             if (goal.getRuleAppManager() instanceof FocussedRuleApplicationManager) {
-                final FocussedRuleApplicationManager focusManager =
-                        (FocussedRuleApplicationManager) goal.getRuleAppManager();
+                final AutomatedRuleApplicationManager focusManager =
+                        (AutomatedRuleApplicationManager) goal.getRuleAppManager();
                 goal.setRuleAppManager(null);
                 final AutomatedRuleApplicationManager realManager =
                         focusManager.getDelegate();
@@ -448,8 +447,10 @@ public class InteractiveProver {
         if(applyStrategy!=null){
             applyStrategy.clear();
         }
-        proof.clearAndDetachRuleAppIndexes();
-        proof = null;
+        if (proof != null) {
+           proof.clearAndDetachRuleAppIndexes();
+           proof = null;
+        }
         focusedGoal = null;
         //probably more clean up has to be done here.
     }

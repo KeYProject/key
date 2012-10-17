@@ -46,4 +46,15 @@ public interface AutomatedRuleApplicationManager extends NewRuleListener {
 
     AutomatedRuleApplicationManager copy ();
 
+    /**
+     * Get an underlying rule application manager.
+     * 
+     * Rule application manager implementations may choose to "wrap" another
+     * manager. This method retrieves the wrapped instance or <code>null</code>
+     * if the manager has no delegate.
+     * 
+     * @return the wrapped manager or <code>null</code> if not present
+     */
+    AutomatedRuleApplicationManager getDelegate();
+
 }

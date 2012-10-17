@@ -1,4 +1,4 @@
-public class SuffixArray {
+public final class SuffixArray {
 
     private final int[] a;
     private final int[] suffixes;
@@ -6,16 +6,26 @@ public class SuffixArray {
 
     /*@ invariant (\forall int i; 0 <= i && i < N; 
       @           (\exists int j; 0 <= j && j < N; suffixes[j]==i))
+      @           // suffixes is a permutation on idices
+      @ &&
+      @         (\forall int i; 0 <= i && i < N;
+      @                  0 <= suffixes[i] && suffixes[i] < N)
+      @           // follows from above, cannot hurt
+      @ &&
+      @         (\forall int i; 0 < i && i < N; suffixes[i-1] != suffixes[i])
+      @           // follows from above, cannot hurt
       @ &&
       @ 	(\forall int i,j; 0 < i && i < N && 0 <= j &&
       @            a[suffixes[i-1]+j] == a[suffixes[i]+j] 
       @            && suffixes[i-1]+j < N-1 && suffixes[i]+j < N-1;
-      @            a[suffixes[i-1]+j+1] <= a[suffixes[i]+j+1]);
+      @            a[suffixes[i-1]+j+1] <= a[suffixes[i]+j+1])
+      @           // suffixes is ordered lexicographically
+      @ && 
+      @          a.length == N && suffixes.length == N;
       @*/
 
     /*@ normal_behavior
       @ ensures this.a == a;
-      @ ensures N == a.length && N == suffixes.length;
       @ pure
       @*/
     public SuffixArray(int[] a) {
@@ -38,8 +48,9 @@ public class SuffixArray {
       @ requires 0 <= y && y < a.length;
       @ requires x != y;
       @ ensures (\forall int i; 0 <= i && i < \result; a[x+i]==a[y+i]);
-      @ ensures a[x+\result]!=a[y+\result] || \result == a.length-x || \result == a.length-y;
-      @ strictly_pure helper
+      @ ensures a[x+\result]!=a[y+\result] 
+      @         || \result == a.length-x || \result == a.length-y;
+      @ strictly_pure 
       @*/
     private int lcp(int x, int y) {
         int l = 0;
@@ -53,11 +64,10 @@ public class SuffixArray {
 // TODO: better spec with sortedness of suffixes in mind
 
     /*@ normal_behavior
-      @ requires a != null && suffixes != null;
       @ requires 0 < i && i < N;
       @ ensures (\forall int j; 0 <= j && j < \result; a[suffixes[i]+j]==a[suffixes[i-1]+j]);
       @ ensures a[suffixes[i]+\result]!=a[suffixes[i-1]+\result] || \result == a.length-suffixes[i] || \result == a.length-suffixes[i-1];
-      @ strictly_pure helper
+      @ strictly_pure
       @*/
     public int lcp(int i) {
         return lcp(suffixes[i], suffixes[i-1]);

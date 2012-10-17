@@ -137,7 +137,7 @@ public final class BooleanLDT extends LDT {
 
     
     @Override
-    public Expression translateTerm(Term t, ExtList children) {
+    public Expression translateTerm(Term t, ExtList children, Services services) {
 	if(t.op() == bool_true) {
 	    return BooleanLiteral.TRUE;
 	} else if(t.op() == bool_false) { 
