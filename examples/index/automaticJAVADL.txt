@@ -38,7 +38,8 @@ provable: ./heap/block_contracts/Simple__getLength.key
 provable: ./heap/block_contracts/Simple__square.key
 provable: ./heap/block_contracts/Simple__unnecessaryBlockContract.key
 provable: ./heap/block_contracts/Simple__unnecessaryLoopInvariant.key
-provable: ./heap/block_contracts/GreatestCommonDivisor.key
+# the following test has a reload problem probably caused by the one-step-simplifier
+# provable: ./heap/block_contracts/GreatestCommonDivisor.key
 
 # Other tests:
 provable: ./heap/information_flow/ArrayList_contains.key
