@@ -14,6 +14,20 @@
 # It is used by bin/runAllProofs.pl.
 #
 
+# Tests for rule application restrictions
+provable: ./heap/polarity_tests/wellformed1.key
+notprovable: ./heap/polarity_tests/wellformed2.key
+provable: ./heap/polarity_tests/wellformed3.key
+notprovable: ./heap/polarity_tests/wellformed4.key
+provable: ./heap/polarity_tests/wellformed5.key
+notprovable: ./heap/polarity_tests/wellformed6.key
+provable: ./heap/polarity_tests/wellformed7.key
+notprovable: ./heap/polarity_tests/wellformed8.key
+provable: ./heap/polarity_tests/wellformed9.key
+notprovable: ./heap/polarity_tests/wellformed10.key
+notprovable: ./heap/polarity_tests/wellformed11.key
+
+
 # Tests for block contracts:
 provable: ./heap/block_contracts/Simple__add.key
 provable: ./heap/block_contracts/Simple__addAbsoluteValues.key
