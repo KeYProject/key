@@ -352,7 +352,7 @@ public final class SpecificationRepository {
 	    (new RewriteTacletGoalTemplate(addedSeq,
 					   ImmutableSLList.<Taclet>nil(),
 					   TB.func(unlimited, subs)));
-	tacletBuilder.setStateRestriction(RewriteTaclet.IN_SEQUENT_STATE);
+	tacletBuilder.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);
 	tacletBuilder.setName(MiscTools.toValidTacletName(
 					"limit " + unlimited.name()));
 	tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
