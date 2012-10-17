@@ -39,19 +39,19 @@ import de.uka.ilkd.key.util.CommandLine;
  * This has been extracted from MainWindow to keep GUI and control further apart.
  */
 public class Main {
-    private static final String HELP = "-help";
-    private static final String AUTO = "-auto";
-    private static final String AUTO_LOADONLY = "-auto_loadonly";
-    private static final String DEBUG = "-debug";
-    private static final String NO_DEBUG = "-no_debug";
-    private static final String ASSERTION = "-assertion";
-    private static final String NO_ASSERTION = "-no_assertion";
-    private static final String NO_JMLSPECS = "-no_jmlspecs";
-    public static final String JUSTIFY_RULES ="-justify_rules";
-    private static final String PRINT_STATISTICS ="-print_statistics";
-    private static final String TIMEOUT ="-timeout";
-    private static final String EXAMPLES = "-examples"; 
-    public static final String JKEY_PREFIX = "-jr-";
+    private static final String HELP = "--help";
+    private static final String AUTO = "--auto";
+    private static final String AUTO_LOADONLY = "--auto_loadonly";
+    private static final String DEBUG = "--debug";
+    private static final String NO_DEBUG = "--no_debug";
+    private static final String ASSERTION = "--assertion";
+    private static final String NO_ASSERTION = "--no_assertion";
+    private static final String NO_JMLSPECS = "--no_jmlspecs";
+    public static final String JUSTIFY_RULES ="--justify_rules";
+    private static final String PRINT_STATISTICS ="--print_statistics";
+    private static final String TIMEOUT ="--timeout";
+    private static final String EXAMPLES = "--examples"; 
+    public static final String JKEY_PREFIX = "--jr-";
     public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
     public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
     public static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
@@ -138,28 +138,32 @@ public class Main {
     	cl.setIndentation(3);
     	cl.addText("Options for the KeY-Prover", false);
     	cl.addText("\n", false);
+    	cl.addText("./runProver [options | --justify_rules [justify rule options] filename] [filename(s)]", true);
     	cl.addText("  <filename>      : loads a .key file", true);
     	cl.addOption(HELP, null, "display this text");
     	cl.addText("-Khelp" ,false);
     	cl.addText("displays help for technical/debug parameters", true);
-    	cl.addOption(AUTO, null, "start prove procedure after initialisation");
+    	
+    	cl.addText("Batchmode options", false);
+    	cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
     	cl.addOption(AUTO_LOADONLY, null, "");
-    	cl.addOption(NO_JMLSPECS, null, "disables parsing JML specifications");
-    	cl.addOption(EXAMPLES, "<examplefiles>", "loads directory with example files on startup");
-    	cl.addOption(PRINT_STATISTICS, "<filename>",  "in auto mode, output nr. of rule applications and time spent");
-    	cl.addOption(TIMEOUT, "<timeout>", "the timeout in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +")");
-    	cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets (options always with prefix -jr) needs teh path to the rule file as argument" );
+    	cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
+    	cl.addOption(EXAMPLES, "<directory>", "load directory with example files on startup");
+    	cl.addOption(PRINT_STATISTICS, "<filename>",  "in auto mode, output nr. of rule applications and time spent on proving");
+    	cl.addOption(TIMEOUT, "<timeout>", "the timeout for each proof in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +", i.e., no timeout)");
+    	cl.addText("Options for justify rules", false);
+    	cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument" );
     	cl.addText("\n", true);
     	cl.addText("The 'justifyrules' command has a number options you can set.", false);
     	cl.addText("Provide the option name and the value as separate arguments.", false);
     	cl.addText("\n", true);
-    	cl.addOption(JMAX_RULES, "<number>","the maximum number of rule application to perform (default: " + LemmataAutoModeOptions.DEFAULT_MAXRULES +")");
-    	cl.addOption(JPATH_OF_RESULT, "<path>", "the folder to store proofs to");
+    	cl.addOption(JMAX_RULES, "<number>","maximum number of rule application to perform (default: " + LemmataAutoModeOptions.DEFAULT_MAXRULES +")");
+    	cl.addOption(JPATH_OF_RESULT, "<path>", "store proofs to this folder");
     	cl.addOption(JTIMEOUT, "<timeout>", "the timeout in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +")");
-    	cl.addOption(JPRINT, "<terminal/disable>", "where to send output (use 'terminal' or 'disable')");
-    	cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "flag to save or drop proofs (then stored to path given by "+ JPATH_OF_RESULT + ")");
-    	cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "file to read axioms from");
-    	cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "file to read definitions from");
+    	cl.addOption(JPRINT, "<terminal/disable>", "send output to terminal or disable output");
+    	cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "save or drop proofs (then stored to path given by "+ JPATH_OF_RESULT + ")");
+    	cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "read axioms from file");
+    	cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "read definitions from file");
     	return cl;
     }
     public static UserInterface evaluateOptions(CommandLine cl) {

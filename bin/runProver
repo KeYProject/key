@@ -100,23 +100,22 @@ fi
 list_help(){
   echo "./runProver [options] [filename]"
   echo "\nOptions for using this script"
-  echo "  J-options are passed through to the JVM following the -J option
+  echo "  J-option: pass option to the JVM following the -J option
 convention of javac"
-
-  echo "  K-options are options, passed to the KeY system"
-  echo "  -K-keydebug : with this option one can choose of which classes the debug output 
-		    is to be send to the standard output. For this use the prefix: 
-		    -J-Dkey.debug.prefix=
-		    and name the classes after the prefix"
-  echo "  -K-keydebug: switches the debugflag to on"
-  echo "  -K-debugclassloader: switches the Debugclassloadflag on"
-  echo "  -K-debugprefix <prefix> : sets the debug prefix"
-  echo "  -K-remotedebug <port>: option for remote debugging; parameter for
+  echo "Debugging:"
+  echo "  --K-keydebug: turns debugging on"
+  echo "  --K-debugclassloader: switches the Debugclassloadflag on to load
+classes for debugging"
+  echo "  --K-debugprefix <debugclass> : send debug output of debugclass to
+stadard out"
+  echo "  --K-remotedebug <port>: option for remote debugging; parameter for
 listening port"
-  echo "  -K-assertionflag: switches assertionflag to true"
-  echo "  -K-server:   "
-  echo "  -Khelp, -Kh	: prints this help message"
-  echo "  -help	: prints help message of the KeY prover"
+  echo "  --K-assertionflag: switches assertionflag on, s.t. debug assertions
+are used"
+  echo "Other:"
+  echo "  --K-server:  switches Java -server on "
+  echo "  --Khelp, -Kh	: prints this help message"
+  echo "  --help	: prints help message of the KeY prover"
 
 }
 
@@ -131,37 +130,38 @@ while [ $# -ne 0 ]; do
     case $1 in
 #     -K options for configuration options of KeY, such as debugmode, flags,
 # remote debugging
-	-Kh)
+	--Kh)
 # 	    set ${1} #removes the minus from the option, s.t. it can be passed to key as option
 	    list_help
 	    exit;;
-	-Khelp)
+	--Khelp)
 # 	    set ${1#--} #removes the minus from the option, s.t. it can be passed to key as option
 	    list_help
 	    exit;;
-        -K-keydebug) keysysprops="${keysysprops}-DKeyDebugFlag=on "
+        --K-keydebug) keysysprops="${keysysprops}-DKeyDebugFlag=on "
             shift
             continue;;
-        -K-debugclassloader) keysysprops="${keysysprops}-DKeyDebugClassLoader=on
+        --K-debugclassloader)
+keysysprops="${keysysprops}-DKeyDebugClassLoader=on
 "
             shift
             continue;;
 
-	-K-debugprefix) keysysprops="${keysysprops}-Dkey.debug.prefix=${2}"
+	--K-debugprefix) keysysprops="${keysysprops}-Dkey.debug.prefix=${2}"
 	    shift
 	    shift
 	    continue;;
-	-K-assertionflag) keysysprops="${keysysprops}-DKeyAssertionFlag=true "
+	--K-assertionflag) keysysprops="${keysysprops}-DKeyAssertionFlag=true "
 	    shift
 	    continue;;
 
-	-K-remotedebug) JAVA_OPTIONS="-Xdebug -Xnoagent -Djava.compiler=NONE
+	--K-remotedebug) JAVA_OPTIONS="-Xdebug -Xnoagent -Djava.compiler=NONE
 -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${2}"
 	    shift
 	    shift
 	    continue;;
 
-	-K-server) keysysprops="${keysysprops}-server "
+	--K-server) keysysprops="${keysysprops}-server "
             shift
             continue;;
 # -J options follwing conventions of Java for -J options

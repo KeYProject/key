@@ -64,7 +64,7 @@ import java.util.Map;
  */
 public final class CommandLine {
 
-    private static final String MINUS = "-";
+    private static final String MINUS = "--";
 
     /**
      * Help elements are messages which can appear in usage pages, here: Options
