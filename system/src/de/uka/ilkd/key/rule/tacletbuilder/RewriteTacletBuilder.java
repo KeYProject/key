@@ -35,11 +35,11 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
      * the sequent</li>
      *</ul>
      */
-    private int stateRestriction;
+    private int applicationRestriction;
 
-    public RewriteTacletBuilder setStateRestriction
-	( int p_stateRestriction ) {
-	stateRestriction = p_stateRestriction;
+    public RewriteTacletBuilder setApplicationRestriction
+	( int p_applicationRestriction ) {
+	applicationRestriction = p_applicationRestriction;
 	return this;
     }
 
@@ -85,7 +85,7 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
 				 attrs,
 				 find,
 				 prefixBuilder.getPrefixMap(),
-				 stateRestriction,
+				 applicationRestriction,
 				 choices);
     }
 

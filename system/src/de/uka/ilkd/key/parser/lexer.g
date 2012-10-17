@@ -130,6 +130,8 @@ tokens {
         // Keywords related to taclets
         SAMEUPDATELEVEL = "\\sameUpdateLevel";
         INSEQUENTSTATE = "\\inSequentState";
+        ANTECEDENTPOLARITY = "\\antecedentPolarity";
+        SUCCEDENTPOLARITY = "\\succedentPolarity";
         CLOSEGOAL = "\\closegoal";
         HEURISTICSDECL = "\\heuristicsDecl";
 	NONINTERACTIVE = "\\noninteractive";
