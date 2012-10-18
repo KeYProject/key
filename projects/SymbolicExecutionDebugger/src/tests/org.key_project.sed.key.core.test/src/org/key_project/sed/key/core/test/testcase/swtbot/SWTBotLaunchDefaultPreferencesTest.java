@@ -204,8 +204,8 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
       try {
          // Make sure that KeY's main window is hidden and contains no proofs.
          if (MainWindow.hasInstance()) {
-            KeYUtil.clearProofList(MainWindow.getInstance(false));
-            MainWindow.getInstance(false).setVisible(false);
+            KeYUtil.clearProofList(MainWindow.getInstance());
+            MainWindow.getInstance().setVisible(false);
          }
          // Set preference
          SWTWorkbenchBot bot = new SWTWorkbenchBot();
@@ -224,13 +224,13 @@ public class SWTBotLaunchDefaultPreferencesTest extends AbstractKeYDebugTargetTe
             public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
                if (showMainWindow) {
                   assertTrue(MainWindow.hasInstance());
-                  assertTrue(MainWindow.getInstance(false).isVisible());
-                  assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance(false)));
+                  assertTrue(MainWindow.getInstance().isVisible());
+                  assertFalse(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
                }
                else {
                   if (MainWindow.hasInstance()) {
-                     assertFalse(MainWindow.getInstance(false).isVisible());
-                     assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance(false)));
+                     assertFalse(MainWindow.getInstance().isVisible());
+                     assertTrue(KeYUtil.isProofListEmpty(MainWindow.getInstance()));
                   }
                }
             }

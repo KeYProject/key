@@ -91,6 +91,8 @@ public class TestKey extends TestSuite {
        de.uka.ilkd.key.util.TestNodePreorderIterator.class,
        de.uka.ilkd.key.symbolic_execution.TestExecutionNodePreorderIterator.class,
        de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
+       de.uka.ilkd.key.symbolic_execution.TestSymbolicConfigurationExtractor.class,
+       de.uka.ilkd.key.symbolic_execution.TestSymbolicConfigurationWriterAndReader.class,
        de.uka.ilkd.key.symbolic_execution.TestSymbolicExecutionTreeBuilder.class,
        de.uka.ilkd.key.symbolic_execution.po.TestFunctionalOperationContractPO.class,
        de.uka.ilkd.key.symbolic_execution.po.TestProgramMethodPO.class,

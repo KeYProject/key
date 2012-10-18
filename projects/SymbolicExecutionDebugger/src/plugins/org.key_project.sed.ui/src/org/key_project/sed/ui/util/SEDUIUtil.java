@@ -24,8 +24,8 @@ import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.provider.SEDDebugNodeContentProvider;
 import org.key_project.sed.core.provider.SEDDebugTargetContentProvider;
-import org.key_project.sed.ui.job.AbstractExecutionTreeDiagramEditorJob;
 import org.key_project.util.eclipse.JobUtil;
+import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
 import org.key_project.util.eclipse.job.ScheduledJobCollector;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
@@ -73,8 +73,8 @@ public final class SEDUIUtil {
       ISelection oldSelection = debugView.getViewer().getSelection();
       if (!selection.equals(SWTUtil.toList(oldSelection))) {
          // Change selection in debug view if new elements are selected in a Job because the debug view uses Jobs itself to expand the debug model and it is required to wait for them.
-         AbstractExecutionTreeDiagramEditorJob.cancelJobs(parentPart);
-         Job selectJob = new AbstractExecutionTreeDiagramEditorJob("Synchronizing selection", parentPart) {
+         AbstractWorkbenchPartJob.cancelJobs(parentPart);
+         Job selectJob = new AbstractWorkbenchPartJob("Synchronizing selection", parentPart) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                try {

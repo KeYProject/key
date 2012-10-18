@@ -121,6 +121,12 @@
             id="org.key_project.sed.key.ui.saveProofCommand"
             name="Save Symbolic Execution Tree as Proof File">
       </command>
+      <command
+            categoryId="org.eclipse.debug.ui.category.run"
+            description="Generates an Object Diagram for configurations of the current node."
+            id="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
+            name="Visualize Configurations">
+      </command>
    </extension>
       <extension
             point="org.eclipse.ui.commandImages">
@@ -131,6 +137,10 @@
          <image
                commandId="org.key_project.sed.key.ui.saveProofCommand"
                icon="icons/saveKeYProof.gif">
+         </image>
+         <image
+               commandId="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
+               icon="icons/configurations_object_diagram.gif">
          </image>
       </extension>
       <extension
@@ -165,6 +175,27 @@
                </iterate>
             </enabledWhen>
          </handler>
+         <handler
+               class="org.key_project.sed.key.ui.visualization.execution_tree.command.VisualizeConfigurationsCommand"
+               commandId="org.key_project.sed.key.ui.visualizeConfigurationsCommand">
+            <enabledWhen>
+               <iterate
+                     ifEmpty="false"
+                     operator="and">
+                  <or>
+                     <and>
+                        <instanceof
+                              value="org.key_project.sed.key.core.model.IKeYSEDDebugNode">
+                        </instanceof>
+                        <test
+                              forcePluginActivation="true"
+                              property="org.key_project.sed.key.core.keySedDebugNodeHasExecutionStateNode">
+                        </test>
+                     </and>
+                  </or>
+               </iterate>
+            </enabledWhen>
+         </handler>
       </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -179,6 +210,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+M2+K">
+      </key>
+      <key
+            commandId="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+C">
       </key>
    </extension>
       <extension
@@ -282,6 +319,29 @@
                allPopups="true"
                locationURI="popup:org.eclipse.debug.ui.DebugView?after=additions">
             <command
+                  commandId="org.key_project.sed.key.ui.visualizeConfigurationsCommand"
+                  icon="icons/configurations_object_diagram.gif"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <and>
+                           <instanceof
+                                 value="org.key_project.sed.key.core.model.IKeYSEDDebugNode">
+                           </instanceof>
+                           <test
+                                 forcePluginActivation="true"
+                                 property="org.key_project.sed.key.core.keySedDebugNodeHasExecutionStateNode">
+                           </test>
+                        </and>
+                     </or>
+                  </iterate>
+               </visibleWhen>
+            </command>
+            <command
                   commandId="org.key_project.sed.key.ui.saveProofCommand"
                   icon="icons/saveKeYProof.gif"
                   style="push">
@@ -331,5 +391,31 @@
                properties="isSingleKeyDebugTarget"
                type="org.eclipse.debug.core.model.IDebugElement">
          </propertyTester>
+      </extension>
+      <extension
+            point="org.key_project.sed.ui.visualization.executionTree.contextMenuEntries">
+         <entry
+               factory="org.key_project.sed.key.ui.visualization.execution_tree.feature.DebugNodeVisualizeConfigurationsFeatureFactory"
+               icon="icons/configurations_object_diagram.gif"
+               iconId="org.key_project.sed.key.ui.visualization.VisualizeConfigurationsFeature"
+               inButtonPad="true"
+               inMenu="true"
+               modes="READ_ONLY"
+               text="Visualize Configurations">
+         </entry>
+      </extension>
+      <extension
+            point="org.eclipse.ui.editors">
+         <editor
+               class="org.key_project.sed.key.ui.visualization.object_diagram.editor.ConfigurationObjectDiagramEditor"
+               contributorClass="org.key_project.sed.ui.visualization.object_diagram.editor.ReadonlyObjectDiagramActionBarContributor"
+               default="false"
+               icon="icons/configurations_object_diagram.gif"
+               id="org.key_project.sed.key.ui.ConfigurationObjectDiagramEditor"
+               name="Configurations Object Diagram Editor">
+            <contentTypeBinding
+                  contentTypeId="org.eclipse.graphiti.content.diagram">
+            </contentTypeBinding>
+         </editor>
       </extension>
 </plugin>

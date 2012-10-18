@@ -1,6 +1,8 @@
 package org.key_project.sed.core.test.util;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -65,6 +67,7 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDValue;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.LaunchUtil;
 import org.key_project.sed.core.util.SEDPreferenceUtil;
@@ -72,6 +75,8 @@ import org.key_project.sed.core.util.SEDPreorderIterator;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
@@ -888,7 +893,7 @@ public final class TestSedCoreUtil {
       if (expected != null) {
          // Compare node
          TestCase.assertNotNull(current);
-         TestCase.assertEquals(expected.getName(), current.getName());
+         TestCase.assertTrue(expected.getName() + " does not match " + current.getName(), StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
          TestCase.assertEquals(expected.getPathCondition(), current.getPathCondition());
          TestCase.assertEquals(expected.getNodeType(), current.getNodeType());
          compareDebugElement(expected, current, compareReferences, compareVariables);
@@ -1035,7 +1040,7 @@ public final class TestSedCoreUtil {
       if (expected != null) {
          TestCase.assertNotNull(current);
          // Compare stack frame
-         TestCase.assertEquals(expected.getName(), current.getName());
+         TestCase.assertTrue(expected.getName() + " does not match " + current.getName(), StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
          TestCase.assertEquals(expected.getName(), expected.getCharStart(), current.getCharStart());
          TestCase.assertEquals(expected.getName(), expected.getCharEnd(), current.getCharEnd());
          TestCase.assertEquals(expected.getName(), expected.getLineNumber(), current.getLineNumber());
@@ -1053,16 +1058,46 @@ public final class TestSedCoreUtil {
             if (expected.hasVariables()) {
                IVariable[] expectedVariables = expected.getVariables();
                IVariable[] currentVariables = current.getVariables();
-               TestCase.assertEquals(expected.getName(), expectedVariables.length, currentVariables.length);
-               for (int i = 0; i < expectedVariables.length; i++) {
-                  compareVariable(expectedVariables[i], currentVariables[i], compareVariables);
-               }
+               compareVariables(expectedVariables, currentVariables, compareVariables);
             }
          }
       }
       else {
          TestCase.assertNull(current);
       }
+   }
+   
+   /**
+    * Compares the given {@link IVariable}s with each other. The order is not relevant.
+    * @param expected The expected {@link IVariable}s.
+    * @param current The current {@link IVariable}s.
+    * @param compareVariables Compare variables?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareVariables(IVariable[] expected, IVariable[] current, boolean compareVariables) throws DebugException {
+      TestCase.assertEquals(expected.length, current.length);
+      // Compare ignore order
+      List<IVariable> availableCurrentVariables = new LinkedList<IVariable>();
+      CollectionUtil.addAll(availableCurrentVariables, current);
+      for (int i = 0; i < expected.length; i++) {
+         final IVariable expectedVariable = expected[i];
+         // Find current variable with same name
+         IVariable currentVariable = CollectionUtil.searchAndRemove(availableCurrentVariables, new IFilter<IVariable>() {
+            @Override
+            public boolean select(IVariable element) {
+               try {
+                  return element.getName().equalsIgnoreCase(expectedVariable.getName());
+               }
+               catch (DebugException e) {
+                  throw new RuntimeException(e);
+               }
+            }
+         });
+         TestCase.assertNotNull(currentVariable);
+         // Compare variables
+         compareVariable(expectedVariable, currentVariable, compareVariables);
+      }
+      TestCase.assertTrue(availableCurrentVariables.isEmpty());
    }
    
    /**
@@ -1076,7 +1111,7 @@ public final class TestSedCoreUtil {
       if (expected != null) {
          TestCase.assertNotNull(current);
          // Compare variable
-         TestCase.assertEquals(expected.getName(), current.getName());
+         TestCase.assertTrue(expected.getName() + " does not match " + current.getName(), StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
          TestCase.assertEquals(expected.getName(), expected.getReferenceTypeName(), current.getReferenceTypeName());
          compareDebugElement(expected, current, true, compareVariables);
          // Compare value
@@ -1101,16 +1136,17 @@ public final class TestSedCoreUtil {
          TestCase.assertEquals(expected.isAllocated(), current.isAllocated());
          TestCase.assertEquals(expected.getReferenceTypeName(), current.getReferenceTypeName());
          TestCase.assertTrue(expected.getValueString() + " does not match " + current.getValueString(), StringUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
+         if (expected instanceof ISEDValue) {
+            TestCase.assertTrue(current instanceof ISEDValue);
+            TestCase.assertEquals(((ISEDValue)expected).isMultiValued(), ((ISEDValue)current).isMultiValued());
+         }
          compareDebugElement(expected, current, true, compareVariables);
          // Compare variables
          TestCase.assertEquals(expected.hasVariables(), current.hasVariables());
          if (expected.hasVariables()) {
             IVariable[] expectedVariables = expected.getVariables();
             IVariable[] currentVariables = current.getVariables();
-            TestCase.assertEquals(expectedVariables.length, currentVariables.length);
-            for (int i = 0; i < expectedVariables.length; i++) {
-               compareVariable(expectedVariables[i], currentVariables[i], compareVariables);
-            }
+            compareVariables(expectedVariables, currentVariables, compareVariables);
          }
       }
       else {

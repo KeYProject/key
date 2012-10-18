@@ -11,15 +11,12 @@ import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
-import org.eclipse.graphiti.features.IFeature;
-import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.notification.INotificationService;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.widgets.Display;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.ui.job.AbstractExecutionTreeDiagramEditorJob;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDNotificationService;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.execution_tree.wizard.SaveAsExecutionTreeDiagramWizard;
@@ -27,6 +24,7 @@ import org.key_project.sed.ui.visualization.util.CustomizableDiagramEditorContex
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.sed.ui.visualization.util.PaletteHideableDiagramEditor;
+import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.ArrayUtil;
 
@@ -86,33 +84,6 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
       super.unregisterBOListener();
       DebugPlugin.getDefault().removeDebugEventListener(debugListener);
    }
-   
-   /**
-    * Executes the given {@link IFeature} with the given {@link IContext}.
-    * @param feature The {@link IFeature} to execute.
-    * @param context the {@link IContext} to use.
-    */
-   public void executeFeatureInJob(String jobName, 
-                                   final IFeature feature, 
-                                   final IContext context) {
-      new AbstractExecutionTreeDiagramEditorJob(jobName, this) {
-         @Override
-         protected IStatus run(IProgressMonitor monitor) {
-            try {
-               SWTUtil.checkCanceled(monitor);
-               context.putProperty(ExecutionTreeUtil.CONTEXT_PROPERTY_MONITOR, monitor);
-               executeFeature(feature, context);
-               return Status.OK_STATUS;
-            }
-            catch (OperationCanceledException e) {
-               return Status.CANCEL_STATUS;
-            }
-            catch (Exception e) {
-               return LogUtil.getLogger().createErrorStatus(e);
-            }
-         }
-      }.schedule();
-   }
 
    /**
     * Handles the detected debug events. 
@@ -138,8 +109,8 @@ public class ExecutionTreeDiagramEditor extends PaletteHideableDiagramEditor {
       // Update diagram content if required.
       if (updateRequired) {
          // Do an asynchronous update in the UI thread (same behavior as DomainModelChangeListener which is responsible for changes in EMF objects)
-         AbstractExecutionTreeDiagramEditorJob.cancelJobs(this);
-         new AbstractExecutionTreeDiagramEditorJob("Updating Symbolic Execution Tree", this) {
+         AbstractWorkbenchPartJob.cancelJobs(this);
+         new AbstractWorkbenchPartJob("Updating Symbolic Execution Tree", this) {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                return updateDiagramInJob(monitor);

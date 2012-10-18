@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.util.LinkedHashMap;
@@ -32,22 +32,7 @@ import de.uka.ilkd.key.util.LinkedHashMap;
  * @author Martin Hentschel
  * @see ExecutionNodeReader
  */
-public class ExecutionNodeWriter {
-   /**
-    * New line.
-    */
-   public static final String NEW_LINE = System.getProperty("line.separator");
-   
-   /**
-    * The used leading white space in each level.
-    */
-   public static final String LEADING_WHITE_SPACE_PER_LEVEL = "   ";
-   
-   /**
-    * Attribute name to store encodings.
-    */
-   public static final String ATTRIBUTE_ENCODING = "encoding";
-   
+public class ExecutionNodeWriter extends AbstractWriter {   
    /**
     * Attribute name to store {@link IExecutionElement#getName()}.
     */
@@ -72,6 +57,11 @@ public class ExecutionNodeWriter {
     * Attribute name to store {@link IExecutionVariable#getValueString()}.
     */
    public static final String ATTRIBUTE_VALUE_STRING = "valueString";
+
+   /**
+    * Attribute name to store {@link IExecutionValue#getConditionString()}.
+    */
+   public static final String ATTRIBUTE_CONDITION_STRING = "conditionString";
 
    /**
     * Attribute name to store {@link IExecutionVariable#getArrayIndex()}.
@@ -104,14 +94,19 @@ public class ExecutionNodeWriter {
    public static final String ATTRIBUTE_PATH_IN_TREE = "path";
 
    /**
-    * Attribute naem to store {@link IExecutionBranchCondition#isMergedBranchCondition()}.
+    * Attribute name to store {@link IExecutionBranchCondition#isMergedBranchCondition()}.
     */
    public static final String ATTRIBUTE_MERGED_BRANCH_CONDITION = "mergedBranchCondition";
-   
+
    /**
-    * The default enconding.
+    * Attribute name to store {@link IExecutionVariable#isValueAnObject()}.
     */
-   public static final String DEFAULT_ENCODING = "UTF-8";
+   public static final String ATTRIBUTE_IS_VALUE_AN_OBJECT = "isValueAnObject";
+
+   /**
+    * Attribute name to store {@link IExecutionVariable#isValueUnknown()}.
+    */
+   public static final String ATTRIBUTE_IS_VALUE_UNKNOWN = "isValueUnknown";
    
    /**
     * Tag name to store {@link IExecutionBranchCondition}s.
@@ -162,6 +157,11 @@ public class ExecutionNodeWriter {
     * Tag name to store {@link IExecutionVariable}s.
     */
    public static final String TAG_VARIABLE = "variable";
+
+   /**
+    * Tag name to store {@link IExecutionValue}s.
+    */
+   public static final String TAG_VALUE = "value";
 
    /**
     * Tag name to store one entry of {@link IExecutionNode#getCallStack()}.
@@ -536,17 +536,49 @@ public class ExecutionNodeWriter {
    protected void appendVariable(int level, IExecutionVariable variable, StringBuffer sb) throws ProofInputException {
       Map<String, String> attributeValues = new LinkedHashMap<String, String>();
       attributeValues.put(ATTRIBUTE_NAME, variable.getName());
-      attributeValues.put(ATTRIBUTE_TYPE_STRING, variable.getTypeString());
-      attributeValues.put(ATTRIBUTE_VALUE_STRING, variable.getValueString());
       attributeValues.put(ATTRIBUTE_ARRAY_INDEX, variable.getArrayIndex() + "");
       attributeValues.put(ATTRIBUTE_IS_ARRAY_INDEX, variable.isArrayIndex() + "");
       appendStartTag(level, TAG_VARIABLE, attributeValues, sb);
+      appendValues(level + 1, variable, sb);
+      appendEndTag(level, TAG_VARIABLE, sb);
+   }
 
-      IExecutionVariable[] childVariables = variable.getChildVariables();
+   /**
+    * Appends the contained {@link IExecutionValue}s to the given {@link StringBuffer}.
+    * @param level The level to use.
+    * @param variable The {@link IExecutionVariable} which provides the {@link IExecutionValue}s.
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendValues(int level, IExecutionVariable variable, StringBuffer sb) throws ProofInputException {
+      IExecutionValue[] values = variable.getValues();
+      for (IExecutionValue value : values) {
+         appendValue(level, value, sb);
+      }
+   }
+
+   /**
+    * Appends the given {@link IExecutionValue} with its children to the given {@link StringBuffer}.
+    * @param level The level to use.
+    * @param value The {@link IExecutionValue} to append.
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendValue(int level, IExecutionValue value, StringBuffer sb) throws ProofInputException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_NAME, value.getName());
+      attributeValues.put(ATTRIBUTE_TYPE_STRING, value.getTypeString());
+      attributeValues.put(ATTRIBUTE_VALUE_STRING, value.getValueString());
+      attributeValues.put(ATTRIBUTE_IS_VALUE_AN_OBJECT, value.isValueAnObject() + "");
+      attributeValues.put(ATTRIBUTE_IS_VALUE_UNKNOWN, value.isValueUnknown() + "");
+      attributeValues.put(ATTRIBUTE_CONDITION_STRING, value.getConditionString());
+      appendStartTag(level, TAG_VALUE, attributeValues, sb);
+
+      IExecutionVariable[] childVariables = value.getChildVariables();
       for (IExecutionVariable childVariable : childVariables) {
          appendVariable(level + 1, childVariable, sb);
       }
-      appendEndTag(level, TAG_VARIABLE, sb);
+      appendEndTag(level, TAG_VALUE, sb);
    }
 
    /**
@@ -616,102 +648,5 @@ public class ExecutionNodeWriter {
          node = parent;
       }
       return sb.toString();
-   }
-
-   /**
-    * Appends an empty tag to the given {@link StringBuffer}.
-    * @param level The level.
-    * @param tagName The tag name.
-    * @param attributeValues The attributes.
-    * @param sb The {@link StringBuffer} to append to.
-    */
-   protected void appendEmptyTag(int level, String tagName, Map<String, String> attributeValues, StringBuffer sb) {
-      appendWhiteSpace(level, sb);
-      sb.append("<");
-      sb.append(tagName);
-      for (Entry<String, String> entry : attributeValues.entrySet()) {
-         appendAttribute(entry.getKey(), entry.getValue(), sb);
-      }
-      sb.append("/>");
-      appendNewLine(sb);
-   }
-
-   /**
-    * Appends a start tag to the given {@link StringBuffer}.
-    * @param level The level.
-    * @param tagName The tag name.
-    * @param attributeValues The attributes.
-    * @param sb The {@link StringBuffer} to append to.
-    */
-   protected void appendStartTag(int level, String tagName, Map<String, String> attributeValues, StringBuffer sb) {
-      appendWhiteSpace(level, sb);
-      sb.append("<");
-      sb.append(tagName);
-      for (Entry<String, String> entry : attributeValues.entrySet()) {
-         appendAttribute(entry.getKey(), entry.getValue(), sb);
-      }
-      sb.append(">");
-      appendNewLine(sb);
-   }
-
-   /**
-    * Appends an end tag to the given {@link StringBuffer}.
-    * @param level The level.
-    * @param tagName The tag name.
-    * @param sb The {@link StringBuffer} to append to.
-    */
-   protected void appendEndTag(int level, String tagName, StringBuffer sb) {
-      appendWhiteSpace(level, sb);
-      sb.append("</");
-      sb.append(tagName);
-      sb.append(">");
-      appendNewLine(sb);
-   }
-   
-   /**
-    * Adds leading white space to the {@link StringBuffer}.
-    * @param level The level in the tree used for leading white space (formating).
-    * @param sb The {@link StringBuffer} to write to.
-    */
-   protected void appendWhiteSpace(int level, StringBuffer sb) {
-      for (int i = 0; i < level; i++) {
-         sb.append(LEADING_WHITE_SPACE_PER_LEVEL);
-      }
-   }
-
-   /**
-    * Adds an XML attribute to the given {@link StringBuffer}.
-    * @param attributeName The attribute name.
-    * @param value The attribute value.
-    * @param sb The {@link StringBuffer} to write to.
-    */
-   protected void appendAttribute(String attributeName, String value, StringBuffer sb) {
-      if (attributeName != null && value != null) {
-         sb.append(" ");
-         sb.append(attributeName);
-         sb.append("=\"");
-         sb.append(JavaUtil.encodeText(value));
-         sb.append("\"");
-      }
-   }
-   
-   /**
-    * Adds an XML header to the given {@link StringBuffer}.
-    * @param encoding The encoding to use.
-    * @param sb The {@link StringBuffer} to write to.
-    */
-   protected void appendXmlHeader(String encoding, StringBuffer sb) {
-      sb.append("<?xml version=\"1.0\"");
-      appendAttribute(ATTRIBUTE_ENCODING, encoding, sb);
-      sb.append("?>");
-      appendNewLine(sb);
-   }
-   
-   /**
-    * Adds a line break to the given {@link StringBuffer}.
-    * @param sb The {@link StringBuffer} to write to.
-    */
-   protected void appendNewLine(StringBuffer sb) {
-      sb.append(NEW_LINE);
    }
 }

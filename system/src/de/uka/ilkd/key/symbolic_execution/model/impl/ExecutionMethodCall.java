@@ -29,7 +29,47 @@ public class ExecutionMethodCall extends AbstractExecutionStateNode<MethodBodySt
     */
    @Override
    protected String lazyComputeName() {
-      return getMethodReference().toString();
+      MethodReference explicitConstructorMR = getExplicitConstructorMethodReference();
+      return explicitConstructorMR != null ?
+             explicitConstructorMR.toString() :
+             getMethodReference().toString();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isImplicitConstructor() {
+      return SymbolicExecutionUtil.isImplicitConstructor(getProgramMethod());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public MethodReference getExplicitConstructorMethodReference() {
+      IProgramMethod explicitConstructor = getExplicitConstructorProgramMethod();
+      if (explicitConstructor != null) {
+         MethodReference mr = getMethodReference();
+         return new MethodReference(mr.getArguments(), explicitConstructor.getProgramElementName(), null); // Ignore the prefix because it is ugly if a constructor is called on an object not part of the symbolic execution tree.
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public IProgramMethod getExplicitConstructorProgramMethod() {
+      IProgramMethod pm = getProgramMethod();
+      if (SymbolicExecutionUtil.isImplicitConstructor(pm)) {
+         return SymbolicExecutionUtil.findExplicitConstructor(getServices(), pm);
+      }
+      else {
+         return null;
+      }
    }
 
    /**

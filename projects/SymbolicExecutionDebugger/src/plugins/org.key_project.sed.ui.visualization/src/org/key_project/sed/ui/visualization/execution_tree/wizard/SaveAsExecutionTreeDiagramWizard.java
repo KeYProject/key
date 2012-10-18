@@ -14,7 +14,7 @@ import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 /**
- * A new wizard to create Symbolic Execution Tree Diagrams.
+ * A new wizard to save existing Symbolic Execution Tree Diagrams in an additional resource.
  * @author Martin Hentschel
  */
 public class SaveAsExecutionTreeDiagramWizard extends AbstractExecutionTreeDiagramSaveAsWizard {
@@ -50,6 +50,14 @@ public class SaveAsExecutionTreeDiagramWizard extends AbstractExecutionTreeDiagr
       Assert.isNotNull(diagramTypeProvider);
       Diagram diagram = diagramTypeProvider.getDiagram();
       return EcoreUtil.copy(diagram); // Return a copy because it is modified during save process (URL to domain file)
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected String getInitialWindowTitle() {
+      return "Save Symbolic Execution Tree Diagram";
    }
 
    /**

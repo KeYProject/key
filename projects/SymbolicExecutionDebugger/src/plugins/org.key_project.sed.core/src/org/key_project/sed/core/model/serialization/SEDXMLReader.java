@@ -408,6 +408,7 @@ public class SEDXMLReader {
       value.setAllocated(isAllocated(attributes));
       value.setReferenceTypeName(getReferenceTypeName(attributes));
       value.setValueString(getValueString(attributes));
+      value.setMultiValued(isMultiValued(attributes));
       return value;
    }
    
@@ -725,6 +726,15 @@ public class SEDXMLReader {
       catch (NumberFormatException e) {
          throw new SAXException(e);
       }
+   }
+   
+   /**
+    * Returns the multi valued value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isMultiValued(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_MULTI_VALUED));
    }
    
    /**

@@ -108,4 +108,9 @@ public interface IExecutionTreeImageConstants {
     * Key of the image for terminate action.
     */
    public static final String IMG_TERMINATE = PREFIX + "terminate";
+
+   /**
+    * Key of the image for visualize state action.
+    */
+   public static final String IMG_VISUALIZE_STATE = PREFIX + "visualizeState";
 }

@@ -13,6 +13,7 @@ import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.KeYModelUtil.SourceLocation;
 import org.key_project.sed.key.core.util.LogUtil;
 
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -174,7 +175,10 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     * @throws DebugException Occurred Exception.
     */
    protected SourceLocation computeSourceLocation() throws DebugException {
-      SourceLocation location = KeYModelUtil.convertToSourceLocation(executionNode.getProgramMethod().getPositionInfo());
+      IProgramMethod explicitConstructor = executionNode.getExplicitConstructorProgramMethod();
+      SourceLocation location = KeYModelUtil.convertToSourceLocation(explicitConstructor != null ?
+                                                                     explicitConstructor.getPositionInfo() :
+                                                                     executionNode.getProgramMethod().getPositionInfo());
       // Try to update the position info with the position of the method name provided by JDT.
       try {
          if (location.getCharEnd() >= 0) {

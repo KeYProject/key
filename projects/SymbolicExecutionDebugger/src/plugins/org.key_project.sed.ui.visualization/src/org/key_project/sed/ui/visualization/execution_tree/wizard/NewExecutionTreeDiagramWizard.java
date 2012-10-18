@@ -33,6 +33,14 @@ public class NewExecutionTreeDiagramWizard extends AbstractExecutionTreeDiagramS
     * {@inheritDoc}
     */
    @Override
+   protected String getInitialWindowTitle() {
+      return "Create Symbolic Execution Tree Diagram";
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    protected String getDiagramPageTitle() {
       return "Create Symbolic Execution Tree Diagram";
    }
