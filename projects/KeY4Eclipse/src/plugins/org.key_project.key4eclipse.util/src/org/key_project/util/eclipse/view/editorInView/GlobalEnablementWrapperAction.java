@@ -24,7 +24,7 @@ public class GlobalEnablementWrapperAction implements IAction, IGlobalEnablement
     * The {@link IAction} to wrapp.
     */
    private IAction action;
-   
+
    /**
     * The global enabled state.
     */
@@ -369,5 +369,13 @@ public class GlobalEnablementWrapperAction implements IAction, IGlobalEnablement
       boolean oldEnabled = isEnabled();
       this.globalEnabled = globalEnabled;
       firePropertyChange(new PropertyChangeEvent(this, ENABLED, oldEnabled, isEnabled()));
+   }
+   
+   /**
+    * Returns the wrapped {@link IAction}.
+    * @return The wrapped {@link IAction}.
+    */
+   public IAction getAction() {
+      return action;
    }
 }

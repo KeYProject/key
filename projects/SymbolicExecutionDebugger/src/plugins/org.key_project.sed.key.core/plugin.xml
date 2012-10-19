@@ -33,4 +33,14 @@
             class="org.key_project.sed.key.core.util.KeYSEDPreferencesInitializer">
       </initializer>
    </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.key_project.sed.key.core.propertyTester.KeYSEDDebugNodeHasExecutionStateNodePropertyTester"
+            id="org.key_project.sed.key.core.keySedDebugNodeHasExecutionStateNode"
+            namespace="org.key_project.sed.key.core"
+            properties="keySedDebugNodeHasExecutionStateNode"
+            type="org.key_project.sed.key.core.model.IKeYSEDDebugNode">
+      </propertyTester>
+   </extension>
 </plugin>

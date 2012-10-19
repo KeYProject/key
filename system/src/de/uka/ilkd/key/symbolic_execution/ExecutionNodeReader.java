@@ -21,6 +21,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -50,7 +51,10 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 
 /**
  * Allows to read XML files which contains an symbolic execution tree
@@ -162,10 +166,10 @@ public class ExecutionNodeReader {
       private Deque<AbstractKeYlessExecutionNode> parentNodeStack = new LinkedList<AbstractKeYlessExecutionNode>();
 
       /**
-       * The parent hierarchy of {@link IExecutionVariable} filled by {@link #startElement(String, String, String, Attributes)}
+       * The parent hierarchy of {@link IExecutionVariable} and {@link IExecutionValue} filled by {@link #startElement(String, String, String, Attributes)}
        * and emptied by {@link #endElement(String, String, String)}. 
        */
-      private Deque<KeYlessVariable> parentVariableStack = new LinkedList<KeYlessVariable>();
+      private Deque<Object> parentVariableValueStack = new LinkedList<Object>();
       
       /**
        * Maps an {@link AbstractKeYlessExecutionNode} to the path entries of its call stack.
@@ -179,20 +183,29 @@ public class ExecutionNodeReader {
       public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
          AbstractKeYlessExecutionNode parent = parentNodeStack.peekFirst();
          if (isVariable(uri, localName, qName)) {
-            KeYlessVariable parentVariable = parentVariableStack.peekFirst();
-            KeYlessVariable variable = createVariable(parentVariable, uri, localName, qName, attributes);
-            if (parentVariable != null) {
-               parentVariable.addChildVariable(variable);
+            Object parentValue = parentVariableValueStack.peekFirst();
+            KeYlessVariable variable = createVariable(parentValue instanceof KeYlessValue ? (KeYlessValue)parentValue : null, uri, localName, qName, attributes);
+            if (parentValue != null) {
+               ((KeYlessValue)parentValue).addChildVariable(variable);
             }
             else {
                if (parent instanceof AbstractKeYlessStateNode<?>) {
                   ((AbstractKeYlessStateNode<?>)parent).addVariable(variable);
                }
                else {
-                  throw new SAXException("Can't add variable to parent executio node.");
+                  throw new SAXException("Can't add variable to parent execution node.");
                }
             }
-            parentVariableStack.addFirst(variable);
+            parentVariableValueStack.addFirst(variable);
+         }
+         else if (isValue(uri, localName, qName)) {
+            Object parentValue = parentVariableValueStack.peekFirst();
+            if (!(parentValue instanceof KeYlessVariable)) {
+               throw new SAXException("Can't add value to parent variable.");
+            }
+            KeYlessValue value = createValue((KeYlessVariable)parentValue, uri, localName, qName, attributes);
+            ((KeYlessVariable)parentValue).addValue(value);
+            parentVariableValueStack.addFirst(value);
          }
          else if (isCallStackEntry(uri, localName, qName)) {
             List<String> callStackEntries = callStackPathEntries.get(parent);
@@ -220,7 +233,10 @@ public class ExecutionNodeReader {
       @Override
       public void endElement(String uri, String localName, String qName) throws SAXException {
          if (isVariable(uri, localName, qName)) {
-            parentVariableStack.removeFirst();
+            parentVariableValueStack.removeFirst();
+         }
+         else if (isValue(uri, localName, qName)) {
+            parentVariableValueStack.removeFirst();
          }
          else if (isCallStackEntry(uri, localName, qName)) {
             // Nothing to do.
@@ -257,6 +273,17 @@ public class ExecutionNodeReader {
    protected boolean isVariable(String uri, String localName, String qName) {
       return ExecutionNodeWriter.TAG_VARIABLE.equals(qName);
    }
+   
+   /**
+    * Checks if the currently parsed tag represents an {@link IExecutionValue}.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @return {@code true} represents an {@link IExecutionValue}, {@code false} is something else.
+    */
+   protected boolean isValue(String uri, String localName, String qName) {
+      return ExecutionNodeWriter.TAG_VALUE.equals(qName);
+   }
 
    /**
     * Checks if the currently parsed tag represents an entry of {@link IExecutionNode#getCallStack()}.
@@ -271,24 +298,45 @@ public class ExecutionNodeReader {
 
    /**
     * Creates a new {@link IExecutionVariable} with the given content.
-    * @param parentVariable The parent {@link IExecutionVariable}.
+    * @param parentValue The parent {@link IExecutionValue}.
     * @param uri The URI.
     * @param localName THe local name.
     * @param qName The qName.
     * @param attributes The attributes.
     * @return The created {@link IExecutionVariable}.
     */
-   protected KeYlessVariable createVariable(IExecutionVariable parentVariable,
+   protected KeYlessVariable createVariable(IExecutionValue parentValue,
                                             String uri, 
                                             String localName, 
                                             String qName, 
                                             Attributes attributes) {
-      return new KeYlessVariable(parentVariable, 
+      return new KeYlessVariable(parentValue, 
                                  isArrayIndex(attributes), 
                                  getArrayIndex(attributes), 
-                                 getTypeString(attributes), 
-                                 getValueString(attributes), 
                                  getName(attributes));
+   }
+
+   /**
+    * Creates a new {@link IExecutionValue} with the given content.
+    * @param parentVariable The parent {@link IExecutionVariable}.
+    * @param uri The URI.
+    * @param localName THe local name.
+    * @param qName The qName.
+    * @param attributes The attributes.
+    * @return The created {@link IExecutionValue}.
+    */
+   protected KeYlessValue createValue(IExecutionVariable parentVariable,
+                                      String uri, 
+                                      String localName, 
+                                      String qName, 
+                                      Attributes attributes) {
+      return new KeYlessValue(parentVariable, 
+                              getTypeString(attributes), 
+                              getValueString(attributes), 
+                              getName(attributes),
+                              isValueUnknown(attributes),
+                              isValueAnObject(attributes),
+                              getConditionString(attributes));
    }
 
    /**
@@ -371,12 +419,39 @@ public class ExecutionNodeReader {
    }
 
    /**
+    * Returns the is value an object value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isValueAnObject(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_IS_VALUE_AN_OBJECT));
+   }
+
+   /**
+    * Returns the is value unknown value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isValueUnknown(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_IS_VALUE_UNKNOWN));
+   }
+
+   /**
     * Returns the value string value.
     * @param attributes The {@link Attributes} which provides the content.
     * @return The value.
     */
    protected String getValueString(Attributes attributes) {
       return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_VALUE_STRING);
+   }
+
+   /**
+    * Returns the value condition string value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected String getConditionString(Attributes attributes) {
+      return attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_CONDITION_STRING);
    }
 
    /**
@@ -828,7 +903,7 @@ public class ExecutionNodeReader {
                                       boolean pathConditionChanged) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
       }
-      
+
       /**
        * Adds the given {@link IExecutionVariable}.
        * @param variable The {@link IExecutionVariable} to add.
@@ -859,6 +934,38 @@ public class ExecutionNodeReader {
       @Override
       public IExecutionVariable[] getVariables() {
          return variables.toArray(new IExecutionVariable[variables.size()]);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public int getConfigurationsCount() throws ProofInputException {
+         return 0;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ISymbolicConfiguration getInitialConfiguration(int configurationIndex) throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ISymbolicConfiguration getCurrentConfiguration(int configurationIndex) throws ProofInputException {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ImmutableList<ISymbolicEquivalenceClass> getConfigurationsEquivalenceClasses(int configurationIndex) throws ProofInputException {
+         return null;
       }
    }
    
@@ -1008,6 +1115,30 @@ public class ExecutionNodeReader {
       public String getElementType() {
          return "Method Call";
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isImplicitConstructor() {
+         return false;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public MethodReference getExplicitConstructorMethodReference() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IProgramMethod getExplicitConstructorProgramMethod() {
+         return null;
+      }
    }
 
    /**
@@ -1115,9 +1246,9 @@ public class ExecutionNodeReader {
     */
    public static class KeYlessVariable extends AbstractKeYlessExecutionElement implements IExecutionVariable {
       /**
-       * The parent {@link IExecutionVariable} if available.
+       * The parent {@link IExecutionValue} if available.
        */
-      private IExecutionVariable parentVariable;
+      private IExecutionValue parentValue;
       
       /**
        * The is array flag.
@@ -1130,6 +1261,96 @@ public class ExecutionNodeReader {
       private int arrayIndex;
       
       /**
+       * The contained values.
+       */
+      private List<IExecutionValue> values = new LinkedList<IExecutionValue>();
+      
+      /**
+       * Constructor.
+       * @param parentVariable The parent {@link IExecutionValue} if available.
+       * @param isArrayIndex The is array flag.
+       * @param arrayIndex The array index.
+       * @param name The name.
+       */
+      public KeYlessVariable(IExecutionValue parentValue, 
+                             boolean isArrayIndex, 
+                             int arrayIndex, 
+                             String name) {
+         super(name);
+         this.parentValue = parentValue;
+         this.isArrayIndex = isArrayIndex;
+         this.arrayIndex = arrayIndex;
+      }
+      
+      /**
+       * Adds the given child {@link IExecutionValue}.
+       * @param variable The child {@link IExecutionValue} to add.
+       */
+      public void addValue(IExecutionValue variable) {
+         values.add(variable);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionValue getParentValue() {
+         return parentValue;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionValue[] getValues() {
+         return values.toArray(new IExecutionValue[values.size()]);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public int getArrayIndex() {
+         return arrayIndex;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isArrayIndex() {
+         return isArrayIndex;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IProgramVariable getProgramVariable() {
+         return null;
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Variable";
+      }
+   }
+   
+   /**
+    * An implementation of {@link IExecutionValue} which is independent
+    * from KeY and provides such only children and default attributes.
+    * @author Martin Hentschel
+    */
+   public static class KeYlessValue extends AbstractKeYlessExecutionElement implements IExecutionValue {
+      /**
+       * The parent {@link IExecutionVariable} if available.
+       */
+      private IExecutionVariable variable;
+      
+      /**
        * The type string.
        */
       private String typeString;
@@ -1140,31 +1361,49 @@ public class ExecutionNodeReader {
       private String valueString;
       
       /**
+       * Is the value unknown?
+       */
+      private boolean valueUnknown;
+
+      /**
+       * Is the value an object?
+       */
+      private boolean valueAnObject;
+      
+      /**
        * The child variables.
        */
       private List<IExecutionVariable> childVariables = new LinkedList<IExecutionVariable>();
+
+      /**
+       * The condition as {@link String}.
+       */
+      private String conditionString;
       
       /**
        * Constructor.
-       * @param parentVariable The parent {@link IExecutionVariable} if available.
-       * @param isArrayIndex The is array flag.
-       * @param arrayIndex The array index.
+       * @param variable The parent {@link IExecutionVariable}.
        * @param typeString The type string.
        * @param valueString The value string.
        * @param name The name.
+       * @param valueUnknown Is the value unknown?
+       * @param valueAnObject Is the value an object?
+       * @param conditionString The condition as human readable {@link String}.
        */
-      public KeYlessVariable(IExecutionVariable parentVariable, 
-                             boolean isArrayIndex, 
-                             int arrayIndex, 
-                             String typeString, 
-                             String valueString, 
-                             String name) {
+      public KeYlessValue(IExecutionVariable variable, 
+                          String typeString, 
+                          String valueString, 
+                          String name,
+                          boolean valueUnknown,
+                          boolean valueAnObject,
+                          String conditionString) {
          super(name);
-         this.parentVariable = parentVariable;
-         this.isArrayIndex = isArrayIndex;
-         this.arrayIndex = arrayIndex;
+         this.variable = variable;
          this.typeString = typeString;
          this.valueString = valueString;
+         this.valueUnknown = valueUnknown;
+         this.valueAnObject = valueAnObject;
+         this.conditionString = conditionString;
       }
       
       /**
@@ -1195,8 +1434,16 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public IExecutionVariable getParentVariable() {
-         return parentVariable;
+      public String getConditionString() throws ProofInputException {
+         return conditionString;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IExecutionVariable getVariable() {
+         return variable;
       }
 
       /**
@@ -1211,24 +1458,16 @@ public class ExecutionNodeReader {
        * {@inheritDoc}
        */
       @Override
-      public int getArrayIndex() {
-         return arrayIndex;
+      public boolean isValueUnknown() throws ProofInputException {
+         return valueUnknown;
       }
 
       /**
        * {@inheritDoc}
        */
       @Override
-      public boolean isArrayIndex() {
-         return isArrayIndex;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public IProgramVariable getProgramVariable() {
-         return null;
+      public boolean isValueAnObject() throws ProofInputException {
+         return valueAnObject;
       }
 
       /**
@@ -1244,7 +1483,15 @@ public class ExecutionNodeReader {
        */
       @Override
       public String getElementType() {
-         return "Variable";
+         return "Value";
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Term getCondition() throws ProofInputException {
+         return null;
       }
    }
 }

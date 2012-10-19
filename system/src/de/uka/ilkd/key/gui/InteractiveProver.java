@@ -10,10 +10,7 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -26,8 +23,18 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.RuleAppIndex;
+import de.uka.ilkd.key.proof.TacletFilter;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -440,8 +447,10 @@ public class InteractiveProver {
         if(applyStrategy!=null){
             applyStrategy.clear();
         }
-        proof.clearAndDetachRuleAppIndexes();
-        proof = null;
+        if (proof != null) {
+           proof.clearAndDetachRuleAppIndexes();
+           proof = null;
+        }
         focusedGoal = null;
         //probably more clean up has to be done here.
     }

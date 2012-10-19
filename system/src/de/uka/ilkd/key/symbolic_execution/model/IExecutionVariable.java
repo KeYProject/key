@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
@@ -8,7 +7,9 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
 /**
  * <p>
  * A variable value pair contained in an {@link IExecutionStateNode}, e.g.
- * the method parameter {@code int x = 42}.
+ * the method parameter {@code int x = 42;} will have the variable value pair
+ * {@code x = 42}. This class represents the variable ({@code x}) which is represented
+ * while its values are reprented as child {@link IExecutionValue} instances.
  * </p>
  * <p>
  * The default implementation is {@link ExecutionVariable} which
@@ -16,6 +17,7 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionVariable;
  * </p>
  * @author Martin Hentschel
  * @see IExecutionStateNode
+ * @see IExecutionValue
  * @see ExecutionVariable
  */
 public interface IExecutionVariable extends IExecutionElement {
@@ -24,36 +26,6 @@ public interface IExecutionVariable extends IExecutionElement {
     * @return The {@link IProgramVariable} which contains the represented value.
     */
    public IProgramVariable getProgramVariable();
-   
-   /**
-    * Returns the value of the variable.
-    * @return The value of the variable.
-    */
-   public Term getValue() throws ProofInputException;
-   
-   /**
-    * Returns the value of the variable as human readable string representation.
-    * @return The value of the variable as human readable string representation.
-    */
-   public String getValueString() throws ProofInputException;
-   
-   /**
-    * Returns the type of the variable as human readable string.
-    * @return The type of the variable as human readable string.
-    */
-   public String getTypeString() throws ProofInputException;
-   
-   /**
-    * Returns the parent {@link IExecutionVariable}.
-    * @return The parent {@link IExecutionVariable}.
-    */
-   public IExecutionVariable getParentVariable();
-   
-   /**
-    * Returns contained child variables which forms complex data types.
-    * @return The contained child variables.
-    */
-   public IExecutionVariable[] getChildVariables() throws ProofInputException;
    
    /**
     * Returns the index in the parent array if an array cell value is represented.
@@ -66,4 +38,16 @@ public interface IExecutionVariable extends IExecutionElement {
     * @return {@code true} is array cell value, {@code false} is a "normal" value.
     */
    public boolean isArrayIndex();
+   
+   /**
+    * Returns the parent {@link IExecutionValue} if available.
+    * @return The parent {@link IExecutionValue} if available and {@code null} otherwise.
+    */
+   public IExecutionValue getParentValue();
+   
+   /**
+    * Returns the possible values of this {@link IExecutionVariable}.
+    * @return The possible values of this {@link IExecutionVariable}.
+    */
+   public IExecutionValue[] getValues() throws ProofInputException;
 }

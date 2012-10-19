@@ -197,6 +197,11 @@ public class SEDXMLWriter {
    public static final String ATTRIBUTE_ALLOCATED = "allocated";
 
    /**
+    * Attribute name to store multi valued flags.
+    */
+   public static final String ATTRIBUTE_MULTI_VALUED = "multiValued";
+
+   /**
     * Attribute name to store path conditions.
     */
    public static final String ATTRIBUTE_PATH_CONDITION = "pathCondition";
@@ -783,6 +788,9 @@ public class SEDXMLWriter {
       attributeValues.put(ATTRIBUTE_REFERENCE_TYPE_NAME, value.getReferenceTypeName());
       attributeValues.put(ATTRIBUTE_VALUE_STRING, value.getValueString());
       attributeValues.put(ATTRIBUTE_ALLOCATED, value.isAllocated() + "");
+      if (value instanceof ISEDValue) {
+         attributeValues.put(ATTRIBUTE_MULTI_VALUED, ((ISEDValue)value).isMultiValued() + "");
+      }
       appendStartTag(level, TAG_VALUE, attributeValues, sb);
       // Append children
       if (value.hasVariables()) {

@@ -9,6 +9,7 @@ import org.key_project.sed.core.util.LogUtil;
 import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
 /**
@@ -64,15 +65,13 @@ public class KeYVariable extends AbstractSEDVariable {
     */
    @Override
    public String getReferenceTypeName() throws DebugException {
-      try {
-         String typeName = executionVariable.getTypeString();
+      if (getValue() != null) {
+         String typeName = getValue().getReferenceTypeName();
          return typeName != null ? typeName : StringUtil.EMPTY_STRING;
       }
-      catch (ProofInputException e) {
-         LogUtil.getLogger().logError(e);
-         throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute reference type name.", e));
+      else {
+         return StringUtil.EMPTY_STRING;
       }
-
    }
 
    /**
@@ -88,10 +87,27 @@ public class KeYVariable extends AbstractSEDVariable {
     */
    @Override
    public IValue getValue() throws DebugException {
-      if (value == null) {
-         value = new KeYValue(getDebugTarget(), executionVariable);
+      synchronized (this) {
+         try {
+            if (value == null) {
+               IExecutionValue[] values = executionVariable.getValues();
+               if (values.length == 0) {
+                  throw new DebugException(LogUtil.getLogger().createErrorStatus("An IExecutionVariable must provide at least one IExecutionValue."));
+               }
+               else if (values.length == 1) {
+                  value = new KeYValue(getDebugTarget(), values[0]);
+               }
+               else {
+                  value = new KeYConditionalValues(getDebugTarget(), values);
+               }
+            }
+            return value;
+         }
+         catch (ProofInputException e) {
+            LogUtil.getLogger().logError(e);
+            throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute value.", e));
+         }
       }
-      return value;
    }
 
    /**

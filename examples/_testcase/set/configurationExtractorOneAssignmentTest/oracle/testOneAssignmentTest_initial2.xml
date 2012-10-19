@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state name="One Step Simplification resulting in return first.value+second.value+tempX.value+tempY.value;">
+      <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o3"/>
+   </state>
+   <object xml:id="o1" name="self" type="OneAssignmentTest">
+      <association name="y" programVariable="y" isArrayIndex="false" arrayIndex="-1" target="o2"/>
+   </object>
+   <object xml:id="o2" name="self.y" type="OneAssignmentTestValueWrapper">
+   </object>
+   <object xml:id="o3" name="x" type="OneAssignmentTestValueWrapper">
+   </object>
+</model>

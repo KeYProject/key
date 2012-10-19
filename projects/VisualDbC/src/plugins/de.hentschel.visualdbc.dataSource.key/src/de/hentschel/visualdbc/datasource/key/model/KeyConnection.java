@@ -286,16 +286,13 @@ public class KeyConnection extends MemoryConnection {
          SwingUtil.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-               if (!MainWindow.hasInstance()) {
-                  MainWindow.createInstance(Main.getMainWindowTitle());
-               }
                // Open connection in key
                if (interactive) {
                   main = MainWindow.getInstance();
                   main.setVisible(true);
                }
                else {
-                  main = MainWindow.getInstance(false);
+                  main = MainWindow.getInstance();
                }
             }
          });
@@ -1834,9 +1831,8 @@ public class KeyConnection extends MemoryConnection {
    /**
     * Closes the active task without user interaction.
     */
-   @SuppressWarnings("deprecation")
    public void closeTaskWithoutInteraction() {
-      main.closeTaskWithoutInteraction();
+      main.getUserInterface().removeProof(main.getMediator().getProof());
    }
    
    /**

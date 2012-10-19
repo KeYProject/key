@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.compute();" pathCondition="true" pathConditionChanged="false">
+      <statement name="classWrapper=new InstanceCreationTestWrapper (1);" pathCondition="true" pathConditionChanged="false">
+         <methodCall name="InstanceCreationTestWrapper(var);" pathCondition="true" pathConditionChanged="false">
+            <statement name="this.value=var;" pathCondition="true" pathConditionChanged="false">
+               <methodReturn name="&lt;return of InstanceCreationTestWrapper(var);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of InstanceCreationTestWrapper(var);&gt;">
+                  <statement name="instanceWrapper=new InstanceCreationTestWrapper (2);" pathCondition="true" pathConditionChanged="false">
+                     <methodCall name="InstanceCreationTestWrapper(var_1);" pathCondition="true" pathConditionChanged="false">
+                        <statement name="this.value=var_1;" pathCondition="true" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of InstanceCreationTestWrapper(var_1);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of InstanceCreationTestWrapper(var_1);&gt;">
+                              <branchNode name="if (next!=null) {   next.instanceWrapper=new InstanceCreationTestWrapper (3);InstanceCreationTestWrapper localWrapper = new InstanceCreationTestWrapper (4);return    classWrapper.value+instanceWrapper.value+next.instanceWrapper.value+localWrapper.value; }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
+                                 <branchCondition name="!self.next = null" pathCondition="!self.next = null" pathConditionChanged="true" branchCondition="!self.next = null" mergedBranchCondition="false">
+                                    <statement name="next.instanceWrapper=new InstanceCreationTestWrapper (3);" pathCondition="!self.next = null" pathConditionChanged="false">
+                                       <methodCall name="InstanceCreationTestWrapper(var_2);" pathCondition="!self.next = null" pathConditionChanged="false">
+                                          <statement name="this.value=var_2;" pathCondition="!self.next = null" pathConditionChanged="false">
+                                             <methodReturn name="&lt;return of InstanceCreationTestWrapper(var_2);&gt;" pathCondition="!self.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of InstanceCreationTestWrapper(var_2);&gt;">
+                                                <statement name="InstanceCreationTestWrapper localWrapper = new InstanceCreationTestWrapper (4);" pathCondition="!self.next = null" pathConditionChanged="false">
+                                                   <methodCall name="InstanceCreationTestWrapper(var_3);" pathCondition="!self.next = null" pathConditionChanged="false">
+                                                      <statement name="this.value=var_3;" pathCondition="!self.next = null" pathConditionChanged="false">
+                                                         <methodReturn name="&lt;return of InstanceCreationTestWrapper(var_3);&gt;" pathCondition="!self.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of InstanceCreationTestWrapper(var_3);&gt;">
+                                                            <statement name="return classWrapper.value+instanceWrapper.value+next.instanceWrapper.value+localWrapper.value;" pathCondition="!self.next = null" pathConditionChanged="false">
+                                                               <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="!self.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  8
++ \if (  \if (self.next = self)
+             \then (i_11)
+             \else (i_6)
+       = i_14)
+      \then (4)
+      \else (\if (self.next = self)
+                 \then (3)
+                 \else (\if (self.next = self)
+                            \then (\if (  \if (  self.next
+                                               = self)
+                                              \then (i_11)
+                                              \else (i_6)
+                                        = i_2)
+                                       \then (1)
+                                       \else (\if (  self.next
+                                                   = self)
+                                                  \then (i_11)
+                                                  \else (i_6).value))
+                            \else (2)))&apos; as result of self.compute();&gt;">
+                                                                  <termination name="&lt;end&gt;" pathCondition="!self.next = null" pathConditionChanged="false" exceptionalTermination="false">
+                                                                  </termination>
+                                                               </methodReturn>
+                                                            </statement>
+                                                         </methodReturn>
+                                                      </statement>
+                                                   </methodCall>
+                                                </statement>
+                                             </methodReturn>
+                                          </statement>
+                                       </methodCall>
+                                    </statement>
+                                 </branchCondition>
+                                 <branchCondition name="self.next = null" pathCondition="self.next = null" pathConditionChanged="true" branchCondition="self.next = null" mergedBranchCondition="false">
+                                    <statement name="return -100;" pathCondition="self.next = null" pathConditionChanged="false">
+                                       <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="self.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-100&apos; as result of self.compute();&gt;">
+                                          <termination name="&lt;end&gt;" pathCondition="self.next = null" pathConditionChanged="false" exceptionalTermination="false">
+                                          </termination>
+                                       </methodReturn>
+                                    </statement>
+                                 </branchCondition>
+                              </branchNode>
+                           </methodReturn>
+                        </statement>
+                     </methodCall>
+                  </statement>
+               </methodReturn>
+            </statement>
+         </methodCall>
+      </statement>
+   </methodCall>
+</startNode>
