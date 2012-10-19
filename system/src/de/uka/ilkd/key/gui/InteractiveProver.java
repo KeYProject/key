@@ -569,9 +569,12 @@ public class InteractiveProver {
                 mediator ().notify
                 (new GeneralFailureEvent("An exception occurred during" 
                         + " strategy execution.\n Exception:" + result.getException()));  
-            }   
+            }
 
-        }       
+            // make it possible to free memory
+            goals = null;
+            worker = null;
+        }
     }
 
 }
