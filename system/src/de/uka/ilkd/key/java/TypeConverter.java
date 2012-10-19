@@ -172,6 +172,9 @@ public final class TypeConverter {
 	    Function f = emb.getFunctionSymbol();
 	    // TODO make a sensible error recovery
 	    return TB.func(f, subs);
+	} else if(op instanceof TypeCast) {
+	    TypeCast tc = (TypeCast) op;
+	    return TB.cast(services, tc.getKeYJavaType(services).getSort(), subs[0]);
 	} else {
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());		
