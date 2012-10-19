@@ -1216,6 +1216,14 @@ options {
                 if (mod != "") mod += " and ";
                 mod += "\"\\inSequentState\""; 
             }
+            if ((applicationRestriction & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
+                if (mod != "") mod += " and ";
+                mod += "\"\\antecedentPolarity\""; 
+            }
+            if ((applicationRestriction & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
+                if (mod != "") mod += " and ";
+                mod += "\"\\succedentPolarity\"";
+            }
             if (mod == "") {
                 mod = "Application restrictions";               
             }
@@ -3387,6 +3395,8 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
         ( FIND LPAREN find = termorseq RPAREN
             (   SAMEUPDATELEVEL { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
               | INSEQUENTSTATE { applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE; }
+              | ANTECEDENTPOLARITY { applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY; }
+              | SUCCEDENTPOLARITY { applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY; }
             )*
         ) ?
         { 

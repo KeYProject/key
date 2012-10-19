@@ -765,7 +765,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             strategyProperties.getProperty
             ( StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY ) );
     }
-    
+
     private boolean instQuantifiersWithQueries() {
         return StrategyProperties.QUANTIFIERS_INSTANTIATE
                .equals ( strategyProperties.getProperty
@@ -2215,12 +2215,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "inReachableStateImplication",
         	      NonDuplicateAppModPositionFeature.INSTANCE );
         
-        bindRuleSet(d, "negPolarity", 
-        		ifZero(PolarityFeature.NEGATIVE_POLARITY, longConst(0), inftyConst()));
-
-        bindRuleSet(d, "posPolarity", 
-        		ifZero(PolarityFeature.POSITIVE_POLARITY, longConst(0), inftyConst()));
-
         bindRuleSet ( d, "limitObserver",
   	      NonDuplicateAppModPositionFeature.INSTANCE );
         
