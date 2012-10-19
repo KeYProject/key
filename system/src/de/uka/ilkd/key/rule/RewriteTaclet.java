@@ -42,26 +42,6 @@ public final class RewriteTaclet extends FindTaclet {
     /** all taclet consituents must be in the same state 
      * as the sequent */
     public static final int IN_SEQUENT_STATE = 2;
-    
-    /**
-     * If the surrounding formula has been decomposed completely, the find-term
-     * will NOT appear on the SUCcedent. The formula "wellformed(h)" in
-     * "wellformed(h) ==>" or in "==> wellformed(h) -> (inv(h) = inv(h2))"
-     * or in "==> \if(b) \then(!wellformed(h)) \else(!wellformed(h2))"
-     * has antecedent polarity. The formula "wellformed(h)" in
-     * "wellformed(h) <-> wellformed(h2) ==>" has NO antecedent polarity.
-     */
-    public static final int ANTECEDENT_POLARITY = 4;
-    
-    /**
-     * If the surrounding formula has been decomposed completely, the find-term
-     * will NOT appear on the ANTEcedent. The formula "wellformed(h)" in
-     * "==> wellformed(h)" or in "wellformed(h) -> (inv(h) = inv(h2)) ==>"
-     * or in "\if(b) \then(!wellformed(h)) \else(!wellformed(h2)) ==>"
-     * has succedent polarity. The formula "wellformed(h)" in
-     * "wellformed(h) <-> wellformed(h2) ==>" has NO succedent polarity.
-     */
-    public static final int SUCCEDENT_POLARITY = 8;
 
     
     /**
@@ -162,7 +142,6 @@ public final class RewriteTaclet extends FindTaclet {
 	if ( getApplicationRestriction() == NONE)  
 	    return p_mc;
         
-    int polarity = p_pos.isInAntec() ? -1 : 1;  // init polarity
 	SVInstantiations svi = p_mc.getInstantiations ();
 	if ( p_pos.posInTerm () != null ) {
 	    PIOPathIterator it = p_pos.iterator ();
@@ -185,26 +164,8 @@ public final class RewriteTaclet extends FindTaclet {
                 return null;
             }
 
-            // compute polarity
-                                                                                // toggle polarity if find term is subterm of
-            if ((op == Junctor.NOT) ||                                          //   not
-                (op == Junctor.IMP && it.getChild() == 0)) {                    //   left hand side of implication
-                polarity = polarity * -1;
-                                                                                // do not change polarity if find term is subterm of
-            } else if ((op == Junctor.AND) ||                                   //   and
-                       (op == Junctor.OR) ||                                    //   or
-                       (op == Junctor.IMP && it.getChild() != 0) ||             //   right hand side of implication
-                       (op == IfThenElse.IF_THEN_ELSE && it.getChild() != 0)) { //   then or else part of if-then-else
-                // do nothing
-            } else {                                                            // find term has no polarity in any other case
-                polarity = 0;
-            }
 	    }
 	}
-    if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1) ||
-        ((getApplicationRestriction() & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
-        return null;
-    }
 
 	return p_mc.setInstantiations ( svi );
     }
@@ -362,12 +323,6 @@ public final class RewriteTaclet extends FindTaclet {
         }
         if ((getApplicationRestriction() & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
             res.append("\\inSequentState");
-        }
-        if ((getApplicationRestriction() & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
-            res.append("\\antecedentPolarity");
-        }
-        if ((getApplicationRestriction() & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
-            res.append("\\succedentPolarity");
         }
 	return res;
     }
