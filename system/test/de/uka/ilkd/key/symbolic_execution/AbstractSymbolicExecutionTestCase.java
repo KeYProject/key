@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -400,11 +401,45 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertNotNull(current);
          IExecutionVariable[] expectedVariables = expected.getVariables();
          IExecutionVariable[] currentVariables = current.getVariables();
-         assertEquals(expectedVariables.length, currentVariables.length);
-         for (int i = 0; i < expectedVariables.length; i++) {
-            assertVariable(expectedVariables[i], currentVariables[i], true, true);
-         }
+         assertVariables(expectedVariables, currentVariables, true, true);
       }
+   }
+   
+   /**
+    * Makes sure that the given variables are the same.
+    * @param expected The expected variables.
+    * @param current The current variables.
+    * @param compareParent Compare parent?
+    * @param compareChildren Compare children?
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertVariables(IExecutionVariable[] expected, 
+                                         IExecutionVariable[] current,
+                                         boolean compareParent, 
+                                         boolean compareChildren) throws ProofInputException {
+      TestCase.assertEquals(expected.length, current.length);
+      // Compare ignore order
+      List<IExecutionVariable> availableCurrentVariables = new LinkedList<IExecutionVariable>();
+      JavaUtil.addAll(availableCurrentVariables, current);
+      for (int i = 0; i < expected.length; i++) {
+         final IExecutionVariable expectedVariable = expected[i];
+         // Find current variable with same name
+         IExecutionVariable currentVariable = JavaUtil.searchAndRemove(availableCurrentVariables, new IFilter<IExecutionVariable>() {
+            @Override
+            public boolean select(IExecutionVariable element) {
+               try {
+                  return JavaUtil.equalIgnoreWhiteSpace(expectedVariable.getName(), element.getName());
+               }
+               catch (ProofInputException e) {
+                  throw new RuntimeException(e);
+               }
+            }
+         });
+         TestCase.assertNotNull(currentVariable);
+         // Compare variables
+         assertVariable(expectedVariable, currentVariable, compareParent, compareChildren);
+      }
+      TestCase.assertTrue(availableCurrentVariables.isEmpty());
    }
 
    /**
@@ -433,10 +468,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          if (compareChildren) {
             IExecutionValue[] expectedValues = expected.getValues();
             IExecutionValue[] currentValues = current.getValues();
-            assertEquals(expectedValues.length, currentValues.length);
-            for (int i = 0; i < expectedValues.length; i++) {
-               assertValue(expectedValues[i], currentValues[i], true, true);
-            }
+            assertValues(expectedValues, currentValues, true, true);
          }
       }
       else {
@@ -444,6 +476,46 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       }
    }
 
+
+   
+   /**
+    * Makes sure that the given values are the same.
+    * @param expected The expected values.
+    * @param current The current values.
+    * @param compareParent Compare parent?
+    * @param compareChildren Compare children?
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertValues(IExecutionValue[] expected, 
+                                      IExecutionValue[] current,
+                                      boolean compareParent, 
+                                      boolean compareChildren) throws ProofInputException {
+      TestCase.assertEquals(expected.length, current.length);
+      // Compare ignore order
+      List<IExecutionValue> availableCurrentVariables = new LinkedList<IExecutionValue>();
+      JavaUtil.addAll(availableCurrentVariables, current);
+      for (int i = 0; i < expected.length; i++) {
+         final IExecutionValue expectedVariable = expected[i];
+         // Find current variable with same name
+         IExecutionValue currentVariable = JavaUtil.searchAndRemove(availableCurrentVariables, new IFilter<IExecutionValue>() {
+            @Override
+            public boolean select(IExecutionValue element) {
+               try {
+                  return JavaUtil.equalIgnoreWhiteSpace(expectedVariable.getName(), element.getName()) &&
+                         JavaUtil.equalIgnoreWhiteSpace(expectedVariable.getConditionString(), element.getConditionString());
+               }
+               catch (ProofInputException e) {
+                  throw new RuntimeException(e);
+               }
+            }
+         });
+         TestCase.assertNotNull(currentVariable);
+         // Compare variables
+         assertValue(expectedVariable, currentVariable, compareParent, compareChildren);
+      }
+      TestCase.assertTrue(availableCurrentVariables.isEmpty());
+   }
+   
    /**
     * Makes sure that the given values are the same.
     * @param expected The expected variable.
@@ -473,10 +545,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          if (compareChildren) {
             IExecutionVariable[] expectedChildVariables = expected.getChildVariables();
             IExecutionVariable[] currentChildVariables = current.getChildVariables();
-            assertEquals(expectedChildVariables.length, currentChildVariables.length);
-            for (int i = 0; i < expectedChildVariables.length; i++) {
-               assertVariable(expectedChildVariables[i], currentChildVariables[i], compareParent, compareChildren);
-            }
+            assertVariables(expectedChildVariables, currentChildVariables, compareParent, compareChildren);
          }
       }
       else {
