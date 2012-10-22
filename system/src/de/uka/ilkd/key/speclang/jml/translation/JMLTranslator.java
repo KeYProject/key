@@ -1762,7 +1762,9 @@ final class JMLTranslator {
         
         @Override
         protected boolean isGeneralized () {
-            return true;
+            // this class already contains the correct handling
+            // of generalized quantifiers, therefore returning false is correct
+            return false;
         }
 
         /** Creates a term for a bounded numerical quantifier (e.g., sum).*/

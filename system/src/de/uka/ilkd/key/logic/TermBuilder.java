@@ -667,6 +667,15 @@ public class TermBuilder {
         if (a.sort() == Sort.FORMULA) {
             return a;
         } else if (a.sort() == booleanLDT.targetSort()) {
+            // special case where a is the result of convertToBoolean
+            if (a.op() == IfThenElse.IF_THEN_ELSE) {
+                assert a.subs().size() == 3;
+                assert a.sub(0).sort() == Sort.FORMULA;
+                if (a.sub(1) == booleanLDT.getTrueTerm() && a.sub(2) == booleanLDT.getFalseTerm())
+                    return a.sub(0);
+                else if (a.sub(1) == booleanLDT.getFalseTerm() && a.sub(2) == booleanLDT.getTrueTerm())
+                    return not(a.sub(0));
+            }
             return equals(a, TRUE(services));
         } else {
             throw new TermCreationException("Term " + a + " cannot be converted"
@@ -680,6 +689,7 @@ public class TermBuilder {
         if (a.sort() == booleanLDT.targetSort()) {
             return a;
         } else if (a.sort() == Sort.FORMULA) {
+            // special case where a is the result of convertToFormula
             if (a.op() == Equality.EQUALS && a.sub(1) == booleanLDT.getTrueTerm() ) {
                 return a.sub(0);
             }
