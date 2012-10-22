@@ -13,7 +13,8 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 
 /**
- * Handler that starts the KeY UI via {@link KeYUtil#openMainWindow()}.
+ * Handler that starts a proof for selected {@link IMethod}s
+ * in the KeY UI via {@link KeYUtil#startProofAsync(IMethod)}.
  */
 @SuppressWarnings("restriction")
 public class StartProofHandler extends AbstractSaveExecutionHandler {

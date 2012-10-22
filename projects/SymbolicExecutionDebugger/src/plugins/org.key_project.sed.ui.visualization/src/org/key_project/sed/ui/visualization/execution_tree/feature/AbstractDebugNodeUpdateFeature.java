@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -33,7 +32,7 @@ import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.SEDPreorderIterator;
-import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
+import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -271,14 +270,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    public boolean update(IUpdateContext context) {
       try {
          // Define monitor to use
-         IProgressMonitor monitor;
-         Object contextMonitor = context.getProperty(ExecutionTreeUtil.CONTEXT_PROPERTY_MONITOR);
-         if (contextMonitor instanceof IProgressMonitor) {
-            monitor = (IProgressMonitor)contextMonitor;
-         }
-         else {
-            monitor = new NullProgressMonitor();
-         }
+         IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
          // Update name
          PictogramElement pictogramElement = context.getPictogramElement();
          monitor.beginTask("Update element: " + pictogramElement, 3);

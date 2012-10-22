@@ -1,4 +1,4 @@
-package org.key_project.sed.ui.job;
+package org.key_project.util.eclipse.job;
 
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.IWorkbenchPart;
@@ -11,7 +11,7 @@ import org.key_project.util.java.ObjectUtil;
  * which have to be executed in serial order. 
  * @author Martin Hentschel
  */
-public abstract class AbstractExecutionTreeDiagramEditorJob extends Job {
+public abstract class AbstractWorkbenchPartJob extends Job {
    /**
     * The {@link IWorkbenchPart} which has executed this {@link Job}.
     */
@@ -22,7 +22,7 @@ public abstract class AbstractExecutionTreeDiagramEditorJob extends Job {
     * @param name The name of this {@link Job}.
     * @param part The {@link IWorkbenchPart} which has executed this {@link Job}.
     */
-   public AbstractExecutionTreeDiagramEditorJob(String name, IWorkbenchPart part) {
+   public AbstractWorkbenchPartJob(String name, IWorkbenchPart part) {
       super(name);
       this.part = part;
       setRule(new ObjectchedulingRule(part));

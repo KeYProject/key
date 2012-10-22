@@ -220,14 +220,14 @@ public class DesignTests extends TestCase {
 	for (int i = 0; i<meth.length; i++) {
 	    if (meth[i].getName().startsWith("test")) {
 		try {
-		    message = ".";
-		    badClasses = (LinkedList)meth[i].invoke(this, (Object[])null);
-		    System.out.print(message);
 		    testcases++;
-		    failures += badClasses.size() > 0 ? 1 : 0;
+		    message = ".";
+		    meth[i].invoke(this, (Object[])null);
+		    System.out.print(message);
 		} catch (Exception e) {
 		    e.printStackTrace();
 		    System.err.println("Could not invoke method "+meth[i]);
+                    failures ++;
 		}
 	    }
 	}	

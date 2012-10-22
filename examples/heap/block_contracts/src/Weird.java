@@ -29,7 +29,7 @@ public class Weird {
               @
               @ continue_behavior
               @ requires x > 0 && y < 0;
-              @ continues z == x % y;
+              @ continues () z == x % y;
               @ assignable \nothing;
               @
               @ also
@@ -153,7 +153,7 @@ public class Weird {
             /*@ requires x > 0 && y > 0;
               @ ensures z == \old(z);
               @ breaks (label) z < \old(z);
-              @ continues z > \old(z);
+              @ continues () z > \old(z);
               @ returns z + \old(z) == 0 && \result == 100;
               @ diverges x == y;
               @ signals (Exception e) \old(z) - z == 0;
@@ -192,8 +192,8 @@ public class Weird {
         int z = 0;
         /*@ requires z == 0;
           @ ensures x == y;
-          @ breaks x > y;
-          @ continues x < y;
+          @ breaks () x > y;
+          @ continues () x < y;
           @ returns x == 0 && y == 0;
           @ signals (Exception e) x + y == 0;
           @ diverges x == y;
@@ -210,8 +210,8 @@ public class Weird {
         int x = 1;
         /*@ requires x == 0;
           @ ensures u == v;
-          @ breaks v > w;
-          @ continues w < v;
+          @ breaks () v > w;
+          @ continues () w < v;
           @ returns v == 0 && u == 0;
           @ signals (Exception e) x + u == 0;
           @ diverges x == u;

@@ -137,8 +137,8 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
                                       new MethodCallCreateFeature(this),
                                       new MethodReturnCreateFeature(this),
                                       new StatementCreateFeature(this),
-                                       new TerminationCreateFeature(this),
-                                       new ThreadCreateFeature(this)};
+                                      new TerminationCreateFeature(this),
+                                      new ThreadCreateFeature(this)};
       }
       else {
          return new ICreateFeature[0];

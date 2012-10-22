@@ -17,6 +17,20 @@ public final class JavaUtil {
    }
    
    /**
+    * Adds all elements to the {@link Collection}. 
+    * @param <T> The type of the {@link Collection}s elements.
+    * @param collection The {@link Collection} to add to.
+    * @param elementsToAdd The elements to add.
+    */
+   public static <T> void addAll(Collection<T> collection, T... elementsToAdd) {
+      if (collection != null && elementsToAdd != null) {
+         for (T toAdd : elementsToAdd) {
+            collection.add(toAdd);
+         }
+      }
+   }
+   
+   /**
     * Returns the index of the element to search in the given iterator.
     * @param iter The iterator to search in.
     * @param toSearch The element to search.
@@ -199,6 +213,30 @@ public final class JavaUtil {
                T next = iter.next();
                if (filter.select(next)) {
                   result = next;
+               }
+            }
+         }
+      }
+      return result;
+   }
+
+   /**
+    * Searches an element in the given {@link Iterable} instance and removes
+    * the found element from it.
+    * @param iterable The instance to search in.
+    * @param filter The filter to select an element.
+    * @return The found element or {@code null} if no element was found.
+    */
+   public static <T> T searchAndRemove(Iterable<T> iterable, IFilter<T> filter) {
+      T result = null;
+      if (iterable != null && filter != null) {
+         Iterator<T> iter = iterable.iterator();
+         if (iter != null) {
+            while (result == null && iter.hasNext()) {
+               T next = iter.next();
+               if (filter.select(next)) {
+                  result = next;
+                  iter.remove();
                }
             }
          }

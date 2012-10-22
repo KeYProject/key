@@ -12,7 +12,8 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 
 /**
- * Handler that starts the KeY UI via {@link KeYUtil#openMainWindow()}.
+ * Handler that loads selected {@link IFile}s if supported 
+ * in the KeY UI via {@link KeYUtil#loadAsync(IResource)}.
  */
 public class LoadResourceHandler extends AbstractSaveExecutionHandler {
     /**

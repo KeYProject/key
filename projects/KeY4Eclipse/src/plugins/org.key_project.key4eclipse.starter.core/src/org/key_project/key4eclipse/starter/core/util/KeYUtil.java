@@ -156,9 +156,6 @@ public final class KeYUtil {
         SwingUtil.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                if (!MainWindow.hasInstance()) {
-                   MainWindow.createInstance(Main.getMainWindowTitle());
-                }
                 MainWindow.getInstance().setVisible(true);
             }
         });
@@ -381,10 +378,10 @@ public final class KeYUtil {
             @Override
             public void run() {
                 try {
-                    if (!MainWindow.hasInstance()) {
-                        MainWindow.createInstance(Main.getMainWindowTitle());
+                    MainWindow main = MainWindow.getInstance();
+                    if (showKeYMainWindow) {
+                       main.setVisible(true);
                     }
-                    MainWindow main = MainWindow.getInstance(showKeYMainWindow);
                     if (showKeYMainWindow && !main.isVisible()) {
                         main.setVisible(true);
                     }
@@ -650,7 +647,7 @@ public final class KeYUtil {
     */
    public static boolean isProofInUI(Proof proof) {
       boolean inUI = false;
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          Set<ProofAggregate> proofAggregates = proof.env().getProofs();
          Iterator<ProofAggregate> iter = proofAggregates.iterator();
          while (!inUI && iter.hasNext()) {

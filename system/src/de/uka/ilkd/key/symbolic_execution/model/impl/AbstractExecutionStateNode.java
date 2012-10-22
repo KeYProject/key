@@ -1,12 +1,17 @@
 package de.uka.ilkd.key.symbolic_execution.model.impl;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeSymbolicConfigurationExtractor;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 
 /**
  * Provides a basic implementation of {@link IExecutionStateNode}.
@@ -17,6 +22,11 @@ public abstract class AbstractExecutionStateNode<S extends SourceElement> extend
     * The variable value pairs of the current state.
     */
    private IExecutionVariable[] variables;
+   
+   /**
+    * The used {@link ExecutionNodeSymbolicConfigurationExtractor}.
+    */
+   private ExecutionNodeSymbolicConfigurationExtractor configurationExtractor;
    
    /**
     * Constructor.
@@ -63,4 +73,62 @@ public abstract class AbstractExecutionStateNode<S extends SourceElement> extend
     * @return The {@link IExecutionVariable}s of the current state.
     */
    protected abstract IExecutionVariable[] lazyComputeVariables();
+
+   /**
+    * Returns the used {@link ExecutionNodeSymbolicConfigurationExtractor}.
+    * @return The used {@link ExecutionNodeSymbolicConfigurationExtractor}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   public ExecutionNodeSymbolicConfigurationExtractor getConfigurationExtractor() throws ProofInputException {
+      synchronized (this) {
+         if (configurationExtractor == null) {
+            configurationExtractor = lazyComputeConfigurationExtractor();
+         }
+         return configurationExtractor;
+      }
+   }
+
+   /**
+    * Instantiates the used {@link ExecutionNodeSymbolicConfigurationExtractor} lazily
+    * when {@link #getConfigurationExtractor()} is called the first time.
+    * @return The created {@link ExecutionNodeSymbolicConfigurationExtractor}.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected ExecutionNodeSymbolicConfigurationExtractor lazyComputeConfigurationExtractor() throws ProofInputException {
+      ExecutionNodeSymbolicConfigurationExtractor result = new ExecutionNodeSymbolicConfigurationExtractor(this);
+      result.analyse();
+      return result;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public int getConfigurationsCount() throws ProofInputException {
+      return getConfigurationExtractor().getConfigurationsCount();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISymbolicConfiguration getInitialConfiguration(int configurationIndex) throws ProofInputException {
+      return getConfigurationExtractor().getInitialConfiguration(configurationIndex);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ISymbolicConfiguration getCurrentConfiguration(int configurationIndex) throws ProofInputException {
+      return getConfigurationExtractor().getCurrentConfiguration(configurationIndex);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public ImmutableList<ISymbolicEquivalenceClass> getConfigurationsEquivalenceClasses(int configurationIndex) throws ProofInputException {
+      return getConfigurationExtractor().getEquivalenceClasses(configurationIndex);
+   }
 }

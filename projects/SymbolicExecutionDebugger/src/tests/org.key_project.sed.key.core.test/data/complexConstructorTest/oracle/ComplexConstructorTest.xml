@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_6dbe66b5-2439-46fd-b7b0-c4aac555709d" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_36327958-de88-47f1-a9a6-e38b4db9fa31" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_0f4bf339-5afd-4e39-9f33-87ab9d05c60e" name="ComplexConstructorTest.main();" pathCondition="true" lineNumber="-1" charStart="60" charEnd="64">
+            <sedStatement xml:id="_43200efa-055c-4c55-b8db-5b260500d5c9" name="DefaultConstructor dc = new DefaultConstructor ();" pathCondition="true" lineNumber="-1" charStart="72" charEnd="121">
+               <sedMethodCall xml:id="_e95042f7-d868-4754-85ab-645f62352c8a" name="DefaultConstructor();" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                  <sedMethodReturn xml:id="_dad6bfbb-00ec-444b-b57b-3c2d76c93845" name="&lt;return of DefaultConstructor();&gt;" pathCondition="true" lineNumber="-1" charStart="-1" charEnd="-1">
+                     <sedStatement xml:id="_a6b9a329-12c2-4c16-a3f1-9c4b6aaab215" name="ExplicitConstructor ec = new ExplicitConstructor ();" pathCondition="true" lineNumber="-1" charStart="125" charEnd="176">
+                        <sedMethodCall xml:id="_4134f85c-b407-4aa7-ac55-00b850ebb349" name="ExplicitConstructor();" pathCondition="true" lineNumber="-1" charStart="581" charEnd="600">
+                           <sedMethodReturn xml:id="_f0632cfc-a261-42e6-801a-70be8d2ded98" name="&lt;return of ExplicitConstructor();&gt;" pathCondition="true" lineNumber="-1" charStart="581" charEnd="600">
+                              <sedStatement xml:id="_284868a2-8260-474c-8836-0f6ac82491b7" name="ExplicitConstructorWithSuper ecws = new ExplicitConstructorWithSuper ();" pathCondition="true" lineNumber="-1" charStart="180" charEnd="251">
+                                 <sedMethodCall xml:id="_965d22f5-7c4b-4893-bac1-a31393293f13" name="ExplicitConstructorWithSuper();" pathCondition="true" lineNumber="-1" charStart="680" charEnd="708">
+                                    <sedMethodReturn xml:id="_90b7aedb-2405-4198-86f9-354c25e984a3" name="&lt;return of ExplicitConstructorWithSuper();&gt;" pathCondition="true" lineNumber="-1" charStart="680" charEnd="708">
+                                       <sedStatement xml:id="_a9b7c6a8-0274-4f99-b846-28c559fe8bc7" name="A a = new A ();" pathCondition="true" lineNumber="-1" charStart="255" charEnd="269">
+                                          <sedMethodCall xml:id="_f8dc490f-06cb-442c-9130-6ce0819256d9" name="A();" pathCondition="true" lineNumber="-1" charStart="773" charEnd="774">
+                                             <sedMethodCall xml:id="_50a1a8ed-4c5f-4235-b1cc-3d7ba2562438" name="A(a_4);" pathCondition="true" lineNumber="-1" charStart="808" charEnd="809">
+                                                <sedStatement xml:id="_68bbe242-58ff-4cc5-ab7b-3f829c9df439" name="this.a=a_4;" pathCondition="true" lineNumber="-1" charStart="822" charEnd="833">
+                                                   <sedMethodReturn xml:id="_2cbe5c7f-c46c-4156-83a0-5af9dfbd9bc8" name="&lt;return of A(a_4);&gt;" pathCondition="true" lineNumber="-1" charStart="808" charEnd="809">
+                                                      <sedMethodReturn xml:id="_5a14bd5c-72cb-45c0-b8fa-803e82bf0640" name="&lt;return of A();&gt;" pathCondition="true" lineNumber="-1" charStart="773" charEnd="774">
+                                                         <sedStatement xml:id="_935cb903-aae5-4cbb-985a-5972e7c6941c" name="A aCustom = new A (12);" pathCondition="true" lineNumber="-1" charStart="273" charEnd="295">
+                                                            <sedMethodCall xml:id="_07a2132b-708f-4792-a1ea-655fef911068" name="A(var);" pathCondition="true" lineNumber="-1" charStart="808" charEnd="809">
+                                                               <sedStatement xml:id="_bda3a0d2-02de-48af-88f9-815557bc0783" name="this.a=var;" pathCondition="true" lineNumber="-1" charStart="822" charEnd="833">
+                                                                  <sedMethodReturn xml:id="_e19b0b66-23a6-455c-82f2-064ff4c97001" name="&lt;return of A(var);&gt;" pathCondition="true" lineNumber="-1" charStart="808" charEnd="809">
+                                                                     <sedStatement xml:id="_f9bb2368-3cc9-445f-a72c-c485e769df7c" name="B b = new B ();" pathCondition="true" lineNumber="-1" charStart="299" charEnd="313">
+                                                                        <sedMethodCall xml:id="_4ee5f579-593d-449b-8087-6b1cc1954312" name="B();" pathCondition="true" lineNumber="-1" charStart="895" charEnd="896">
+                                                                           <sedMethodCall xml:id="_e5632332-e467-4cd4-91fe-2e741cc15d1f" name="B(b_4);" pathCondition="true" lineNumber="-1" charStart="932" charEnd="933">
+                                                                              <sedMethodCall xml:id="_f97af081-fc06-4c38-b68d-f7ea8b7391b1" name="A();" pathCondition="true" lineNumber="-1" charStart="773" charEnd="774">
+                                                                                 <sedMethodCall xml:id="_378f84eb-bda5-4c9d-ada2-2694851f30bb" name="A(a_8);" pathCondition="true" lineNumber="-1" charStart="808" charEnd="809">
+                                                                                    <sedStatement xml:id="_6714f69c-9566-4f81-a58b-45d59a687b64" name="this.a=a_8;" pathCondition="true" lineNumber="-1" charStart="822" charEnd="833">
+                                                                                       <sedMethodReturn xml:id="_faa23020-3419-4dd7-ab04-0fe0f026c104" name="&lt;return of A(a_8);&gt;" pathCondition="true" lineNumber="-1" charStart="808" charEnd="809">
+                                                                                          <sedMethodReturn xml:id="_7d478842-2fe8-4013-b968-6f7e77c22e01" name="&lt;return of A();&gt;" pathCondition="true" lineNumber="-1" charStart="773" charEnd="774">
+                                                                                             <sedStatement xml:id="_f20846eb-e5d9-41bb-9055-8460c8aca0a2" name="this.b=b_4;" pathCondition="true" lineNumber="-1" charStart="950" charEnd="961">
+                                                                                                <sedMethodReturn xml:id="_07534247-c3e4-4ac0-951d-0d6c5386c352" name="&lt;return of B(b_4);&gt;" pathCondition="true" lineNumber="-1" charStart="932" charEnd="933">
+                                                                                                   <sedMethodReturn xml:id="_fa75eab0-52e1-40a6-b96f-3ce8a3145eb5" name="&lt;return of B();&gt;" pathCondition="true" lineNumber="-1" charStart="895" charEnd="896">
+                                                                                                      <sedStatement xml:id="_d0d25b81-51dd-4ed9-a477-1173ea774d1a" name="B bCustomB = new B (true);" pathCondition="true" lineNumber="-1" charStart="317" charEnd="342">
+                                                                                                         <sedMethodCall xml:id="_ce832df3-240a-4a0b-b6f6-9a0d1b3a4960" name="B(var_1);" pathCondition="true" lineNumber="-1" charStart="932" charEnd="933">
+                                                                                                            <sedMethodCall xml:id="_fdbdce06-eb52-48ba-a12b-f35f951cef23" name="A();" pathCondition="true" lineNumber="-1" charStart="773" charEnd="774">
+                                                                                                               <sedMethodCall xml:id="_2d924cef-0da3-4dd0-bf80-1b655c3d6b6f" name="A(a_9);" pathCondition="true" lineNumber="-1" charStart="808" charEnd="809">
+                                                                                                                  <sedStatement xml:id="_45ce4a01-f137-4262-8c8e-d34a4ff522d8" name="this.a=a_9;" pathCondition="true" lineNumber="-1" charStart="822" charEnd="833">
+                                                                                                                     <sedMethodReturn xml:id="_3dfcd3b3-8f46-4cb6-bdaf-6d0779c70749" name="&lt;return of A(a_9);&gt;" pathCondition="true" lineNumber="-1" charStart="808" charEnd="809">
+                                                                                                                        <sedMethodReturn xml:id="_1cdfb4b6-670f-497d-ab9d-377d77933a62" name="&lt;return of A();&gt;" pathCondition="true" lineNumber="-1" charStart="773" charEnd="774">
+                                                                                                                           <sedStatement xml:id="_c0249f2b-ab38-489b-a801-dd82bdce588b" name="this.b=var_1;" pathCondition="true" lineNumber="-1" charStart="950" charEnd="961">
+                                                                                                                              <sedMethodReturn xml:id="_121158ab-fb4d-4a5a-a8f0-2e6d7503d4ad" name="&lt;return of B(var_1);&gt;" pathCondition="true" lineNumber="-1" charStart="932" charEnd="933">
+                                                                                                                                 <sedStatement xml:id="_3047c705-55c3-4b14-9e02-e474cb0458f5" name="B bCustomIB = new B (11,true);" pathCondition="true" lineNumber="-1" charStart="346" charEnd="376">
+                                                                                                                                    <sedMethodCall xml:id="_16dee28d-0bbd-4890-9226-1ee07e6f0e04" name="B(var_2,var_3);" pathCondition="true" lineNumber="-1" charStart="978" charEnd="979">
+                                                                                                                                       <sedMethodCall xml:id="_328b607b-1d62-4ab6-929b-1c515bcf8cd6" name="A(a_10);" pathCondition="true" lineNumber="-1" charStart="808" charEnd="809">
+                                                                                                                                          <sedStatement xml:id="_65d78678-668b-4bbb-8857-4addacd7eaf1" name="this.a=a_10;" pathCondition="true" lineNumber="-1" charStart="822" charEnd="833">
+                                                                                                                                             <sedMethodReturn xml:id="_d377a8b0-d95f-4509-930a-e2be2cebb420" name="&lt;return of A(a_10);&gt;" pathCondition="true" lineNumber="-1" charStart="808" charEnd="809">
+                                                                                                                                                <sedStatement xml:id="_3c383bd6-41ae-4dbc-860b-86e51cfa9887" name="this.b=var_3;" pathCondition="true" lineNumber="-1" charStart="1016" charEnd="1027">
+                                                                                                                                                   <sedMethodReturn xml:id="_8beb2c52-03aa-44d7-aa12-c2292eefdd56" name="&lt;return of B(var_2,var_3);&gt;" pathCondition="true" lineNumber="-1" charStart="978" charEnd="979">
+                                                                                                                                                      <sedStatement xml:id="_cbb8ad23-63eb-4e37-a943-810c199cd7b2" name="return dc.x+ec.x+ecws.x+a.a+aCustom.a+b.a+b.a+bCustomB.a+bCustomIB.a;" pathCondition="true" lineNumber="-1" charStart="380" charEnd="465">
+                                                                                                                                                         <sedMethodReturn xml:id="_e7a22d9a-6355-49c7-a102-2a74a7e0aba4" name="&lt;return &apos;191&apos; as result of ComplexConstructorTest.main();&gt;" pathCondition="true" lineNumber="-1" charStart="60" charEnd="64">
+                                                                                                                                                            <sedTermination xml:id="_ce0afc20-9410-4d82-876d-f95d6b37018e" name="&lt;end&gt;" pathCondition="true">
+                                                                                                                                                            </sedTermination>
+                                                                                                                                                         </sedMethodReturn>
+                                                                                                                                                      </sedStatement>
+                                                                                                                                                   </sedMethodReturn>
+                                                                                                                                                </sedStatement>
+                                                                                                                                             </sedMethodReturn>
+                                                                                                                                          </sedStatement>
+                                                                                                                                       </sedMethodCall>
+                                                                                                                                    </sedMethodCall>
+                                                                                                                                 </sedStatement>
+                                                                                                                              </sedMethodReturn>
+                                                                                                                           </sedStatement>
+                                                                                                                        </sedMethodReturn>
+                                                                                                                     </sedMethodReturn>
+                                                                                                                  </sedStatement>
+                                                                                                               </sedMethodCall>
+                                                                                                            </sedMethodCall>
+                                                                                                         </sedMethodCall>
+                                                                                                      </sedStatement>
+                                                                                                   </sedMethodReturn>
+                                                                                                </sedMethodReturn>
+                                                                                             </sedStatement>
+                                                                                          </sedMethodReturn>
+                                                                                       </sedMethodReturn>
+                                                                                    </sedStatement>
+                                                                                 </sedMethodCall>
+                                                                              </sedMethodCall>
+                                                                           </sedMethodCall>
+                                                                        </sedMethodCall>
+                                                                     </sedStatement>
+                                                                  </sedMethodReturn>
+                                                               </sedStatement>
+                                                            </sedMethodCall>
+                                                         </sedStatement>
+                                                      </sedMethodReturn>
+                                                   </sedMethodReturn>
+                                                </sedStatement>
+                                             </sedMethodCall>
+                                          </sedMethodCall>
+                                       </sedStatement>
+                                    </sedMethodReturn>
+                                 </sedMethodCall>
+                              </sedStatement>
+                           </sedMethodReturn>
+                        </sedMethodCall>
+                     </sedStatement>
+                  </sedMethodReturn>
+               </sedMethodCall>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

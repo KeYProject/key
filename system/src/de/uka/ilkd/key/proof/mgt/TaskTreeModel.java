@@ -62,7 +62,9 @@ public class TaskTreeModel extends DefaultTreeModel {
             env = null;
 	    p = (TaskTreeNode) p.getParent();
 	}
-	removeNodeFromParent(p);
+	if (p.getParent() != null) { // Make sure that p has a parent, because otherwise throws removeNodeFromParent(p): java.lang.IllegalArgumentException: node does not have a parent.
+	   removeNodeFromParent(p);
+	}
 	
 	if(env != null) {
 	    env.getProofs()
