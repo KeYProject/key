@@ -18,6 +18,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
@@ -488,73 +489,89 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
                          String precondition,
                          int numberOfReturnNodeInMostLeftBranch,
                          int expectedNumberOfConfigurations) throws Exception {
-      // Define test settings
-      final String methodFullName = "compute";
-      // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false);
-      // Resume
-      resume(env.getUi(), env.getBuilder(), oraclePathInBaseDir + symbolicExecutionOracleFileName, keyRepDirectory);
-      // Find most left method return node
-      IExecutionNode returnNode = env.getBuilder().getStartNode();
-      int foundReturnStatement = 0;
-      while (foundReturnStatement < numberOfReturnNodeInMostLeftBranch && returnNode.getChildren().length >= 1) {
-         returnNode = returnNode.getChildren()[0];
-         if (returnNode instanceof IExecutionMethodReturn) {
-            foundReturnStatement++;
+      String originalRuntimeExceptions = null;
+      try {
+         // Define test settings
+         final String methodFullName = "compute";
+         // Store original settings of KeY which requires that at least one proof was instantiated.
+         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
+            createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false);
+         }
+         originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
+         assertNotNull(originalRuntimeExceptions);
+         SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
+         // Create proof environment for symbolic execution
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false);
+         // Resume
+         resume(env.getUi(), env.getBuilder(), oraclePathInBaseDir + symbolicExecutionOracleFileName, keyRepDirectory);
+         // Find most left method return node
+         IExecutionNode returnNode = env.getBuilder().getStartNode();
+         int foundReturnStatement = 0;
+         while (foundReturnStatement < numberOfReturnNodeInMostLeftBranch && returnNode.getChildren().length >= 1) {
+            returnNode = returnNode.getChildren()[0];
+            if (returnNode instanceof IExecutionMethodReturn) {
+               foundReturnStatement++;
+            }
+         }
+         assertTrue(returnNode instanceof IExecutionMethodReturn);
+         // Get the return statement which is returned in returnNode
+         IExecutionNode returnStatement = returnNode.getParent();
+         while (!(returnStatement instanceof IExecutionStatement)) {
+            if (returnStatement instanceof IExecutionStatement) {
+               foundReturnStatement++;
+            }
+            returnStatement = returnStatement.getParent();
+         }
+         assertNotNull(returnStatement);
+         assertTrue(returnStatement.getName().startsWith("return"));
+         // Extract possible heaps
+         SymbolicConfigurationExtractor extractor = new SymbolicConfigurationExtractor(returnStatement.getProofNode());
+         extractor.analyse();
+         // Test the initial configurations (first time with lazy computation)
+         List<ISymbolicConfiguration> initialConfigurationsFirstTime = new ArrayList<ISymbolicConfiguration>(extractor.getConfigurationsCount());
+         assertEquals(expectedNumberOfConfigurations, extractor.getConfigurationsCount());
+         for (int i = 0; i < extractor.getConfigurationsCount(); i++) {
+            ISymbolicConfiguration current = extractor.getInitialConfiguration(i);
+            initialConfigurationsFirstTime.add(current);
+            String oracleFile = oraclePathInBaseDir + initialStatesOraclePrefix + i + initialStatesOracleFileExtension;
+            createOracleFile(current, oracleFile);
+            if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
+               SymbolicConfigurationReader reader = new SymbolicConfigurationReader();
+               ISymbolicConfiguration expected = reader.read(new File(keyRepDirectory, oracleFile));
+               assertNotNull(expected);
+               assertModel(expected, current);
+            }
+         }
+         // Test the initial configurations (second time with same configurations)
+         for (int i = 0; i < extractor.getConfigurationsCount(); i++) {
+            ISymbolicConfiguration current = extractor.getInitialConfiguration(i);
+            assertSame(initialConfigurationsFirstTime.get(i), current);
+         }
+         // Test the current configurations (first time with lazy computation)
+         List<ISymbolicConfiguration> currentConfigurationsFirstTime = new ArrayList<ISymbolicConfiguration>(extractor.getConfigurationsCount());
+         for (int i = 0; i < extractor.getConfigurationsCount(); i++) {
+            ISymbolicConfiguration current = extractor.getCurrentConfiguration(i);
+            currentConfigurationsFirstTime.add(current);
+            String oracleFile = oraclePathInBaseDir + currentStatesOraclePrefix + i + currentStatesOracleFileExtension;
+            createOracleFile(current, oracleFile);
+            if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
+               SymbolicConfigurationReader reader = new SymbolicConfigurationReader();
+               ISymbolicConfiguration expected = reader.read(new File(keyRepDirectory, oracleFile));
+               assertNotNull(expected);
+               assertModel(expected, current);
+            }
+         }
+         // Test the current configurations (second time with same configurations)
+         for (int i = 0; i < extractor.getConfigurationsCount(); i++) {
+            ISymbolicConfiguration current = extractor.getCurrentConfiguration(i);
+            assertSame(currentConfigurationsFirstTime.get(i), current);
          }
       }
-      assertTrue(returnNode instanceof IExecutionMethodReturn);
-      // Get the return statement which is returned in returnNode
-      IExecutionNode returnStatement = returnNode.getParent();
-      while (!(returnStatement instanceof IExecutionStatement)) {
-         if (returnStatement instanceof IExecutionStatement) {
-            foundReturnStatement++;
+      finally {
+         // Restore runtime option
+         if (originalRuntimeExceptions != null) {
+            SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, originalRuntimeExceptions);
          }
-         returnStatement = returnStatement.getParent();
-      }
-      assertNotNull(returnStatement);
-      assertTrue(returnStatement.getName().startsWith("return"));
-      // Extract possible heaps
-      SymbolicConfigurationExtractor extractor = new SymbolicConfigurationExtractor(returnStatement.getProofNode());
-      extractor.analyse();
-      // Test the initial configurations (first time with lazy computation)
-      List<ISymbolicConfiguration> initialConfigurationsFirstTime = new ArrayList<ISymbolicConfiguration>(extractor.getConfigurationsCount());
-      assertEquals(expectedNumberOfConfigurations, extractor.getConfigurationsCount());
-      for (int i = 0; i < extractor.getConfigurationsCount(); i++) {
-         ISymbolicConfiguration current = extractor.getInitialConfiguration(i);
-         initialConfigurationsFirstTime.add(current);
-         String oracleFile = oraclePathInBaseDir + initialStatesOraclePrefix + i + initialStatesOracleFileExtension;
-         createOracleFile(current, oracleFile);
-         if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
-            SymbolicConfigurationReader reader = new SymbolicConfigurationReader();
-            ISymbolicConfiguration expected = reader.read(new File(keyRepDirectory, oracleFile));
-            assertNotNull(expected);
-            assertModel(expected, current);
-         }
-      }
-      // Test the initial configurations (second time with same configurations)
-      for (int i = 0; i < extractor.getConfigurationsCount(); i++) {
-         ISymbolicConfiguration current = extractor.getInitialConfiguration(i);
-         assertSame(initialConfigurationsFirstTime.get(i), current);
-      }
-      // Test the current configurations (first time with lazy computation)
-      List<ISymbolicConfiguration> currentConfigurationsFirstTime = new ArrayList<ISymbolicConfiguration>(extractor.getConfigurationsCount());
-      for (int i = 0; i < extractor.getConfigurationsCount(); i++) {
-         ISymbolicConfiguration current = extractor.getCurrentConfiguration(i);
-         currentConfigurationsFirstTime.add(current);
-         String oracleFile = oraclePathInBaseDir + currentStatesOraclePrefix + i + currentStatesOracleFileExtension;
-         createOracleFile(current, oracleFile);
-         if (!CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY) {
-            SymbolicConfigurationReader reader = new SymbolicConfigurationReader();
-            ISymbolicConfiguration expected = reader.read(new File(keyRepDirectory, oracleFile));
-            assertNotNull(expected);
-            assertModel(expected, current);
-         }
-      }
-      // Test the current configurations (second time with same configurations)
-      for (int i = 0; i < extractor.getConfigurationsCount(); i++) {
-         ISymbolicConfiguration current = extractor.getCurrentConfiguration(i);
-         assertSame(currentConfigurationsFirstTime.get(i), current);
       }
    }
    
