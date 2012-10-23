@@ -732,7 +732,7 @@ public class JMLSpecFactory {
         if (!clauses.accessible.equalsModRenaming(TB.allLocs(services))) {
             assert (progVars.selfVar == null) == pm.isStatic();
             final Contract depContract = cf.dep(
-                    pm.getContainerType(), pm,
+                    pm.getContainerType(), pm, pm.getContainerType(),
                     TB.convertToFormula(clauses.requires.get(services.getTypeConverter().getHeapLDT().getHeap()),services), clauses.measuredBy,
                     clauses.accessible, progVars.selfVar,
                     progVars.paramVars);

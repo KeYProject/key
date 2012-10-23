@@ -42,6 +42,7 @@ public final class DependencyContractImpl implements DependencyContract {
     final String name;
     final KeYJavaType kjt;
     final IObserverFunction target;
+    final KeYJavaType specifiedIn;
     final Term originalPre;
     final Term originalMby;    
     final Term originalDep;
@@ -55,15 +56,16 @@ public final class DependencyContractImpl implements DependencyContract {
     //-------------------------------------------------------------------------
     
     DependencyContractImpl(String baseName,
-	                           String name, 
-	                           KeYJavaType kjt,
-	    			   IObserverFunction target,
-	    			   Term pre,
-	                  	   Term mby,	    			   
-	                  	   Term dep,
-	                  	   ProgramVariable selfVar,
-	                  	   ImmutableList<ProgramVariable> paramVars,
-	                  	   int id) {
+                           String name,
+                           KeYJavaType kjt,
+                           IObserverFunction target,
+                           KeYJavaType specifiedIn,
+                           Term pre,
+                           Term mby,
+                           Term dep,
+                           ProgramVariable selfVar,
+                           ImmutableList<ProgramVariable> paramVars,
+                           int id) {
 	assert baseName != null;
 	assert kjt != null;
 	assert target != null;
@@ -77,9 +79,10 @@ public final class DependencyContractImpl implements DependencyContract {
         this.name = name != null 
                   ? name 
                   : ContractFactory.generateContractName(baseName, kjt, target,
-                                       id);
+                                       specifiedIn, id);
 	this.kjt = kjt;
 	this.target = target;
+    this.specifiedIn = specifiedIn;
 	this.originalPre = pre;
 	this.originalMby = mby;	
 	this.originalDep = dep;
@@ -89,18 +92,20 @@ public final class DependencyContractImpl implements DependencyContract {
     }
     
     
-    DependencyContractImpl(String baseName, 
-	                          KeYJavaType kjt,
-	    			  IObserverFunction target,
-	    			  Term pre,
-	                  	  Term mby,	    			  
-	                  	  Term dep,
-	                  	  ProgramVariable selfVar,
-	                  	  ImmutableList<ProgramVariable> paramVars) {
+    DependencyContractImpl(String baseName,
+                           KeYJavaType kjt,
+                           IObserverFunction target,
+                           KeYJavaType specifiedIn,
+                           Term pre,
+                           Term mby,
+                           Term dep,
+                           ProgramVariable selfVar,
+                           ImmutableList<ProgramVariable> paramVars) {
 	this(baseName, 
              null, 
              kjt, 
-             target, 
+             target,
+             specifiedIn,
              pre, 
              mby,             
              dep, 
@@ -363,7 +368,8 @@ public final class DependencyContractImpl implements DependencyContract {
 
     @Override
     public String getDisplayName() {
-        return ContractFactory.generateDisplayName(baseName, kjt, target, id);
+        return ContractFactory.generateDisplayName(baseName, kjt, target,
+                                                   specifiedIn, id);
     }
 
 
@@ -391,6 +397,7 @@ public final class DependencyContractImpl implements DependencyContract {
                                           null,
                                           kjt,
                                           target,
+                                          specifiedIn,
                                           originalPre,
                                           originalMby,
                                           originalDep,
@@ -407,6 +414,7 @@ public final class DependencyContractImpl implements DependencyContract {
                                           null,
                                           newKJT,
                                           newPM,
+                                          specifiedIn,
                                           originalPre,
                                           originalMby,
                                           originalDep,
@@ -418,6 +426,7 @@ public final class DependencyContractImpl implements DependencyContract {
     
     @Override
     public String getTypeName() {
-        return ContractFactory.generateContractTypeName(baseName, kjt, target);
+        return ContractFactory.generateContractTypeName(baseName, kjt, target,
+                                                        specifiedIn);
     }
 }
