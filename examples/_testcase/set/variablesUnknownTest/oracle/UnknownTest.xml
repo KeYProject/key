@@ -212,27 +212,99 @@
                                           <variable name="next" arrayIndex="-1" isArrayIndex="false">
                                              <value name="next {true}" typeString="endless.UnknownTest" valueString="u_7" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                                 <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                                   <value name="next {    \if (u_2 = self)
-        \then (u_7)
-        \else (\if (u_7 = self)
-                   \then (null)
-                   \else (u_2))
-  = u_2
-&amp; !u_7 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="    \if (u_2 = self)
-        \then (u_7)
-        \else (\if (u_7 = self)
-                   \then (null)
-                   \else (u_2))
-  = u_2
-&amp; !u_7 = self">
+                                                   <value name="next {!u_7 = self &amp; !u_2 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="!u_7 = self &amp; !u_2 = self">
                                                    </value>
                                                 </variable>
                                                 <variable name="previous" arrayIndex="-1" isArrayIndex="false">
-                                                   <value name="previous {  !(  u_2 = self
-    | \if (u_7 = self)  \then (null)  \else (u_2) = u_7)
-&amp; !u_7 = self}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !(  u_2 = self
-    | \if (u_7 = self)  \then (null)  \else (u_2) = u_7)
-&amp; !u_7 = self">
+                                                   <value name="previous {  !  \if (  \if (u_2 = self)
+                \then (u_7)
+                \else (\if (u_7 = self)
+                           \then (null)
+                           \else (u_2))
+          = u_2)
+         \then (u_7)
+         \else (\if (  u_2 = self
+                     |   \if (u_7 = self)
+                             \then (null)
+                             \else (u_2)
+                       = u_7)
+                    \then (null)
+                    \else (\if (  \if (u_2 = self)
+                                      \then (u_7)
+                                      \else (\if (  u_7
+                                                  = self)
+                                                 \then (null)
+                                                 \else (u_2))
+                                = self)
+                               \then (u_2)
+                               \else (\if (  \if (  u_2
+                                                  = self)
+                                                 \then (u_7)
+                                                 \else (\if (  u_7
+                                                             = self)
+                                                            \then (null)
+                                                            \else (u_2))
+                                           = u_2)
+                                          \then (null)
+                                          \else (\if (  u_2
+                                                      = self)
+                                                     \then (u_7)
+                                                     \else (\if (  u_7
+                                                                 = self)
+                                                                \then (null)
+                                                                \else (u_2)).next))))
+   = self
+&amp; (  !  \if (u_2 = self)
+            \then (u_7)
+            \else (\if (u_7 = self)
+                       \then (null)
+                       \else (u_2))
+      = self
+   &amp; (!u_2 = self &amp; !u_7 = self))}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !  \if (  \if (u_2 = self)
+                \then (u_7)
+                \else (\if (u_7 = self)
+                           \then (null)
+                           \else (u_2))
+          = u_2)
+         \then (u_7)
+         \else (\if (  u_2 = self
+                     |   \if (u_7 = self)
+                             \then (null)
+                             \else (u_2)
+                       = u_7)
+                    \then (null)
+                    \else (\if (  \if (u_2 = self)
+                                      \then (u_7)
+                                      \else (\if (  u_7
+                                                  = self)
+                                                 \then (null)
+                                                 \else (u_2))
+                                = self)
+                               \then (u_2)
+                               \else (\if (  \if (  u_2
+                                                  = self)
+                                                 \then (u_7)
+                                                 \else (\if (  u_7
+                                                             = self)
+                                                            \then (null)
+                                                            \else (u_2))
+                                           = u_2)
+                                          \then (null)
+                                          \else (\if (  u_2
+                                                      = self)
+                                                     \then (u_7)
+                                                     \else (\if (  u_7
+                                                                 = self)
+                                                                \then (null)
+                                                                \else (u_2)).next))))
+   = self
+&amp; (  !  \if (u_2 = self)
+            \then (u_7)
+            \else (\if (u_7 = self)
+                       \then (null)
+                       \else (u_2))
+      = self
+   &amp; (!u_2 = self &amp; !u_7 = self))">
                                                    </value>
                                                 </variable>
                                              </value>
@@ -297,13 +369,11 @@
 | !u_7 = self
 &amp; (!u_2 = self &amp; (!u_2.next = null &amp; !u_2.next = null))">
                                        <variable name="next" arrayIndex="-1" isArrayIndex="false">
-                                          <value name="next {    !u_7 = self
-  &amp; (!u_2 = self &amp; (u_2.next = null &amp; u_2.next = null))
-| !u_7 = self
-&amp; (!u_2 = self &amp; (!u_2.next = null &amp; !u_2.next = null))}" typeString="endless.UnknownTest" valueString="u_2" isValueAnObject="true" isValueUnknown="false" conditionString="    !u_7 = self
-  &amp; (!u_2 = self &amp; (u_2.next = null &amp; u_2.next = null))
-| !u_7 = self
-&amp; (!u_2 = self &amp; (!u_2.next = null &amp; !u_2.next = null))">
+                                          <value name="next {  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
+| !u_2 = self
+&amp; (!u_2.next = null &amp; !u_2.next = null)}" typeString="endless.UnknownTest" valueString="u_2" isValueAnObject="true" isValueUnknown="false" conditionString="  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
+| !u_2 = self
+&amp; (!u_2.next = null &amp; !u_2.next = null)">
                                              <variable name="next" arrayIndex="-1" isArrayIndex="false">
                                                 <value name="next {  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
 | !u_2 = self
@@ -319,11 +389,11 @@
                                                       </value>
                                                    </variable>
                                                    <variable name="previous" arrayIndex="-1" isArrayIndex="false">
-                                                      <value name="previous {  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
-| !u_2 = self
-&amp; (!u_2.next = null &amp; !u_2.next = null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !u_2 = self &amp; (u_2.next = null &amp; u_2.next = null)
-| !u_2 = self
-&amp; (!u_2.next = null &amp; !u_2.next = null)">
+                                                      <value name="previous {  !u_7 = self &amp; (!u_2 = self &amp; u_2.next = null)
+| !u_7 = self
+&amp; (!u_2 = self &amp; !u_2.next = null)}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="  !u_7 = self &amp; (!u_2 = self &amp; u_2.next = null)
+| !u_7 = self
+&amp; (!u_2 = self &amp; !u_2.next = null)">
                                                       </value>
                                                    </variable>
                                                 </value>
