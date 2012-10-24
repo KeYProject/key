@@ -614,9 +614,8 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class);
                 final Services services = (Services)params[0];
-                IObserverFunction inv = services.getJavaInfo().getInv();
                 Term obj = ((SLExpression) params[1]).getTerm();
-                return new SLExpression(TB.func(inv, TB.getBaseHeap(services), obj));
+                return new SLExpression(TB.inv(services, obj));
             }
         });
         
