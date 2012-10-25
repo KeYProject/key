@@ -801,7 +801,7 @@ options {
                         semanticError("There is no attribute '" + attributeName + 
                             "' declared in type '" + prefixSort + "'.\n"+
                             "If you wanted to use observer symbols, "+
-                            "please make sure to use raw (i.e., not pretty-printed) syntax, "
+                            "please make sure to use raw (i.e., not pretty-printed) syntax, "+
                             "e.g., 'java.lang.Object::<inv>(heap,t)'");
                     }                    
 
