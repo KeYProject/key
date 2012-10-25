@@ -19,8 +19,8 @@ import javax.swing.JOptionPane;
 
 public final class Debug implements DebugMBean {
 
-    private Debug() {
-    }
+//    private Debug() {
+//    }
 
     /** has to be set in order to enable assertion */
     public static boolean ENABLE_ASSERTION = Boolean.getBoolean("KeyAssertionFlag");

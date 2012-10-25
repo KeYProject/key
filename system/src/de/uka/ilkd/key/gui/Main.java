@@ -135,35 +135,37 @@ public class Main {
     }
     private static CommandLine createCommandLine(){
     	CommandLine cl= new CommandLine();
-    	cl.setIndentation(3);
-    	cl.addText("Options for the KeY-Prover", false);
-    	cl.addText("\n", false);
-    	cl.addText("./runProver [options | --justify_rules [justify rule options] filename] [filename(s)]", true);
-    	cl.addText("  <filename>      : loads a .key file", true);
-    	cl.addOption(HELP, null, "display this text");
-    	cl.addText("-Khelp" ,false);
-    	cl.addText("displays help for technical/debug parameters", true);
     	
-    	cl.addText("Batchmode options", false);
+    	
+    	cl.addText("./runProver [options | --justify_rules [justify rule options] filename] [filename(s)]\n", false);
+    	cl.setIndentation(3);
+//    	cl.addText("  <filename>      : loads a .key file", true);
+    	cl.addText("Options for the KeY-Prover\n", false);
+    	cl.addText("\n", false);
+    	cl.addOption(HELP, null, "display this text");
+    	cl.addText("--Khelp" ,false);
+    	cl.addText("display help for technical/debug parameters\n", false);
+
+    	cl.addText("Batchmode options:\n", false);
     	cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
-    	cl.addOption(AUTO_LOADONLY, null, "");
+    	cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
     	cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
-    	cl.addOption(EXAMPLES, "<directory>", "load directory with example files on startup");
-    	cl.addOption(PRINT_STATISTICS, "<filename>",  "in auto mode, output nr. of rule applications and time spent on proving");
-    	cl.addOption(TIMEOUT, "<timeout>", "the timeout for each proof in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +", i.e., no timeout)");
-    	cl.addText("Options for justify rules", false);
+    	cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");
+    	cl.addOption(PRINT_STATISTICS, "<filename>",  "output nr. of rule applications and time spent on proving");
+    	cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +", i.e., no timeout)");
+    	cl.addText("Options for justify rules:\n", false);
     	cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument" );
     	cl.addText("\n", true);
-    	cl.addText("The 'justifyrules' command has a number options you can set.", false);
-    	cl.addText("Provide the option name and the value as separate arguments.", false);
+    	cl.addText("The 'justifyrules' command has a number of options you can set. As default configuration the proofs are not stored to a file.\n", false);
+    	cl.addText("Provide the option name and the value as separate arguments.\n", false);
     	cl.addText("\n", true);
     	cl.addOption(JMAX_RULES, "<number>","maximum number of rule application to perform (default: " + LemmataAutoModeOptions.DEFAULT_MAXRULES +")");
     	cl.addOption(JPATH_OF_RESULT, "<path>", "store proofs to this folder");
-    	cl.addOption(JTIMEOUT, "<timeout>", "the timeout in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +")");
+    	cl.addOption(JTIMEOUT, "<timeout>", "the timeout for proof of a taclet in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +")");
     	cl.addOption(JPRINT, "<terminal/disable>", "send output to terminal or disable output");
     	cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "save or drop proofs (then stored to path given by "+ JPATH_OF_RESULT + ")");
-    	cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "read axioms from file");
-    	cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "read definitions from file");
+    	cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "read axioms from given file");
+    	cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "read definitions from given file");
     	return cl;
     }
     public static UserInterface evaluateOptions(CommandLine cl) {
@@ -382,7 +384,7 @@ public class Main {
             ps.println("File not found or unrecognized option" +
                     (offending != null? ": "+offending: ".")+"\n");
         //ps.println("Possible parameters are (* = default): ");
-        ps.println("  <filename>      : loads a .key file");
+//        ps.println("  <filename>      : loads a .key file");
         cl.printUsage(ps);
 //        for (CommandLineOption clo: CommandLineOption.values())
 //            if (clo.message != null) ps.println(clo.message);
