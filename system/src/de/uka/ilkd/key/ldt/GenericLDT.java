@@ -70,7 +70,7 @@ public final class GenericLDT extends LDT {
     }
 
     @Override
-    public Expression translateTerm(Term t, ExtList children) {
+    public Expression translateTerm(Term t, ExtList children, Services services) {
         if(t.op() instanceof Function && hasLiteralFunction((Function)t.op())) {
             return GenericLiteral.INSTANCE;
         }

@@ -87,8 +87,6 @@ public final class IntegerLDT extends LDT {
     private final Function andJlong;
     private final Function xorJint;
     private final Function xorJlong;
-    private final Function max;
-    private final Function min;
     private final Function moduloByte;
     private final Function moduloShort;
     private final Function moduloInt;
@@ -237,8 +235,6 @@ public final class IntegerLDT extends LDT {
         inInt               = addFunction(services, "inInt");
         inLong              = addFunction(services, "inLong");
         inChar              = addFunction(services, "inChar");
-        max					= addFunction(services, "max");
-        min					= addFunction(services, "min");
         index				= addFunction(services, "index");
 
         //cache often used constants       
@@ -987,18 +983,6 @@ public final class IntegerLDT extends LDT {
      */    
     public Function getJavaUnsignedShiftRightLong() {
         return javaUnsignedShiftRightLong;
-    }
-    
-    /** The maximum function */
-    public Function getMax(){
-    	return max;
-    }
-    
-    /** The minimum function.
-     *
-     */
-    public Function getMin(){
-    	return min;
     }
     
     public Term zero() {	
