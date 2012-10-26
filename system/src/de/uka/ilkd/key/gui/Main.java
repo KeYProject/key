@@ -135,17 +135,14 @@ public class Main {
     }
     private static CommandLine createCommandLine(){
     	CommandLine cl= new CommandLine();
-    	
-    	
-    	cl.addText("./runProver [options | --justify_rules [justify rule options] filename] [filename(s)]\n", false);
-    	cl.setIndentation(3);
-//    	cl.addText("  <filename>      : loads a .key file", true);
+    	cl.setIndentation(1);
+    	cl.addText("./runProver [options | --justify_rules [justify rule options] filename] [filename(s)]\n\n", false);
     	cl.addText("Options for the KeY-Prover\n", false);
     	cl.addText("\n", false);
     	cl.addOption(HELP, null, "display this text");
     	cl.addText("--Khelp" ,false);
-    	cl.addText("display help for technical/debug parameters\n", false);
-
+    	//cl.setIndentation(0);
+    	cl.addText("display help for technical/debug parameters\n\n", true);    
     	cl.addText("Batchmode options:\n", false);
     	cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
     	cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");

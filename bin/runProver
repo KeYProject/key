@@ -100,19 +100,14 @@ fi
 list_help(){
   echo "./runProver [options] [filename]"
   echo "\nOptions for using this script"
-  echo "  J-option: pass option to the JVM following the -J option
-convention of javac"
-  echo "Debugging:"
-  echo "  --K-keydebug: turns debugging on"
-  echo "  --K-debugclassloader: switches the Debugclassloadflag on to load
-classes for debugging"
-  echo "  --K-debugprefix <debugclass> : send debug output of debugclass to
-stadard out"
-  echo "  --K-remotedebug <port>: option for remote debugging; parameter for
-listening port"
-  echo "  --K-assertionflag: switches assertionflag on, s.t. debug assertions
-are used"
-  echo "Other:"
+  echo "  J-option: pass option to the JVM following the -J option convention of javac\n"
+  echo "Debugging:\n"
+  echo "  --K-keydebug: turn debugging on"
+  echo "  --K-debugclassloader: switch the Debugclassloadflag on to load classes for debugging"
+  echo "  --K-debugprefix <debugclass> : send debug output of debugclass to stadard out"
+  echo "  --K-remotedebug <port>: turn remote debugging on; parameter for listening port"
+  echo "  --K-assertionflag: switch assertionflag on, s.t. debug assertions are used"
+  echo "Other:\n"
   echo "  --K-server:  switches Java -server on "
   echo "  --Khelp, -Kh	: prints this help message"
   echo "  --help	: prints help message of the KeY prover"
