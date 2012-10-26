@@ -30,20 +30,34 @@ public abstract class MainWindowAction extends AbstractAction {
 	assert mainWindow != null;
 	this.mainWindow = mainWindow;
     }
-    
-    protected MainWindowAction(MainWindow mainWindow, String name, String toolTip, Boolean selected){
+
+    protected MainWindowAction(MainWindow mainWindow, String name, String toolTip, Boolean selected) {
         this(mainWindow);
-        if (name != null) setName(name);
-        if (toolTip != null) setTooltip(toolTip);
-        if (selected != null) setSelected(selected);
+        if (name != null) {
+            setName(name);
+        }
+        if (toolTip != null) {
+            setTooltip(toolTip);
+        }
+        
+        if (selected != null) {
+            setSelected(selected);
+        }
     }
-    
-    protected MainWindowAction(MainWindow mainWindow, String name, String toolTip, Boolean selected, KeyStroke acceleratorKey, Icon icon){
+
+    protected MainWindowAction(MainWindow mainWindow, String name, String toolTip,
+            Boolean selected,
+            KeyStroke acceleratorKey, Icon icon) {
         this(mainWindow, name, toolTip, selected);
-        if (acceleratorKey != null) setAcceleratorKey(acceleratorKey);
-        if (icon != null) setIcon(icon);
+        if (acceleratorKey != null) {
+            setAcceleratorKey(acceleratorKey);
+        }
+
+        if (icon != null) {
+            setIcon(icon);
+        }
     }
-    
+
     protected KeYMediator getMediator() {
 	return mainWindow.getMediator();
     }
@@ -72,4 +86,7 @@ public abstract class MainWindowAction extends AbstractAction {
         putValue(SELECTED_KEY, b);
     }
 
+    protected boolean isSelected() {
+        return getValue(SELECTED_KEY) == Boolean.TRUE;
+    }
 }
