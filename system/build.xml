@@ -57,7 +57,31 @@
        <exclude name="**/TestCommons.java"/>
        <exclude name="**/TestSMTBenchmark.java"/>
        <exclude name="**/TestSMTSolver.java"/>
-        <exclude name="**/TestTriggersSet.java"/>
+       <exclude name="**/TestTriggersSet.java"/>
+     </fileset>
+   </batchtest>
+  </junit>
+  </target>
+
+
+
+  <target name="hudsonUnitTest" depends="compile">
+     <junit printsummary="yes" haltonfailure="yes" fork="yes" showoutput="true">
+     <jvmarg value="-Xmx2048m"/>
+     <sysproperty key="key.home" value="${env.KEY_HOME}"/>
+    <classpath>
+      <pathelement location="${ext.dir}/antlr.jar"/>
+      <pathelement location="${ext.dir}/recoderKey.jar"/>
+      <pathelement location="${ext.dir}/javacc.jar"/>
+      <pathelement location="${ext.dir}/junit.jar"/>
+      <pathelement path="${dist.dir}"/>
+    </classpath>
+
+   <formatter type="xml"/>
+
+   <batchtest fork="yes" todir="${test.reports}">
+     <fileset dir="${test.dir}">
+       <include name="TestKey.java"/>
      </fileset>
    </batchtest>
   </junit>

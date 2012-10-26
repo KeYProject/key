@@ -23,6 +23,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
@@ -52,6 +53,7 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
@@ -97,6 +99,8 @@ public final class SpecificationRepository {
                 = new LinkedHashMap<ProofOblInput,ImmutableSet<Proof>>();
     private final Map<LoopStatement,LoopInvariant> loopInvs
                 = new LinkedHashMap<LoopStatement,LoopInvariant>();
+    private final Map<StatementBlock,ImmutableSet<BlockContract>> blockContracts
+                = new LinkedHashMap<StatementBlock, ImmutableSet<BlockContract>>();
     private final Map<IObserverFunction,IObserverFunction> unlimitedToLimited
     		= new LinkedHashMap<IObserverFunction,IObserverFunction>();
     private final Map<IObserverFunction,IObserverFunction> limitedToUnlimited
@@ -348,7 +352,7 @@ public final class SpecificationRepository {
 	    (new RewriteTacletGoalTemplate(addedSeq,
 					   ImmutableSLList.<Taclet>nil(),
 					   TB.func(unlimited, subs)));
-	tacletBuilder.setStateRestriction(RewriteTaclet.IN_SEQUENT_STATE);
+	tacletBuilder.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);
 	tacletBuilder.setName(MiscTools.toValidTacletName(
 					"limit " + unlimited.name()));
 	tacletBuilder.addRuleSet(new RuleSet(new Name("limitObserver")));
@@ -1067,22 +1071,69 @@ public final class SpecificationRepository {
     }
     
     
+    public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
+        if (blockContracts.get(block) == null) {
+            return DefaultImmutableSet.<BlockContract>nil();
+        }
+        else {
+            return blockContracts.get(block);
+        }
+    }
+
+    public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block, final Modality modality)
+    {
+        ImmutableSet<BlockContract> result = getBlockContracts(block);
+        final Modality matchModality = getMatchModality(modality);
+        for (BlockContract contract : result) {
+            if (!contract.getModality().equals(matchModality)
+                    || (modality.transaction() && !contract.isTransactionApplicable() && !contract.isReadOnly(services))) {
+                result = result.remove(contract);
+            }
+        }
+        return result;
+    }
+
+    private Modality getMatchModality(final Modality modality)
+    {
+        if (modality.transaction()) {
+            return modality == Modality.DIA_TRANSACTION ? Modality.DIA : Modality.BOX;
+        }
+        else {
+            return modality;
+        }
+    }
+
+    public void addBlockContract(final BlockContract contract)
+    {
+        final StatementBlock block = contract.getBlock();
+        blockContracts.put(block, getBlockContracts(block).add(contract));
+    }
+
+
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {
-	for(SpecificationElement spec : specs) {
-	    if(spec instanceof Contract) {
-		addContract((Contract)spec);
-	    } else if(spec instanceof ClassInvariant) {
-		addClassInvariant((ClassInvariant)spec);
-	    } else if(spec instanceof InitiallyClause){
-	        addInitiallyClause((InitiallyClause)spec);
-	    } else if(spec instanceof ClassAxiom) {
-		addClassAxiom((ClassAxiom)spec);
-	    } else if(spec instanceof LoopInvariant) {
-		setLoopInvariant((LoopInvariant)spec);
-	    } else {
-		assert false : "unexpected spec: " + spec +"\n("+spec.getClass()+")";
-	    }
-	}
+        for (SpecificationElement spec : specs) {
+            if (spec instanceof Contract) {
+                addContract((Contract)spec);
+            }
+            else if (spec instanceof ClassInvariant) {
+                addClassInvariant((ClassInvariant)spec);
+            }
+            else if (spec instanceof InitiallyClause) {
+                addInitiallyClause((InitiallyClause)spec);
+            }
+            else if (spec instanceof ClassAxiom) {
+                addClassAxiom((ClassAxiom)spec);
+            }
+            else if (spec instanceof LoopInvariant) {
+                setLoopInvariant((LoopInvariant)spec);
+            }
+            else if (spec instanceof BlockContract) {
+                addBlockContract((BlockContract) spec);
+            }
+            else {
+                assert false : "unexpected spec: " + spec + "\n(" + spec.getClass() + ")";
+            }
+        }
     }
     
     

@@ -24,9 +24,10 @@ public class VariableReference extends JavaNonTerminalProgramElement
                                implements  NameReference, Expression, 
                                ReferencePrefix {
 
-    protected ProgramVariable variable;
+    protected final ProgramVariable variable;
     
     protected VariableReference() {
+        variable = null;
     }
 
     public VariableReference(ExtList children) {

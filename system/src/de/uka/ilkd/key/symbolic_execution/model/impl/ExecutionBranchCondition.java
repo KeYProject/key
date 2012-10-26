@@ -63,12 +63,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     */
    @Override
    protected String lazyComputeName() throws ProofInputException {
-      if (isMergedBranchCondition()) {
-         return getFormatedBranchCondition();
-      }
-      else {
-         return getProofNodeInfo().getBranchLabel();
-      }
+      return getFormatedBranchCondition();
    }
 
    /**
@@ -115,7 +110,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
          branchCondition = SymbolicExecutionUtil.simplify(getProof(), branchCondition);
       }
       else {
-         branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode());
+         branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), true);
       }
       // Format branch condition
       StringBuffer sb = ProofSaver.printTerm(branchCondition, getServices(), true);
@@ -216,7 +211,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
          Term[] result = new Term[mergedProofNodes.size()];
          Iterator<Node> iter = mergedProofNodes.iterator();
          for (int i = 0; i < result.length; i++) {
-            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next());
+            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), true);
          }
          return result;
       }

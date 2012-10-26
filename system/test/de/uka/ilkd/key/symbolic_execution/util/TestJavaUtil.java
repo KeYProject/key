@@ -12,6 +12,118 @@ import junit.framework.TestCase;
  */
 public class TestJavaUtil extends TestCase {
    /**
+    * Tests for {@link JavaUtil#searchAndRemove(Iterable, IFilter)}.
+    */
+   public void testSearchAndRemove() {
+      List<String> collection = new LinkedList<String>();
+      collection.add("A");
+      collection.add("B");
+      collection.add("C");
+      collection.add("D");
+       assertEquals("A", JavaUtil.searchAndRemove(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "A".equals(element);
+          }
+       }));
+       assertNull("A", JavaUtil.searchAndRemove(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "A".equals(element);
+          }
+       }));
+       assertEquals("B", JavaUtil.searchAndRemove(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "B".equals(element);
+          }
+       }));
+       assertNull("B", JavaUtil.searchAndRemove(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "A".equals(element);
+          }
+       }));
+       assertEquals("C", JavaUtil.searchAndRemove(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "C".equals(element);
+          }
+       }));
+       assertNull("C", JavaUtil.searchAndRemove(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "A".equals(element);
+          }
+       }));
+       assertEquals("D", JavaUtil.searchAndRemove(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "D".equals(element);
+          }
+       }));
+       assertNull("D", JavaUtil.searchAndRemove(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "A".equals(element);
+          }
+       }));
+       assertNull(JavaUtil.searchAndRemove(collection, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "E".equals(element);
+          }
+       }));
+       assertNull(JavaUtil.searchAndRemove(collection, null));
+       assertNull(JavaUtil.searchAndRemove(null, new IFilter<String>() {
+          @Override
+          public boolean select(String element) {
+             return "E".equals(element);
+          }
+       }));
+   }
+   
+   /**
+    * Test for {@link JavaUtil#addAll(java.util.Collection, Object...)}
+    */
+   public void testAddAll() {
+      List<String> collection = new LinkedList<String>();
+      JavaUtil.addAll(null, "A");
+      assertEquals(0, collection.size());
+      JavaUtil.addAll(collection, (String[])null);
+      assertEquals(0, collection.size());
+      JavaUtil.addAll(collection, "A");
+      assertEquals(1, collection.size());
+      assertEquals("A", collection.get(0));
+      JavaUtil.addAll(collection, "B");
+      assertEquals(2, collection.size());
+      assertEquals("A", collection.get(0));
+      assertEquals("B", collection.get(1));
+      JavaUtil.addAll(collection, "C", "D");
+      assertEquals(4, collection.size());
+      assertEquals("A", collection.get(0));
+      assertEquals("B", collection.get(1));
+      assertEquals("C", collection.get(2));
+      assertEquals("D", collection.get(3));
+      JavaUtil.addAll(collection, new String[] {"E"});
+      assertEquals(5, collection.size());
+      assertEquals("A", collection.get(0));
+      assertEquals("B", collection.get(1));
+      assertEquals("C", collection.get(2));
+      assertEquals("D", collection.get(3));
+      assertEquals("E", collection.get(4));
+      JavaUtil.addAll(collection, new String[] {"F", "G"});
+      assertEquals(7, collection.size());
+      assertEquals("A", collection.get(0));
+      assertEquals("B", collection.get(1));
+      assertEquals("C", collection.get(2));
+      assertEquals("D", collection.get(3));
+      assertEquals("E", collection.get(4));
+      assertEquals("F", collection.get(5));
+      assertEquals("G", collection.get(6));
+   }
+   
+   /**
     * Tests {@link JavaUtil#indexOf(Object[], Object)}
     */
    public void testIndexOf_array() {

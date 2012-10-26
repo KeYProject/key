@@ -1,7 +1,9 @@
 package org.key_project.sed.core.model;
 
+import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
 import org.key_project.sed.core.model.impl.AbstractSEDValue;
+import org.key_project.sed.core.model.memory.SEDMemoryValue;
 
 /**
  * A value of a variable of a node in the symbolic execution tree,
@@ -15,5 +17,17 @@ import org.key_project.sed.core.model.impl.AbstractSEDValue;
  * @author Martin Hentschel
  */
 public interface ISEDValue extends IValue, ISEDDebugElement {
-
+   /**
+    * Checks if the represented value is an object.
+    * @return {@code true} value is object, {@code false} value is object attribute.
+    * @throws DebugException Occurred Exception.
+    */
+   public boolean isObject() throws DebugException;
+   
+   /**
+    * Checks if this value is single or multi valued (case of multiple conditional values).
+    * @return {@code true} multi valued, {@code false} single valued.
+    * @throws DebugException Occurred Exception.
+    */
+   public boolean isMultiValued() throws DebugException;
 }

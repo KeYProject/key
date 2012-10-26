@@ -65,6 +65,7 @@ public class NodeInfo {
         symbolicExecNames.add(new Name("executeIntegerAssignment"));
         symbolicExecNames.add(new Name("simplify_object_creation"));
         symbolicExecNames.add(new Name("split_if"));
+        symbolicExecNames.add(new Name("split_cond"));
         symbolicExecNames.add(new Name("simplify_expression"));
         symbolicExecNames.add(new Name("loop_expand"));
     }
@@ -161,7 +162,7 @@ public class NodeInfo {
     }
   
     
-    private static boolean isSymbolicExecution(Taclet t) {
+    public static boolean isSymbolicExecution(Taclet t) {
         ImmutableList<RuleSet> list = t.getRuleSets();
 	RuleSet       rs;
 	while (!list.isEmpty()) {

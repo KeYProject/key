@@ -22,6 +22,8 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.RetargetAction;
 import org.key_project.sed.ui.visualization.action.AbstractEditorInViewActionBarContributor;
 import org.key_project.sed.ui.visualization.action.GlobalEnablementZoomComboContributionItem;
+import org.key_project.sed.ui.visualization.util.GraphitiGlobalEnablementWrapperAction;
+import org.key_project.util.eclipse.view.editorInView.GlobalEnablementWrapperAction;
 import org.key_project.util.eclipse.view.editorInView.SaveAsAction;
 
 /**
@@ -49,6 +51,14 @@ public class ReadonlyDiagramEditorActionBarContributor extends AbstractEditorInV
     */
    public ReadonlyDiagramEditorActionBarContributor(IWorkbenchPart fixedPart) {
       super(fixedPart);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected GlobalEnablementWrapperAction createActionWrapper(IAction action) {
+      return new GraphitiGlobalEnablementWrapperAction(action);
    }
    
    /**

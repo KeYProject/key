@@ -122,9 +122,10 @@ $JAVA $JAVA_OPTIONS $keysysprops \
 -Dkey.home="$KEY_HOME" \
 -classpath "$keyclasspath" junit.textui.TestRunner $testcase
 
-if [ "$testcase" = "TestKey" ]; then
-    $JAVA $JAVA_OPTIONS $keysysprops \
-	-ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx2048m \
-	-Dkey.home="$KEY_HOME" \
-	-classpath "$keyclasspath" de.uka.ilkd.key.util.DesignTests
-fi
+# DesignTests are now included as test cases in TestKey
+#if [ "$testcase" = "TestKey" ]; then
+#    $JAVA $JAVA_OPTIONS $keysysprops \
+#	-ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx2048m \
+#	-Dkey.home="$KEY_HOME" \
+#	-classpath "$keyclasspath" de.uka.ilkd.key.util.DesignTests
+#fi

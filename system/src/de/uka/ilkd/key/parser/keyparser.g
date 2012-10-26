@@ -333,6 +333,10 @@ options {
 	}
     }
 
+    public void recover( RecognitionException ex, BitSet tokenSet ) throws TokenStreamException {
+     consume();
+     consumeUntil( tokenSet );
+    }
 
     public String getChooseContract() {
       return chooseContract;
@@ -523,17 +527,17 @@ options {
     private Named lookup(Name n) {
        if(isProblemParser()) {
           final Namespace[] lookups = {
-            normalConfig.namespaces().functions(), 
-            schemaConfig.namespaces().functions(), 
+            schemaConfig.namespaces().programVariables(),
             normalConfig.namespaces().variables(), 
             schemaConfig.namespaces().variables(), 
-            schemaConfig.namespaces().programVariables()
+            normalConfig.namespaces().functions(), 
+            schemaConfig.namespaces().functions(), 
           };
           return doLookup(n,lookups);
        } else {
           final Namespace[] lookups = {
-              functions(), variables(), 
-              programVariables()
+              programVariables(), variables(),
+              functions()
           };
           return doLookup(n,lookups);
        }
@@ -795,7 +799,10 @@ options {
                     
                     if (vars.size() == 0) {
                         semanticError("There is no attribute '" + attributeName + 
-                            "' declared in type '" + prefixSort + "'");
+                            "' declared in type '" + prefixSort + "'.\n"+
+                            "If you wanted to use observer symbols, "+
+                            "please make sure to use raw (i.e., not pretty-printed) syntax, "+
+                            "e.g., 'java.lang.Object::<inv>(heap,t)'");
                     }                    
 
                     if (LogicPrinter.printInShortForm(attributeName, 
@@ -1018,7 +1025,7 @@ options {
      * If the sort is not found for the first time, the name is expanded with "java.lang." 
      * and the look up restarts
      */
-     private Sort lookupSort(String name) throws SemanticException {        
+     private Sort lookupSort(String name) throws SemanticException {
 	Sort result = (Sort) sorts().lookup(new Name(name));
 	if (result == null) {
 	    if(name.equals(NullSort.NAME.toString())) {
@@ -1048,25 +1055,28 @@ options {
      */
     private Operator lookupVarfuncId(String varfunc_name, Term[] args) 
         throws NotDeclException, SemanticException {
+        
+
         // case 1: variable
         Operator v = (Operator) variables().lookup(new Name(varfunc_name));
         if (v != null && (args == null || (inSchemaMode() && v instanceof ModalOperatorSV))) {
             return v;
         }
-        
-        // case 2: function
-        v = (Operator) functions().lookup(new Name(varfunc_name));
-        if (v != null) { // we allow both args==null (e.g. `c')
-                         // and args.length=0 (e.g. 'c())' here 
-            return v;
-        }
-        
-        // case 3: program variable
+
+        // case 2: program variable
         v = (Operator) programVariables().lookup
             (new ProgramElementName(varfunc_name));
         if (v != null && args==null) {
             return v;
         }
+        
+        // case 3: function
+        v = (Operator) functions().lookup(new Name(varfunc_name));
+        if (v != null) { // we allow both args==null (e.g. `c')
+                         // and args.length=0 (e.g. 'c())' here 
+            return v;
+        }
+
         
         // case 4: instantiation of sort depending function
         int separatorIndex = varfunc_name.indexOf("::"); 
@@ -1199,20 +1209,27 @@ options {
 
 
     private TacletBuilder createTacletBuilderFor
-        (Object find, int stateRestriction) 
+        (Object find, int applicationRestriction) 
         throws InvalidFindException {
-        if ( stateRestriction != RewriteTaclet.NONE && !( find instanceof Term ) ) {        
-            String mod;
-            switch (stateRestriction) {
-                case RewriteTaclet.SAME_UPDATE_LEVEL: 
-                       mod = "\"\\sameUpdateLevel\""; 
-                break;
-                case RewriteTaclet.IN_SEQUENT_STATE: 
-                       mod = "\"\\inSequentState\""; 
-                break;                
-                default: 
-                       mod = "State restrictions"; 
-                break;                
+        if ( applicationRestriction != RewriteTaclet.NONE && !( find instanceof Term ) ) {        
+            String mod = "";
+            if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
+                mod = "\"\\sameUpdateLevel\"";
+            }
+            if ((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
+                if (mod != "") mod += " and ";
+                mod += "\"\\inSequentState\""; 
+            }
+            if ((applicationRestriction & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
+                if (mod != "") mod += " and ";
+                mod += "\"\\antecedentPolarity\""; 
+            }
+            if ((applicationRestriction & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
+                if (mod != "") mod += " and ";
+                mod += "\"\\succedentPolarity\"";
+            }
+            if (mod == "") {
+                mod = "Application restrictions";               
             }
             
             throw new InvalidFindException
@@ -1223,7 +1240,7 @@ options {
             return new NoFindTacletBuilder();
         } else if ( find instanceof Term ) {
             return new RewriteTacletBuilder().setFind((Term)find)
-                .setStateRestriction(stateRestriction);
+                .setApplicationRestriction(applicationRestriction);
         } else if ( find instanceof Sequent ) {
             Sequent findSeq = (Sequent) find;
             if ( findSeq.isEmpty() ) {
@@ -1387,21 +1404,21 @@ decls :
            if(parse_includes) return;
            activatedChoices = DefaultImmutableSet.<Choice>nil();  
 	}
-        (options_choice)? { if(onlyWith) return; }
+        (options_choice)? 
         (
-            option_decls
+            {!onlyWith}? option_decls
         |    
-            sort_decls
+            {!onlyWith}? sort_decls
         |
-            prog_var_decls
+            {!onlyWith}? prog_var_decls
         |
-            schema_var_decls
+            {!onlyWith}? schema_var_decls
         |
             pred_decls
         |
             func_decls
         |
-            ruleset_decls
+            {!onlyWith}? ruleset_decls
 
         ) *
     ;
@@ -1677,9 +1694,9 @@ prog_var_decls
                   if (name != null ) {
 		    // commented out as pv do not have unique name (at the moment)
 		    //  throw new AmbigiousDeclException
-     		    //  	(var_name, getFilename(), getLine(), getColumn()); 
-		    if(name instanceof ProgramVariable && 
-			    !((ProgramVariable)name).getKeYJavaType().equals(kjt)) { 
+     		    //  	(var_name, getFilename(), getLine(), getColumn());
+		    if(!(name instanceof ProgramVariable) || (name instanceof ProgramVariable && 
+			    !((ProgramVariable)name).getKeYJavaType().equals(kjt))) { 
                       namespaces().programVariables().add(new LocationVariable
                         (pvName, kjt));
 		    }
@@ -1901,15 +1918,17 @@ pred_decl
                     		     whereToBind,
                     		     false);
                 }
-                
 		if (lookup(p.name()) != null) {
-		    throw new AmbigiousDeclException(p.name().toString(), 
-		                                     getFilename(), 
-		                                     getLine(), 
-		                                     getColumn());
-		}
-		
-                addFunction(p);         
+		    if(!isProblemParser()) {
+		        throw new AmbigiousDeclException(p.name().toString(), 
+		                                         getFilename(), 
+		                                         getLine(), 
+		                                         getColumn());
+		                                     
+		    }
+		}else{
+                  addFunction(p);         
+                }
             } 
         }
         SEMI
@@ -1999,15 +2018,16 @@ func_decl
 	                             whereToBind,
 	                             unique);                    
 	        }
-	        
 		if (lookup(f.name()) != null) {
-		    throw new AmbigiousDeclException(f.name().toString(), 
+		    if(!isProblemParser()) {
+		      throw new AmbigiousDeclException(f.name().toString(), 
 		                                     getFilename(), 
 		                                     getLine(), 
 		                                     getColumn());
-		}
-	        
-	        addFunction(f);
+		    }
+		}else{
+	    	    addFunction(f);
+	        }
             } 
         }
         SEMI
@@ -2171,13 +2191,16 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
                 name = PrimitiveType.JAVA_BIGINT.getName();
             }
             
-            Sort s = lookupSort(name);
-            if(checkSort && s == null) {
-                throw new NotDeclException("sort", 
+            Sort s = null;
+            if(checkSort) {
+                s = lookupSort(name);
+                if(s == null) {
+                  throw new NotDeclException("sort", 
                                            name, 
                                            getFilename(), 
                                            getLine(),  
-                                           getColumn());
+                                           getColumn()); 
+                }
             }
             
             result = new Pair<Sort,Type>(s, t);
@@ -3363,7 +3386,7 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
     Object  find = null;
     r = null;
     TacletBuilder b = null;
-    int stateRestriction = RewriteTaclet.NONE;
+    int applicationRestriction = RewriteTaclet.NONE;
 }
     : 
         name:IDENT (choices=option_list[choices])? 
@@ -3373,12 +3396,15 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
         } 
 	( SCHEMAVAR one_schema_var_decl ) *
         ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
-        ( FIND LPAREN find = termorseq RPAREN 
-            ( SAMEUPDATELEVEL { stateRestriction = RewriteTaclet.SAME_UPDATE_LEVEL; } |
-              INSEQUENTSTATE { stateRestriction = RewriteTaclet.IN_SEQUENT_STATE; } 
-            ) ? ) ?
+        ( FIND LPAREN find = termorseq RPAREN
+            (   SAMEUPDATELEVEL { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
+              | INSEQUENTSTATE { applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE; }
+              | ANTECEDENTPOLARITY { applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY; }
+              | SUCCEDENTPOLARITY { applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY; }
+            )*
+        ) ?
         { 
-            b = createTacletBuilderFor(find, stateRestriction);
+            b = createTacletBuilderFor(find, applicationRestriction);
             b.setName(new Name(name.getText()));
             b.setIfSequent(ifSeq);
         }
@@ -4231,17 +4257,20 @@ problem returns [ Term a = null ]
         (pref = preferences)
         { if ((pref!=null) && (capturer != null)) capturer.mark(); }
         
+
+
         string = bootClassPath
         // the result is of no importance here (strange enough)        
         
         stlist = classPaths 
-
         string = javaSource
+
         decls
         { 
             if(parse_includes || onlyWith) return null;
             switchToNormalMode();
         }
+
         // WATCHOUT: choices is always going to be an empty set here,
 	// isn't it?
 	( contracts )*

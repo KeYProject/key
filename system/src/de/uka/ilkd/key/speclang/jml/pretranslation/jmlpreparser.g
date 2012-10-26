@@ -204,6 +204,7 @@ methodlevel_element[ImmutableList<String> mods]
     |   result=assert_statement[mods]
     |   result=assume_statement[mods]
     |   result=nowarn_pragma[mods]
+    |   result=block_specification[mods]
 ;
 
 
@@ -389,8 +390,11 @@ heavyweight_spec_case[ImmutableList<String> mods]
     (s=modifier  { mods = mods.append(s); })?
     (
 	    result=behavior_spec_case[mods]
-	|   result=exceptional_behavior_spec_case[mods]
+	    |   result=break_behavior_spec_case[mods]
+	    |   result=continue_behavior_spec_case[mods]
+	    |   result=exceptional_behavior_spec_case[mods]
       	|   result=normal_behavior_spec_case[mods]
+      	|   result=return_behavior_spec_case[mods]
     )
 ;
 
@@ -592,11 +596,14 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
 	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
-	|   ps=name_clause           { sc.addName(ps);}
+	|   ps=name_clause           { sc.addName(ps); }
 	|   captures_clause 
 	|   when_clause
 	|   working_space_clause
 	|   duration_clause
+	|   ps=breaks_clause         { sc.addBreaks(ps); }
+	|   ps=continues_clause      { sc.addContinues(ps); }
+	|   ps=returns_clause        { sc.addReturns(ps); }
     )
     {
     	if(b == Behavior.EXCEPTIONAL_BEHAVIOR 
@@ -607,8 +614,17 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
       	    raiseError("signals not allowed in normal behavior.");
     	} else if(b == Behavior.NORMAL_BEHAVIOR 
     	          && !sc.getSignalsOnly().isEmpty()) {
-	    raiseError("signals_only not allowed in normal behavior.");
-    	}
+	        raiseError("signals_only not allowed in normal behavior.");
+    	} else if(b == Behavior.NORMAL_BEHAVIOR 
+	              && !sc.getBreaks().isEmpty()) {
+		    raiseError("breaks not allowed in normal behavior.");
+    	} else if(b == Behavior.NORMAL_BEHAVIOR 
+	              && !sc.getContinues().isEmpty()) {
+		    raiseError("continues not allowed in normal behavior.");
+		} else if(b == Behavior.NORMAL_BEHAVIOR 
+	              && !sc.getReturns().isEmpty()) {
+		    raiseError("returns not allowed in normal behavior.");
+	    }
     }
 ;
 
@@ -840,7 +856,6 @@ field_declaration[ImmutableList<String> mods]
     	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(fd);
     }
 ;
-
 
 
 
@@ -1088,13 +1103,14 @@ loop_specification[ImmutableList<String> mods]
    result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ls);
 }
 :
+    ps=loop_invariant       { ls.addInvariant(ps); }
     (
     	options { greedy = true; }
     	:
-    	    ps=loop_invariant       { ls.addInvariant(ps); }
+            ps=loop_invariant       { ls.addInvariant(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); } 
-    )+
+    )*
 ;
 
 
@@ -1193,4 +1209,107 @@ expression returns [PositionedString result = null]
     { 
     	result = createPositionedString(t.getText(), t);
     }
+;
+
+
+
+//-----------------------------------------------------------------------------
+//block specifications
+//-----------------------------------------------------------------------------
+
+block_specification[ImmutableList<String> mods] 
+	returns [ImmutableList<TextualJMLConstruct> result = null] 
+	throws SLTranslationException
+:
+    
+    result=method_specification[mods]
+;
+
+breaks_clause
+	returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	breaks_keyword result=expression { result = result.prepend("breaks "); }
+;
+
+
+breaks_keyword
+:
+	BREAKS
+;
+
+
+continues_clause
+	returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	continues_keyword result=expression { result = result.prepend("continues "); }
+;
+
+
+continues_keyword
+:
+	CONTINUES
+;
+
+
+returns_clause
+	returns [PositionedString result = null]
+	throws SLTranslationException
+:
+	returns_keyword result=expression { result = result.prepend("returns "); }
+;
+
+
+returns_keyword
+:
+	RETURNS
+;
+
+
+break_behavior_spec_case[ImmutableList<String> mods]
+	returns [ImmutableList<TextualJMLConstruct> result = null]
+	throws SLTranslationException
+:
+    break_behavior_keyword
+    result=generic_spec_case[mods, Behavior.BREAK_BEHAVIOR]
+;
+
+
+break_behavior_keyword
+:
+      	BREAK_BEHAVIOR
+    |	BREAK_BEHAVIOUR
+;
+
+
+continue_behavior_spec_case[ImmutableList<String> mods]
+	returns [ImmutableList<TextualJMLConstruct> result = null]
+	throws SLTranslationException
+:
+    continue_behavior_keyword
+    result=generic_spec_case[mods, Behavior.CONTINUE_BEHAVIOR]
+;
+
+
+continue_behavior_keyword
+:
+      	CONTINUE_BEHAVIOR
+    |	CONTINUE_BEHAVIOUR
+;
+
+
+return_behavior_spec_case[ImmutableList<String> mods]
+	returns [ImmutableList<TextualJMLConstruct> result = null]
+	throws SLTranslationException
+:
+    return_behavior_keyword
+    result=generic_spec_case[mods, Behavior.RETURN_BEHAVIOR]
+;
+
+
+return_behavior_keyword
+:
+      	RETURN_BEHAVIOR
+    |	RETURN_BEHAVIOUR
 ;

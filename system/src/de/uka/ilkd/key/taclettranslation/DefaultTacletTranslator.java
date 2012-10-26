@@ -91,10 +91,13 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
      *            translated.
      * @param find
      *            the find pattern of the taclet, already translated.
+     * @param polarity
+     *            a value between -1 and 1. describes the expected polarity of
+     *            the find clause (-1 antecedent, 0 both, +1 succedent)
      * @return translation
      */
     private Term translateReplaceAndAddFormula(
-	    TacletGoalTemplate template, Term find) {
+	    TacletGoalTemplate template, Term find, int polarity) {
 	TermBuilder tb = TermBuilder.DF;
 	
 	Term replace = find;
@@ -108,14 +111,23 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 	    add = STD_ADD; 
 	if (replace == null)
 	    replace = STD_REPLACE;
-	Term term = tb.imp(translateEqivalence(find, replace), add);
+	
+	assert polarity == 0 || add == STD_ADD : 
+	    "add() commands not allowed in polarity rules (syntactically forbidden)";
+
+	Term term = tb.imp(translateEquivalence(find, replace, polarity), add);
 	return term;
 
     }
     
-    private Term translateEqivalence(Term t1, Term t2){
+    private Term translateEquivalence(Term find, Term replace, int polarity){
 	TermBuilder tb = TermBuilder.DF;
-	return tb.equals(t1, t2);
+	switch(polarity) {
+	case 0: return tb.equals(find, replace);
+	case 1: return tb.imp(replace, find);
+	case -1: return tb.imp(find, replace);
+	default: throw new IllegalArgumentException();
+	}
     }
     
     private Term translateReplaceAndAddSequent(TacletGoalTemplate template, int type){
@@ -172,9 +184,11 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 		list = list.append(translateReplaceAndAddSequent(template,SUCC));
 
 	    } else if(taclet instanceof RewriteTaclet){
-		    if (((RewriteTaclet)taclet).find().sort().equals(Sort.FORMULA)) {
+		    RewriteTaclet rwTaclet = (RewriteTaclet)taclet;
+		    if (rwTaclet.find().sort().equals(Sort.FORMULA)) {
+		        int polarity = getPolarity(rwTaclet);
 			list = list.append(translateReplaceAndAddFormula(
-			         template, find));
+			         template, find, polarity));
 
 		    } else {
 			list = list.append(translateReplaceAndAddTerm(
@@ -201,6 +215,17 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
 	    return tb.imp(tb.and(list),tb.or(find, assum));
 	}
 	return tb.imp(tb.and(list),assum);
+    }
+
+    private int getPolarity(RewriteTaclet rwTaclet) {
+        int restr = rwTaclet.getApplicationRestriction();
+        if((restr & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
+            return -1;
+        } else if((restr & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
+            return +1;
+        } else {
+            return 0;
+        }
     }
 }
 

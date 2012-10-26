@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.ExtList;
 
 /**
@@ -101,21 +102,25 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         doDefaultAction(x);
     }
 
-    public void performActionOnStatementBlock(StatementBlock x) {
+    public void performActionOnStatementBlock(final StatementBlock x) {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
-                return new StatementBlock(changeList);
+                StatementBlock newBlock = new StatementBlock(changeList);
+                performActionOnBlockContract(x, newBlock);
+                return newBlock;
             }
         };
         def.doAction(x);
     }
-    
+
+    protected void performActionOnBlockContract(final StatementBlock oldBlock, final StatementBlock newBlock) {
+        //do nothing
+    }
     
     protected void performActionOnLoopInvariant(LoopStatement oldLoop, 
                                                 LoopStatement newLoop) {
         //do nothing
     }
-
     
 
     // eee
@@ -1229,6 +1234,15 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);	
     }     
     
+    @Override
+    public void performActionOnSeqLength(SeqLength x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new SeqLength(changeList);
+            }
+        };
+        def.doAction(x);        
+    }
 
     /**
      * returns the position of pe2 in the virtual child array of pe1

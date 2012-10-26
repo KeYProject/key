@@ -32,6 +32,11 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  */
 public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionTestCase {
    /**
+    * If the fast mode is enabled the step wise creation of models is disabled.
+    */
+   private static final boolean FAST_MODE = true;
+   
+   /**
     * Number of executed SET nodes to execute all in one.
     */
    private static final int ALL_IN_ONE_RUN = ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN;
@@ -44,8 +49,65 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Default stop conditions of executed SET nodes.
     */
-   private static final int[] DEFAULT_MAXIMAL_SET_NODES_PER_RUN = {ALL_IN_ONE_RUN, SINGLE_SET_NODE_RUN};
-
+   private static final int[] DEFAULT_MAXIMAL_SET_NODES_PER_RUN;
+   
+   /**
+    * Static class constructor.
+    */
+   static {
+      if (FAST_MODE) {
+         DEFAULT_MAXIMAL_SET_NODES_PER_RUN = new int[] {ALL_IN_ONE_RUN};
+      }
+      else {
+         DEFAULT_MAXIMAL_SET_NODES_PER_RUN = new int[] {ALL_IN_ONE_RUN, SINGLE_SET_NODE_RUN};
+      }
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/complexConstructorTest
+    */
+   public void testComplexConstructorTest() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/complexConstructorTest/test/ComplexConstructorTest.java", 
+             "ComplexConstructorTest", 
+             "main", 
+             "examples/_testcase/set/complexConstructorTest/oracle/ComplexConstructorTest.xml",
+             false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/simpleConstructorTest
+    */
+   public void testSimpleConstructorTest() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/simpleConstructorTest/test/SimpleConstructorTest.java", 
+             "SimpleConstructorTest", 
+             "main", 
+             "examples/_testcase/set/simpleConstructorTest/oracle/SimpleConstructorTest.xml",
+             false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/variablesUnknownTest
+    */
+   public void testVariablesUnknownTest() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/variablesUnknownTest/test/UnknownTest.java", 
+             "UnknownTest", 
+             "main", 
+             "examples/_testcase/set/variablesUnknownTest/oracle/UnknownTest.xml",
+             true,
+             false,
+             ALL_IN_ONE_RUN,
+             false);
+   }
+   
    /**
     * Tests example: examples/_testcase/set/variablesParameterAttributesChange
     */
@@ -833,9 +895,13 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
          // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
          ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
          env.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
-         // Execute auto mode until no more symbolic execution tree nodes are found
+         int nodeCount;
+         // Execute auto mode until no more symbolic execution tree nodes are found or no new rules are applied.
          do {
+            // Store the number of nodes before start of the auto mode 
+            nodeCount = env.getProof().countNodes();
             // Run proof
+            SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(env.getProof());
             env.getUi().startAndWaitForProof(env.getProof());
             // Update symbolic execution tree 
             env.getBuilder().analyse();
@@ -845,7 +911,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                assertNotNull(value);
                assertTrue(value.intValue() + " is not less equal to " + maximalNumberOfExecutedSetNodes, value.intValue() <= maximalNumberOfExecutedSetNodes);
             }
-         } while(stopCondition.wasSetNodeExecuted());
+         } while(stopCondition.wasSetNodeExecuted() && nodeCount != env.getProof().countNodes());
          // Create new oracle file if required in a temporary directory
          createOracleFile(env.getBuilder().getStartNode(), oraclePathInBaseDirFile, includeVariables, includeCallStack);
          // Read oracle file

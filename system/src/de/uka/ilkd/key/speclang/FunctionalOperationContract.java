@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -67,13 +69,12 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        Services services);
 
     public Term getPost(List<LocationVariable> heapContext,
-                        Term heapTerm,
+                        Map<LocationVariable,Term> heapTerms,
 	                Term selfTerm, 
 	    	        ImmutableList<Term> paramTerms, 
 	    	        Term resultTerm, 
 	    	        Term excTerm,
 	    	        Map<LocationVariable,Term> atPres,
 	    	        Services services);
-
 
 }

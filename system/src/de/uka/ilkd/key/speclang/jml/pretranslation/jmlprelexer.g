@@ -38,6 +38,9 @@ tokens {
     AXIOM                       = "axiom";
     BEHAVIOR 			= "behavior";
     BEHAVIOUR 			= "behaviour";
+	BREAKS				= "breaks";
+	BREAK_BEHAVIOR 	    = "break_behavior";
+    BREAK_BEHAVIOUR 	= "break_behaviour";
     CAPTURES 			= "captures";
     CAPTURES_RED 		= "captures_redundantly";
     CODE 			= "code";
@@ -47,6 +50,9 @@ tokens {
     CONST 			= "const";
     CONSTRAINT			= "constraint";
     CONSTRAINT_RED		= "constraint_redundantly";
+	CONTINUES			= "continues";
+	CONTINUE_BEHAVIOR 	= "continue_behavior";
+    CONTINUE_BEHAVIOUR 	= "continue_behaviour";
     DECREASES  			= "decreases";
     DECREASES_REDUNDANTLY  	= "decreases_redundantly";
     DECREASING  		= "decreasing";
@@ -105,6 +111,9 @@ tokens {
     REPRESENTS_RED		= "represents_redundantly";
     REQUIRES 			= "requires";
     REQUIRES_RED 		= "requires_redundantly";
+	RETURNS				= "returns";
+	RETURN_BEHAVIOR 	= "return_behavior";
+    RETURN_BEHAVIOUR 	= "return_behaviour";
     SCOPE_SAFE 			= "scopeSafe";
     ARBITRARY_SCOPE             = "arbitraryScope";
     ARBITRARY_SCOPE_THIS        = "arbitraryScopeThis";

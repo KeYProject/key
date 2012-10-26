@@ -232,7 +232,7 @@ public class TacletGenerator {
         if (satisfiabilityGuard)
             functionalRepresentsAddSatisfiabilityBranch(target, services, heapSV,
                     selfSV, schemaRepresents, tacletBuilder);
-        tacletBuilder.setStateRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         result = result.add(tacletBuilder.getTaclet());
 
         //return

@@ -240,7 +240,7 @@ public final class QueryAxiom extends ClassAxiom {
 	}
 	tacletBuilder.addVarsNew(resultProgSV, 
 				 target.getReturnType().getJavaType());
-	tacletBuilder.setStateRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+	tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
 	tacletBuilder.addTacletGoalTemplate
 	    (new RewriteTacletGoalTemplate(addedSeq,
 					   ImmutableSLList.<Taclet>nil(),

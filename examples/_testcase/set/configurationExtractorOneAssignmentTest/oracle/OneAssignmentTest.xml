@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.compute(x);" pathCondition="true" pathConditionChanged="false">
+      <statement name="OneAssignmentTestValueWrapper tempX = x;" pathCondition="true" pathConditionChanged="false">
+         <statement name="OneAssignmentTestValueWrapper tempY = y;" pathCondition="true" pathConditionChanged="false">
+            <statement name="first=x;" pathCondition="true" pathConditionChanged="false">
+               <statement name="second=y;" pathCondition="true" pathConditionChanged="false">
+                  <statement name="return first.value+second.value+tempX.value+tempY.value;" pathCondition="true" pathConditionChanged="false">
+                     <branchCondition name="!x = null" pathCondition="!x = null" pathConditionChanged="true" branchCondition="!x = null" mergedBranchCondition="false">
+                        <branchCondition name="!self.y = null" pathCondition="!x = null &amp; !self.y = null" pathConditionChanged="true" branchCondition="!self.y = null" mergedBranchCondition="false">
+                           <methodReturn name="&lt;return of self.compute(x);&gt;" pathCondition="!x = null &amp; !self.y = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;x.value * 2 + self.y.value * 2&apos; as result of self.compute(x);&gt;">
+                              <termination name="&lt;end&gt;" pathCondition="!x = null &amp; !self.y = null" pathConditionChanged="false" exceptionalTermination="false">
+                              </termination>
+                           </methodReturn>
+                        </branchCondition>
+                        <branchCondition name="self.y = null" pathCondition="!x = null &amp; self.y = null" pathConditionChanged="true" branchCondition="self.y = null" mergedBranchCondition="false">
+                           <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; self.y = null" pathConditionChanged="false" exceptionalTermination="true">
+                           </termination>
+                        </branchCondition>
+                     </branchCondition>
+                     <branchCondition name="x = null" pathCondition="x = null" pathConditionChanged="true" branchCondition="x = null" mergedBranchCondition="false">
+                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="x = null" pathConditionChanged="false" exceptionalTermination="true">
+                        </termination>
+                     </branchCondition>
+                  </statement>
+               </statement>
+            </statement>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>

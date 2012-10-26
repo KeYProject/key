@@ -10,7 +10,17 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.GridBagLayout;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -24,14 +34,71 @@ import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.JViewport;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 
-import de.uka.ilkd.key.gui.actions.*;
-import de.uka.ilkd.key.gui.configuration.*;
+import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
+import de.uka.ilkd.key.gui.actions.AboutAction;
+import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
+import de.uka.ilkd.key.gui.actions.ExitMainAction;
+import de.uka.ilkd.key.gui.actions.FontSizeAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
+import de.uka.ilkd.key.gui.actions.LicenseAction;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
+import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
+import de.uka.ilkd.key.gui.actions.OpenExampleAction;
+import de.uka.ilkd.key.gui.actions.OpenFileAction;
+import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
+import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
+import de.uka.ilkd.key.gui.actions.ProofManagementAction;
+import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
+import de.uka.ilkd.key.gui.actions.SaveFileAction;
+import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
+import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
+import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
+import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
+import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
+import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
+import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
+import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
+import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.configuration.GeneralSettings;
+import de.uka.ilkd.key.gui.configuration.PathConfig;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
@@ -44,18 +111,22 @@ import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
+import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
@@ -172,7 +243,7 @@ public final class MainWindow extends JFrame  {
     /** for locking of threads waiting for the prover to exit */
     public final Object monitor = new Object();
     
-    public static MainWindow instance = null;    
+    private static MainWindow instance = null;    
     
 //    private ProverTaskListener taskListener;
     
@@ -199,12 +270,9 @@ public final class MainWindow extends JFrame  {
     
     /**
      * initialize the singleton object of this class.
-     * 
-     * @param title
-     *            the frame's title
      */
-    private void initialize(String title) {
-        setTitle(title);
+    private void initialize() {
+        setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
         setLaF();
         setIconImage(IconFactory.keyLogo());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -976,20 +1044,6 @@ public final class MainWindow extends JFrame  {
         }
     }
     
-    // FIXME DOES NOT DO THE SAME AS THE ONE ONE ABOVE
-    @Deprecated
-    public void closeTaskWithoutInteraction() {
-        final Proof proof = mediator.getProof();
-        if (proof != null) {
-            final TaskTreeNode rootTask = 
-                proof.getBasicTask().getRootTask();     
-            proofList.removeTaskWithoutInteraction(rootTask);   
-            proof.getServices().getSpecificationRepository().removeProof(proof);
-            proof.mgt().removeProofListener();
-            proofTreeView.removeProofs(rootTask.allProofs());
-        }
-    }
-    
     /**
      * brings window in front and request focus
      */
@@ -1604,12 +1658,6 @@ public final class MainWindow extends JFrame  {
         }
     }
     
-
-    public static boolean hasInstance() {
-        return instance != null;
-    }   
-    
-    
     /**
      * returns an instance of Main and creates one if necessary
      * <strong>Do not use</strong> this method to access the mediator as long as
@@ -1626,40 +1674,26 @@ public final class MainWindow extends JFrame  {
      * @throws IllegalStateException 
      */
     public static MainWindow getInstance() throws IllegalStateException {
-        return getInstance(true);
-    }
-
-    /**
-     * returns an instance of Main and creates one if necessary
-     * <strong>Do not use</strong> this method to access the mediator as long as
-     * you do not attempt create a GUI element. In particular be aware that the 
-     * pattern <tt>getInstance(boolean).mediator().getProof()</tt> breaks GUI and prover 
-     * separation and will not work if an alternative GUI is used (e.g. soon for 
-     * the visual debugger). 
-     * 
-     * Further the above pattern is very fragile as the mediator may have changed 
-     * the selected proof. Usually if you want to have access to a proof e.g. in
-     * the strategy hand the proof object over at the creation time of the component.
-     * 
-     * @param visible a boolean indicating if Main shall be made visible
-     * @return the instance of Main
-     * @throws Exception 
-     */
-    public static MainWindow getInstance(final boolean visible) throws IllegalStateException {
-        
-        if(instance == null) {
-            // TODO Come up with a better exception class
-            throw new IllegalStateException("There is no GUI main window. Sorry.");
-        }        
-        return instance;
-    }
-
-    public static void createInstance(String title) {
-	assert instance == null : "Attempt to create a second mainwindow";
-	if(instance == null) {
+	if (instance == null) {
 	    instance = new MainWindow();
-	    instance.initialize(title);
+	    instance.initialize();
 	}
+
+	return instance;
+    }
+    
+    /**
+     * <p>
+     * Checks if an instance of the main window is already created or not.
+     * </p>
+     * <p>
+     * This method is required, because the Eclipse integration of KeY has
+     * to do some cleanup only if a main window exists.
+     * </p>
+     * @return {@code true} {@link MainWindow} exists and is available via {@link #getInstance()}, {@code false} {@link MainWindow} is not instantiated and will be instantiated via {@link #getInstance()}.
+     */
+    public static boolean hasInstance() {
+       return instance != null;
     }
     
     

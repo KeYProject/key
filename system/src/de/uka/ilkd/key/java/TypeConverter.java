@@ -585,7 +585,7 @@ public final class TypeConverter {
 	} else if (term.op() instanceof Function) {
 	    for(LDT model : models) {
                 if (model.hasLiteralFunction((Function)term.op())) {
-                    return model.translateTerm(term, null);	       
+                    return model.translateTerm(term, null, services);	       
                 }
             }
 	}
@@ -599,7 +599,7 @@ public final class TypeConverter {
 	} else if (term.op() instanceof Function) {
 	    for(LDT model : models) {
                 if (model.containsFunction((Function)term.op())) {             
-                    return model.translateTerm(term, children);
+                    return model.translateTerm(term, children, services);
                 }  
 	    }
 	} 
