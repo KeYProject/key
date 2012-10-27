@@ -18,20 +18,20 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 /**
  * The macro FinishSymbolicExecutionMacro continues automatic rule application
  * until there is no more modality on the sequent.
- * 
+ *
  * This is done by implementing a delegationg {@link Strategy} which assigns to
  * any rule application infinite costs if there is no modality on the sequent.
- * 
+ *
  * @author mattias ulbrich
  */
 public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
-    @Override 
+    @Override
     public String getName() {
         return "Finish symbolic execution";
     }
 
-    @Override 
+    @Override
     public String getDescription() {
         return "Continue automatic strategy application until no more modality is on the sequent.";
     }
@@ -67,7 +67,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
         return false;
     }
 
-    @Override 
+    @Override
     protected Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
         return new FilterSymbexStrategy(
                 mediator.getInteractiveProver().getProof().getActiveStrategy());
@@ -77,46 +77,28 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
      * The Class FilterAppManager is a special strategy assigning to any rule
      * infinite costs if the goal has no modality
      */
-    private static class FilterSymbexStrategy implements Strategy {
+    private static class FilterSymbexStrategy extends FilterStrategy {
 
         private static final Name NAME = new Name(FilterSymbexStrategy.class.getSimpleName());
 
-        private final Strategy delegate;
-
         public FilterSymbexStrategy(Strategy delegate) {
-            this.delegate = delegate;
+            super(delegate);
         }
 
-
-        @Override 
+        @Override
         public Name name() {
             return NAME;
         }
 
-        @Override 
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if(!hasModality(goal.node())) {
-                return TopRuleAppCost.INSTANCE;
-            }
-
-            return delegate.computeCost(app, pio, goal);
-        }
-
-        // just to make sure double check ...
-        @Override 
+        @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
             if(!hasModality(goal.node())) {
                 return false;
             }
-            
-            return delegate.isApprovedApp(app, pio, goal);
+
+            return super.isApprovedApp(app, pio, goal);
         }
 
-        @Override 
-        public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-                RuleAppCostCollector collector) {
-            delegate.instantiateApp(app, pio, goal, collector);
-        }
     }
 
 }
