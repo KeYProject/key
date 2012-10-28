@@ -5,13 +5,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -21,6 +22,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.LongRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
@@ -36,10 +39,12 @@ public class AutoPilotProofMacro extends StrategyProofMacro {
 
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
 
+    private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("to_be_done");
+
 
     @Override
     public String getName() {
-        return "AUTOPILOT";
+        return "Auto pilot";
     }
 
     @Override
@@ -86,6 +91,17 @@ public class AutoPilotProofMacro extends StrategyProofMacro {
         return false;
     }
 
+    private static boolean isNonHumanInteractionTagged(Rule rule, Services services) {
+        if (rule instanceof Taclet) {
+            Taclet taclet = (Taclet) rule;
+            ImmutableList<RuleSet> ruleSets = taclet.getRuleSets();
+            RuleSet interactionRuleSet = (RuleSet)services.getNamespaces().ruleSets().
+                    lookup(NON_HUMAN_INTERACTION_RULESET);
+            return ruleSets.contains(interactionRuleSet);
+        }
+        return false;
+    }
+
     private static class AutoPilotStrategy implements Strategy {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
@@ -112,11 +128,16 @@ public class AutoPilotProofMacro extends StrategyProofMacro {
 
         @Override
         public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+
+            Rule rule = app.rule();
+            if(isNonHumanInteractionTagged(rule, goal.proof().getServices())) {
+                return TopRuleAppCost.INSTANCE;
+            }
+
             if(hasModality(goal.node())) {
                 return delegate.computeCost(app, pio, goal);
             }
 
-            Rule rule = app.rule();
             String name = rule.name().toString();
             if(ADMITTED_RULES_SET.contains(name)) {
                 return LongRuleAppCost.ZERO_COST;
@@ -146,21 +167,6 @@ public class AutoPilotProofMacro extends StrategyProofMacro {
             delegate.instantiateApp(app, pio, goal, collector);
         }
 
-    }
-
-    private boolean checkINV(RuleApp app, PosInOccurrence pio, Goal goal) {
-        Rule rule = app.rule();
-        if(rule == OneStepSimplifier.INSTANCE) {
-            Term updatedTerm = pio.subTerm().sub(0);
-            System.out.println(updatedTerm);
-        } else {
-            String name = rule.name().toString();
-            if(name.startsWith("Class_invariant_axiom")) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     @Override
