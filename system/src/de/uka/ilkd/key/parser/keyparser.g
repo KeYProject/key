@@ -3433,11 +3433,6 @@ modifiers[TacletBuilder b]
            while(it.hasNext())
                b.addRuleSet((RuleSet)it.next());
          }
-        | NONINTERACTIVE { 
-                //      b.setNoninteractive(true);  
-                // "noninteractive" (as it is now) is confusing
-                // dropped this completely until a better solution (->Uwe)
-            }       
         | DISPLAYNAME dname = string_literal 
             {b.setDisplayName(dname);}
         | HELPTEXT htext = string_literal

@@ -15,23 +15,15 @@ package de.uka.ilkd.key.rule;
 
 
 public final class TacletAttributes {
-    private boolean noninteractive;
    
     private String displayName;
     private String helpText;
 
 
    public TacletAttributes() {
-	this.noninteractive = false;	
         this.displayName = null;
         this.helpText = null;
    }
-
-    
-    /** returns true if the <I>interactive</I> option is set */
-    public boolean noninteractive() {
-	return noninteractive;
-    }
 
     
     public String displayName() {
@@ -41,7 +33,6 @@ public final class TacletAttributes {
     public String helpText() {
        return helpText;
     }
-    
 
     /** sets an optional display name (presented to the user)
      */
@@ -51,11 +42,5 @@ public final class TacletAttributes {
 
     public void setHelpText(String s) {
        helpText = s;
-    }
-
-    /** sets the noninteractive flag to the given value.
-     */
-    public void setNoninteractive(boolean ni) {
-	noninteractive = ni;
     }
 }

@@ -413,9 +413,9 @@ public final class LogicPrinter {
     }
 
     protected void printAttribs(Taclet taclet) throws IOException{
-        if (taclet.noninteractive()) {
-            layouter.brk().print("\\noninteractive");
-        }       
+//        if (taclet.noninteractive()) {
+//            layouter.brk().print("\\noninteractive");
+//        }       
     }
 
     protected void printRewriteAttributes(RewriteTaclet taclet) throws IOException{

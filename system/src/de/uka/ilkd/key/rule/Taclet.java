@@ -140,11 +140,6 @@ public abstract class Taclet implements Rule, Named {
      */
     protected final ImmutableList<RuleSet> ruleSets;
 
-    /** 
-     * should taclet be applied by strategies only 
-     */
-    private final boolean noninteractive;
-    
     /**
      * map from a schemavariable to its prefix. The prefix is used to test
      * correct instantiations of the schemavariables by resolving/avoiding
@@ -205,7 +200,6 @@ public abstract class Taclet implements Rule, Named {
 	variableConditions = applPart.getVariableConditions();
 	this.goalTemplates = goalTemplates;
 	this.ruleSets      = ruleSets;
-	noninteractive     = attrs.noninteractive();
 	this.choices       = choices;
 	this.prefixMap     = prefixMap;
         this.displayName   = attrs.displayName() == null ? 
@@ -760,12 +754,12 @@ public abstract class Taclet implements Rule, Named {
 	return ruleSets;
     }
 
-    /** 
-     * returns true iff the Taclet is to be applied only noninteractive
-     */
-    public boolean noninteractive() {
-	return noninteractive;
-    }
+//    /** 
+//     * returns true iff the Taclet is to be applied only noninteractive
+//     */
+//    public boolean noninteractive() {
+//	return noninteractive;
+//    }
 
 
     public ImmutableMap<SchemaVariable,TacletPrefix> prefixMap() {
@@ -1400,7 +1394,7 @@ public abstract class Taclet implements Rule, Named {
     }
 
     StringBuffer toStringAttribs(StringBuffer sb) {
-	if (noninteractive()) sb = sb.append(" \\noninteractive");
+//	if (noninteractive()) sb = sb.append(" \\noninteractive");
 	return sb;
     }
     
@@ -1435,11 +1429,6 @@ public abstract class Taclet implements Rule, Named {
     }
 
     protected boolean admissibleInteractive(ImmutableList<RuleSet> notAdmissibleRuleSets) {
-        if (noninteractive()) {
-            for (final RuleSet tacletRuleSet : getRuleSets() ) {
-                if ( notAdmissibleRuleSets.contains ( tacletRuleSet ) ) return false;
-            }
-        }
         return true;
     }
 
