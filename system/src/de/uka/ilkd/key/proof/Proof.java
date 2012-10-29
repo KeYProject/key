@@ -845,9 +845,11 @@ public class Proof implements Named {
      */
     public synchronized void removeProofTreeListener
 	(ProofTreeListener listener) {
-	synchronized(listenerList) {
-	    listenerList.remove(listener);
-	}
+       if (listenerList != null) {
+          synchronized(listenerList) {
+             listenerList.remove(listener);
+         }
+       }
     }
     
     

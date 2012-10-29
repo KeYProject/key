@@ -31,4 +31,23 @@ public interface IExecutionMethodCall extends IExecutionStateNode<MethodBodyStat
     * @return The called {@link IProgramMethod}.
     */
    public IProgramMethod getProgramMethod();
+   
+   /**
+    * Checks if an implicit constructor is called.
+    * @return {@code true} implicit constructor is called, {@code false} method or explicit constructor is called.
+    */
+   public boolean isImplicitConstructor();
+   
+   /**
+    * Returns a copy of the {@link MethodReference} which calls the
+    * explicit constructor instead of the implicit constructor.
+    * @return The {@link MethodReference} to the explicit constructor or {@code null} if no constructor is called.
+    */
+   public MethodReference getExplicitConstructorMethodReference();
+
+   /**
+    * Returns the explicit constructor.
+    * @return The explicit constructor or {@code null} if no constructor is called.
+    */
+   public IProgramMethod getExplicitConstructorProgramMethod();
 }

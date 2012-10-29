@@ -48,5 +48,6 @@ public class ExecutionTreeImageProvider extends AbstractImageProvider {
        addImageFilePath(IExecutionTreeImageConstants.IMG_STEP_OVER, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "stepover_co.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_STEP_RETURN, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "stepreturn_co.gif");
        addImageFilePath(IExecutionTreeImageConstants.IMG_TERMINATE, ROOT_FOLDER_FOR_IMG_DEBUG_UI + "terminate_co.gif");
+       addImageFilePath(IExecutionTreeImageConstants.IMG_VISUALIZE_STATE, ROOT_FOLDER_FOR_IMG + "object_diagram.gif");
    }
 }

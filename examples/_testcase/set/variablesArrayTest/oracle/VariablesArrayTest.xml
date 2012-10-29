@@ -1,96 +1,142 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
-      <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
       </variable>
       <statement name="int[][] multiArray = new int[2][];" pathCondition="true" pathConditionChanged="false">
-         <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+         <variable name="self" arrayIndex="-1" isArrayIndex="false">
+            <value name="self {true}" typeString="VariablesArrayTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+            </value>
          </variable>
-         <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
          </variable>
          <statement name="multiArray[0]=new int[]{1,2 };" pathCondition="true" pathConditionChanged="false">
-            <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+               <value name="self {true}" typeString="VariablesArrayTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+               </value>
             </variable>
-            <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
             </variable>
-            <variable name="multiArray" typeString="int[][]" valueString="x_arr_arr_2" arrayIndex="-1" isArrayIndex="false">
-               <variable name="length" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
-               </variable>
-               <variable name="multiArray[0]" typeString="int[]" valueString="\if (\exists int iv;
-       (iv = 0 &amp; iv &gt;= 0 &amp; iv &lt;= 2))
-    \then (null)
-    \else (x_arr_arr_2[0])" arrayIndex="0" isArrayIndex="true">
-                  <variable name="length" typeString="int" valueString="\if (\exists int iv;
-       (iv = 0 &amp; iv &gt;= 0 &amp; iv &lt;= 2))
-    \then (null)
-    \else (x_arr_arr_2[0]).length" arrayIndex="-1" isArrayIndex="false">
+            <variable name="multiArray" arrayIndex="-1" isArrayIndex="false">
+               <value name="multiArray {true}" typeString="int[][]" valueString="x_arr_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                     <value name="length {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
                   </variable>
-               </variable>
-               <variable name="multiArray[1]" typeString="int[]" valueString="\if (\exists int iv;
-       (iv = 1 &amp; iv &gt;= 0 &amp; iv &lt;= 2))
-    \then (null)
-    \else (x_arr_arr_2[1])" arrayIndex="1" isArrayIndex="true">
-                  <variable name="length" typeString="int" valueString="\if (\exists int iv;
-       (iv = 1 &amp; iv &gt;= 0 &amp; iv &lt;= 2))
-    \then (null)
-    \else (x_arr_arr_2[1]).length" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                     <value name="[0] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
                   </variable>
-               </variable>
+                  <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                     <value name="[1] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
+                  </variable>
+               </value>
             </variable>
             <statement name="multiArray[1]=new int[]{3,4,5 };" pathCondition="true" pathConditionChanged="false">
-               <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <value name="self {true}" typeString="VariablesArrayTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  </value>
                </variable>
-               <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
                </variable>
-               <variable name="multiArray" typeString="int[][]" valueString="x_arr_arr_2" arrayIndex="-1" isArrayIndex="false">
-                  <variable name="length" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
-                  </variable>
-                  <variable name="multiArray[0]" typeString="int[]" valueString="x_arr_4" arrayIndex="0" isArrayIndex="true">
-                     <variable name="length" typeString="int" valueString="x_arr_4.length" arrayIndex="-1" isArrayIndex="false">
+               <variable name="multiArray" arrayIndex="-1" isArrayIndex="false">
+                  <value name="multiArray {true}" typeString="int[][]" valueString="x_arr_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                        <value name="length {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
                      </variable>
-                  </variable>
-                  <variable name="multiArray[1]" typeString="int[]" valueString="\if (\exists int iv;
-       (iv = 1 &amp; iv &gt;= 0 &amp; iv &lt;= 2))
-    \then (null)
-    \else (x_arr_arr_2[1])" arrayIndex="1" isArrayIndex="true">
-                     <variable name="length" typeString="int" valueString="\if (\exists int iv;
-       (iv = 1 &amp; iv &gt;= 0 &amp; iv &lt;= 2))
-    \then (null)
-    \else (x_arr_arr_2[1]).length" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                        <value name="[0] {true}" typeString="int[]" valueString="x_arr_4" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                              <value name="length {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                              <value name="[0] {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                           <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                              <value name="[1] {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                              </value>
+                           </variable>
+                        </value>
                      </variable>
-                  </variable>
+                     <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                        <value name="[1] {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
+                     </variable>
+                  </value>
                </variable>
                <statement name="return multiArray[0][0]+multiArray[0][1]+multiArray[1][0]+multiArray[1][1]+multiArray[1][2];" pathCondition="true" pathConditionChanged="false">
-                  <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <value name="self {true}" typeString="VariablesArrayTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     </value>
                   </variable>
-                  <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
                   </variable>
-                  <variable name="multiArray" typeString="int[][]" valueString="x_arr_arr_2" arrayIndex="-1" isArrayIndex="false">
-                     <variable name="length" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
-                     </variable>
-                     <variable name="multiArray[0]" typeString="int[]" valueString="x_arr_4" arrayIndex="0" isArrayIndex="true">
-                        <variable name="length" typeString="int" valueString="x_arr_4.length" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="multiArray" arrayIndex="-1" isArrayIndex="false">
+                     <value name="multiArray {true}" typeString="int[][]" valueString="x_arr_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                           <value name="length {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
                         </variable>
-                     </variable>
-                     <variable name="multiArray[1]" typeString="int[]" valueString="x_arr_9" arrayIndex="1" isArrayIndex="true">
-                        <variable name="length" typeString="int" valueString="x_arr_9.length" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                           <value name="[0] {true}" typeString="int[]" valueString="x_arr_4" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                                 <value name="[0] {true}" typeString="int" valueString="1" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                                 <value name="[1] {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
                         </variable>
-                     </variable>
+                        <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                           <value name="[1] {true}" typeString="int[]" valueString="x_arr_9" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                              <variable name="length" arrayIndex="-1" isArrayIndex="false">
+                                 <value name="length {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[0]" arrayIndex="0" isArrayIndex="true">
+                                 <value name="[0] {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[1]" arrayIndex="1" isArrayIndex="true">
+                                 <value name="[1] {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                              <variable name="[2]" arrayIndex="2" isArrayIndex="true">
+                                 <value name="[2] {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                                 </value>
+                              </variable>
+                           </value>
+                        </variable>
+                     </value>
                   </variable>
-                  <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  12
-+ \if (x_arr_9 = x_arr_4)
-      \then (3)
-      \else (\if (x_arr_9 = x_arr_4)
-                 \then (0)
-                 \else (1))
-+ \if (x_arr_9 = x_arr_4)
-      \then (4)
-      \else (\if (x_arr_9 = x_arr_4)
-                 \then (0)
-                 \else (2))&apos; as result of self.main();&gt;">
-                     <variable name="self" typeString="VariablesArrayTest" valueString="self" arrayIndex="-1" isArrayIndex="false">
+                  <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;15&apos; as result of self.main();&gt;">
+                     <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <value name="self {true}" typeString="VariablesArrayTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        </value>
                      </variable>
-                     <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
                      </variable>
                      <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
                      </termination>

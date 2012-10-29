@@ -799,7 +799,10 @@ options {
                     
                     if (vars.size() == 0) {
                         semanticError("There is no attribute '" + attributeName + 
-                            "' declared in type '" + prefixSort + "'");
+                            "' declared in type '" + prefixSort + "'.\n"+
+                            "If you wanted to use observer symbols, "+
+                            "please make sure to use raw (i.e., not pretty-printed) syntax, "+
+                            "e.g., 'java.lang.Object::<inv>(heap,t)'");
                     }                    
 
                     if (LogicPrinter.printInShortForm(attributeName, 
@@ -1052,6 +1055,7 @@ options {
      */
     private Operator lookupVarfuncId(String varfunc_name, Term[] args) 
         throws NotDeclException, SemanticException {
+        
 
         // case 1: variable
         Operator v = (Operator) variables().lookup(new Name(varfunc_name));

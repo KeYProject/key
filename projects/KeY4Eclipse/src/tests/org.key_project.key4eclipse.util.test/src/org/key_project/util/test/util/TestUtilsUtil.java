@@ -687,11 +687,11 @@ public class TestUtilsUtil {
       TestCase.assertEquals("Proof Search Strategy", pane.getTitleAt(2));
       AbstractSwingBotComponent<?> tabComponent = pane.select(2);
       if (MethodTreatment.CONTRACTS.equals(methodTreatment)) {
-         SwingBotJRadioButton contractsButton = tabComponent.bot().jRadioButton("Contract", 0);
+         SwingBotJRadioButton contractsButton = tabComponent.bot().jRadioButton("Contract", 1);
          contractsButton.click();
       }
       else {
-         SwingBotJRadioButton expandButton = tabComponent.bot().jRadioButton("Expand", 1);
+         SwingBotJRadioButton expandButton = tabComponent.bot().jRadioButton("Expand", 2);
          expandButton.click();
       }
       TestCase.assertEquals("Proof", pane.getTitleAt(0));

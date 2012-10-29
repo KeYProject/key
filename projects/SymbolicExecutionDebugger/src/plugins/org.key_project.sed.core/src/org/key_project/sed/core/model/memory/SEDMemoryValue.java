@@ -31,6 +31,16 @@ public class SEDMemoryValue extends AbstractSEDValue {
    private boolean allocated;
    
    /**
+    * Is object or only an object attribute?
+    */
+   private boolean object;
+   
+   /**
+    * Is multi valued?
+    */
+   private boolean multiValued;
+
+   /**
     * The contained variables.
     */
    private List<IVariable> variables = new LinkedList<IVariable>();
@@ -76,6 +86,14 @@ public class SEDMemoryValue extends AbstractSEDValue {
    }
 
    /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isMultiValued() throws DebugException {
+      return multiValued;
+   }
+
+   /**
     * Adds a new contained {@link IVariable}.
     * @param variable The {@link IVariable} to add.
     */
@@ -105,5 +123,29 @@ public class SEDMemoryValue extends AbstractSEDValue {
     */
    public void setAllocated(boolean allocated) {
       this.allocated = allocated;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isObject() {
+      return object;
+   }
+
+   /**
+    * Defines if this value is an object or just an object attribute.
+    * @param object {@code true} is ojbect, {@code false} is object attribute.
+    */
+   public void setObject(boolean object) {
+      this.object = object;
+   }
+   
+   /**
+    * Defines if this value is multi valued.
+    * @param multiValued Multi valued?
+    */
+   public void setMultiValued(boolean multiValued) {
+      this.multiValued = multiValued;
    }
 }

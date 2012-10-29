@@ -31,7 +31,6 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewSite;
 import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.ui.job.AbstractExecutionTreeDiagramEditorJob;
 import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ReadonlyDiagramEditorActionBarContributor;
@@ -41,9 +40,9 @@ import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTre
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
+import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.ObjectUtil;
 
 /**
@@ -162,9 +161,9 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
    @Override
    protected DiagramEditorInput createEditorInput() {
       // Create empty diagram
-      final Diagram diagram = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, 
-                                                                          IOUtil.getFileNameWithoutExtension("Empty Diagram"), 
-                                                                          true);
+      Diagram diagram = Graphiti.getPeCreateService().createDiagram(ExecutionTreeDiagramTypeProvider.TYPE, 
+                                                                    "Empty Diagram", 
+                                                                    true);
       URI domainURI = URI.createURI("INVALID" + ExecutionTreeUtil.DOMAIN_FILE_EXTENSION_WITH_DOT);
       GraphitiUi.getPeService().setPropertyValue(diagram, ExecutionTreeUtil.USER_PROPERTY_DOMAIN_MODEL_FILE, domainURI.toString());
       // Create editing domain and resource that contains the diagram
@@ -273,7 +272,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
                         setEditorEnabled(true);
                      }
                   });
-                  AbstractExecutionTreeDiagramEditorJob.cancelJobs(editor);
+                  AbstractWorkbenchPartJob.cancelJobs(editor);
                   editor.executeFeatureInJob("Changing Symbolic Execution Tree", feature, context);
                   // Unset message
                   setMessage(null);

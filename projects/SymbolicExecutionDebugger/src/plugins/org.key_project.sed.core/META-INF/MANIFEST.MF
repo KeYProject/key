@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.sed.core.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
+ org.eclipse.core.expressions;bundle-version="3.4.300",
  org.eclipse.debug.core;bundle-version="3.7.0";visibility:=reexport,
  org.eclipse.debug.ui;bundle-version="3.7.101",
  org.key_project.util;bundle-version="1.0.0"

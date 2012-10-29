@@ -96,11 +96,11 @@ import de.hentschel.visualdbc.dbcmodel.DbcModel;
 import de.hentschel.visualdbc.generation.operation.CreateOperation;
 import de.hentschel.visualdbc.generation.test.util.TestGenerationUtil;
 import de.hentschel.visualdbc.interactive.proving.ui.test.util.TestInteractiveProvingUtil;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
+import de.uka.ilkd.key.util.KeYResourceManager;
 
 /**
  * Provides static methods that make testing easier.
@@ -1658,7 +1658,7 @@ public final class TestKeyUtil {
     */
    public static SwingBotJFrame getInteractiveKeyMain(IResource resource) {
       SwingBot bot = new SwingBot();
-      SwingBotJFrame frame = bot.jFrame(Main.getMainWindowTitle());
+      SwingBotJFrame frame = bot.jFrame(KeYResourceManager.getManager().getUserInterfaceTitle());
       TestCase.assertTrue(frame.isOpen());
       return frame;
    }

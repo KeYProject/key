@@ -487,26 +487,36 @@ public class TermBuilder {
     }
 
 
-//    public Term min(QuantifiableVariable qv, Term t, Services services) {
-//        Quantifier q =
-//                (Quantifier)services.getNamespaces().functions().lookup(
-//                    Quantifier.MIN_NAME);
-//        return tf.createTerm(q,
-//                           new ImmutableArray<Term>(t),
-//                           new ImmutableArray<QuantifiableVariable>(qv),
-//                           null);
-//    }
-//
-//
-//    public Term max(QuantifiableVariable qv, Term t, Services services) {
-//        Quantifier q =
-//                (Quantifier)services.getNamespaces().functions().lookup(
-//                    Quantifier.MAX_NAME);
-//        return tf.createTerm(q,
-//                           new ImmutableArray<Term>(t),
-//                           new ImmutableArray<QuantifiableVariable>(qv),
-//                           null);
-//    }
+
+    /** Constructs a bounded product comprehension expression. */
+    public Term bprod(QuantifiableVariable qv,
+                     Term a,
+                     Term b,
+                     Term t,
+                     Services services) {
+        Function bprod = services.getTypeConverter().getIntegerLDT().getBprod();
+        return func(bprod,
+                    new Term[]{a, b, t},
+                    new ImmutableArray<QuantifiableVariable>(qv));
+    }
+
+
+    public Term min(QuantifiableVariable qv, Term t, Services services) {
+        Function min = services.getTypeConverter().getIntegerLDT().getMin();
+        return tf.createTerm(min,
+                           new ImmutableArray<Term>(t),
+                           new ImmutableArray<QuantifiableVariable>(qv),
+                           null);
+    }
+
+
+    public Term max(QuantifiableVariable qv, Term t, Services services) {
+        Function max = services.getTypeConverter().getIntegerLDT().getMax();
+        return tf.createTerm(max,
+                           new ImmutableArray<Term>(t),
+                           new ImmutableArray<QuantifiableVariable>(qv),
+                           null);
+    }
 
 
     public Term not(Term t) {
@@ -657,6 +667,15 @@ public class TermBuilder {
         if (a.sort() == Sort.FORMULA) {
             return a;
         } else if (a.sort() == booleanLDT.targetSort()) {
+            // special case where a is the result of convertToBoolean
+            if (a.op() == IfThenElse.IF_THEN_ELSE) {
+                assert a.subs().size() == 3;
+                assert a.sub(0).sort() == Sort.FORMULA;
+                if (a.sub(1) == booleanLDT.getTrueTerm() && a.sub(2) == booleanLDT.getFalseTerm())
+                    return a.sub(0);
+                else if (a.sub(1) == booleanLDT.getFalseTerm() && a.sub(2) == booleanLDT.getTrueTerm())
+                    return not(a.sub(0));
+            }
             return equals(a, TRUE(services));
         } else {
             throw new TermCreationException("Term " + a + " cannot be converted"
@@ -664,6 +683,22 @@ public class TermBuilder {
         }
     }
 
+    /** For a formula a, convert it to a boolean expression. */
+    public Term convertToBoolean(Term a, Services services){
+        BooleanLDT booleanLDT = services.getTypeConverter().getBooleanLDT();
+        if (a.sort() == booleanLDT.targetSort()) {
+            return a;
+        } else if (a.sort() == Sort.FORMULA) {
+            // special case where a is the result of convertToFormula
+            if (a.op() == Equality.EQUALS && a.sub(1) == booleanLDT.getTrueTerm() ) {
+                return a.sub(0);
+            }
+            return ife(a, TRUE(services), FALSE(services));
+        } else {
+            throw new TermCreationException("Term " + a + " cannot be converted"
+                    + " into a boolean.");
+}
+    }
 
 
     //-------------------------------------------------------------------------

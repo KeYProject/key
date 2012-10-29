@@ -5,11 +5,9 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.graphiti.features.IRemoveFeature;
-import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.IRemoveContext;
 import org.eclipse.graphiti.features.context.impl.RemoveContext;
@@ -22,7 +20,7 @@ import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeFeatureProvider;
-import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
+import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.java.CollectionUtil;
 
@@ -45,6 +43,7 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
     * the {@link Object}s to select after reconstructing {@link #getDiagram()}.
     */
    public static final Object PROPERTY_ELEMENTS_TO_SELECT = "elementsToSelect";
+   
    /**
     * Property for an {@link IProgressHandler} instance which is used
     * to detect when the feature execution has started and is stopped.
@@ -58,7 +57,7 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
    
    /**
     * Constructor.
-    * @param fp The {@link ExecutionTreeFeatureProvider} which provides this {@link IUpdateFeature}.
+    * @param fp The {@link ExecutionTreeFeatureProvider} which provides this {@link ICustomFeature}.
     */
    public DebugTargetConnectFeature(ExecutionTreeFeatureProvider fp) {
       super(fp);
@@ -111,14 +110,7 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
       }
       try {
          // Define monitor to use
-         IProgressMonitor monitor;
-         Object contextMonitor = context.getProperty(ExecutionTreeUtil.CONTEXT_PROPERTY_MONITOR);
-         if (contextMonitor instanceof IProgressMonitor) {
-            monitor = (IProgressMonitor)contextMonitor;
-         }
-         else {
-            monitor = new NullProgressMonitor();
-         }
+         IProgressMonitor monitor = GraphitiUtil.getProgressMonitor(context);
          // Change connection
          Object obj = context.getProperty(PROPERTY_DEBUG_TARGETS);
          if (obj instanceof ISEDDebugTarget[]) {
@@ -151,7 +143,7 @@ public class DebugTargetConnectFeature extends AbstractCustomFeature {
             // Update diagram
             if (!monitor.isCanceled()) {
                UpdateContext updateContext = new UpdateContext(getDiagram());
-               updateContext.putProperty(ExecutionTreeUtil.CONTEXT_PROPERTY_MONITOR, new SubProgressMonitor(monitor, 1));
+               updateContext.putProperty(GraphitiUtil.CONTEXT_PROPERTY_MONITOR, new SubProgressMonitor(monitor, 1));
                getFeatureProvider().updateIfPossible(updateContext);
             }
             changesDone = true;

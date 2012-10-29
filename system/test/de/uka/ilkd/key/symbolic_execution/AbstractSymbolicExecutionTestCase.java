@@ -6,8 +6,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.Deque;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -54,6 +55,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodPO;
 import de.uka.ilkd.key.symbolic_execution.po.ProgramMethodSubsetPO;
@@ -224,7 +226,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       else {
          // Order of children is not relevant.
          ExecutionNodePreorderIterator expectedIter = new ExecutionNodePreorderIterator(expected);
-         Set<IExecutionNode> currentVisitedNodes = new HashSet<IExecutionNode>();
+         Set<IExecutionNode> currentVisitedNodes = new LinkedHashSet<IExecutionNode>();
          while (expectedIter.hasNext()) {
             IExecutionNode expectedNext = expectedIter.next();
             IExecutionNode currentNext = searchExecutionNode(current, expectedNext);
@@ -293,7 +295,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       int i = 0;
       IExecutionNode[] children = parentToSearchIn.getChildren();
       while (result == null && i < children.length) {
-         if (children[i].getName().equals(directChildToSearch.getName()) &&
+         if (JavaUtil.equalIgnoreWhiteSpace(children[i].getName(), directChildToSearch.getName()) &&
              children[i].getElementType().equals(directChildToSearch.getElementType())) {
             result = children[i];
          }
@@ -322,12 +324,12 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Compare nodes
       assertNotNull(expected);
       assertNotNull(current);
-      assertEquals(expected.getName(), current.getName());
+      assertTrue("Expected \"" + expected.getName() + "\" but is \"" + current.getName() + "\".", JavaUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
       assertEquals(expected.isPathConditionChanged(), current.isPathConditionChanged());
-      assertEquals(expected.getFormatedPathCondition(), current.getFormatedPathCondition());
+      assertTrue("Expected \"" + expected.getFormatedPathCondition() + "\" but is \"" + current.getFormatedPathCondition() + "\".", JavaUtil.equalIgnoreWhiteSpace(expected.getFormatedPathCondition(), current.getFormatedPathCondition()));
       if (expected instanceof IExecutionBranchCondition) {
          assertTrue("Expected IExecutionBranchCondition but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionBranchCondition);
-         assertEquals(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition());
+         assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getFormatedBranchCondition() + "\" but is \"" + ((IExecutionBranchCondition)current).getFormatedBranchCondition() + "\".", JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition()));
          assertEquals(((IExecutionBranchCondition)expected).isMergedBranchCondition(), ((IExecutionBranchCondition)current).isMergedBranchCondition());
       }
       else if (expected instanceof IExecutionStartNode) {
@@ -399,11 +401,45 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertNotNull(current);
          IExecutionVariable[] expectedVariables = expected.getVariables();
          IExecutionVariable[] currentVariables = current.getVariables();
-         assertEquals(expectedVariables.length, currentVariables.length);
-         for (int i = 0; i < expectedVariables.length; i++) {
-            assertVariable(expectedVariables[i], currentVariables[i], true, true);
-         }
+         assertVariables(expectedVariables, currentVariables, true, true);
       }
+   }
+   
+   /**
+    * Makes sure that the given variables are the same.
+    * @param expected The expected variables.
+    * @param current The current variables.
+    * @param compareParent Compare parent?
+    * @param compareChildren Compare children?
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertVariables(IExecutionVariable[] expected, 
+                                         IExecutionVariable[] current,
+                                         boolean compareParent, 
+                                         boolean compareChildren) throws ProofInputException {
+      TestCase.assertEquals(expected.length, current.length);
+      // Compare ignore order
+      List<IExecutionVariable> availableCurrentVariables = new LinkedList<IExecutionVariable>();
+      JavaUtil.addAll(availableCurrentVariables, current);
+      for (int i = 0; i < expected.length; i++) {
+         final IExecutionVariable expectedVariable = expected[i];
+         // Find current variable with same name
+         IExecutionVariable currentVariable = JavaUtil.searchAndRemove(availableCurrentVariables, new IFilter<IExecutionVariable>() {
+            @Override
+            public boolean select(IExecutionVariable element) {
+               try {
+                  return JavaUtil.equalIgnoreWhiteSpace(expectedVariable.getName(), element.getName());
+               }
+               catch (ProofInputException e) {
+                  throw new RuntimeException(e);
+               }
+            }
+         });
+         TestCase.assertNotNull(currentVariable);
+         // Compare variables
+         assertVariable(expectedVariable, currentVariable, compareParent, compareChildren);
+      }
+      TestCase.assertTrue(availableCurrentVariables.isEmpty());
    }
 
    /**
@@ -424,20 +460,92 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertEquals(expected.isArrayIndex(), current.isArrayIndex());
          assertEquals(expected.getArrayIndex(), current.getArrayIndex());
          assertEquals(expected.getName(), current.getName());
-         assertEquals(expected.getTypeString(), current.getTypeString());
-         assertTrue(expected.getValueString() + " does not match " + current.getValueString(), JavaUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
          // Compare parent
          if (compareParent) {
-            assertVariable(expected.getParentVariable(), current.getParentVariable(), false, false);
+            assertValue(expected.getParentValue(), current.getParentValue(), false, false);
+         }
+         // Compare children
+         if (compareChildren) {
+            IExecutionValue[] expectedValues = expected.getValues();
+            IExecutionValue[] currentValues = current.getValues();
+            assertValues(expectedValues, currentValues, true, true);
+         }
+      }
+      else {
+         assertNull(current);
+      }
+   }
+
+
+   
+   /**
+    * Makes sure that the given values are the same.
+    * @param expected The expected values.
+    * @param current The current values.
+    * @param compareParent Compare parent?
+    * @param compareChildren Compare children?
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertValues(IExecutionValue[] expected, 
+                                      IExecutionValue[] current,
+                                      boolean compareParent, 
+                                      boolean compareChildren) throws ProofInputException {
+      TestCase.assertEquals(expected.length, current.length);
+      // Compare ignore order
+      List<IExecutionValue> availableCurrentVariables = new LinkedList<IExecutionValue>();
+      JavaUtil.addAll(availableCurrentVariables, current);
+      for (int i = 0; i < expected.length; i++) {
+         final IExecutionValue expectedVariable = expected[i];
+         // Find current variable with same name
+         IExecutionValue currentVariable = JavaUtil.searchAndRemove(availableCurrentVariables, new IFilter<IExecutionValue>() {
+            @Override
+            public boolean select(IExecutionValue element) {
+               try {
+                  return JavaUtil.equalIgnoreWhiteSpace(expectedVariable.getName(), element.getName()) &&
+                         JavaUtil.equalIgnoreWhiteSpace(expectedVariable.getConditionString(), element.getConditionString());
+               }
+               catch (ProofInputException e) {
+                  throw new RuntimeException(e);
+               }
+            }
+         });
+         TestCase.assertNotNull(currentVariable);
+         // Compare variables
+         assertValue(expectedVariable, currentVariable, compareParent, compareChildren);
+      }
+      TestCase.assertTrue(availableCurrentVariables.isEmpty());
+   }
+   
+   /**
+    * Makes sure that the given values are the same.
+    * @param expected The expected variable.
+    * @param current The current variable.
+    * @param compareParent Compare parent?
+    * @param compareChildren Compare children?
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected static void assertValue(IExecutionValue expected, 
+                                     IExecutionValue current,
+                                     boolean compareParent, 
+                                     boolean compareChildren) throws ProofInputException {
+      if (expected != null) {
+         assertNotNull(current);
+         // Compare variable
+         assertTrue(expected.getName() + " does not match " + current.getName(), JavaUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
+         assertEquals(expected.getTypeString(), current.getTypeString());
+         assertTrue(expected.getValueString() + " does not match " + current.getValueString(), JavaUtil.equalIgnoreWhiteSpace(expected.getValueString(), current.getValueString()));
+         assertEquals(expected.isValueAnObject(), current.isValueAnObject());
+         assertEquals(expected.isValueUnknown(), current.isValueUnknown());
+         assertTrue(expected.getConditionString() + " does not match " + current.getConditionString(), JavaUtil.equalIgnoreWhiteSpace(expected.getConditionString(), current.getConditionString()));
+         // Compare parent
+         if (compareParent) {
+            assertVariable(expected.getVariable(), current.getVariable(), false, false);
          }
          // Compare children
          if (compareChildren) {
             IExecutionVariable[] expectedChildVariables = expected.getChildVariables();
             IExecutionVariable[] currentChildVariables = current.getChildVariables();
-            assertEquals(expectedChildVariables.length, currentChildVariables.length);
-            for (int i = 0; i < expectedChildVariables.length; i++) {
-               assertVariable(expectedChildVariables[i], currentChildVariables[i], compareParent, compareChildren);
-            }
+            assertVariables(expectedChildVariables, currentChildVariables, compareParent, compareChildren);
          }
       }
       else {
