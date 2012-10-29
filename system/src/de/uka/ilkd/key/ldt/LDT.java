@@ -48,8 +48,10 @@ public abstract class LDT implements Named {
     //-------------------------------------------------------------------------
     
     protected LDT(Name name, Services services) {
-	sort = (Sort) services.getNamespaces().sorts().lookup(name);
-	assert sort != null;
+        sort = (Sort) services.getNamespaces().sorts().lookup(name);
+	    if (sort == null)
+	        throw new RuntimeException("LDT "+name+" not found.\n"+
+	                "It seems that there are definitions missing from the .key files.");
         this.name = name;
     }
     

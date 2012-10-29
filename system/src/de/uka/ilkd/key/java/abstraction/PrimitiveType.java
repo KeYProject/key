@@ -20,13 +20,13 @@ import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
-import de.uka.ilkd.key.java.expression.literal.GenericLiteral;
+import de.uka.ilkd.key.java.expression.literal.FreeLiteral;
 import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.GenericLDT;
+import de.uka.ilkd.key.ldt.FreeLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
@@ -72,8 +72,8 @@ public final class PrimitiveType implements Type {
 	new PrimitiveType("\\seq", EmptySeqLiteral.INSTANCE, SeqLDT.NAME);
     public static final PrimitiveType JAVA_SET =
 	new PrimitiveType("\\set", EmptySetLiteral.LOCSET, SetLDT.NAME); 
-    public static final PrimitiveType JAVA_GENERIC_ADT =
-            new PrimitiveType("\\gen", GenericLiteral.INSTANCE, GenericLDT.NAME);
+    public static final PrimitiveType JAVA_FREE_ADT =
+            new PrimitiveType("\\free", FreeLiteral.INSTANCE, FreeLDT.NAME);
 
     public static final PrimitiveType PROGRAM_SV   = new PrimitiveType("SV", null, null);
 

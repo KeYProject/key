@@ -6,9 +6,9 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
-public class GenericLiteral extends Literal {
+public class FreeLiteral extends Literal {
     
-    public final static GenericLiteral INSTANCE = new GenericLiteral();
+    public final static FreeLiteral INSTANCE = new FreeLiteral();
 
     @Override
     public void visit(Visitor v) {
@@ -18,7 +18,7 @@ public class GenericLiteral extends Literal {
 
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ) {
-        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_GENERIC_ADT);
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FREE_ADT);
     }
 
 }

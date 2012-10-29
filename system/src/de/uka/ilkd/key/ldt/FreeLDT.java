@@ -5,10 +5,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
-import de.uka.ilkd.key.java.expression.literal.GenericLiteral;
+import de.uka.ilkd.key.java.expression.literal.FreeLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -18,12 +19,14 @@ import de.uka.ilkd.key.util.ExtList;
  * @author daniel
  *
  */
-public final class GenericLDT extends LDT {
+public final class FreeLDT extends LDT {
 
-    public static final Name NAME = new Name("Generic");
+    public static final Name NAME = new Name("Free");
+    
+    // neutral element, the only pre-defined function
     private Function atom;
 
-    public GenericLDT(Services services) {
+    public FreeLDT(Services services) {
         super(NAME, services);
         atom      = addFunction(services, "atom");
     }
@@ -51,9 +54,7 @@ public final class GenericLDT extends LDT {
 
     @Override
     public Term translateLiteral(Literal lit, Services services) {
-        // TODO Auto-generated method stub
-        assert false;
-        return null;
+        return TermBuilder.DF.func(atom);
     }
 
     @Override
@@ -72,7 +73,7 @@ public final class GenericLDT extends LDT {
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
         if(t.op() instanceof Function && hasLiteralFunction((Function)t.op())) {
-            return GenericLiteral.INSTANCE;
+            return FreeLiteral.INSTANCE;
         }
         assert false;
         return null;
