@@ -30,7 +30,12 @@ import de.uka.ilkd.key.strategy.Strategy;
 public abstract class StrategyProofMacro implements ProofMacro {
 
     protected abstract Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc);
-    
+
+    protected ProverTaskListener createTaskListener(InteractiveProver interactiveProver,
+            Strategy oldStrategy) {
+        return new StopListener(interactiveProver, oldStrategy);
+    }
+
     /**
      * When a prove run is finished, we need to reset the goals' rule
      * application managers using this listener.
@@ -114,7 +119,7 @@ public abstract class StrategyProofMacro implements ProofMacro {
         // this resets the proof strategy and the managers after the automation
         // has run
         interactiveProver.addProverTaskListener(
-                new StopListener(interactiveProver, oldStrategy));
+                createTaskListener(interactiveProver, oldStrategy));
 
         // find the relevant goals
         // and start

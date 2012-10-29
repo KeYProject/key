@@ -30,7 +30,7 @@ import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
-public class AutoPilotProofMacro extends StrategyProofMacro {
+public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
     private static final String[] ADMITTED_RULES = {
         "orRight", "impRight", "notRight", "close",
@@ -44,14 +44,15 @@ public class AutoPilotProofMacro extends StrategyProofMacro {
 
     @Override
     public String getName() {
-        return "Auto pilot";
+        return "Auto pilot (preparation only)";
     }
 
     @Override
     public String getDescription() {
-        return "tbd";
+        return "<html><ol><li>Finish symbolic execution" +
+                "<li>Separate proof obligations" +
+                "<li>Expand invariant definitions</ol>";
     }
-
 
     /*
      * convert a string array to a set of strings
