@@ -3433,6 +3433,7 @@ modifiers[TacletBuilder b]
            while(it.hasNext())
                b.addRuleSet((RuleSet)it.next());
          }
+        | NONINTERACTIVE { b.addRuleSet((RuleSet)ruleSets().lookup(new Name("notHumanReadable"))); }
         | DISPLAYNAME dname = string_literal 
             {b.setDisplayName(dname);}
         | HELPTEXT htext = string_literal

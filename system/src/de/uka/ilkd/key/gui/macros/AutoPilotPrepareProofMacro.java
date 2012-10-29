@@ -33,13 +33,12 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
     private static final String[] ADMITTED_RULES = {
-        "orRight", "impRight", "notRight", "close",
-        "andRight"
+        "orRight", "impRight", "close", "andRight"
     };
 
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
 
-    private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("to_be_done");
+    private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");
 
 
     @Override
