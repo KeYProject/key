@@ -44,7 +44,6 @@ public final class TypeConverter {
     private IntegerLDT integerLDT;
     private BooleanLDT booleanLDT;
     private LocSetLDT locSetLDT;
-    private SetLDT setLDT;
     private HeapLDT heapLDT;
     private SeqLDT seqLDT;
     private FreeLDT genLDT;
@@ -76,8 +75,6 @@ public final class TypeConverter {
             this.heapLDT = (HeapLDT) ldt;
         } else if (ldt instanceof SeqLDT) {
             this.seqLDT = (SeqLDT) ldt;
-        } else if (ldt instanceof SetLDT) {
-            this.setLDT = (SetLDT) ldt;
         } else if (ldt instanceof FreeLDT){
             this.genLDT = (FreeLDT) ldt;
         } else if (ldt instanceof FloatLDT ) {
@@ -139,10 +136,6 @@ public final class TypeConverter {
 	return seqLDT;
     }
     
-    public SetLDT getSetLDT(){
-    	return setLDT;
-    }
-    
     public FreeLDT getGenLDT(){
         return genLDT;
     }
@@ -176,8 +169,6 @@ public final class TypeConverter {
 	    responsibleLDT = locSetLDT;
 	} else if(seqLDT.isResponsible(op, subs, services, ec)) {
 	    responsibleLDT = seqLDT;
-	} else if(setLDT.isResponsible(op, subs, services, ec)) {
-	    responsibleLDT = setLDT;
 	} else if(genLDT.isResponsible(op, subs, services, ec)) {
 	    responsibleLDT = genLDT;
 	} else if(charListLDT.isResponsible(op, subs, services, ec)) {

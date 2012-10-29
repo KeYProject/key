@@ -74,7 +74,7 @@ ELEMTYPE : "\\elemtype";
 EQUAL_SINGLE : "=";
 EVERYTHING : "\\everything";
 FRESH : "\\fresh"; 
-GEN : "\\gen";
+FREE : "\\free";
 GEQ : ">=";
 GT : ">";
 IMPLIES : "==>";
@@ -138,7 +138,6 @@ WORKINGSPACE : "\\working_space";
 XOR : "^";
 
 LOCSET : "\\locset";
-SET : "\\set";
 EMPTYSET : "\\empty";
 SINGLETON : "\\singleton";
 UNION : "\\set_union";

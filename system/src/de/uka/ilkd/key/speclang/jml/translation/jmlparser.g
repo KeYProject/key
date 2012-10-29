@@ -1990,13 +1990,11 @@ builtintype returns [KeYJavaType type = null] throws SLTranslationException
         |   LOCSET
             {
                 type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_LOCSET);
-            }
-        |   SET { type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SET); }
         |   SEQ
             {
                 type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SEQ);
             }            
-        | GEN { type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_GENERIC_ADT); }
+        | FREE { type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_FREE_ADT); }
 	)
 	
 ;

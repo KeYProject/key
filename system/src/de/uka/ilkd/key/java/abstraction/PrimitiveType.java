@@ -30,7 +30,6 @@ import de.uka.ilkd.key.ldt.FreeLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
@@ -70,8 +69,6 @@ public final class PrimitiveType implements Type {
 	new PrimitiveType("\\locset", EmptySetLiteral.LOCSET, LocSetLDT.NAME);
     public static final PrimitiveType JAVA_SEQ =
 	new PrimitiveType("\\seq", EmptySeqLiteral.INSTANCE, SeqLDT.NAME);
-    public static final PrimitiveType JAVA_SET =
-	new PrimitiveType("\\set", EmptySetLiteral.LOCSET, SetLDT.NAME); 
     public static final PrimitiveType JAVA_FREE_ADT =
             new PrimitiveType("\\free", FreeLiteral.INSTANCE, FreeLDT.NAME);
 

@@ -25,7 +25,6 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 public class EmptySetLiteral extends Literal {
 
     public static final EmptySetLiteral LOCSET = new EmptySetLiteral();
-    public static final EmptySetLiteral UNTYPED = new EmptySetLiteral(false);
     
     private final boolean locSet;
     
@@ -55,7 +54,7 @@ public class EmptySetLiteral extends Literal {
 
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	PrimitiveType type = locSet? PrimitiveType.JAVA_LOCSET : PrimitiveType.JAVA_SET;
+	PrimitiveType type = PrimitiveType.JAVA_LOCSET;
 	return javaServ.getJavaInfo().getKeYJavaType(type);
     }
 }
