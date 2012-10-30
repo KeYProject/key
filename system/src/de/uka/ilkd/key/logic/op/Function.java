@@ -77,6 +77,11 @@ public class Function extends AbstractSortedOperator {
     }
     
     
+    public Function(Name name, Sort sort, boolean isSkolemConstant) {
+    	this(name, sort, new ImmutableArray<Sort>(), null, false, true);
+    }
+    
+    
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------     

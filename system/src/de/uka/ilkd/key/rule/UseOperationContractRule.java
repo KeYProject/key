@@ -304,10 +304,10 @@ public final class UseOperationContractRule implements BuiltInRule {
 	
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name methodHeapName = new Name(TB.newName(services, heap+"After_" + pm.getName()));
-	final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort());
+	final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort(), true);
 	services.getNamespaces().functions().addSafely(methodHeapFunc);
 	final Name anonHeapName = new Name(TB.newName(services, "anon_" + heap + "_" + pm.getName()));
-	final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
+	final Function anonHeapFunc = new Function(anonHeapName, heap.sort(), true);
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
 	final Term anonHeap = TB.func(anonHeapFunc);	
 	final Term assumption = TB.equals(TB.anon(services, 

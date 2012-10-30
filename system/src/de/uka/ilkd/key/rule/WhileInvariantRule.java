@@ -127,7 +127,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final String anonFuncName 
     	    = TB.newName(services, pv.name().toString());
         final Function anonFunc 
-    	    = new Function(new Name(anonFuncName), pv.sort());
+    	    = new Function(new Name(anonFuncName), pv.sort(), true);
         services.getNamespaces().functions().addSafely(anonFunc);
         final Term elemUpd = TB.elementary(services, (LocationVariable)pv, TB.func(anonFunc));
         if(anonUpdate == null) {
@@ -149,7 +149,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	final Name anonHeapName = new Name(TB.newName(services, "anon_"+heap.name()+"_loop"));
 	final Function anonHeapFunc = new Function(anonHeapName,
-					     heapLDT.targetSort());
+					     heapLDT.targetSort(), true);
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
 	final Term anonHeapTerm = TB.func(anonHeapFunc);
 	

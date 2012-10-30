@@ -736,7 +736,7 @@ public abstract class TacletApp implements RuleApp {
 	    				  boolean interesting,
 	    				  Services services) {
 	final Function c 
-		= new Function(new Name(instantiation), sort, new Sort[0]);
+		= new Function(new Name(instantiation), sort, true);
 	return addInstantiation(sv, TB.func(c), interesting, services);
     }
     
