@@ -104,7 +104,26 @@ public final class CommandLine {
         }
 
     }
+    /**
+     * Text that should appear in usage pages. You can decide about the
+     * indentation of the text (beginning of line or description column).
+     */
+    private class AdditionalHelpTextParts extends HelpElement {
+        private String description;
+        private String command;
+        private boolean indentToDescriptionColumn;
 
+        @Override
+        protected void print(PrintStream ps, int descriptionCol) {
+            int indent = indentSize;
+            
+         
+            indent(ps, indent);
+            printIndentedMessage(ps, command, descriptionCol);
+            indent(ps, descriptionCol-command.length());
+            printIndentedMessage(ps, description, 0);
+        }
+    }
     /**
      * Text that should appear in usage pages. You can decide about the
      * indentation of the text (beginning of line or description column).
@@ -205,6 +224,13 @@ public final class CommandLine {
      */
     public void addText(String description, boolean identToDescriptionColumn) {
         AdditionalHelpText text = new AdditionalHelpText();
+        text.description = description;
+        text.indentToDescriptionColumn = identToDescriptionColumn;
+        helpElements.add(text);
+    }
+    public void addTextPart(String command, String description, boolean identToDescriptionColumn) {
+        AdditionalHelpTextParts text = new AdditionalHelpTextParts();
+        text.command = command;
         text.description = description;
         text.indentToDescriptionColumn = identToDescriptionColumn;
         helpElements.add(text);

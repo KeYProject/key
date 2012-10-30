@@ -41,6 +41,7 @@ import de.uka.ilkd.key.util.CommandLine;
 public class Main {
     private static final String HELP = "--help";
     private static final String AUTO = "--auto";
+    private static final String LAST = "--last";
     private static final String AUTO_LOADONLY = "--auto_loadonly";
     private static final String DEBUG = "--debug";
     private static final String NO_DEBUG = "--no_debug";
@@ -135,14 +136,13 @@ public class Main {
     }
     private static CommandLine createCommandLine(){
     	CommandLine cl= new CommandLine();
-    	cl.setIndentation(1);
+    	cl.setIndentation(3);
     	cl.addText("./runProver [options | --justify_rules [justify rule options] filename] [filename(s)]\n\n", false);
     	cl.addText("Options for the KeY-Prover\n", false);
     	cl.addText("\n", false);
     	cl.addOption(HELP, null, "display this text");
-    	cl.addText("--Khelp" ,false);
-    	//cl.setIndentation(0);
-    	cl.addText("display help for technical/debug parameters\n\n", true);    
+    	cl.addTextPart("--Khelp", "display help for technical/debug parameters\n", true);
+    	cl.addOption(LAST, null, "start prover with last loaded problem");
     	cl.addText("Batchmode options:\n", false);
     	cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
     	cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
@@ -244,6 +244,10 @@ public class Main {
       			System.out.println(fileArguments.get(0));
       			fileNameOnStartUp=fileArguments.get(0);    	
       		}
+      	}
+      	if(cl.isSet(LAST)){
+      		System.out.println("Last loaded file: ");
+      		fileNameOnStartUp=null;
       	}
         
 //        while (opt.length > index) loop:{
