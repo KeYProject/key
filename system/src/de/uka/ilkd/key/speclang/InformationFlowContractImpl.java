@@ -33,7 +33,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
 
     private final Term origDep;
     private final ImmutableList<ImmutableList<Term>> origRespects;
-    private final ImmutableList<ImmutableList<Term>> origDeclassify;
+    private final ImmutableList<ImmutableList<Term>> origDeclassifies;
     SymbolicExecData symExecData;
 
     //-------------------------------------------------------------------------
@@ -56,7 +56,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
                                           Term exec,
                                           Term dep,
                                           ImmutableList<ImmutableList<Term>> respects,
-                                          ImmutableList<ImmutableList<Term>> declassify,
+                                          ImmutableList<ImmutableList<Term>> declassifies,
                                           boolean toBeSaved,
                                           int id) {
         super(baseName, name, forClass, pm, specifiedIn, modality, pre, mby, mod,
@@ -64,11 +64,11 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
 
         assert dep != null;
         assert respects != null;
-        assert declassify != null;
+        assert declassifies != null;
 
         this.origDep = dep;
         this.origRespects = respects;
-        this.origDeclassify = declassify;
+        this.origDeclassifies = declassifies;
     }
 
 
@@ -87,11 +87,11 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
                                        Term exec,
                                        Term dep,
                                        ImmutableList<ImmutableList<Term>> respects,
-                                       ImmutableList<ImmutableList<Term>> declassify,
+                                       ImmutableList<ImmutableList<Term>> declassifies,
                                        boolean toBeSaved) {
 
         this(baseName, null, forClass, pm, specifiedIn, modality, pre, mby, mod,
-             hasRealMod, self, params, result, exec, dep, respects, declassify,
+             hasRealMod, self, params, result, exec, dep, respects, declassifies,
              toBeSaved, INVALID_ID);
     }
 
@@ -107,8 +107,8 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
 
 
     @Override
-    public boolean hasDeclassify() {
-        return !origDeclassify.isEmpty();
+    public boolean hasDeclassifies() {
+        return !origDeclassifies.isEmpty();
     }
 
 
@@ -152,7 +152,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
 
 
     @Override
-    public ImmutableList<ImmutableList<Term>> getDeclassify(Term heapTerm,
+    public ImmutableList<ImmutableList<Term>> getDeclassifies(Term heapTerm,
                                                             Term selfTerm,
                                                             ImmutableList<Term> paramTerms,
                                                             Term resultTerm,
@@ -167,7 +167,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
             origParamTerms = origParamTerms.append(getResult());
             paramTerms = paramTerms.append(resultTerm);
         }
-        return TB.replace2(origDeclassify, heapTerm,
+        return TB.replace2(origDeclassifies, heapTerm,
                            getSelf(), selfTerm,
                            origParamTerms, paramTerms, services);
     }
@@ -186,7 +186,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
         return "<html>"
                + super.getHTMLBody(services)
                + getHTMLFor2(origRespects, "respects", services)
-               + getHTMLForDeclassify(services)
+               + getHTMLForDeclassifies(services)
                + "</html>";
     }
 
@@ -221,17 +221,17 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
     }
     
 
-    private String getHTMLForDeclassify(Services services) {
-        String declassify = "";
-        if (hasDeclassify()) {
+    private String getHTMLForDeclassifies(Services services) {
+        String declassifies = "";
+        if (hasDeclassifies()) {
             final String quickPrint =
                     LogicPrinter.quickPrintTerm(
-                    origDeclassify.head().head(),
+                    origDeclassifies.head().head(),
                     services);
-            declassify = "<br><b>declassify</b> ";
-            declassify += LogicPrinter.escapeHTML(quickPrint, false);
+            declassifies = "<br><b>declassifies</b> ";
+            declassifies += LogicPrinter.escapeHTML(quickPrint, false);
         }
-        return declassify;
+        return declassifies;
     }
 
 
@@ -278,7 +278,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
                                                op.getExc(),
                                                origDep,
                                                origRespects,
-                                               origDeclassify,
+                                               origDeclassifies,
                                                op.toBeSaved(),
                                                op.id());
     }
@@ -301,7 +301,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
                                                op.getExc(),
                                                origDep,
                                                origRespects,
-                                               origDeclassify,
+                                               origDeclassifies,
                                                op.toBeSaved(),
                                                op.id());
     }
@@ -327,7 +327,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
                                                op.getExc(),
                                                origDep,
                                                origRespects,
-                                               origDeclassify,
+                                               origDeclassifies,
                                                op.toBeSaved(),
                                                op.id());
     }
@@ -352,7 +352,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
                                                op.getExc(),
                                                origDep,
                                                origRespects,
-                                               origDeclassify,
+                                               origDeclassifies,
                                                op.toBeSaved(),
                                                op.id());
     }
@@ -375,7 +375,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
                                                op.getExc(),
                                                origDep,
                                                origRespects,
-                                               origDeclassify,
+                                               origDeclassifies,
                                                op.toBeSaved(),
                                                op.id());
     }
@@ -398,7 +398,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
                                                op.getExc(),
                                                origDep,
                                                origRespects,
-                                               origDeclassify,
+                                               origDeclassifies,
                                                op.toBeSaved(),
                                                op.id());
     }
@@ -420,7 +420,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
                                                op.getExc(),
                                                origDep,
                                                origRespects,
-                                               origDeclassify,
+                                               origDeclassifies,
                                                op.toBeSaved(),
                                                op.id());
     }
@@ -442,7 +442,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
                                                op.getExc(),
                                                origDep,
                                                origRespects,
-                                               origDeclassify,
+                                               origDeclassifies,
                                                op.toBeSaved(),
                                                op.id());
     }
@@ -464,7 +464,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
                                                op.getExc(),
                                                origDep,
                                                origRespects,
-                                               origDeclassify,
+                                               origDeclassifies,
                                                op.toBeSaved(),
                                                op.id());
     }
@@ -507,8 +507,8 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
 
 
     @Override
-    public ImmutableList<ImmutableList<Term>> getDeclassify() {
-        return origDeclassify;
+    public ImmutableList<ImmutableList<Term>> getDeclassifies() {
+        return origDeclassifies;
     }
 
 
@@ -519,12 +519,12 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
         }
         assert origDep != null;
         assert origRespects != null;
-        assert origDeclassify != null;
+        assert origDeclassifies != null;
         InformationFlowContract ifc = (InformationFlowContract) c;
         return super.equals(c)
                && origDep.equals(ifc.getDep())
                && origRespects.equals(ifc.getRespects())
-               && origDeclassify.equals(ifc.getDeclassify());
+               && origDeclassifies.equals(ifc.getDeclassifies());
     }
     
     

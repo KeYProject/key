@@ -51,4 +51,10 @@ public final class UpdateSV extends AbstractSV {
     public String proofToString() {
 	return "\\schemaVar \\update " + name() + ";\n";
     }    
+
+
+    @Override
+    public Operator rename(Name name) {
+        return new UpdateSV(name);
+    }
 }

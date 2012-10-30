@@ -57,4 +57,10 @@ public final class LogicVariable extends AbstractSortedOperator
     public String toString() {
 	return name() + ":" + sort();
     }
+
+
+    @Override
+    public Operator rename(Name name) {
+        return new LogicVariable(name, sort());
+    }
 }

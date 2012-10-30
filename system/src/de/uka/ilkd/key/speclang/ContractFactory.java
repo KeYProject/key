@@ -206,13 +206,17 @@ public class ContractFactory {
                                                    boolean hasMod,
                                                    ProgramVariableCollection progVars,
                                                    boolean toBeSaved) {
+        final Term self = progVars.selfVar != null ? tb.var(progVars.selfVar) : null;
+        final ImmutableList<Term> params = tb.var(progVars.paramVars);
+        final Term result = progVars.resultVar != null ? tb.var(progVars.resultVar) : null;
+        final Term exc = progVars.excVar != null ? tb.var(progVars.excVar) : null;
         return new SymbolicExecDataImpl(SYMB_EXEC_CONTRACT_BASENAME,
                                         forClass, pm, specifiedIn, modality, requires, measuredBy,
                                         modifies, hasMod,
-                                        tb.var(progVars.selfVar),
-                                        tb.var(progVars.paramVars),
-                                        tb.var(progVars.resultVar),
-                                        tb.var(progVars.excVar),
+                                        self,
+                                        params,
+                                        result,
+                                        exc,
                                         toBeSaved );
     }
 
@@ -221,8 +225,12 @@ public class ContractFactory {
             ProgramVariableCollection progVars,
             Term accessible,
             ImmutableList<ImmutableList<Term>> respects,
-            ImmutableList<ImmutableList<Term>> declassify,
+            ImmutableList<ImmutableList<Term>> declassifies,
             boolean toBeSaved) {
+        final Term self = progVars.selfVar != null ? tb.var(progVars.selfVar) : null;
+        final ImmutableList<Term> params = tb.var(progVars.paramVars);
+        final Term result = progVars.resultVar != null ? tb.var(progVars.resultVar) : null;
+        final Term exc = progVars.excVar != null ? tb.var(progVars.excVar) : null;
         return new InformationFlowContractImpl(INFORMATION_FLOW_CONTRACT_BASENAME,
                                                symbData.getKJT(),
                                                symbData.getTarget(),
@@ -232,12 +240,12 @@ public class ContractFactory {
                                                symbData.getMby(),
                                                symbData.getMod(),
                                                symbData.hasModifiesClause(),
-                                               tb.var(progVars.selfVar),
-                                               tb.var(progVars.paramVars),
-                                               tb.var(progVars.resultVar),
-                                               tb.var(progVars.excVar),
+                                               self,
+                                               params,
+                                               result,
+                                               exc,
                                                accessible, respects,
-                                               declassify,
+                                               declassifies,
                                                toBeSaved);
     }
     

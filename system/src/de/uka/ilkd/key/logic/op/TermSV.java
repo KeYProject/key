@@ -60,4 +60,10 @@ public final class TermSV extends AbstractSV {
     public String proofToString() {
 	return "\\schemaVar \\term " + sort().name() + " " + name() + ";\n";
     }
+
+
+    @Override
+    public Operator rename(Name name) {
+        return new TermSV(name, sort(), isRigid(), isStrict());
+    }
 }

@@ -153,7 +153,7 @@ public class JMLSpecFactory {
         public Term returns;
         public boolean strictlyPure;
         public ImmutableList<ImmutableList<Term>> respects;
-        public ImmutableList<ImmutableList<Term>> declassify;
+        public ImmutableList<ImmutableList<Term>> declassifies;
     }
 
     //-------------------------------------------------------------------------
@@ -355,10 +355,10 @@ public class JMLSpecFactory {
                 translateIndependetClauses(pm, progVars.selfVar,
                                           progVars.paramVars, progVars.resultVar,
                                           textualSpecCase.getRespects());
-        clauses.declassify =
+        clauses.declassifies =
                 translateIndependetClauses(pm, progVars.selfVar,
                                            progVars.paramVars, progVars.resultVar,
-                                           textualSpecCase.getDeclassify());
+                                           textualSpecCase.getDeclassifies());
         return clauses;
     }
 
@@ -1070,7 +1070,7 @@ public class JMLSpecFactory {
                                                         progVars,
                                                         clauses.accessible,
                                                         clauses.respects,
-                                                        clauses.declassify,
+                                                        clauses.declassifies,
                                                         false));
             }
             result = result.add(symbData);

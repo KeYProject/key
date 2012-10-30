@@ -64,4 +64,10 @@ public final class SkolemTermSV extends AbstractSV {
 	        + name() 
 	        + ";\n";
     }
+
+
+    @Override
+    public Operator rename(Name name) {
+        return new SkolemTermSV(name, sort());
+    }
 }

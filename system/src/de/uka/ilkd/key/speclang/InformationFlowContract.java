@@ -50,7 +50,7 @@ public interface InformationFlowContract extends SymbolicExecData {
     /**
      * Returns the declassification formulas.
      */
-    public ImmutableList<ImmutableList<Term>> getDeclassify(
+    public ImmutableList<ImmutableList<Term>> getDeclassifies(
             Term heapTerm,
             Term selfTerm,
             ImmutableList<Term> paramTerms,
@@ -58,10 +58,10 @@ public interface InformationFlowContract extends SymbolicExecData {
             Services services);
 
 
-    public ImmutableList<ImmutableList<Term>> getDeclassify();
+    public ImmutableList<ImmutableList<Term>> getDeclassifies();
 
 
-    public boolean hasDeclassify();
+    public boolean hasDeclassifies();
 
 
     public boolean hasRespects();

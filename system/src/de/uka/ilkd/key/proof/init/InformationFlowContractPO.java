@@ -77,15 +77,15 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
         final Term mainInputEqRelation =
                 buildMainInputEqualsRelation(contract, referenceLocSet1,
                                              referenceLocSet2, vs, services);
-        final ImmutableList<Term> declassifyRelations =
-                buildDeclassifyRelations(referenceLocSet1, declassClause1,
+        final ImmutableList<Term> declassifiesRelations =
+                buildDeclassifiesRelations(referenceLocSet1, declassClause1,
                                          referenceLocSet2, declassClause2,
                                          services);
 
         ImmutableList<Term> inputRelations =
                 ImmutableSLList.<Term>nil();
         inputRelations = inputRelations.append(mainInputEqRelation);
-        inputRelations = inputRelations.append(declassifyRelations);
+        inputRelations = inputRelations.append(declassifiesRelations);
 
         return TB.and(inputRelations);
     }
@@ -138,10 +138,10 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
 
 
         ImmutableList<ImmutableList<Term>> declassClause1 =
-                contract.getDeclassify(vs.c1.heapAtPre, vs.c1.self, vs.c1.params,
+                contract.getDeclassifies(vs.c1.heapAtPre, vs.c1.self, vs.c1.params,
                                        vs.c1.resultAtPost, services);
         ImmutableList<ImmutableList<Term>> declassClause2 =
-                contract.getDeclassify(vs.c2.heapAtPre, vs.c2.self, vs.c2.params,
+                contract.getDeclassifies(vs.c2.heapAtPre, vs.c2.self, vs.c2.params,
                                        vs.c2.resultAtPost, services);
 
         ImmutableList<Term> inputOutputRelations = ImmutableSLList.<Term>nil();
@@ -511,7 +511,7 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
     }
 
 
-    private static ImmutableList<Term> buildDeclassifyRelations(
+    private static ImmutableList<Term> buildDeclassifiesRelations(
             ImmutableList<Term> referenceLocSet1,
             ImmutableList<ImmutableList<Term>> declassClause1,
             ImmutableList<Term> referenceLocSet2,
@@ -523,7 +523,7 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
         for (ImmutableList<Term> declassification1 : declassClause1) {
             ImmutableList<Term> declassification2 = declassClause2It.next();
             Term declTerm =
-                    buildDeclassifyRelation(referenceLocSet1, declassification1,
+                    buildDeclassifiesRelation(referenceLocSet1, declassification1,
                                             referenceLocSet2, declassification2,
                                             services);
             declassifications = declassifications.append(declTerm);
@@ -532,7 +532,7 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
     }
 
 
-    private static Term buildDeclassifyRelation(ImmutableList<Term> referenceLocSet1,
+    private static Term buildDeclassifiesRelation(ImmutableList<Term> referenceLocSet1,
                                                 ImmutableList<Term> declassClause1,
                                                 ImmutableList<Term> referenceLocSet2,
                                                 ImmutableList<Term> declassClause2,

@@ -374,14 +374,14 @@ assignableclause returns [Term result = null] throws SLTranslationException
 declassifiesclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
 {
     Term declass = null;
-    Term frompart = null;
-    Term topart = null;
+    SLExpression frompart = null;
+    SLExpression topart = null;
     Term ifpart = null;
 }
 :
-    del:DECLASSIFY declass = predicate
-    (FROM frompart = storeRefUnion)?
-    (TO topart = storeRefUnion)?
+    del:DECLASSIFIES declass = termexpression
+    (FROM frompart = sequence)?
+    (TO topart = sequence)?
     (IF ifpart = predicate)?
     { result = translator.translate(del.getText(), ImmutableList.class, declass, frompart, topart, ifpart, services); }
     ;
@@ -472,8 +472,8 @@ respectsclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil(
 }
 :
     resp:RESPECTS
-    term = storeref { result = result.append(term); }
-    (COMMA term = storeref { result = result.append(term); })*
+    term = termexpression { result = result.append(term); }
+    (COMMA term = termexpression { result = result.append(term); })*
         { result = translator.translate(resp.getText(), ImmutableList.class, result, services); }
     ;
 
@@ -1711,21 +1711,48 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
                                                         
         }
         
-    |   SEQEMPTY
+    |   (SEQEMPTY
+        | ((LPAREN SEQDEF | LPAREN SEQ) quantifiedvardecls SEMI)
+        | (SEQSINGLETON | SEQ) LPAREN
+        | SEQSUB LPAREN
+        | SEQREVERSE
+        | SEQREPLACE
+        | (tk1:SEQCONTAINS{tk=tk1;}
+          | tk2: SEQCONCAT{tk=tk2;}
+          | tk3: SEQGET{tk=tk3;}
+          | tk4: INDEXOF{tk=tk4;}))
+         => result = sequence    
+    
+    |   LPAREN result=expression RPAREN
+;
+
+
+sequence returns [SLExpression result = null] throws SLTranslationException
+{
+    ImmutableList<SLExpression> list = null;
+    ImmutableList<Term> tlist = null;
+    SLExpression e1 = null;
+    SLExpression e2 = null;
+    SLExpression e3 = null;
+    KeYJavaType typ;
+    Term t, t2;
+    Token tk = null;
+    Pair<KeYJavaType,ImmutableList<LogicVariable>> declVars = null;    
+}
+:
+        SEQEMPTY
         {
             result = new SLExpression(TB.seqEmpty(services));
         }
-    
-    |   SEQSINGLETON LPAREN e1=expression RPAREN
+    |   ((LPAREN SEQDEF | LPAREN SEQ) quantifiedvardecls SEMI) => result=seqdefterm
+    |   (SEQSINGLETON | SEQ) LPAREN list=exprList RPAREN
         {
-            result = new SLExpression(TB.seqSingleton(services, e1.getTerm()));
-        }    
-    
+            result = translator.translate("\\seq", SLExpression.class, list, services);
+        }
     |   SEQSUB LPAREN e1=expression COMMA e2=expression COMMA e3=expression RPAREN
         {
             result = new SLExpression(TB.seqSub(services, e1.getTerm(), e2.getTerm(), e3.getTerm()));
         }
-        
     |   SEQREVERSE LPAREN e1=expression RPAREN
         {
             result = new SLExpression(TB.seqReverse(services, e1.getTerm()));
@@ -1745,7 +1772,6 @@ jmlprimary returns [SLExpression result=null] throws SLTranslationException
         {
             result = translator.translate(tk.getText(), SLExpression.class, services, e1, e2);
         }
-    |   LPAREN result=expression RPAREN
 ;
 
 specquantifiedexpression returns [Term result = null] throws SLTranslationException

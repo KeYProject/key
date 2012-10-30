@@ -54,4 +54,11 @@ public final class FormulaSV extends AbstractSV {
     public String proofToString() {
 	return "\\schemaVar \\formula " + name() + ";\n";
     }
+    
+    
+    @Override
+    public Operator rename(Name name) {
+        return new FormulaSV(name, isRigid());
+    }
+
 }

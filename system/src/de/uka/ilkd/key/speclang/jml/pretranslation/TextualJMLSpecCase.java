@@ -197,12 +197,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public void addDeclassify(PositionedString ps) {
+    public void addDeclassifies(PositionedString ps) {
         declassifies = declassifies.append(ps);
     }
 
 
-    public void addDeclassify(ImmutableList<PositionedString> l) {
+    public void addDeclassifies(ImmutableList<PositionedString> l) {
         declassifies = declassifies.append(l);
     }
     
@@ -297,7 +297,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public ImmutableList<PositionedString> getDeclassify() {
+    public ImmutableList<PositionedString> getDeclassifies() {
         return declassifies;
     }
 
@@ -364,7 +364,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         }
         it = declassifies.iterator();
         while (it.hasNext()) {
-            sb.append("declassify: ").append(it.next()).append("\n");
+            sb.append("declassifies: ").append(it.next()).append("\n");
         }
         return sb.toString();
     }
