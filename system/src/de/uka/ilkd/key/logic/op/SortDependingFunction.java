@@ -48,7 +48,7 @@ public final class SortDependingFunction extends Function {
 	      instantiateResultSort(template, sortDependingOn),
 	      instantiateArgSorts(template, sortDependingOn),
 	      null,
-	      template.unique);
+	      template.unique, false);
 	this.template = template;
 	this.sortDependingOn = sortDependingOn;
     }

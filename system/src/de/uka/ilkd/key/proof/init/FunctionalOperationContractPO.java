@@ -172,6 +172,27 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
+    protected Term generateMbyAtPreDef(Term selfVar,
+                                       ImmutableList<Term> paramVars) {
+        final Term mbyAtPreDef;
+        if (contract.hasMby()) {
+            final Function mbyAtPreFunc =
+                    new Function(new Name(TB.newName(services, "mbyAtPre")),
+                                 services.getTypeConverter().getIntegerLDT().targetSort());
+            register(mbyAtPreFunc);
+            mbyAtPre = TB.func(mbyAtPreFunc);
+            final Term mby = contract.getMby(TB.getBaseHeap(services), selfVar, paramVars, services);
+            mbyAtPreDef = TB.equals(mbyAtPre, mby);
+        } else {
+            mbyAtPreDef = TB.tt();
+        }
+        return mbyAtPreDef;
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected Term getPre(List<LocationVariable> modHeaps,
                           ProgramVariable selfVar, 
                           ImmutableList<ProgramVariable> paramVars,
@@ -367,7 +388,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
              po = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract, true);
           }
           else {
-             po = contract.createProofObl(initConfig, contract);
+             po = contract.createProofObl(initConfig);
           }
           return new LoadedPOContainer(po, proofNum);
        }

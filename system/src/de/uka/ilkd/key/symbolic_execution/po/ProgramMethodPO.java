@@ -152,6 +152,15 @@ public class ProgramMethodPO extends AbstractOperationPO {
     * {@inheritDoc}
     */
    @Override
+   protected Term generateMbyAtPreDef(Term selfVar,
+                                      ImmutableList<Term> paramVars) {
+      return TB.tt();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    protected Term getPre(List<LocationVariable> modHeaps,
                          ProgramVariable selfVar, 
                          ImmutableList<ProgramVariable> paramVars, 

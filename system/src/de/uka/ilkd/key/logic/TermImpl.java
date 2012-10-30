@@ -107,6 +107,19 @@ final class TermImpl implements Term {
     
     
     @Override
+    public <T> T op(Class<T> opClass)
+            throws IllegalArgumentException {
+        if (!opClass.isInstance(op)) {
+            throw new IllegalArgumentException(
+                    "Operator does not match the expected type:\n"
+                    + "Operator type was: " + op.getClass() + "\n"
+                    + "Expected type was: " + opClass);
+        }
+        return opClass.cast(op);
+    }
+    
+    
+    @Override
     public ImmutableArray<Term> subs() {
 	return subs;
     }

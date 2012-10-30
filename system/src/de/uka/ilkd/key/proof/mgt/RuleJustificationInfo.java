@@ -16,6 +16,7 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import java.util.Set;
 
 
 public class RuleJustificationInfo {
@@ -38,5 +39,9 @@ public class RuleJustificationInfo {
         } else {
 	    return just;
 	}
-    }    
+    }
+    
+    public Set<Rule> getRegisteredRules() {
+        return rule2justif.keySet();
+    }
 }

@@ -378,19 +378,25 @@ public final class DependencyContractImpl implements DependencyContract {
 	return null;
     }
 
+    
     @Override
     public boolean transactionApplicableContract() {
         return false;
     }
 
+    
     @Override
-    public ProofOblInput createProofObl(InitConfig initConfig,
-	    Contract contract) {
-	return new DependencyContractPO(initConfig,
-	        (DependencyContract) contract);
+    public ProofOblInput createProofObl(InitConfig initConfig) {
+	return new DependencyContractPO(initConfig, this);
     }
 
+    
+    @Override
+    public ProofOblInput getProofObl(Services services) {
+        return services.getSpecificationRepository().getPO(this);
+    }
 
+	        	        
     @Override
     public DependencyContract setID(int newId) {
         return new DependencyContractImpl(baseName,

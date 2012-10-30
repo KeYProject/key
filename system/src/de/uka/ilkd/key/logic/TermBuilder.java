@@ -166,7 +166,19 @@ public class TermBuilder {
     public LocationVariable selfVar(Services services,
                                     KeYJavaType kjt,
                                     boolean makeNameUnique) {
-    String name = "self";
+	return selfVar(services, kjt, makeNameUnique, "");
+    }    
+    
+    
+    /**
+     * Creates a program variable for "self". Take care to register it
+     * in the namespaces!
+     */
+    public LocationVariable selfVar(Services services, 
+                                    KeYJavaType kjt,
+                                    boolean makeNameUnique,
+                                    String postfix) {
+	String name = "self" + postfix;
     if(makeNameUnique) {
         name = newName(services, name);
     }
@@ -182,10 +194,23 @@ public class TermBuilder {
                                     IProgramMethod pm,
                                     KeYJavaType kjt,
                                     boolean makeNameUnique) {
+        return selfVar(services, pm, kjt, makeNameUnique, "");
+    }
+    
+    
+    /**
+     * Creates a program variable for "self". Take care to register it
+     * in the namespaces!
+     */
+    public LocationVariable selfVar(Services services, 
+                                    IProgramMethod pm,
+                                    KeYJavaType kjt,
+                                    boolean makeNameUnique,
+                                    String postfix) {
         if(pm.isStatic()) {
             return null;
         } else {
-            return selfVar(services, kjt, makeNameUnique);
+            return selfVar(services, kjt, makeNameUnique, postfix);
         }
     }
 
@@ -303,15 +328,27 @@ public class TermBuilder {
      * in the namespaces.
      */
     public LocationVariable heapAtPreVar(Services services,
-                         String baseName,
-                                         Sort sort,
-                             boolean makeNameUnique) {
-        assert sort != null;
-    if(makeNameUnique) {
-        baseName = newName(services, baseName);
+                                         String baseName,
+                                         boolean makeNameUnique) {
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        return heapAtPreVar(services, baseName, heapLDT.getHeap().sort(),
+                            makeNameUnique);
     }
-    return new LocationVariable(new ProgramElementName(baseName),
-                            new KeYJavaType(sort));
+
+    /**
+     * Creates a program variable for the atPre heap. Take care to register it
+     * in the namespaces.
+     */
+    public LocationVariable heapAtPreVar(Services services,
+                                         String baseName,
+                                         Sort sort,
+                                         boolean makeNameUnique) {
+        assert sort != null;
+        if (makeNameUnique) {
+            baseName = newName(services, baseName);
+        }
+        return new LocationVariable(new ProgramElementName(baseName),
+                                    new KeYJavaType(sort));
     }
 
     //-------------------------------------------------------------------------
@@ -838,12 +875,23 @@ public class TermBuilder {
     }
 
 
-    public Term apply(Term update, Term target) {
-    if(update.sort() != Sort.UPDATE) {
+    public ImmutableList<Term> apply(Term update,
+                                     ImmutableList<Term> targets) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (Term target : targets) {
+            result = result.append(apply(update, target));
+        }
+        return result;
+    }
+    
+    
+    public Term apply(Term update,
+                      Term target) {
+        if (update.sort() != Sort.UPDATE) {
         throw new TermCreationException("Not an update: " + update);
-    } else if(update.op() == UpdateJunctor.SKIP) {
+        } else if (update.op() == UpdateJunctor.SKIP) {
         return target;
-    } else if(target.equals(tt())) {
+        } else if (target.equals(tt())) {
             return tt();
         } else {
         return tf.createTerm(UpdateApplication.UPDATE_APPLICATION,
@@ -1663,6 +1711,24 @@ public class TermBuilder {
     }
 
 
+    public Term seq(Services services, Term... terms) {
+        Term result = seqEmpty(services);
+        for (Term term : terms) {
+            result = seqConcat(services, result, seqSingleton(services, term));
+        }
+        return result;
+    }
+    
+    
+    public Term seq(Services services, ImmutableList<Term> terms) {
+        Term result = seqEmpty(services);
+        for (Term term : terms) {
+            result = seqConcat(services, result, seqSingleton(services, term));
+        }
+        return result;
+    }
+    
+    
     public Term seqSub(Services services, Term s, Term from, Term to) {
     return func(services.getTypeConverter().getSeqLDT().getSeqSub(),
             new Term[]{s, from, to});
@@ -1751,6 +1817,155 @@ public class TermBuilder {
        }
        return result;
     }
+    
+    
+    //-------------------------------------------------------------------------
+    // information flow operators
+    //-------------------------------------------------------------------------
+
+    public Term eqAtLocs(Services services,
+                         Term heap1,
+                         Term locset1,
+                         Term heap2,
+                         Term locset2) {
+        return (locset1.equals(DF.empty(services))
+                && locset2.equals(DF.empty(services)))
+               ? TermBuilder.tt
+               : func((Function) services.getNamespaces().functions().lookup(new Name(
+                "__EQUALS__LOCS__")), // TODO: define string constant elsewhere
+                      heap1, locset1, heap2, locset2);
+    }
+
+    
+    public Term eqAtLocsPost(Services services,
+                             Term heap1_pre,
+                             Term heap1_post,
+                             Term locset1,
+                             Term heap2_pre,
+                             Term heap2_post,
+                             Term locset2) {
+        return (locset1.equals(DF.empty(services))
+                && locset2.equals(DF.empty(services)))
+               ? TermBuilder.tt
+               : func((Function) services.getNamespaces().functions().lookup(new Name(
+                "__EQUALS__LOCS__POST__")), // TODO: define string constant elsewhere
+                      heap1_pre, heap1_post, locset1, heap2_pre, heap2_post, locset2);
+    }
+    
+    
+    //-------------------------------------------------------------------------
+    // Term manipulation (e.g. for contract generation)
+    //-------------------------------------------------------------------------
+
+    public Term replace(Term t,
+                        Services services,
+                        Term originalSelfTerm,
+                        Term selfTerm,
+                        ImmutableList<Term> originalParamTerms,
+                        ImmutableList<Term> paramTerms,
+                        Term... moreReplacementPairs) {
+        return replace(t, services, null, null, originalSelfTerm,
+                       selfTerm, originalParamTerms, paramTerms,
+                       moreReplacementPairs);
+    }
+
+    
+    public Term replace(Term t,
+                        Services services,
+                        Term originalHeapTerm,
+                        Term heapTerm,
+                        Term originalSelfTerm,
+                        Term selfTerm,
+                        ImmutableList<Term> originalParamTerms,
+                        ImmutableList<Term> paramTerms,
+                        Term... moreReplacementPairs) {
+        de.uka.ilkd.key.util.LinkedHashMap<Term, Term> map =
+                new de.uka.ilkd.key.util.LinkedHashMap<Term, Term>();
+        
+        if (heapTerm != null) {
+            assert heapTerm.sort().equals(
+                    services.getTypeConverter().getHeapLDT().targetSort());
+            map.put(TermBuilder.DF.getBaseHeap(services), heapTerm);
+        }
+
+        assert (selfTerm == null && originalSelfTerm == null)
+               || selfTerm.sort().extendsTrans(originalSelfTerm.sort());
+        map.put(originalSelfTerm, selfTerm);
+
+        assert equalSorts(originalParamTerms, paramTerms);
+        map.putAll(originalParamTerms, paramTerms);
+
+        assert moreReplacementPairs.length % 2 == 0;
+        for (int i = 0; i < moreReplacementPairs.length; i = i + 2) {
+            if (moreReplacementPairs[i] != null
+                && moreReplacementPairs[i + 1] != null) {
+                assert moreReplacementPairs[i].sort().equals(
+                        moreReplacementPairs[i + 1].sort());
+                map.put(moreReplacementPairs[i], moreReplacementPairs[i + 1]);
+            }
+        }
+
+        OpReplacer or = new OpReplacer(map);
+        Term result = or.replace(t);
+        
+        return result;
+    }
+    
+
+    private boolean equalSorts(ImmutableList<Term> originalParamTerms,
+                                      ImmutableList<Term> paramTerms) {
+        Iterator<Term> origIt = originalParamTerms.iterator();
+        for (Term param : paramTerms) {
+            if (!origIt.next().sort().getClass().isInstance(param.sort())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    public ImmutableList<Term> replace(ImmutableList<Term> ts,
+                                       Term heapTerm,
+                                       Term originalSelfTerm,
+                                       Term selfTerm,
+                                       ImmutableList<Term> originalParamTerms,
+                                       ImmutableList<Term> paramTerms,
+                                       Services services) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (Term origTerm : ts) {
+            result = result.append(replace(origTerm, services,
+                                           getBaseHeap(services), heapTerm,
+                                           originalSelfTerm, selfTerm,
+                                           originalParamTerms, paramTerms));
+
+        }
+        return result;
+    }
+
+
+    public ImmutableList<ImmutableList<Term>> replace2(
+            ImmutableList<ImmutableList<Term>> tss,
+            Term heapTerm,
+            Term originalSelfTerm,
+            Term selfTerm,
+            ImmutableList<Term> originalParamTerms,
+            ImmutableList<Term> paramTerms,
+            Services services) {
+        ImmutableList<ImmutableList<Term>> result =
+                ImmutableSLList.<ImmutableList<Term>>nil();
+        for (ImmutableList<Term> ts : tss) {
+            ImmutableList<Term> clause =
+                    replace(ts, heapTerm, originalSelfTerm, selfTerm,
+                            originalParamTerms, paramTerms, services);
+            result = result.append(clause);
+        }
+        return result;
+    }
+    
+    
+    //-------------------------------------------------------------------------
+    // Serviced TermBuilder
+    //-------------------------------------------------------------------------
 
     public static class Serviced extends TermBuilder {
 

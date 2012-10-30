@@ -236,7 +236,7 @@ public class DefaultProblemLoader {
             throw new RuntimeException("Contract not found: " + baseContractName);
          }
          else {
-            return new LoadedPOContainer(contract.createProofObl(initConfig, contract), proofNum);
+            return new LoadedPOContainer(contract.createProofObl(initConfig), proofNum);
          }
       }
       else if (proofObligation != null && proofObligation.length() > 0) {

@@ -999,6 +999,21 @@ public final class SpecificationRepository {
         return null;
     }    
     
+    
+    /**
+     * Returns the PO that the passed contract is about, or null.
+     */
+    public ContractPO getPO(Contract c) {
+        for (ProofOblInput po : proofs.keySet()) {
+            if (po instanceof ContractPO
+                && ((ContractPO) po).getContract().equals(c)) {
+                return (ContractPO) po;
+            }
+        }
+        return null;
+    }
+    
+    
     /**
      * Returns the {@link ProofOblInput} from which the given {@link Proof}
      * was created.

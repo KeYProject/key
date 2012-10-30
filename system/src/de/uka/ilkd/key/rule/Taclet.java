@@ -154,6 +154,9 @@ public abstract class Taclet implements Rule, Named {
      */
     protected final ImmutableMap<SchemaVariable,TacletPrefix> prefixMap;
     
+
+    private final boolean surviveSymbExec;
+    
     /** cache; contains set of all bound variables */
     private ImmutableSet<QuantifiableVariable> boundVariables = null;
     
@@ -189,29 +192,54 @@ public abstract class Taclet implements Rule, Named {
      * @param attrs attributes for the Taclet; these are boolean values
      * indicating a noninteractive or recursive use of the Taclet.      
      */
-    Taclet(Name                     name,
-	   TacletApplPart           applPart,  
-	   ImmutableList<TacletGoalTemplate> goalTemplates, 
-	   ImmutableList<RuleSet>            ruleSets,
-	   TacletAttributes         attrs, 
-	   ImmutableMap<SchemaVariable,TacletPrefix> prefixMap,
-	   ImmutableSet<Choice> choices ){
+    Taclet(Name name,
+           TacletApplPart applPart,
+           ImmutableList<TacletGoalTemplate> goalTemplates,
+           ImmutableList<RuleSet> ruleSets,
+           TacletAttributes attrs,
+           ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+           ImmutableSet<Choice> choices,
+           boolean surviveSmbExec) {
 
-	this.name          = name;
-	ifSequent          = applPart.ifSequent();
-	varsNew            = applPart.varsNew();
-	varsNotFreeIn      = applPart.varsNotFreeIn();
-	varsNewDependingOn = applPart.varsNewDependingOn();
-	variableConditions = applPart.getVariableConditions();
-	this.goalTemplates = goalTemplates;
-	this.ruleSets      = ruleSets;
-	noninteractive     = attrs.noninteractive();
-	this.choices       = choices;
-	this.prefixMap     = prefixMap;
-        this.displayName   = attrs.displayName() == null ? 
-                name.toString() : attrs.displayName();
+        this.name = name;
+        ifSequent = applPart.ifSequent();
+        varsNew = applPart.varsNew();
+        varsNotFreeIn = applPart.varsNotFreeIn();
+        varsNewDependingOn = applPart.varsNewDependingOn();
+        variableConditions = applPart.getVariableConditions();
+        this.goalTemplates = goalTemplates;
+        this.ruleSets = ruleSets;
+        noninteractive = attrs.noninteractive();
+        this.choices = choices;
+        this.prefixMap = prefixMap;
+        this.displayName = attrs.displayName() == null
+                           ? name.toString() : attrs.displayName();
+        surviveSymbExec = surviveSmbExec;
     }
 
+    /**
+     * creates a Schematic Theory Specific Rule (Taclet) with the given
+     * parameters.
+     *
+     * @param name the name of the Taclet
+     * @param applPart contains the application part of an Taclet that is the
+     * if-sequence, the variable conditions
+     * @param goalTemplates a list of goal descriptions.
+     * @param ruleSets a list of rule sets for the Taclet
+     * @param attrs attributes for the Taclet; these are boolean values
+     * indicating a noninteractive or recursive use of the Taclet.
+     */
+    Taclet(Name name,
+           TacletApplPart applPart,
+           ImmutableList<TacletGoalTemplate> goalTemplates,
+           ImmutableList<RuleSet> ruleSets,
+           TacletAttributes attrs,
+           ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
+           ImmutableSet<Choice> choices) {
+        this(name, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
+             false);
+    }
+        
     protected void cacheMatchInfo() {
 	boundVariables = getBoundVariables();
         
@@ -1448,5 +1476,9 @@ public abstract class Taclet implements Rule, Named {
             if ( admissibleRuleSets.contains ( tacletRuleSet ) ) return true;
         }
         return false;
+    }
+    
+    public boolean getSurviveSymbExec() {
+        return surviveSymbExec;
     }
 }

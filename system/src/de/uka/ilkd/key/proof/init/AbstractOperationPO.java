@@ -41,11 +41,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -293,9 +289,19 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return The term representing the general assumption.
     */
    protected Term generateSelfNotNull(IProgramMethod pm, ProgramVariable selfVar) {
+      return generateSelfNotNull(pm, TB.var(selfVar));
+   }
+
+   /**
+    * Generates the general assumption that self is not null.
+    * @param pm The {@link IProgramMethod} to execute.
+    * @param selfVar The self variable.
+    * @return The term representing the general assumption.
+    */
+   protected Term generateSelfNotNull(IProgramMethod pm, Term selfVar) {
       return selfVar == null || pm.isConstructor() ? 
              TB.tt() : 
-             TB.not(TB.equals(TB.var(selfVar), TB.NULL(services)));
+             TB.not(TB.equals(selfVar, TB.NULL(services)));
    }
 
    /**
@@ -305,9 +311,19 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return The term representing the general assumption.
     */
    protected Term generateSelfCreated(IProgramMethod pm, ProgramVariable selfVar) {
+      return generateSelfCreated(pm, TB.var(selfVar));
+   }
+
+   /**
+    * Generates the general assumption that self is created.
+    * @param pm The {@link IProgramMethod} to execute.
+    * @param selfVar The self variable.
+    * @return The term representing the general assumption.
+    */
+   protected Term generateSelfCreated(IProgramMethod pm, Term selfVar) {
       return selfVar == null || pm.isConstructor() ? 
              TB.tt() : 
-             TB.created(services, TB.var(selfVar));
+             TB.created(services, selfVar);
    }
 
    /**
@@ -320,9 +336,22 @@ public abstract class AbstractOperationPO extends AbstractPO {
    protected Term generateSelfExactType(IProgramMethod pm, 
                                         ProgramVariable selfVar, 
                                         KeYJavaType selfKJT) {
+      return generateSelfExactType(pm, TB.var(selfVar), selfKJT);
+   }
+
+   /**
+    * Generates the general assumption which defines the type of self.
+    * @param pm The {@link IProgramMethod} to execute.
+    * @param selfVar The self variable.
+    * @param selfKJT The {@link KeYJavaType} of the self variable.
+    * @return The term representing the general assumption.
+    */
+   protected Term generateSelfExactType(IProgramMethod pm, 
+                                        Term selfVar, 
+                                        KeYJavaType selfKJT) {
       final Term selfExactType = selfVar == null || pm.isConstructor() ? 
             TB.tt() : 
-            TB.exactInstance(services, selfKJT.getSort(), TB.var(selfVar));
+            TB.exactInstance(services, selfKJT.getSort(), selfVar);
       return selfExactType;
    }
 
@@ -339,8 +368,27 @@ public abstract class AbstractOperationPO extends AbstractPO {
       return paramsOK;
    }
 
+    /**
+     * Generates the general assumption that all parameter arguments are valid.
+     *
+     * @param paramVars The parameters {@link ProgramVariable}s.
+     * @return The term representing the general assumption.
+     */
+    protected Term generateParamsOK2(ImmutableList<Term> paramVars) {
+        Term paramsOK = TB.tt();
+        for (Term paramVar : paramVars) {
+            assert paramVar.op() instanceof ProgramVariable;
+            ProgramVariable pv = (ProgramVariable)paramVar.op();
+            paramsOK = TB.and(paramsOK, TB.reachableValue(services, pv));
+        }
+        return paramsOK;
+    }
+
    protected abstract Term generateMbyAtPreDef(ProgramVariable selfVar, 
                                                ImmutableList<ProgramVariable> paramVars);
+
+   protected abstract Term generateMbyAtPreDef(Term selfVar, 
+                                               ImmutableList<Term> paramVars);
 
    /**
     * Creates the precondition.

@@ -147,7 +147,11 @@ public class ProofEnvironment {
 	}
     }
 
-    /** retrieves all proofs registered at this environment 
+    public Set<Rule> getRegisteredRules() {
+        return justifInfo.getRegisteredRules();
+    }
+
+/** retrieves all proofs registered at this environment 
      */
     public Set<ProofAggregate> getProofs() {
 	return proofs;

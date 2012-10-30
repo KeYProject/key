@@ -42,6 +42,11 @@ import de.uka.ilkd.key.util.Triple;
  */
 public class ContractFactory {
 
+    public static final String SYMB_EXEC_CONTRACT_BASENAME =
+            "Symbolic Execution";
+    public static final String INFORMATION_FLOW_CONTRACT_BASENAME =
+            "Non-interference contract";
+    
     private static final String INVALID_ID = "INVALID_ID";
     private static final String UNKNOWN_CONTRACT_IMPLEMENTATION = "unknown contract implementation";
     private static final String CONTRACT_COMBINATION_MARKER = "#";

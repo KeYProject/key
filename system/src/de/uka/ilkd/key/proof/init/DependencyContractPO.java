@@ -276,7 +276,7 @@ public final class DependencyContractPO extends AbstractPO
           throw new RuntimeException("Contract not found: " + baseContractName);
        }
        else {
-          return new LoadedPOContainer(contract.createProofObl(initConfig, contract), proofNum);
+          return new LoadedPOContainer(contract.createProofObl(initConfig), proofNum);
        }
     }
 }
