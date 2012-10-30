@@ -22,12 +22,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
@@ -201,6 +196,51 @@ public class ContractFactory {
                                           selfVar, paramVars);
     }
 
+    public SymbolicExecData createSymbolicExecData(KeYJavaType forClass,
+                                                   IProgramMethod pm,
+                                                   KeYJavaType specifiedIn,
+                                                   Modality modality,
+                                                   Term requires,
+                                                   Term measuredBy,
+                                                   Term modifies,
+                                                   boolean hasMod,
+                                                   ProgramVariableCollection progVars,
+                                                   boolean toBeSaved) {
+        return new SymbolicExecDataImpl(SYMB_EXEC_CONTRACT_BASENAME,
+                                        forClass, pm, specifiedIn, modality, requires, measuredBy,
+                                        modifies, hasMod,
+                                        tb.var(progVars.selfVar),
+                                        tb.var(progVars.paramVars),
+                                        tb.var(progVars.resultVar),
+                                        tb.var(progVars.excVar),
+                                        toBeSaved );
+    }
+
+    public InformationFlowContract createInformationFlowContract(
+            SymbolicExecData symbData,
+            ProgramVariableCollection progVars,
+            Term accessible,
+            ImmutableList<ImmutableList<Term>> respects,
+            ImmutableList<ImmutableList<Term>> declassify,
+            boolean toBeSaved) {
+        return new InformationFlowContractImpl(INFORMATION_FLOW_CONTRACT_BASENAME,
+                                               symbData.getKJT(),
+                                               symbData.getTarget(),
+                                               symbData.getSpecifiedIn(),
+                                               symbData.getModality(),
+                                               symbData.getPre(),
+                                               symbData.getMby(),
+                                               symbData.getMod(),
+                                               symbData.hasModifiesClause(),
+                                               tb.var(progVars.selfVar),
+                                               tb.var(progVars.paramVars),
+                                               tb.var(progVars.resultVar),
+                                               tb.var(progVars.excVar),
+                                               accessible, respects,
+                                               declassify,
+                                               toBeSaved);
+    }
+    
     @Override
     public boolean equals (Object o){
         if (o instanceof ContractFactory){

@@ -15,9 +15,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 
 
@@ -28,7 +27,7 @@ public interface SymbolicExecData extends Contract {
 
     
     @Override
-    public ProgramMethod getTarget();
+    public IProgramMethod getTarget();
     
     
     public KeYJavaType getSpecifiedIn();

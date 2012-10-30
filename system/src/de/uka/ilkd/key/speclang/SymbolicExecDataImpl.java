@@ -30,7 +30,7 @@ class SymbolicExecDataImpl implements SymbolicExecData {
     protected static final TermBuilder TB = TermBuilder.DF;
     private final int id;
     private final KeYJavaType forClass;
-    private final ProgramMethod pm;
+    private final IProgramMethod pm;
     private final KeYJavaType specifiedIn;
     private final String baseName;
     private final String name;
@@ -62,7 +62,7 @@ class SymbolicExecDataImpl implements SymbolicExecData {
     protected SymbolicExecDataImpl(String baseName,
                                     String name,
                                     KeYJavaType forClass,
-                                    ProgramMethod pm,
+                                    IProgramMethod pm,
                                     KeYJavaType specifiedIn,
                                     Modality modality,
                                     Term pre,
@@ -117,7 +117,7 @@ class SymbolicExecDataImpl implements SymbolicExecData {
 
     SymbolicExecDataImpl(String baseName,
                           KeYJavaType kjt,
-                          ProgramMethod pm,
+                          IProgramMethod pm,
                           KeYJavaType specifiedIn,
                           Modality modality,
                           Term pre,
@@ -128,7 +128,6 @@ class SymbolicExecDataImpl implements SymbolicExecData {
                           ImmutableList<Term> params,
                           Term result,
                           Term exc,
-                          Term savedHeapAtPre,
                           boolean toBeSaved) {
         this(baseName, null, kjt, pm, specifiedIn, modality, pre, mby, mod,
              hasRealMod, self, params, result, exc, toBeSaved, INVALID_ID);
@@ -172,7 +171,7 @@ class SymbolicExecDataImpl implements SymbolicExecData {
 
 
     @Override
-    public ProgramMethod getTarget() {
+    public IProgramMethod getTarget() {
         return pm;
     }
 

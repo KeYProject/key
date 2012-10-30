@@ -16,7 +16,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InformationFlowContractPO;
@@ -43,7 +43,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
     protected InformationFlowContractImpl(String baseName,
                                           String name,
                                           KeYJavaType forClass,
-                                          ProgramMethod pm,
+                                          IProgramMethod pm,
                                           KeYJavaType specifiedIn,
                                           Modality modality,
                                           Term pre,
@@ -74,7 +74,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
 
     public InformationFlowContractImpl(String baseName,
                                        KeYJavaType forClass,
-                                       ProgramMethod pm,
+                                       IProgramMethod pm,
                                        KeYJavaType specifiedIn,
                                        Modality modality,
                                        Term pre,

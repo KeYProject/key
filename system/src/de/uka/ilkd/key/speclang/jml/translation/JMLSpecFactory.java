@@ -26,15 +26,10 @@ import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.*;
-import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
@@ -82,6 +77,62 @@ public class JMLSpecFactory {
         modelFields = new HashSet<Pair<KeYJavaType, IObserverFunction>>();
     }
 
+    private ImmutableSet<SymbolicExecData> createSymbExecDatas(ContractClauses clauses,
+                                                               IProgramMethod pm,
+                                                               ProgramVariableCollection progVars) {
+        LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
+        
+        // create contracts
+        ImmutableSet<SymbolicExecData> symbDatas = DefaultImmutableSet.<SymbolicExecData>nil();
+        if (clauses.diverges.equals(TB.ff())) {
+            SymbolicExecData symbData =
+                    cf.createSymbolicExecData(pm.getContainerType(), pm,
+                                              pm.getContainerType(),
+                                              Modality.DIA,
+                                              clauses.requires.get(heap),
+                                              clauses.measuredBy,
+                                              clauses.assignables.get(heap),
+                                              !clauses.strictlyPure,
+                                              progVars,
+                                              false);
+            symbDatas = symbDatas.add(symbData);
+        } else if (clauses.diverges.equals(TB.tt())) {
+            SymbolicExecData symbData =
+                    cf.createSymbolicExecData(pm.getContainerType(), pm,
+                                              pm.getContainerType(),
+                                              Modality.BOX,
+                                              clauses.requires.get(heap),
+                                              clauses.measuredBy,
+                                              clauses.assignables.get(heap),
+                                              !clauses.strictlyPure,
+                                              progVars, false);
+            symbDatas = symbDatas.add(symbData);
+        } else {
+            SymbolicExecData symbData1 =
+                    cf.createSymbolicExecData(pm.getContainerType(), pm,
+                                              pm.getContainerType(),
+                                              Modality.DIA,
+                                              TB.and(clauses.requires.get(heap),
+                                                     TB.not(clauses.diverges)),
+                                              clauses.measuredBy,
+                                              clauses.assignables.get(heap),
+                                              !clauses.strictlyPure,
+                                              progVars,
+                                              false);
+            SymbolicExecData symbData2 =
+                    cf.createSymbolicExecData(pm.getContainerType(), pm,
+                                              pm.getContainerType(),
+                                              Modality.BOX,
+                                              clauses.requires.get(heap),
+                                              clauses.measuredBy,
+                                              clauses.assignables.get(heap),
+                                              !clauses.strictlyPure,
+                                              progVars,
+                                              false);
+            symbDatas = symbDatas.add(symbData1).add(symbData2);
+        }
+        return symbDatas;
+    }
 
 
     //-------------------------------------------------------------------------
@@ -101,6 +152,8 @@ public class JMLSpecFactory {
         public Map<Label, Term> continues;
         public Term returns;
         public boolean strictlyPure;
+        public ImmutableList<ImmutableList<Term>> respects;
+        public ImmutableList<ImmutableList<Term>> declassify;
     }
 
     //-------------------------------------------------------------------------
@@ -298,6 +351,14 @@ public class JMLSpecFactory {
                 progVars.atPres,
                 originalBehavior,
                 textualSpecCase.getReturns());
+        clauses.respects =
+                translateIndependetClauses(pm, progVars.selfVar,
+                                          progVars.paramVars, progVars.resultVar,
+                                          textualSpecCase.getRespects());
+        clauses.declassify =
+                translateIndependetClauses(pm, progVars.selfVar,
+                                           progVars.paramVars, progVars.resultVar,
+                                           textualSpecCase.getDeclassify());
         return clauses;
     }
 
@@ -306,6 +367,7 @@ public class JMLSpecFactory {
             IProgramMethod pm,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar,
             ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
         if (originalClauses.isEmpty()) {
@@ -316,7 +378,7 @@ public class JMLSpecFactory {
             for (PositionedString expr : originalClauses) {
                 ImmutableList<Term> translated =
                         JMLTranslator.translate(
-                        expr, pm.getContainerType(), selfVar, paramVars, null,
+                        expr, pm.getContainerType(), selfVar, paramVars, resultVar,
                         null, null, ImmutableList.class, services);
                 result = result.append(translated);
             }
@@ -991,6 +1053,8 @@ public class JMLSpecFactory {
                 translateJMLClauses(pm, textualSpecCase,
                                     progVars, originalBehavior);
         Map<LocationVariable,Term> posts = generatePostCondition(progVars, clauses, originalBehavior);
+        ImmutableSet<SymbolicExecData> symbDatas =
+                createSymbExecDatas(clauses, pm, progVars);
 
         // create contracts
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
@@ -999,7 +1063,18 @@ public class JMLSpecFactory {
                                                                  clauses, posts));
         result = result.union(createDependencyOperationContract(pm, progVars,
                                                                 clauses));
-
+        for (SymbolicExecData symbData : symbDatas) {
+            if (!clauses.respects.isEmpty()) {
+                result = result.add(
+                        cf.createInformationFlowContract(symbData,
+                                                        progVars,
+                                                        clauses.accessible,
+                                                        clauses.respects,
+                                                        clauses.declassify,
+                                                        false));
+            }
+            result = result.add(symbData);
+        }
         return result;
     }
     

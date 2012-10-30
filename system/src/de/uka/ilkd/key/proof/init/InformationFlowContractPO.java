@@ -609,7 +609,7 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
     private IFProofObligationVars buildProofObligationVars(
             final ProofObligationVars symbExecVS,
             Proof proof) {
-        final ProgramMethod pm = getContract().getTarget();
+        final IProgramMethod pm = getContract().getTarget();
         final IFProofObligationVars vs =
                 new IFProofObligationVars(pm, contract.getKJT(), symbExecVS,
                 proof, services);
@@ -917,7 +917,7 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
         final Map<Term, Term> map1, map2;
 
 
-        IFProofObligationVars(ProgramMethod pm,
+        IFProofObligationVars(IProgramMethod pm,
                               KeYJavaType kjt,
                               ProofObligationVars symbExecVars,
                               Proof proof,
@@ -930,7 +930,7 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
 
         IFProofObligationVars(ProofObligationVars c1,
                               ProofObligationVars c2,
-                              ProgramMethod pm,
+                              IProgramMethod pm,
                               KeYJavaType kjt,
                               ProofObligationVars symbExecVars,
                               Proof proof) {

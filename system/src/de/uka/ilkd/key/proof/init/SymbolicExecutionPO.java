@@ -51,7 +51,7 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
                                SymbolicExecData contract) {
         super(initConfig, contract.getName());
         this.contract = contract;
-        ProgramMethod pm = contract.getTarget();
+        IProgramMethod pm = contract.getTarget();
         vs = new ProofObligationVars(pm, contract.getKJT(), services);
         assert (vs.self == null) == (pm.isStatic());
     }

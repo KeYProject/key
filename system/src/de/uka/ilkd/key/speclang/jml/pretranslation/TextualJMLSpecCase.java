@@ -44,6 +44,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private ImmutableList<PositionedString> returns =
             ImmutableSLList.<PositionedString>nil();
 
+    private ImmutableList<PositionedString> respects =
+            ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> declassify =
+            ImmutableSLList.<PositionedString>nil();
+    
     private Map<String, ImmutableList<PositionedString>>
       assignables = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
@@ -182,6 +187,26 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
+    public void addRespects(PositionedString ps) {
+        respects = respects.append(ps);
+    }
+
+
+    public void addRespects(ImmutableList<PositionedString> l) {
+        respects = respects.append(l);
+    }
+
+
+    public void addDeclassify(PositionedString ps) {
+        declassify = declassify.append(ps);
+    }
+
+
+    public void addDeclassify(ImmutableList<PositionedString> l) {
+        declassify = declassify.append(l);
+    }
+    
+    
     public Behavior getBehavior() {
         return behavior;
     }
@@ -267,6 +292,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
+    public ImmutableList<PositionedString> getRespects() {
+        return respects;
+    }
+
+
+    public ImmutableList<PositionedString> getDeclassify() {
+        return declassify;
+    }
+
+
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
@@ -323,6 +358,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("returns: ").append(it.next()).append("\n");
         }
+        it = respects.iterator();
+        while (it.hasNext()) {
+            sb.append("respects: ").append(it.next()).append("\n");
+        }
+        it = declassify.iterator();
+        while (it.hasNext()) {
+            sb.append("declassify: ").append(it.next()).append("\n");
+        }
         return sb.toString();
     }
 
@@ -345,7 +388,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && depends.equals(sc.depends)
                && breaks.equals(sc.breaks)
                && continues.equals(sc.continues)
-               && returns.equals(sc.returns);
+               && returns.equals(sc.returns)
+               && respects.equals(sc.respects)
+               && declassify.equals(sc.declassify);
     }
 
 
@@ -363,6 +408,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + depends.hashCode()
                + breaks.hashCode()
                + continues.hashCode()
-               + returns.hashCode();
+               + returns.hashCode()
+               + respects.hashCode()
+               + declassify.hashCode();
     }
 }

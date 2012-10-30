@@ -11,11 +11,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.Visitor;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
@@ -43,7 +39,7 @@ class ProofObligationVars {
     final Term heapAtPost;
 
 
-    ProofObligationVars(ProgramMethod pm,
+    ProofObligationVars(IProgramMethod pm,
                         KeYJavaType kjt, // contract.getKJT()
                         Services services) {
         this(pm, kjt, "", services);
@@ -91,7 +87,7 @@ class ProofObligationVars {
     }
 
 
-    public ProofObligationVars(ProgramMethod pm,
+    public ProofObligationVars(IProgramMethod pm,
                                KeYJavaType kjt,
                                Term self,
                                Term selfAtPost,
@@ -108,7 +104,7 @@ class ProofObligationVars {
     }
 
     
-    public ProofObligationVars(ProgramMethod pm,
+    public ProofObligationVars(IProgramMethod pm,
                                KeYJavaType kjt,
                                Term self,
                                Term selfAtPost,
@@ -142,7 +138,7 @@ class ProofObligationVars {
     }
     
 
-    ProofObligationVars(ProgramMethod pm,
+    ProofObligationVars(IProgramMethod pm,
                         KeYJavaType kjt,
                         String postfix,
                         Services services) {
