@@ -150,4 +150,12 @@ public interface Contract extends SpecificationElement {
      * Returns technical name for the contract type.
      */
     public String getTypeName();
+    
+    
+    /**
+     * Checks whether there are other contracts which have to be started before
+     * this one.
+     */
+    public ImmutableList<Contract> getContractsToBeStartedBefore(Services services);
+
 }

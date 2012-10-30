@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -435,4 +436,11 @@ public final class DependencyContractImpl implements DependencyContract {
         return ContractFactory.generateContractTypeName(baseName, kjt, target,
                                                         specifiedIn);
     }
+    
+    
+    @Override
+    public ImmutableList<Contract> getContractsToBeStartedBefore(Services services) {
+        return ImmutableSLList.<Contract>nil();
+    }
+
 }

@@ -14,14 +14,11 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.InformationFlowContractPO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
+import de.uka.ilkd.key.proof.init.*;
 
 
 
@@ -174,14 +171,6 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
 
 
     @Override
-    public String getHTMLText(Services services) {
-        return "<html>"
-               + getHTMLBody(services)
-               + "</html>";
-    }
-
-
-    @Override
     public String getHTMLBody(Services services) {
         return "<html>"
                + super.getHTMLBody(services)
@@ -286,7 +275,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
 
     @Override
     public InformationFlowContract setTarget(KeYJavaType newKJT,
-                                             ObserverFunction newPM) {
+                                             IObserverFunction newPM) {
         SymbolicExecData op = super.setTarget(newKJT, newPM);
         return new InformationFlowContractImpl(op.getBaseName(), op.getName(),
                                                op.getKJT(), op.getTarget(),
@@ -531,7 +520,7 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
     @Override
     public ImmutableList<Contract> getContractsToBeStartedBefore(Services services) {
         SymbolicExecData symbExecCont = getSymbExecData(services);
-        SymbolicExecutionPO symbExecPO = symbExecCont.getProofObl(services);
+        ProofOblInput symbExecPO = symbExecCont.getProofObl(services);
         if (symbExecPO == null) {
             return ImmutableSLList.<Contract>nil().append(symbExecCont);
         } else {

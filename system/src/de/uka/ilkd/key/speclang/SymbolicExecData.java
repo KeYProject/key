@@ -174,11 +174,4 @@ public interface SymbolicExecData extends Contract {
     
     public boolean equalsData(SymbolicExecData data);
     
-    /**
-     * Lookup the proof obligation belonging to the contract in the
-     * specification repository.
-     */
-    @Override
-    public SymbolicExecutionPO getProofObl(Services services);
-
 }

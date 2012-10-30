@@ -385,8 +385,8 @@ class SymbolicExecDataImpl implements SymbolicExecData {
 
 
     @Override
-    public SymbolicExecutionPO getProofObl(Services services) {
-        return (SymbolicExecutionPO)services.getSpecificationRepository().getPO(this);
+    public ProofOblInput getProofObl(Services services) {
+        return services.getSpecificationRepository().getPO(this);
     }
 
 
@@ -636,6 +636,11 @@ class SymbolicExecDataImpl implements SymbolicExecData {
         return specifiedIn;
     }
 
+    
+    @Override
+    public ImmutableList<Contract> getContractsToBeStartedBefore(Services services) {
+        return ImmutableSLList.<Contract>nil();
+    }
     
     
     // the following code is legacy code

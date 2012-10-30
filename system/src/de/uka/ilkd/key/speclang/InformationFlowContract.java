@@ -13,9 +13,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 
 
@@ -118,14 +117,8 @@ public interface InformationFlowContract extends SymbolicExecData {
      * Return a new contract which equals this contract except that the
      * the KeYJavaType and ObserverFunction are set to the new values.
      */
+    @Override
     public InformationFlowContract setTarget(KeYJavaType newKJT,
-                                             ObserverFunction newPM);
+                                             IObserverFunction newPM);
     
-    
-    /**
-     * Checks whether there are other contracts which have to be started before
-     * this one.
-     */
-    public ImmutableList<Contract> getContractsToBeStartedBefore(Services services);
-
 }

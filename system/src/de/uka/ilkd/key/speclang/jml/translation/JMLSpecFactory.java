@@ -1058,11 +1058,6 @@ public class JMLSpecFactory {
 
         // create contracts
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
-        result = result.union(createFunctionalOperationContracts(name, pm,
-                                                                 progVars,
-                                                                 clauses, posts));
-        result = result.union(createDependencyOperationContract(pm, progVars,
-                                                                clauses));
         for (SymbolicExecData symbData : symbDatas) {
             if (!clauses.respects.isEmpty()) {
                 result = result.add(
@@ -1075,6 +1070,12 @@ public class JMLSpecFactory {
             }
             result = result.add(symbData);
         }
+        result = result.union(createFunctionalOperationContracts(name, pm,
+                                                                 progVars,
+                                                                 clauses, posts));
+        result = result.union(createDependencyOperationContract(pm, progVars,
+                                                                clauses));
+
         return result;
     }
     

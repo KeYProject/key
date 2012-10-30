@@ -18,6 +18,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -929,6 +930,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     @Override
     public String getTypeName() {
         return ContractFactory.generateContractTypeName(baseName, kjt, pm, specifiedIn);
+    }
+
+    
+    @Override
+    public ImmutableList<Contract> getContractsToBeStartedBefore(Services services) {
+        return ImmutableSLList.<Contract>nil();
     }
 
 }

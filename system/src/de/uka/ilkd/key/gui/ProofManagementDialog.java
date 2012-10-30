@@ -48,6 +48,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -59,7 +60,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
@@ -114,6 +114,7 @@ public final class ProofManagementDialog extends JDialog {
 	targetIcons = new HashMap<Pair<KeYJavaType,IObserverFunction>,Icon>();
 	classTree = new ClassTree(true, true, services, targetIcons);
 	classTree.addTreeSelectionListener(new TreeSelectionListener() {
+            @Override
 	    public void valueChanged(TreeSelectionEvent e) {
 		updateContractPanel();
 	    }
@@ -127,6 +128,7 @@ public final class ProofManagementDialog extends JDialog {
          */
         private static final long serialVersionUID = -7810888250050777877L;
 
+        @Override
         public Component getListCellRendererComponent(JList list, 
 	     					   	  Object value, 
 		     					  int index, 
@@ -156,6 +158,7 @@ public final class ProofManagementDialog extends JDialog {
 	    }
 	});
 	proofList.addListSelectionListener(new ListSelectionListener() {
+            @Override
 	    public void valueChanged(ListSelectionEvent e) {
 		updateContractPanel();
 	    }
@@ -185,6 +188,7 @@ public final class ProofManagementDialog extends JDialog {
 	//create contract panel by method
 	contractPanelByMethod = new ContractSelectionPanel(services, false);
 	contractPanelByMethod.addMouseListener(new MouseAdapter() {
+            @Override
 	    public void mouseClicked(MouseEvent e){
 		if(e.getClickCount() == 2){
 		    startButton.doClick();
@@ -193,6 +197,7 @@ public final class ProofManagementDialog extends JDialog {
 	});
 	contractPanelByMethod.addListSelectionListener(
 				new ListSelectionListener() {
+            @Override
 	    public void valueChanged(ListSelectionEvent e) {
 		updateStartButton();
 	    }
@@ -202,6 +207,7 @@ public final class ProofManagementDialog extends JDialog {
 	//create contract panel by proof
 	contractPanelByProof = new ContractSelectionPanel(services, false);
 	contractPanelByProof.addMouseListener(new MouseAdapter() {
+            @Override
 	    public void mouseClicked(MouseEvent e){
 		updateStartButton();
 		if(e.getClickCount() == 2){
@@ -210,6 +216,7 @@ public final class ProofManagementDialog extends JDialog {
 	    }
 	});
 	contractPanelByProof.addListSelectionListener(new ListSelectionListener() {
+            @Override
 	    public void valueChanged(ListSelectionEvent e) {
 		updateStartButton();
 	    }
@@ -221,6 +228,7 @@ public final class ProofManagementDialog extends JDialog {
         tabbedPane.addTab("By Target", listPanelByMethod);
         tabbedPane.addTab("By Proof", listPanelByProof);
         tabbedPane.addChangeListener(new ChangeListener() {
+            @Override
             public void stateChanged(ChangeEvent e) {
         	updateStartButton();
         	if(proofList.getSelectedIndex() == -1 
@@ -246,11 +254,12 @@ public final class ProofManagementDialog extends JDialog {
 	startButton.setMinimumSize(buttonDim);
 	startButton.setEnabled(false);
 	startButton.addActionListener(new ActionListener() {
+            @Override
 	    public void actionPerformed(ActionEvent e) { 
-                ProofOblInput po = createPOForSelectedContract();
-                if(po != null) {
+                Contract contract = getSelectedContract();
+                if(contract != null) {
                     setVisible(false);                    
-                    findOrStartProof(po);
+                    findOrStartProof(contract);
                 }
 	    }
 	});
@@ -262,12 +271,14 @@ public final class ProofManagementDialog extends JDialog {
 	cancelButton.setPreferredSize(buttonDim);
 	cancelButton.setMinimumSize(buttonDim);
 	cancelButton.addActionListener(new ActionListener() {
+            @Override
 	    public void actionPerformed(ActionEvent e) {
 		setVisible(false);
 	    }
 	});
 	buttonPanel.add(cancelButton);
         ActionListener escapeListener = new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent event) {
                 if(event.getActionCommand().equals("ESC")) {
                     cancelButton.doClick();
@@ -334,6 +345,7 @@ public final class ProofManagementDialog extends JDialog {
         	final KeYJavaType[] kjtsarr 
         		= kjts.toArray(new KeYJavaType[kjts.size()]);
         	Arrays.sort(kjtsarr, new Comparator<KeYJavaType>() {
+                    @Override
         	    public int compare(KeYJavaType o1, KeYJavaType o2) {
         		return o1.getFullName().compareTo(o2.getFullName());
         	    }
@@ -420,19 +432,16 @@ public final class ProofManagementDialog extends JDialog {
     }
     
     
-    private ProofOblInput createPOForSelectedContract() {
-	final Contract contract = getActiveContractPanel().getContract();
-	return contract == null
-	       ? null
-	       : contract.createProofObl(initConfig);
+    private Contract getSelectedContract() {
+        return getActiveContractPanel().getContract();
     }
     
     
-    private Proof findPreferablyClosedProof(ProofOblInput po) {
-        ImmutableSet<Proof> proofs = specRepos.getProofs(po);
+    private Proof findPreferablyClosedProof(Contract contract) {
+        ImmutableSet<Proof> proofs = specRepos.getProofs(contract);
         
         //no proofs?
-        if(proofs.size() == 0) {
+        if(proofs.isEmpty()) {
             return null;
         }
         
@@ -448,14 +457,20 @@ public final class ProofManagementDialog extends JDialog {
     }    
     
     
-    private void findOrStartProof(ProofOblInput po) {
-        Proof proof = findPreferablyClosedProof(po);
+    private void findOrStartProof(Contract contract) {
+        Proof proof = findPreferablyClosedProof(contract);
         if(proof == null) {
         	UserInterface ui = mediator.getUI();
             ProblemInitializer pi = 
             		new ProblemInitializer(ui, mediator.getProfile(), services, true, ui);
             try {
-                pi.startProver(initConfig, po, 0);
+                ImmutableList<Contract> preContracts
+                        = contract.getContractsToBeStartedBefore(services);
+                for (Contract c : preContracts) {
+                    pi.startProver(initConfig, c.createProofObl(initConfig), 0);
+                    pi = new ProblemInitializer(ui, mediator.getProfile(), services, true, ui);
+                }
+                pi.startProver(initConfig, contract.createProofObl(initConfig), 0);
             } catch(ProofInputException exc) {
         	ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
             }
@@ -467,32 +482,32 @@ public final class ProofManagementDialog extends JDialog {
     
     
     private void updateStartButton() {
-	final ProofOblInput po = createPOForSelectedContract();
-	if(po == null) {
+        final Contract contract = getSelectedContract();
+        if (contract == null) {
 	    startButton.setText("No Contract");
             startButton.setIcon(null);
 	    startButton.setEnabled(false);
 	} else {
-	    final Proof proof = findPreferablyClosedProof(po);
-	    if(proof == null) {
+            final Proof proof = findPreferablyClosedProof(contract);
+            if (proof == null) {
 		startButton.setText("Start Proof");
 		startButton.setIcon(null);
+                startButton.setEnabled(true);
 	    } else {
 		final ProofStatus status = proof.mgt().getStatus();
-		if(status.getProofOpen()) {
 		    startButton.setText("Go to Proof");		    
+                if (status.getProofOpen()) {
 		    startButton.setIcon(keyIcon);
-		} else if(status.getProofClosedButLemmasLeft()) {
-		    startButton.setText("Go to Proof");
+                } else if (status.getProofClosedButLemmasLeft()) {
 		    startButton.setIcon(keyAlmostClosedIcon);
 		} else {
 		    assert status.getProofClosed();
-		    startButton.setText("Go to Proof");
 		    startButton.setIcon(keyClosedIcon);
 		}
-	    }
 	    startButton.setEnabled(true);
 	}
+    }
+        validate();
     }
         
     
@@ -538,9 +553,7 @@ public final class ProofManagementDialog extends JDialog {
 		boolean allClosed = true;		
 		boolean lemmasLeft = false;
 		for(Contract contract : contracts) {
-		    final ProofOblInput po
-		    	= contract.createProofObl(initConfig);
-		    Proof proof = findPreferablyClosedProof(po);
+		    Proof proof = findPreferablyClosedProof(contract);
 		    if(proof == null) {
 			allClosed = false;
 		    } else {
