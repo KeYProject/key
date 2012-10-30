@@ -184,6 +184,9 @@ public final class TypeConverter {
 	    Function f = emb.getFunctionSymbol();
 	    // TODO make a sensible error recovery
 	    return TB.func(f, subs);
+	} else if(op instanceof TypeCast) {
+	    TypeCast tc = (TypeCast) op;
+	    return TB.cast(services, tc.getKeYJavaType(services).getSort(), subs[0]);
 	} else {
 	    Debug.out("typeconverter: no data type model "+
 		      "available to convert:", op, op.getClass());		
@@ -570,35 +573,63 @@ public final class TypeConverter {
      * @throws RuntimeException iff a conversion is not possible
      */
     public Expression convertToProgramElement(Term term) {
-	assert term != null;
-	if (term.op() == heapLDT.getNull()) {
-	    return NullLiteral.NULL;
-	} else if (term.op() instanceof Function) {
-	    for(LDT model : models) {
-                if (model.hasLiteralFunction((Function)term.op())) {
+        assert term != null;
+        if (term.op() == heapLDT.getNull()) {
+            return NullLiteral.NULL;
+        } else if (term.op() instanceof Function) {
+            Function function = (Function)term.op();
+            for(LDT model : models) {
+                if (model.hasLiteralFunction(function)) {
                     return model.translateTerm(term, null, services);	       
                 }
             }
-	}
-        
-	final ExtList children = new ExtList();
-	for (int i=0; i<term.arity(); i++) {
-	    children.add(convertToProgramElement(term.sub(i)));
-	}
-	if (term.op() instanceof ProgramInLogic) {
-	    return ((ProgramInLogic)term.op()).convertToProgram(term, children);
-	} else if (term.op() instanceof Function) {
-	    for(LDT model : models) {
-                if (model.containsFunction((Function)term.op())) {             
+        }
+
+        final ExtList children = new ExtList();
+        for (int i=0; i<term.arity(); i++) {
+            children.add(convertToProgramElement(term.sub(i)));
+        }
+
+        if (term.op() instanceof ProgramInLogic) {
+            return ((ProgramInLogic)term.op()).convertToProgram(term, children);
+        } else if (term.op() instanceof Function) {
+            Function function = (Function)term.op();
+            for(LDT model : models) {
+                if (model.containsFunction(function)) {             
                     return model.translateTerm(term, children, services);
-                }  
-	    }
-	} 
-	throw new RuntimeException("Cannot convert term to program: "+term
-				   +" "+term.op().getClass());
+                }
+            }
+            Expression tryTranslate = translateJavaCast(term, children);
+            if(tryTranslate != null) {
+                return tryTranslate;
+            }
+        }
+        throw new RuntimeException("Cannot convert term to program: "+term
+                +" "+term.op().getClass());
     }
 
     
+    private Expression translateJavaCast(Term term, ExtList children) {
+        if (term.op() instanceof Function) {
+            Function function = (Function)term.op();
+            if (function instanceof SortDependingFunction) {
+                SortDependingFunction sdf = (SortDependingFunction) function;
+                SortDependingFunction castFunction = 
+                        SortDependingFunction.getFirstInstance(Sort.CAST_NAME, services);
+                if(sdf.isSimilar(castFunction)) {
+                    Sort s = sdf.getSortDependingOn();
+                    KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(s);
+                    if(kjt != null) {
+                        children.add(new TypeRef(kjt));
+                        return new ParenthesizedExpression(new TypeCast(children));
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+
     public KeYJavaType getKeYJavaType(Term t) {
 	KeYJavaType result = null;
 	if(t.sort().extendsTrans(services.getJavaInfo().objectSort())) {
