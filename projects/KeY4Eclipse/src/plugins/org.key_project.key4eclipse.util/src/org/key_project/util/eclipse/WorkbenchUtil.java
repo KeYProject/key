@@ -34,6 +34,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.views.navigator.ResourceComparator;
 import org.eclipse.ui.wizards.newresource.BasicNewFolderResourceWizard;
 import org.key_project.util.eclipse.swt.viewer.FileSelectionValidator;
+import org.key_project.util.java.ObjectUtil;
 
 /**
  * Provides static methods 
@@ -376,5 +377,36 @@ public final class WorkbenchUtil {
         else {
             return null;
         }
+    }
+
+    /**
+     * Returns the name of the perspective with the given ID.
+     * @param perspectiveId The ID of the perspective.
+     * @return The name of the perspective or {@code null} if no perspective is available with the given ID.
+     */
+    public static String getPerspectiveName(String perspectiveId) {
+        IPerspectiveDescriptor perspective = PlatformUI.getWorkbench().getPerspectiveRegistry().findPerspectiveWithId(perspectiveId);
+        return perspective != null ? perspective.getLabel() : null;
+    }
+    
+    /**
+     * Checks if a perspective with the given ID is currently opened in the given {@link IWorkbenchPage}.
+     * @param perspectiveId The perspective ID to check.
+     * @param page The {@link IWorkbenchPage} to check opened perspective in.
+     * @return {@code true} perspective is currently opened in the given {@link IWorkbenchPage}, {@code false} perspective is not opened in the given {@link IWorkbenchPage}.
+     */
+    public static boolean isPerspectiveOpen(String perspectiveId, IWorkbenchPage page) {
+       if (page != null) {
+          IPerspectiveDescriptor pd = page.getPerspective();
+          if (pd != null) {
+             return ObjectUtil.equals(perspectiveId, page.getPerspective().getId());
+          }
+          else {
+             return false;
+          }
+       }
+       else {
+          return false;
+       }
     }
 }

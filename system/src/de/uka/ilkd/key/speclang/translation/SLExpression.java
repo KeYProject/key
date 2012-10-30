@@ -48,6 +48,7 @@ public final class SLExpression {
     /**
      * USE WITH CARE! Term-SLExpressions should have a type!
      */
+    @Deprecated
     public SLExpression(Term term) {
 	assert term != null;
 	this.term = term;

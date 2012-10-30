@@ -419,11 +419,18 @@ public final class LogicPrinter {
     }
 
     protected void printRewriteAttributes(RewriteTaclet taclet) throws IOException{
-        final int stateRestriction = taclet.getStateRestriction();
-        if (stateRestriction == RewriteTaclet.SAME_UPDATE_LEVEL) {
+        final int applicationRestriction = taclet.getApplicationRestriction();
+        if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
             layouter.brk().print("\\sameUpdateLevel");
-        } else if (stateRestriction == RewriteTaclet.IN_SEQUENT_STATE) {
+        }
+        if ((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
             layouter.brk().print("\\inSequentState");
+        }
+        if ((applicationRestriction & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
+            layouter.brk().print("\\antecedentPolarity");
+        }
+        if ((applicationRestriction & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
+            layouter.brk().print("\\succedentPolarity");
         }
     }
 

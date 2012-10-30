@@ -1,67 +1,123 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.main(a,b);" pathCondition="true" pathConditionChanged="false">
-      <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+      <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+         <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+         </value>
       </variable>
       <statement name="a=3;" pathCondition="true" pathConditionChanged="false">
-         <variable name="self" typeString="VariablesParameterAttributesChange" valueString="self" arrayIndex="-1" isArrayIndex="false">
+         <variable name="self" arrayIndex="-1" isArrayIndex="false">
+            <value name="self {true}" typeString="VariablesParameterAttributesChange" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+            </value>
          </variable>
-         <variable name="a" typeString="int" valueString="a" arrayIndex="-1" isArrayIndex="false">
+         <variable name="a" arrayIndex="-1" isArrayIndex="false">
+            <value name="a {true}" typeString="int" valueString="a" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
          </variable>
-         <variable name="b" typeString="int" valueString="b" arrayIndex="-1" isArrayIndex="false">
+         <variable name="b" arrayIndex="-1" isArrayIndex="false">
+            <value name="b {true}" typeString="int" valueString="b" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
          </variable>
-         <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+         <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+            <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            </value>
          </variable>
          <statement name="int c = 4;" pathCondition="true" pathConditionChanged="false">
-            <variable name="self" typeString="VariablesParameterAttributesChange" valueString="self" arrayIndex="-1" isArrayIndex="false">
+            <variable name="self" arrayIndex="-1" isArrayIndex="false">
+               <value name="self {true}" typeString="VariablesParameterAttributesChange" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+               </value>
             </variable>
-            <variable name="a" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false">
+            <variable name="a" arrayIndex="-1" isArrayIndex="false">
+               <value name="a {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
             </variable>
-            <variable name="b" typeString="int" valueString="b" arrayIndex="-1" isArrayIndex="false">
+            <variable name="b" arrayIndex="-1" isArrayIndex="false">
+               <value name="b {true}" typeString="int" valueString="b" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
             </variable>
-            <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+            <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+               <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+               </value>
             </variable>
             <statement name="b=2;" pathCondition="true" pathConditionChanged="false">
-               <variable name="self" typeString="VariablesParameterAttributesChange" valueString="self" arrayIndex="-1" isArrayIndex="false">
+               <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                  <value name="self {true}" typeString="VariablesParameterAttributesChange" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                  </value>
                </variable>
-               <variable name="a" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false">
+               <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                  <value name="a {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
                </variable>
-               <variable name="b" typeString="int" valueString="b" arrayIndex="-1" isArrayIndex="false">
+               <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                  <value name="b {true}" typeString="int" valueString="b" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
                </variable>
-               <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+               <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                  <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
                </variable>
-               <variable name="c" typeString="int" valueString="4" arrayIndex="-1" isArrayIndex="false">
+               <variable name="c" arrayIndex="-1" isArrayIndex="false">
+                  <value name="c {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                  </value>
                </variable>
                <statement name="c=a+b;" pathCondition="true" pathConditionChanged="false">
-                  <variable name="self" typeString="VariablesParameterAttributesChange" valueString="self" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                     <value name="self {true}" typeString="VariablesParameterAttributesChange" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     </value>
                   </variable>
-                  <variable name="a" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                     <value name="a {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
                   </variable>
-                  <variable name="b" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                     <value name="b {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
                   </variable>
-                  <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                     <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
                   </variable>
-                  <variable name="c" typeString="int" valueString="4" arrayIndex="-1" isArrayIndex="false">
+                  <variable name="c" arrayIndex="-1" isArrayIndex="false">
+                     <value name="c {true}" typeString="int" valueString="4" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                     </value>
                   </variable>
                   <statement name="return a+b+c;" pathCondition="true" pathConditionChanged="false">
-                     <variable name="self" typeString="VariablesParameterAttributesChange" valueString="self" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                        <value name="self {true}" typeString="VariablesParameterAttributesChange" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        </value>
                      </variable>
-                     <variable name="a" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                        <value name="a {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
                      </variable>
-                     <variable name="b" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                        <value name="b {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
                      </variable>
-                     <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                        <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
                      </variable>
-                     <variable name="c" typeString="int" valueString="5" arrayIndex="-1" isArrayIndex="false">
+                     <variable name="c" arrayIndex="-1" isArrayIndex="false">
+                        <value name="c {true}" typeString="int" valueString="5" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                        </value>
                      </variable>
                      <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;10&apos; as result of self.main(a,b);&gt;">
-                        <variable name="self" typeString="VariablesParameterAttributesChange" valueString="self" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="self" arrayIndex="-1" isArrayIndex="false">
+                           <value name="self {true}" typeString="VariablesParameterAttributesChange" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                           </value>
                         </variable>
-                        <variable name="a" typeString="int" valueString="3" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="a" arrayIndex="-1" isArrayIndex="false">
+                           <value name="a {true}" typeString="int" valueString="3" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
                         </variable>
-                        <variable name="b" typeString="int" valueString="2" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="b" arrayIndex="-1" isArrayIndex="false">
+                           <value name="b {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
                         </variable>
-                        <variable name="exc" typeString="Null" valueString="null" arrayIndex="-1" isArrayIndex="false">
+                        <variable name="exc" arrayIndex="-1" isArrayIndex="false">
+                           <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+                           </value>
                         </variable>
                         <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
                         </termination>

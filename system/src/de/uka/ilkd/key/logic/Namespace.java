@@ -193,6 +193,11 @@ public class Namespace implements java.io.Serializable {
 	}
     }
     
+    /** Convenience method to look up. */
+    public Named lookup(String name){
+        return lookup(new Name(name));
+    }
+    
     /** returns list of the elements (not the keys) in this
      * namespace (not about the one of the parent)
      * @return the list of the named objects

@@ -47,6 +47,7 @@ public class InvariantConfigurator {
     private static final String DEFAULT = "Default";
 
     private static InvariantConfigurator configurator = null;
+    // TODO: store Terms instead of Strings
     private List<Map<String,String>[]> invariants = null;
     private HashMap<LoopStatement, List<Map<String,String>[]>> mapLoopsToInvariants = null;
     private int index = 0;
@@ -246,7 +247,7 @@ public class InvariantConfigurator {
                     // FIXME check again and think what is the default for savedHeap
                     loopInvTexts[INV_IDX].put(heap.toString(), "true");
                   } else {
-                    loopInvTexts[INV_IDX].put(heap.toString(), printTerm(i, true));
+                    loopInvTexts[INV_IDX].put(heap.toString(), printTerm(i, false));
                   }
                 }
 
@@ -269,7 +270,7 @@ public class InvariantConfigurator {
                 if (variant == null) {
                     loopInvTexts[VAR_IDX].put(DEFAULT,"");
                 } else {                    
-                    loopInvTexts[VAR_IDX].put(DEFAULT,printTerm(variant, true));
+                    loopInvTexts[VAR_IDX].put(DEFAULT,printTerm(variant, false));
                 }
 
                 if (!mapLoopsToInvariants.containsKey(loopInv.getLoop())) {
@@ -759,7 +760,8 @@ public class InvariantConfigurator {
                 index = inputPane.getSelectedIndex();
                 // might throw parserException
                 
-                result =  parser.parse(new StringReader(invariants.get(index)[INV_IDX].get(heap.toString())), Sort.ANY, services, services.getNamespaces(),
+                final String invAsString = invariants.get(index)[INV_IDX].get(heap.toString());
+                result =  parser.parse(new StringReader(invAsString), Sort.ANY, services, services.getNamespaces(),
                 getAbbrevMap());
 
                 return result;

@@ -13,7 +13,7 @@ import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 @SuppressWarnings("unchecked")
-public class TestKey extends TestCase {
+public class TestKey extends TestSuite {
 
     static Class[] utilityTests = new Class[] {
 	de.uka.ilkd.key.collection.TestSetAsListOfString.class,
@@ -59,7 +59,8 @@ public class TestKey extends TestCase {
 	de.uka.ilkd.key.proof.TestTacletIndex.class,
 	de.uka.ilkd.key.proof.TestProofTree.class,
 	de.uka.ilkd.key.proof.TestGoal.class,
-	de.uka.ilkd.key.proof.TestTermTacletAppIndex.class
+	de.uka.ilkd.key.proof.TestTermTacletAppIndex.class,
+	de.uka.ilkd.key.taclettranslation.TestTacletTranslator.class
     };
 
 
@@ -91,6 +92,8 @@ public class TestKey extends TestCase {
        de.uka.ilkd.key.util.TestNodePreorderIterator.class,
        de.uka.ilkd.key.symbolic_execution.TestExecutionNodePreorderIterator.class,
        de.uka.ilkd.key.symbolic_execution.TestExecutionNodeWriterAndReader.class,
+       de.uka.ilkd.key.symbolic_execution.TestSymbolicConfigurationExtractor.class,
+       de.uka.ilkd.key.symbolic_execution.TestSymbolicConfigurationWriterAndReader.class,
        de.uka.ilkd.key.symbolic_execution.TestSymbolicExecutionTreeBuilder.class,
        de.uka.ilkd.key.symbolic_execution.po.TestFunctionalOperationContractPO.class,
        de.uka.ilkd.key.symbolic_execution.po.TestProgramMethodPO.class,
@@ -135,6 +138,7 @@ public class TestKey extends TestCase {
         suite.addTest(createSuite(speclangTests, "Testing JML frontend"));
         suite.addTest(createSuite(smtTests, "Testing SMT backend"));
 	suite.addTest(createSuite(setTests, "Testing Symbolic Execution Trees"));
+	suite.addTest(createSuite(new Class[]{de.uka.ilkd.key.util.DesignTests.class}, "Test Design Constraints"));
         
 	return suite;
     }

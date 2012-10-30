@@ -18,10 +18,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
@@ -51,17 +48,18 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 /**
  * Standard implementation of the OperationContract interface.
  */
-public final class FunctionalOperationContractImpl implements FunctionalOperationContract {
+public class FunctionalOperationContractImpl implements FunctionalOperationContract {
     
     protected static final TermBuilder TB = TermBuilder.DF;
 
     final String baseName;
     final String name;
-    final KeYJavaType kjt;    
+    final KeYJavaType kjt;
     final IProgramMethod pm;
+    final KeYJavaType specifiedIn;
     final Modality modality;
     final Map<LocationVariable,Term> originalPres;
-    final Term originalMby;    
+    final Term originalMby;
     final Map<LocationVariable,Term> originalPosts;
     final Map<LocationVariable,Term> originalMods;
     final ProgramVariable originalSelfVar;
@@ -86,24 +84,25 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     //-------------------------------------------------------------------------
     
     FunctionalOperationContractImpl(String baseName,
-	                          String name,
-                                  KeYJavaType kjt,	                          
-                                  IProgramMethod pm,
-            		          Modality modality,
-            		          Map<LocationVariable,Term> pres,
-            		          Term mby,
-            		          Map<LocationVariable,Term> posts,
-            		          Map<LocationVariable,Term> mods,
-            		          boolean hasRealMod,
-            		          ProgramVariable selfVar,
-            		          ImmutableList<ProgramVariable> paramVars,
-            		          ProgramVariable resultVar,
-            		          ProgramVariable excVar,
-                                  Map<LocationVariable, LocationVariable> atPreVars,
-                                  int id,
-                                  boolean toBeSaved,
-                                  boolean transaction) {
-	assert !(name == null && baseName == null);
+                                    String name,
+                                    KeYJavaType kjt,
+                                    IProgramMethod pm,
+                                    KeYJavaType specifiedIn,
+                                    Modality modality,
+                                    Map<LocationVariable,Term> pres,
+                                    Term mby,
+                                    Map<LocationVariable,Term> posts,
+                                    Map<LocationVariable,Term> mods,
+                                    boolean hasRealMod,
+                                    ProgramVariable selfVar,
+                                    ImmutableList<ProgramVariable> paramVars,
+                                    ProgramVariable resultVar,
+                                    ProgramVariable excVar,
+                                    Map<LocationVariable, LocationVariable> atPreVars,
+                                    int id,
+                                    boolean toBeSaved,
+                                    boolean transaction) {
+        assert !(name == null && baseName == null);
         assert kjt != null;	
         assert pm != null;
         assert pres != null;
@@ -122,23 +121,24 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
         this.baseName               = baseName;
         this.name = name != null 
                   ? name 
-                  : ContractFactory.generateContractName(baseName, kjt, pm, id);
+                  : ContractFactory.generateContractName(baseName, kjt, pm, specifiedIn, id);
         this.pm          	    = pm;
         this.kjt                    = kjt;
+        this.specifiedIn            = specifiedIn;
         this.modality               = modality;
-	this.originalPres           = pres;
-	this.originalMby            = mby;
-	this.originalPosts          = posts;
-	this.originalMods           = mods;
-	this.hasRealModifiesClause  = hasRealMod;
-	this.originalSelfVar        = selfVar;
-	this.originalParamVars      = paramVars;
-	this.originalResultVar      = resultVar;
-	this.originalExcVar         = excVar;
-	this.originalAtPreVars      = atPreVars;
-	this.id                     = id;
+        this.originalPres           = pres;
+        this.originalMby            = mby;
+        this.originalPosts          = posts;
+        this.originalMods           = mods;
+        this.hasRealModifiesClause  = hasRealMod;
+        this.originalSelfVar        = selfVar;
+        this.originalParamVars      = paramVars;
+        this.originalResultVar      = resultVar;
+        this.originalExcVar         = excVar;
+        this.originalAtPreVars      = atPreVars;
+        this.id                     = id;
         this.transaction            = transaction;
-	this.toBeSaved	            = toBeSaved;
+        this.toBeSaved	            = toBeSaved;
     }
   
     
@@ -158,25 +158,27 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
      * @param heapAtPreVar the variable used for the pre-heap
      */
     FunctionalOperationContractImpl(String baseName,
-                                 KeYJavaType kjt,	    
-                                 IProgramMethod pm,
-            		         Modality modality,
-            		         Map<LocationVariable,Term> pres,
-            		         Term mby,            		         
-            		         Map<LocationVariable,Term> posts,
-            		         Map<LocationVariable,Term> mods,
-            		         boolean hasMod,
-            		         ProgramVariable selfVar,
-            		         ImmutableList<ProgramVariable> paramVars,
-            		         ProgramVariable resultVar,
-            		         ProgramVariable excVar,
-                                 Map<LocationVariable,LocationVariable> atPreVars,
-                                 boolean toBeSaved,
-                                 boolean transaction) {
+                                    KeYJavaType kjt,
+                                    IProgramMethod pm,
+                                    KeYJavaType specifiedIn,
+                                    Modality modality,
+                                    Map<LocationVariable,Term> pres,
+                                    Term mby,
+                                    Map<LocationVariable,Term> posts,
+                                    Map<LocationVariable,Term> mods,
+                                    boolean hasMod,
+                                    ProgramVariable selfVar,
+                                    ImmutableList<ProgramVariable> paramVars,
+                                    ProgramVariable resultVar,
+                                    ProgramVariable excVar,
+                                    Map<LocationVariable, LocationVariable> atPreVars,
+                                    boolean toBeSaved,
+                                    boolean transaction) {
         this(baseName,
              null,
              kjt,             
              pm,
+             specifiedIn,
              modality,
              pres,
              mby,
@@ -224,7 +226,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     //-------------------------------------------------------------------------
 
     
-    private Map<ProgramVariable, ProgramVariable> getReplaceMap(
+    protected Map<ProgramVariable, ProgramVariable> getReplaceMap(
 	    		      ProgramVariable selfVar, 
 	    		      ImmutableList<ProgramVariable> paramVars, 
 	    		      ProgramVariable resultVar, 
@@ -278,7 +280,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     }
     
     
-    private Map<Term, Term> getReplaceMap(
+    protected Map<Term, Term> getReplaceMap(
 	    		      LocationVariable baseHeap,
 	    		      Term heapTerm,
 	    		      Term selfTerm, 
@@ -856,7 +858,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
 	        	        
     @Override
     public String getDisplayName() {
-        return ContractFactory.generateDisplayName(baseName, kjt, pm, id);
+        return ContractFactory.generateDisplayName(baseName, kjt, pm, specifiedIn, id);
     }
 
 
@@ -876,6 +878,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                                    null,
                                                    kjt,
                                                    pm,
+                                                   specifiedIn,
                                                    modality,
                                                    originalPres,
                                                    originalMby,
@@ -901,6 +904,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
                                                    null,
                                                    newKJT,
                                                    (IProgramMethod) newPM,
+                                                   specifiedIn,
                                                    modality,
                                                    originalPres,
                                                    originalMby,
@@ -920,6 +924,7 @@ public final class FunctionalOperationContractImpl implements FunctionalOperatio
     
     @Override
     public String getTypeName() {
-        return ContractFactory.generateContractTypeName(baseName, kjt, pm);
+        return ContractFactory.generateContractTypeName(baseName, kjt, pm, specifiedIn);
     }
+
 }

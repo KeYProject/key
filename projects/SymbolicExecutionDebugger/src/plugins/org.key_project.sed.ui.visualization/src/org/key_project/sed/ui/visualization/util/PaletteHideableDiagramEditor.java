@@ -1,13 +1,20 @@
 package org.key_project.sed.ui.visualization.util;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.SnapToGrid;
 import org.eclipse.gef.commands.CommandStack;
+import org.eclipse.gef.editparts.ZoomManager;
+import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.gef.ui.palette.FlyoutPaletteComposite.FlyoutPreferences;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
@@ -19,12 +26,15 @@ import org.eclipse.graphiti.internal.command.ICommand;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
+import org.eclipse.graphiti.ui.internal.action.AbstractPreDefinedAction;
 import org.eclipse.graphiti.ui.internal.command.GefCommandWrapper;
 import org.eclipse.graphiti.ui.internal.config.IConfigurationProvider;
 import org.eclipse.graphiti.ui.internal.editor.DiagramEditorInternal;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IWorkbenchPart;
+import org.key_project.util.eclipse.job.AbstractWorkbenchPartJob;
+import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.view.editorInView.AbstractEditorInViewView;
 import org.key_project.util.eclipse.view.editorInView.GlobalEnablementWrapperAction;
 import org.key_project.util.eclipse.view.editorInView.IGlobalEnablement;
@@ -87,6 +97,33 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
    }
    
    /**
+    * Executes the given {@link IFeature} with the given {@link IContext}.
+    * @param feature The {@link IFeature} to execute.
+    * @param context the {@link IContext} to use.
+    */
+   public void executeFeatureInJob(String jobName, 
+                                   final IFeature feature, 
+                                   final IContext context) {
+      new AbstractWorkbenchPartJob(jobName, this) {
+         @Override
+         protected IStatus run(IProgressMonitor monitor) {
+            try {
+               SWTUtil.checkCanceled(monitor);
+               context.putProperty(GraphitiUtil.CONTEXT_PROPERTY_MONITOR, monitor);
+               executeFeature(feature, context);
+               return Status.OK_STATUS;
+            }
+            catch (OperationCanceledException e) {
+               return Status.CANCEL_STATUS;
+            }
+            catch (Exception e) {
+               return LogUtil.getLogger().createErrorStatus(e);
+            }
+         }
+      }.schedule();
+   }
+   
+   /**
     * {@inheritDoc}
     */
    @Override
@@ -143,13 +180,30 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
     * {@inheritDoc}
     */
    @Override
+   protected void initActionRegistry(ZoomManager zoomManager) {
+      super.initActionRegistry(zoomManager);
+      // Make sure that all action always use this editor as selection provider instead of the currently active editor because this is required if the editor is shown in a view!
+      ActionRegistry actionRegistry = getActionRegistry();
+      Iterator<?> iter = actionRegistry.getActions();
+      while (iter.hasNext()) {
+         Object next = iter.next();
+         if (next instanceof AbstractPreDefinedAction) {
+            ((AbstractPreDefinedAction)next).setSelectionProvider(getGraphicalViewer());
+         }
+      }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    protected void registerAction(IAction action) {
       if (action instanceof IGlobalEnablement) {
          registerGlobalEnablement((IGlobalEnablement)action);
          super.registerAction(action);
       }
       else {
-         GlobalEnablementWrapperAction wrapper = new GlobalEnablementWrapperAction(action); // Required to disable keyboard shortcuts if a message is shown.
+         GraphitiGlobalEnablementWrapperAction wrapper = new GraphitiGlobalEnablementWrapperAction(action); // Required to disable keyboard shortcuts if a message is shown.
          registerGlobalEnablement(wrapper);
          super.registerAction(wrapper);
       }
@@ -403,5 +457,18 @@ public class PaletteHideableDiagramEditor extends DiagramEditor implements IGlob
    @Override
    public IConfigurationProvider getConfigurationProvider() {
       return super.getConfigurationProvider();
+   }
+   
+   /**
+    * <p>
+    * {@inheritDoc}
+    * </p>
+    * <p>
+    * Overwritten to ignore warnings.
+    * </p>
+    */   
+   @Override
+   protected void configureGraphicalViewer() {
+      super.configureGraphicalViewer();
    }
 }

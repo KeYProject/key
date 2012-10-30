@@ -122,6 +122,7 @@ public class MonKeYBatchMode {
       boolean useDependencyContracts = !parameters.isDependencyContractsOff();
       boolean useQuery = !parameters.isQueryTreatmentOff();
       boolean useDefOps = !parameters.isArithmeticTreatmentBase();
+      int i = 1; // location index
       for (String location : parameters.getLocations()) {
          System.out.println("Loading location \"" + location + "\".");
          // Do dummy load to filter out API parsing time
@@ -143,11 +144,24 @@ public class MonKeYBatchMode {
                                                                showMainWindow);
          long loadingTime = System.currentTimeMillis() - loadStartTime;
          System.out.println("Found " + proofs.size() + " proofs in location \"" + location + "\".");
+         // Load proofs
+         String loadDirectory = parameters.getLocationLoadDirectory(i);
+         if (loadDirectory != null) {
+            for (MonKeYProof proof : proofs) {
+               System.out.println("Loading proof \"" + proof.getTypeName() + "#" + proof.getTargetName() + "\" from " + loadDirectory + File.separator + proof.getProofFileName());
+               proof.loadProof(loadDirectory, bootClassPath != null ? bootClassPath.getAbsolutePath() : null);
+            }
+         }
          // Do the proofs
          for (MonKeYProof proof : proofs) {
-            System.out.println("Starting proof \"" + proof.getTypeName() + "#" + proof.getTargetName());
+            System.out.println("Starting proof \"" + proof.getTypeName() + "#" + proof.getTargetName() + "\"");
             proof.startProof(expandMethods, useDependencyContracts, useQuery, useDefOps);
             System.out.println("Proof \"" + proof.getTypeName() + "#" + proof.getTargetName() + "\" finished with result " + proof.getResult() + " \" in " + proof.getTime() + " milliseconds");
+         }
+         // Save the proofs
+         for (MonKeYProof proof : proofs) {
+            System.out.println("Save proof \"" + proof.getTypeName() + "#" + proof.getTargetName() + "\"");
+            proof.save(roundSubDir.getAbsolutePath());
          }
          // Save location/round result
          File proofResultFile = new File(roundSubDir, getLocationName(location) + ".csv");
@@ -161,6 +175,8 @@ public class MonKeYBatchMode {
          result.add(new VerificationRoundResult(location, round, loadingTime, sums));
          // Remove proofs
          removeProofEnvFromKeY(proofs);
+         // Update location index
+         i++;
       }
       return result;
    }
@@ -321,6 +337,8 @@ public class MonKeYBatchMode {
       sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
       sb.append("Contract");
       sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
+      sb.append("Proof Reuse");
+      sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
       sb.append("Proof Result");
       sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
       sb.append("Nodes");
@@ -340,6 +358,8 @@ public class MonKeYBatchMode {
          sb.append(proof.getTargetName());
          sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
          sb.append(proof.getContractName());
+         sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
+         sb.append(proof.getReuseStatus());
          sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
          sb.append(proof.getResult() != null ? proof.getResult().getDisplayText() : StringUtil.EMPTY_STRING);
          sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
@@ -397,6 +417,8 @@ public class MonKeYBatchMode {
       sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
       sb.append("Proofs");
       sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
+      sb.append("Reused Proofs");
+      sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
       sb.append("Closed Proofs");
       sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
       sb.append("Nodes");
@@ -416,6 +438,8 @@ public class MonKeYBatchMode {
          sb.append(result.getLoadingTime());
          sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
          sb.append(result.getSums().getProofsCount());
+         sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
+         sb.append(result.getSums().getReusedProofsCount());
          sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
          sb.append(result.getSums().getClosedCount());
          sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
@@ -460,6 +484,8 @@ public class MonKeYBatchMode {
       sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
       sb.append("Average Proofs");
       sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
+      sb.append("Average Reused Proofs");
+      sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
       sb.append("Average Closed Proofs");
       sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
       sb.append("Average Nodes");
@@ -475,6 +501,7 @@ public class MonKeYBatchMode {
          // Compute average
          long loadingTimeSum = 0;
          int proofCountSum = 0;
+         long proofReusedSum = 0;
          int closedProofsSum = 0;
          long nodesSum = 0;
          long branchesSum = 0;
@@ -483,6 +510,7 @@ public class MonKeYBatchMode {
          for (VerificationRoundResult result : entry.getValue()) {
             loadingTimeSum += result.getLoadingTime();
             proofCountSum += result.getSums().getProofsCount();
+            proofReusedSum += result.getSums().getReusedProofsCount();
             closedProofsSum += result.getSums().getClosedCount();
             nodesSum += result.getSums().getNodes();
             branchesSum += result.getSums().getBranches();
@@ -498,6 +526,8 @@ public class MonKeYBatchMode {
          sb.append(loadingTimeSum / rounds);
          sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
          sb.append(proofCountSum / rounds);
+         sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
+         sb.append(proofReusedSum / rounds);
          sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
          sb.append(closedProofsSum / rounds);
          sb.append(SWTUtil.CSV_VALUE_SEPARATOR);
@@ -538,6 +568,7 @@ public class MonKeYBatchMode {
       System.out.print(" [" + MonKeYBatchModeParameters.PARAM_QUERY_TREATMENT_OFF + "]");
       System.out.print(" [" + MonKeYBatchModeParameters.PARAM_ARITHMETIC_TREATMENT_BASE + "]");
       System.out.print(" [" + MonKeYBatchModeParameters.PARAM_BOOT_CLASS_PATH + " <bootClassPath>]");
+      System.out.print(" [" + MonKeYBatchModeParameters.PARAM_LOAD_PREFIX + "<indexInListOfLocations> <bootClassPath>]");
       System.out.print(" " + MonKeYBatchModeParameters.PARAM_OUTPUT_PATH + " " + "<outputPath>");
       System.out.println(" <listOfLocations>");
       System.out.println();
@@ -552,6 +583,7 @@ public class MonKeYBatchMode {
       System.out.println("\t" + MonKeYBatchModeParameters.PARAM_ARITHMETIC_TREATMENT_BASE + " If defined, arithmetic treatment Base is used instead of DefOps.");
       System.out.println("\t" + MonKeYBatchModeParameters.PARAM_BOOT_CLASS_PATH + " An optional boot class path which is used for all source locations.");
       System.out.println("\t" + MonKeYBatchModeParameters.PARAM_OUTPUT_PATH + " The output directory in state proof results are written. In the defined directory is a sub directory with the current time created. It contains for each round one sub directory. For each source location is a CSV file with the proof results and a properties file with the accumulated results created. The main directory contains also CSV files with the accumulated results over all rounds and his averages.");
+      System.out.println("\t" + MonKeYBatchModeParameters.PARAM_LOAD_PREFIX + "<indexInListOfLocations> The directory which provides proof files to load for the location defined at index <indexInListOfLocations> starting with 1. Load directory for first location is defined via \"" + MonKeYBatchModeParameters.PARAM_LOAD_PREFIX + "1 D:\\Temp\\ProofFilesForLocation1\".");
       System.out.println("\t" + MonKeYBatchModeParameters.PARAM_SHOW_HELP + " ");
       System.out.println("\t" + "<listOfLocations>" + " The absoulte paths to the source directories. Each of them contains a complete project to verify with KeY.");
       // Example

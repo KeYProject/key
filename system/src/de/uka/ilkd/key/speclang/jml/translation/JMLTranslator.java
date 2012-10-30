@@ -16,7 +16,9 @@ import java.util.Map;
 
 import antlr.Token;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -24,13 +26,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermCreationException;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -65,19 +61,24 @@ final class JMLTranslator {
     private EnumMap<JMLKeyWord, JMLTranslationMethod> translationMethods;
     
     public static enum JMLKeyWord {
+    	// general features, not really keywords
         ARRAY_REF ("array reference"),
         INV ("\\inv"),
         INV_FOR ("\\invariant_for"),
-        ACCESSIBLE ("accessible"),
-        ASSIGNABLE ("assignable"),
         CAST ("cast"),
         CONDITIONAL ("conditional"),
+        
+        // clauses
+        ACCESSIBLE ("accessible"),
+        ASSIGNABLE ("assignable"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
         REPRESENTS ("represents"),
         REQUIRES ("requires"),
         SIGNALS ("signals"),
         SIGNALS_ONLY ("signals_only"),
+        
+        // quantifiers and "generalized quantifiers"
         FORALL ("\\forall"),
         EXISTS ("\\exists"),
         BSUM ("\\bsum"),
@@ -86,7 +87,22 @@ final class JMLTranslator {
         NUM_OF ("\\num_of"),
         PRODUCT ("\\product"),
         SUM ("\\sum"),
+        
+        // ADT stuff
         SEQ_DEF ("\\seq_def"),
+        STORE_REF_EXPR("store_ref_expr"),
+        CREATE_LOCSET("create locset"),
+        PAIRWISE_DISJOINT("\\disjoint"),
+        EMPTY ("\\empty"),
+        UNION ("\\set_union"),
+        INTERSECT ("\\intersect"),
+        SINGLETON ("\\singleton"),
+        SETMINUS ("\\set_minus"),
+        UNIONINF ("\\infinite_union"),
+        DISJOINT ("\\disjoint"),
+        SUBSET ("\\subset"),
+        
+        // logical operators
         EQUIVALENCE ("<==>"),
         ANTIVALENCE ("<=!=>"),
         EQ ("=="),
@@ -97,19 +113,20 @@ final class JMLTranslator {
         INDEX_OF ("\\indexOf"),
         SEQ_GET ("\\seq_get"),
         SEQ_CONCAT ("\\seq_concat"),
-        CONTAINS ("\\contains"),
         REACH ("reach"),
         REACH_LOCS ("reachLocs"),
         COMMENTARY ("(* *)"),
-        STORE_REF_EXPR("store_ref_expr"),
-        CREATE_LOCSET("create locset"),
-        PAIRWISE_DISJOINT("\\disjoint"),
         DL ("\\dl_"),
+        
+        // arithmetic
         ADD ("+"),
         SUBTRACT ("-"),
         SHIFT_LEFT ("<<"),
         SHIFT_RIGHT (">>"),
-        UNSIGNED_SHIFT_RIGHT (">>>");
+        UNSIGNED_SHIFT_RIGHT (">>>"),
+        BREAKS ("breaks"),
+        CONTINUES ("continues"),
+        RETURNS ("returns");
 
         private final String jmlName;
         JMLKeyWord(String name) {
@@ -338,6 +355,44 @@ final class JMLTranslator {
                 return result;
             }
         });
+        translationMethods.put(JMLKeyWord.BREAKS, new JMLTranslationMethod() {
+
+            @Override
+            public Pair<Label, Term> translate(SLTranslationExceptionManager excManager, Object... params) throws SLTranslationException {
+                checkParameters(params, Term.class, String.class, Services.class);
+                Term term = (Term) params[0];
+                String label = (String) params[1];
+                Services services = (Services) params[2];
+                Term formula = term == null ? TB.tt() : TB.convertToFormula(term, services);
+                return new Pair<Label, Term>(label == null ? null : new ProgramElementName(label), formula);
+            }
+        });
+        translationMethods.put(JMLKeyWord.CONTINUES, new JMLTranslationMethod() {
+
+            @Override
+            public Pair<Label, Term> translate(SLTranslationExceptionManager excManager,
+                                  Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, Term.class, String.class, Services.class);
+                Term term = (Term) params[0];
+                String label = (String) params[1];
+                Services services = (Services) params[2];
+                Term formula = term == null ? TB.tt() : TB.convertToFormula(term, services);
+                return new Pair<Label, Term>(label == null ? null : new ProgramElementName(label), formula);
+            }
+        });     
+        translationMethods.put(JMLKeyWord.RETURNS, new JMLTranslationMethod() {
+
+            @Override
+            public Term translate(SLTranslationExceptionManager excManager,
+                                  Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, Term.class, Services.class);
+                Term term = (Term) params[0];
+                Services services = (Services) params[1];
+                return term == null ? TB.tt() : TB.convertToFormula(term, services);
+            }
+        });
 
         // quantifiers
         translationMethods.put(JMLKeyWord.FORALL,
@@ -357,6 +412,12 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 return TB.imp(t1, t2);
             }
+
+
+            @Override
+            protected boolean isGeneralized() {
+                return false;
+            }
         });
         translationMethods.put(JMLKeyWord.EXISTS,
                                new JMLQuantifierTranslationMethod() {
@@ -374,6 +435,12 @@ final class JMLTranslator {
                                                Term t2)
                     throws SLTranslationException {
                 return TB.and(t1, t2);
+            }
+
+
+            @Override
+            protected boolean isGeneralized() {
+                return false;
             }
         });
         translationMethods.put(JMLKeyWord.BSUM, new JMLTranslationMethod() {
@@ -422,6 +489,71 @@ final class JMLTranslator {
                 return TB.bsum(qv, lo, hi, body, services);
             }
         });
+
+        translationMethods.put(JMLKeyWord.PRODUCT,
+                new JMLBoundedNumericalQuantifierTranslationMethod() {
+
+            @Override
+            public Term translateBoundedNumericalQuantifier(
+                    QuantifiableVariable qv,
+                    Term lo,
+                    Term hi,
+                    Term body) {
+                return TB.bprod(qv, lo, hi, body, services);
+            }
+        });
+
+        translationMethods.put(JMLKeyWord.MIN,
+                               new JMLQuantifierTranslationMethod() {
+
+            @Override
+            public Term translateQuantifier(QuantifiableVariable qv,
+                                            Term t)
+                    throws SLTranslationException {
+                Term min = TB.min(qv, t, services);
+                return min;
+            }
+
+
+            @Override
+            public Term combineQuantifiedTerms(Term t1,
+                                               Term t2)
+                    throws SLTranslationException {
+                throw new SLTranslationException("Only terms of the form (\\min int i; t) are valid");
+            }
+
+
+            @Override
+            protected boolean isGeneralized() {
+                return true;
+            }
+        });
+        translationMethods.put(JMLKeyWord.MAX,
+                new JMLQuantifierTranslationMethod() {
+
+            @Override
+            public Term translateQuantifier(QuantifiableVariable qv,
+                    Term t)
+                            throws SLTranslationException {
+                Term max = TB.max(qv, t, services);
+                return max;
+            }
+
+
+            @Override
+            public Term combineQuantifiedTerms(Term t1,
+                    Term t2)
+                            throws SLTranslationException {
+                throw new SLTranslationException("Only terms of the form (\\max int i; t) are valid");
+            }
+
+
+            @Override
+            protected boolean isGeneralized() {
+                return true;
+            }
+        });
+
         translationMethods.put(JMLKeyWord.SEQ_DEF, new JMLTranslationMethod() {
 
             @Override
@@ -501,9 +633,8 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class);
                 final Services services = (Services)params[0];
-                IObserverFunction inv = services.getJavaInfo().getInv();
                 Term obj = ((SLExpression) params[1]).getTerm();
-                return new SLExpression(TB.func(inv, TB.getBaseHeap(services), obj));
+                return new SLExpression(TB.inv(services, obj));
             }
         });
         
@@ -611,24 +742,6 @@ final class JMLTranslator {
                                         seqtype);
             }
         });
-        
-        translationMethods.put(JMLKeyWord.CONTAINS, new JMLTranslationMethod() {
-            // this is a quick hack; to be removed eventually; hopefully there will be support for set ADTs soon, so this will be obsolete
-
-            /** @deprecated */
-            @Override
-            public Object translate(SLTranslationExceptionManager excManager, Object... params)
-                    throws SLTranslationException {
-                checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
-                final Services services = (Services)params[0];
-                final Term seq = ((SLExpression)params[1]).getTerm();
-                final Term elem = ((SLExpression)params[2]).getTerm();
-                final LogicVariable i = new LogicVariable(new Name("i"), services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT).getSort());
-                final Term body = TB.and(TB.leq(TB.zero(services), TB.var(i), services),TB.lt(TB.var(i), TB.seqLen(services, seq), services), TB.equals(TB.seqGet(services, Sort.ANY, seq, TB.var(i)), elem));
-                return new SLExpression(TB.ex(i, body));
-            }
-        });
-        
         
         translationMethods.put(JMLKeyWord.REACH,
                                new JMLFieldAccessExpressionTranslationMethod() {
@@ -1049,7 +1162,8 @@ final class JMLTranslator {
 
                     try {
                         Term resultTerm = TB.func(function, args, null);
-                        SLExpression result = new SLExpression(resultTerm);
+                        SLExpression result = new SLExpression(resultTerm,
+                                services.getJavaInfo().getKeYJavaType(resultTerm.sort()));
                         return result;
                     } catch (TermCreationException ex) {
                         throw excManager.createException("Cannot create term " + function.name() + 
@@ -1081,6 +1195,38 @@ final class JMLTranslator {
                 
             }
         });
+        
+        
+        // sets
+        translationMethods.put(JMLKeyWord.EMPTY, new JMLTranslationMethod() {
+
+			@Override
+			public SLExpression translate(SLTranslationExceptionManager excManager,
+					Object... params) throws SLTranslationException {
+				checkParameters(params,Services.class,JavaInfo.class);
+				return new SLExpression(TB.empty((Services)params[0]),
+                        ((JavaInfo)params[1]).getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+			}});
+        
+        translationMethods.put(JMLKeyWord.UNION, new JMLTranslationMethod() {
+
+			@Override
+			public SLExpression translate(SLTranslationExceptionManager excManager,
+					Object... params) throws SLTranslationException {
+				checkParameters(params, Term.class, JavaInfo.class);
+				Term t = (Term)params[0];
+				return new SLExpression(t, ((JavaInfo)params[1]).getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+			}});
+        translationMethods.put(JMLKeyWord.INTERSECT, new JMLTranslationMethod() {
+
+			@Override
+			public SLExpression translate(SLTranslationExceptionManager excManager,
+					Object... params) throws SLTranslationException {
+				checkParameters(params, Term.class, JavaInfo.class);
+				Term t = (Term)params[0];
+				JavaInfo javaInfo = (JavaInfo)params[1];
+				return new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+			}});
 
         // others
         translationMethods.put(JMLKeyWord.ARRAY_REF,
@@ -1502,7 +1648,9 @@ final class JMLTranslator {
                 }
             }
 
-            return translateQuantifiers(declVars, preTerm, bodyTerm);
+            Term res = isGeneralized()? translateGeneralizedQuantifiers(declVars,preTerm,bodyTerm)
+                    :translateQuantifiers(declVars, preTerm, bodyTerm);
+            return res;
         }
 
 
@@ -1518,6 +1666,16 @@ final class JMLTranslator {
             return result;
         }
 
+        public Term translateGeneralizedQuantifiers(Iterable<LogicVariable> qvs, Term t1, Term t2)
+        throws SLTranslationException {
+            Iterator<LogicVariable> it = qvs.iterator();
+            LogicVariable qv = it.next();
+            if (it.hasNext()) {
+                throw new SLTranslationException("Only one quantified variable is allowed in this context.");
+            }
+            Term cond = TB.convertToBoolean(TB.and(t1, t2),services);
+            return translateQuantifier(qv, cond);
+        }
 
         public abstract Term combineQuantifiedTerms(Term t1,
                                                     Term t2)
@@ -1528,6 +1686,7 @@ final class JMLTranslator {
                                                  Term t)
                 throws SLTranslationException;
      
+        protected abstract boolean isGeneralized ();
     }
     
     /**
@@ -1559,103 +1718,116 @@ final class JMLTranslator {
     }
 
     private abstract class JMLBoundedNumericalQuantifierTranslationMethod extends JMLQuantifierTranslationMethod {
-            final static String notBounded = "Only numerical quantifier expressions of form (\\sum int i; l<=i && i<u; t) are permitted";
-            final static String notInt = "Bounded numerical quantifier variable must be of type int.";
+        final static String notBounded = "Only numerical quantifier expressions of form (\\sum int i; l<=i && i<u; t) are permitted";
+        final static String notInt = "Bounded numerical quantifier variable must be of types int or \\bigint.";
 
 
-            private  boolean isBoundedNumerical(Term a, LogicVariable lv){
-                    return lowerBound(a,lv)!=null && upperBound(a,lv)!=null;
+        private  boolean isBoundedNumerical(Term a, LogicVariable lv){
+            return lowerBound(a,lv)!=null && upperBound(a,lv)!=null;
+        }
+
+        /**
+         * Extracts lower bound from <code>a</code> if it matches the pattern.
+         * @param a guard to be disected
+         * @param lv variable bound by quantifier
+         * @return lower bound term (or null)
+         */
+        private  Term lowerBound(Term a, LogicVariable lv){
+            if(a.arity()>0 && a.sub(0).op()==Junctor.AND){
+                a=a.sub(0);
             }
-
-            /**
-             * Extracts lower bound from <code>a</code> if it matches the pattern.
-             * @param a guard to be disected
-             * @param lv variable bound by quantifier
-             * @return lower bound term (or null)
-             */
-            private  Term lowerBound(Term a, LogicVariable lv){
-                    if(a.arity()>0 && a.sub(0).op()==Junctor.AND){
-                            a=a.sub(0);
-                    }
-                    if(a.arity()==2 && a.op()== Junctor.AND && a.sub(0).arity()==2 && a.sub(0).sub(1).op()==lv
-                                    && a.sub(0).op().equals(services.getTypeConverter().getIntegerLDT().getLessOrEquals())){
-                            return a.sub(0).sub(0);
-                    }
-                    return null;
+            if(a.arity()==2 && a.op()== Junctor.AND && a.sub(0).arity()==2 && a.sub(0).sub(1).op()==lv
+                    && a.sub(0).op().equals(services.getTypeConverter().getIntegerLDT().getLessOrEquals())){
+                return a.sub(0).sub(0);
             }
+            return null;
+        }
 
-            /**
-             * Extracts upper bound from <code>a</code> if it matches the pattern.
-             * @param a guard to be disected
-             * @param lv variable bound by quantifier
-             * @return upper bound term (or null)
-             */
-            private Term upperBound(Term a, LogicVariable lv){
-                    if(a.arity()>0 && a.sub(0).op()==Junctor.AND){
-                            a=a.sub(0);
-                    }   
-                    if(a.arity()==2 && a.op()==Junctor.AND && a.sub(1).arity()==2 && a.sub(1).sub(0).op()==lv
-                                    && a.sub(1).op().equals(services.getTypeConverter().getIntegerLDT().getLessThan())){
-                            return a.sub(1).sub(1);
-                    }
-                    return null;
+        /**
+         * Extracts upper bound from <code>a</code> if it matches the pattern.
+         * @param a guard to be disected
+         * @param lv variable bound by quantifier
+         * @return upper bound term (or null)
+         */
+        private Term upperBound(Term a, LogicVariable lv){
+            if(a.arity()>0 && a.sub(0).op()==Junctor.AND){
+                a=a.sub(0);
+            }   
+            if(a.arity()==2 && a.op()==Junctor.AND && a.sub(1).arity()==2 && a.sub(1).sub(0).op()==lv
+                    && a.sub(1).op().equals(services.getTypeConverter().getIntegerLDT().getLessThan())){
+                return a.sub(1).sub(1);
             }
-
-
-            @Override
-            public Term translate(SLTranslationExceptionManager excManager, Object... params)
-            throws SLTranslationException {
-                    checkParameters(params,
-                                    Term.class, Term.class, KeYJavaType.class,
-                                    ImmutableList.class, Boolean.class, Services.class);
-                    KeYJavaType declsType = (KeYJavaType) params[2];
-                    if (!declsType.getJavaType().equals(PrimitiveType.JAVA_INT))
-                            throw new SLTranslationException(notInt);
-                    return super.translate(excManager, params);
-            }
+            return null;
+        }
 
 
         @Override
-        public Term translateQuantifiers(Iterable<LogicVariable> qvs,
-                                         Term t1,
-                                         Term t2)
+        public Term translate(SLTranslationExceptionManager excManager, Object... params)
                 throws SLTranslationException {
+            checkParameters(params,
+                    Term.class, Term.class, KeYJavaType.class,
+                    ImmutableList.class, Boolean.class, Services.class);
+            de.uka.ilkd.key.java.abstraction.Type declsType = 
+                    ((KeYJavaType) params[2]).getJavaType();
+            if (!declsType.equals(PrimitiveType.JAVA_INT)
+                    && !declsType.equals(PrimitiveType.JAVA_BIGINT))
+                throw new SLTranslationException(notInt);
+            return super.translate(excManager, params);
+        }
+
+        @Override
+        @Deprecated
+        public Term translateQuantifiers(Iterable<LogicVariable> qvs, Term t1, Term t2) {
+            assert false;
+            return null;
+        }
+
+        @Override
+        public Term translateGeneralizedQuantifiers(Iterable<LogicVariable> qvs,
+                Term t1,
+                Term t2)
+                        throws SLTranslationException {
             Iterator<LogicVariable> it = qvs.iterator();
             LogicVariable lv = it.next();
             if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
                 throw new SLTranslationException(notBounded);
             } else {
                 return translateBoundedNumericalQuantifier(lv,
-                                                           lowerBound(t1, lv),
-                                                           upperBound(t1, lv),
-                                                           t2);
+                        lowerBound(t1, lv),
+                        upperBound(t1, lv),
+                        t2);
             }
         }
 
-            /** Creates a term for a bounded numerical quantifier (e.g., sum).*/
-            public abstract Term translateBoundedNumericalQuantifier(QuantifiableVariable qv, Term lo, Term hi, Term body);
-
-
-        /** Should not be called. */
         @Override
-        @Deprecated
-        public Term combineQuantifiedTerms(Term t1,
-                                           Term t2) {
-            assert false;
-            return null;
+        protected boolean isGeneralized () {
+            return true;
         }
 
+        /** Creates a term for a bounded numerical quantifier (e.g., sum).*/
+        public abstract Term translateBoundedNumericalQuantifier(QuantifiableVariable qv, Term lo, Term hi, Term body);
 
-        /** Should not be called. */
-        @Override
-        @Deprecated
-        public Term translateQuantifier(QuantifiableVariable qv,
-                                        Term t) {
-            assert false;
-            return null;
-        }
+
+                /** Should not be called. */
+                @Override
+                @Deprecated
+                public Term combineQuantifiedTerms(Term t1,
+                        Term t2) {
+                    assert false;
+                    return null;
+                }
+
+
+                /** Should not be called. */
+                @Override
+                @Deprecated
+                public Term translateQuantifier(QuantifiableVariable qv,
+                        Term t) {
+                    assert false;
+                    return null;
+                }
     }
-    
+
     /**
      * Translation method for expressions only allowed to appear in a postcondition.
      * @author bruns

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="x">
+      <term term="x"/>
+      <term term="x.next"/>
+      <term term="x.next.next"/>
+   </equivalenceClass>
+   <state name="One Step Simplification resulting in return x.value+x.next.value+x.next.next.value;">
+      <association name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+   </state>
+   <object xml:id="o1" name="x" type="SimpleLinkedOjbects">
+      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+   </object>
+</model>

@@ -10,6 +10,7 @@ import org.eclipse.graphiti.notification.DefaultNotificationService;
 import org.eclipse.graphiti.notification.INotificationService;
 import org.key_project.sed.ui.visualization.execution_tree.provider.ExecutionTreeDiagramTypeProvider;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
+import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 
 /**
  * Implementation of {@link INotificationService} for Symbolic Execution Tree digrams.
@@ -40,7 +41,7 @@ public class SEDNotificationService extends DefaultNotificationService {
       final IFeatureProvider fp = dtp.getFeatureProvider();
       for (PictogramElement pe : dirtyPes) {
          final UpdateContext updateContext = new UpdateContext(pe);
-         updateContext.putProperty(ExecutionTreeUtil.CONTEXT_PROPERTY_MONITOR, monitor);
+         updateContext.putProperty(GraphitiUtil.CONTEXT_PROPERTY_MONITOR, monitor);
          // fp.updateIfPossible(updateContext);
          fp.updateIfPossibleAndNeeded(updateContext);
       }

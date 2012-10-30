@@ -15,7 +15,7 @@ public class ProgramVariableCollection {
     public ImmutableList<ProgramVariable> paramVars;
     public ProgramVariable resultVar;
     public ProgramVariable excVar;
-    public Map<LocationVariable,LocationVariable> atPreVars ;
+    public Map<LocationVariable,LocationVariable> atPreVars;
     public Map<LocationVariable,Term> atPres;
     
     public ProgramVariableCollection(ProgramVariable selfVar,

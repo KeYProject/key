@@ -30,6 +30,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
+// TODO Make LDTs in this class less hard-coded.
+// Every time a new LDT is introduced, this must be touched.
+// Perhaps a map going from Class<T extends LDT> to T would make
+// this more flexible.   (MU)
 
 public final class TypeConverter {
     
@@ -42,6 +46,7 @@ public final class TypeConverter {
     private LocSetLDT locSetLDT;
     private HeapLDT heapLDT;
     private SeqLDT seqLDT;
+    private FreeLDT genLDT;
     @SuppressWarnings("unused")
     private FloatLDT floatLDT;
     @SuppressWarnings("unused")
@@ -70,6 +75,8 @@ public final class TypeConverter {
             this.heapLDT = (HeapLDT) ldt;
         } else if (ldt instanceof SeqLDT) {
             this.seqLDT = (SeqLDT) ldt;
+        } else if (ldt instanceof FreeLDT){
+            this.genLDT = (FreeLDT) ldt;
         } else if (ldt instanceof FloatLDT ) {
             this.floatLDT = (FloatLDT) ldt;
         } else if (ldt instanceof DoubleLDT) {
@@ -129,6 +136,9 @@ public final class TypeConverter {
 	return seqLDT;
     }
     
+    public FreeLDT getGenLDT(){
+        return genLDT;
+    }
     
     public CharListLDT getCharListLDT() {
 	return charListLDT;
@@ -159,6 +169,8 @@ public final class TypeConverter {
 	    responsibleLDT = locSetLDT;
 	} else if(seqLDT.isResponsible(op, subs, services, ec)) {
 	    responsibleLDT = seqLDT;
+	} else if(genLDT.isResponsible(op, subs, services, ec)) {
+	    responsibleLDT = genLDT;
 	} else if(charListLDT.isResponsible(op, subs, services, ec)) {
 	    responsibleLDT = charListLDT;
     	} else if(op instanceof Equals) {
@@ -369,7 +381,7 @@ public final class TypeConverter {
 	} else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
 	    return translateOperator
 		((de.uka.ilkd.key.java.expression.Operator)pe, ec);
-	} else if (pe instanceof PrimitiveType) {
+	} else if (pe instanceof recoder.abstraction.PrimitiveType) {
 	    throw new IllegalArgumentException("TypeConverter could not handle"
 					       +" this primitive type");
 	} else if (pe instanceof MetaClassReference) {

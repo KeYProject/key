@@ -55,10 +55,11 @@ public class MonKeYProofLabelProvider extends LabelProvider implements ITableLab
                 case 0 : return proof.getTypeName();
                 case 1 : return proof.getTargetName();
                 case 2 : return proof.getContractName();
-                case 3 : return proof.getResult() != null ? proof.getResult().getDisplayText() : StringUtil.EMPTY_STRING;
-                case 4 : return proof.hasResult() ? proof.getNodes() + StringUtil.EMPTY_STRING : StringUtil.EMPTY_STRING;
-                case 5 : return proof.hasResult() ? proof.getBranches() + StringUtil.EMPTY_STRING : StringUtil.EMPTY_STRING;
-                case 6 : return proof.hasResult() ? proof.getTime() + StringUtil.EMPTY_STRING : StringUtil.EMPTY_STRING;
+                case 3 : return proof.getReuseStatus();
+                case 4 : return proof.getResult() != null ? proof.getResult().getDisplayText() : StringUtil.EMPTY_STRING;
+                case 5 : return proof.hasResult() ? proof.getNodes() + StringUtil.EMPTY_STRING : StringUtil.EMPTY_STRING;
+                case 6 : return proof.hasResult() ? proof.getBranches() + StringUtil.EMPTY_STRING : StringUtil.EMPTY_STRING;
+                case 7 : return proof.hasResult() ? proof.getTime() + StringUtil.EMPTY_STRING : StringUtil.EMPTY_STRING;
                 default : return getText(element);
             }
         }

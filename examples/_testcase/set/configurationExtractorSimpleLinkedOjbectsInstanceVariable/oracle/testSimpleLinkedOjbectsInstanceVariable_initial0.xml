@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state name="One Step Simplification resulting in return this.value+this.next.value+this.next.next.value;">
+      <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+   </state>
+   <object xml:id="o1" name="self" type="SimpleLinkedOjbectsInstanceVariable">
+      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o2"/>
+   </object>
+   <object xml:id="o2" name="self.next" type="SimpleLinkedOjbectsInstanceVariable">
+      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o3"/>
+   </object>
+   <object xml:id="o3" name="self.next.next" type="SimpleLinkedOjbectsInstanceVariable">
+   </object>
+</model>

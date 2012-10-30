@@ -22,6 +22,7 @@ import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.java.NonTerminalProgramElement;
+import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -798,7 +799,7 @@ public class Recoder2KeYConverter {
     
     
     public EmptySetLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral e) {
-	return EmptySetLiteral.INSTANCE;
+	return EmptySetLiteral.LOCSET;
     }
     
     public Singleton convert(de.uka.ilkd.key.java.recoderext.adt.Singleton e) {
@@ -1569,10 +1570,15 @@ public class Recoder2KeYConverter {
                 // method reference before method decl, also recursive calls.
                 // do not use:
                 final String oldCurrent = currentClass;
-                final String className = ((recoder.java.declaration.MethodDeclaration) method)
-                .getMemberParent().getFullName();
-                recoder.io.DataLocation loc = getServiceConfiguration()
-                .getSourceFileRepository().findSourceFile(className);
+                
+                recoder.io.DataLocation loc = null;
+                TypeDeclaration td = ((recoder.java.declaration.MethodDeclaration) method).getMemberParent();
+                NonTerminalProgramElement tdc = td.getParent();
+                while (tdc != null && !(tdc instanceof recoder.java.CompilationUnit)) {
+                   tdc = tdc.getASTParent();
+                }
+                loc = tdc instanceof recoder.java.CompilationUnit ? ((recoder.java.CompilationUnit)tdc).getOriginalDataLocation() : null;
+                
                 if (loc instanceof recoder.io.DataFileLocation) {
                     currentClass = ((recoder.io.DataFileLocation) loc)
                     .getFile().getAbsolutePath();

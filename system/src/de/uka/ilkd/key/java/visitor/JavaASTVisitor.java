@@ -9,6 +9,7 @@
 //
 
 package de.uka.ilkd.key.java.visitor;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.CompilationUnit;
 import de.uka.ilkd.key.java.ContextStatementBlock;
@@ -160,6 +161,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /** 
@@ -191,6 +193,12 @@ public abstract class JavaASTVisitor extends JavaASTWalker
                                        .getLoopInvariant((LoopStatement) node);
             if(li != null) {
                 performActionOnLoopInvariant(li);
+            }
+        } else if (node instanceof StatementBlock && services != null) {
+            ImmutableSet<BlockContract> bcs = services.getSpecificationRepository()
+                                                      .getBlockContracts((StatementBlock) node);
+            for (BlockContract bc : bcs) {
+                performActionOnBlockContract(bc);
             }
         }
     }
@@ -956,6 +964,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     
     @Override
     public void performActionOnLoopInvariant(LoopInvariant x) {
+        //do nothing
+    }
+    
+    @Override
+    public void performActionOnBlockContract(BlockContract x) {
         //do nothing
     }
 
