@@ -87,11 +87,7 @@ for i in $key_ext_jars ; do
     fi
 done
 
-if [ "x$ASPECTJRTPATH" != x ]
-then
-  echo "Using AspectJ runtime from:       $ASPECTJRTPATH"
-  keyclasspath=$keyclasspath:$ASPECTJRTPATH
-fi
+
 
 #
 #Function prints help message

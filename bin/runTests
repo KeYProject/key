@@ -40,18 +40,12 @@ echo "Using JDK installation from:      $JAVA_HOME"
 
 
 # For debugging reasons disable JIT (otherwise strace doesn't work)
-JAVA_OPTIONS=
+JAVA_OPTIONS=""
 #JAVA_OPTIONS=-classic
 
 # Uncomment the following definition for remote debugging on port 1234
 #JAVA_OPTIONS='-DKeyDebugFlag=on -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=1234'
 
-# Change that, if your java interpreter is different
-#
-# MAC OS X
-
-#
-# Now $KEY_HOME  
 #
 
 if [ -z "$KEY_HOME" ] ; then
@@ -91,14 +85,84 @@ for i in $key_ext_jars ; do
     fi
 done
 
-if [ x$ASPECTJRTPATH != x ]
-then
-  echo "Using AspectJ runtime from:       $ASPECTJRTPATH"
-  keyclasspath=$keyclasspath:$ASPECTJRTPATH
-fi
+
 
 ## jcoverage (stuff; optional)
 keyclasspath="$KEY_HOME/system/instrumented/:${keyclasspath}:$KEY_LIB/jcoverage.jar"
+
+#
+#Function prints help message
+#
+
+list_help(){
+  echo "./runTest [options] [filename]"
+  echo "\nOptions for using this script"
+  echo "  J-option: pass option to the JVM following the -J option convention of javac\n"
+  echo "Debugging:\n"
+  echo "  --K-keydebug: turn debugging on"
+  echo "  --K-debugclassloader: switch the Debugclassloadflag on to load classes for debugging"
+  echo "  --K-debugprefix <debugclass> : send debug output of debugclass to stadard out"
+  echo "  --K-remotedebug <port>: turn remote debugging on; parameter for listening port"
+  echo "  --K-assertionflag: switch assertionflag on, s.t. debug assertions are used"
+  echo "Other:\n"
+
+  echo "  --Khelp, -Kh	: prints this help message"
+  echo "  --help	: prints help message of the KeY prover"
+
+}
+
+#
+# KeY-specific command line options
+#
+keysysprops=""
+keyoptions=""
+while [ $# -ne 0 ]; do
+    case $1 in
+#     -K options for configuration options of KeY, such as debugmode, flags,
+# remote debugging
+	--Kh)
+# 	    set ${1} #removes the minus from the option, s.t. it can be passed to key as option
+	    list_help
+	    exit;;
+	--Khelp)
+# 	    set ${1#--} #removes the minus from the option, s.t. it can be passed to key as option
+	    list_help
+	    exit;;
+        --K-keydebug) keysysprops="${keysysprops}-DKeyDebugFlag=on "
+            shift
+            continue;;
+        --K-debugclassloader)
+keysysprops="${keysysprops}-DKeyDebugClassLoader=on
+"
+            shift
+            continue;;
+
+	--K-debugprefix) keysysprops="${keysysprops}-Dkey.debug.prefix=${2}"
+	    shift
+	    shift
+	    continue;;
+	--K-assertionflag) keysysprops="${keysysprops}-DKeyAssertionFlag=true "
+	    shift
+	    continue;;
+
+	--K-remotedebug) JAVA_OPTIONS="-Xdebug -Xnoagent -Djava.compiler=NONE
+-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${2}"
+	    shift
+	    shift
+	    continue;;
+
+
+# -J options follwing conventions of Java for -J options
+	-J*)
+	    option=${1#-J}
+	    JAVA_OPTIONS="${JAVA_OPTIONS}${option} "
+	    shift
+	    continue;;
+	  
+	  *) break;;
+
+    esac
+done	
 
 
 if [ ! -d "$HOME/.key" ]
@@ -120,12 +184,6 @@ fi
 $JAVA $JAVA_OPTIONS $keysysprops \
 -ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx2048m \
 -Dkey.home="$KEY_HOME" \
--classpath "$keyclasspath" junit.textui.TestRunner $testcase
+-classpath "$keyclasspath" junit.textui.TestRunner $testcase 
 
-# DesignTests are now included as test cases in TestKey
-#if [ "$testcase" = "TestKey" ]; then
-#    $JAVA $JAVA_OPTIONS $keysysprops \
-#	-ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx2048m \
-#	-Dkey.home="$KEY_HOME" \
-#	-classpath "$keyclasspath" de.uka.ilkd.key.util.DesignTests
-#fi
+
