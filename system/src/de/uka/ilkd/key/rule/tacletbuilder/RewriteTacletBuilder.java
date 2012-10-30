@@ -43,6 +43,15 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
 	return this;
     }
 
+
+    /* for information flow purposes; TODO: find better solution */
+    private boolean surviveSmbExec;
+    
+    public void setSurviveSmbExec(boolean b) {
+        surviveSmbExec = b;
+    }
+    
+    
     /** sets the <I>find</I> of the Taclet that is to build to the given
      * term.
      * @return this RewriteTacletBuilder
@@ -86,7 +95,8 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
 				 find,
 				 prefixBuilder.getPrefixMap(),
 				 applicationRestriction,
-				 choices);
+				 choices,
+                 surviveSmbExec);
     }
 
     /**

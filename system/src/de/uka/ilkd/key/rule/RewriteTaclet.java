@@ -106,8 +106,21 @@ public final class RewriteTaclet extends FindTaclet {
 			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, 
 			 int                       p_applicationRestriction,
 			 ImmutableSet<Choice> choices){
+        this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
+             p_applicationRestriction, choices, false);
+    }	
+
+    public RewriteTaclet(Name name, TacletApplPart applPart,  
+			 ImmutableList<TacletGoalTemplate>  goalTemplates, 
+			 ImmutableList<RuleSet>             ruleSets,
+			 TacletAttributes          attrs,
+			 Term                      find,
+			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, 
+			 int                       p_applicationRestriction,
+			 ImmutableSet<Choice> choices,
+             boolean surviveSymbExec){
 	super(name, applPart, goalTemplates, ruleSets, attrs,
-	      find, prefixMap, choices);
+	      find, prefixMap, choices, surviveSymbExec);
 	applicationRestriction = p_applicationRestriction;
 	
 	cacheMatchInfo();

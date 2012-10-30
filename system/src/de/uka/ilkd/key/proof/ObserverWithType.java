@@ -5,7 +5,7 @@
 package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 
 /**
  *
@@ -14,10 +14,10 @@ import de.uka.ilkd.key.logic.op.ObserverFunction;
 public class ObserverWithType {
 
     public final KeYJavaType kjt;
-    public final ObserverFunction obs;
+    public final IObserverFunction obs;
 
     public ObserverWithType(KeYJavaType kjt,
-                            ObserverFunction obs) {
+                            IObserverFunction obs) {
         this.kjt = kjt;
         this.obs = obs;
     }

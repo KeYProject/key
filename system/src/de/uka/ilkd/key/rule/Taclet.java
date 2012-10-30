@@ -155,8 +155,6 @@ public abstract class Taclet implements Rule, Named {
     protected final ImmutableMap<SchemaVariable,TacletPrefix> prefixMap;
     
 
-    private final boolean surviveSymbExec;
-    
     /** cache; contains set of all bound variables */
     private ImmutableSet<QuantifiableVariable> boundVariables = null;
     
@@ -181,6 +179,11 @@ public abstract class Taclet implements Rule, Named {
     /** Integer to cache the hashcode */
     private int hashcode = 0;    
     
+    /* TODO: find better solution*/
+    private final boolean surviveSymbExec;
+    
+    
+
     /**
      * creates a Schematic Theory Specific Rule (Taclet) with the given
      * parameters.  
@@ -214,7 +217,7 @@ public abstract class Taclet implements Rule, Named {
         this.prefixMap = prefixMap;
         this.displayName = attrs.displayName() == null
                            ? name.toString() : attrs.displayName();
-        surviveSymbExec = surviveSmbExec;
+        this.surviveSymbExec = surviveSmbExec;
     }
 
     /**

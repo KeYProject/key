@@ -43,30 +43,27 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInProgram;
-import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.ContractApplicationData;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.ObserverWithType;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.InformationFlowContractPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.InformationFlowContract;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -296,7 +293,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     /**
      * @return (assumption, anon update, anon heap)
      */
-    private static Triple<Term,Term,Term> createAnonUpdate(LocationVariable heap, IProgramMethod pm, 
+    private static AnonUpdateData createAnonUpdate(LocationVariable heap, IProgramMethod pm, 
 	                                     	    	   Term mod, 
 	                                     	    	   Services services) {
 	assert pm != null;
@@ -306,6 +303,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Name methodHeapName = new Name(TB.newName(services, heap+"After_" + pm.getName()));
 	final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort(), true);
 	services.getNamespaces().functions().addSafely(methodHeapFunc);
+    final Term methodHeap = TB.func(methodHeapFunc);
 	final Name anonHeapName = new Name(TB.newName(services, "anon_" + heap + "_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort(), true);
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
@@ -314,10 +312,10 @@ public final class UseOperationContractRule implements BuiltInRule {
 				          TB.var(heap), 
 				          mod,
 				          anonHeap),
-		               TB.func(methodHeapFunc)); 
-	final Term anonUpdate = TB.elementary(services, heap, TB.func(methodHeapFunc));
+                            methodHeap); 
+	final Term anonUpdate = TB.elementary(services, heap, methodHeap);
 	
-	return new Triple<Term,Term,Term>(assumption, anonUpdate, anonHeap);
+	return new AnonUpdateData(assumption, anonUpdate, methodHeap, TB.getBaseHeap(services), anonHeap);
     } 
     
     
@@ -659,29 +657,32 @@ public final class UseOperationContractRule implements BuiltInRule {
         Term wellFormedAnon = null;
         Term atPreUpdates = null;
         Term reachableState = null;
+        ImmutableList<AnonUpdateData> anonUpdateDatas =
+                ImmutableSLList.<AnonUpdateData>nil();
 
         for(LocationVariable heap : heapContext) {
-           final Triple<Term,Term,Term> tAnon;
+           final AnonUpdateData tAnon;
            // TODO probably the special case still needs fixing (later)
            if(heap == baseHeap && !contract.hasModifiesClause()) {
-             tAnon = new Triple<Term,Term,Term>(TB.tt(), TB.skip(), TB.var(heap));
+             tAnon = new AnonUpdateData(TB.tt(), TB.skip(), TB.var(heap), TB.var(heap), TB.var(heap));
            }else{
              tAnon = createAnonUpdate(heap, inst.pm, mods.get(heap), services);
            }
+           anonUpdateDatas = anonUpdateDatas.append(tAnon);
            if(anonAssumption == null) {
-             anonAssumption = tAnon.first;
+             anonAssumption = tAnon.assumption;
            }else{
-             anonAssumption = TB.and(anonAssumption, tAnon.first);
+             anonAssumption = TB.and(anonAssumption, tAnon.assumption);
            }
            if(anonUpdate == null) {
-             anonUpdate = tAnon.second;
+             anonUpdate = tAnon.anonUpdate;
            }else{
-             anonUpdate = TB.parallel(anonUpdate, tAnon.second);
+             anonUpdate = TB.parallel(anonUpdate, tAnon.anonUpdate);
            }
            if(wellFormedAnon == null) {
-             wellFormedAnon = TB.wellFormed(tAnon.third,services);
+             wellFormedAnon = TB.wellFormed(tAnon.anonHeap,services);
            }else{
-             wellFormedAnon = TB.and(wellFormedAnon, TB.wellFormed(tAnon.third,services));
+             wellFormedAnon = TB.and(wellFormedAnon, TB.wellFormed(tAnon.anonHeap,services));
            }
            final Term up = TB.elementary(services, atPreVars.get(heap), TB.var(heap));
            if(atPreUpdates == null) {
@@ -723,6 +724,16 @@ public final class UseOperationContractRule implements BuiltInRule {
                                 	     	             freeExcPost, 
                                 	     	             post}))));
        
+        // prepare information flow analysis
+        assert anonUpdateDatas.size() == 1; // information flow extension is at the moment not compatible to non-base-heap setting
+        Term contractApplPredTerm =
+                storePrePostInPredAndGenInfoFlowTaclet(inst,
+                                                       anonUpdateDatas.head(),
+                                                       contractSelf,
+                                                       contractResult,
+                                                       TB.var(excVar),
+                                                       goal, services);
+        
         //create "Pre" branch
 	int i = 0;
 	for(Term arg : contractParams) {
@@ -772,6 +783,11 @@ public final class UseOperationContractRule implements BuiltInRule {
         postGoal.addFormula(new SequentFormula(postAssumption), 
         	            true, 
         	            false);
+        postGoal.addFormula(new SequentFormula(contractApplPredTerm),
+                            true,
+                            false);
+
+
         
         //create "Exceptional Post" branch
         final StatementBlock excPostSB 
@@ -830,7 +846,240 @@ public final class UseOperationContractRule implements BuiltInRule {
         return displayName();
     }
     
+
+    /**
+     * Store pre- / poststate of the method invocation and generate information
+     * flow taclet.
+     */
+    // TODO: add exception var
+    private Term storePrePostInPredAndGenInfoFlowTaclet(final Instantiation inst,
+                                                        final AnonUpdateData anonUpdateData,
+                                                        final Term contractSelf,
+                                                        final Term contractResult,
+                                                        final Term exceptionVar,
+                                                        final Goal goal,
+                                                        final Services services) {
+        ContractApplicationData appData =
+                new ContractApplicationData(contractSelf, inst.actualParams,
+                                            anonUpdateData.methodHeapAtPre,
+                                            contractResult, exceptionVar,
+                                            anonUpdateData.methodHeap);
+        final Function contApplPred = generateContApplPredicate(inst.pm,
+                                                                services);
+        final Term contractApplPredTerm =
+                TB.apply(inst.u, 
+                    instantiateContApplPredicate(contApplPred, appData, inst.pm));
+        final Taclet informationFlowContractApp =
+                genInfFlowContractApplTaclet(contApplPred, inst.pm, services);
+        goal.addTaclet(informationFlowContractApp,
+                       SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        return contractApplPredTerm;
+    }
+
     
+    private Function generateContApplPredicate(IProgramMethod pm,
+                                               Services services) {
+        String nameSting =
+                MiscTools.toValidTacletName(pm.getContainerType().getFullName()
+                + "::" + pm.getFullName() + "__RELATES").toString();
+        final Name name = new Name(nameSting);
+        Function pred = (Function) services.getNamespaces().functions().lookup(
+                name);
+        if (pred == null) {
+            // Arguments: params, heapAtPre, exception, heapAtPost
+            int length = pm.getParamTypes().size() + 3;
+            if (!pm.isStatic()) {
+                // Arguments: + self
+                length++;
+            }
+            if (!pm.isVoid() && !pm.isConstructor()) {
+                // Arguments: + result
+                length++;
+            }
+            Sort[] predArgSorts =
+                    new Sort[length];
+
+            int i = 0;
+            if (!pm.isStatic()) {
+                // type of self
+                predArgSorts[i++] = pm.getContainerType().getSort();
+            }
+            // types of params
+            for (KeYJavaType t : pm.getParamTypes()) {
+                predArgSorts[i++] = t.getSort();
+            }
+            // type of heapAtPre
+            predArgSorts[i++] = TB.getBaseHeap(services).sort();
+            if (!pm.isVoid() && !pm.isConstructor()) {
+                // type of result
+                predArgSorts[i++] = pm.getReturnType().getSort();
+            }
+            // type of exception
+            predArgSorts[i++] = services.getJavaInfo().getTypeByClassName(
+                    "java.lang.Exception").getSort();
+            // type of heapAtPost
+            predArgSorts[i++] = TB.getBaseHeap(services).sort();
+
+            pred = new Function(name, Sort.FORMULA, predArgSorts);
+            services.getNamespaces().functions().addSafely(pred);
+        }
+        return pred;
+    }
+     
+    
+    private Term instantiateContApplPredicate(Function pred,
+                                              ContractApplicationData appData,
+                                              IProgramMethod pm) {
+        Sort[] predArgSorts = new Sort[pred.argSorts().size()];
+        pred.argSorts().toArray(predArgSorts);
+        Term[] predArgs = new Term[predArgSorts.length];
+
+        int i = 0;
+        ImmutableList<Term> params = appData.params;
+
+        if (!pm.isStatic()) {
+            // self
+            predArgs[i++] = appData.self;
+        }
+        // params
+        for (KeYJavaType t : pm.getParamTypes()) {
+            predArgSorts[i] = t.getSort();
+            predArgs[i++] = params.head();
+            params = params.tail();
+        }
+        // heapAtPre
+        predArgs[i++] = appData.heapAtPre;
+        if (!pm.isVoid() && !pm.isConstructor()) {
+            // result
+            predArgs[i++] = appData.result;
+        }
+        // exception
+        predArgs[i++] = appData.exception;
+        // heapAtPost
+        predArgs[i++] = appData.heapAtPost;
+
+        return TB.func(pred, predArgs);
+    }
+     
+    
+    private ContractApplicationData generateApplicationDataSVs(Function pred,
+                                                               String schemaPrefix,
+                                                               IProgramMethod pm,
+                                                               Services services) {
+        Sort[] predArgSorts = new Sort[pred.argSorts().size()];
+        pred.argSorts().toArray(predArgSorts);
+        final int numParams = pm.getParamTypes().size();
+        Term[] paramsSVs = new Term[numParams];
+
+        int i = 0;
+        Term selfAtPreSV;
+        if (!pm.isStatic()) {
+            selfAtPreSV = createTermSV(schemaPrefix + "_self",
+                                       predArgSorts[i], services);
+            i++;
+        } else {
+            selfAtPreSV = null;
+        }
+        int j = 0;
+        for (KeYJavaType t : pm.getParamTypes()) {
+            predArgSorts[i] = t.getSort();
+            paramsSVs[j] = createTermSV(schemaPrefix + "_param_" + (j + 1),
+                                        predArgSorts[i], services);
+            i++;
+            j++;
+        }
+        Term heapAtPreSV = createTermSV(schemaPrefix + "_heapAtPre",
+                                        predArgSorts[i], services);
+        i++;
+        Term resSV = null;
+        if (!pm.isVoid() && !pm.isConstructor()) {
+            resSV = createTermSV(schemaPrefix + "_res", predArgSorts[i],
+                                 services);
+            i++;
+        }
+        Term exceptionSV = createTermSV(schemaPrefix + "_exception",
+                                        predArgSorts[i], services);
+        i++;
+        Term heapAtPostSV = createTermSV(schemaPrefix + "_heapAtPost",
+                                         predArgSorts[i], services);
+        i++;
+
+        return new ContractApplicationData(selfAtPreSV, paramsSVs, heapAtPreSV,
+                                           resSV, exceptionSV, heapAtPostSV);
+    }
+    
+    
+    private Taclet genInfFlowContractApplTaclet(Function contractApplPred,
+                                                IProgramMethod pm,
+                                                Services services) {
+        Name tacletName =
+                MiscTools.toValidTacletName("use information flow contract for "
+                + pm.getFullName());
+        ObserverWithType target =
+                new ObserverWithType(pm.getContainerType(), pm);
+
+        ContractApplicationData schemaDataFind = generateApplicationDataSVs(
+                contractApplPred, "find", pm, services);
+        ContractApplicationData schemaDataAssumes = generateApplicationDataSVs(
+                contractApplPred, "assumes", pm, services);
+        Term schemaFind = instantiateContApplPredicate(contractApplPred,
+                schemaDataFind, pm);
+        Term schemaAssumes = instantiateContApplPredicate(contractApplPred,
+                schemaDataAssumes, pm);
+
+        ImmutableSet<InformationFlowContract> ifContracts =
+                getInfromFlowContracts(pm, services);
+        Term schemaContApps = InformationFlowContractPO.buildContractApplications(
+                target, ifContracts, schemaDataFind, schemaDataAssumes, services);
+        
+        //create sequents
+        Sequent assumesSeq = Sequent.createAnteSequent(
+                new Semisequent(new SequentFormula(schemaAssumes)));
+        Sequent axiomSeq = Sequent.createAnteSequent(
+                new Semisequent(new SequentFormula(schemaContApps)));
+        
+        //create taclet
+        RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+        tacletBuilder.setName(tacletName);
+        tacletBuilder.setFind(schemaFind); // TODO: is this correct? has to match only in the antecedent!
+        tacletBuilder.setIfSequent(assumesSeq);
+        RewriteTacletGoalTemplate goal =
+                new RewriteTacletGoalTemplate(axiomSeq,
+                                              ImmutableSLList.<Taclet>nil(),
+                                              schemaFind);
+        tacletBuilder.addTacletGoalTemplate(goal);
+        tacletBuilder.addRuleSet(new RuleSet(new Name("userTaclets1")));
+        tacletBuilder.setSurviveSmbExec(true);
+        return tacletBuilder.getTaclet();
+    }
+    
+    
+    private ImmutableSet<InformationFlowContract> getInfromFlowContracts(
+            IProgramMethod pm,
+            Services services) {
+        ImmutableSet<Contract> contracts =
+                services.getSpecificationRepository().getContracts(
+                pm.getContainerType(), pm);
+        ImmutableSet<InformationFlowContract> ifContracts =
+                DefaultImmutableSet.<InformationFlowContract>nil();
+        for(Contract c : contracts) {
+            if (c instanceof InformationFlowContract) {
+                ifContracts = ifContracts.add((InformationFlowContract)c);
+            }
+        }
+        return ifContracts;
+    }    
+
+
+    private Term createTermSV(String svName,
+                              Sort predArgSort,
+                              Services services) {
+        Name name = services.getVariableNamer().getTemporaryNameProposal(svName);
+        return TB.var(SchemaVariableFactory.createTermSV(name, predArgSort));
+    }
+        
+    
+
     
     //-------------------------------------------------------------------------
     //inner classes
@@ -884,5 +1133,22 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
 
+    private static class AnonUpdateData {
+
+        public final Term assumption, anonUpdate, methodHeap, methodHeapAtPre, anonHeap;
+
+
+        public AnonUpdateData(Term assumption,
+                              Term anonUpdate,
+                              Term methodHeap,
+                              Term methodHeapAtPre,
+                              Term anonHeap) {
+            this.assumption = assumption;
+            this.anonUpdate = anonUpdate;
+            this.methodHeap = methodHeap;
+            this.methodHeapAtPre = methodHeapAtPre;
+            this.anonHeap = anonHeap;
+        }
+    }
 
 }
