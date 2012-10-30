@@ -40,7 +40,7 @@ tokens {
     ACCESSIBLE      = "accessible";
     ASSIGNABLE      = "assignable";
     ENSURES         = "ensures";
-    DECLASSIFY      = "declassify";
+    DECLASSIFIES    = "declassifies";
     DEPENDS         = "depends";
     REPRESENTS      = "represents";
     REQUIRES        = "requires";

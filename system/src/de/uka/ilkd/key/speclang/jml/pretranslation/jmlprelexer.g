@@ -53,6 +53,7 @@ tokens {
 	CONTINUES			= "continues";
 	CONTINUE_BEHAVIOR 	= "continue_behavior";
     CONTINUE_BEHAVIOUR 	= "continue_behaviour";
+    DECLASSIFIES                = "declassifies";
     DECREASES  			= "decreases";
     DECREASES_REDUNDANTLY  	= "decreases_redundantly";
     DECREASING  		= "decreasing";
@@ -114,6 +115,7 @@ tokens {
 	RETURNS				= "returns";
 	RETURN_BEHAVIOR 	= "return_behavior";
     RETURN_BEHAVIOUR 	= "return_behaviour";
+    RESPECTS                    = "respects";
     SCOPE_SAFE 			= "scopeSafe";
     ARBITRARY_SCOPE             = "arbitraryScope";
     ARBITRARY_SCOPE_THIS        = "arbitraryScopeThis";

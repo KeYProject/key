@@ -46,7 +46,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private ImmutableList<PositionedString> respects =
             ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> declassify =
+    private ImmutableList<PositionedString> declassifies =
             ImmutableSLList.<PositionedString>nil();
     
     private Map<String, ImmutableList<PositionedString>>
@@ -198,12 +198,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public void addDeclassify(PositionedString ps) {
-        declassify = declassify.append(ps);
+        declassifies = declassifies.append(ps);
     }
 
 
     public void addDeclassify(ImmutableList<PositionedString> l) {
-        declassify = declassify.append(l);
+        declassifies = declassifies.append(l);
     }
     
     
@@ -298,7 +298,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public ImmutableList<PositionedString> getDeclassify() {
-        return declassify;
+        return declassifies;
     }
 
 
@@ -362,7 +362,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("respects: ").append(it.next()).append("\n");
         }
-        it = declassify.iterator();
+        it = declassifies.iterator();
         while (it.hasNext()) {
             sb.append("declassify: ").append(it.next()).append("\n");
         }
@@ -390,7 +390,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && continues.equals(sc.continues)
                && returns.equals(sc.returns)
                && respects.equals(sc.respects)
-               && declassify.equals(sc.declassify);
+               && declassifies.equals(sc.declassifies);
     }
 
 
@@ -410,6 +410,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + continues.hashCode()
                + returns.hashCode()
                + respects.hashCode()
-               + declassify.hashCode();
+               + declassifies.hashCode();
     }
 }

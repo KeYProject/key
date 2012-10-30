@@ -339,7 +339,7 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = breaksclause
     |   result = continuesclause
     |   result = dependsclause
-    |   result = declassifyclause
+    |   result = declassifiesclause
     |   result = ensuresclause
     |   result = representsclause
     |   result = requiresclause
@@ -371,7 +371,7 @@ assignableclause returns [Term result = null] throws SLTranslationException
     ;
 
 
-declassifyclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
+declassifiesclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
 {
     Term declass = null;
     Term frompart = null;

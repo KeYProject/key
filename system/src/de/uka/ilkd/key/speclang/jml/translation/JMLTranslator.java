@@ -107,7 +107,9 @@ final class JMLTranslator {
         UNSIGNED_SHIFT_RIGHT (">>>"),
         BREAKS ("breaks"),
         CONTINUES ("continues"),
-        RETURNS ("returns");
+        RETURNS ("returns"),
+        RESPECTS ("respects"),
+        DECLASSIFIES ("declassifies");
 
         private final String jmlName;
         JMLKeyWord(String name) {
@@ -1436,6 +1438,42 @@ final class JMLTranslator {
 			               .getKeYJavaType(PrimitiveType.JAVA_SEQ);
 				return new SLExpression(TB.values((Services)params[0]),t);
 			}});
+        translationMethods.put(JMLKeyWord.RESPECTS, new JMLTranslationMethod() {
+
+            @Override
+            public ImmutableList translate(
+                    SLTranslationExceptionManager excManager,
+                    Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, ImmutableList.class, Services.class);
+                ImmutableList respectsList = (ImmutableList) params[0];
+                return respectsList;
+            }
+        });
+        translationMethods.put(JMLKeyWord.DECLASSIFIES,
+                               new JMLTranslationMethod() {
+
+            @Override
+            public ImmutableList translate(
+                    SLTranslationExceptionManager excManager,
+                    Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, Term.class, Term.class,
+                                SLExpression.class, SLExpression.class,
+                                Services.class);
+                Term declass = (Term) params[0];
+                SLExpression frompart = (SLExpression) params[1];
+                SLExpression topart = (SLExpression) params[2];
+                Term ifpart = (Term) params[3];
+
+                Term frompartTerm = (frompart != null ? frompart.getTerm() : null);
+                Term topartTerm = (topart != null ? topart.getTerm() : null);
+                
+                ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+                return result.append(declass).append(frompartTerm).append(topartTerm).append(
+                        ifpart);
+            }
+        });
     }
 
 
