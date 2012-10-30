@@ -105,8 +105,8 @@ public final class CommandLine {
 
     }
     /**
-     * Text that should appear in usage pages. You can decide about the
-     * indentation of the text (beginning of line or description column).
+     * Text that should appear in usage pages. If an external help option/command 
+     * with description should appear in helptext and printed similar to internal options
      */
     private class AdditionalHelpTextParts extends HelpElement {
         private String description;
@@ -228,6 +228,12 @@ public final class CommandLine {
         text.indentToDescriptionColumn = identToDescriptionColumn;
         helpElements.add(text);
     }
+    /**
+     * 
+     * @param command
+     * @param description
+     * @param identToDescriptionColumn
+     */
     public void addTextPart(String command, String description, boolean identToDescriptionColumn) {
         AdditionalHelpTextParts text = new AdditionalHelpTextParts();
         text.command = command;

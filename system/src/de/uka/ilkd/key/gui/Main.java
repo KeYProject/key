@@ -39,7 +39,9 @@ import de.uka.ilkd.key.util.CommandLine;
  * This has been extracted from MainWindow to keep GUI and control further apart.
  */
 public class Main {
-
+/**
+ * Command line options
+ */
     private static final String HELP = "--help";
     private static final String AUTO = "--auto";
     private static final String LAST = "--last";
@@ -115,7 +117,13 @@ public class Main {
     private static boolean loadOnly = false;
 
     private static String fileNameOnStartUp = null;
+    /**
+     * Object handling the parsing of commandline options
+     */
     private static CommandLine cl;
+    /**
+     * flag whether recent loaded file should be loaded on startup
+     */
     private static Boolean loadRecentFile=false;
 
 
@@ -175,6 +183,10 @@ public class Main {
     public static String getMainWindowTitle() {
         return "KeY " + KeYResourceManager.getManager().getVersion();
     }
+    /**
+     * Register commandline options with command line object
+     * @return commandline object 
+     */
     private static CommandLine createCommandLine(){
     	CommandLine cl= new CommandLine();
     	cl.setIndentation(3);
@@ -209,6 +221,10 @@ public class Main {
     	cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "read definitions from given file");
     	return cl;
     }
+    /**
+     * Evaluate the parsed commandline options
+     * @param commandline object cl
+     */
     public static void evaluateOptions(CommandLine cl) {
 
         ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
@@ -354,7 +370,7 @@ public class Main {
 
       	if(!fileArguments.isEmpty()){
       		if(new File(fileArguments.get(0)).exists()){
-      			System.out.println("Loading: "+fileArguments.get(0));
+      			//System.out.println("Loading: "+fileArguments.get(0));
       			fileNameOnStartUp=fileArguments.get(0);    	
       		}
       	}
@@ -373,6 +389,9 @@ public class Main {
         }
         if(cl.isSet(LAST)){
         	loadRecentFile=true;
+        }
+        if(cl.isSet(EXPERIMENTAL)){
+        	//atm do nothing
         }
         	
     }
@@ -403,11 +422,11 @@ public class Main {
 	    });
 	    if(loadRecentFile){
 	    	fileNameOnStartUp = MainWindow.getInstance().getRecentFiles().getMostRecent().getAbsolutePath(); 
-        	System.out.println("Loading recent File: "+fileNameOnStartUp);
+        	//System.out.println("Loading recent File: "+fileNameOnStartUp);
 
 	    }    
 	    ui = MainWindow.getInstance().getUserInterface();
-
+	    System.out.println("Loading: "+fileNameOnStartUp);
 	}
 
 	return ui;
