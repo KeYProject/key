@@ -43,6 +43,7 @@ public class Main {
     private static final String AUTO = "--auto";
     private static final String LAST = "--last";
     private static final String AUTO_LOADONLY = "--auto_loadonly";
+    private static final String EXPERIMENTAL = "--experimental";
     private static final String DEBUG = "--debug";
     private static final String NO_DEBUG = "--no_debug";
     private static final String ASSERTION = "--assertion";
@@ -80,7 +81,7 @@ public class Main {
 
     private static String fileNameOnStartUp = null;
     private static CommandLine cl;
-    
+
 
     
     /**
@@ -121,6 +122,7 @@ public class Main {
     public static void loadCommandLineFile(UserInterface ui) {
         if (Main.getFileNameOnStartUp() != null) {
             ui.loadProblem(new File(Main.getFileNameOnStartUp()));
+            
         } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             ui.openExamples();
         }
@@ -142,7 +144,8 @@ public class Main {
     	cl.addText("\n", false);
     	cl.addOption(HELP, null, "display this text");
     	cl.addTextPart("--Khelp", "display help for technical/debug parameters\n", true);
-    	cl.addOption(LAST, null, "start prover with last loaded problem");
+    	cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
+    	cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
     	cl.addText("Batchmode options:\n", false);
     	cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
     	cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
@@ -169,7 +172,6 @@ public class Main {
         UserInterface ui = null;
         ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
         String uiMode = "INTERACTIVE";
-
         
         if(cl.isSet(AUTO)){
         	uiMode="AUTO";
@@ -238,17 +240,14 @@ public class Main {
         {evaluateLemmataOptions(cl);}
         
         //arguments not assigned to a command line option may be files
-     
+
       	if(!fileArguments.isEmpty()){
       		if(new File(fileArguments.get(0)).exists()){
       			System.out.println(fileArguments.get(0));
       			fileNameOnStartUp=fileArguments.get(0);    	
       		}
       	}
-      	if(cl.isSet(LAST)){
-      		System.out.println("Last loaded file: ");
-      		fileNameOnStartUp=null;
-      	}
+
         
 //        while (opt.length > index) loop:{
 //            if ((new File(opt[index])).exists()) {
@@ -340,9 +339,14 @@ public class Main {
                     MainWindow.createInstance(getMainWindowTitle());
                     MainWindow key = MainWindow.getInstance();
                     key.setVisible(true);
+                  
                 }
             });
             ui = MainWindow.getInstance().getUserInterface();
+            if(cl.isSet(LAST)){
+            	fileNameOnStartUp = MainWindow.getInstance().getRecentFiles().getMostRecent().getAbsolutePath(); 
+            	System.out.println("Loading recent File: "+fileNameOnStartUp);
+            }
         }
         return ui;
     }
