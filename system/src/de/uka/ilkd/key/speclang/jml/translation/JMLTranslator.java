@@ -16,6 +16,7 @@ import java.util.Map;
 
 import antlr.Token;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -60,19 +61,24 @@ final class JMLTranslator {
     private EnumMap<JMLKeyWord, JMLTranslationMethod> translationMethods;
     
     public static enum JMLKeyWord {
+    	// general features, not really keywords
         ARRAY_REF ("array reference"),
         INV ("\\inv"),
         INV_FOR ("\\invariant_for"),
-        ACCESSIBLE ("accessible"),
-        ASSIGNABLE ("assignable"),
         CAST ("cast"),
         CONDITIONAL ("conditional"),
+        
+        // clauses
+        ACCESSIBLE ("accessible"),
+        ASSIGNABLE ("assignable"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
         REPRESENTS ("represents"),
         REQUIRES ("requires"),
         SIGNALS ("signals"),
         SIGNALS_ONLY ("signals_only"),
+        
+        // quantifiers and "generalized quantifiers"
         FORALL ("\\forall"),
         EXISTS ("\\exists"),
         BSUM ("\\bsum"),
@@ -81,7 +87,22 @@ final class JMLTranslator {
         NUM_OF ("\\num_of"),
         PRODUCT ("\\product"),
         SUM ("\\sum"),
+        
+        // ADT stuff
         SEQ_DEF ("\\seq_def"),
+        STORE_REF_EXPR("store_ref_expr"),
+        CREATE_LOCSET("create locset"),
+        PAIRWISE_DISJOINT("\\disjoint"),
+        EMPTY ("\\empty"),
+        UNION ("\\set_union"),
+        INTERSECT ("\\intersect"),
+        SINGLETON ("\\singleton"),
+        SETMINUS ("\\set_minus"),
+        UNIONINF ("\\infinite_union"),
+        DISJOINT ("\\disjoint"),
+        SUBSET ("\\subset"),
+        
+        // logical operators
         EQUIVALENCE ("<==>"),
         ANTIVALENCE ("<=!=>"),
         EQ ("=="),
@@ -92,14 +113,12 @@ final class JMLTranslator {
         INDEX_OF ("\\indexOf"),
         SEQ_GET ("\\seq_get"),
         SEQ_CONCAT ("\\seq_concat"),
-        CONTAINS ("\\contains"),
         REACH ("reach"),
         REACH_LOCS ("reachLocs"),
         COMMENTARY ("(* *)"),
-        STORE_REF_EXPR("store_ref_expr"),
-        CREATE_LOCSET("create locset"),
-        PAIRWISE_DISJOINT("\\disjoint"),
         DL ("\\dl_"),
+        
+        // arithmetic
         ADD ("+"),
         SUBTRACT ("-"),
         SHIFT_LEFT ("<<"),
@@ -724,24 +743,6 @@ final class JMLTranslator {
             }
         });
         
-        translationMethods.put(JMLKeyWord.CONTAINS, new JMLTranslationMethod() {
-            // this is a quick hack; to be removed eventually; hopefully there will be support for set ADTs soon, so this will be obsolete
-
-            /** @deprecated */
-            @Override
-            public Object translate(SLTranslationExceptionManager excManager, Object... params)
-                    throws SLTranslationException {
-                checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
-                final Services services = (Services)params[0];
-                final Term seq = ((SLExpression)params[1]).getTerm();
-                final Term elem = ((SLExpression)params[2]).getTerm();
-                final LogicVariable i = new LogicVariable(new Name("i"), services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_BIGINT).getSort());
-                final Term body = TB.and(TB.leq(TB.zero(services), TB.var(i), services),TB.lt(TB.var(i), TB.seqLen(services, seq), services), TB.equals(TB.seqGet(services, Sort.ANY, seq, TB.var(i)), elem));
-                return new SLExpression(TB.ex(i, body));
-            }
-        });
-        
-        
         translationMethods.put(JMLKeyWord.REACH,
                                new JMLFieldAccessExpressionTranslationMethod() {
 
@@ -1161,7 +1162,8 @@ final class JMLTranslator {
 
                     try {
                         Term resultTerm = TB.func(function, args, null);
-                        SLExpression result = new SLExpression(resultTerm);
+                        SLExpression result = new SLExpression(resultTerm,
+                                services.getJavaInfo().getKeYJavaType(resultTerm.sort()));
                         return result;
                     } catch (TermCreationException ex) {
                         throw excManager.createException("Cannot create term " + function.name() + 
@@ -1193,6 +1195,38 @@ final class JMLTranslator {
                 
             }
         });
+        
+        
+        // sets
+        translationMethods.put(JMLKeyWord.EMPTY, new JMLTranslationMethod() {
+
+			@Override
+			public SLExpression translate(SLTranslationExceptionManager excManager,
+					Object... params) throws SLTranslationException {
+				checkParameters(params,Services.class,JavaInfo.class);
+				return new SLExpression(TB.empty((Services)params[0]),
+                        ((JavaInfo)params[1]).getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+			}});
+        
+        translationMethods.put(JMLKeyWord.UNION, new JMLTranslationMethod() {
+
+			@Override
+			public SLExpression translate(SLTranslationExceptionManager excManager,
+					Object... params) throws SLTranslationException {
+				checkParameters(params, Term.class, JavaInfo.class);
+				Term t = (Term)params[0];
+				return new SLExpression(t, ((JavaInfo)params[1]).getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+			}});
+        translationMethods.put(JMLKeyWord.INTERSECT, new JMLTranslationMethod() {
+
+			@Override
+			public SLExpression translate(SLTranslationExceptionManager excManager,
+					Object... params) throws SLTranslationException {
+				checkParameters(params, Term.class, JavaInfo.class);
+				Term t = (Term)params[0];
+				JavaInfo javaInfo = (JavaInfo)params[1];
+				return new SLExpression(t, javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_LOCSET));
+			}});
 
         // others
         translationMethods.put(JMLKeyWord.ARRAY_REF,

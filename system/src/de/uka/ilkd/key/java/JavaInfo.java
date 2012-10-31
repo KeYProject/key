@@ -37,21 +37,8 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.DoubleLDT;
-import de.uka.ilkd.key.ldt.FloatLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LRUCache;
@@ -415,30 +402,10 @@ public final class JavaInfo {
 	}
 	
 	if(result == null) {
+	    Name ldtName = type.getCorrespondingLDTName();
 	    final Namespace sorts = services.getNamespaces().sorts();
 	    final Sort sort;
-	    if(type == PrimitiveType.JAVA_BOOLEAN) {
-		sort = (Sort) sorts.lookup(BooleanLDT.NAME);;
-	    } else if(type == PrimitiveType.JAVA_BYTE
-	              || type == PrimitiveType.JAVA_CHAR 
-	              || type == PrimitiveType.JAVA_INT 
-                      || type == PrimitiveType.JAVA_LONG 
-		      || type == PrimitiveType.JAVA_SHORT
-		      || type == PrimitiveType.JAVA_BIGINT) { 
-		 sort = (Sort) sorts.lookup(IntegerLDT.NAME);;
-	    } else if(type == PrimitiveType.JAVA_FLOAT) {
-		sort = (Sort) sorts.lookup(FloatLDT.NAME);
-	    } else if(type == PrimitiveType.JAVA_DOUBLE) {
-		sort = (Sort) sorts.lookup(DoubleLDT.NAME);
-	    } else if(type == PrimitiveType.JAVA_LOCSET) {
-                sort = (Sort) sorts.lookup(LocSetLDT.NAME);
-	    } else if(type == PrimitiveType.JAVA_SEQ) {
-                sort = (Sort) sorts.lookup(SeqLDT.NAME);
-	    } else {
-		assert false : "unexpected primitive type: " + type;
-	    	sort = null;
-	    }
-	    
+	    sort = (Sort) sorts.lookup(ldtName);
 	    assert sort != null : "could not find sort for type: " + type;
 	    result = new KeYJavaType(type, sort);
 	    if(type2KJTCache != null) {
@@ -512,7 +479,17 @@ public final class JavaInfo {
 	         }
 	     }
 	 }	
-	 return sort2KJTCache.get(sort);
+	 
+	 // lookup for primitive ldts
+	 KeYJavaType result = sort2KJTCache.get(sort);
+	 if(result == null) {
+	     Name n = sort.name();
+	     PrimitiveType pt = PrimitiveType.getPrimitiveTypeByLDT(n);
+	     if(pt != null) {
+	         return getPrimitiveKeYJavaType(pt);
+	     }
+	 }
+    return result;
      }
 
 
