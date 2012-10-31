@@ -1,9 +1,21 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License. 
+// See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
@@ -15,9 +27,11 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.CommandLine;
 
 /**
  * The main entry point for KeY
@@ -25,6 +39,33 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  * This has been extracted from MainWindow to keep GUI and control further apart.
  */
 public class Main {
+/**
+ * Command line options
+ */
+    private static final String HELP = "--help";
+    private static final String AUTO = "--auto";
+    private static final String LAST = "--last";
+    private static final String AUTO_LOADONLY = "--auto-loadonly";
+    private static final String EXPERIMENTAL = "--experimental";
+    private static final String DEBUG = "--debug";
+    private static final String NO_DEBUG = "--no_debug";
+    private static final String ASSERTION = "--assertion";
+    private static final String NO_ASSERTION = "--no-assertion";
+    private static final String NO_JMLSPECS = "--no-jmlspecs";
+    public static final String JUSTIFY_RULES ="--justify-rules";
+    private static final String PRINT_STATISTICS ="--print-statistics";
+    private static final String TIMEOUT ="--timeout";
+    private static final String EXAMPLES = "--examples"; 
+    public static final String JKEY_PREFIX = "--jr-";
+    public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
+    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
+    public static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
+    public static final String JTIMEOUT = JKEY_PREFIX + "timeout";
+    public static final String JPRINT = JKEY_PREFIX + "print";
+    public static final String JSAVE_RESULTS_TO_FILE = JKEY_PREFIX + "saveProofToFile";
+    public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
+    public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX +"signature";
+
     /**
      * The user interface modes KeY can operate in.
      */
@@ -39,6 +80,7 @@ public class Main {
 	 */
 	AUTO
     }
+
 
     public static final String INTERNAL_VERSION =
             KeYResourceManager.getManager().getSHA1();
@@ -75,6 +117,16 @@ public class Main {
     private static boolean loadOnly = false;
 
     private static String fileNameOnStartUp = null;
+    /**
+     * Object handling the parsing of commandline options
+     */
+    private static CommandLine cl;
+    /**
+     * flag whether recent loaded file should be loaded on startup
+     */
+    private static Boolean loadRecentFile=false;
+
+
     
     /**
      * <p>
@@ -85,7 +137,7 @@ public class Main {
      * </p>
      * <p>
      * Conclusion: It must be possible to use KeY with a custom examples
-     * directory without showin the chooser on startup.
+     * directory without show in the chooser on startup.
      * </p>
      */
     public static boolean showExampleChooserIfExamplesDirIsDefined = true;
@@ -99,93 +151,213 @@ public class Main {
         // does no harm on non macs
         System.setProperty("apple.laf.useScreenMenuBar","true");
 
-        evaluateOptions(args);
-        UserInterface userInterface = createUserInterface();
 
-        loadCommandLineFile(userInterface);
+        try {
+			cl = createCommandLine();
+			cl.parse(args);
+			evaluateOptions(cl);
+			UserInterface userInterface = createUserInterface();
+			loadCommandLineFile(userInterface);
+		} catch (CommandLineException e) {
+			e.printStackTrace();
+			System.out.println("Exception during parsing of commandline options");
+		}
+        
     }
 
     public static void loadCommandLineFile(UserInterface ui) {
         if (Main.getFileNameOnStartUp() != null) {
             ui.loadProblem(new File(Main.getFileNameOnStartUp()));
+            
         } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             ui.openExamples();
         }
     }
 
-    public static void evaluateOptions(String[] opt) {
-        int index = 0;
-        ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
-        while (opt.length > index) loop:{
-            if ((new File(opt[index])).exists()) {
-                fileNameOnStartUp=opt[index];
-            } else  { // long option 
-                try {
-                    String option = opt[index].toUpperCase();
-                    CommandLineOption clo = CommandLineOption.valueOf(option);
-                    switch (clo) {
-                    case AUTO_LOADONLY:
-                        loadOnly = true;
-                    case AUTO:
-                        uiMode = UiMode.AUTO;
-                        break;
-                    case DEBUG:
-                        de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = true;
-                        break;
-                    case NO_DEBUG: 
-                        de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
-                        break;
-                    case ASSERTION:
-                        de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = true;
-                        break;
-                    case NO_ASSERTION:
-                        de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = false;
-                        break;
-                    case NO_JMLSPECS:
-                        GeneralSettings.disableSpecs = true;
-                        break;
-                    case JUSTIFY_RULES:
-                        LinkedList<String> options = new LinkedList<String>();
-                        for(int i = index+1; i < opt.length; i++){
-                            options.add(opt[i]);
-                        }
-                        evaluateLemmataOptions(options);
-                        // is last option
-                        break loop;
-                    case PRINT_STATISTICS:
-                        if ( !( opt.length > index + 1 ) ) printUsageAndExit (true,null);
-                        statisticsFile = opt[++index];
-                        break;
-                    case TIMEOUT:
-                        long timeout = -1;
-                        try {
-                            timeout = Long.parseLong(opt[index + 1]);
-                        } catch (NumberFormatException nfe) {
-                            System.out.println("Illegal timeout (must be a number >=-1).");
-                            System.exit(-1);
-                        }
-                        if (timeout < -1) {
-                            System.out.println("Illegal timeout (must be a number >=-1).");
-                            System.exit(-1);
-                        }
-                        index++;
-                        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
-                        break;
-                    case EXAMPLES:
-                        if ( !( opt.length > index + 1 ) ) printUsageAndExit (true,null);
-                        examplesDir = opt[++index];
-                        break;
-                    case HELP:
-                        printUsageAndExit(false,null);
-                    }
-                } catch (IllegalArgumentException e) {
-                    // no CommandLineOption found
-                    printUsageAndExit(true,opt[index]);
-                }
-            }
 
-            index++;
+    /**
+     * Returns the used title. This information is required in other
+     * projects which instantiates the {@link MainWindow} manually.
+     * @return The title of {@link MainWindow} to use.
+     */
+    public static String getMainWindowTitle() {
+        return "KeY " + KeYResourceManager.getManager().getVersion();
+    }
+    /**
+     * Register commandline options with command line object
+     * @return commandline object 
+     */
+    private static CommandLine createCommandLine(){
+    	CommandLine cl= new CommandLine();
+    	cl.setIndentation(3);
+    	cl.addSection("Test Headline");
+    	cl.addText("Usage: ./runProver [options | --justify_rules [justify rule options] filename] [filename(s)]\n\n", false);
+    	cl.addSection("Options for the KeY-Prover");
+    	cl.addOption(HELP, null, "display this text");
+    	cl.addTextPart("--Khelp", "display help for technical/debug parameters\n", true);
+    	cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
+    	cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
+    	cl.addSection("Batchmode options:");
+    	cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
+    	cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
+    	cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
+    	cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");
+    	cl.addOption(PRINT_STATISTICS, "<filename>",  "output nr. of rule applications and time spent on proving");
+    	cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +", i.e., no timeout)");
+    	cl.addSection("Options for justify rules:");
+    	cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument" );
+    	cl.addText("\n", true);
+    	cl.addText("The 'justifyrules' command has a number of options you can set. As default configuration the proofs are not stored to a file.\n", false);
+    	cl.addText("Provide the option name and the value as separate arguments.\n", false);
+    	cl.addText("\n", true);
+    	cl.addOption(JMAX_RULES, "<number>","maximum number of rule application to perform (default: " + LemmataAutoModeOptions.DEFAULT_MAXRULES +")");
+    	cl.addOption(JPATH_OF_RESULT, "<path>", "store proofs to this folder");
+    	cl.addOption(JTIMEOUT, "<timeout>", "the timeout for proof of a taclet in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +")");
+    	cl.addOption(JPRINT, "<terminal/disable>", "send output to terminal or disable output");
+    	cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "save or drop proofs (then stored to path given by "+ JPATH_OF_RESULT + ")");
+    	cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "read axioms from given file");
+    	cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "read definitions from given file");
+    	return cl;
+    }
+    /**
+     * Evaluate the parsed commandline options
+     * @param commandline object cl
+     */
+    public static void evaluateOptions(CommandLine cl) {
+
+        ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
+
+        
+        if(cl.isSet(AUTO)){
+        	uiMode = UiMode.AUTO;
         }
+        if(cl.isSet(AUTO_LOADONLY)){
+        	uiMode = UiMode.AUTO;
+        	loadOnly = true;
+        }
+        
+        if(cl.isSet(HELP)){
+        	printUsageAndExit(false, null);	
+        }
+//        if(cl.isSet(DEBUG)){
+//        	 de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = true;
+//        }
+//        if(cl.isSet(NO_DEBUG)){
+//        	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
+//        }
+//        if(cl.isSet(ASSERTION)){
+//        	de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = true;
+//        }
+//        if(cl.isSet(NO_ASSERTION)){
+//        	de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = false;
+//        }
+        if(cl.isSet(NO_JMLSPECS)){
+        	GeneralSettings.disableSpecs = true;
+        }
+
+//    public static void evaluateOptions(String[] opt) {
+//        int index = 0;
+//        ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
+//        while (opt.length > index) loop:{
+//            if ((new File(opt[index])).exists()) {
+//                fileNameOnStartUp=opt[index];
+//            } else  { // long option 
+//                try {
+//                    String option = opt[index].toUpperCase();
+//                    CommandLineOption clo = CommandLineOption.valueOf(option);
+//                    switch (clo) {
+//                    case AUTO_LOADONLY:
+//                        loadOnly = true;
+//                    case AUTO:
+//                        uiMode = UiMode.AUTO;
+//                        break;
+//                    case DEBUG:
+//                        de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = true;
+//                        break;
+//                    case NO_DEBUG: 
+//                        de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
+//                        break;
+//                    case ASSERTION:
+//                        de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = true;
+//                        break;
+//                    case NO_ASSERTION:
+//                        de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = false;
+//                        break;
+//                    case NO_JMLSPECS:
+//                        GeneralSettings.disableSpecs = true;
+//                        break;
+//                    case JUSTIFY_RULES:
+//                        LinkedList<String> options = new LinkedList<String>();
+//                        for(int i = index+1; i < opt.length; i++){
+//                            options.add(opt[i]);
+//                        }
+//                        evaluateLemmataOptions(options);
+//                        // is last option
+//                        break loop;
+//                    case PRINT_STATISTICS:
+//                        if ( !( opt.length > index + 1 ) ) printUsageAndExit (true,null);
+//                        statisticsFile = opt[++index];
+//                        break;
+//                    case TIMEOUT:
+//                        long timeout = -1;
+//                        try {
+//                            timeout = Long.parseLong(opt[index + 1]);
+//                        } catch (NumberFormatException nfe) {
+//                            System.out.println("Illegal timeout (must be a number >=-1).");
+//                            System.exit(-1);
+//                        }
+//                        if (timeout < -1) {
+//                            System.out.println("Illegal timeout (must be a number >=-1).");
+//                            System.exit(-1);
+//                        }
+//                        index++;
+//                        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
+//                        break;
+//                    case EXAMPLES:
+//                        if ( !( opt.length > index + 1 ) ) printUsageAndExit (true,null);
+//                        examplesDir = opt[++index];
+//                        break;
+//                    case HELP:
+//                        printUsageAndExit(false,null);
+//                    }
+//                } catch (IllegalArgumentException e) {
+//                    // no CommandLineOption found
+//                    printUsageAndExit(true,opt[index]);
+//                }
+//            }
+
+
+        if(cl.isSet(PRINT_STATISTICS)){
+        	statisticsFile = cl.getString(PRINT_STATISTICS, null);
+        	if(statisticsFile.equals(null)){
+        		printUsageAndExit(true,null);
+        	}
+        }
+        if(cl.isSet(TIMEOUT)){
+           System.out.println("Timeout is set");
+           long timeout = -1;
+           try {
+               timeout = cl.getLong(TIMEOUT, -1);
+               System.out.println("Timeout is: "+ timeout+" ms");
+           } catch (NumberFormatException nfe) {
+               System.out.println("Illegal timeout (must be a number >=-1).");
+               System.exit(-1);
+           } catch (CommandLineException e) {
+        	   System.out.println("Wrong argument for timeout");
+		   }
+           if (timeout < -1) {
+               System.out.println("Illegal timeout (must be a number >=-1).");
+               System.exit(-1);
+           }
+           ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
+        }
+        if(cl.isSet(EXAMPLES)){
+        	examplesDir = cl.getString(EXAMPLES, null);
+        	if (examplesDir.equals(null)){
+        		printUsageAndExit(true, null);
+        	}
+        }
+        
         if (Debug.ENABLE_DEBUG) {
             System.out.println("Running in debug mode ...");
         } else {
@@ -196,7 +368,32 @@ public class Main {
         } else {
             System.out.println("Not using assertions ...");
         }
+        if(cl.isSet(LAST)){
+        	loadRecentFile=true;
+        }
+        if(cl.isSet(EXPERIMENTAL)){
+        	System.out.println("Running in experimental mode ...");
+        	//atm do nothing
+        }
+     	List<String> fileArguments = cl.getArguments();
+     	Iterator iter = fileArguments.iterator();
+
+        if(cl.isSet(JUSTIFY_RULES))
+        {evaluateLemmataOptions(cl);}
+        
+        //arguments not assigned to a command line option may be files
+
+      	if(!fileArguments.isEmpty()){
+      		if(new File(fileArguments.get(0)).exists()){
+      			//System.out.println("Loading: "+fileArguments.get(0));
+      			fileNameOnStartUp=fileArguments.get(0);    	
+      		}else{
+      			printUsageAndExit(true, null);
+      		}
+      	}
+        	
     }
+
 
     /**
      * Initializes the {@link UserInterface} to be used by KeY.
@@ -221,14 +418,20 @@ public class Main {
 		    key.setVisible(true);
 		}
 	    });
+	    if(loadRecentFile){
+	    	fileNameOnStartUp = MainWindow.getInstance().getRecentFiles().getMostRecent().getAbsolutePath(); 
+        	
 
+	    }    
 	    ui = MainWindow.getInstance().getUserInterface();
+	    System.out.println("Loading: "+fileNameOnStartUp);
 	}
 
 	return ui;
+
     }
 
-    private static void evaluateLemmataOptions(LinkedList<String> options){
+    private static void evaluateLemmataOptions(CommandLine options){
 
         LemmataAutoModeOptions opt;
         try {
@@ -242,6 +445,7 @@ public class Main {
             e.printStackTrace();
             System.exit(1);
             return;
+            
         }
 
 
@@ -264,11 +468,8 @@ public class Main {
         if (exitWithError) 
             ps.println("File not found or unrecognized option" +
                     (offending != null? ": "+offending: ".")+"\n");
-        ps.println("Possible parameters are (* = default): ");
-        for (CommandLineOption clo: CommandLineOption.values())
-            if (clo.message != null) ps.println(clo.message);
-        ps.println("  <filename>      : loads a .key file");
-        System.exit(exitWithError? -1: 0);
+          cl.printUsage(ps);
+          System.exit(exitWithError? -1: 0);
     }
 
     public static String getExamplesDir() {
@@ -299,52 +500,4 @@ public class Main {
         return fileNameOnStartUp;
     }
     
-    /** All possible command line options must be entered here. 
-     * @author bruns
-     */
-    private static enum CommandLineOption {
-        AUTO ('a',
-                "  auto            : start prove procedure after initialisation"),
-        AUTO_LOADONLY (null,null),
-        DEBUG ('d',
-                "  debug           : enables debug mode"),
-        NO_DEBUG ('x',
-                "  no_debug        : disables debug mode (*)"),
-        ASSERTION (null,
-                "  assertion       : enables assertions (*)"),
-        NO_ASSERTION ('n',
-                "  no_assertion    : disables assertions"),
-        NO_JMLSPECS (null,
-                "  no_jmlspecs     : disables parsing JML specifications"),
-        JUSTIFY_RULES ('r',
-                "  justifyrules    : autoprove taclets (add '?help' for instructions)"),
-        PRINT_STATISTICS ('p',
-                "  print_statistics <filename>\n" +
-                "                  : in auto mode, output nr. of rule applications and time spent"),
-        TIMEOUT ('t',
-                "  timeout <time in ms>\n"+
-                "                  : set maximal time for rule " +
-                "application in ms (-1 disables timeout)"),
-        EXAMPLES (null,
-                "  examples <dir>  : open examples dialog for the given directory"),
-        HELP ('h',
-                "  help            : display this text");
-        
-        Character shortName;
-        String message;
-        
-        /**
-         * @param shortName one-letter option, <code>null</code> if not defined
-         * @param message help text, <code>null</code> to show no help text
-         */
-        CommandLineOption(Character shortName, String message){
-            this.shortName = shortName;
-            this.message = message;
-        }
-        
-        @Override
-        public String toString() {
-            return super.toString().toLowerCase();
-        }
-    }
 }
