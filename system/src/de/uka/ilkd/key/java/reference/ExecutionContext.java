@@ -125,7 +125,7 @@ public class ExecutionContext
     public ReferencePrefix getRuntimeInstance() {
 	return runtimeInstance;
     }
-    
+
     /** calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
      * @param v the Visitor

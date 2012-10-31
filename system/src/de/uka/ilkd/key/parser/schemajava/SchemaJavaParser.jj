@@ -2108,8 +2108,10 @@ TypeReference PrimitiveType() :
      | "long"
      | "float"
      | "double"
+     | "\\set"
      | "\\seq"
      | "\\locset"
+     | "\\gen"
      | "\\bigint"
      )
 	{

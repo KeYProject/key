@@ -92,6 +92,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	// try to get invariant from JML specification
 	LoopInvariant inv = app.getInvariant(); 
+	if (inv == null) // may happen after reloading proof 
+	    throw new RuleAbortException("no invariant found");
 
 	//collect self, execution context
 	final MethodFrame innermostMethodFrame 

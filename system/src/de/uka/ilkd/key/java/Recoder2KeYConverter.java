@@ -799,7 +799,7 @@ public class Recoder2KeYConverter {
     
     
     public EmptySetLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral e) {
-	return EmptySetLiteral.INSTANCE;
+	return EmptySetLiteral.LOCSET;
     }
     
     public Singleton convert(de.uka.ilkd.key.java.recoderext.adt.Singleton e) {

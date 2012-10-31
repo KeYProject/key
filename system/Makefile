@@ -249,7 +249,7 @@ all_gen:
 	@$(MAKE) -s all_hlp   	
 
 .PHONY: all_hlp
-all_hlp: argfile.normal $(ANTLR_PARSER) $(JAVACC_PARSER) $(PROOFJAVA_PARSER) $(DIFF_PARSER) copyResources
+all_hlp: argfile.normal $(ANTLR_PARSER) $(JAVACC_PARSER) $(PROOFJAVA_PARSER) $(DIFF_PARSER) copy
 ifeq "$(BRANDING)" ""
 # always update SHA1 hash in order to get useful bug reports		
 	@echo $(SHA1) > ${BINARYPATH}/de/uka/ilkd/key/util/sha1
@@ -273,8 +273,8 @@ endif
 	@$(JAVAC) $(OPTIONS) @argfile 2>>error.msg || true
 	@./success
 
-.PHONY: copyResources
-copyResources: javahomeset
+.PHONY: copy
+copy: javahomeset
 	@echo "[copying resources]"
 	@cp -r $(RESOURCEPATH)/* $(BINARYPATH)
 
