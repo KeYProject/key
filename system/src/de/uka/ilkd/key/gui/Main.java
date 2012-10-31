@@ -255,76 +255,7 @@ public class Main {
         	GeneralSettings.disableSpecs = true;
         }
 
-//    public static void evaluateOptions(String[] opt) {
-//        int index = 0;
-//        ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
-//        while (opt.length > index) loop:{
-//            if ((new File(opt[index])).exists()) {
-//                fileNameOnStartUp=opt[index];
-//            } else  { // long option 
-//                try {
-//                    String option = opt[index].toUpperCase();
-//                    CommandLineOption clo = CommandLineOption.valueOf(option);
-//                    switch (clo) {
-//                    case AUTO_LOADONLY:
-//                        loadOnly = true;
-//                    case AUTO:
-//                        uiMode = UiMode.AUTO;
-//                        break;
-//                    case DEBUG:
-//                        de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = true;
-//                        break;
-//                    case NO_DEBUG: 
-//                        de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
-//                        break;
-//                    case ASSERTION:
-//                        de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = true;
-//                        break;
-//                    case NO_ASSERTION:
-//                        de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = false;
-//                        break;
-//                    case NO_JMLSPECS:
-//                        GeneralSettings.disableSpecs = true;
-//                        break;
-//                    case JUSTIFY_RULES:
-//                        LinkedList<String> options = new LinkedList<String>();
-//                        for(int i = index+1; i < opt.length; i++){
-//                            options.add(opt[i]);
-//                        }
-//                        evaluateLemmataOptions(options);
-//                        // is last option
-//                        break loop;
-//                    case PRINT_STATISTICS:
-//                        if ( !( opt.length > index + 1 ) ) printUsageAndExit (true,null);
-//                        statisticsFile = opt[++index];
-//                        break;
-//                    case TIMEOUT:
-//                        long timeout = -1;
-//                        try {
-//                            timeout = Long.parseLong(opt[index + 1]);
-//                        } catch (NumberFormatException nfe) {
-//                            System.out.println("Illegal timeout (must be a number >=-1).");
-//                            System.exit(-1);
-//                        }
-//                        if (timeout < -1) {
-//                            System.out.println("Illegal timeout (must be a number >=-1).");
-//                            System.exit(-1);
-//                        }
-//                        index++;
-//                        ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
-//                        break;
-//                    case EXAMPLES:
-//                        if ( !( opt.length > index + 1 ) ) printUsageAndExit (true,null);
-//                        examplesDir = opt[++index];
-//                        break;
-//                    case HELP:
-//                        printUsageAndExit(false,null);
-//                    }
-//                } catch (IllegalArgumentException e) {
-//                    // no CommandLineOption found
-//                    printUsageAndExit(true,opt[index]);
-//                }
-//            }
+
 
 
         if(cl.isSet(PRINT_STATISTICS)){
