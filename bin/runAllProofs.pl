@@ -269,7 +269,7 @@ sub system_timeout {
  
 sub runAuto {
   my $dk = &getcwd . "/$_[0]";
-  my $command = $absolute_bin_path . "/runProver $dk auto";
+  my $command = $absolute_bin_path . "/runProver --auto $dk";
   # print "Command is: $command\n";
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
@@ -304,7 +304,7 @@ sub reloadFile {
 	return;
     }
 
-    my $command = $absolute_bin_path . "/runProver $dk auto_loadonly";
+    my $command = $absolute_bin_path . "/runProver --auto_loadonly $dk";
     # print "Command is: $command\n";
     my $result = &system_timeout($time_limit, $command);
 #    print "\nReturn value: $result\n";
