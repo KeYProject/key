@@ -142,7 +142,22 @@ public final class CommandLine {
             printIndentedMessage(ps, description, indent);
         }
     }
+    /**
+     * Prints section-headlines without any indent
+     * @author sarah
+     *
+     */
+    private class AdditionalHelpTextSection extends HelpElement {
+        private String text;
+        //private boolean indentToDescriptionColumn;
 
+        @Override
+        protected void print(PrintStream ps, int descriptionCol) {
+
+
+            printIndentedMessage(ps, text, 0);
+        }
+    }
     /**
      * default value for the length of a line for output.
      */
@@ -229,7 +244,7 @@ public final class CommandLine {
         helpElements.add(text);
     }
     /**
-     * 
+     * Add help text of a command which is not part of teh KeY prover, but part of the running script
      * @param command
      * @param description
      * @param identToDescriptionColumn
@@ -240,6 +255,16 @@ public final class CommandLine {
         text.description = description;
         text.indentToDescriptionColumn = identToDescriptionColumn;
         helpElements.add(text);
+    }
+    /**
+     * Add Section Heading without any indentation
+     * @param text
+     */
+    public void addSection(String text) {
+        AdditionalHelpTextSection head = new AdditionalHelpTextSection();
+        head.text = "\n"+text+"\n\n";
+
+        helpElements.add(head);
     }
 
     /**

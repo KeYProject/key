@@ -190,23 +190,21 @@ public class Main {
     private static CommandLine createCommandLine(){
     	CommandLine cl= new CommandLine();
     	cl.setIndentation(3);
+    	cl.addSection("Test Headline");
     	cl.addText("Usage: ./runProver [options | --justify_rules [justify rule options] filename] [filename(s)]\n\n", false);
-    	cl.addText("Options for the KeY-Prover\n", false);
-    	cl.addText("\n", false);
+    	cl.addSection("Options for the KeY-Prover");
     	cl.addOption(HELP, null, "display this text");
     	cl.addTextPart("--Khelp", "display help for technical/debug parameters\n", true);
     	cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
     	cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
-    	cl.addText("\n", false);
-    	cl.addText("Batchmode options:\n", false);
+    	cl.addSection("Batchmode options:");
     	cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
     	cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
     	cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
     	cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");
     	cl.addOption(PRINT_STATISTICS, "<filename>",  "output nr. of rule applications and time spent on proving");
     	cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +", i.e., no timeout)");
-    	cl.addText("\n", false);
-    	cl.addText("Options for justify rules:\n", false);
+    	cl.addSection("Options for justify rules:");
     	cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument" );
     	cl.addText("\n", true);
     	cl.addText("The 'justifyrules' command has a number of options you can set. As default configuration the proofs are not stored to a file.\n", false);
@@ -389,6 +387,8 @@ public class Main {
       		if(new File(fileArguments.get(0)).exists()){
       			//System.out.println("Loading: "+fileArguments.get(0));
       			fileNameOnStartUp=fileArguments.get(0);    	
+      		}else{
+      			printUsageAndExit(true, null);
       		}
       	}
         	
