@@ -45,15 +45,15 @@ public class Main {
     private static final String HELP = "--help";
     private static final String AUTO = "--auto";
     private static final String LAST = "--last";
-    private static final String AUTO_LOADONLY = "--auto_loadonly";
+    private static final String AUTO_LOADONLY = "--auto-loadonly";
     private static final String EXPERIMENTAL = "--experimental";
     private static final String DEBUG = "--debug";
     private static final String NO_DEBUG = "--no_debug";
     private static final String ASSERTION = "--assertion";
-    private static final String NO_ASSERTION = "--no_assertion";
-    private static final String NO_JMLSPECS = "--no_jmlspecs";
-    public static final String JUSTIFY_RULES ="--justify_rules";
-    private static final String PRINT_STATISTICS ="--print_statistics";
+    private static final String NO_ASSERTION = "--no-assertion";
+    private static final String NO_JMLSPECS = "--no-jmlspecs";
+    public static final String JUSTIFY_RULES ="--justify-rules";
+    private static final String PRINT_STATISTICS ="--print-statistics";
     private static final String TIMEOUT ="--timeout";
     private static final String EXAMPLES = "--examples"; 
     public static final String JKEY_PREFIX = "--jr-";
@@ -190,7 +190,7 @@ public class Main {
     private static CommandLine createCommandLine(){
     	CommandLine cl= new CommandLine();
     	cl.setIndentation(3);
-    	cl.addText("./runProver [options | --justify_rules [justify rule options] filename] [filename(s)]\n\n", false);
+    	cl.addText("Usage: ./runProver [options | --justify_rules [justify rule options] filename] [filename(s)]\n\n", false);
     	cl.addText("Options for the KeY-Prover\n", false);
     	cl.addText("\n", false);
     	cl.addOption(HELP, null, "display this text");
@@ -360,23 +360,6 @@ public class Main {
         	}
         }
         
-     	List<String> fileArguments = cl.getArguments();
-     	Iterator iter = fileArguments.iterator();
-
-        if(cl.isSet(JUSTIFY_RULES))
-        {evaluateLemmataOptions(cl);}
-        
-        //arguments not assigned to a command line option may be files
-
-      	if(!fileArguments.isEmpty()){
-      		if(new File(fileArguments.get(0)).exists()){
-      			//System.out.println("Loading: "+fileArguments.get(0));
-      			fileNameOnStartUp=fileArguments.get(0);    	
-      		}
-      	}
-
-        
-
         if (Debug.ENABLE_DEBUG) {
             System.out.println("Running in debug mode ...");
         } else {
@@ -391,8 +374,23 @@ public class Main {
         	loadRecentFile=true;
         }
         if(cl.isSet(EXPERIMENTAL)){
+        	System.out.println("Running in experimental mode ...");
         	//atm do nothing
         }
+     	List<String> fileArguments = cl.getArguments();
+     	Iterator iter = fileArguments.iterator();
+
+        if(cl.isSet(JUSTIFY_RULES))
+        {evaluateLemmataOptions(cl);}
+        
+        //arguments not assigned to a command line option may be files
+
+      	if(!fileArguments.isEmpty()){
+      		if(new File(fileArguments.get(0)).exists()){
+      			//System.out.println("Loading: "+fileArguments.get(0));
+      			fileNameOnStartUp=fileArguments.get(0);    	
+      		}
+      	}
         	
     }
 
@@ -422,7 +420,7 @@ public class Main {
 	    });
 	    if(loadRecentFile){
 	    	fileNameOnStartUp = MainWindow.getInstance().getRecentFiles().getMostRecent().getAbsolutePath(); 
-        	//System.out.println("Loading recent File: "+fileNameOnStartUp);
+        	
 
 	    }    
 	    ui = MainWindow.getInstance().getUserInterface();
@@ -470,7 +468,7 @@ public class Main {
         if (exitWithError) 
             ps.println("File not found or unrecognized option" +
                     (offending != null? ": "+offending: ".")+"\n");
-        cl.printUsage(ps);
+          cl.printUsage(ps);
           System.exit(exitWithError? -1: 0);
     }
 
