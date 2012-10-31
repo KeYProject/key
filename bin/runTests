@@ -103,7 +103,7 @@ list_help(){
   echo "  --K-debugclassloader: switch the Debugclassloadflag on to load classes for debugging"
   echo "  --K-debugprefix <debugclass> : send debug output of debugclass to stadard out"
   echo "  --K-remotedebug <port>: turn remote debugging on; parameter for listening port"
-  echo "  --K-assertionflag: switch assertionflag on, s.t. debug assertions are used"
+
   echo "Other:\n"
 
   echo "  --Khelp, -Kh	: prints this help message"
@@ -141,9 +141,7 @@ keysysprops="${keysysprops}-DKeyDebugClassLoader=on
 	    shift
 	    shift
 	    continue;;
-	--K-assertionflag) keysysprops="${keysysprops}-DKeyAssertionFlag=true "
-	    shift
-	    continue;;
+
 
 	--K-remotedebug) JAVA_OPTIONS="-Xdebug -Xnoagent -Djava.compiler=NONE
 -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${2}"
