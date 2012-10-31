@@ -9,6 +9,9 @@
 //
 package de.uka.ilkd.key.proof.init;
 
+import java.io.IOException;
+import java.util.Properties;
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -17,10 +20,17 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.JavaModel;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -34,7 +44,7 @@ import de.uka.ilkd.key.util.Pair;
 /**
  * An abstract proof obligation implementing common functionality.
  */
-public abstract class AbstractPO implements ProofOblInput {
+public abstract class AbstractPO implements IPersistablePO {
 
     protected static final TermFactory TF = TermFactory.DEFAULT;
     protected static final TermBuilder TB = TermBuilder.DF;
@@ -44,27 +54,25 @@ public abstract class AbstractPO implements ProofOblInput {
     protected final HeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
     protected final String name;
-    private ImmutableSet<NoPosTacletApp> taclets;
+    protected ImmutableSet<NoPosTacletApp> taclets;
     private String header;
     private ProofAggregate proofAggregate;
     protected Term[] poTerms;
     protected String[] poNames;
-    protected Contract contract;
 
 
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
     public AbstractPO(InitConfig initConfig,
-                      String name,
-                      Contract contract) {
+                      String name) {
         this.initConfig = initConfig;
         this.services = initConfig.getServices();
         this.javaInfo = initConfig.getServices().getJavaInfo();
         this.heapLDT = initConfig.getServices().getTypeConverter().getHeapLDT();
         this.specRepos = initConfig.getServices().getSpecificationRepository();
         this.name = name;
-        this.contract = contract;
+        taclets = DefaultImmutableSet.nil();
     }
 
 
@@ -72,7 +80,7 @@ public abstract class AbstractPO implements ProofOblInput {
     //methods for use in subclasses
     //-------------------------------------------------------------------------
     private ImmutableSet<ClassAxiom> getAxiomsForObserver(
-            Pair<Sort, ObserverFunction> usedObs,
+            Pair<Sort, IObserverFunction> usedObs,
             ImmutableSet<ClassAxiom> axioms) {
         for (ClassAxiom axiom : axioms) {
             if (axiom.getTarget()==null || !(axiom.getTarget().equals(usedObs.second)
@@ -84,24 +92,24 @@ public abstract class AbstractPO implements ProofOblInput {
     }
 
 
-    private boolean reach(Pair<Sort, ObserverFunction> from,
-                          Pair<Sort, ObserverFunction> to,
+    private boolean reach(Pair<Sort, IObserverFunction> from,
+                          Pair<Sort, IObserverFunction> to,
                           ImmutableSet<ClassAxiom> axioms) {
-        ImmutableSet<Pair<Sort, ObserverFunction>> reached =
+        ImmutableSet<Pair<Sort, IObserverFunction>> reached =
                 DefaultImmutableSet.nil();
-        ImmutableSet<Pair<Sort, ObserverFunction>> newlyReached = DefaultImmutableSet.<Pair<Sort, ObserverFunction>>nil().add(
+        ImmutableSet<Pair<Sort, IObserverFunction>> newlyReached = DefaultImmutableSet.<Pair<Sort, IObserverFunction>>nil().add(
                 from);
 
         while (!newlyReached.isEmpty()) {
-            for (Pair<Sort, ObserverFunction> node : newlyReached) {
+            for (Pair<Sort, IObserverFunction> node : newlyReached) {
                 newlyReached = newlyReached.remove(node);
                 reached = reached.add(node);
                 final ImmutableSet<ClassAxiom> nodeAxioms = getAxiomsForObserver(
                         node, axioms);
                 for (ClassAxiom nodeAxiom : nodeAxioms) {
-                    final ImmutableSet<Pair<Sort, ObserverFunction>> nextNodes = nodeAxiom.getUsedObservers(
+                    final ImmutableSet<Pair<Sort, IObserverFunction>> nextNodes = nodeAxiom.getUsedObservers(
                             services);
-                    for (Pair<Sort, ObserverFunction> nextNode : nextNodes) {
+                    for (Pair<Sort, IObserverFunction> nextNode : nextNodes) {
                         if (nextNode.equals(to)) {
                             return true;
                         } else if (!reached.contains(nextNode)) {
@@ -116,17 +124,17 @@ public abstract class AbstractPO implements ProofOblInput {
     }
 
 
-    private ImmutableSet<Pair<Sort, ObserverFunction>> getSCC(ClassAxiom startAxiom,
+    private ImmutableSet<Pair<Sort, IObserverFunction>> getSCC(ClassAxiom startAxiom,
                                                               ImmutableSet<ClassAxiom> axioms) {
         //TODO: make more efficient
-        final Pair<Sort, ObserverFunction> start =
-                new Pair<Sort, ObserverFunction>(startAxiom.getKJT().getSort(),
-                                                 startAxiom.getTarget());
-        ImmutableSet<Pair<Sort, ObserverFunction>> result =
+        final Pair<Sort, IObserverFunction> start =
+                new Pair<Sort, IObserverFunction>(startAxiom.getKJT().getSort(),
+                                                  startAxiom.getTarget());
+        ImmutableSet<Pair<Sort, IObserverFunction>> result =
                 DefaultImmutableSet.nil();
         for (ClassAxiom nodeAxiom : axioms) {
-            final Pair<Sort, ObserverFunction> node =
-                    new Pair<Sort, ObserverFunction>(
+            final Pair<Sort, IObserverFunction> node =
+                    new Pair<Sort, IObserverFunction>(
                     nodeAxiom.getKJT().getSort(),
                                                      nodeAxiom.getTarget());
             if (reach(start, node, axioms) && reach(node, start, axioms)) {
@@ -138,12 +146,11 @@ public abstract class AbstractPO implements ProofOblInput {
 
 
     protected void collectClassAxioms(KeYJavaType selfKJT) {
-        taclets = DefaultImmutableSet.nil();
         final ImmutableSet<ClassAxiom> axioms =
                 specRepos.getClassAxioms(selfKJT);
 
         for (ClassAxiom axiom : axioms) {
-            final ImmutableSet<Pair<Sort, ObserverFunction>> scc =
+            final ImmutableSet<Pair<Sort, IObserverFunction>> scc =
                     getSCC(axiom, axioms);
             for (Taclet axiomTaclet : axiom.getTaclets(scc, services)) {
                 assert axiomTaclet != null : "class axiom returned null taclet: "
@@ -158,10 +165,10 @@ public abstract class AbstractPO implements ProofOblInput {
 
 
     protected final void register(ProgramVariable pv) {
-//         Namespace progVarNames = services.getNamespaces().programVariables();
-//         if (pv != null && progVarNames.lookup(pv.name()) == null) {
-//             progVarNames.addSafely(pv);
-//         }
+         Namespace progVarNames = services.getNamespaces().programVariables();
+         if (pv != null && progVarNames.lookup(pv.name()) == null) {
+             progVarNames.addSafely(pv);
+         }
     }
 
 
@@ -173,15 +180,15 @@ public abstract class AbstractPO implements ProofOblInput {
 
 
     protected final void register(Function f) {
-//         Namespace functionNames = services.getNamespaces().functions();
-//         if (f != null && functionNames.lookup(f.name()) == null) {
-//             assert f.sort() != Sort.UPDATE;
-//             if (f.sort() == Sort.FORMULA) {
-//                 functionNames.addSafely(f);
-//             } else {
-//                 functionNames.addSafely(f);
-//             }
-//         }
+         Namespace functionNames = services.getNamespaces().functions();
+         if (f != null && functionNames.lookup(f.name()) == null) {
+             assert f.sort() != Sort.UPDATE;
+             if (f.sort() == Sort.FORMULA) {
+                 functionNames.addSafely(f);
+             } else {
+                 functionNames.addSafely(f);
+             }
+         }
     }
 
 
@@ -288,5 +295,28 @@ public abstract class AbstractPO implements ProofOblInput {
     @Override
     public boolean implies(ProofOblInput po) {
         return equals(po);
+    }
+
+
+    protected void assignPOTerms(Term... poTerms) {
+        this.poTerms = poTerms;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void fillSaveProperties(Properties properties) throws IOException {
+        properties.setProperty(IPersistablePO.PROPERTY_CLASS, getClass().getCanonicalName());
+        properties.setProperty(IPersistablePO.PROPERTY_NAME, name);
+    }
+    
+    /**
+     * Returns the name value from the given properties.
+     * @param properties The properties to read from.
+     * @return The name value.
+     */
+    public static String getName(Properties properties) {
+       return properties.getProperty(IPersistablePO.PROPERTY_NAME);
     }
 }

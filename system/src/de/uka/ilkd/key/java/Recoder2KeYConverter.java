@@ -12,39 +12,166 @@
 
 package de.uka.ilkd.key.java;
 
-import java.lang.reflect.*;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
 import recoder.java.NonTerminalProgramElement;
+import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTList;
-import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.java.abstraction.*;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.abstraction.Field;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.declaration.modifier.*;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.ClassInitializer;
+import de.uka.ilkd.key.java.declaration.ConstructorDeclaration;
+import de.uka.ilkd.key.java.declaration.EnumClassDeclaration;
+import de.uka.ilkd.key.java.declaration.Extends;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.Implements;
+import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
+import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.Throws;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.declaration.modifier.Model;
-import de.uka.ilkd.key.java.expression.*;
+import de.uka.ilkd.key.java.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
-import de.uka.ilkd.key.java.expression.literal.*;
-import de.uka.ilkd.key.java.expression.operator.*;
+import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.expression.literal.CharLiteral;
+import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
+import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
+import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.expression.literal.LongLiteral;
+import de.uka.ilkd.key.java.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.expression.literal.StringLiteral;
+import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
+import de.uka.ilkd.key.java.expression.operator.BinaryAndAssignment;
+import de.uka.ilkd.key.java.expression.operator.BinaryNot;
+import de.uka.ilkd.key.java.expression.operator.BinaryOr;
+import de.uka.ilkd.key.java.expression.operator.BinaryOrAssignment;
+import de.uka.ilkd.key.java.expression.operator.BinaryXOr;
+import de.uka.ilkd.key.java.expression.operator.BinaryXOrAssignment;
+import de.uka.ilkd.key.java.expression.operator.Conditional;
+import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.DLEmbeddedExpression;
-import de.uka.ilkd.key.java.expression.operator.adt.*;
-import de.uka.ilkd.key.java.recoderext.*;
-import de.uka.ilkd.key.java.reference.*;
+import de.uka.ilkd.key.java.expression.operator.Divide;
+import de.uka.ilkd.key.java.expression.operator.DivideAssignment;
+import de.uka.ilkd.key.java.expression.operator.Equals;
+import de.uka.ilkd.key.java.expression.operator.GreaterOrEquals;
+import de.uka.ilkd.key.java.expression.operator.GreaterThan;
+import de.uka.ilkd.key.java.expression.operator.Instanceof;
+import de.uka.ilkd.key.java.expression.operator.Intersect;
+import de.uka.ilkd.key.java.expression.operator.LessOrEquals;
+import de.uka.ilkd.key.java.expression.operator.LessThan;
+import de.uka.ilkd.key.java.expression.operator.LogicalAnd;
+import de.uka.ilkd.key.java.expression.operator.LogicalNot;
+import de.uka.ilkd.key.java.expression.operator.LogicalOr;
+import de.uka.ilkd.key.java.expression.operator.Minus;
+import de.uka.ilkd.key.java.expression.operator.MinusAssignment;
+import de.uka.ilkd.key.java.expression.operator.Modulo;
+import de.uka.ilkd.key.java.expression.operator.ModuloAssignment;
+import de.uka.ilkd.key.java.expression.operator.Negative;
+import de.uka.ilkd.key.java.expression.operator.New;
+import de.uka.ilkd.key.java.expression.operator.NewArray;
+import de.uka.ilkd.key.java.expression.operator.NotEquals;
+import de.uka.ilkd.key.java.expression.operator.Plus;
+import de.uka.ilkd.key.java.expression.operator.PlusAssignment;
+import de.uka.ilkd.key.java.expression.operator.Positive;
+import de.uka.ilkd.key.java.expression.operator.PostDecrement;
+import de.uka.ilkd.key.java.expression.operator.PostIncrement;
+import de.uka.ilkd.key.java.expression.operator.PreDecrement;
+import de.uka.ilkd.key.java.expression.operator.PreIncrement;
+import de.uka.ilkd.key.java.expression.operator.ShiftLeft;
+import de.uka.ilkd.key.java.expression.operator.ShiftLeftAssignment;
+import de.uka.ilkd.key.java.expression.operator.ShiftRight;
+import de.uka.ilkd.key.java.expression.operator.ShiftRightAssignment;
+import de.uka.ilkd.key.java.expression.operator.Times;
+import de.uka.ilkd.key.java.expression.operator.TimesAssignment;
+import de.uka.ilkd.key.java.expression.operator.TypeCast;
+import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
+import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRightAssignment;
+import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqConcat;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqIndexOf;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqReverse;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
+import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
+import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
+import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
+import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
+import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
+import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.reference.SuperConstructorReference;
+import de.uka.ilkd.key.java.reference.SuperReference;
+import de.uka.ilkd.key.java.reference.ThisConstructorReference;
+import de.uka.ilkd.key.java.reference.ThisReference;
+import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.Assert;
+import de.uka.ilkd.key.java.statement.Break;
+import de.uka.ilkd.key.java.statement.Case;
+import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.java.statement.Do;
+import de.uka.ilkd.key.java.statement.Else;
+import de.uka.ilkd.key.java.statement.EnhancedFor;
+import de.uka.ilkd.key.java.statement.Finally;
+import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.ForUpdates;
+import de.uka.ilkd.key.java.statement.Guard;
+import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.statement.SynchronizedBlock;
+import de.uka.ilkd.key.java.statement.Then;
+import de.uka.ilkd.key.java.statement.Throw;
+import de.uka.ilkd.key.java.statement.TransactionStatement;
+import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramConstant;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.*;
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.ExtList;
 
 
 /**
@@ -80,7 +207,7 @@ public class Recoder2KeYConverter {
         return (ProgramElement) result;
     }
 
-    public ProgramMethod processDefaultConstructor(
+    public IProgramMethod processDefaultConstructor(
             recoder.abstraction.DefaultConstructor df) {
         return convert(df);
     }
@@ -129,10 +256,10 @@ public class Recoder2KeYConverter {
     /**
      * methodsDeclaring contains the recoder method declarations as keys that
      * have been started to convert but are not yet finished. The mapped value
-     * is the reference to the later completed ProgramMethod.
+     * is the reference to the later completed IProgramMethod.
      */
-    private HashMap<recoder.java.declaration.MethodDeclaration, ProgramMethod> methodsDeclaring = 
-	new HashMap<recoder.java.declaration.MethodDeclaration, ProgramMethod>();
+    private HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod> methodsDeclaring = 
+	new HashMap<recoder.java.declaration.MethodDeclaration, IProgramMethod>();
 
     /**
      * locClass2finalVar stores the final variables that need to be passed
@@ -238,7 +365,7 @@ public class Recoder2KeYConverter {
 
         // if not in cache, search it - and fill the cache
         if (m == null) {
-            Class[] context = new Class[] { contextClass };
+            Class<?>[] context = new Class<?>[] { contextClass };
 
             // remember all superclasses for the cache
             LinkedList<Class<?>> l = new LinkedList<Class<?>>();
@@ -415,6 +542,7 @@ public class Recoder2KeYConverter {
     private Literal getLiteralFor(
             recoder.service.ConstantEvaluator.EvaluationResult p_er) {
         switch (p_er.getTypeCode()) {
+        // XXX need to add one for \bigint, too?
         case recoder.service.ConstantEvaluator.BOOLEAN_TYPE:
             return BooleanLiteral.getBooleanLiteral(p_er.getBoolean());
         case recoder.service.ConstantEvaluator.CHAR_TYPE:
@@ -539,8 +667,9 @@ public class Recoder2KeYConverter {
             return Class.forName(className);
         } catch (ClassNotFoundException cnfe) {
             Debug.out("There is an AST class " +className + " missing at KeY.", cnfe);
-            throw new ConvertException(this.getClass().toString()+" could not find a conversion from RecodeR class "+recoderClass.getClass()+".\n"
-                    +"Maybe you have added a class to package key.recoderext and did not add the equivalent to key.java.expression or its subpackages."
+            throw new ConvertException("Recoder2KeYConverter could not find a conversion from RecodeR "+recoderClass.getClass()+".\n"
+                    +"Maybe you have added a class to package key.java.recoderext and did not add the equivalent to key.java.expression or its subpackages."
+                    +"\nAt least there is no class named "+className+"."
                     ,cnfe);
         } catch (ExceptionInInitializerError initErr) {
             Debug.out("recoder2key: Failed initializing class.", initErr);
@@ -554,15 +683,23 @@ public class Recoder2KeYConverter {
     private static int RECODER_PREFIX_LENGTH = "recoder.".length();
 
     /**
-     * constructs the name of the corresponding KeYClass
-     * 
+     * constructs the name of the corresponding KeYClass.
+     * Expected prefixes are either recoder or ...key.java.recoderext
      * @param recoderClass
      *            Class that is the original recoder
      * @return String containing the KeY-Classname
      */
     private String getKeYName(Class<? extends recoder.java.JavaProgramElement> recoderClass) {
-        return "de.uka.ilkd.key."
-        + recoderClass.getName().substring(RECODER_PREFIX_LENGTH);
+        final String prefix ="de.uka.ilkd.key.";
+        final String recoderClassName = recoderClass.getName();
+        if (recoderClassName.startsWith("recoder.")) {
+            return prefix+recoderClassName.substring(RECODER_PREFIX_LENGTH);
+        } else if (recoderClassName.startsWith(prefix+"java.recoderext.")) {
+            return recoderClassName.replaceAll("recoderext\\.", "");
+        } else {
+            assert false : "Unexpected class prefix: "+recoderClassName;
+            return "";
+        }
     }
 
     /**
@@ -654,17 +791,15 @@ public class Recoder2KeYConverter {
     public BooleanLiteral convert(
             recoder.java.expression.literal.BooleanLiteral booleanLit) {
 
-        // if there are comments to take into consideration
-        // change parameter to ExtList
-        // TODO make comments available
-
-        return (booleanLit.getValue() ? BooleanLiteral.TRUE
-                : BooleanLiteral.FALSE);
+        // The source code position is very important because a single boolean literal is maybe a complete loop condition and the symbolic execution debugger needs source code position to separate code steps from internal proof steps. For this reason is the usage of the singleton constants not possible.
+        return booleanLit.getValue() ? 
+               new BooleanLiteral(collectComments(booleanLit), positionInfo(booleanLit), true) : 
+               new BooleanLiteral(collectComments(booleanLit), positionInfo(booleanLit), false);
     }
     
     
     public EmptySetLiteral convert(de.uka.ilkd.key.java.recoderext.adt.EmptySetLiteral e) {
-	return EmptySetLiteral.INSTANCE;
+	return EmptySetLiteral.LOCSET;
     }
     
     public Singleton convert(de.uka.ilkd.key.java.recoderext.adt.Singleton e) {
@@ -812,7 +947,7 @@ public class Recoder2KeYConverter {
         return new ProgramElementName(id.getText(),
                 collectComments(id).collect(Comment.class));
     }
-
+    
     /** convert a recoderext MethodFrameStatement to a KeY MethodFrameStatement */
     public MethodFrame convert(
             de.uka.ilkd.key.java.recoderext.MethodCallStatement rmcs) {
@@ -903,22 +1038,20 @@ public class Recoder2KeYConverter {
      * 
      * @author m.u.
      */
+   public EnumClassDeclaration convert(
+         de.uka.ilkd.key.java.recoderext.EnumClassDeclaration td) {
 
-    /*
-     * // has to be reinserted when java5 is supported
-     * 
-     * public EnumClassDeclaration convert(
-     * de.uka.ilkd.key.java.recoderext.EnumClassDeclaration td) {
-     * 
-     * KeYJavaType kjt = getKeYJavaType(td); ExtList classMembers =
-     * collectChildren(td);
-     * 
-     * EnumClassDeclaration keyEnumDecl = new EnumClassDeclaration(
-     * classMembers, new ProgramElementName(td.getFullName()), parsingLibs,
-     * td.getEnumConstantDeclarations());
-     * 
-     * kjt.setJavaType(keyEnumDecl); return keyEnumDecl; }
-     */
+      KeYJavaType kjt = getKeYJavaType(td);
+      ExtList classMembers = collectChildren(td);
+
+      EnumClassDeclaration keyEnumDecl = new EnumClassDeclaration(classMembers,
+            new ProgramElementName(td.getFullName()), isParsingLibs(),
+            td.getEnumConstantDeclarations());
+
+      kjt.setJavaType(keyEnumDecl);
+      return keyEnumDecl;
+   }
+     
 
     public InterfaceDeclaration convert(
             recoder.java.declaration.InterfaceDeclaration td) {
@@ -958,11 +1091,11 @@ public class Recoder2KeYConverter {
     }
 
     /**
-     * convert a recoder ConstructorDeclaration to a KeY ProgramMethod
+     * convert a recoder ConstructorDeclaration to a KeY IProgramMethod
      * (especially the declaration type of its parent is determined and handed
      * over)
      */
-    public ProgramMethod convert(
+    public IProgramMethod convert(
             recoder.java.declaration.ConstructorDeclaration cd) {
         ConstructorDeclaration consDecl = new ConstructorDeclaration(
                 collectChildren(cd),
@@ -973,11 +1106,12 @@ public class Recoder2KeYConverter {
 
         Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
                             ? Sort.ANY
-                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();        
-        ProgramMethod result 
+                            : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();    
+        final KeYJavaType containerKJT = getKeYJavaType(cont);
+        IProgramMethod result 
         	= new ProgramMethod(consDecl,
-        			    getKeYJavaType(cont), 
-        			    getKeYJavaType(cd.getReturnType()),
+        			    containerKJT, 
+        			    KeYJavaType.VOID_TYPE,
         			    positionInfo(cd),
         			    heapSort);
         insertToMap(cd, result);
@@ -985,10 +1119,10 @@ public class Recoder2KeYConverter {
     }
 
     /**
-     * convert a recoder DefaultConstructor to a KeY ProgramMethod (especially
+     * convert a recoder DefaultConstructor to a KeY IProgramMethod (especially
      * the declaration type of its parent is determined and handed over)
      */
-    public ProgramMethod convert(recoder.abstraction.DefaultConstructor dc) {
+    public IProgramMethod convert(recoder.abstraction.DefaultConstructor dc) {
         ExtList children = new ExtList();
         children.add(new ProgramElementName(dc.getName()));
         ConstructorDeclaration consDecl = new ConstructorDeclaration(children,
@@ -997,8 +1131,9 @@ public class Recoder2KeYConverter {
         Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
                             ? Sort.ANY
                             : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();        
-        ProgramMethod result = new ProgramMethod(consDecl,
-                getKeYJavaType(cont), getKeYJavaType(dc.getReturnType()),
+        final KeYJavaType containerKJT = getKeYJavaType(cont);
+        IProgramMethod result = new ProgramMethod(consDecl,
+                containerKJT, KeYJavaType.VOID_TYPE,
                 PositionInfo.UNDEFINED,
                 heapSort);
         insertToMap(dc, result);
@@ -1090,16 +1225,16 @@ public class Recoder2KeYConverter {
     }
 
     /**
-     * convert a recoder MethodDeclaration to a KeY ProgramMethod (especially
+     * convert a recoder MethodDeclaration to a KeY IProgramMethod (especially
      * the declaration type of its parent is determined and handed over)
      */
-    public ProgramMethod convert(recoder.java.declaration.MethodDeclaration md) {
-        ProgramMethod result = null;
+    public IProgramMethod convert(recoder.java.declaration.MethodDeclaration md) {
+        IProgramMethod result = null;
 
         // methodsDeclaring contains the recoder method declarations as keys
         // that have been started to convert but are not yet finished.
         // The mapped value is the reference to the later completed
-        // ProgramMethod.
+        // IProgramMethod.
         if (methodsDeclaring.containsKey(md)) {
             // a recursive call from a method reference
             return methodsDeclaring.get(md);
@@ -1138,15 +1273,20 @@ public class Recoder2KeYConverter {
             Sort heapSort = rec2key.getTypeConverter().getTypeConverter().getHeapLDT() == null
                             ? Sort.ANY
                             : rec2key.getTypeConverter().getTypeConverter().getHeapLDT().targetSort();
+            final KeYJavaType containerType = getKeYJavaType(cont);
+            assert containerType != null;
+            final Type returnType = md.getReturnType();
+            // may be null for a void method
+            final KeYJavaType returnKJT = returnType==null? KeYJavaType.VOID_TYPE : getKeYJavaType(returnType);
             result = new ProgramMethod(methDecl, 
-        	    		       getKeYJavaType(cont),
-                    		       getKeYJavaType(md.getReturnType()), positionInfo(md),
+        	    		       containerType,
+                    		       returnKJT, positionInfo(md),
                     		       heapSort);
 
             insertToMap(md, result);
         }
         methodsDeclaring.remove(md);
-        result = (ProgramMethod) getMapping().toKeY(md);
+        result = (IProgramMethod) getMapping().toKeY(md);
         return result;
     }
 
@@ -1424,16 +1564,21 @@ public class Recoder2KeYConverter {
         .getSourceInfo();
         recoder.abstraction.Method method = sourceInfo.getMethod(mr);
 
-        final ProgramMethod pm;
+        final IProgramMethod pm;
         if (!getMapping().mapped(method)) {
             if (method instanceof recoder.java.declaration.MethodDeclaration) {
                 // method reference before method decl, also recursive calls.
                 // do not use:
                 final String oldCurrent = currentClass;
-                final String className = ((recoder.java.declaration.MethodDeclaration) method)
-                .getMemberParent().getFullName();
-                recoder.io.DataLocation loc = getServiceConfiguration()
-                .getSourceFileRepository().findSourceFile(className);
+                
+                recoder.io.DataLocation loc = null;
+                TypeDeclaration td = ((recoder.java.declaration.MethodDeclaration) method).getMemberParent();
+                NonTerminalProgramElement tdc = td.getParent();
+                while (tdc != null && !(tdc instanceof recoder.java.CompilationUnit)) {
+                   tdc = tdc.getASTParent();
+                }
+                loc = tdc instanceof recoder.java.CompilationUnit ? ((recoder.java.CompilationUnit)tdc).getOriginalDataLocation() : null;
+                
                 if (loc instanceof recoder.io.DataFileLocation) {
                     currentClass = ((recoder.io.DataFileLocation) loc)
                     .getFile().getAbsolutePath();
@@ -1448,7 +1593,7 @@ public class Recoder2KeYConverter {
                 pm = null;
             }
         } else {
-            pm = (ProgramMethod) getMapping().toKeY(method);
+            pm = (IProgramMethod) getMapping().toKeY(method);
         }
 
         ExtList children = collectChildren(mr);
@@ -1744,6 +1889,10 @@ public class Recoder2KeYConverter {
         return new CopyAssignment(collectChildrenAndComments(arg));
     }
 
+    public TransactionStatement convert(de.uka.ilkd.key.java.recoderext.TransactionStatement tr){
+        return new TransactionStatement(tr.getType());
+    }
+    
     public PostIncrement convert(recoder.java.expression.operator.PostIncrement arg) {
         return new PostIncrement(collectChildrenAndComments(arg));
     }
@@ -1897,7 +2046,30 @@ public class Recoder2KeYConverter {
     }
 
     public ExecutionContext convert(de.uka.ilkd.key.java.recoderext.ExecutionContext arg) {
-        return new ExecutionContext(collectChildrenAndComments(arg));
+       TypeReference classContext = convert(arg.getTypeReference()); 
+
+       IProgramMethod methodContext = null;
+       if (arg.getMethodContext() != null) {
+          JavaInfo jInfo = services.getJavaInfo();
+          
+          ImmutableList<KeYJavaType> paramTypes = ImmutableSLList.<KeYJavaType>nil();
+          for (recoder.java.reference.TypeReference tr : arg.getMethodContext().getParamTypes()) {
+             TypeReference keyTR = convert(tr);
+             paramTypes = paramTypes.append(keyTR.getKeYJavaType());
+          }
+          
+          methodContext = jInfo.getProgramMethod(classContext.getKeYJavaType(), 
+                                                 arg.getMethodContext().getMethodName().getText(), 
+                                                 paramTypes, 
+                                                 classContext.getKeYJavaType());
+       }
+       
+       ReferencePrefix runtimeInstance = null;
+       if (arg.getRuntimeInstance() != null) {
+          runtimeInstance = (ReferencePrefix) callConvert(arg.getRuntimeInstance());
+       }
+       
+       return new ExecutionContext(classContext, methodContext, runtimeInstance);
     }
 
     public ThisConstructorReference convert(recoder.java.reference.ThisConstructorReference arg) {

@@ -14,66 +14,26 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Vector;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JTextField;
-import javax.swing.JTree;
-import javax.swing.KeyStroke;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.TreeModelEvent;
-import javax.swing.event.TreeModelListener;
+import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.TreeUI;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.plaf.metal.MetalTreeUI;
-import javax.swing.text.Position;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeCellRenderer;
-import javax.swing.tree.TreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.tree.*;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.gui.AutoModeListener;
-import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.GUIListener;
-import de.uka.ilkd.key.gui.IconFactory;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.KeYSelectionEvent;
-import de.uka.ilkd.key.gui.KeYSelectionListener;
-import de.uka.ilkd.key.gui.RuleAppListener;
+import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
+import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -81,11 +41,8 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.util.Debug;
 
 public class ProofTreeView extends JPanel {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1640354881070567924L;
+    
+    private static final long serialVersionUID = 3732875161168302809L;
     private static final Color PASTEL_COLOR = new Color(255,255,204);
     private static final Color BISQUE_COLOR = new Color(240,228,196);
     private static final Color PALE_RED_COLOR = new Color(255,153,153);
@@ -95,10 +52,10 @@ public class ProofTreeView extends JPanel {
     private KeYMediator mediator;
 
     /** The JTree that is used for actual display and interaction */
-    private final JTree delegateView;
+    final JTree delegateView;
 
     /** the model that is displayed by the delegateView */
-    private GUIProofTreeModel delegateModel;
+    GUIProofTreeModel delegateModel;
     
     private HashMap<Proof, GUIProofTreeModel> models = new HashMap<Proof, GUIProofTreeModel>(20);
 
@@ -206,7 +163,7 @@ public class ProofTreeView extends JPanel {
 
 	this.setLayout(new BorderLayout());
 	this.add(new JScrollPane(delegateView), BorderLayout.CENTER);
-	this.proofTreeSearchPanel = new ProofTreeSearchPanel();
+	this.proofTreeSearchPanel = new ProofTreeSearchPanel(this);
 	this.add(proofTreeSearchPanel, BorderLayout.SOUTH);	
 	
 	layoutKeYComponent();	
@@ -219,7 +176,7 @@ public class ProofTreeView extends JPanel {
 	
 	final ActionListener keyboardAction = new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
-	        proofTreeSearchPanel.setVisible(true);
+	        showSearchPanel();
 	    }               
 	};
 	
@@ -434,7 +391,7 @@ public class ProofTreeView extends JPanel {
      * Selects the given Branchnode in the ProofTreeView and displays the
      * first child in the main view.
      */
-    private void selectBranchNode(GUIBranchNode node) {
+    void selectBranchNode(GUIBranchNode node) {
         if (node == null) {
             return;
         }
@@ -481,6 +438,12 @@ public class ProofTreeView extends JPanel {
 
 
     // INNER CLASSES 
+
+    public void showSearchPanel() {
+        proofTreeSearchPanel.setVisible(true);
+    }
+
+
 
     // listens to gui events
     class GUIProofTreeGUIListener implements GUIListener,
@@ -778,6 +741,7 @@ public class ProofTreeView extends JPanel {
 		new JCheckBoxMenuItem("Hide Closed Subtrees");
 	private JMenuItem search = new JMenuItem("Search");
 	private JMenuItem prune    = new JMenuItem("Prune Proof");
+	private JMenuItem delayedCut = new JMenuItem("Delayed Cut");
 	private JMenuItem runStrategy = new JMenuItem("Apply Strategy",
 	    IconFactory.autoModeStartLogo(10));
         
@@ -819,8 +783,21 @@ public class ProofTreeView extends JPanel {
 		    }
 		}
 	    }
+	    
+	    if(branch != path){
+	        delayedCut.addActionListener(this);
+	        delayedCut.setEnabled(false);
+	        if (proof != null) {
+	            if (!invokedNode.leaf() && 
+	                proof.getSubtreeGoals(invokedNode).size()>0) {
+	                delayedCut.setEnabled(true);
+	            }
+	        }
+	    }
+	    this.add(delayedCut);
 	    this.add(new JSeparator());
 
+	    
 
 	    this.add(expandAll);
 	    expandAll.addActionListener(this);
@@ -858,6 +835,11 @@ public class ProofTreeView extends JPanel {
 	    // enable goals
 	    this.add(new SetGoalsBelowEnableStatus(true));
 
+	    ProofMacroMenu macroMenu = new ProofMacroMenu(mediator, null);
+	    if(!macroMenu.isEmpty()) {
+	        this.add(new JSeparator());
+	        this.add(macroMenu);
+	    }
 
 //	    if (branch != path) {
 //                this.add(new JSeparator());
@@ -873,6 +855,14 @@ public class ProofTreeView extends JPanel {
 	}
 
 	public void actionPerformed(ActionEvent e) {
+	       if (e.getSource() == delayedCut) {
+	           delegateModel.setAttentive(false);
+	           if(mediator().processDelayedCut(invokedNode)){
+	               delegateModel.updateTree ( null );
+	           }
+	           delegateModel.setAttentive(true);
+	           makeNodeVisible(mediator.getSelectedNode());
+	           }else
 	    if (e.getSource() == prune) {
 		delegateModel.setAttentive(false);
 		mediator().setBack(invokedNode);
@@ -1113,208 +1103,6 @@ public class ProofTreeView extends JPanel {
 
  	}
 
-    class ProofTreeSearchPanel extends JPanel implements DocumentListener,
-            TreeModelListener {
-
-        /**
-         * 
-         */
-        private static final long serialVersionUID = -1945019325314041986L;
-        private JTextField searchString = new JTextField(20);
-        private JButton prev = new JButton("Prev");
-        private JButton next = new JButton("Next");
-        private JPanel panel = new JPanel();        
-        private JButton close = new JButton("Close");
-        private int startRow = 0;
-        private int currentRow = 0;
-        private Position.Bias direction = Position.Bias.Forward;
-        private ActionListener closePanel = new ActionListener() {
-            public void actionPerformed(ActionEvent actionEvent) {
-                setVisible(false);
-            }
-        };
-        private ActionListener search = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource() == next) {        
-                    direction = Position.Bias.Forward;
-                    searchString.requestFocusInWindow();
-                } else if (e.getSource() == prev) {
-                    direction = Position.Bias.Backward;
-                    searchString.requestFocusInWindow();
-                } else {
-                    // if e.g. called by pressing enter, perform a forward search
-                    direction = Position.Bias.Forward;
-                }
-                searchNext();
-            }
-        };
-   
-        public ProofTreeSearchPanel() {
-            registerKeyboardAction(closePanel, KeyStroke
-                .getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent
-                .WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-            registerKeyboardAction(search, KeyStroke
-                .getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent
-                .WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-            searchString.getDocument().addDocumentListener(this);
-            prev.addActionListener(search);
-            next.addActionListener(search);
-            close.addActionListener(closePanel);
-            setLayout(new BorderLayout());
-            add(searchString, BorderLayout.NORTH);
-            panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
-            panel.add(Box.createHorizontalGlue());
-            panel.add(prev);
-            panel.add(next);
-            panel.add(Box.createHorizontalGlue());
-            panel.add(close);
-            add(panel, BorderLayout.SOUTH);
-            super.setVisible(false);
-        }
-
-        public void setVisible(boolean vis) {
-            super.setVisible(vis);
-            if (vis) {
-                searchString.selectAll();
-                searchString.requestFocusInWindow();
-            } else {
-                delegateView.requestFocusInWindow();
-            }
-        }
-
-        private synchronized void searchNext() {
-            if (cache == null) fillCache();
-            if (direction == Position.Bias.Forward) {
-                if (currentRow + 1 < cache.size()) {
-                    startRow = currentRow + 1;
-                } else {
-                    startRow = 0;
-                }
-            } else {
-                if (currentRow - 1 >= 0) {
-                    startRow = currentRow - 1;
-                } else {
-                    startRow = cache.size() - 1;
-                }
-            }
-            search();
-        }
-
-        private synchronized void search() {
-            if (searchString.getText().equals("")) {
-                    startRow = 0;
-            }
-            currentRow = getNextMatch(searchString.getText(),
-                startRow, direction);
-            GUIAbstractTreeNode node = null;
-            TreePath tp = null;
-            if (currentRow != -1) {
-                node = cache.get(currentRow);
-                tp = new TreePath(node.getPath());
-            }
-            if (node != null && node instanceof GUIBranchNode) {
-                selectBranchNode((GUIBranchNode)node);
-            } else {
-                delegateView.scrollPathToVisible(tp);
-                delegateView.setSelectionPath(tp);
-            }
-        }
-
-        public void changedUpdate(DocumentEvent e) {
-            search();
-        }
-
-        public void insertUpdate(DocumentEvent e) {
-            search();
-        }
-
-        public void removeUpdate(DocumentEvent e) {
-            search();
-        }
-
-        public void treeNodesChanged(TreeModelEvent e) {
-            reset();
-        }
-
-        public void treeNodesInserted(TreeModelEvent e) {
-            reset();
-        }
-
-        public void treeNodesRemoved(TreeModelEvent e) {
-            reset();
-        }
-
-        public void treeStructureChanged(TreeModelEvent e) {
-            reset();
-        }
-
-        private Vector<GUIAbstractTreeNode> cache;
-
-        public synchronized void reset() {
-            cache = null;
-        }
-
-        private void fillCache() {
-            cache = new Vector<GUIAbstractTreeNode>();
-            if (delegateModel.getRoot() != null) {
-                cache.add((GUIAbstractTreeNode)delegateModel.getRoot());
-                fillCacheHelp((GUIBranchNode)delegateModel.getRoot());
-            }
-        }
-
-        private void fillCacheHelp(GUIBranchNode branch) {
-            if (branch == null) return;
-            GUIAbstractTreeNode n;
-            for (int i = 0; i < delegateModel.getChildCount(branch); i++) {
-                n = (GUIAbstractTreeNode)delegateModel.getChild(branch, i);
-                cache.add(n);
-                if (n instanceof GUIBranchNode)
-                        fillCacheHelp((GUIBranchNode)n);
-            }
-        }
-
-        private int getNextMatch(String searchString, int startingRow,
-                Position.Bias bias) {
-            if (cache == null) fillCache();
-            String s = searchString.toLowerCase();
-            
-            if (bias == Position.Bias.Forward) {
-                if (startingRow < 0) startingRow = 0;
-                for (int i = startingRow; i < cache.size(); i++) {
-                    if (containsString(cache.get(i).toString().toLowerCase(),
-                            s)) return i;
-                }
-                for (int i = 0; i < startingRow && i < cache.size(); i++) {
-                    if (containsString(cache.get(i).toString().toLowerCase(),
-                            s)) return i;
-                }
-            } else {
-                if (startingRow > cache.size() - 1) startingRow = cache.size()
-                        - 1;
-                for (int i = startingRow; i >= 0; i--) {
-                    if (containsString(cache.get(i).toString().toLowerCase(),
-                            s)) return i;
-                }
-                for (int i = cache.size() - 1; i > startingRow && i > 0; i--) {
-                    if (containsString(cache.get(i).toString().toLowerCase(),
-                            s)) return i;
-                }
-            }
-            return -1;
-        }
-
-        /** 
-         * returns true if <tt>searchString</tt> is a substring of <tt>string</tt>
-         * @param string the String where to search for an occurrence of <tt>searchString</tt>
-         * @param searchString the String to be looked for
-         * @return true if a match has been found
-         */
-        private boolean containsString(String string, String searchString) {
-            assert string != null && searchString != null;
-            return string.indexOf(searchString) != -1;
-        }
-    }
-    
     // to prevent memory leaks
     private static class CacheLessMetalTreeUI extends MetalTreeUI{
         

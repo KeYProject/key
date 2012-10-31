@@ -22,13 +22,6 @@ public interface SMTSettings {
      */
     public long getTimeout();
 
-    /**
-     * Returns the generic command that should be used for starting a solver of
-     * type <code>type</code>.<br>
-     * Allowed place holders:<br>
-     * %f Filename %p Problem formula.
-     */
-    public String getCommand(SolverType type);
 
     /**
      * The path of the folder, where the smt files are stored temporarily.
@@ -91,9 +84,19 @@ public interface SMTSettings {
      */
     public boolean useAssumptionsForBigSmallIntegers();
     
+    /**
+     * @return Returns the logic used by solvers using SMT-Lib-Format
+     */
+    public String getLogic();
+   
     public long getMaximumInteger();
     
     public long getMinimumInteger();
+    
+    /**
+     * Returns true if and only if the version should be checked each time a solver is started.
+     */
+    public boolean checkForSupport();
   
 
 }

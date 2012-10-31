@@ -220,6 +220,7 @@ public class SolverLauncher implements SolverListener {
 		    SMTSolver solver = factory.createSolver(problem, this,
 			    services);
 		    problem.addSolver(solver);
+		
 		}
 	    }
 	}
@@ -227,7 +228,7 @@ public class SolverLauncher implements SolverListener {
     }
 
     private void launchIntern(SMTProblem problem, Services services,
-	    SolverType[] solverTypes) throws SolverException {
+	    SolverType[] solverTypes)  {
 
 	LinkedList<SolverType> types = new LinkedList<SolverType>();
 	for (SolverType type : solverTypes) {
@@ -240,13 +241,16 @@ public class SolverLauncher implements SolverListener {
 
     private void launchIntern(Collection<SolverType> factories,
 	    Collection<SMTProblem> problems, Services services)
-	    throws SolverException {
+	    {
 
 	// consider only installed solvers.
 	LinkedList<SolverType> installedSolvers = new LinkedList<SolverType>();
 	for (SolverType type : factories) {
 	    if (type.isInstalled(false)) {
-		installedSolvers.add(type);
+	    	installedSolvers.add(type);
+	    	if(settings.checkForSupport()){
+	    		type.checkForSupport();
+	    	}
 	    }
 	}
 	problems = prepareSolvers(installedSolvers, problems, services);
@@ -263,7 +267,7 @@ public class SolverLauncher implements SolverListener {
     }
 
     private void launchIntern(Collection<SMTProblem> problems,
-	    Collection<SolverType> factories) throws SolverException {
+	    Collection<SolverType> factories)  {
 
 	LinkedList<SMTSolver> solvers = new LinkedList<SMTSolver>();
 	for (SMTProblem problem : problems) {
@@ -314,7 +318,7 @@ public class SolverLauncher implements SolverListener {
 
     private void launchSolvers(LinkedList<SMTSolver> solvers,
 	    Collection<SMTProblem> problems, Collection<SolverType> solverTypes)
-	    throws SolverException {
+    {
 
 	notifyListenersOfStart(problems, solverTypes);
 
@@ -394,7 +398,7 @@ public class SolverLauncher implements SolverListener {
 	}
     }
 
-    private void notifyListenersOfStop() throws SolverException {
+    private void notifyListenersOfStop()  {
 	Collection<SMTSolver> solvers = session.getProblemSolvers();
 	for (SolverLauncherListener listener : listeners) {
 	    listener.launcherStopped(this, solvers);

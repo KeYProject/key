@@ -12,13 +12,14 @@ package de.uka.ilkd.key.proof;
 
 import java.util.*;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
 
 public class Node {
     /** the proof the node belongs to */
@@ -114,6 +115,7 @@ public class Node {
     }    
 
     public void setAppliedRuleApp(RuleApp ruleApp) {
+        this.nodeInfo.updateNoteInfo();
         this.appliedRuleApp = ruleApp;        
     }
 
@@ -464,10 +466,14 @@ public class Node {
     /** marks a node as closed */
     Node close() {
 	closed = true;
-	if (parent != null && parent.isCloseable()) {
-	    return parent.close();
-	}	
-	return this;
+        Node tmp = parent;
+        Node result = this;
+        while (tmp != null && tmp.isCloseable()) {
+            tmp.closed = true;
+            result = tmp;
+            tmp = tmp.parent();
+        }
+        return result;
     }
 
     /** checks if an inner node is closeable */

@@ -1,0 +1,63 @@
+package org.key_project.sed.key.ui;
+
+import org.eclipse.debug.ui.DebugUITools;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.key_project.sed.key.core.util.KeySEDUtil;
+import org.key_project.sed.key.ui.util.KeYSEDImages;
+import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
+import org.osgi.framework.BundleContext;
+
+/**
+ * The activator class controls the plug-in life cycle
+ */
+public class Activator extends AbstractUIPlugin {
+
+	// The plug-in ID
+	public static final String PLUGIN_ID = "org.key_project.sed.key.ui"; //$NON-NLS-1$
+
+	// The shared instance
+	private static Activator plugin;
+	
+	/**
+	 * The constructor
+	 */
+	public Activator() {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 */
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		plugin = this;
+		// Make sure that the symbolic debug perspective is opened instead of the regular debug perspective when a KeY launch type is launched
+      DebugUITools.setLaunchPerspective(KeySEDUtil.getConfigurationType(), KeySEDUtil.MODE, SymbolicDebugPerspectiveFactory.PERSPECTIVE_ID);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 */
+	public void stop(BundleContext context) throws Exception {
+	    Display.getDefault().syncExec(new Runnable() {
+	            @Override
+	            public void run() {
+	                KeYSEDImages.disposeImages();
+	            }
+	    });
+            plugin = null;
+            super.stop(context);
+	}
+
+	/**
+	 * Returns the shared instance
+	 *
+	 * @return the shared instance
+	 */
+	public static Activator getDefault() {
+		return plugin;
+	}
+
+}

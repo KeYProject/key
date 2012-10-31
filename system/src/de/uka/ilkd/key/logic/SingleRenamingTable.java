@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 public class SingleRenamingTable extends RenamingTable{
 
     SourceElement oldVar,newVar;
-    LinkedList ll= new LinkedList();
+    LinkedList<SourceElement> ll= new LinkedList<SourceElement>();
 
     public SingleRenamingTable(SourceElement oldVar, SourceElement newVar){
 	this.oldVar = oldVar;
@@ -35,7 +35,7 @@ public class SingleRenamingTable extends RenamingTable{
 	return null;
     }
 
-    public Iterator getRenamingIterator(){
+    public Iterator<SourceElement> getRenamingIterator(){
 	return ll.listIterator(0);
     }
     
@@ -45,8 +45,8 @@ public class SingleRenamingTable extends RenamingTable{
 	return ("SingleRenamingTable: "+oldVar+" id: "+ ov.id() +" -> "+newVar + " id: " + nv.id());
     }
     
-    public HashMap getHashMap(){
-        HashMap hm = new HashMap();
+    public HashMap<SourceElement, SourceElement> getHashMap(){
+        HashMap<SourceElement, SourceElement> hm = new HashMap<SourceElement, SourceElement>();
         hm.put(oldVar,newVar);
         return hm;
     }

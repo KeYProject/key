@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="null">
+      <term term="newInstance"/>
+      <term term="null"/>
+   </equivalenceClass>
+   <state name="return instance.x+finalInstance.x+staticInt+finalStaticint;">
+      <value name="newInstance" programVariable="newInstance" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
+      <value name="SimpleStaticAttributes::instance" programVariable="SimpleStaticAttributes::instance" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
+      <value name="SimpleStaticAttributes::staticInt" programVariable="SimpleStaticAttributes::staticInt" isArrayIndex="false" arrayIndex="-1" value="1" type="int"/>
+   </state>
+</model>

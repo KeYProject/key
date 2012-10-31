@@ -13,7 +13,7 @@
  */
 package de.uka.ilkd.key.gui.notification.actions;
 
-import java.awt.Component;
+import java.awt.Frame;
 
 import javax.swing.JOptionPane;
 
@@ -29,7 +29,7 @@ public class GeneralFailureJTextPaneDisplay extends ShowDisplayPane {
     /**
      * generates an action used for displaying text 
      */
-    public GeneralFailureJTextPaneDisplay(Component parentComponent) {
+    public GeneralFailureJTextPaneDisplay(Frame parentComponent) {
         super(parentComponent);
         
     }

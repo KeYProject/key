@@ -10,98 +10,111 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.io.*;
-import java.net.JarURLConnection;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.jar.JarInputStream;
+import java.util.zip.ZipEntry;
 
 
 public class WebstartMain {
-    
+
+    private static final int BUFFER_SIZE = 4096;
+
+
     private static void delete(File f) {
-	if(f.isDirectory()) {
-	    for(File c : f.listFiles()) {
-		delete(c);
-	    }
-	}
-	f.delete();
+        if(f.isDirectory()) {
+            for(File c : f.listFiles()) {
+                delete(c);
+            }
+        }
+        f.delete();
     } 
 
-        
+
     private static File setupExamples() {
-	try {
-	    final File tempDir = File.createTempFile("keyheap-examples-", null);
-	    tempDir.delete();
-	    if(!tempDir.mkdir()) {
-		return null;
-	    }
-	    Runtime.getRuntime().addShutdownHook(new Thread() {
-		public void run() {
-		    delete(tempDir);
-		}
-	    });
+        try {
+            URL examplesURL = WebstartMain.class.getResource("/examples-heap.jar");	
+            if(examplesURL == null) {
+                throw new IOException("Missing examples.jar in resources");
+            }
 
-	    //get jar file
-	    URL examplesURL = WebstartMain.class.getResource("/examples/heap/");	
-	    JarURLConnection conn 
-	    	= (JarURLConnection)examplesURL.openConnection();
-	    JarFile jarFile = conn.getJarFile();
+            File tempDir = createTempDirectory();
+            System.out.println(tempDir);
 
-	    //read relevant entries
-	    Enumeration<JarEntry> entries = jarFile.entries();
-	    while(entries.hasMoreElements()) {
-		JarEntry entry = entries.nextElement();
-		if(entry.getName().startsWith("examples/heap/")) {
-		    String relativeName 
-		    	= entry.getName().substring("examples/heap/".length());
-		    if(relativeName.length() == 0) {
-			continue;
-		    }
-		    
-		    File localFile 
-		    	= new File(tempDir.getAbsolutePath(), relativeName);
-		    if(entry.isDirectory()) {
-			if(!localFile.mkdir()) {
-			    return null;
-			}
-		    } else {
-			if(!localFile.createNewFile()) {
-			    return null;
-			}
+            JarInputStream zis = new JarInputStream(examplesURL.openStream());
 
-			InputStream inputStream = jarFile.getInputStream(entry);
-			FileOutputStream outputStream 
-				= new FileOutputStream(localFile);
-			int i;
-			while ((i = inputStream.read()) != -1) {
-			    outputStream.write((char) i);
-			}
-			inputStream.close();
-			outputStream.close();
-		    }
-		}
-	    }
+            try {
+                byte[] buffer = new byte[BUFFER_SIZE];
 
-	    return tempDir;
-	} catch(IOException e) {
-	    return null;
-	}
+                for(ZipEntry zipEntry = zis.getNextEntry(); 
+                        zipEntry != null;
+                        zipEntry = zis.getNextEntry()) {
+
+
+                    String entryName = zipEntry.getName();
+                    File outFile = new File(tempDir, entryName);
+
+                    if(zipEntry.isDirectory()) {
+
+                        boolean mkdirSuccess = outFile.mkdir();
+                        if(!mkdirSuccess) {
+                            throw new IOException("Cannot create directory " + outFile);
+                        }
+
+                    } else {
+
+                        FileOutputStream fos = new FileOutputStream(outFile);
+
+                        try {
+                            int n;
+                            while ((n = zis.read(buffer, 0, BUFFER_SIZE)) > -1) {
+                                fos.write(buffer, 0, n);
+                            }
+                        } finally {
+                            fos.close();
+                        }
+                        zis.closeEntry();
+                    }
+                }
+            } finally {
+                zis.close();
+            }
+            return tempDir;
+        } catch(IOException e) {
+            e.printStackTrace();
+            return null;
+        } 
     }
-    
-    
+
+
+    private static File createTempDirectory() throws IOException {
+        final File tempDir = File.createTempFile("keyheap-examples-", null);
+        tempDir.delete();
+        if(!tempDir.mkdir()) {
+            return null;
+        }
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                delete(tempDir);
+            }
+        });
+        return tempDir;
+    }
+
+
     public static void main(String[] args) {
-	File examplesDir = setupExamples();
+        File examplesDir = setupExamples();
 
-	if(examplesDir != null) {
-	    String[] newArgs = new String[args.length + 2];
-	    System.arraycopy(args, 0, newArgs, 0, args.length);
-	    newArgs[args.length] = "EXAMPLES";
-	    newArgs[args.length + 1] = examplesDir.getAbsolutePath();
-	    args = newArgs;
-	}
+        if(examplesDir != null) {
+            String[] newArgs = new String[args.length + 2];
+            System.arraycopy(args, 0, newArgs, 0, args.length);
+            newArgs[args.length] = "EXAMPLES";
+            newArgs[args.length + 1] = examplesDir.getAbsolutePath();
+            args = newArgs;
+        }
 
-	Main.main(args);
+        Main.main(args);
     }
 }

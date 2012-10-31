@@ -15,7 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.proof.RuleSource;
+import de.uka.ilkd.key.proof.io.RuleSource;
 
 
 /**

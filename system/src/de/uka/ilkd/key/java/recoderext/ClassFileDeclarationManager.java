@@ -175,7 +175,12 @@ public class ClassFileDeclarationManager {
                 DataLocation currentDataLocation = walker.getCurrentDataLocation();
                 System.out.println("Now reading: " + currentDataLocation);
                 InputStream is = walker.openCurrent();
-                ClassFile cf = parser.parseClassFile(is);
+                ClassFile cf;
+                try { 
+                    cf = parser.parseClassFile(is);
+                } finally {
+                    is.close();
+                }
                 manager.addClassFile(cf, currentDataLocation);
             } catch(Exception ex) {
                 throw new Exception("Error while loading: " + walker.getCurrentDataLocation(), ex);

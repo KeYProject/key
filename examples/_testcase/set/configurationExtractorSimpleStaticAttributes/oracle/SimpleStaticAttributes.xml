@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="SimpleStaticAttributes.compute(newInstance);" pathCondition="true" pathConditionChanged="false">
+      <statement name="staticInt=1;" pathCondition="true" pathConditionChanged="false">
+         <branchNode name="if (finalStaticint==42&amp;&amp;staticInt==1) {   instance=newInstance;return    instance.x+finalInstance.x+staticInt+finalStaticint; }else  {return    -1; }" pathCondition="true" pathConditionChanged="false">
+            <statement name="instance=newInstance;" pathCondition="true" pathConditionChanged="false">
+               <statement name="return instance.x+finalInstance.x+staticInt+finalStaticint;" pathCondition="true" pathConditionChanged="false">
+                  <branchCondition name="!newInstance = null" pathCondition="!newInstance = null" pathConditionChanged="true" branchCondition="!newInstance = null" mergedBranchCondition="false">
+                     <branchCondition name="!SimpleStaticAttributes.finalInstance = null" pathCondition="  !newInstance = null
+&amp; !SimpleStaticAttributes.finalInstance = null" pathConditionChanged="true" branchCondition="!SimpleStaticAttributes.finalInstance = null" mergedBranchCondition="false">
+                        <methodReturn name="&lt;return of SimpleStaticAttributes.compute(newInstance);&gt;" pathCondition="  !newInstance = null
+&amp; !SimpleStaticAttributes.finalInstance = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  43
++ newInstance.x
++ SimpleStaticAttributes.finalInstance.x&apos; as result of SimpleStaticAttributes.compute(newInstance);&gt;">
+                           <termination name="&lt;end&gt;" pathCondition="  !newInstance = null
+&amp; !SimpleStaticAttributes.finalInstance = null" pathConditionChanged="false" exceptionalTermination="false">
+                           </termination>
+                        </methodReturn>
+                     </branchCondition>
+                     <branchCondition name="SimpleStaticAttributes.finalInstance = null" pathCondition="  !newInstance = null
+&amp; SimpleStaticAttributes.finalInstance = null" pathConditionChanged="true" branchCondition="SimpleStaticAttributes.finalInstance = null" mergedBranchCondition="false">
+                        <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="  !newInstance = null
+&amp; SimpleStaticAttributes.finalInstance = null" pathConditionChanged="false" exceptionalTermination="true">
+                        </termination>
+                     </branchCondition>
+                  </branchCondition>
+                  <branchCondition name="newInstance = null" pathCondition="newInstance = null" pathConditionChanged="true" branchCondition="newInstance = null" mergedBranchCondition="false">
+                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="newInstance = null" pathConditionChanged="false" exceptionalTermination="true">
+                     </termination>
+                  </branchCondition>
+               </statement>
+            </statement>
+         </branchNode>
+      </statement>
+   </methodCall>
+</startNode>

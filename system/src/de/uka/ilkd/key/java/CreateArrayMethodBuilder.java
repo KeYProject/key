@@ -197,7 +197,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * creates the implicit method <code>&lt;allocate&gt;</code> which is a
      * stump and given meaning by a contract
      */
-    public ProgramMethod getArrayInstanceAllocatorMethod(
+    public IProgramMethod getArrayInstanceAllocatorMethod(
             TypeReference arrayTypeReference) {
 
         final Modifier[] modifiers = new Modifier[] { new Private(),
@@ -312,7 +312,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * create the method declaration of the
      * <code>&lt;createArrayHelper&gt;</code> method
      */
-    public ProgramMethod getCreateArrayHelperMethod(
+    public IProgramMethod getCreateArrayHelperMethod(
             TypeReference arrayTypeReference, ProgramVariable length,
             ImmutableList<Field> fields) {
 
@@ -338,8 +338,8 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * fulfills a similar purpose as <code>&lt;createObject&gt;</code> in
      * addition it sets the arrays length and calls the prepare method
      */
-    public ProgramMethod getCreateArrayMethod(TypeReference arrayTypeReference,
-            ProgramMethod prepare, ImmutableList<Field> fields) {
+    public IProgramMethod getCreateArrayMethod(TypeReference arrayTypeReference,
+            IProgramMethod prepare, ImmutableList<Field> fields) {
 
         final Modifier[] modifiers = new Modifier[] { new Protected(),
                 new Static() };
@@ -382,7 +382,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
      * returns the prepare method for arrays initialising all array fields with
      * their default value
      */
-    public ProgramMethod getPrepareArrayMethod(TypeRef arrayRef,
+    public IProgramMethod getPrepareArrayMethod(TypeRef arrayRef,
             ProgramVariable length, Expression defaultValue, ImmutableList<Field> fields) {
 
         final KeYJavaType arrayType = arrayRef.getKeYJavaType();
@@ -414,7 +414,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
 
         return new ProgramMethod(md, 
         	                 arrayType, 
-        			 null,
+        			 KeYJavaType.VOID_TYPE,
         			 PositionInfo.UNDEFINED,
         			 heapSort);
     }

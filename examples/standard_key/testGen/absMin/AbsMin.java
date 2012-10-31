@@ -18,7 +18,7 @@ public class AbsMin{
 	if(result<0){
 	    result = -result;
 	}
-	return result;
+	return -result;
     }
 
 }

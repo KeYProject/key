@@ -13,8 +13,16 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.expression.operator.TypeCast;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeRef;
@@ -23,9 +31,11 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -56,7 +66,7 @@ public class ExpandMethodBody extends ProgramTransformer {
 	MethodBodyStatement mbs = (MethodBodyStatement) pe;
 	//        MethodReference mr = mbs.getMethodReference();
 
-        ProgramMethod pm = mbs.getProgramMethod(services);
+        IProgramMethod pm = mbs.getProgramMethod(services);
 	//mr.method(services, mbs.getBodySource());
 
 	MethodDeclaration methDecl = pm.getMethodDeclaration();
@@ -86,12 +96,25 @@ public class ExpandMethodBody extends ProgramTransformer {
 	    new ProgVarReplaceVisitor(result, map, services); 
 	paramRepl.start();	
 	result = (StatementBlock) paramRepl.result();
+	
+	// bugfix for #1226
+	// Add a down cast if the programvariable is of a supertype
+	{
+	    KeYJavaType classType = mbs.getBodySource();
+	    if (newCalled instanceof ProgramVariable) {
+	        ProgramVariable pv = (ProgramVariable)newCalled;
+	        if(pv.getKeYJavaType() != classType) {
+	            newCalled = new ParenthesizedExpression(
+	                    new TypeCast(pv, new TypeRef(classType)));
+	        }
+            }
+	}
 
         return 
 	    new MethodFrame(mbs.getResultVariable(),
-			    new ExecutionContext(classContext, newCalled),
+			    new ExecutionContext(classContext, pm, newCalled),
 			    result,
-                            pm, PositionInfo.UNDEFINED); 
+                            PositionInfo.UNDEFINED); 
     }
 
 }

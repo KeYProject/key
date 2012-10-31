@@ -47,14 +47,20 @@ public final class DropEffectlessElementariesCondition
 	    ElementaryUpdate eu = (ElementaryUpdate) update.op();
 	    LocationVariable lhs = (LocationVariable) eu.lhs();
 	    if(relevantVars.contains(lhs)) {
-		relevantVars.remove(lhs);
+	        relevantVars.remove(lhs);
+	        // updates of the form "x:=x" can be discarded (MU,CS)
+	        if(lhs.equals(update.sub(0).op())) {
+	            return TB.skip();
+	        }
 		return null;
 	    } else {
 		return TB.skip();
 	    }
 	} else if(update.op() == UpdateJunctor.PARALLEL_UPDATE) {
 	    Term sub0 = update.sub(0);
-	    Term sub1 = update.sub(1);
+            Term sub1 = update.sub(1);
+            // first descend to the second sub-update to keep relevantVars in
+            // good order
 	    Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars);
 	    Term newSub0 = dropEffectlessElementariesHelper(sub0, relevantVars);
 	    if(newSub0 == null && newSub1 == null) {

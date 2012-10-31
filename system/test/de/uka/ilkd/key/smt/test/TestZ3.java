@@ -14,6 +14,7 @@ import de.uka.ilkd.key.smt.SolverType;
 
 
 public class TestZ3 extends TestSMTSolver {
+    private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
 
     private static boolean isInstalled = false;
     private static boolean installChecked = false;
@@ -21,20 +22,34 @@ public class TestZ3 extends TestSMTSolver {
     
     @Override
     public boolean toolNotInstalled() {
-	if (!installChecked) {    
-	    isInstalled = getSolverType().isInstalled(true);
-	    installChecked = true;
-	    if(!isInstalled) {
-		System.out.println("Warning: " + getSolverType().getName() + " is not installed, tests skipped.");
-	    }	    
-	}
-	
-        return false;
+    	if (!installChecked) {    
+    		isInstalled = getSolverType().isInstalled(true);
+    		installChecked = true;
+    		if(!isInstalled) {
+    			System.out.println("Warning: " + getSolverType().getName() + " is not installed, tests skipped.");
+            System.out.println("Maybe use JVM system property \"" + SYSTEM_PROPERTY_SOLVER_PATH + "\" to define the path to the Z3 command.");
+    		}	  
+    		
+    		if(isInstalled &&!getSolverType().supportHasBeenChecked()){
+    			if(!getSolverType().checkForSupport()){
+    				System.out.println("Warning: " + "The version of the solver "+ getSolverType().getName() + " used for the following tests may not be supported.");
+    			}    			
+    		}
+    	}
+
+    	
+    	
+
+        return !isInstalled;
     }
     
     @Override
     public SolverType getSolverType() {
-	
-	return SolverType.Z3_SOLVER;
+       SolverType type = SolverType.Z3_SOLVER;
+       String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
+       if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
+          type.setSolverCommand(solverPathProperty);
+       }
+       return type;
     }
 }

@@ -15,11 +15,16 @@ import java.io.FileNotFoundException;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.parser.*;
+import de.uka.ilkd.key.parser.DeclPicker;
+import de.uka.ilkd.key.parser.KeYLexer;
+import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.ParserConfig;
+import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
-import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.IProofFileParser;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
 
@@ -131,10 +136,15 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
 	    if(problemTerm == null) {
 	       boolean chooseDLContract = problemParser.getChooseContract() != null;
-	       if(chooseDLContract)
+          boolean proofObligation = problemParser.getProofObligation() != null;
+	       if(chooseDLContract) {
   	         searchS = "\\chooseContract";
+	       }
+	       else if (proofObligation) {
+	            searchS = "\\proofObligation";
+	       }
 	       else {
-	         throw new ProofInputException("No \\problem or \\chooseContract in the input file!");
+	         throw new ProofInputException("No \\problem or \\chooseContract or \\proofObligation in the input file!");
 	       }
 	    }
 
@@ -157,7 +167,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     @Override
     public ProofAggregate getPO() throws ProofInputException {
         assert problemTerm != null;
-	String name = name();
+        String name = name();
         ProofSettings settings = getPreferences();
         return ProofAggregate.createProofAggregate(
                 new Proof(name, 
@@ -180,7 +190,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     /** 
      * Reads a saved proof of a .key file.
      */
-    public void readProof(ProblemLoader prl) throws ProofInputException {
+    public void readProof(IProofFileParser prl) throws ProofInputException {
 	if(lastParser == null) {
 	    readProblem();
 	}

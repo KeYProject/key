@@ -64,6 +64,10 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     public ImplicitIdentifier createImplicitIdentifier(String text) {
         return new ImplicitIdentifier(text);
     }
+    
+    public Identifier createIdentifier (String text){
+        return new ExtendedIdentifier(text);
+    }
 
     public SpecialReferenceWrapper createThisReference(TypeReference typeRef,
 						       Expression var) {
@@ -98,8 +102,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     }
 
     public ContextStatementBlock createContextStatementBlock(TypeSVWrapper typeRef,
+                          MethodSignatureSVWrapper pm,
 							     ExpressionSVWrapper var) {
-	return new ContextStatementBlock(typeRef, var);
+	return new ContextStatementBlock(typeRef, pm, var);
     }
 
     public ContextStatementBlock createContextStatementBlock(ExecCtxtSVWrapper ec) {
@@ -176,6 +181,14 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 	}
 	return new LabelSVWrapper(sv);
     }
+    
+    public MethodSignatureSVWrapper getMethodSignatureSVWrapper(String s) throws ParseException{
+       SchemaVariable sv=lookupSchemaVariable(s);
+       if (!(sv instanceof ProgramSV)) {   
+           throwSortInvalid(sv, "MethodSignature");
+       }
+       return new MethodSignatureSVWrapper(sv);
+        }
     
     public JumpLabelSVWrapper getJumpLabelSV(String s) throws ParseException {
         SchemaVariable sv=lookupSchemaVariable(s);

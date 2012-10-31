@@ -68,7 +68,8 @@ public final class ClassInvariantImpl implements ClassInvariant {
         this.originalSelfVar = selfVar;
         final OpCollector oc = new OpCollector();
         originalInv.execPostOrder(oc);
-        this.isStatic        = !oc.contains(originalSelfVar);
+        this.isStatic        = selfVar == null;
+//        assert isStatic == !oc.contains(originalSelfVar);
     }
     
 
@@ -119,7 +120,15 @@ public final class ClassInvariantImpl implements ClassInvariant {
         final Map<Operator, Operator> replaceMap 
         	= getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalInv);   
+        Term res = or.replace(originalInv);
+        res = TermBuilder.DF.convertToFormula(res, services);
+        return res;
+    }
+
+
+    @Override
+    public Term getOriginalInv() {
+        return originalInv;
     }
     
  

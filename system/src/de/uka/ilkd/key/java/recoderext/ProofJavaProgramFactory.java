@@ -32,6 +32,7 @@ import recoder.java.reference.VariableReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.util.StringUtils;
+import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
 import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.parser.proofjava.ProofJavaParser;
 
@@ -369,6 +370,14 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     }
 
     /**
+     * Create a {@link MethodSignature}.
+     */
+    public MethodSignature createMethodSignature(Identifier methodName,
+        ASTList<TypeReference> paramTypes) {
+       return new MethodSignature(methodName, paramTypes);
+    }
+
+    /**
      * Create a {@link MethodCallStatement}.
      */
     public MethodCallStatement createMethodCallStatement(Expression resVar,
@@ -425,4 +434,5 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public ObjectTypeIdentifier createObjectTypeIdentifier(String text) {
         return new ObjectTypeIdentifier(text);
     }
+    
 }

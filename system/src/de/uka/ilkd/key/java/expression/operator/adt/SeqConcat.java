@@ -11,6 +11,7 @@
 
 package de.uka.ilkd.key.java.expression.operator.adt;
 
+import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.expression.operator.BinaryOperator;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -20,6 +21,11 @@ public class SeqConcat extends BinaryOperator {
 
     public SeqConcat(ExtList children) {
         super(children);
+    }
+
+
+    public SeqConcat(Expression seq1, Expression seq2) {
+        super(seq1, seq2);
     }
 
 

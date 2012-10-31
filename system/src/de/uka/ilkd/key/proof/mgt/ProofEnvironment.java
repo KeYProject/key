@@ -19,6 +19,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -76,7 +77,7 @@ public class ProofEnvironment {
     }
 
 
-    /** returns the object managing the rules in this environement and
+    /** returns the object managing the rules in this environment and
      * their justifications. The object is unique to this environment. 
      */
     public RuleJustificationInfo getJustifInfo() {
@@ -99,10 +100,10 @@ public class ProofEnvironment {
     public void registerProof(ProofOblInput po, ProofAggregate pl) {
         pl.setProofEnv(this);
         proofs.add(pl);
-        if(pl.size() == 1) {
+        for(Proof p : pl.getProofs()) {
             getInitialServices().getSpecificationRepository()
-                                .registerProof(po, pl.getFirstProof());
-        }        
+                                .registerProof(po, p);
+        }
     }
 
     /** registers a rule with the given justification at the
@@ -154,9 +155,9 @@ public class ProofEnvironment {
 
     public void removeProofList(ProofAggregate pl) {
 	proofs.remove(pl);
-        if(pl.size() == 1) {
+        for(Proof p : pl.getProofs()) {
             getInitialServices().getSpecificationRepository()
-                                .removeProof(pl.getFirstProof());
+                                .removeProof(p);
         }
     }
 

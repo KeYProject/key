@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.key_project.util.test.category"
+            name="KeY Util Tests">
+      </category>
+      <view
+            category="org.key_project.util.test.category"
+            class="org.key_project.util.test.view.GraphitiEditorInViewView"
+            icon="icons/symbolic_debug.gif"
+            id="org.key_project.util.test.view.GraphitiEditorInViewView"
+            name="Graphiti Editor In View"
+            restorable="true">
+      </view>
+      <view
+            category="org.key_project.util.test.category"
+            class="org.key_project.util.test.view.TextControlEditorInViewView"
+            icon="icons/symbolic_debug.gif"
+            id="org.key_project.util.test.view.TextControlEditorInViewView"
+            name="Text Control Editor In View"
+            restorable="true">
+      </view>
+      <view
+            category="org.key_project.util.test.category"
+            class="org.key_project.util.test.view.LoggingAbstractViewBasedView"
+            icon="icons/symbolic_debug.gif"
+            id="org.key_project.util.test.view.LoggingAbstractViewBasedView"
+            name="Logging View Based View"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.key_project.util.test.editor.TextControlEditor"
+            default="false"
+            icon="icons/symbolic_debug.gif"
+            id="org.key_project.util.test.editor.TextControlEditor"
+            name="Text Control Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.key_project.util.test.perspective.EmptyTestPerspectiveFactory"
+            icon="icons/symbolic_debug.gif"
+            id="org.key_project.util.test.perspective.EmptyTestPerspectiveFactory"
+            name="Empty Test Perspective">
+      </perspective>
+   </extension>
+
+</plugin>

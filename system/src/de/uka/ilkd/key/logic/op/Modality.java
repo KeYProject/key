@@ -39,6 +39,32 @@ public final class Modality extends AbstractSortedOperator {
      */
     public static final Modality BOX = new Modality(new Name("box"));
 
+
+    /** 
+     * A Java Card transaction version of the diamond modality. Means that a transaction is
+     * currently underway.
+     */    
+    public static final Modality DIA_TRANSACTION = new Modality(new Name("diamond_transaction"));
+
+    /** 
+     * A Java Card transaction version of the box modality. Means that a transaction is
+     * currently underway.
+     */    
+    public static final Modality BOX_TRANSACTION = new Modality(new Name("box_transaction"));
+
+    /** 
+     * The throughout operator of dynamic logic. A formula
+     * [[alpha;]]Phi can be read as during processing the program alpha
+     * Phi should hold at every step of execution. 
+     */    
+    public static final Modality TOUT = new Modality(new Name("throughout"));
+
+    /** 
+     * A Java Card transaction version of the throughout modality. Means that a transaction is
+     * currently underway.
+     */    
+    public static final Modality TOUT_TRANSACTION = new Modality(new Name("throughout_transaction"));
+
     
     /** creates a modal operator with the given name
      * @param name the Name of the modality 
@@ -55,5 +81,19 @@ public final class Modality extends AbstractSortedOperator {
      */
     public static Modality getModality(String str) {
         return nameMap.get(str);
+    }
+    
+    /** Whether this modality is termination sensitive,
+     * i.e., it is a "diamond-kind" modality.
+     * @return
+     */
+    public boolean terminationSensitive(){
+        return (this == DIA || this == DIA_TRANSACTION);
+    }
+    
+    /** Whether this is a transaction modality 
+     */
+    public boolean transaction(){
+        return (this == BOX_TRANSACTION || this == DIA_TRANSACTION);
     }
 }

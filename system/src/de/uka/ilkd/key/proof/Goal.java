@@ -16,16 +16,19 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.RuleAppListener;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.proofevent.NodeChangeJournal;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
@@ -46,7 +49,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  *  setting back several proof steps. The sequent has to be changed using the
  *  methods of Goal.  
  */
-public class Goal  {
+public final class Goal  {
 
     private Node node;
 
@@ -218,16 +221,8 @@ public class Goal  {
     }
 
     public void setGlobalProgVars(ImmutableSet<ProgramVariable> s) {
-        ImmutableSet<ProgramVariable> globalProgVars = getGlobalProgVars();
-        Namespace ns = proof().getNamespaces().programVariables();
-        Iterator<ProgramVariable> it = s.iterator();
-        while (it.hasNext()) {
-            ProgramVariable pv = it.next();
-            if (!globalProgVars.contains(pv)) {
-                ns.addSafely(pv);
-            }
-        }
-	node.setGlobalProgVars(s);
+        assert node.proof().getNamespaces().contains(names(s)) : "\""+names(s)+ "\" not found in namespace.";
+        node.setGlobalProgVars(s);
     }
 
     /** 
@@ -309,6 +304,16 @@ public class Goal  {
     public void addFormula ( SequentFormula cf, boolean inAntec,
 			     boolean first ) {
 	setSequent(sequent().addFormula(cf, inAntec, first));
+    }
+
+    public void addFormulaToAntecedent(SequentFormula formula, boolean first)
+    {
+        addFormula(formula, true, first);
+    }
+
+    public void addFormulaToSuccedent(SequentFormula formula, boolean first)
+    {
+        addFormula(formula, false, first);
     }
 
     /** returns set of rules applied at this branch 
@@ -464,9 +469,9 @@ public class Goal  {
 	while (it.hasNext()) {
 	    s = s.add((ProgramVariable)it.next());
 	}
-        proof().getNamespaces().programVariables().reset();
         node().setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
-	setGlobalProgVars(s);
+        proof().getNamespaces().programVariables().set(s);
+        setGlobalProgVars(s);
     }
 
 
@@ -509,7 +514,7 @@ public class Goal  {
      */
     public void removeLastAppliedRuleApp () {
 	appliedRuleApps = appliedRuleApps.tail ();
-	node ().setAppliedRuleApp ( null );
+	//node ().setAppliedRuleApp ( null );
     }
 
     
@@ -556,12 +561,8 @@ public class Goal  {
 	return goalList;
     }
 
-
-    
-    
-
-
     private void resetTagManager() {
+    
         tagManager = new FormulaTagManager ( this );
     }
 
@@ -611,10 +612,8 @@ public class Goal  {
         
         proof.getServices().saveNameRecorder(n);
         
-        if ( goalList == null ) {
-            // this happens for the simplify decision procedure
-            // we do nothing in this case
-        } else if ( goalList.isEmpty() ) {
+        if (goalList != null){
+        if (goalList.isEmpty() ) {
             proof.closeGoal ( this );           
         } else {
             proof.replace ( this, goalList );
@@ -622,6 +621,7 @@ public class Goal  {
                     ((TacletApp)ruleApp).taclet ().closeGoal () )
                 // the first new goal is the one to be closed
                 proof.closeGoal ( goalList.head () );
+        }
         }
 
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(p_ruleApp);
@@ -648,5 +648,13 @@ public class Goal  {
 	synchronized(ruleAppListenerList) {	
 	    ruleAppListenerList.remove(p);
 	}
+    }
+    
+    private <T extends Named> ImmutableSet<Name> names(ImmutableSet<T> set) {
+        ImmutableSet<Name> names = DefaultImmutableSet.<Name>nil();
+        for (T elem : set) {
+            names = names.add(elem.name());
+        }
+        return names;
     }
 }

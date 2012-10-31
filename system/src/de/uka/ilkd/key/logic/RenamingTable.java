@@ -20,18 +20,19 @@ public abstract class RenamingTable{
 
     public abstract SourceElement  getRenaming(SourceElement se);
 
-    public abstract Iterator getRenamingIterator();
+    public abstract Iterator<? extends SourceElement> getRenamingIterator();
 
-    public static RenamingTable getRenamingTable(HashMap hmap){
+    public static RenamingTable getRenamingTable(HashMap<? extends SourceElement, ? extends SourceElement> hmap){
 	if (hmap.size()==0)return null;
 	if (hmap.size()==1){
-	    Object[] oldVar= hmap.keySet().toArray();
-	    Object newVar= hmap.get(oldVar[0]);
-	    return new SingleRenamingTable((SourceElement)oldVar[0],(SourceElement)newVar);
+	    SourceElement[] oldVar= hmap.keySet().toArray(new SourceElement[]{});
+	    // XXX chosing entry 0 from a _set_ is quite arbitrarily, isnt it???
+	    SourceElement newVar= hmap.get(oldVar[0]);
+	    return new SingleRenamingTable(oldVar[0],newVar);
 	}
 	else return new MultiRenamingTable(hmap);
     }
     
-    public abstract HashMap getHashMap();
+    public abstract HashMap<? extends SourceElement, ? extends SourceElement> getHashMap();
 
 }

@@ -19,6 +19,7 @@ import java.util.Iterator;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 
 
 public class ProofSaverLatex extends ProofSaver {
@@ -129,7 +130,8 @@ public class ProofSaverLatex extends ProofSaver {
       sb.append("% "+proof.name()+"\n");
       try {
 	  FileInputStream inp=new FileInputStream(header.getFile());
-	  while (inp.available()>0) sb.append((char)inp.read());	   
+	  while (inp.available()>0) sb.append((char)inp.read());
+	  inp.close();
       } catch (IOException ioe) {
 	  sb=new StringBuffer("% Could not find proofheader.tex\n");
       }

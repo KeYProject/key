@@ -41,6 +41,8 @@ public final class SeqLDT extends LDT {
     private final Function seqConcat;
     private final Function seqSub;
     private final Function seqReverse;   
+    private final Function seqDef;
+    private final Function values;
     
     
     public SeqLDT(Services services) {
@@ -53,6 +55,8 @@ public final class SeqLDT extends LDT {
         seqSub        = addFunction(services, "seqSub");
         seqReverse    = addFunction(services, "seqReverse");
         seqIndexOf    = addFunction(services, "seqIndexOf");
+        seqDef         = addFunction(services, "seqDef");
+        values			= addFunction(services, "values");
     }
     
     
@@ -88,6 +92,19 @@ public final class SeqLDT extends LDT {
     
     public Function getSeqReverse() {
 	return seqReverse;
+    }
+
+    
+    public Function getSeqDef() {
+	return seqDef;
+    }
+    
+    /** Placeholder for the sequence of values observed through the execution of an enhanced for loop.
+     * Follows David Cok's proposal to adapt JML to Java5.
+     * @return
+     */
+    public Function getValues(){
+    	return values;
     }
 
     
@@ -163,7 +180,7 @@ public final class SeqLDT extends LDT {
 
     
     @Override
-    public Expression translateTerm(Term t, ExtList children) {
+    public Expression translateTerm(Term t, ExtList children, Services services) {
 	if(t.op().equals(seqEmpty)) {
 	    return EmptySeqLiteral.INSTANCE;
 	}

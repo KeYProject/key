@@ -10,11 +10,18 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import de.uka.ilkd.key.collection.*;
+import java.io.IOException;
+import java.util.Properties;
+
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
@@ -26,6 +33,8 @@ public final class DependencyContractPO extends AbstractPO
                                         implements ContractPO {
     
     private Term mbyAtPre;    
+    
+    private DependencyContract contract;
            
     
     //-------------------------------------------------------------------------
@@ -34,8 +43,9 @@ public final class DependencyContractPO extends AbstractPO
     
     public DependencyContractPO(InitConfig initConfig, 
 	    			DependencyContract contract) {
-    	super(initConfig, contract.getName(), contract);
+    	super(initConfig, contract.getName());
     	assert !(contract instanceof FunctionalOperationContract);
+      this.contract = contract;
     }
     
     
@@ -95,8 +105,8 @@ public final class DependencyContractPO extends AbstractPO
             mbyAtPreDef = TB.tt();
         }        
              
-        return TB.and(new Term[]{TB.wellFormedHeap(services), 
-        			 TB.wellFormed(services, anonHeap),
+        return TB.and(new Term[]{TB.wellFormed(TB.getBaseHeap(services), services), 
+        			 TB.wellFormed(anonHeap, services),
         	       		 selfNotNull,
         	       		 selfCreated,
         	       		 selfExactType,
@@ -112,17 +122,18 @@ public final class DependencyContractPO extends AbstractPO
     
     @Override
     public void readProblem() throws ProofInputException {
-	ObserverFunction target = contract.getTarget();
-	if(target instanceof ProgramMethod) {
+	IObserverFunction target = contract.getTarget();
+	if(target instanceof IProgramMethod) {
 	    target = javaInfo.getToplevelPM(contract.getKJT(), 
-		    			    (ProgramMethod)target);
+		    			    (IProgramMethod)target);
 	    // FIXME: for some reason the above method call returns null now and then, the following line (hopefully) is a work-around
 	    if (target == null) target = contract.getTarget();
 	}
 	
 	//prepare variables
 	final ProgramVariable selfVar 
-		= TB.selfVar(services, contract.getKJT(), true);
+		= !contract.getTarget().isStatic() 
+                  ? TB.selfVar(services, contract.getKJT(), true) : null;
 	final ImmutableList<ProgramVariable> paramVars
 		= TB.paramVars(services, target, true);
 
@@ -144,13 +155,13 @@ public final class DependencyContractPO extends AbstractPO
 			                     contract.getKJT(), 
 					     paramVars,
 					     anonHeap),
-			        contract.getPre(selfVar, paramVars, services));
+			        contract.getPre(heapLDT.getHeap(), selfVar, paramVars, null, services));
 	final Term dep = getContract().getDep(selfVar, paramVars, services);
 	
 	//prepare update
 	final Term changedHeap 
 		= TB.anon(services, 
-			  TB.heap(services), 
+			  TB.getBaseHeap(services), 
 			  TB.setMinus(services, 
 				      TB.allLocs(services), 
 				      dep), 
@@ -162,7 +173,7 @@ public final class DependencyContractPO extends AbstractPO
 	//prepare target term
 	final Term[] subs
 		= new Term[paramVars.size() + (target.isStatic() ? 1 : 2)];
-	subs[0] = TB.heap(services);
+	subs[0] = TB.getBaseHeap(services);
 	int offset = 1;
 	if(!target.isStatic()) {
 	    subs[1] = TB.var(selfVar);
@@ -181,7 +192,7 @@ public final class DependencyContractPO extends AbstractPO
                         	         TB.apply(update, targetTerm)));
 	
         //save in field
-        poTerms = new Term[]{po};
+        assignPOTerms(po);
         
         //add axioms
         collectClassAxioms(contract.getKJT());
@@ -200,7 +211,7 @@ public final class DependencyContractPO extends AbstractPO
     
     @Override
     public DependencyContract getContract() {
-        return (DependencyContract)contract;
+        return contract;
     }
     
     
@@ -225,4 +236,47 @@ public final class DependencyContractPO extends AbstractPO
         return contract.hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void fillSaveProperties(Properties properties) throws IOException {
+        super.fillSaveProperties(properties);
+        properties.setProperty("contract", contract.getName());
+    }
+    
+    /**
+     * Instantiates a new proof obligation with the given settings.
+     * @param initConfig The already load {@link InitConfig}.
+     * @param properties The settings of the proof obligation to instantiate.
+     * @return The instantiated proof obligation.
+     * @throws IOException Occurred Exception.
+     */
+    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
+       String contractName = properties.getProperty("contract");
+       int proofNum = 0;
+       String baseContractName = null;
+       int ind = -1;
+       for (String tag : FunctionalOperationContractPO.TRANSACTION_TAGS.values()) {
+          ind = contractName.indexOf("." + tag);
+          if (ind > 0) {
+             break;
+          }
+          proofNum++;
+       }
+       if (ind == -1) {
+          baseContractName = contractName;
+          proofNum = 0;
+       }
+       else {
+          baseContractName = contractName.substring(0, ind);
+       }
+       final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
+       if (contract == null) {
+          throw new RuntimeException("Contract not found: " + baseContractName);
+       }
+       else {
+          return new LoadedPOContainer(contract.createProofObl(initConfig, contract), proofNum);
+       }
+    }
 }

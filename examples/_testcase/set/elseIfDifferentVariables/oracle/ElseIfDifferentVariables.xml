@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main(a,b);" pathCondition="true" pathConditionChanged="false">
+      <branchNode name="if (a) {return 1; }else if (b) {return 2;   }else  {return 3;   }" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="a = TRUE" pathCondition="a = TRUE" pathConditionChanged="true" branchCondition="a = TRUE" mergedBranchCondition="false">
+            <statement name="return 1;" pathCondition="a = TRUE" pathConditionChanged="false">
+               <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="a = TRUE" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;1&apos; as result of self.main(a,b);&gt;">
+                  <termination name="&lt;end&gt;" pathCondition="a = TRUE" pathConditionChanged="false" exceptionalTermination="false">
+                  </termination>
+               </methodReturn>
+            </statement>
+         </branchCondition>
+         <branchCondition name="!a = TRUE" pathCondition="!a = TRUE" pathConditionChanged="true" branchCondition="!a = TRUE" mergedBranchCondition="false">
+            <branchNode name="if (b) {return 2; }else  {return 3; }" pathCondition="!a = TRUE" pathConditionChanged="false">
+               <branchCondition name="b = TRUE" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="true" branchCondition="b = TRUE" mergedBranchCondition="false">
+                  <statement name="return 2;" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;2&apos; as result of self.main(a,b);&gt;">
+                        <termination name="&lt;end&gt;" pathCondition="!a = TRUE &amp; b = TRUE" pathConditionChanged="false" exceptionalTermination="false">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </branchCondition>
+               <branchCondition name="!b = TRUE" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="true" branchCondition="!b = TRUE" mergedBranchCondition="false">
+                  <statement name="return 3;" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of self.main(a,b);&gt;" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;3&apos; as result of self.main(a,b);&gt;">
+                        <termination name="&lt;end&gt;" pathCondition="!a = TRUE &amp; !b = TRUE" pathConditionChanged="false" exceptionalTermination="false">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </branchCondition>
+            </branchNode>
+         </branchCondition>
+      </branchNode>
+   </methodCall>
+</startNode>

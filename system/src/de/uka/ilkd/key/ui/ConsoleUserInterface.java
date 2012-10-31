@@ -1,30 +1,42 @@
 package de.uka.ilkd.key.ui;
 
+import java.io.File;
+import java.util.List;
+
 import de.uka.ilkd.key.gui.ApplyStrategy;
-import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
+import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.ProofStarter;
 
-public class ConsoleUserInterface implements UserInterface {
+public class ConsoleUserInterface extends AbstractUserInterface {
 
-    private final MainWindow mainWindow;
     private final BatchMode batchMode;
     private final boolean verbose;
+	private ProofStarter ps;
+	private KeYMediator mediator;
 
-    public ConsoleUserInterface(MainWindow mainWindow, BatchMode batchMode, boolean verbose) {
-        this.mainWindow = mainWindow;
-        this.batchMode = batchMode;
+    public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
+    	this.batchMode = batchMode;
         this.verbose = verbose;
+        this.mediator  = new KeYMediator(this);
     }
 
     public void taskFinished(TaskFinishedInfo info) {
         System.out.print("[ DONE ");
         if (info.getSource() instanceof ApplyStrategy) {
             System.out.println("  ... rule application ]");
+            System.out.println("number of goals remaining open:" + 
+                    info.getProof().openGoals().size());
             System.out.flush();
             batchMode.finishedBatchMode ( info.getResult(), 
                     info.getProof(), info.getTime(), 
@@ -37,16 +49,18 @@ public class ConsoleUserInterface implements UserInterface {
                     System.exit(-1);
             } 
             if(batchMode.isLoadOnly() ||  info.getProof().openGoals().size()==0) {
-                System.out.println("proof.openGoals.size=" + 
+                System.out.println("number of open goals after loading:" + 
                         info.getProof().openGoals().size());              
                 System.exit(0);
             }
-            
-            mainWindow.getMediator().startAutoMode();
+            final Object result = ps.start();
+            if (verbose) {
+            	System.out.println(result);
+            }
         }
     }
 
-    @Override
+   @Override
     public void progressStarted(Object sender) {
         // TODO Implement ProblemInitializerListener.progressStarted
         if(verbose) {
@@ -66,7 +80,9 @@ public class ConsoleUserInterface implements UserInterface {
             ProofAggregate proofAggregate) {
         // TODO Implement ProblemInitializerListener.proofCreated
         // XXX WHY AT THE MAINWINDOW?!?!
-        mainWindow.addProblem(proofAggregate);
+    	ps = new ProofStarter(this);
+        ps.init(proofAggregate);
+        mediator.setProof(proofAggregate.getFirstProof());
     }
 
     @Override
@@ -133,5 +149,90 @@ public class ConsoleUserInterface implements UserInterface {
             System.out.println("ConsoleUserInterface.setProgress(" + progress + ")");
         }
     }
-    
+
+    @Override
+    public void notifyAutoModeBeingStarted() {
+    	// nothing to do
+    }
+
+    @Override
+    public void notifyAutomodeStopped() {
+    	// nothing to do
+    }
+
+    @Override
+    public void notify(NotificationEvent event) {
+        if(verbose) {
+        	System.out.println(event);
+        }
+    }
+
+    @Override
+    public void completeAndApplyTacletMatch(ApplyTacletDialogModel[] models, Goal goal) {
+        if(verbose) {
+        	System.out.println("Taclet match completion not supported by console.");
+        }
+    }
+
+	@Override
+    public boolean confirmTaskRemoval(String string) {
+	    return true;
+    }
+
+	@Override
+    public void loadProblem(File file) {
+		super.loadProblem(file, null, null, mediator);
+	}
+
+   @Override
+   public void loadProblem(File file, List<File> classPath, File bootClassPath) {
+      super.loadProblem(file, classPath, bootClassPath, mediator);
+   }
+
+	@Override
+    public void openExamples() {
+		System.out.println("Open Examples not suported by console UI.");
+    }
+
+   @Override
+   public ProblemInitializer createProblemInitializer() {
+      ProblemInitializer pi = new ProblemInitializer(this, 
+            mediator.getProfile(), 
+            new Services(mediator.getExceptionHandler()), 
+            true, 
+            this);
+      return pi;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYMediator getMediator() {
+     return mediator;
+   }
+
+   /**
+    * Checks if the verbose is active or not.
+    * @return {@code true} verbose is active, {@code false} verbose is deactivated.
+    */
+   public boolean isVerbose() {
+      return verbose;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isAutoModeSupported(Proof proof) {
+      return true; // All proofs are supported.
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeProof(Proof proof) {
+      // Nothing to do.
+   }
 }

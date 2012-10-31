@@ -25,7 +25,7 @@ public class MaxRuleAppSlider extends JSlider {
      * 
      */
     private static final long serialVersionUID = 5810499328583797609L;
-    private static final int MAX_RULE_APPS_LOG10 = 5;
+    private static final int MAX_RULE_APPS_LOG10 = 6;
     private final static String TEXT = "Max. Rule Applications: ";
     private KeYMediator mediator;
     private static LinkedList<MaxRuleAppSlider> allInstances = new LinkedList<MaxRuleAppSlider>();
@@ -40,13 +40,14 @@ public class MaxRuleAppSlider extends JSlider {
 
         for ( int n = 0; n <= MAX_RULE_APPS_LOG10; n++ ) {
             int val = (int)Math.pow(10, n);
-            JLabel l = new JLabel ( ""+val );
+            String sval = ""+(val >= 10000? val >= 1000000? (val/1000000)+"M": (val/1000)+"k" : +val);
+            JLabel l = new JLabel ( ""+sval );
             l.setFont(l.getFont().deriveFont(9F));
             labelTable.put(Integer.valueOf ( n*9 ), l);
         }
 
         setLabelTable ( labelTable );
-        setPaintLabels ( true );
+        setPaintLabels (true);
 
         // show ticks
         setMajorTickSpacing ( 9 );

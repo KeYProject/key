@@ -11,9 +11,11 @@
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 /**
@@ -24,9 +26,12 @@ public interface SpecExtractor {
     /**
      * Returns the operation contracts for the passed operation.
      */
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm)
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm)
         throws SLTranslationException;
-    
+
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm, boolean addInvariant)
+        throws SLTranslationException;
+
     /**
      * Returns the class invariants for the passed type.
      */
@@ -36,10 +41,20 @@ public interface SpecExtractor {
     /**
      * Returns the loop invariant for the passed loop (if any).
      */
-    public LoopInvariant extractLoopInvariant(ProgramMethod pm, 
+    public LoopInvariant extractLoopInvariant(IProgramMethod pm, 
                                               LoopStatement loop)
         throws SLTranslationException;
-    
+
+    /**
+     * Returns the block contracts for the passed block.
+     */
+    public ImmutableSet<BlockContract> extractBlockContracts(IProgramMethod method, StatementBlock block) throws SLTranslationException;
+
+    /**
+     * Returns the block contracts for the passed labeled statement if it labels a block.
+     */
+    public ImmutableSet<BlockContract> extractBlockContracts(IProgramMethod method, LabeledStatement labeled) throws SLTranslationException;
+
     /**
      * Returns all warnings generated so far in the translation process.
      * (e.g. this may warn about unsupported features which have been ignored 

@@ -3,6 +3,7 @@ package de.uka.ilkd.key.gui.configuration;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -13,7 +14,7 @@ import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 
 
 public class ProofIndependentSettings implements SettingsListener {
-        public static final ProofIndependentSettings DEFAULT_INSTANCE = new ProofIndependentSettings(PathConfig.PROOF_INDEPENDT_SETTINGS);
+        public static final ProofIndependentSettings DEFAULT_INSTANCE = new ProofIndependentSettings(PathConfig.getProofIndependentSettings());
         private final ProofIndependentSMTSettings smtSettings = ProofIndependentSMTSettings.getDefaultSettingsData();
         private final LemmaGeneratorSettings lemmaGeneratorSettings = new LemmaGeneratorSettings();
         private final String filename;
@@ -28,7 +29,7 @@ public class ProofIndependentSettings implements SettingsListener {
                 for (Settings settings : settingsSet) {
                         settings.addSettingsListener(this);
                 }
-                loadSettings(filename);
+                loadSettings();
         }
 
         @Override
@@ -43,18 +44,25 @@ public class ProofIndependentSettings implements SettingsListener {
                 return lemmaGeneratorSettings;
         }
         
-        public void loadSettings(String file){
+        public void loadSettings(){
                 try {
-                    FileInputStream in = new FileInputStream(PathConfig.PROOF_INDEPENDT_SETTINGS);
-                    Properties properties = new Properties();
-                    properties.load(in);
-                    for(Settings settings : settingsSet){
-                            settings.readSettings(this,properties);
+                    File testFile = new File(filename);
+                    if(testFile.exists()){
+                        load(testFile);
                     }
                 } catch (IOException e){
-                        new RuntimeException(e);
+                    throw new RuntimeException(e);
                 }
       
+        }
+        
+        private void load(File file) throws IOException{
+            FileInputStream in = new FileInputStream(file);
+            Properties properties = new Properties();
+            properties.load(in);
+            for(Settings settings : settingsSet){
+                settings.readSettings(this,properties);
+            }
         }
         
         public void saveSettings(){
@@ -62,17 +70,19 @@ public class ProofIndependentSettings implements SettingsListener {
                 try {
                     File file = new File(filename);
                     if (!file.exists()) {                        
-                            new File(PathConfig.KEY_CONFIG_DIR+File.separator).mkdirs();
+                            new File(PathConfig.getKeyConfigDir()+File.separator).mkdirs();
                             file.createNewFile();
                     }            
-                    FileOutputStream out = new FileOutputStream(file);
-                   
                     Properties result = new Properties();
                     for (Settings settings : settingsSet) {
                             settings.writeSettings(this,result);
                     }
-                    result.store(out, "Proof-Independent-Settings-File");
-                    
+                    FileOutputStream out = new FileOutputStream(file);                   
+                    try { 
+                        result.store(out, "Proof-Independent-Settings-File");
+                    } finally { 
+                        out.close();
+                    }
                 } catch (IOException e){
                     throw new RuntimeException(e);
                 }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main(instance);" pathCondition="true" pathConditionChanged="false">
+      <statement name="return instance.x;" pathCondition="true" pathConditionChanged="false">
+         <branchCondition name="!instance = null" pathCondition="!instance = null" pathConditionChanged="true" branchCondition="!instance = null" mergedBranchCondition="false">
+            <methodReturn name="&lt;return of self.main(instance);&gt;" pathCondition="!instance = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;instance.x&apos; as result of self.main(instance);&gt;">
+               <termination name="&lt;end&gt;" pathCondition="!instance = null" pathConditionChanged="false" exceptionalTermination="false">
+               </termination>
+            </methodReturn>
+         </branchCondition>
+         <branchCondition name="instance = null" pathCondition="instance = null" pathConditionChanged="true" branchCondition="instance = null" mergedBranchCondition="false">
+            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="instance = null" pathConditionChanged="false" exceptionalTermination="true">
+            </termination>
+         </branchCondition>
+      </statement>
+   </methodCall>
+</startNode>

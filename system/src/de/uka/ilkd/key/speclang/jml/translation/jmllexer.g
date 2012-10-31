@@ -37,19 +37,28 @@ tokens {
     TRUE = "true";    
     VOID = "void";
 
-    ACCESSIBLE                  = "accessible";
-    ASSIGNABLE 			= "assignable";
-    ENSURES 			= "ensures";
-    DECLASSIFY                  = "declassify";
-    DECLASSIFY_VAR              = "declassify_var";
-    DEPENDS                     = "depends";
-    REPRESENTS			= "represents";
-    SECURE_FOR                  = "secure_for";
-    SIGNALS 			= "signals";
-    SIGNALS_ONLY 		= "signals_only";
+    ACCESSIBLE      = "accessible";
+    ASSIGNABLE      = "assignable";
+    ENSURES         = "ensures";
+    DECLASSIFY      = "declassify";
+    DEPENDS         = "depends";
+    REPRESENTS      = "represents";
+    REQUIRES        = "requires";
+    RESPECTS        = "respects";
+    SECURE_FOR      = "secure_for";
+    SIGNALS         = "signals";
+    SIGNALS_ONLY    = "signals_only";
+    
+    NULLABLE        = "nullable";
+    NON_NULL        = "non_null";
+
+    BREAKS          = "breaks";
+    CONTINUES       = "continues";
+    RETURNS         = "returns";
 }
 
 AND : "&";
+BACKUP : "\\backup";
 BIGINT : "\\bigint";
 BITWISENOT : "~";
 BSUM : "\\bsum";  //KeY extension, not official JML
@@ -65,6 +74,7 @@ ELEMTYPE : "\\elemtype";
 EQUAL_SINGLE : "=";
 EVERYTHING : "\\everything";
 FRESH : "\\fresh"; 
+FREE : "\\free";
 GEQ : ">=";
 GT : ">";
 IMPLIES : "==>";
@@ -72,6 +82,7 @@ IMPLIESBACKWARD : "<==";
 IN_IMMORTAL_MEMORY : "\\inImmortalMemory"; //KeY extension, not official JML
 IN_OUTER_SCOPE : "\\inOuterScope"; //KeY extension, not official JML
 INCLUSIVEOR : "|";
+INDEX : "\\index";
 INTO : "\\into";
 INV : "\\inv";
 INVARIANT_FOR : "\\invariant_for";
@@ -90,12 +101,11 @@ MINUS : "-";
 MOD : "%";
 MULT : "*";
 NONNULLELEMENTS : "\\nonnullelements";
-NON_NULL : "\\non_null";
-NULLABLE : "\\nullable";
 NOT : "!";
 NOT_MODIFIED : "\\not_modified";
 NOT_SPECIFIED : "\\not_specified";
 NOTHING : "\\nothing";
+LESS_THAN_NOTHING : "\\less_than_nothing";   //KeY extension for strict purity, not official JML (MU)
 OLD : "\\old";
 OTHER : "\\other";
 OUTER_SCOPE : "\\outerScope"; //KeY extension, not official JML
@@ -116,12 +126,14 @@ SHIFTLEFT : "<<";
 SHIFTRIGHT : ">>";
 SPACE : "\\space";
 STRING_EQUAL : "\\string_equal";
+TRANSACTIONUPDATED: "\\transactionUpdated";
 TYPEOF : "\\typeof";
 TYPE_SMALL : "\\type";
 TYPE : "\\TYPE";
 ST : "<:";
 SUCH_THAT : "\\such_that";
 UNSIGNEDSHIFTRIGHT : ">>>";
+VALUES : "\\values";
 WORKINGSPACE : "\\working_space";
 XOR : "^";
 
@@ -146,7 +158,7 @@ SEQSUB : "\\seq_sub";
 SEQREVERSE : "\\seq_reverse";
 SEQREPLACE : "\\seq_put";
 INDEXOF : "\\indexOf";
-SEQCONTAINS : "\\contains"; // temp workaround as long as sets are not yet implemented
+SEQDEF : "\\seq_def";
 
 MEASURED_BY : "\\measured_by";
 
@@ -272,9 +284,9 @@ options {
     testLiterals = true;
     paraphrase = "an identifier";
 }:
-        LETTER (LETTERORDIGIT)*
+   LETTER (LETTERORDIGIT)*
 ;
-
+    
 HEXNUMERAL
     :
         '0'! ('x'!|'X'!) (HEXDIGIT)+

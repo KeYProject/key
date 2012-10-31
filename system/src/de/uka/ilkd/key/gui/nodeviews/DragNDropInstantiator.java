@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <state name="return 42;">
+      <value name="a" programVariable="a" isArrayIndex="false" arrayIndex="-1" value="a" type="int"/>
+      <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="ObjectConditionTest::instance" programVariable="ObjectConditionTest::instance" isArrayIndex="false" arrayIndex="-1" target="o4"/>
+   </state>
+   <object xml:id="o1" name="self" type="ObjectConditionTest">
+      <value name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" value="1" type="int"/>
+      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o2"/>
+   </object>
+   <object xml:id="o2" name="self.next" type="ObjectConditionTest">
+      <value name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" value="2" type="int"/>
+      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o3"/>
+   </object>
+   <object xml:id="o3" name="self.next.next" type="ObjectConditionTest">
+      <value name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" value="3" type="int"/>
+   </object>
+   <object xml:id="o4" name="ObjectConditionTest.instance" type="ObjectConditionTest">
+      <value name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" value="4" type="int"/>
+      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o5"/>
+   </object>
+   <object xml:id="o5" name="ObjectConditionTest.instance.next" type="ObjectConditionTest">
+      <value name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" value="5" type="int"/>
+      <association name="next" programVariable="next" isArrayIndex="false" arrayIndex="-1" target="o6"/>
+   </object>
+   <object xml:id="o6" name="ObjectConditionTest.instance.next.next" type="ObjectConditionTest">
+      <value name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" value="6" type="int"/>
+   </object>
+</model>

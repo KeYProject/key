@@ -153,12 +153,12 @@ public class KeYResourceManager {
 	return copyIfNotExists(o.getClass(),resourcename,targetLocation);
     }
     
-    public boolean copyIfNotExists(Class cl, String resourcename, 
+    public boolean copyIfNotExists(Class<?> cl, String resourcename, 
 		   String targetLocation) {
 	return copy(cl, resourcename, targetLocation, false);
     }
 
-    public boolean copy(Class cl, String resourcename, 
+    public boolean copy(Class<?> cl, String resourcename, 
 			String targetLocation, boolean overwrite) {
 	URL resourceURL = cl.getResource(resourcename);
 
@@ -177,8 +177,6 @@ public class KeYResourceManager {
 	// copying the resource to the target if targetfile 
 	// does not exist yet
 	boolean result = false;
-	ReadableByteChannel sourceStream = null;
-	FileChannel targetStream  = null;
 	try{
 	    File targetFile = new File(targetLocation);
 	    if (overwrite || !targetFile.exists()){
@@ -188,35 +186,27 @@ public class KeYResourceManager {
 		}
 		targetFile.createNewFile();	    
 		targetFile.deleteOnExit();
-		
-		sourceStream = Channels.newChannel(resourceURL.openStream());		
-		targetStream = new FileOutputStream (targetFile).getChannel();  
-		
-		long actualTransferredByte = targetStream.transferFrom(sourceStream, 0, Long.MAX_VALUE);
+				
+	        final ReadableByteChannel sourceStream = Channels.newChannel(resourceURL.openStream());
+                
+                long actualTransferredByte = 0;
+	        try { 
+	            final FileChannel targetStream  = new FileOutputStream (targetFile).getChannel();
+	            try { 
+	                actualTransferredByte = targetStream.transferFrom(sourceStream, 0, Long.MAX_VALUE);
+	            } finally {
+	                targetStream.close();
+	            }   
+	        } finally {
+	            sourceStream.close();
+	        }
 		if (actualTransferredByte < 0 || actualTransferredByte == Long.MAX_VALUE) {
 		    throw new RuntimeException("File " + resourcename + " too big.");
 		}
 	    }
 	} catch(Exception e) {
 	    System.err.println("KeYError: " + e);
-	    return false;
-	} finally {	    
-	    if (sourceStream != null) {
-		try {
-	            sourceStream.close();
-                } catch (IOException e) {
-        	    System.err.println("KeYError: " + e);
-        	    result = false;
-                }
-	    }
-	    if (targetStream != null) {
-		try {
-		    targetStream.close();
-                } catch (IOException e) {
-        	    System.err.println("KeYError: " + e);
-        	    result = false;
-                }
-	    }
+	    return false;	
 	}
 	
 	return result;
@@ -228,7 +218,7 @@ public class KeYResourceManager {
      * @param resourcename the String that contains the name of the resource
      * @return the URL of the resource
      */
-    public URL getResourceFile(Class cl, String resourcename) {
+    public URL getResourceFile(Class<?> cl, String resourcename) {
         URL resourceURL = cl.getResource(resourcename);
 	if (resourceURL == null && cl.getSuperclass() != null) {
 	    return getResourceFile(cl.getSuperclass(), resourcename);
@@ -245,5 +235,17 @@ public class KeYResourceManager {
      */
     public URL getResourceFile(Object o, String resourcename) {
 	return getResourceFile(o.getClass(), resourcename);
+    }
+
+    /**
+     * All KeY {@link de.uka.ilkd.key.ui.UserInterface}s should use a common
+     * title string when they require one, for instance for a GUI window title
+     * bar.
+     * 
+     * @return the title string to be used by the KeY
+     *         <code>UserInterfaces</code>
+     */
+    public String getUserInterfaceTitle() {
+	return "KeY " + this.getVersion();
     }
 }

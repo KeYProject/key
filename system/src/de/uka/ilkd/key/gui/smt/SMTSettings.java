@@ -28,8 +28,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
 
 
-import de.uka.ilkd.key.smt.SolverType;
-
 
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
@@ -68,11 +66,7 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
                 return proof;
         }
 
-        @Override
-        public String getCommand(SolverType type) {
-                
-                return piSettings.getCommand(type);
-        }
+
 
         @Override
         public int getMaxConcurrentProcesses() {
@@ -88,7 +82,7 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
         @Override
         public String getSMTTemporaryFolder() {
-              return   PathConfig.KEY_CONFIG_DIR
+              return   PathConfig.getKeyConfigDir()
               + File.separator + "smt_formula";
         }
 
@@ -199,6 +193,16 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
         public long getMinimumInteger() {
                 return pdSettings.minInteger;
         }
+
+		@Override
+		public String getLogic() {
+			return "AUFLIA";
+		}
+
+		@Override
+		public boolean checkForSupport() {
+			return piSettings.checkForSupport;
+		}
 
         
 

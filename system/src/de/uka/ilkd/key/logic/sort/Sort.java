@@ -35,7 +35,7 @@ public interface Sort extends Named {
      */
     final Sort ANY = new SortImpl(new Name("any"));    
     
-    final Name CAST_NAME = new Name("cast");
+    public final Name CAST_NAME = new Name("cast");
     final Name INSTANCE_NAME = new Name("instance");
     final Name EXACT_INSTANCE_NAME = new Name("exactInstance");    
     
@@ -75,4 +75,6 @@ public interface Sort extends Named {
      * returns the exactinstanceof symbol of this Sort
      */
     SortDependingFunction getExactInstanceofSymbol(Services services);
+
+    String declarationString();
 }

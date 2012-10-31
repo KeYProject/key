@@ -46,7 +46,7 @@ public class ProofSettings {
 
     static {     
 	PROVER_CONFIG_FILE = new File
-	    (PathConfig.KEY_CONFIG_DIR+File.separator+"proof-settings.props");
+	    (PathConfig.getKeyConfigDir()+File.separator+"proof-settings.props");
 	PROVER_CONFIG_FILE_TEMPLATE =
 	    KeYResourceManager.getManager ().getResourceFile
 	    ( ProofSettings.class, "default-proof-settings.props" );
@@ -157,12 +157,16 @@ public class ProofSettings {
 	ensureInitialized();
 	try {
 	    if (!PROVER_CONFIG_FILE.exists()) {	                       
-                new File(PathConfig.KEY_CONFIG_DIR+File.separator).mkdirs();
+                new File(PathConfig.getKeyConfigDir()+File.separator).mkdirs();
                 PROVER_CONFIG_FILE.createNewFile();
 	    }            
 	    FileOutputStream out = 
 		new FileOutputStream(PROVER_CONFIG_FILE);
-	    settingsToStream(settings,out);
+	    try { 
+	        settingsToStream(settings,out);
+	    } finally {
+	        out.close();
+	    }
 	} catch (IOException e){
 	    System.err.println("Warning: could not save proof-settings.");
 	    System.err.println(e);
@@ -215,7 +219,11 @@ public class ProofSettings {
     public void loadSettings(){
 	try {
 	    FileInputStream in = new FileInputStream(PROVER_CONFIG_FILE);
-	    loadSettingsFromStream(in);
+	    try { 
+	        loadSettingsFromStream(in);
+	    } finally {
+	        in.close();
+	    }
 	} catch (IOException e){
             System.err.println
 		("Warning: no proof-settings could be loaded, using defaults");

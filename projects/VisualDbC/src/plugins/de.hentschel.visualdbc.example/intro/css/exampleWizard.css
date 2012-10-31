@@ -1,0 +1,6 @@
+a#openWizard img {
+   background-image : url(graphics/visualDbC.gif);
+}
+a#openWizard:hover img {
+   background-image : url(graphics/visualDbC_hov.gif);
+}

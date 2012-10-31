@@ -10,18 +10,31 @@
 
 package de.uka.ilkd.key.ldt;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.ExtList;
 
 
@@ -36,6 +49,11 @@ public final class HeapLDT extends LDT {
         
     public static final Name SELECT_NAME = new Name("select");
     public static final Name STORE_NAME = new Name("store");
+    public static final Name BASE_HEAP_NAME = new Name("heap");
+    public static final Name SAVED_HEAP_NAME = new Name("savedHeap");
+    public static final Name[] VALID_HEAP_NAMES = { BASE_HEAP_NAME, SAVED_HEAP_NAME };
+
+
     
     //additional sorts
     private final Sort fieldSort;    
@@ -63,12 +81,12 @@ public final class HeapLDT extends LDT {
     private final Function nullFunc;
     
     //predicates
-    private final Function wellFormed;    
+    private final Map<Sort,Function> wellFormed;    
     private final Function acc;
     private final Function reach;
     
     //heap pv
-    private final LocationVariable heap;
+    private final ImmutableArray<LocationVariable> heaps;
     
     
     
@@ -97,10 +115,14 @@ public final class HeapLDT extends LDT {
         classErroneous    = addSortDependingFunction(services, "<classErroneous>");
         length            = addFunction(services, "length");        
         nullFunc          = addFunction(services, "null");
-        wellFormed        = addFunction(services, "wellFormed");
         acc               = addFunction(services, "acc");
         reach             = addFunction(services, "reach");
-        heap	          = (LocationVariable) progVars.lookup(new Name("heap"));    
+        heaps = new ImmutableArray<LocationVariable>(new LocationVariable[]{
+                (LocationVariable) progVars.lookup(BASE_HEAP_NAME),
+                (LocationVariable) progVars.lookup(SAVED_HEAP_NAME)
+        });
+        wellFormed = new LinkedHashMap<Sort,Function>();
+        wellFormed.put((Sort)sorts.lookup(new Name("Heap")), addFunction(services, "wellFormed"));
     }
     
     
@@ -131,7 +153,7 @@ public final class HeapLDT extends LDT {
      * Given a constant symbol representing a field, this method returns a
      * simplified name of the constant symbol to be used for pretty printing.
      */
-    public String getPrettyFieldName(Function fieldSymbol) {
+    public String getPrettyFieldName(Named fieldSymbol) {
 	String name = fieldSymbol.name().toString();
 	int index = name.indexOf("::");
 	if(index == -1) {
@@ -259,8 +281,8 @@ public final class HeapLDT extends LDT {
     }
     
     
-    public Function getWellFormed() {
-	return wellFormed;
+    public Function getWellFormed(Sort sort) {
+	return wellFormed.get(sort);
     }
     
     
@@ -275,9 +297,36 @@ public final class HeapLDT extends LDT {
     
     
     public LocationVariable getHeap() {
-	return heap;
+	return heaps.get(0);
     }
     
+    public LocationVariable getSavedHeap() {
+        return heaps.get(1);
+    }
+
+    
+    public ImmutableArray<LocationVariable> getAllHeaps() {
+        return heaps;
+    }
+
+    public LocationVariable getHeapForName(Name name) {
+        for (LocationVariable h : getAllHeaps()) {
+            if (h.name().equals(name)) {
+                return h;
+            }
+        }
+        return null;
+    }
+
+   /* public LocationVariable getHeap(String heapName) {
+       
+       if(TermBuilder.BASE_HEAP_NAME.equals(heapName)) {
+         return heap;
+       }else{
+         assert TermBuilder.SAVED_HEAP_NAME.equals(heapName);
+         return savedHeap;
+       }
+    }*/    
     
     /**
      * Given a "program variable" representing a field or a model field, 
@@ -340,6 +389,16 @@ public final class HeapLDT extends LDT {
         return result;
     }
 
+    @Override
+    public final boolean containsFunction(Function op) {
+    	if (super.containsFunction(op)) {
+    		return true;
+    	}
+    	if (op instanceof SortDependingFunction) {
+    		return ((SortDependingFunction) op).isSimilar(select);
+    	}
+    	return op.isUnique() && op.sort() == getFieldSort();
+    }
     
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
@@ -392,9 +451,24 @@ public final class HeapLDT extends LDT {
 
     
     @Override
-    public Expression translateTerm(Term t, ExtList children) {
-	assert false;
-	return null;
+    public Expression translateTerm(Term t, ExtList children, Services services) {
+    	if (t.op() instanceof SortDependingFunction && 
+    			((SortDependingFunction)t.op()).isSimilar(select)) {
+    		ProgramVariable heap = (ProgramVariable) children.remove(0);
+    		if (heap != getHeap()) {
+    			throw new IllegalArgumentException("Can only translate field access to base heap.");
+    		}
+    		ReferencePrefix prefix = (ReferencePrefix) children.remove(0);
+    		ProgramVariable field = (ProgramVariable) children.remove(0);
+    		
+    		if (prefix instanceof NullLiteral) {
+    			return new FieldReference(field, null);
+    		}
+    		return new FieldReference(field, prefix);
+    	} else if (t.sort() == getFieldSort() && t.op() instanceof Function && ((Function) t.op()).isUnique()) {
+    		return services.getJavaInfo().getAttribute(getPrettyFieldName(t.op()), getClassName((Function) t.op()));
+    	}
+    	throw new IllegalArgumentException("Could not translate " + ProofSaver.printTerm(t, null) + " to program.");
     }
     
     
@@ -403,4 +477,6 @@ public final class HeapLDT extends LDT {
 	assert false;
 	return null;
     }
+
+
 }

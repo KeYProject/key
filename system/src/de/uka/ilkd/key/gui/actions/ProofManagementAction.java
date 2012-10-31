@@ -21,8 +21,8 @@ public final class ProofManagementAction extends MainWindowAction {
 
     public ProofManagementAction(MainWindow mainWindow) {
 	super(mainWindow);
-	setName("Proof Management...");
-	setTooltip("Proof Management.");
+	setName("Proof Management");
+	setTooltip("Proof Management");
 	setAcceleratorLetter(KeyEvent.VK_M);
 
 	setEnabled(enabled());
@@ -54,10 +54,10 @@ public final class ProofManagementAction extends MainWindowAction {
 
     private void showProofManagement() {
 	if (getMediator().getProof() == null) {
-	    getMediator().notify(
+	    mainWindow.notify(
 		    new GeneralFailureEvent("Please load a proof first"));
 	} else {
-	    ProofManagementDialog.showInstance(getMediator().getProof().env()
+	    ProofManagementDialog.showInstance(getMediator(), getMediator().getProof().env()
 		    .getInitConfig());
 	}
     }

@@ -10,10 +10,15 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.List;
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ObserverFunction;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -37,7 +42,7 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns the contracted function symbol.
      */
-    public ObserverFunction getTarget();
+    public IObserverFunction getTarget();
         
     /**
      * Tells whether the contract contains a measured_by clause.
@@ -47,16 +52,33 @@ public interface Contract extends SpecificationElement {
     /**
      * Returns the precondition of the contract.
      */
-    public Term getPre(ProgramVariable selfVar, 
+    public Term getPre(LocationVariable heap,
+                       ProgramVariable selfVar, 
 	    	       ImmutableList<ProgramVariable> paramVars,
+                       Map<LocationVariable,? extends ProgramVariable> atPreVars,
+	    	       Services services);
+
+    public Term getPre(List<LocationVariable> heapContext,
+                       ProgramVariable selfVar, 
+	    	       ImmutableList<ProgramVariable> paramVars,
+                       Map<LocationVariable,? extends ProgramVariable> atPreVars,
 	    	       Services services);
     
     /**
      * Returns the precondition of the contract.
      */
-    public Term getPre(Term heapTerm,
+    public Term getPre(LocationVariable heap,
+                       Term heapTerm,
 	               Term selfTerm, 
 	    	       ImmutableList<Term> paramTerms,
+                       Map<LocationVariable,Term> atPres,
+	    	       Services services);    
+
+    public Term getPre(List<LocationVariable> heapContext,
+                       Map<LocationVariable,Term> heapTerms,
+	               Term selfTerm, 
+	    	       ImmutableList<Term> paramTerms,
+                       Map<LocationVariable,Term> atPres,
 	    	       Services services);    
     
     
@@ -86,7 +108,9 @@ public interface Contract extends SpecificationElement {
      * specified directly in DL, but not for JML contracts)
      */
     public boolean toBeSaved();
-    
+
+    public boolean transactionApplicableContract();
+
     /**
      * Returns a parseable String representation of the contract. 
      * Precondition: toBeSaved() must be true.
@@ -99,4 +123,23 @@ public interface Contract extends SpecificationElement {
      */
     public ProofOblInput createProofObl(InitConfig initConfig,
 	    Contract contract);
+    
+    /**
+     * Returns a contract which is identical this contract except that
+     * the id is set to the new id.
+     */
+    public Contract setID(int newId);
+    
+    
+    /**
+     * Returns a contract which is identical this contract except that
+     * the KeYJavaType and IObserverFunction are set to the new values.
+     */
+    public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
+    
+    
+    /**
+     * Returns technical name for the contract type.
+     */
+    public String getTypeName();
 }

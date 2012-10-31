@@ -10,10 +10,7 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -21,43 +18,47 @@ import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.ApplyStrategy.ApplyStrategyInfo;
+import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
+import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.Debug;
 
 public class InteractiveProver {
 
     /** the proof the interactive prover works on */
     private Proof proof;
-
+    
     /** the user focused goal */
     private Goal focusedGoal;
-
-    /** true iff in interactive mode */
-
-    private boolean interactive = true;
-
+    
     /** the central strategy processor including GUI signalling */
     private ApplyStrategy applyStrategy;
     private final ProverTaskListener focussedAutoModeTaskListener =
         new FocussedAutoModeTaskListener ();
 
-    /** list of proof listeners and interactive proof listeners */
-    private List<AutoModeListener> listenerList = 
-        Collections.synchronizedList(new ArrayList<AutoModeListener>(10));
-
+    /**
+     * list of proof listeners and interactive proof listeners. We use an
+     * immutable list to store listeners to allow for addition/removal within
+     * listener code
+     */
+    private ImmutableList<AutoModeListener> listenerList = ImmutableSLList.nil();
 
     /** listens to the current selected proof and node */
     private KeYSelectionListener selListener;
@@ -67,14 +68,19 @@ public class InteractiveProver {
     
     private boolean resumeAutoMode = false;
 
+    private AutoModeWorker worker;
+
 
     /** creates a new interactive prover object 
      */
     public InteractiveProver(KeYMediator mediator) {
-	selListener = new InteractiveProverKeYSelectionListener();
-	this.mediator = mediator;
-	mediator.addKeYSelectionListener(selListener);
-	applyStrategy = new ApplyStrategy(mediator);
+        selListener = new InteractiveProverKeYSelectionListener();
+        this.mediator = mediator;
+        mediator.addKeYSelectionListener(selListener);
+
+        mediator.getProfile().setSelectedGoalChooserBuilder(DepthFirstGoalChooserBuilder.NAME);//XXX
+
+        applyStrategy = new ApplyStrategy(mediator.getProfile().getSelectedGoalChooserBuilder().create());
         applyStrategy.addProverTaskObserver(mediator().getProverTaskListener());
     }
 
@@ -89,39 +95,29 @@ public class InteractiveProver {
     public void setProof(Proof p) {
 	proof = p;
     }
-
-    public void addAutoModeListener(AutoModeListener p) { 
-	synchronized(listenerList) {
-	    listenerList.add(p);
-	}
+    
+    public void addAutoModeListener(AutoModeListener p) {
+        listenerList = listenerList.prepend(p);
     }
 
-    public void removeAutoModeListener(AutoModeListener p) { 
-	synchronized(listenerList) {	
-	    listenerList.remove(p);
-	}
+    public void removeAutoModeListener(AutoModeListener p) {
+        listenerList = listenerList.removeAll(p);
     }
 
     /** fires the event that automatic execution has started */
     protected void fireAutoModeStarted(ProofEvent e) {
-	synchronized(listenerList) {
         for (AutoModeListener aListenerList : listenerList) {
-            aListenerList.
-                    autoModeStarted(e);
+            aListenerList.autoModeStarted(e);
         }
-	}
     }
 
     /** fires the event that automatic execution has stopped */
     public void fireAutoModeStopped(ProofEvent e) {
-	synchronized(listenerList) {
         for (AutoModeListener aListenerList : listenerList) {
-            aListenerList.
-                    autoModeStopped(e);
+            aListenerList.autoModeStopped(e);
         }
-	}
     }
-    
+
     void setResumeAutoMode(boolean b) {
        resumeAutoMode = b;
     }
@@ -129,14 +125,6 @@ public class InteractiveProver {
 
     public boolean resumeAutoMode() {
 	return resumeAutoMode;
-    }
-
-    public boolean interactiveMode() {
-	return interactive;
-    }
-
-    public void setInteractive(boolean interact) {
-	interactive=interact;
     }
 
 
@@ -147,8 +135,8 @@ public class InteractiveProver {
      * @param goal
      */
     public void applyInteractive ( RuleApp app, Goal goal ) {
-        goal.node().getNodeInfo().setInteractiveRuleApplication(true);
- 		goal.apply(app);
+        goal.node().getNodeInfo().setInteractiveRuleApplication(true); 		        
+        goal.apply(app);
     }
 
 
@@ -162,34 +150,27 @@ public class InteractiveProver {
      */
     public Proof getProof() {
 	return proof;
-    }    
-
+    }
+    
     /** starts the execution of rules with active strategy. The
      * strategy will only be applied on the goals of the list that
      * is handed over and on the new goals an applied rule adds
      */
-    public void startAutoMode ( ImmutableList<Goal> goals ) {
-        if ( goals.isEmpty () ) {
-            if ( Main.batchMode ) {
-                // Everything is already proven.
-                // Nothing to be saved. Exit successfully.
-                System.exit ( 0 );
-            } else {
-                mediator ().popupWarning ( "No enabled goals available", "Oops..." );
-                return;
-            }
+    public void startAutoMode ( ImmutableList<Goal> goals) {
+        if ( goals.isEmpty () ) {                        
+        	mediator ().notify(new GeneralInformationEvent("No enabled goals available."));
+        	return;
         }
-        
-        if ( Main.batchMode ) {
-            interactive = false;
-        }
-        
-        applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(), getTimeout() );
+        mediator().stopInterface(true);
+        mediator().setInteractive(false);
+        worker = new AutoModeWorker(goals);
+        worker.start();
     }
+    
     
     /** stops the execution of rules */
     public void stopAutoMode () {
-        applyStrategy.stop();
+        if (worker != null) worker.stop();
     }
     
     /**
@@ -206,12 +187,12 @@ public class InteractiveProver {
                         
             final AutomatedRuleApplicationManager realManager = goal.getRuleAppManager ();
             goal.setRuleAppManager ( null );
-            final FocussedRuleApplicationManager focusManager =
+            final AutomatedRuleApplicationManager focusManager =
                 new FocussedRuleApplicationManager ( realManager, goal, focus );
             goal.setRuleAppManager ( focusManager );
         }
 
-        startAutoMode ( ImmutableSLList.<Goal>nil().prepend ( goal ) );
+        startAutoMode ( ImmutableSLList.<Goal>nil().prepend ( goal ));
     }
 
     private void finishFocussedAutoMode () {
@@ -221,8 +202,8 @@ public class InteractiveProver {
             // remove any filtering rule app managers that are left in the proof
             // goals
             if (goal.getRuleAppManager() instanceof FocussedRuleApplicationManager) {
-                final FocussedRuleApplicationManager focusManager =
-                        (FocussedRuleApplicationManager) goal.getRuleAppManager();
+                final AutomatedRuleApplicationManager focusManager =
+                        (AutomatedRuleApplicationManager) goal.getRuleAppManager();
                 goal.setRuleAppManager(null);
                 final AutomatedRuleApplicationManager realManager =
                         focusManager.getDelegate();
@@ -282,14 +263,14 @@ public class InteractiveProver {
      *            the BuiltInRule for which the applications are collected
      * @param pos
      *            the PosInSequent the position information
-     * @return a SetOf<RuleApp> with all possible rule applications
+     * @return a SetOf<IBuiltInRuleApp> with all possible rule applications
      */
-    public ImmutableSet<RuleApp> getBuiltInRuleApp(BuiltInRule rule, 
+    public ImmutableSet<IBuiltInRuleApp> getBuiltInRuleApp(BuiltInRule rule, 
 					  PosInOccurrence     pos) {
 	
-	ImmutableSet<RuleApp> result = DefaultImmutableSet.<RuleApp>nil();
+	ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
 
-        for (final RuleApp app : getInteractiveRuleAppIndex().
+        for (final IBuiltInRuleApp app : getInteractiveRuleAppIndex().
                 getBuiltInRules(focusedGoal, pos)) {
             if (app.rule() == rule) {
                 result = result.add(app);
@@ -308,9 +289,9 @@ public class InteractiveProver {
      * @return
      * 				a SetOf<RuleApp> with all possible applications of the rule
      */
-    protected ImmutableSet<RuleApp> getBuiltInRuleAppsForName(String name, PosInOccurrence pos)
+    protected ImmutableSet<IBuiltInRuleApp> getBuiltInRuleAppsForName(String name, PosInOccurrence pos)
     {
-        ImmutableSet<RuleApp> result = DefaultImmutableSet.<RuleApp>nil();
+        ImmutableSet<IBuiltInRuleApp> result = DefaultImmutableSet.<IBuiltInRuleApp>nil();
         ImmutableList<BuiltInRule> match = ImmutableSLList.<BuiltInRule>nil();
                 
         //get all possible rules for current position in sequent
@@ -466,8 +447,10 @@ public class InteractiveProver {
         if(applyStrategy!=null){
             applyStrategy.clear();
         }
-        proof.clearAndDetachRuleAppIndexes();
-        proof = null;
+        if (proof != null) {
+           proof.clearAndDetachRuleAppIndexes();
+           proof = null;
+        }
         focusedGoal = null;
         //probably more clean up has to be done here.
     }
@@ -516,4 +499,82 @@ public class InteractiveProver {
         applyStrategy.removeProverTaskObserver(ptl);        
     }
     
+    /* <p>
+     * Invoking start() on the SwingWorker causes a new Thread
+     * to be created that will call construct(), and then
+     * finished().  Note that finished() is called even if
+     * the worker is interrupted because we catch the
+     * InterruptedException in doWork().
+     * </p>
+     * <p>
+     * <b>Attention:</b> Before this thread is started it is required to
+     * freeze the MainWindow via
+     * {@code 
+     * mediator().stopInterface(true);
+     *   mediator().setInteractive(false);
+     * }. The thread itself unfreezes the UI when it is finished. 
+     * </p>
+     */
+    private class AutoModeWorker extends SwingWorker {
+        
+        private ImmutableList<Goal> goals;
+
+        public AutoModeWorker(ImmutableList<Goal> goals) {
+            this.goals = goals;
+        }        
+        
+        public Object construct() {
+            return doWork();
+        }
+        
+        public Object doWork() {
+            boolean stopMode = proof.getSettings().getStrategySettings()
+                    .getActiveStrategyProperties().getProperty(
+                            StrategyProperties.STOPMODE_OPTIONS_KEY)
+                            .equals(StrategyProperties.STOPMODE_NONCLOSE);
+            boolean retreatMode = proof.getSettings().getStrategySettings()
+            .getActiveStrategyProperties().getProperty(
+                    StrategyProperties.RETREAT_MODE_OPTIONS_KEY)
+                    .equals(StrategyProperties.RETREAT_MODE_RETREAT);
+            /**
+             * In retreatMode, the proof on the node of each previous
+             * goal is pruned, unless it was closed in the automatic proof.
+             * Other than in standard mode, in retreatMode this is done for
+             * each goal (sequentially), even if we get stuck in a goal before. 
+             */
+            if(retreatMode) {
+                return applyStrategy.startRetreat ( proof, goals, mediator ().getMaxAutomaticSteps(),
+                        getTimeout(), stopMode );
+            } else
+                return applyStrategy.start ( proof, goals, mediator ().getMaxAutomaticSteps(),
+                        getTimeout(), stopMode );
+        }
+        
+        /**
+         * Called by the "Stop" button, interrupts the worker thread 
+         * which is running this.doWork().  Note that the doWork() 
+         * method handles InterruptedExceptions cleanly.
+         */
+        public void stop () {
+           interrupt();
+        }
+
+        public void finished() {
+            final ApplyStrategyInfo result = (ApplyStrategyInfo) get ();            
+            
+            mediator().setInteractive( true );            
+            mediator().startInterface( true );
+
+            if (result.isError()) {
+                mediator ().notify
+                (new GeneralFailureEvent("An exception occurred during" 
+                        + " strategy execution.\n Exception:" + result.getException()));  
+            }
+
+            // make it possible to free memory
+            goals = null;
+            worker = null;
+        }
+    }
+
 }

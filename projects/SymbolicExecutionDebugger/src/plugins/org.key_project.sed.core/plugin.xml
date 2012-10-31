@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+      <extension
+            point="org.eclipse.core.runtime.preferences">
+         <initializer
+               class="org.key_project.sed.core.util.SEDPreferenceUtilInitializer">
+         </initializer>
+      </extension>
+      <extension
+            point="org.eclipse.core.expressions.propertyTesters">
+         <propertyTester
+               class="org.key_project.sed.core.propertyTester.StackFrameHasVariablesPropertyTester"
+               id="org.key_project.sed.core.stackFrameHasVariablesPropertyTester"
+               namespace="org.key_project.sed.core"
+               properties="stackFrameHasVariables"
+               type="org.eclipse.debug.core.model.IStackFrame">
+         </propertyTester>
+      </extension>
+</plugin>

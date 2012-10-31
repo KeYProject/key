@@ -20,7 +20,10 @@ import javax.swing.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.gui.join.JoinMenuItem;
+import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
@@ -33,7 +36,11 @@ import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.join.JoinIsApplicable;
+import de.uka.ilkd.key.proof.join.ProspectivePartner;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
@@ -55,6 +62,7 @@ class TacletMenu extends JMenu {
     private PosInSequent pos;
     private SequentView sequentView;
     private KeYMediator mediator;
+
 
     private TacletAppComparator comp = new TacletAppComparator();
         
@@ -81,12 +89,34 @@ class TacletMenu extends JMenu {
 	this.sequentView = sequentView;
 	this.mediator = sequentView.mediator();
  	this.pos = pos;
+ 	findList = removeObsolete(findList);
+    rewriteList = removeObsolete(rewriteList);
+    noFindList = removeObsolete(noFindList);
 	// delete RewriteTaclet from findList because they will be in
 	// the rewrite list and concatenate both lists
 	createTacletMenu(removeRewrites(findList).prepend(rewriteList),
 			 noFindList, builtInList, new MenuControl());
     }
-
+    
+    /** Remove rules which belong to rule set "obsolete".
+     * Obsolete rules are sound, but are discouraged to use in
+     * both automated and interactive proofs, mostly because of proof complexity issues.
+     */
+    private ImmutableList<TacletApp> removeObsolete(ImmutableList<TacletApp> list) {
+        ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
+        for (TacletApp ta: list) {
+            boolean isObsolete = false;
+            for (RuleSet rs: ta.taclet().getRuleSets()) {
+                if (rs.name().equals(new Name("obsolete"))) {
+                    isObsolete = true;
+                    break;
+                }
+            }
+            if (!isObsolete)
+                result = result.append(ta);
+        }
+        return result;
+    }
     
     /** removes RewriteTaclet from list
      * @param list the IList<Taclet> from where the RewriteTaclet are
@@ -128,11 +158,12 @@ class TacletMenu extends JMenu {
 	    createSMTMenu(control);
 	}
 	createFocussedAutoModeMenu ( control );
+	ceateJoinMenu(control);
     
 	//        addPopFrameItem(control);
 
 	addClipboardItem(control);
-
+	
 	if (pos != null) {
 	    PosInOccurrence occ = pos.getPosInOccurrence();	    
 	    if (occ != null && occ.posInTerm() != null) {
@@ -147,6 +178,8 @@ class TacletMenu extends JMenu {
 		}
 	    }
 	}
+	
+	addMacroMenu();
     }
 
     private void createBuiltInRuleMenu(ImmutableList<BuiltInRule> builtInList,
@@ -159,6 +192,14 @@ class TacletMenu extends JMenu {
 		addBuiltInRuleItem(it.next(), control);
 	    }
 	}
+    }
+    
+    private void addMacroMenu() {
+        ProofMacroMenu menu = new ProofMacroMenu(mediator, pos.getPosInOccurrence());
+        if(!menu.isEmpty()) {
+            addSeparator();
+            add(menu);
+        }
     }
     
         private void createSMTMenu(MenuControl control) {
@@ -176,6 +217,16 @@ class TacletMenu extends JMenu {
                 }
 
         }
+        
+        private void ceateJoinMenu(MenuControl control){
+            
+               List<ProspectivePartner> partner = 
+                       JoinIsApplicable.INSTANCE.isApplicable(mediator.getSelectedGoal(),pos.getPosInOccurrence());
+               if(!partner.isEmpty()){
+                   JMenuItem item = new JoinMenuItem(partner,mediator.getProof(),mediator);
+                   add(item);
+               }
+        }   
 				      
     /**
      * adds an item for built in rules (e.g. Run Simplify or Update Simplifier)
@@ -183,9 +234,31 @@ class TacletMenu extends JMenu {
     private void addBuiltInRuleItem(BuiltInRule builtInRule,
 				    MenuControl control) {
         JMenuItem item;
-        item = new DefaultBuiltInRuleMenuItem(builtInRule);                       
-        item.addActionListener(control);
-        add(item);
+        if (builtInRule == WhileInvariantRule.INSTANCE) {
+            // we add two items in this case: one for auto one for interactive
+            item = new MenuItemForTwoModeRules(builtInRule.displayName(), 
+                    "Apply Rule", "Applies a known and complete loop specification immediately.",
+                    "Enter Loop Specification", "Allows to modify an existing or to enter a new loop specification.", builtInRule);
+            item.addActionListener(control);
+            add(item);
+        } else if (builtInRule == BlockContractRule.INSTANCE) {
+            // we add two items in this case: one for auto one for interactive
+            item = new MenuItemForTwoModeRules(builtInRule.displayName(), 
+                    "Apply Rule", "Applies a known and complete block specification immediately.",
+                    "Choose and Apply Contract", "Asks to select the contract to be applied.", builtInRule);
+            item.addActionListener(control);
+            add(item);
+        } else if (builtInRule == UseOperationContractRule.INSTANCE) {
+            item = new MenuItemForTwoModeRules(builtInRule.displayName(), 
+                    "Apply Contract", "All available contracts of the method are combined and applied.",
+                    "Choose and Apply Contract", "Asks to select the contract to be applied.", builtInRule);
+            item.addActionListener(control);
+            add(item);        
+        } else {
+            item = new DefaultBuiltInRuleMenuItem(builtInRule);        
+            item.addActionListener(control);
+            add(item);
+        }
     }
 
     
@@ -305,17 +378,21 @@ class TacletMenu extends JMenu {
 	List<TacletMenuItem> items = new LinkedList<TacletMenuItem>();
 	
         final InsertHiddenTacletMenuItem insHiddenItem = 
-            new InsertHiddenTacletMenuItem(mediator.mainFrame(), 
+            new InsertHiddenTacletMenuItem(MainWindow.getInstance(), 
                     mediator.getNotationInfo(), mediator.getServices());
         
         final InsertionTacletBrowserMenuItem insSystemInvItem = 
-            new InsertSystemInvariantTacletMenuItem(mediator.mainFrame(), 
+            new InsertSystemInvariantTacletMenuItem(MainWindow.getInstance(), 
                     mediator.getNotationInfo(), mediator.getServices());
        
         
         for (final TacletApp app : taclets) {
-           
+            
             final Taclet taclet = app.taclet();
+            if(!mediator.getFilterForInteractiveProving().filter(taclet)){
+            	continue;
+            }
+            
             if (insHiddenItem.isResponsible(taclet)) {
                 insHiddenItem.add(app);
             } else if (insSystemInvItem.isResponsible(taclet)) { 
@@ -392,11 +469,14 @@ class TacletMenu extends JMenu {
 	      
         	}});
         	thread.start();            
-            }else if (e.getSource() instanceof BuiltInRuleMenuItem) {
-        	   
-                   mediator.selectedBuiltInRule
-                    (((BuiltInRuleMenuItem) e.getSource()).connectedTo(), 
-                     pos.getPosInOccurrence());
+            }           
+            else if (e.getSource() instanceof BuiltInRuleMenuItem) {
+
+                final BuiltInRuleMenuItem birmi = (BuiltInRuleMenuItem) e
+                        .getSource();
+                mediator.selectedBuiltInRule(
+                        birmi.connectedTo(), pos.getPosInOccurrence(), 
+                        birmi.forcedApplication());
         	
 	    } else if (e.getSource() instanceof FocussedRuleApplicationMenuItem) {
 	        mediator.getInteractiveProver ()

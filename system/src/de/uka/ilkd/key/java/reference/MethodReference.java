@@ -14,13 +14,20 @@ package de.uka.ilkd.key.java.reference;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.PrettyPrinter;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -284,12 +291,12 @@ public class MethodReference extends JavaNonTerminalProgramElement
         return prefixType;        
     }
     
-    public ProgramMethod method(Services services, 
+    public IProgramMethod method(Services services, 
             			KeYJavaType refPrefixType, 
             			ExecutionContext ec) {	
         ProgramVariable inst = services.getJavaInfo().getAttribute(
                 ImplicitFieldAdder.IMPLICIT_ENCLOSING_THIS, ec.getTypeReference().getKeYJavaType());
-        ProgramMethod pm = method(services, refPrefixType, 
+        IProgramMethod pm = method(services, refPrefixType, 
                 getMethodSignature(services, ec),
                 ec.getTypeReference().getKeYJavaType());
         while(inst!=null && pm==null){
@@ -316,12 +323,12 @@ public class MethodReference extends JavaNonTerminalProgramElement
      * @param context the KeYJavaType from where the method is called  
      * @return the found program method
      */
-    public ProgramMethod method
+    public IProgramMethod method
     	(Services services, KeYJavaType classType, 
     	        ImmutableList<KeYJavaType> signature, 
     	        KeYJavaType context) {
         final String methodName = name.toString();        
-        ProgramMethod pm = services.getJavaInfo().getProgramMethod(classType, 
+        IProgramMethod pm = services.getJavaInfo().getProgramMethod(classType, 
                 methodName, signature, context);
 	return pm;
     }
@@ -348,12 +355,12 @@ public class MethodReference extends JavaNonTerminalProgramElement
 
     public KeYJavaType getKeYJavaType(Services services, 
 				      ExecutionContext ec) {
-	ProgramMethod meth = method(services, 
+	IProgramMethod meth = method(services, 
 	        determineStaticPrefixType(services, ec), ec);
 	if(meth == null){
 	    return ec.getTypeReference().getKeYJavaType();
 	}
-	return meth.getKeYJavaType();
+	return meth.getReturnType();
 		      
     }
 

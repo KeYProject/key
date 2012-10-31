@@ -10,13 +10,20 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
-import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Comment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.declaration.MethodDeclaration;
+import de.uka.ilkd.key.java.declaration.Modifier;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Helper class used by the JML translation. Provides methods that look for
@@ -31,9 +38,12 @@ public final class JMLInfoExtractor {
     
     /**
      * Checks whether "comment" is a JML comment containing "key".
+     * see bugreport #1166
      */
     private static boolean checkFor(String key, String comment) {
-	return comment.startsWith("/*@") && comment.contains(key);
+        int index = comment.indexOf(key);
+	boolean result = MiscTools.isJMLComment(comment) && index >= 0;
+	return result;
     }    
     
     
@@ -73,7 +83,7 @@ public final class JMLInfoExtractor {
     
 
     
-    private static boolean hasJMLModifier(ProgramMethod pm, String mod) {
+    private static boolean hasJMLModifier(IProgramMethod pm, String mod) {
         ImmutableList<Comment> coms = ImmutableSLList.<Comment>nil();
         final MethodDeclaration method = pm.getMethodDeclaration();
         
@@ -89,7 +99,7 @@ public final class JMLInfoExtractor {
         }
         
         // ... or to the return type ...
-        if(method.getTypeReference() != null) {
+        if(!pm.isVoid() && !pm.isConstructor()) {
             coms = coms.prepend(method.getTypeReference().getComments());
         }
         
@@ -138,6 +148,20 @@ public final class JMLInfoExtractor {
             return false;
         } else {
             return hasJMLModifier((TypeDeclaration)t.getJavaType(), "pure");
+        }
+    }
+    
+    /**
+     * Returns true iff the given type is specified as pure, i.e. all
+     * methods and constructors are by default specified "strictly_pure"
+     * 
+     * If t is not a reference type, false is returned.
+     */
+    public static boolean isStrictlyPureByDefault(KeYJavaType t) {
+        if(!(t.getJavaType() instanceof TypeDeclaration)) {
+            return false;
+        } else {
+            return hasJMLModifier((TypeDeclaration)t.getJavaType(), "strictly_pure");
         }
     }
 
@@ -220,7 +244,7 @@ public final class JMLInfoExtractor {
      * Returns true iff the <code>pos</code>-th parameter of the given method
      * is declared "nullable" (implicitly or explicitly). 
      */
-    public static boolean parameterIsNullable(ProgramMethod pm, int pos) {
+    public static boolean parameterIsNullable(IProgramMethod pm, int pos) {
         MethodDeclaration md = pm.getMethodDeclaration();
         ParameterDeclaration pd = md.getParameterDeclarationAt(pos);
 
@@ -233,7 +257,7 @@ public final class JMLInfoExtractor {
      * is declared "nullable" (implicitly or explicitly). 
      * Warning: weird things may happen if the parameter doesn't belong to the method.
      */
-    public static boolean parameterIsNullable(ProgramMethod pm,
+    public static boolean parameterIsNullable(IProgramMethod pm,
             ParameterDeclaration pd) {
 	assert pm.getMethodDeclaration().getParameters().contains(pd): "parameter "+pd+" does not belong to method declaration "+pm;
 	ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
@@ -256,14 +280,14 @@ public final class JMLInfoExtractor {
     }
     
     
-    public static boolean resultIsNullable(ProgramMethod pm) {
+    public static boolean resultIsNullable(IProgramMethod pm) {
         MethodDeclaration md = pm.getMethodDeclaration();
         
         ImmutableList<Comment> comments = ImmutableSLList.<Comment>nil();
         for(Modifier mod : md.getModifiers()) {
             comments = comments.prepend(mod.getComments());
         }
-        if(md.getTypeReference() != null) {
+        if(!pm.isVoid() && !pm.isConstructor()) {
             comments = comments.prepend(md.getTypeReference().getComments());
         }
         Comment[] methodComments = md.getComments();
@@ -286,7 +310,7 @@ public final class JMLInfoExtractor {
     /**
      * Returns true iff the given method is specified "pure".
      */
-    public static boolean isPure(ProgramMethod pm) {
+    public static boolean isPure(IProgramMethod pm) {
         return hasJMLModifier(pm, "pure") 
                || isPureByDefault(pm.getContainerType());
     }
@@ -295,7 +319,16 @@ public final class JMLInfoExtractor {
     /**
      * Returns true iff the given method is specified "helper".
      */
-    public static boolean isHelper(ProgramMethod pm) {
+    public static boolean isHelper(IProgramMethod pm) {
 	return hasJMLModifier(pm, "helper");
+    }
+
+    /**
+     * Returns true iff the given method is specified "strictly_pure"
+     * or the containing type is specified so.
+     */
+    public static boolean isStrictlyPure(IProgramMethod pm) {
+        return hasJMLModifier(pm, "strictly_pure") 
+                || isStrictlyPureByDefault(pm.getContainerType());
     }
 }

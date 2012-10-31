@@ -10,32 +10,71 @@
 
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.SetRuleFilter;
-import de.uka.ilkd.key.rule.*;
-
+import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.QueryExpand;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.strategy.feature.*;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
-import de.uka.ilkd.key.strategy.termProjection.*;
-import de.uka.ilkd.key.strategy.termfeature.*;
-import de.uka.ilkd.key.strategy.termgenerator.*;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCost;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCostScalerFeature;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.SplittableQuantifiedFormulaFeature;
+import de.uka.ilkd.key.strategy.termProjection.AssumptionProjection;
+import de.uka.ilkd.key.strategy.termProjection.CoeffGcdProjection;
+import de.uka.ilkd.key.strategy.termProjection.DividePolynomialsProjection;
+import de.uka.ilkd.key.strategy.termProjection.FocusFormulaProjection;
+import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
+import de.uka.ilkd.key.strategy.termProjection.MonomialColumnOp;
+import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
+import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
+import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
+import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
+import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
+import de.uka.ilkd.key.util.MiscTools;
 
 
 /**
  * Strategy tailored to be used as long as a java program can be found in
  * the sequent.
  */
-public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
+public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private final RuleSetDispatchFeature costComputationDispatcher;
     private final Feature costComputationF;
@@ -53,11 +92,15 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private final StrategyProperties strategyProperties;
+    private OneStepSimplifier oneStepSimplifierRuleInstance;
     
     protected JavaCardDLStrategy(Proof p_proof,
                                  StrategyProperties strategyProperties) {
         
         super ( p_proof );
+        
+        this.oneStepSimplifierRuleInstance = 
+              MiscTools.findOneStepSimplifier(p_proof);
         
         this.strategyProperties =
             (StrategyProperties)strategyProperties.clone ();
@@ -104,18 +147,22 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             assert false;
         }
 
-        final String queryProp = strategyProperties
-        .getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
+        final String queryProp = strategyProperties.getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
         final Feature queryF;
         if (queryProp.equals(StrategyProperties.QUERY_ON)) {
-                queryF = querySpecFeature(longConst(200));
+       	    queryF = querySpecFeature(new QueryExpandCost(200,1,1,false)); 
+        } else if (queryProp.equals(StrategyProperties.QUERY_RESTRICTED)) {
+        	// All tests in the example directory pass with this strategy. 
+        	//Hence, the old query_on strategy is obsolete.
+    	    queryF = querySpecFeature(new QueryExpandCost(500,0,20,true));  
         } else if (queryProp.equals(StrategyProperties.QUERY_OFF)) {
-                queryF = querySpecFeature(inftyConst());
+        	queryF = querySpecFeature(inftyConst());
         } else {
                 queryF = null;
                 assert false;
         }
         
+
         final Feature depSpecF;
         final String depProp
         	= strategyProperties.getProperty(
@@ -123,12 +170,12 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final SetRuleFilter depFilter = new SetRuleFilter();
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if (depProp.equals(StrategyProperties.DEP_ON)) {
-            depSpecF = ConditionalFeature.createConditional(depFilter, 
-        	    					    longConst(2500));            
-        } else {
-            depSpecF = ConditionalFeature.createConditional(depFilter, 
-        	    					    inftyConst());
-        }
+                depSpecF = ConditionalFeature.createConditional(depFilter,
+                                                                longConst(400));            
+            } else {
+                depSpecF = ConditionalFeature.createConditional(depFilter,
+                                                                inftyConst());
+            }        
         
         final Feature loopInvF;
         final String loopProp
@@ -138,6 +185,15 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
             loopInvF = loopInvFeature(longConst(0));
         } else {
             loopInvF = loopInvFeature(inftyConst());
+        }
+        
+        final Feature blockFeature;
+        final String blockProperty = strategyProperties.getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
+        if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT)) {
+        	blockFeature = blockContractFeature(longConst(Long.MIN_VALUE));
+        }
+        else {
+        	blockFeature = blockContractFeature(inftyConst());
         }
         
         final Feature oneStepSimplificationF 
@@ -157,12 +213,19 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
               queryF,
               depSpecF,
               loopInvF,
+              blockFeature,
               ifMatchedF});
     }
     
     private Feature loopInvFeature(Feature cost) {
 	SetRuleFilter filter = new SetRuleFilter();
 	filter.addRuleToSet(WhileInvariantRule.INSTANCE);
+	return ConditionalFeature.createConditional(filter, cost);
+    }
+    
+    private Feature blockContractFeature(Feature cost) {
+	SetRuleFilter filter = new SetRuleFilter();
+	filter.addRuleToSet(BlockContractRule.INSTANCE);
 	return ConditionalFeature.createConditional(filter, cost);
     }
 
@@ -178,10 +241,10 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         return ConditionalFeature.createConditional(filter, cost);        
     }
 
-    
     private Feature oneStepSimplificationFeature(Feature cost) {
 	SetRuleFilter filter = new SetRuleFilter();
-	filter.addRuleToSet(OneStepSimplifier.INSTANCE);
+	filter.addRuleToSet(oneStepSimplifierRuleInstance);
+
         return ConditionalFeature.createConditional(filter, cost);        
     }
     
@@ -219,12 +282,15 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         bindRuleSet ( d, "simplify_boolean", -200 );
         
         bindRuleSet ( d, "concrete", -10000 );        
-        bindRuleSet ( d, "simplify", -2000 );        
+        bindRuleSet ( d, "simplify", -3000 );        
         bindRuleSet ( d, "simplify_enlarging", -1800 );        
         bindRuleSet ( d, "simplify_expression", -100 );
         bindRuleSet ( d, "executeIntegerAssignment", -100 );
 
         bindRuleSet ( d, "javaIntegerSemantics", -5000 );
+        
+        // always give infinite cost to obsolete rules
+        bindRuleSet (d, "obsolete", inftyConst());
         
         
         bindRuleSet (d, "update_elim", -8000);
@@ -326,23 +392,47 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         boolean useLoopExpand = strategyProperties.getProperty(
                 StrategyProperties.LOOP_OPTIONS_KEY).
                     equals(StrategyProperties.LOOP_EXPAND);
+        /*boolean useBlockExpand = strategyProperties.getProperty(
+                StrategyProperties.BLOCK_OPTIONS_KEY).
+                    equals(StrategyProperties.BLOCK_EXPAND);*/
         boolean programsToRight = true;//XXX
         
         final String methProp
         	= strategyProperties.getProperty(
         			StrategyProperties.METHOD_OPTIONS_KEY);
         if (methProp.equals(StrategyProperties.METHOD_CONTRACT)) {
-            bindRuleSet(d, "method_expand", longConst(200));	
+        	/* If method treatment by contracts is chosen, this does not mean 
+        	 * that method expansion is disabled. The original cost was 200 
+        	 * and is now increased to 2000 in order to repress method expansion 
+        	 * stronger when method treatment by contracts is chosen. 
+        	 */
+            bindRuleSet(d, "method_expand", longConst(2000));   	
+        	//bindRuleSet(d, "method_expand", inftyConst()); //This seems to be more correct, but the then some proofs from the example directory do not work.
         } else if (methProp.equals(StrategyProperties.METHOD_EXPAND)) {
             bindRuleSet(d, "method_expand", longConst(100));	   
         } else if (methProp.equals(StrategyProperties.METHOD_NONE)) {
             bindRuleSet(d, "method_expand", inftyConst());	  
         } else throw new RuntimeException("Unexpected strategy property "+
                                           methProp);
+
+        
+        final String queryAxProp = strategyProperties.
+                           getProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY);
+        if (queryAxProp.equals(StrategyProperties.QUERYAXIOM_ON)) {
+            bindRuleSet ( d, "query_axiom", longConst(-3000) ); //Originally the QueryAxiom rule was assigned the strategy "simplify". Hence, the cost should be probably low.
+        } else if (queryAxProp.equals(StrategyProperties.QUERYAXIOM_OFF)) {
+            bindRuleSet ( d, "query_axiom", inftyConst());
+        } else {
+                assert false;
+        }
         
         bindRuleSet ( d, "loop_expand",
                       useLoopExpand ? longConst ( 0 )
                                     : inftyConst () );
+        
+        /*bindRuleSet ( d, "block_expand",
+                      useBlockExpand ? longConst ( 0 )
+                                     : inftyConst () );*/
         
         // delete cast
         bindRuleSet ( d, "cast_deletion",
@@ -356,8 +446,8 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         //partial inv axiom
         bindRuleSet ( d, "partialInvAxiom",
                       add ( NonDuplicateAppModPositionFeature.INSTANCE,
-                            longConst ( 10000 ) ) );                        
-        
+                            longConst ( 10000 ) ) );
+
         //inReachableState        
         bindRuleSet ( d, "inReachableStateImplication",
                       add ( NonDuplicateAppModPositionFeature.INSTANCE,
@@ -412,6 +502,21 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // never be instantiated (so that these applications can be removed from
         // the queue and do not have to be considered again).
         setupInstantiationWithoutRetry ( d, p_proof );
+        
+        //chrisg: The following rule, if active, must be applied delta rules.
+        if(autoInductionEnabled()){
+        	bindRuleSet ( d, "auto_induction", -6500 ); //chrisg
+        }else{
+        	bindRuleSet ( d, "auto_induction", inftyConst () ); //chrisg
+        }
+        
+        //chrisg: The following rule is a beta rule that, if active, must have a higher priority than other beta rules.
+        if(autoInductionLemmaEnabled()){
+        	bindRuleSet ( d, "auto_induction_lemma", -300 ) ; 
+        }else{
+            bindRuleSet ( d, "auto_induction_lemma", inftyConst());        	
+        }
+
         
         return d;
     }
@@ -699,6 +804,25 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
                  ( StrategyProperties.QUANTIFIERS_OPTIONS_KEY ) );
     }
 
+    private boolean autoInductionEnabled () { //chrisg
+    	//Negated!
+        return !StrategyProperties.AUTO_INDUCTION_OFF.equals (
+                 strategyProperties.getProperty
+                 ( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY ) );
+    }
+
+    private boolean autoInductionLemmaEnabled () {  //chrisg
+    	final String prop =strategyProperties.getProperty
+                             ( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY ) ;
+    	return prop.equals(StrategyProperties.AUTO_INDUCTION_LEMMA_ON) ||
+    	       prop.equals(StrategyProperties.AUTO_INDUCTION_RESTRICTED);
+    	/*
+        return StrategyProperties.AUTO_INDUCTION_LEMMA_ON.equals (
+                 strategyProperties.getProperty
+                 ( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY ) );
+         */
+    }
+
     private Feature allowSplitting(ProjectionToTerm focus) {
         if ( normalSplitting () ) return longConst ( 0 );
         
@@ -743,6 +867,7 @@ public final class JavaCardDLStrategy extends AbstractFeatureStrategy {
              longConst ( 20 )
           } ) );
 
+        
         bindRuleSet ( d, "split_cond", longConst ( 1 ) );
 
         bindRuleSet ( d, "cut_direct",

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
+      <statement name="int a = a();" pathCondition="true" pathConditionChanged="false">
+         <methodCall name="self.a();" pathCondition="true" pathConditionChanged="false">
+            <statement name="int b1 = b();" pathCondition="true" pathConditionChanged="false">
+               <methodCall name="self.b();" pathCondition="true" pathConditionChanged="false">
+                  <statement name="return c();" pathCondition="true" pathConditionChanged="false">
+                     <methodCall name="self.c();" pathCondition="true" pathConditionChanged="false">
+                        <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
+                           <methodReturn name="&lt;return of self.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.c();&gt;">
+                              <methodReturn name="&lt;return of self.b();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.b();&gt;">
+                                 <statement name="int b2 = b();" pathCondition="true" pathConditionChanged="false">
+                                    <methodCall name="self.b();" pathCondition="true" pathConditionChanged="false">
+                                       <statement name="return c();" pathCondition="true" pathConditionChanged="false">
+                                          <methodCall name="self.c();" pathCondition="true" pathConditionChanged="false">
+                                             <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
+                                                <methodReturn name="&lt;return of self.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.c();&gt;">
+                                                   <methodReturn name="&lt;return of self.b();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.b();&gt;">
+                                                      <statement name="int c = c();" pathCondition="true" pathConditionChanged="false">
+                                                         <methodCall name="self.c();" pathCondition="true" pathConditionChanged="false">
+                                                            <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
+                                                               <methodReturn name="&lt;return of self.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.c();&gt;">
+                                                                  <statement name="return b1+b2+c;" pathCondition="true" pathConditionChanged="false">
+                                                                     <methodReturn name="&lt;return of self.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;126&apos; as result of self.a();&gt;">
+                                                                        <statement name="int x = x();" pathCondition="true" pathConditionChanged="false">
+                                                                           <methodCall name="self.x();" pathCondition="true" pathConditionChanged="false">
+                                                                              <statement name="return 2;" pathCondition="true" pathConditionChanged="false">
+                                                                                 <methodReturn name="&lt;return of self.x();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;2&apos; as result of self.x();&gt;">
+                                                                                    <statement name="return a*x;" pathCondition="true" pathConditionChanged="false">
+                                                                                       <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;252&apos; as result of self.main();&gt;">
+                                                                                          <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                                                                                          </termination>
+                                                                                       </methodReturn>
+                                                                                    </statement>
+                                                                                 </methodReturn>
+                                                                              </statement>
+                                                                           </methodCall>
+                                                                        </statement>
+                                                                     </methodReturn>
+                                                                  </statement>
+                                                               </methodReturn>
+                                                            </statement>
+                                                         </methodCall>
+                                                      </statement>
+                                                   </methodReturn>
+                                                </methodReturn>
+                                             </statement>
+                                          </methodCall>
+                                       </statement>
+                                    </methodCall>
+                                 </statement>
+                              </methodReturn>
+                           </methodReturn>
+                        </statement>
+                     </methodCall>
+                  </statement>
+               </methodCall>
+            </statement>
+         </methodCall>
+      </statement>
+   </methodCall>
+</startNode>

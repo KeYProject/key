@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_1e811ad4-75b6-4121-8ce1-307580f89a0a" name="returnValue(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_288d14b2-23ed-45f3-a62c-6d5d8df1ad5f" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_43c2e08d-8701-4339-aa5f-d0772066c704" name="self.returnValue(value);" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
+            <sedStatement xml:id="_31bd4cf3-69df-42c6-9950-27682ee19e07" name="return value;" pathCondition="true" lineNumber="-1" charStart="150" charEnd="163">
+               <sedMethodReturn xml:id="_e7ab82e9-780d-410d-b9a5-52ec27103c71" name="&lt;return &apos;42&apos; as result of self.returnValue(value);&gt;" pathCondition="true" lineNumber="-1" charStart="122" charEnd="133">
+                  <sedTermination xml:id="_32f55273-6bc1-48e2-80d2-a50fa3c3aae7" name="&lt;end&gt;" pathCondition="true">
+                  </sedTermination>
+               </sedMethodReturn>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

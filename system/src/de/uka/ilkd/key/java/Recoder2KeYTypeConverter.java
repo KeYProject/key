@@ -25,8 +25,8 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.*;
 import de.uka.ilkd.key.util.Debug;
@@ -145,9 +145,10 @@ public class Recoder2KeYTypeConverter {
      * 
      */
     public KeYJavaType getKeYJavaType(recoder.abstraction.Type t) {
-        if (t == null) {
-            return null; // this can originate from 'void'
-        }
+        
+        // change from 2012-02-07: there must be a definite KJT
+        if (t == null)
+            throw new NullPointerException("null cannot be converted into a KJT");
 
         // lookup in the cache
         KeYJavaType kjt = lookupInCache(t);
@@ -448,7 +449,7 @@ public class Recoder2KeYTypeConverter {
                     initArrayMethodBuilder();
                 }	
 
-                final ProgramMethod prepare = arrayMethodBuilder.getPrepareArrayMethod(
+                final IProgramMethod prepare = arrayMethodBuilder.getPrepareArrayMethod(
 										       parentReference, length, defaultValue, fields);
 
                 members.add(arrayMethodBuilder

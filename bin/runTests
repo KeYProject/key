@@ -2,13 +2,13 @@
 
 resolve_symlink  ()
 { 
-   TARGET=`ls -l $1| awk '/\ ->\ /{print $NF}'`
+   TARGET=`ls -l "$1"| awk '/\ ->\ /{print $NF}'`
 
    if [ -n "$TARGET" ] ; then
       RESULT="$TARGET"
       case "$RESULT" in
          /*) break ;;				# absolute symlink
-         *)  RESULT=`dirname $0`/"$RESULT" ;;	# relative symlink
+         *)  RESULT=`dirname "$0"`/"$RESULT" ;;	# relative symlink
       esac
    else
       RESULT=$1
@@ -19,7 +19,6 @@ resolve_symlink  ()
 
 UNAME=`uname -s 2>/dev/null | tr '[:upper:]' '[:lower:]'`
 ARCH=`uname -pm 2>/dev/null | tr '[:upper:]' '[:lower:]' | tr ' ' '-'`
-
 
 if [ -z "$JAVA_HOME" ] ; then
     JAVA=`which java`
@@ -57,9 +56,9 @@ JAVA_OPTIONS=
 
 if [ -z "$KEY_HOME" ] ; then
    KEY_HOME=`resolve_symlink "$0"`	# resolve symlink name
-   KEY_HOME=`dirname $KEY_HOME`		# strip executable filename
+   KEY_HOME=`dirname "$KEY_HOME"`		# strip executable filename
    KEY_HOME=`cd "$KEY_HOME";pwd`	# and now expand the path to full
-   KEY_HOME=`dirname $KEY_HOME`		# strip bin/ sirectory
+   KEY_HOME=`dirname "$KEY_HOME"`		# strip bin/ sirectory
 fi
 echo "Using KeY installation from:      $KEY_HOME"
 
@@ -77,12 +76,11 @@ export PATH
 #
 
 key_ext_jars="antlr.jar recoderKey.jar junit.jar"
-
 keyclasspath="$KEY_HOME/system/binary/"
 
 for i in $key_ext_jars ; do
     current_jar="$KEY_LIB/$i"
-    if [ ! -f $current_jar ]
+    if [ ! -f "$current_jar" ]
     then
        echo Cannot find $current_jar. 
        echo Copy or link the file into the
@@ -108,6 +106,9 @@ then
 mkdir "$HOME/.key"
 fi
 
+PATH=${PATH}:$KEY_LIB
+
+
 if [ "" = "$1" ] 
 then
     echo "No particular test case specified. All tests will be run."
@@ -116,15 +117,15 @@ else
     testcase=`echo $1 | tr '/' '.'`
 fi
 
-COMPLETEOPTIONS="$JAVA_OPTIONS $keysysprops \
--ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx1024m \
--Dkey.home=$KEY_HOME \
--Dkey.pattern.path=$HOME/.key/keypatterns/ \
--classpath $keyclasspath"
+$JAVA $JAVA_OPTIONS $keysysprops \
+-ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx2048m \
+-Dkey.home="$KEY_HOME" \
+-classpath "$keyclasspath" junit.textui.TestRunner $testcase
 
-
-$JAVA $COMPLETEOPTIONS junit.textui.TestRunner $testcase
-
-if [ "$testcase" = "TestKey" ]; then
-    $JAVA $COMPLETEOPTIONS de.uka.ilkd.key.util.DesignTests
-fi
+# DesignTests are now included as test cases in TestKey
+#if [ "$testcase" = "TestKey" ]; then
+#    $JAVA $JAVA_OPTIONS $keysysprops \
+#	-ea:de.uka.ilkd.key... -noverify -Djvm.dir=$JVM_DIR -Xms64m -Xmx2048m \
+#	-Dkey.home="$KEY_HOME" \
+#	-classpath "$keyclasspath" de.uka.ilkd.key.util.DesignTests
+#fi

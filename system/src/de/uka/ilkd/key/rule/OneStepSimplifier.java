@@ -37,6 +37,7 @@ import de.uka.ilkd.key.util.LRUCache;
 public final class OneStepSimplifier implements BuiltInRule, 	
 						KeYSelectionListener {
     
+    // TODO: Remove the singleton instance or make the rule state less to allow parallelization of site proofs started via a ProofStarter which is currently not possible thanks to ConcurrentModificationExceptions (This use case happens for instance in the symbolic execution debugger) 
     public static final OneStepSimplifier INSTANCE 
                                             = new OneStepSimplifier();
     
@@ -68,7 +69,7 @@ public final class OneStepSimplifier implements BuiltInRule,
     //constructors
     //------------------------------------------------------------------------- 
     
-    private OneStepSimplifier() {
+    public OneStepSimplifier() { // Visibility must be public because it is no longer a singleton in general. Side proofs use own OneStepSimplifier instances for parallelization. This is required thanks to the internal state of this rule.
     }
     
     
@@ -115,7 +116,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 	       || !tac.goalTemplates().head().sequent().isEmpty()
 	       || !tac.varsNew().isEmpty()
 	       || tac.varsNewDependingOn().hasNext()
-	       || ((RewriteTaclet)tac).getStateRestriction() 
+	       || ((RewriteTaclet)tac).getApplicationRestriction() 
 	             != RewriteTaclet.NONE
 	       || !proof.mgt().getJustification(app)
 	                      .isAxiomJustification()) {
@@ -496,7 +497,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 		            + (inst.getNumAppliedRules() > 1 
 		               ? " rules" 
 		               : " rule"));
-	((BuiltInRuleApp)ruleApp).setIfInsts(inst.getIfInsts());
+	ruleApp = ((IBuiltInRuleApp)ruleApp).setIfInsts(inst.getIfInsts());
 	
 	return result;
     }
@@ -568,5 +569,10 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    return cf + " (" + numAppliedRules 
 	              + (numAppliedRules > 1 ? " rules)" : "rule)");
 	}
+    }
+
+	@Override
+    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos) {
+	    return new DefaultBuiltInRuleApp(this, pos);
     }
 }

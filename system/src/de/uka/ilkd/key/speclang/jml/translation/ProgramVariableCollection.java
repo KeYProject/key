@@ -3,6 +3,8 @@
  */
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -13,20 +15,20 @@ public class ProgramVariableCollection {
     public ImmutableList<ProgramVariable> paramVars;
     public ProgramVariable resultVar;
     public ProgramVariable excVar;
-    public LocationVariable heapAtPreVar ;
-    public Term heapAtPre;
+    public Map<LocationVariable,LocationVariable> atPreVars;
+    public Map<LocationVariable,Term> atPres;
     
     public ProgramVariableCollection(ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
             ProgramVariable resultVar, ProgramVariable excVar,
-            LocationVariable heapAtPreVar, Term heapAtPre) {
+            Map<LocationVariable,LocationVariable> atPreVars, Map<LocationVariable,Term> atPres) {
         super();
         this.selfVar = selfVar;
         this.paramVars = paramVars;
         this.resultVar = resultVar;
         this.excVar = excVar;
-        this.heapAtPreVar = heapAtPreVar;
-        this.heapAtPre = heapAtPre;
+        this.atPreVars = atPreVars;
+        this.atPres = atPres;
     }
 
     public ProgramVariableCollection() {

@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.speclang;
 
+import antlr.Token;
 import de.uka.ilkd.key.java.Position;
 
 /**
@@ -36,6 +37,10 @@ public class PositionedString {
         this.pos = pos;
     }
     
+    public PositionedString(String text, Token t){
+        this(text, t.getFilename(), new Position(t.getLine(),t.getColumn()));
+    }
+    
     
     public PositionedString(String text, String fileName) {
         this(text, fileName, null);
@@ -43,7 +48,7 @@ public class PositionedString {
     
     
     public PositionedString(String text) {
-        this(text, null);
+        this(text, (String)null);
     }
 
 

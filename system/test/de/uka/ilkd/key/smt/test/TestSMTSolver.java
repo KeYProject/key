@@ -29,11 +29,7 @@ import de.uka.ilkd.key.smt.SolverType;
 
 class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
-    
-    @Override
-    public String getCommand(SolverType type) {
-	return type.getDefaultExecutionCommand();
-    }
+
 
     @Override
     public int getMaxConcurrentProcesses() {
@@ -47,7 +43,7 @@ class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
 
     @Override
     public String getSMTTemporaryFolder() {
-	return   PathConfig.KEY_CONFIG_DIR
+	return   PathConfig.getKeyConfigDir()
 	    + File.separator + "smt_formula";
     }
 
@@ -101,6 +97,16 @@ public long getMaximumInteger() {
 public long getMinimumInteger() {
 
         return ProofDependentSMTSettings.getDefaultSettingsData().minInteger;
+}
+
+@Override
+public String getLogic() {
+	return "AUFLIA";
+}
+
+@Override
+public boolean checkForSupport() {
+	return false;
 }
 
     
@@ -264,7 +270,7 @@ public abstract class TestSMTSolver extends TestCommons {
 	if (isValid && result != null) {
 	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.FALSIFIABLE; 
 	} else {
-	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.TRUE;
+	    return result.isValid() != SMTSolverResult.ThreeValuedTruth.VALID;
 	}
     }
     

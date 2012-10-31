@@ -39,7 +39,6 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -607,6 +606,7 @@ public class TestMatchTaclet extends TestCase {
 	    (new TypeRef(new KeYJavaType
 		(PrimitiveType.JAVA_BYTE, 
 		 new SortImpl(new Name("byte")))),
+		 null,
 	     new LocationVariable(new ProgramElementName("testVar"),
 				 new SortImpl(new Name("testSort"))));
 	MethodFrame mframe = new MethodFrame(null, ec, prg);

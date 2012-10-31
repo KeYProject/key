@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_ee955ce0-55c8-4910-b45d-b04ab7016a99" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_71cbdf78-9027-47ca-8625-baea09a764dc" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_a4dc447a-b05f-4213-be27-c48c856b3187" name="self.main();" pathCondition="true" lineNumber="-1" charStart="256" charEnd="260">
+            <sedStatement xml:id="_6f3a54ba-7b25-449f-93e4-ff715430518c" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="268" charEnd="278">
+               <sedLoopNode xml:id="_4471504c-1662-4cf3-a91f-8feab3ef90b5" name="while ( i&lt;3 ) {   i++; }" pathCondition="true" lineNumber="-1" charStart="282" charEnd="310">
+                  <sedLoopCondition xml:id="_8ac75882-ade2-46a2-ac3b-6e5fac733f01" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="288" charEnd="293">
+                     <sedStatement xml:id="_005a187f-5026-4f7b-a8a4-8dd184c0efb0" name="i++;" pathCondition="true" lineNumber="-1" charStart="301" charEnd="305">
+                        <sedLoopCondition xml:id="_e501d043-eb19-45c6-aded-f12473f8a2e8" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="288" charEnd="293">
+                           <sedStatement xml:id="_d2316b56-ee06-4e55-ab98-e9fa86ee2d93" name="i++;" pathCondition="true" lineNumber="-1" charStart="301" charEnd="305">
+                              <sedLoopCondition xml:id="_1e4823af-9f95-4266-8caa-9d73112afecf" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="288" charEnd="293">
+                                 <sedStatement xml:id="_436c7384-0da9-476a-a82a-38d09058982f" name="i++;" pathCondition="true" lineNumber="-1" charStart="301" charEnd="305">
+                                    <sedLoopCondition xml:id="_383aaba1-b529-4821-8021-31511a345aae" name="i&lt;3" pathCondition="true" lineNumber="-1" charStart="288" charEnd="293">
+                                       <sedMethodReturn xml:id="_62e1c427-7341-4a2e-ae46-6d5960463149" name="&lt;return of self.main();&gt;" pathCondition="true" lineNumber="-1" charStart="256" charEnd="260">
+                                          <sedTermination xml:id="_97f97b45-b352-47bf-8848-2b25dfbf287e" name="&lt;end&gt;" pathCondition="true">
+                                          </sedTermination>
+                                       </sedMethodReturn>
+                                    </sedLoopCondition>
+                                 </sedStatement>
+                              </sedLoopCondition>
+                           </sedStatement>
+                        </sedLoopCondition>
+                     </sedStatement>
+                  </sedLoopCondition>
+               </sedLoopNode>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

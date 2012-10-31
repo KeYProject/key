@@ -87,7 +87,13 @@ public final class ModalOperatorSV extends AbstractSV  {
     public String proofToString() {
 	StringBuffer result = new StringBuffer();
 	result.append("\\schemaVar \\modalOperator {");
+        boolean first = true;
 	for(Modality modality : modalities) {
+            if(!first) {
+              result.append(", ");
+            }else{
+              first = false;
+            }
 	    result.append(modality);
 	}
 	result.append("} ").append(name()).append(";\n");

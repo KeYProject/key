@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_1529a20f-5cb3-4edb-83f9-4f077dce378a" name="main(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_a3199c36-3b7f-4c15-a4c0-51eca0836d85" name="&lt;start&gt;" pathCondition="true">
+      </sedThread>
+   </sedTarget>
+</launch>

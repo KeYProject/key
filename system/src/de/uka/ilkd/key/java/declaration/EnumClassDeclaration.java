@@ -73,7 +73,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * 
      */
     private IProgramVariable findAttr(String fieldName) {
-        String completeName = getName() + "::" + fieldName;
+        String completeName = getFullName() + "::" + fieldName;
         for (int i = 0; i < members.size(); i++) {
             if (members.get(i) instanceof FieldDeclaration) {
                 FieldDeclaration fd = (FieldDeclaration) members.get(i);
@@ -84,13 +84,13 @@ public class EnumClassDeclaration extends ClassDeclaration {
             }
         }
         throw new IllegalStateException(fieldName + " is not an attribute of "
-                + this.getName());
+                + this.getFullName());
     }
 
     /*
      * is pv a enum constant of THIS enum?
      */
-    private boolean isLocalEnumConstant(ProgramVariable pv) {
+    private boolean isLocalEnumConstant(IProgramVariable pv) {
         for (IProgramVariable cnst : constants) {
             if (cnst.equals(pv))
                 return true;
@@ -124,7 +124,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * @param attribute ProgramVariable to check.
      * @return true iff attribute is an enum constant.
      */
-    public static boolean isEnumConstant(ProgramVariable attribute) {
+    public static boolean isEnumConstant(IProgramVariable attribute) {
         KeYJavaType kjt = attribute.getKeYJavaType();
         Type type = kjt.getJavaType();
         if (type instanceof EnumClassDeclaration)

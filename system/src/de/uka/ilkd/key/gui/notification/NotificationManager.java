@@ -17,9 +17,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.JFrame;
+
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.notification.actions.*;
+import de.uka.ilkd.key.gui.notification.actions.ExceptionFailureNotificationDialog;
+import de.uka.ilkd.key.gui.notification.actions.GeneralFailureJTextPaneDisplay;
+import de.uka.ilkd.key.gui.notification.actions.GeneralInformationJTextPaneDisplay;
+import de.uka.ilkd.key.gui.notification.actions.ProofClosedJTextPaneDisplay;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ProofEvent;
 
@@ -37,9 +42,7 @@ public class NotificationManager {
     
     /** true if we are currently in automode */
     private boolean automode;
-    
-    private KeYMediator mediator;
-    
+        
     // Dummy task to avoid null pointer checks
     private static final NotificationTask DUMMY_TASK = 
         new NotificationTask() {
@@ -57,20 +60,22 @@ public class NotificationManager {
     
     
 
-    public void setDefaultNotification() {
+    public void setDefaultNotification(JFrame comp) {
        
         notificationTasks.clear();
         
         final ProofClosedNotification pcn = new ProofClosedNotification();
+        final ExceptionFailureNotification efn = new ExceptionFailureNotification();
         final GeneralFailureNotification gfn = new GeneralFailureNotification();
         final GeneralInformationNotification gin = 
             new GeneralInformationNotification();
         final AbandonNotification an = new AbandonNotification();
         final ExitKeYNotification en = new ExitKeYNotification();
         
-        gfn.addNotificationAction(new GeneralFailureJTextPaneDisplay(mediator.mainFrame()));
-        gin.addNotificationAction(new GeneralInformationJTextPaneDisplay(mediator.mainFrame()));
-        pcn.addNotificationAction(new ProofClosedJTextPaneDisplay(mediator.mainFrame()));
+        gfn.addNotificationAction(new GeneralFailureJTextPaneDisplay(comp));
+        gin.addNotificationAction(new GeneralInformationJTextPaneDisplay(comp));
+        pcn.addNotificationAction(new ProofClosedJTextPaneDisplay(comp));
+        efn.addNotificationAction(new ExceptionFailureNotificationDialog(comp));
         
         addNotificationTask(pcn);
         addNotificationTask(gfn);
@@ -83,12 +88,11 @@ public class NotificationManager {
     /**
      * creates an instance of the notification manager    
      */
-    public NotificationManager(KeYMediator mediator) {        
+    public NotificationManager(KeYMediator mediator, JFrame comp) {        
         
         notificationListener = new NotificationListener();
-        this.mediator = mediator;
         mediator.addAutoModeListener(notificationListener);
-        setDefaultNotification();
+        setDefaultNotification(comp);
     }
     
             
@@ -118,11 +122,11 @@ public class NotificationManager {
     }
 
     /**
-     * find the notificatin task associated with the given event id
+     * find the notification task associated with the given event id
      * @param eventId int identifying the event
-     * @return the notificatin task associated with the given event id
+     * @return the notification task associated with the given event id
      */
-    private NotificationTask getNotificationTask(int eventId) {
+    public NotificationTask getNotificationTask(int eventId) {
         final Iterator<NotificationTask> it = getNotificationTasks();
         while (it.hasNext()) {
             final NotificationTask task = it.next();

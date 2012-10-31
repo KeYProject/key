@@ -10,10 +10,13 @@
 
 package de.uka.ilkd.key.speclang;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 
 
 /**
@@ -27,25 +30,20 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public LoopStatement getLoop();
 
-    /**
-     * Returns the invariant formula.
-     */
-    public Term getInvariant(Term selfTerm, 
-            		     Term heapAtPre,
-            		     Services services);
     
+    /** Returns the invariant formula. */
+    public Term getInvariant(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
+
     /**
      * Returns the modifies clause.
      */
-    public Term getModifies(Term selfTerm, 
-            		    Term heapAtPre,
-            		    Services services);
+    public Term getModifies(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
     
     /**
      * Returns the variant term. 
      */
     public Term getVariant(Term selfTerm, 
-            		   Term heapAtPre,
+            		   Map<LocationVariable,Term> atPres,
             		   Services services);
     
     /**
@@ -55,10 +53,24 @@ public interface LoopInvariant extends SpecificationElement {
     public Term getInternalSelfTerm();
     
     /**
-     * Returns the operator internally used for the pre-heap.
+     * Returns operators internally used for the pre-heap.
      */
-    public Term getInternalHeapAtPre();
+    public Map<LocationVariable,Term> getInternalAtPres();
+
+    /**
+     * Returns the term internally used for the invariant. 
+     * Use with care - it is likely that this is *not* the right "self" for you.
+     */
+    public Map<LocationVariable,Term> getInternalInvariants();
+
+    /**
+     * Returns the term internally used for the variant. 
+     * Use with care - it is likely that this is *not* the right "self" for you.
+     */
+    public Term getInternalVariant();
     
+    public Map<LocationVariable,Term> getInternalModifies();
+
     /**
      * Returns a new loop invariant where the loop reference has been
      * replaced with the passed one.
@@ -67,12 +79,12 @@ public interface LoopInvariant extends SpecificationElement {
     
     /**
      * Returns a new loop invariant where the invariant formula has been
-     * repaced with the passed one. Take care: the variables used for
+     * replaced with the passed one. Take care: the variables used for
      * the receiver, parameters, and local variables must stay the same!
      */
-    public LoopInvariant setInvariant(Term invariant, 
+    public LoopInvariant setInvariant(Map<LocationVariable,Term> invariants, 
             			      Term selfTerm,
-            			      Term heapAtPre,
+            			      Map<LocationVariable,Term> atPres,
             			      Services services); 
     
     /** 
@@ -81,4 +93,5 @@ public interface LoopInvariant extends SpecificationElement {
      * perform some action/transformation on this element.
      */
     public void visit(Visitor v);
+
 }

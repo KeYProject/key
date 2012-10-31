@@ -3,50 +3,50 @@ use strict;
 use Cwd;
 use File::Find;
 use File::Basename;
-use Getopt::Std;
+use Getopt::Long;
 # use File::Copy;
 # use Net::SMTP;
 
 #
 # Configuration variables
 my $bin_path = dirname($0);
-my $path_to_examples = "../system/proofExamples/";
+my $path_to_examples = "system/proofExamples/";
 my $path_to_automated = "index/";
 my $automaticjavadl_txt = "automaticJAVADL.txt";
-my $not_provablejavadl_txt = "notProvableJavaDL.txt";
 # time out set to 30 minutes
 my $time_limit = 30*60; 
 
 # use the time command to print out runtime info
-my $time_command = "/usr/bin/time";
+#my $time_executable = "/usr/bin/time";
 # output of the time command
-my $time_format = '   user %U sec\n system %S sec\nelapsed %E sec\nMax. size %M kB\nAvg. size %t kB';
+#my $time_format = '   user %U sec\n system %S sec\nelapsed %E sec\nMax. size %M kB\nAvg. size %t kB';
 
+my $absolute_bin_path = &getcwd."/".$bin_path;
 
-chdir $bin_path;
-my $absolute_bin_path = &getcwd;
-
-chdir $path_to_examples;
 
 #
 # Command line
 my %option = ();
-getopts("hdl", \%option);
+GetOptions(\%option, 'help|h', 'silent|z', 'delete|d', 'reload|l', 'stopfail|t', 'storefailed|s=s', 'file|f=s');
 
-if ($option{h}) {
-  print "runs all proofs listed in the files: $automaticjavadl_txt and $not_provablejavadl_txt .\n";
-  print "They can be found in " . $bin_path . "/" . $path_to_examples . "/" . $path_to_automated .  "\n\n";
-  print "Use '-h' to get this text (very necessary this line).\n";
-  print "Use '-l' to save proofs and reload them directly afterwards. (Test cases for proof loading)\n";
-  print "Use '-d' to delete all files created automatically by a run of this script.\n";
+if ($option{'help'}) {
+  print "Runs all proofs listed in the file \'$automaticjavadl_txt\'.\n";
+  print "\'$automaticjavadl_txt\' can be found in the directory \'$bin_path/$path_to_examples$path_to_automated\'.\n\n";
+  print "Use '-h' or '--help' to get this text (very necessary this line).\n";
+  print "Use '-z' or '--silent' to reduce verbosity (only final results are displayed).\n";
+  print "Use '-l' or '--reload' to save proofs and reload them directly afterwards. (Test cases for proof loading.)\n";
+  print "Use '-d' or '--delete' to delete all files created automatically by a run of this script.\n";
+  print "Use '-t' or '--stopfail' to stop immediately upon a failure.\n";
+  print "Use '-s <filename>' or '--storefailed <filename>' to store the file names of failures in file <filename>.\n";
+  print "Use '-f <filename>' or '--file <filename>' to load the problems from <filename>.\n";
 #  print "[DEFUNCT] Use '-m email\@address.com' to send the report as an email to the specified address.\n";
 #  print "[DEFUNCT] Use '-c' to get the debug messages from the smtp part if there are email problems.\n";
   exit;
 }
 
-my $reloadTests = $option{l};
+my $reloadTests = $option{'reload'};
 
-if($option{d}) {
+if($option{'delete'}) {
     &cleanDirectories (".");
     exit 0;
 }
@@ -54,21 +54,25 @@ if($option{d}) {
 #
 # read in the configuration files and store them in arrays.
 
-open (HEADER_JAVADL, $path_to_automated . "headerJavaDL.txt") or
-  die $path_to_automated . "headerJavaDL.txt" . " couldn't be opened.";
+open (HEADER_JAVADL, $path_to_examples.$path_to_automated."headerJavaDL.txt") or
+  die $path_to_examples.$path_to_automated."headerJavaDL.txt couldn't be opened.";
 binmode(HEADER_JAVADL);
 my @headerJavaDL = <HEADER_JAVADL>;
 close HEADER_JAVADL;
 
-open (AUTOMATIC, $path_to_automated . $automaticjavadl_txt) or
-  die $path_to_automated . $automaticjavadl_txt . " couldn't be opened.";
-my @automatic_JAVADL = <AUTOMATIC>;
-close AUTOMATIC;
+my $testFile;
+if (not $option{'file'}) {
+  $testFile = $path_to_examples.$path_to_automated.$automaticjavadl_txt;
+} else {
+  $testFile = $option{'file'};
+}
+if (not $option{'silent'}) {print "Reading from $testFile.\n\n";}
 
-open (NOT_PROVABLE, $path_to_automated . $not_provablejavadl_txt) or
-  die $path_to_automated . $not_provablejavadl_txt . " couldn't be opened.";
-my @not_provableJavaDL = <NOT_PROVABLE>;
-close NOT_PROVABLE;
+my @automatic_JAVADL;
+open (AUTOMATIC, $testFile) or
+  die $testFile." couldn't be opened.";
+@automatic_JAVADL = <AUTOMATIC>;
+close AUTOMATIC;
 
 my $counter = 0;
 my $correct = 0;
@@ -82,69 +86,47 @@ my %erroneous;
 #
 # go through automatic files
 #
-
+chdir $path_to_examples;
 foreach my $dotkey (@automatic_JAVADL) {
-
+if (! ($option{'stopfail'} && 
+		($failures + $errors + scalar(@reloadFailed) > 0))) {
    # ignore empty lines and comments
    next if $dotkey =~ /^\s*#/;
    next if $dotkey =~ /^\s*$/;
  
-   $dotkey = &fileline($dotkey);
-   print "now running $dotkey ...\n";
+   (my $provable, $dotkey) = &fileline($dotkey);
+   if (not $option{silent}) {print "Now running $dotkey ...\n";}
 
    &prepare_file($dotkey);
 
    my $success = &runAuto ($dotkey . ".auto.key");
-   if ( $success == 0) {
+
+   if ($provable and $success == 0) {
        &processReturn (0, "indeed provable", $dotkey);
-   } elsif ($success == 256) {
+   } elsif ($provable and $success == 256) {
        &processReturn (1, "proof failed", $dotkey);
+   } elsif ((not $provable) and $success == 0) {
+       &processReturn (1, "should not be provable", $dotkey);
+   } elsif ((not $provable) and $success == 256) {
+       &processReturn (0, "indeed not provable", $dotkey);
    } else {
        &processReturn (2, "error in proof/timed out (" . 
-		       "Error code $success)", $dotkey);
+ 		    "Error code $success)", $dotkey);
    }
+
 
    # replace trailing .key by .auto.proof
    $dotkey =~ s/\.key$/.auto.proof/;
 
-   &reloadFile($dotkey) if $reloadTests;
+   &reloadFile($dotkey) if ($reloadTests and $provable);
     
-   print "\nStatus: $counter examples tested. $failures failures and $errors errors occurred.\n";
-   print "Reload-Tests: " . 
-       ($reloadTests ? (scalar(@reloadFailed) . " failures") : "disabled") 
-       . "\n\n";
+   if (not $option{silent}) {print "\nStatus: $counter examples tested. $failures failures and $errors errors occurred.\n";}
+   if (not $option{silent}) {print "Reload-Tests: " . 
+       (($reloadTests and $provable) ? (scalar(@reloadFailed) . " failures") : "disabled") 
+       . "\n\n";}
 }
-
-#
-# go through unprovable files
-#
-
-foreach my $dotkey (@not_provableJavaDL) {
-
-    # ignore empty lines and comments
-    next if $dotkey =~ /^\s*#/;
-    next if $dotkey =~ /^\s*$/;
-
-    $dotkey = &fileline($dotkey);
-    print "now running $dotkey ...\n";
-
-    &prepare_file($dotkey);
-    
-    my $success = &runAuto ($dotkey . ".auto.key");
-    if ( $success == 0) {
-        &processReturn (1, "should not be provable", $dotkey);
-    } elsif ($success == 256) {
-        &processReturn (0, "indeed not provable", $dotkey);
-    } else {
-	&processReturn (2, "error in proof/timed out (" . 
-		       "Error code $success)", $dotkey);
-    }
-
-    # unlink($dotkey.".auto.key");
-    # unlink($dotkey."auto.0.proof"); 
-
-    print "\nStatus: $counter examples tested. $failures failures and $errors errors occurred.\n\n";
 }
+chdir "../";
 
 print "\n$correct/$counter prover runs according to spec.\n".
      "$failures failures and $errors errors occurred.\n";
@@ -157,7 +139,14 @@ if($reloadTests) {
 
 print &produceResultText;
 
-if($failures + $errors > 0) {
+if($option{'storefailed'}) {
+  &storeFailedProofs
+}
+
+if($failures + $errors + scalar(@reloadFailed) > 0) {
+    if($option{'stopfail'}) {
+        print "Tests stopped after first failure.\n";
+    }
     exit -1;
 } else {
     exit 0;
@@ -191,12 +180,8 @@ sub prepare_file {
 
 sub fileline {
     chop $_[0];
-    return $_[0];
-#  if ($_[0] =~ /\w*#/) {
-#    '';
-#  } else {
-#    $_[0];
-#  }
+    (my $result, my $file) = split(/: */, $_[0]);
+    return (($result eq 'provable'), $file);
 }
 
 sub produceResultText {
@@ -223,8 +208,41 @@ sub produceResultText {
 	}
     }
     
-    return $result;
+    return $result."\n";
 }
+
+sub storeFailedProofs {
+    open (OUT, "> ".$option{'storefailed'}) or 
+        die $option{'storefailed'}." couldn't be opened for writing.";
+
+    if (%failing) {
+# 	++The following files did not behave as expected:
+	foreach my $key (keys %failing) {
+	    print OUT ($failing{$key} eq 'proof failed' ? 'provable: ' : 'notprovable: ');
+	    print OUT "$key\n";
+	}
+    }
+    
+    if (%erroneous) {
+# 	++The following files produced unexpected errors:
+	foreach my $key (keys %erroneous) {
+	    print OUT ($erroneous{$key} eq 'proof failed' ? 'provable: ' : 'notprovable: ');
+	    print OUT "$key\n";
+	}
+    }
+
+    if (@reloadFailed) {
+# 	++The following files could not have their proof reloaded:
+	foreach (@reloadFailed) {
+	    # reload is done only in case the problem is provable
+	    print OUT 'provable: ';
+	    print OUT "$_\n";
+	}
+    }
+    close OUT;
+    print "Failed proof attempts stored in \'".$option{'storefailed'}."\'.\n\n";
+}
+
 
 # first argument: timeout in seconds
 # following arguments: used to call exec.
@@ -251,9 +269,11 @@ sub system_timeout {
  
 sub runAuto {
   my $dk = &getcwd . "/$_[0]";
-  my $command = "$time_command -f '$time_format' " . $absolute_bin_path . "/runProver $dk auto";
+  my $command = $absolute_bin_path . "/runProver $dk auto";
   # print "Command is: $command\n";
+  my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
+  print "Time elapsed: " . (time() - $starttime) . " sec\n";
 #  print "\nReturn value: $result\n";
   return $result;
 }
@@ -275,22 +295,23 @@ sub processReturn {
 
 sub reloadFile {
     my $file = $_[0];
-    print "Try to reload proof result $file:\n";
+    if (not $option{'silent'}) {print "Try to reload proof result $file:\n";}
 
     my $dk = &getcwd . "/$file";
     unless(-r $dk) {
-	print "$dk cannot be read!";
+	if (not $option{'silent'}) {print "$dk cannot be read!";}
 	push @reloadFailed, $file;
 	return;
     }
 
-    my $command = "$time_command -f '$time_format' " . $absolute_bin_path . "/runProver $dk auto_loadonly";
+    my $command = $absolute_bin_path . "/runProver $dk auto_loadonly";
     # print "Command is: $command\n";
     my $result = &system_timeout($time_limit, $command);
 #    print "\nReturn value: $result\n";
 
     if($result != 0) {
-	print "\nCould not reload saved file $file\n";
+	if (not $option{'silent'}) {
+		print "\nCould not reload saved file $file\n";}
 	push @reloadFailed, $file;
     }
 }
@@ -302,7 +323,7 @@ sub cleanDirectories {
 	# $_ holds filename and $File::Find::name the full path
 	# print $_ . "\n";
 	if(/auto\.key$/ || /auto(\.[0-9]+)?\.proof$/) {
-	    print "Remove file $File::Find::name\n";
+	    if (not $option{'silent'}){print "Remove file $File::Find::name\n";}
 	    unlink($_) or die "Cannot remove $_ in " . `pwd` . ": $!"; 
 	}
     }

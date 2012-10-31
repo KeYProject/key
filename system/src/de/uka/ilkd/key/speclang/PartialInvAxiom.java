@@ -11,20 +11,19 @@
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.rule.AntecTacletBuilder;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
@@ -38,17 +37,25 @@ import de.uka.ilkd.key.util.Pair;
 public final class PartialInvAxiom extends ClassAxiom {
     
     private final ClassInvariant inv;
-    private final ObserverFunction target;
+    private final IObserverFunction target;
     
-    public PartialInvAxiom(ClassInvariant inv, Services services) {
+    /** Creates a new class axiom.
+     * 
+     * @param inv (partial) invariant from which the axiom is derived 
+     * @param isStatic whether the axiom should match static invariants (i.e., &lt;$inv&gt;) or instance invariants (i.e., &lt;inv&gt;)
+     * @param services
+     */
+    public PartialInvAxiom(ClassInvariant inv, boolean isStatic, Services services) {
 	assert inv != null;
 	this.inv = inv;
-	this.target = services.getJavaInfo().getInv();
+	assert !isStatic || inv.isStatic();
+	this.target = isStatic? services.getJavaInfo().getStaticInv(inv.getKJT())
+	            : services.getJavaInfo().getInv();
 	assert target != null;
     }
     
     public PartialInvAxiom(ClassInvariant inv, String displayName, Services services){
-        this(inv, services);
+        this(inv, false, services);
         this.displayName = displayName;
     }
     
@@ -59,7 +66,7 @@ public final class PartialInvAxiom extends ClassAxiom {
 
     
     @Override
-    public ObserverFunction getTarget() {
+    public IObserverFunction getTarget() {
 	return target;
     }
     
@@ -78,107 +85,61 @@ public final class PartialInvAxiom extends ClassAxiom {
     
     @Override
     public ImmutableSet<Taclet> getTaclets(
-	    		ImmutableSet<Pair<Sort, ObserverFunction>> toLimit,
-	    		Services services) {
-	ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
-	
-	for(int i = 0; i < 2; i++) {
-	    //create schema variables
-	    final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	    final SchemaVariable heapSV 
-	    	= SchemaVariableFactory.createTermSV(new Name("h"), 
-	    				             heapLDT.targetSort(), 
-	    				             false, 
-	    				             false);
-	    final SchemaVariable selfSV 
-	    	= target.isStatic()
-	    	  ? null
-		  : SchemaVariableFactory.createTermSV(new Name("self"), 
-			    			       inv.getKJT().getSort());
-	    final SchemaVariable eqSV 
-	    	= target.isStatic()
-	    	  ? null
-		  : SchemaVariableFactory.createTermSV(
-			  		new Name("EQ"), 
-			    		services.getJavaInfo().objectSort());
-	    
-	    //instantiate axiom with schema variables
-	    final Term rawAxiom 
-	    	= OpReplacer.replace(TB.heap(services), 
-		  		     TB.var(heapSV), 
-		    		     inv.getInv(selfSV, services));
-	    final Pair<Term,ImmutableSet<VariableSV>> replaceBoundLVsPair 
-	    	= replaceBoundLVsWithSVs(rawAxiom);
-	    final Term schemaAxiom = replaceBoundLVsPair.first;
-	    final ImmutableSet<VariableSV> boundSVs 
-		= replaceBoundLVsPair.second;	    
-	    
-	    //limit observers
-	    final Pair<Term, ImmutableSet<Taclet>> limited 
-	    	= limitTerm(schemaAxiom, toLimit, services);
-	    final Term limitedAxiom = limited.first;
-	    result = result.union(limited.second);
-	    
-	    //create added sequent
-	    final SequentFormula addedCf = new SequentFormula(limitedAxiom);	    
-	    final Semisequent addedSemiSeq 
-	    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(addedCf) 
-	    	                               .semisequent();
-	    final Sequent addedSeq = Sequent.createAnteSequent(addedSemiSeq);	
+            ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
+            Services services) {
+        ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
 
-	    //create taclet
-	    final AntecTacletBuilder tacletBuilder = new AntecTacletBuilder();
-	    tacletBuilder.setFind(TB.inv(services, 
-		    		  	 TB.var(heapSV), 
-		    		  	 i == 0 
-		    		  	 ? TB.var(selfSV) 
-		    		         : TB.var(eqSV)));
-	    tacletBuilder.addTacletGoalTemplate(
-		    new TacletGoalTemplate(addedSeq,
-			    ImmutableSLList.<Taclet>nil()));
-	    tacletBuilder.setName(MiscTools.toValidTacletName(
-		    			   "Partial inv axiom for " 
-		    			   + inv.getName()
-		    			   + (i == 0 ? "" : " EQ")));
-	    tacletBuilder.addRuleSet(new RuleSet(new Name("partialInvAxiom")));
-	    for(VariableSV boundSV : boundSVs) {
-		tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
-		if(selfSV != null) {
-		    tacletBuilder.addVarsNotFreeIn(boundSV, selfSV);
-		}
-		if(eqSV != null && i == 1) {
-		    tacletBuilder.addVarsNotFreeIn(boundSV, eqSV);		    
-		}
-	    }	    
-	    
-	    //\assumes(self = EQ ==>)
-	    if(i == 1) {
-		assert !target.isStatic();
-		final Term ifFormula = TB.equals(TB.var(selfSV), TB.var(eqSV));
-		final SequentFormula ifCf 
-			= new SequentFormula(ifFormula);
-		final Semisequent ifSemiSeq 
-		    	= Semisequent.EMPTY_SEMISEQUENT.insertFirst(ifCf)
-		                                       .semisequent();
-		final Sequent ifSeq = Sequent.createAnteSequent(ifSemiSeq);
-		tacletBuilder.setIfSequent(ifSeq);
-	    }
-	    
-	    result = result.add(tacletBuilder.getTaclet());
-	    
-	    //EQ taclet only for non-static invariants
-	    if(target.isStatic()) {
-		break;
-	    }
-	}
-	
-	//return
-	return result;
+        for (int i = 0; i < 2; i++) {
+            TacletGenerator TG = TacletGenerator.getInstance();
+            Name name = MiscTools.toValidTacletName("Partial inv axiom for "
+                                                    + (target.isStatic()? "static ": "")
+                                                    + inv.getName()
+                                                    + (i == 0 ? "" : " EQ"));
+            
+            //create schema variables
+            final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+            final SchemaVariable heapSV =
+                    SchemaVariableFactory.createTermSV(new Name("h"),
+                                                       heapLDT.targetSort(),
+                                                       false,
+                                                       false);
+            final SchemaVariable selfSV =
+                    target.isStatic()
+                    ? null
+                    : SchemaVariableFactory.createTermSV(new Name("self"),
+                                                         inv.getKJT().getSort());
+            final SchemaVariable eqSV = target.isStatic()
+                                        ? null
+                                        : SchemaVariableFactory.createTermSV(
+                    new Name("EQ"),
+                    services.getJavaInfo().objectSort());
+            
+            ImmutableSet<Taclet> taclets =
+                    TG.generatePartialInvTaclet(name,
+                                                heapSV,
+                                                selfSV,
+                                                eqSV,
+                                                inv.getInv(selfSV, services),
+                                                inv.getKJT(),
+                                                toLimit,
+                                                target.isStatic(),
+                                                i == 1,
+                                                services);
+            result = result.union(taclets);
+
+            //EQ taclet only for non-static invariants
+            if (target.isStatic()) {
+                break;
+            }
+        }
+
+        //return
+        return result;
     }
     
     
     @Override
-    public ImmutableSet<Pair<Sort, ObserverFunction>> getUsedObservers(
+    public ImmutableSet<Pair<Sort, IObserverFunction>> getUsedObservers(
 	    						Services services) {
 	final ProgramVariable dummySelfVar 
 		= TB.selfVar(services, inv.getKJT(), false);

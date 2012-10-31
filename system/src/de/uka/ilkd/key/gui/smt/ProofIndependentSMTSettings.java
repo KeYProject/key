@@ -15,6 +15,7 @@ import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 
 public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configuration.Settings{
+	
         private static final String ACTIVE_SOLVER  = "[SMTSettings]ActiveSolver";
 
         private static final String TIMEOUT="[SMTSettings]SolverTimeout";
@@ -34,8 +35,9 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
         private static final String MAX_CONCURRENT_PROCESSES = "[SMTSettings]maxConcurrentProcesses";
 
    
-        private static final String EXECUTION_STRING  = "[SMTSettings]executionString";
-
+        private static final String SOLVER_PARAMETERS  = "[SMTSettings]solverParametersV1";
+        private static final String SOLVER_COMMAND       = "[SMTSettings]solverCommand";
+        private static final String SOLVER_CHECK_FOR_SUPPORT  = "[SMTSettings]checkForSupport";
   
         public final static int    PROGRESS_MODE_USER = 0;
         public final static int    PROGRESS_MODE_CLOSE = 1;
@@ -61,7 +63,9 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
         private Collection<SettingsListener> listeners = new HashSet<SettingsListener>();
 
         private SolverTypeCollection activeSolverUnion = SolverTypeCollection.EMPTY_COLLECTION;
-        private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<SolverTypeCollection>(); 
+        private LinkedList<SolverTypeCollection> solverUnions = new LinkedList<SolverTypeCollection>();
+
+		public boolean checkForSupport = true; 
 
 
         private ProofIndependentSMTSettings(ProofIndependentSMTSettings data) {
@@ -77,6 +81,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
                 this.pathForSMTTranslation         = data.pathForSMTTranslation;
                 this.pathForTacletTranslation      = data.pathForTacletTranslation;
                 this.modeOfProgressDialog          = data.modeOfProgressDialog;
+                this.checkForSupport			   = data.checkForSupport;
 
 
                 for(Entry<SolverType, SolverData> entry : data.dataOfSolvers.entrySet()){
@@ -119,11 +124,15 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
 
 
         public String getCommand(SolverType type){
-                return dataOfSolvers.get(type).command;
+                return dataOfSolvers.get(type).solverParameters;
         }
 
         public void setCommand(SolverType type, String command){
-                dataOfSolvers.get(type).command = command;
+                dataOfSolvers.get(type).solverCommand = command;
+        }
+        
+        public void setParameters(SolverType type, String parameters){
+            dataOfSolvers.get(type).solverParameters = parameters;
         }
         
 
@@ -148,7 +157,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
                 pathForTacletTranslation = SettingsConverter.read(props, PATH_FOR_TACLET_TRANSLATION, pathForTacletTranslation);
                 modeOfProgressDialog     = SettingsConverter.read(props,PROGRESS_DIALOG_MODE,modeOfProgressDialog);
                 maxConcurrentProcesses   = SettingsConverter.read(props,MAX_CONCURRENT_PROCESSES,maxConcurrentProcesses);
-
+                checkForSupport	         = SettingsConverter.read(props, SOLVER_CHECK_FOR_SUPPORT, checkForSupport);
           
                 for(SolverData solverData : dataOfSolvers.values()){
                         solverData.readSettings(props);
@@ -168,6 +177,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
                 SettingsConverter.store(props,PATH_FOR_TACLET_TRANSLATION,pathForTacletTranslation);
                 SettingsConverter.store(props,ACTIVE_SOLVER,activeSolver);
                 SettingsConverter.store(props,MAX_CONCURRENT_PROCESSES,maxConcurrentProcesses);
+                SettingsConverter.store(props,SOLVER_CHECK_FOR_SUPPORT,checkForSupport);
 
                 for(SolverData solverData : dataOfSolvers.values()){
                         solverData.writeSettings(props);
@@ -178,37 +188,39 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configur
 
 
         public static class SolverData{
-                public String command = "";
+                public String solverParameters = "";
+                public String solverCommand = "";
                 public final SolverType type;
                 
                 public SolverData(SolverType type){
-                        this(type,type.getDefaultExecutionCommand());
-                        
-                        command = type.getDefaultExecutionCommand();
+                        this(type,type.getDefaultSolverCommand(),type.getDefaultSolverParameters());
+                       }
 
-                }
-
-                private SolverData(SolverType type,String command){
+                private SolverData(SolverType type,String command, String parameters){
                         this.type = type;
-                        this.command = command;
+                        this.solverCommand = command;
+                        this.solverParameters = parameters;
                 }
 
                 private void readSettings(Properties props){
 
-                        command = SettingsConverter.read(props,EXECUTION_STRING+type.getName(),command);
-                     
-                        type.setExecutionCommand(command);
+                        solverParameters = SettingsConverter.read(props,SOLVER_PARAMETERS+type.getName(),solverParameters);
+                        solverCommand = SettingsConverter.read(props,SOLVER_COMMAND+type.getName(),solverCommand);
+                        type.setSolverParameters(solverParameters);
+                        type.setSolverCommand(solverCommand);
 
                 }
 
                 private void writeSettings(Properties props){
-                        SettingsConverter.store(props,EXECUTION_STRING+type.getName(),command);
-                        type.setExecutionCommand(command);
+                        SettingsConverter.store(props,SOLVER_PARAMETERS+type.getName(),solverParameters);
+                        SettingsConverter.store(props,SOLVER_COMMAND+type.getName(),solverCommand);
+                        type.setSolverParameters(solverParameters);
+                        type.setSolverCommand(solverCommand);
                 }
 
 
                 public SolverData clone(){
-                        return new SolverData(type,command);
+                        return new SolverData(type,solverCommand,solverParameters);
                 }
 
                 public String toString(){

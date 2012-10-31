@@ -381,13 +381,19 @@ public abstract class Notation {
      * The standard concrete syntax for the element of operator.
      */
     public static final class ElementOfNotation extends Notation {
+        private String symbol;
 
 	public ElementOfNotation() {
 	    super(130);
 	}
+	
+	    public ElementOfNotation(String symbol){
+	        this();
+	        this.symbol = symbol;
+	    }
 
 	public void print(Term t, LogicPrinter sp) throws IOException {
-	    sp.printElementOf(t);
+	    sp.printElementOf(t, symbol);
 	}
     }      
     
@@ -458,7 +464,8 @@ public abstract class Notation {
 		    // logger.debug("Instantiation of " + t+ " [" + t.op() +
                         // "]" + " known.");
 		    if (o instanceof ImmutableList) {
-			final Iterator<Object> it = ((ImmutableList<Object>) o)
+            @SuppressWarnings("unchecked")
+            final Iterator<Object> it = ((ImmutableList<Object>) o)
 				.iterator();
 			sp.getLayouter().print("{");
 			while (it.hasNext()) {

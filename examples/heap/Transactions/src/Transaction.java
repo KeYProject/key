@@ -6,7 +6,7 @@ final class Transaction {
     //@ ghost int id;
     //@ ghost \locset footprint;
     /*@ public invariant footprint == \set_union(\all_fields(this), 
-         this.next == null ? \empty : this.next.footprint);
+         (this.next == null) ? \empty : this.next.footprint);
     */
 
     /* @ public invariant footprint ==              
@@ -15,7 +15,7 @@ final class Transaction {
              \set_union(\singleton(this.id),
              \set_union(\singleton(this.next),
              \set_union(\singleton(this.total),
-             next==null ? \empty : next.footprint)))));
+             (next==null) ? \empty : next.footprint)))));
     */
     
     /*@ public invariant 
@@ -23,7 +23,7 @@ final class Transaction {
     */
 
     //@ invariant id >= 0;
-    //@ invariant total == amount + (next == null ? 0 : next.total);
+    //@ invariant total == amount + ((next == null) ? 0 : next.total);
     /*@ invariant next == null || 
          (id > next.id && 
           next.\inv && 
@@ -34,17 +34,17 @@ final class Transaction {
 
     /*@ requires next == null || next.\inv;
       @ ensures this.next == next && this.amount == amount &&
-      @   total == amount + (next == null ? 0 : next.total);
+      @   total == amount + ((next == null) ? 0 : next.total);
       @ modifies \nothing;
       @*/
     Transaction(/*@nullable*/ Transaction next, int amount) {
         this.next = next;
         this.amount = amount;
-        //@ set this.total = amount + (next == null ? 0 : next.total);
-        //@ set this.id = next == null ? 0 : next.id + 1;
+        //@ set this.total = amount + ((next == null) ? 0 : next.total);
+        //@ set this.id = (next == null) ? 0 : next.id + 1;
         /*@ set this.footprint =
              \set_union(\all_fields(this), 
-             next == null ? \empty : next.footprint);
+             (next == null) ? \empty : next.footprint);
         */
         //      while(false);
     }

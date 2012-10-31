@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+ <copyright>
+ </copyright>
+
+ $Id$
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="de.hentschel.visualdbc.dbcmodel.presentation.DbcmodelModelWizardID"
+            name="%_UI_DbcmodelModelWizard_label"
+            class="de.hentschel.visualdbc.dbcmodel.presentation.DbcmodelModelWizard"
+            category="de.hentschel.visualdbc.generation.ui.category"
+            icon="icons/full/obj16/DbcmodelModelFile.gif">
+         <description>%_UI_DbcmodelModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <editor
+            id="de.hentschel.visualdbc.dbcmodel.presentation.DbcmodelEditorID"
+            name="%_UI_DbcmodelEditor_label"
+            icon="icons/full/obj16/DbcmodelModelFile.gif"
+            extensions="dbc"
+            class="de.hentschel.visualdbc.dbcmodel.presentation.DbcmodelEditor"
+            contributorClass="de.hentschel.visualdbc.dbcmodel.presentation.DbcmodelActionBarContributor">
+      </editor>
+   </extension>
+
+</plugin>

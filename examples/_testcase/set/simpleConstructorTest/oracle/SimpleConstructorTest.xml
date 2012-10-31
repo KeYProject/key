@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="SimpleConstructorTest.main();" pathCondition="true" pathConditionChanged="false">
+      <statement name="SimpleConstructorTest obj = new SimpleConstructorTest (42);" pathCondition="true" pathConditionChanged="false">
+         <callStackEntry path="/0"/>
+         <methodCall name="SimpleConstructorTest(var);" pathCondition="true" pathConditionChanged="false">
+            <callStackEntry path="/0"/>
+            <statement name="this.x=var;" pathCondition="true" pathConditionChanged="false">
+               <callStackEntry path="/0"/>
+               <callStackEntry path="/0/0/0"/>
+               <methodReturn name="&lt;return of SimpleConstructorTest(var);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of SimpleConstructorTest(var);&gt;">
+                  <callStackEntry path="/0"/>
+                  <callStackEntry path="/0/0/0"/>
+                  <statement name="return obj.x;" pathCondition="true" pathConditionChanged="false">
+                     <callStackEntry path="/0"/>
+                     <methodReturn name="&lt;return of SimpleConstructorTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of SimpleConstructorTest.main();&gt;">
+                        <callStackEntry path="/0"/>
+                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </methodReturn>
+            </statement>
+         </methodCall>
+      </statement>
+   </methodCall>
+</startNode>

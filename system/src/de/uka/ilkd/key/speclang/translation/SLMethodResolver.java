@@ -16,8 +16,8 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 /**
  * Resolver for method calls in specifications.
@@ -55,7 +55,7 @@ public final class SLMethodResolver extends SLExpressionResolver {
         
         ImmutableList<KeYJavaType> signature = parameters.getSignature(javaInfo.getServices());
         
-        ProgramMethod pm = null;
+        IProgramMethod pm = null;
         Term recTerm = receiver.getTerm(); 
         
         
@@ -91,12 +91,12 @@ public final class SLMethodResolver extends SLExpressionResolver {
                         " on Type " + receiver.getType());
             }
             subs = new Term[parameters.getParameters().size() + 2];
-            subs[0] = TB.heap(services);
+            subs[0] = TB.getBaseHeap(services);
             subs[1] = recTerm;
             i = 2;
         } else {
             subs = new Term[parameters.getParameters().size() + 1];
-            subs[0] = TB.heap(services);
+            subs[0] = TB.getBaseHeap(services);
             i = 1;
         }
 
@@ -105,14 +105,13 @@ public final class SLMethodResolver extends SLExpressionResolver {
             subs[i++] = slExpression.getTerm();
         }
         
-        if (pm.getKeYJavaType() == null) {
-            // return type is void
+        if (pm.isVoid()) {
             throw manager.excManager.createException("can not use void " +
             		"method \"" + methodName + "\" in specification expression.");
         }
         
         return new SLExpression(TB.tf().createTerm(pm, subs), 
-        	                pm.getKeYJavaType());
+        	                pm.getReturnType());
     }
 
 }

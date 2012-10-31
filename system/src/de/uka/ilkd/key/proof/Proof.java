@@ -67,7 +67,7 @@ public class Proof implements Named {
     private String problemHeader = "";
 
     /** the java information object: JavaInfo+TypeConverter */
-    private final Services services;
+    private Services services;
 
     /** maps the Abbreviations valid for this proof to their corresponding terms.*/
     private AbbrevMap abbreviations = new AbbrevMap();
@@ -98,15 +98,28 @@ public class Proof implements Named {
     
     private Strategy activeStrategy;
     
+    private SettingsListener settingsListener;
+    
+    /**
+     * Set to true if the proof has been abandoned and the dispose method has
+     * been called on this object.
+     */
+    private boolean disposed = false;
+    
 
     /** constructs a new empty proof with name */
     private Proof(Name name, Services services, ProofSettings settings) {
         this.name = name;
         assert services != null : "Tried to create proof without valid services.";
 	this.services = services.copyProofSpecific(this);
-        this.settings = settings;
-
-        addStrategyListener ();
+        settingsListener =
+                new SettingsListener () {
+                    @Override
+                    public void settingsChanged ( GUIEvent config ) {
+                        updateStrategyOnGoals();
+                    }
+                };
+        setSettings(settings);
     }
 
     /**
@@ -217,6 +230,42 @@ public class Proof implements Named {
     }
          
 
+    /**
+     * Cut off all reference such that it does not lead to a big memory leak
+     * if someone still holds a refernce to this proof object. 
+     */
+    public void dispose() {
+        // remove setting listener from settings
+        setSettings(null);
+        // set every reference (except the name) to null
+        root = null;
+        listenerList = null;
+        openGoals = null;
+        problemHeader = null;
+        services = null;
+        abbreviations = null;
+        proofEnv = null;
+        localMgt = null;
+        task = null;
+        settings = null;
+        userLog = null;
+        keyVersionLog = null;
+        activeStrategy = null;
+        settingsListener = null;
+        disposed = true;
+    }
+    
+    
+    /**
+     * Returns true if the proof has been abandoned and the dispose method has
+     * been called on this object. Should be asserted before proof object is
+     * accessed.
+     */
+    public boolean isDisposed() {
+        return disposed;
+    }
+    
+            
     /** 
      * returns the name of the proof. Describes in short what has to be proved.     
      * @return the name of the proof
@@ -308,14 +357,7 @@ public class Proof implements Named {
         while ( it.hasNext () )
             it.next ().setGoalStrategy(ourStrategy);
     }
-    private void addStrategyListener () {
-        getSettings().getStrategySettings()
-            .addSettingsListener ( new SettingsListener () {
-                public void settingsChanged ( GUIEvent config ) {
-                    updateStrategyOnGoals();
-                }
-            });
-    }
+    
 
     public void clearAndDetachRuleAppIndexes () {
         // Taclet indices of the particular goals have to
@@ -364,9 +406,16 @@ public class Proof implements Named {
     }
     
     
-    public void setSettings(ProofSettings newSettings) {
+    public final void setSettings(ProofSettings newSettings) {
+        if (settings != null ){
+            // deregister settings listener
+            settings.getStrategySettings().removeSettingsListener(settingsListener);
+        }
         settings = newSettings;
-        addStrategyListener ();
+        if (settings != null ){
+            // register settings listener
+            settings.getStrategySettings().addSettingsListener (settingsListener);
+        }
     }
     
     
@@ -461,6 +510,7 @@ public class Proof implements Named {
      * removing the last goal will fire the proofClosed event
      * @param goal the Goal to be removed
      */
+    // TODO this should not be public (MU)
     public void remove(Goal goal) {
 	ImmutableList<Goal> newOpenGoals = openGoals.removeAll(goal);
 	if (newOpenGoals != openGoals) {
@@ -522,7 +572,7 @@ public class Proof implements Named {
     private class ProofPruner{
             private Node firstLeaf = null;
             
-            public void prune(final Node cuttingPoint){
+            public ImmutableList<Node> prune(final Node cuttingPoint){
                    
                   // there is only one leaf containing a open goal that is interesting for pruning the sub-tree of <code>node</code>,
                   // namely the first leave that is found by a breadth first search. 
@@ -553,7 +603,7 @@ public class Proof implements Named {
                                 }
                                                    
                                 if (Proof.this.env() != null && visitedNode.parent() != null) { 
-                                        Proof.this.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
+                                        	Proof.this.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
                                 }
                                 
                         }
@@ -570,6 +620,7 @@ public class Proof implements Named {
                         public void visit(Proof proof, Node visitedNode) {
                                 final Iterator<NoPosTacletApp> it = visitedNode.getLocalIntroducedRules().iterator();
                                 while ( it.hasNext () ){
+                                	
                                      firstGoal.ruleAppIndex().removeNoPosTacletApp(it.next ());
                                 }
                                
@@ -581,10 +632,12 @@ public class Proof implements Named {
                   refreshGoal(firstGoal,cuttingPoint);
                   
                   // cut the subtree, it is not needed anymore.
-                  cut(cuttingPoint);
+                  ImmutableList<Node> subtrees =cut(cuttingPoint);
+                  
                   
                   //remove the goals of the residual leaves.
                   removeOpenGoals(residualLeaves);
+                  return subtrees;
          
             }
             
@@ -592,7 +645,8 @@ public class Proof implements Named {
                     goal.setGlobalProgVars(node.getGlobalProgVars());
                     goal.getRuleAppManager().clearCache();
                     goal.ruleAppIndex().clearIndexes();
-       
+                    goal.node().setAppliedRuleApp(null);
+           
             }
             
             private void removeOpenGoals(Collection<Node> toBeRemoved){
@@ -606,18 +660,18 @@ public class Proof implements Named {
             }
             
             
-            private void cut(Node node){
-                    Node[] children = new Node[node.childrenCount()];
+            private ImmutableList<Node> cut(Node node){
+                    ImmutableList<Node> children = ImmutableSLList.nil();
                     Iterator<Node> it = node.childrenIterator();
-                                    
-                    int i = 0;
+                              
                     while(it.hasNext()) {
-                            children[i] = it.next();
-                            i++;
+                            children = children.append(it.next());
+                            
                     }
                     for(Node child : children){
                             node.remove(child);
                     }
+                    return children;
             }
             
     }
@@ -633,18 +687,29 @@ public class Proof implements Named {
      * <code>cuttingPoint</code> remains as the last node on the branch. As a result a 
      * open goal is associated with this node. 
      * @param cuttingPoint
+     * @return Returns the sub trees that has been pruned. 
      */
-    public void pruneProof(Node cuttingPoint){
-            assert cuttingPoint.proof() == this;
-            if(getGoal(cuttingPoint)!= null || cuttingPoint.isClosed()){
-                    return;
-            }
-            
-            ProofPruner pruner = new ProofPruner();
+ 
+    public ImmutableList<Node> pruneProof(Node cuttingPoint){
+        return pruneProof(cuttingPoint,true);
+    }
+    
+    public ImmutableList<Node> pruneProof(Node cuttingPoint,boolean fireChanges){
+        assert cuttingPoint.proof() == this;
+        if(getGoal(cuttingPoint)!= null || cuttingPoint.isClosed()){
+                return null;
+        }
+        
+        ProofPruner pruner = new ProofPruner();
+        if(fireChanges){
             fireProofIsBeingPruned(cuttingPoint);
-            pruner.prune(cuttingPoint);   
+        }
+        ImmutableList<Node> result = pruner.prune(cuttingPoint); 
+        if(fireChanges){
             fireProofGoalsChanged();
             fireProofPruned(cuttingPoint);
+        }
+        return result;
     }
     
     /**
@@ -678,7 +743,7 @@ public class Proof implements Named {
 
 
     /** fires the event that the proof has been expanded at the given node */
-    protected void fireProofExpanded(Node node) {
+    public void fireProofExpanded(Node node) {
 	ProofTreeEvent e = new ProofTreeEvent(this, node);
 	for (int i = 0; i<listenerList.size(); i++) {
 	    listenerList.get(i).proofExpanded(e);
@@ -705,7 +770,7 @@ public class Proof implements Named {
 
     
     /** fires the event that the proof has been restructured */
-    protected void fireProofStructureChanged() {
+    public void fireProofStructureChanged() {
 	ProofTreeEvent e = new ProofTreeEvent(this);
 	for (int i = 0; i<listenerList.size(); i++) {
 	    listenerList.get(i).proofStructureChanged(e);
@@ -780,9 +845,11 @@ public class Proof implements Named {
      */
     public synchronized void removeProofTreeListener
 	(ProofTreeListener listener) {
-	synchronized(listenerList) {
-	    listenerList.remove(listener);
-	}
+       if (listenerList != null) {
+          synchronized(listenerList) {
+             listenerList.remove(listener);
+         }
+       }
     }
     
     

@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -19,9 +18,9 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
-
 
 /**
  * Standard implementation of the LoopInvariant interface.
@@ -29,11 +28,11 @@ import de.uka.ilkd.key.proof.OpReplacer;
 public final class LoopInvariantImpl implements LoopInvariant {
         
     private final LoopStatement loop;
-    private final Term originalInvariant;
-    private final Term originalModifies;
+    private final Map<LocationVariable,Term> originalInvariants;
+    private final Map<LocationVariable,Term> originalModifies;
     private final Term originalVariant;
     private final Term originalSelfTerm;
-    private final Term originalHeapAtPre;
+    private final Map<LocationVariable,Term> originalAtPres;
     
     
     //-------------------------------------------------------------------------
@@ -50,35 +49,44 @@ public final class LoopInvariantImpl implements LoopInvariant {
      * @param heapAtPre the term used for the at pre heap
      */
     public LoopInvariantImpl(LoopStatement loop,
-                             Term invariant,
-                             Term modifies,  
+                             Map<LocationVariable,Term> invariants,
+                             Map<LocationVariable,Term> modifies,  
                              Term variant, 
                              Term selfTerm,
-                             Term heapAtPre) {
+                             Map<LocationVariable,Term> atPres) {
         assert loop != null;
-        assert modifies != null;
-        assert heapAtPre != null;
+        //assert modifies != null;
+        //assert heapAtPre != null;
         this.loop                       = loop;
-	this.originalInvariant          = invariant;
+        this.originalInvariants         = invariants == null ? new LinkedHashMap<LocationVariable,Term>() : invariants;
         this.originalVariant            = variant;
-        this.originalModifies           = modifies;
+        this.originalModifies           = modifies == null ? new LinkedHashMap<LocationVariable,Term>() : modifies;
         this.originalSelfTerm           = selfTerm;   
-        this.originalHeapAtPre          = heapAtPre;
+        this.originalAtPres             = atPres == null ? new LinkedHashMap<LocationVariable,Term>() : atPres;
     }
-    
-    
+
+/*
+    public LoopInvariantImpl(LoopStatement loop,
+                             Term invariant,
+                             Map<LocationVariable,Term> modifies,   
+                             Term variant, 
+                             Term selfTerm,
+                             Map<LocationVariable,Term> atPres) {
+        this(loop,invariant,null,modifies,variant,selfTerm,atPres);
+    }
+*/    
     /**
      * Creates an empty, default loop invariant for the passed loop.
      */
     public LoopInvariantImpl(LoopStatement loop, 
 	    		     Term selfTerm, 
-	    		     Term heapAtPre) {
+	    		     Map<LocationVariable,Term> atPres) {
         this(loop, 
              null, 
-             null, 
-             null, 
+             null,
+             null,
              selfTerm,
-             null);
+             atPres);
     }
     
     
@@ -87,11 +95,11 @@ public final class LoopInvariantImpl implements LoopInvariant {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Map /*Operator, Operator, Term -> Term*/ getReplaceMap(
+    private Map /*Operator, Operator, Term -> Term*/<Term, Term> getReplaceMap(
             Term selfTerm,
-            Term heapAtPre,
+            Map<LocationVariable,Term> atPres,
             Services services) {
-        final Map result = new LinkedHashMap();
+        final Map<Term, Term> result = new LinkedHashMap<Term, Term>();
         
         //self
         if(selfTerm != null) {
@@ -105,26 +113,27 @@ public final class LoopInvariantImpl implements LoopInvariant {
         //-parameters and other local variables are always kept up to
         // date by the ProgVarReplaceVisitor
 
-        //atPre heap
-        if(heapAtPre != null) {
-	    assert originalHeapAtPre.sort().equals(heapAtPre.sort());
-	    result.put(originalHeapAtPre, heapAtPre);
+        if(atPres != null) {
+          for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+             if(atPres.get(h) != null && originalAtPres.get(h) != null) {
+                 assert originalAtPres.get(h).sort().equals(atPres.get(h).sort());
+                 result.put(originalAtPres.get(h), atPres.get(h));
+             }
+          }
         }
-        
+
         return result;
     }
     
     
-    private Map /*Term -> Term*/ getInverseReplaceMap(
+    private Map<Term,Term> getInverseReplaceMap(
             Term selfTerm,
-            Term heapAtPre,
+            Map<LocationVariable,Term> atPres,
             Services services) {
-       final Map result = new LinkedHashMap();
-       final Map replaceMap = getReplaceMap(selfTerm, heapAtPre, services);
-       final Iterator<Map.Entry> it = replaceMap.entrySet().iterator();
-       while(it.hasNext()) {
-           Map.Entry entry = it.next();
-           result.put(entry.getValue(), entry.getKey());
+       final Map<Term,Term> result = new LinkedHashMap<Term,Term>();
+       final Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
+       for(Map.Entry<Term, Term> next: replaceMap.entrySet()) {
+           result.put(next.getValue(), next.getKey());
        }
        return result;
     }
@@ -140,41 +149,54 @@ public final class LoopInvariantImpl implements LoopInvariant {
         return loop;
     }
 
-    
     @Override    
-    public Term getInvariant(Term selfTerm,
-            		     Term heapAtPre,
+    public Term getInvariant(LocationVariable heap,
+                             Term selfTerm,
+            		     Map<LocationVariable,Term> atPres,
             		     Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = getReplaceMap(selfTerm, heapAtPre, services);
+        Map<Term, Term> replaceMap = getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalInvariant);
+        return or.replace(originalInvariants.get(heap));
     }
     
-    
     @Override
-    public Term getModifies(Term selfTerm,
-            		    Term heapAtPre,
+    public Term getModifies(LocationVariable heap, Term selfTerm,
+            		    Map<LocationVariable,Term> atPres,
             		    Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = 
-            getReplaceMap(selfTerm, heapAtPre, services);
+        Map<Term, Term> replaceMap = 
+            getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalModifies);
+        return or.replace(originalModifies.get(heap));
     }
     
 
     @Override
     public Term getVariant(Term selfTerm, 
-            		   Term heapAtPre,
+            		   Map<LocationVariable,Term> atPres,
             		   Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map replaceMap = 
-            getReplaceMap(selfTerm, heapAtPre, services);
+        Map<Term, Term> replaceMap = 
+            getReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(replaceMap);
         return or.replace(originalVariant);
     }
     
+    @Override
+    public Map<LocationVariable,Term> getInternalInvariants() {
+        return originalInvariants;
+    }
+
+    @Override
+    public Term getInternalVariant() {
+        return originalVariant;
+    }
+
+    @Override
+    public Map<LocationVariable,Term> getInternalModifies(){
+    	return originalModifies;
+    }
     
     @Override
     public Term getInternalSelfTerm() {
@@ -183,37 +205,45 @@ public final class LoopInvariantImpl implements LoopInvariant {
     
     
     @Override
-    public Term getInternalHeapAtPre() {
-        return originalHeapAtPre;
+    public Map<LocationVariable,Term> getInternalAtPres() {
+        Map<LocationVariable,Term> result = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable h : originalAtPres.keySet()) {
+          result.put(h, originalAtPres.get(h));
+        }
+        return result;
     }
-    
+
     
     @Override
     public LoopInvariant setLoop(LoopStatement loop) {
         return new LoopInvariantImpl(loop,
-                                     originalInvariant,
+                                     originalInvariants,
                                      originalModifies,
                                      originalVariant,
                                      originalSelfTerm,
-                                     originalHeapAtPre);
+                                     originalAtPres);
     }
     
     
     @Override
-    public LoopInvariant setInvariant(Term invariant, 
+    public LoopInvariant setInvariant(Map<LocationVariable,Term> invariants, 
             			      Term selfTerm,
-            			      Term heapAtPre,
+            			      Map<LocationVariable,Term> atPres,
             			      Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
-        Map inverseReplaceMap 
-            = getInverseReplaceMap(selfTerm, heapAtPre, services);
+        Map<Term, Term> inverseReplaceMap 
+            = getInverseReplaceMap(selfTerm, atPres, services);
         OpReplacer or = new OpReplacer(inverseReplaceMap);
+        Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
+        for(LocationVariable heap : invariants.keySet()) {
+           newInvariants.put(heap, or.replace(invariants.get(heap)));
+        }
         return new LoopInvariantImpl(loop, 
-                                     or.replace(invariant), 
+                                     newInvariants,
                                      originalModifies, 
                                      originalVariant, 
                                      originalSelfTerm,
-                                     originalHeapAtPre);
+                                     originalAtPres);
     }
     
     
@@ -222,11 +252,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
         v.performActionOnLoopInvariant(this);
     }
     
-    
     @Override
     public String toString() {
-        return "invariant: " 
-                + originalInvariant 
+        return "invariants: " 
+                + originalInvariants
                 + "; modifies: " 
                 + originalModifies
                 + "; variant: "

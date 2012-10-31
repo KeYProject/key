@@ -11,34 +11,19 @@
 package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.io.*;
+import java.util.*;
 
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
-
-
 
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.smt.RuleAppSMT;
-import de.uka.ilkd.key.smt.SMTProblem;
-import de.uka.ilkd.key.smt.SMTSolver;
-import de.uka.ilkd.key.smt.SolverType;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverLauncherListener;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 import de.uka.ilkd.key.smt.SMTSolver.SolverState;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
@@ -166,7 +151,9 @@ public class SolverListener implements SolverLauncherListener {
 
                 }
                 if (!problemsWithException.isEmpty()) {
-                      progressDialog.setAdditionalInformation("Exception for...", Color.RED,problemsWithException);
+                	 for(InternSMTProblem problem : problemsWithException){
+                		progressDialog.addInformation("Exception for "+problem.toString()+".", Color.RED,problem);
+                	 }
                 } else {
                         if (settings.getModeOfProgressDialog() == ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE) {
                                 applyEvent(launcher);
@@ -188,14 +175,12 @@ public class SolverListener implements SolverLauncherListener {
 
         private void applyResults() {
                 for (SMTProblem problem : smtProblems) {
-                        if (problem.getFinalResult().isValid() == ThreeValuedTruth.TRUE) {
-                                problem
-                                                .getGoal()
-                                                .apply(
-                                                                new RuleAppSMT(
-                                                                                problem
-                                                                                                .getGoal(),
-                                                                                getTitle(problem)));
+                        if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
+                        	IBuiltInRuleApp app = 
+                        			( (RuleAppSMT) 
+                        					(RuleAppSMT.rule.createApp( null ) )).
+                        					     setTitle( getTitle(problem) );
+                        	problem.getGoal().apply(app);
                         }
                 }
 
@@ -274,32 +259,47 @@ public class SolverListener implements SolverLauncherListener {
 
                         @Override
                         public void additionalInformationChosen(Object obj) {
-                              showInformation((InternSMTProblem)obj);                                
+                        	  if(obj instanceof String){
+                        		  JOptionPane.showOptionDialog(progressDialog,
+                                          obj,
+                                          "Warning",
+                                          JOptionPane.DEFAULT_OPTION,
+                                          JOptionPane.WARNING_MESSAGE,
+                                          null,
+                                          null,
+                                          null);
+                          	  }else if(obj instanceof InternSMTProblem){
+                        		  showInformation((InternSMTProblem)obj);   
+                        	  }
                         }
                 };
                 
                
                 
-                
-
-                 
+                    
 
                 progressDialog = new ProgressDialog(
                                 progressModel,listener,RESOLUTION,smtproblems.size()*solverTypes.size(), new String[] {}, titles);
 
+                for(SolverType type : solverTypes){
+                	if(type.supportHasBeenChecked() && !type.isSupportedVersion()){
+                		addWarning(type);
+                	}
+                }
+         
                 SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
                         public void run() {
                                 progressDialog.setVisible(true);
-                                // progressDialog.setVisible(true);
-
                         }
                 });
 
         }
         
-        private InternSMTProblem getProblem(int col,int row){
+       
+
+		private InternSMTProblem getProblem(int col,int row){
                 for(InternSMTProblem problem : problems){
                         if(problem.problemIndex == row && problem.solverIndex == col){
                                 return problem;
@@ -328,6 +328,7 @@ public class SolverListener implements SolverLauncherListener {
                         final Collection<SolverType> solverTypes,
                         final SolverLauncher launcher) {
                 prepareDialog(smtproblems, solverTypes, launcher);
+               
                 setProgressText(0);
                 timer.schedule(new TimerTask() {
                         @Override
@@ -417,7 +418,7 @@ public class SolverListener implements SolverLauncherListener {
     
                 if (problem.solver.wasInterrupted()) {
                         interrupted(problem);
-                } else if (problem.solver.getFinalResult().isValid() == ThreeValuedTruth.TRUE) {
+                } else if (problem.solver.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
         
                         successfullyStopped(problem,x,y);
                 } else if (problem.solver.getFinalResult().isValid() == ThreeValuedTruth.FALSIFIABLE) {
@@ -554,6 +555,25 @@ public class SolverListener implements SolverLauncherListener {
 
                 return path;
         }
+
+		
+		public void addWarning(SolverType type) {
+			String message = "You are using a version of "+type.getName()+
+					         " which has not been tested for this version of KeY.\nIt can therefore be that" +
+					         " errors occur that would not occur\nusing " +
+					         (type.getSupportedVersions().length > 1 ? 
+					         "one of the following versions:\n" :
+					        	 "the following version:\n");		
+				for(String version : type.getSupportedVersions()){
+					message += version;
+				}
+			
+			
+			progressDialog.addInformation("Warning: Your version of "+type.toString()+" may not be supported by KeY.", Color.ORANGE,message);			
+				
+		
+		}
+	
 
 
 }

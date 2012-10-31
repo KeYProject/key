@@ -10,10 +10,20 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.List;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.OperationContract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.HeapContext;
 
 
 /**
@@ -21,20 +31,75 @@ import de.uka.ilkd.key.speclang.OperationContract;
  * used for applications read in from a proof file; fresh applications are 
  * represented as regular BuiltInRuleApps. (yes, I know that this is ugly - BW) 
  */
-public class ContractRuleApp extends BuiltInRuleApp {
+public class ContractRuleApp extends AbstractContractRuleApp {
 
-    private final Contract instantiation;
-    
-    public ContractRuleApp(PosInOccurrence pio,
-	    		   Contract instantiation) {
-        super(instantiation instanceof OperationContract 
-              ? UseOperationContractRule.INSTANCE
-              : UseDependencyContractRule.INSTANCE,
-              pio);
-        this.instantiation = instantiation;
+    private List<LocationVariable> heapContext;
+
+    ContractRuleApp(BuiltInRule rule, PosInOccurrence pio) {
+    	this(rule,	pio, null);
     }   
-    
-    public Contract getInstantiation() {
-        return instantiation;
+
+    private ContractRuleApp(BuiltInRule rule, 
+    		PosInOccurrence pio, Contract instantiation) {
+    	super(rule, pio, instantiation);
     }
+    
+    public ContractRuleApp(BuiltInRule rule, PosInOccurrence pio,
+            ImmutableList<PosInOccurrence> ifInsts, Contract instantiation) {
+        super(rule, pio, ifInsts, instantiation);
+    }
+
+    public ContractRuleApp replacePos(PosInOccurrence newPos) {
+	    return new ContractRuleApp(rule(), newPos, instantiation);
+    }
+    
+    public ContractRuleApp setContract(Contract contract) {
+        return new ContractRuleApp(rule(), posInOccurrence(), contract);
+    }
+    
+    public UseOperationContractRule rule() {
+    	return (UseOperationContractRule) super.rule();
+    }
+
+    public boolean isSufficientlyComplete() {
+        return pio != null;      
+    }
+    
+    public ContractRuleApp tryToInstantiate(Goal goal) {
+    	if (complete()) {
+    		return this;
+    	}
+    	Services services = goal.proof().getServices();
+    	ImmutableSet<FunctionalOperationContract> contracts = UseOperationContractRule
+    	        .getApplicableContracts(
+    	                UseOperationContractRule.computeInstantiation(
+    	                        posInOccurrence().subTerm(), services),
+    	                services);
+        Modality m = (Modality)programTerm().op();
+        boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION); 
+        heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+    	return setContract(services.getSpecificationRepository()
+    	                .combineOperationContracts(
+    	                		contracts));
+    }
+
+    @Override
+    public ContractRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+        super.setMutable(ifInsts);
+        return this;
+        //return new ContractRuleApp(builtInRule, pio, ifInsts, instantiation);
+    }
+
+    @Override
+    public List<LocationVariable> getHeapContext() {
+      return heapContext;
+    }
+
+    public Term programTerm() {
+        if (posInOccurrence() != null) {
+            return TermBuilder.DF.goBelowUpdates(posInOccurrence().subTerm());
+        }
+        return null;
+    }
+
 }

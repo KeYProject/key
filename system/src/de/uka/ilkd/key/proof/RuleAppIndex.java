@@ -20,6 +20,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentChangeInfo;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -27,7 +28,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 /**
  * manages the possible application of rules (RuleApps) 
  */
-public class RuleAppIndex  {
+public final class RuleAppIndex  {
 
     private Goal                goal;
 
@@ -300,7 +301,7 @@ public class RuleAppIndex  {
      * returns a list of built-in rule applications applicable
      * for the given goal, user defined constraint and position
      */
-    public ImmutableList<RuleApp> getBuiltInRules(Goal g,
+    public ImmutableList<IBuiltInRuleApp> getBuiltInRules(Goal g,
 	    PosInOccurrence pos) {
 	 	 	
 	 return builtInRuleAppIndex().getBuiltInRule(g, pos);

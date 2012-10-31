@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -120,7 +121,9 @@ public final class InitiallyClauseImpl implements InitiallyClause {
         final Map<Operator, Operator> replaceMap 
         	= getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap);
-        return or.replace(originalInv);   
+        Term res = or.replace(originalInv);
+        res = TermBuilder.DF.convertToFormula(res, services);
+        return res;
     }
      
     @Override

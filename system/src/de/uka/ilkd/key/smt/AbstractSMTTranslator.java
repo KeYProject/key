@@ -53,24 +53,39 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                  */
                 private final boolean supportsOnlySimpleMultiplication;
                 private final boolean hasNumberLimit;
+                
+                /**
+                 * Used for SMT2 format: if true the (set-logic AUFLIA) command is used otherwise
+                 * the logic is not set. For instance Z3 then uses automatically the appropriate 
+                 * logic. 
+                 */
+                private final boolean mentionLogic;
 
 
-                public Configuration(boolean supportsOnlySimpleMultiplication) {
-                        this(supportsOnlySimpleMultiplication,false);                       
+                public Configuration(boolean supportsOnlySimpleMultiplication, boolean mentionLogic) {
+                        this(supportsOnlySimpleMultiplication,false,mentionLogic);                       
                 }
                 
-                public Configuration(boolean supportsOnlySimpleMultiplication,boolean hasNumberLimit) {
+                public Configuration(boolean supportsOnlySimpleMultiplication,boolean hasNumberLimit,
+                					 boolean mentionLogic) {
                         super();
                         this.supportsOnlySimpleMultiplication = supportsOnlySimpleMultiplication;
                         this.hasNumberLimit = hasNumberLimit;
+                        this.mentionLogic = mentionLogic;
                 }
                 public boolean hasNumberLimit(){
                         return hasNumberLimit;
                 }
+                
+                public boolean mentionLogic() {
+					return mentionLogic;
+				}
 
         }
 
         private static final TermBuilder TB = TermBuilder.DF;
+        
+        private int nameCounter =0;
 
         private Sort integerSort;
 
@@ -83,19 +98,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         /** The translation result is stored in this variable. */
         protected String text;
 
-        /** StringBuffer contains all declared predicate symbols. */
-        protected final StringBuffer predicate = new StringBuffer();
+//        protected SMTTranslation translation = new SMTTranslation();
 
-        /** StringBuffer to store text which could be usefull for the user */
-        protected final StringBuffer notes = new StringBuffer();
-
-        /** remember all printed predicates */
-        protected final Set<Operator> predicateSet = new HashSet<Operator>();
-
-        /** remember all printed functions */
-        protected final Set<Operator> functionSet = new HashSet<Operator>();
-
-        protected final Set<Sort> sortSet = new HashSet<Sort>();
 
         /** remember all function declarations */
 
@@ -263,6 +267,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         protected final SMTSettings getSettings() {
                 return smtSettings;
         }
+        
+        public Configuration getConfig() {
+			return config;
+		}
 
         private Function getMultiplicationFunction(Services services) {
                 if (multiplicationFunction == null) {
@@ -357,12 +365,18 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 toReturn.size() - 1,
                                 ContextualBlock.ASSUMPTION_INTEGER));
                 start = toReturn.size();
+                toReturn.addAll(buildAssumptionsForSorts(services));
+                assumptionTypes.add(new ContextualBlock(start,
+                        toReturn.size() - 1,
+                        ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY));
+                start = toReturn.size();
                 if (isUsingUninterpretedMultiplication()) {
                         toReturn.addAll(buildAssumptionsForUninterpretedMultiplication(services));
                 }
                 assumptionTypes.add(new ContextualBlock(start,
                                 toReturn.size() - 1,
                                 ContextualBlock.ASSUMPTION_MULTIPLICATION));
+     
                 return toReturn;
         }
 
@@ -843,6 +857,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
                 return distinct;
         }
+        
+     
 
         private Term createLogicalVar(Services services, String baseName,
                         Sort sort) {
@@ -914,6 +930,24 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         }
                 }
                 return result;
+        }
+        
+        private ArrayList<StringBuffer> buildAssumptionsForSorts(Services services){
+        	ArrayList<StringBuffer> result = new ArrayList<StringBuffer>();
+        	if(this.isMultiSorted()){
+         		for(Sort sort : usedRealSort.keySet()){
+         	
+             		if(!isSomeIntegerSort(sort)){
+             			Term var = createLogicalVar(services, "x", sort);
+             			StringBuffer sVar = translateVariable(var.op());
+            			//StringBuffer var = this.makeUnique(new StringBuffer("x"));
+             			StringBuffer typePredicate = this.getTypePredicate(sort, sVar);
+             			StringBuffer assumption = translateLogicalExist(sVar, this.standardSort, typePredicate);
+             			result.add(assumption);
+             		}
+        		}	
+        	}
+        	return result;        	
         }
 
         private HashMap<Long, StringBuffer> getRightConstantContainer(
@@ -1668,9 +1702,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         Vector<QuantifiableVariable> quantifiedVars,
                         Services services) throws IllegalFormulaException {
 
-                // added, because meatavariables should not be translated.
-                assert !(term.op() instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable) : "Metavariables no longer supported";
-               
+       
                 Operator op = term.op();
                 if (op == Junctor.NOT) {
                         StringBuffer arg = translateTerm(term.sub(0),
@@ -2474,6 +2506,73 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         protected boolean isSomeIntegerSort(Sort s) {
                 return s == integerSort;
         }
+        
+        
+        
+        private StringBuffer removeIllegalChars(StringBuffer template, ArrayList<String> toReplace, ArrayList<String> replacement) {
+    	//replace one String
+    	for (int i = 0; i < toReplace.size(); i++) {
+    	    String toRep = toReplace.get(i);
+    	    String replace = replacement.get(i);
+    	    int index = template.indexOf(toRep);
+    	    while (index >= 0) {
+    		template.replace(index, index + toRep.length(), replace);
+    		index = template.indexOf(toRep);
+    	    }
+    	}
+    	
+    	return template;
+        }
+        
+        
+        protected StringBuffer makeUnique(StringBuffer name) {
+        	StringBuffer toReturn = new StringBuffer(name);
+        	
+        	//build the replacement pairs
+        	ArrayList<String> toReplace = new ArrayList<String>();
+        	ArrayList<String> replacement = new ArrayList<String>();
+        	
+        	toReplace.add("[]");
+        	replacement.add("_Array");
+        	
+        	toReplace.add("<");
+        	replacement.add("_abo_");
+        	
+        	toReplace.add(">");
+        	replacement.add("_abc_");
+        	
+        	toReplace.add("{");
+        	replacement.add("_cbo_");
+        	
+        	toReplace.add("}");
+        	replacement.add("_cbc_");
+        	
+        	toReplace.add(".");
+        	replacement.add("_dot_");
+        	
+        	toReplace.add(":");
+        	replacement.add("_col_");
+        	
+        	toReplace.add("\\");
+        	replacement.add("_");
+        	
+        	toReplace.add("$");
+        	replacement.add("_dollar_");
+        	
+        	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
+        	// names are must not begin with special characters
+        	
+        	if(!('A' <= toReturn.charAt(0) && toReturn.charAt(0) <= 'Z') &&
+        	   !('a' <= toReturn.charAt(0) && toReturn.charAt(0) <= 'z')){
+        	toReturn = (new StringBuffer()).append("a_").append(toReturn);
+        	}
+        	
+        	toReturn.append("_").append(nameCounter);
+        	nameCounter++;
+        	return toReturn;
+            }
+
+        
 
         /**
          * Translates the list <code>tacletFormulae</code> to the given syntax.
@@ -2525,15 +2624,17 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 sorts = sorts.add(sort);
                         }
                 }
-
                 for (TacletFormula tf : tacletSetTranslation
                                 .getTranslation(sorts)) {
 
                         for (Term subterm : tf.getInstantiations()) {
                                 try {
-                                        StringBuffer term = translateTerm(
+                                		StringBuffer term = translateComment(1,tf.getTaclet().displayName()+":\n");		
+                                				
+                                        term.append(translateTerm(
                                                         subterm, vector,
-                                                        services);
+                                                        services));
+                                    
                                         result.add(term);
 
                                 } catch (Throwable e) {
@@ -2548,6 +2649,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
 
                 return result;
+        }
+        
+        protected StringBuffer translateComment(int newLines, String comment){
+        	return new StringBuffer();
         }
 
         /**

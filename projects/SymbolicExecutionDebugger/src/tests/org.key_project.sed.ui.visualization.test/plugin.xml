@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.key_project.sed.ui.visualization.test.category"
+            name="Visualization Test Views">
+      </category>
+      <view
+            category="org.key_project.sed.ui.visualization.test.category"
+            class="org.key_project.sed.ui.visualization.test.view.LoggingDebugViewBasedEditorInViewView"
+            icon="icons/symbolic_debug.gif"
+            id="org.key_project.sed.ui.visualization.test.view.LoggingDebugViewBasedEditorInViewView"
+            name="Logging Debug View"
+            restorable="true">
+      </view>
+   </extension>
+
+</plugin>

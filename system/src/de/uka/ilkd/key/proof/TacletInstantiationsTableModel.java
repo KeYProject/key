@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.*;
@@ -371,20 +372,6 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
 
         String instantiation = (String) getValueAt(irow, 1);
         SchemaVariable sv = (SchemaVariable)getValueAt(irow, 0);
-
-        if(! varNamer.isUniqueNameForSchemaVariable(
-                        instantiation,
-                        sv,
-                        originalApp.posInOccurrence(),
-                        originalApp.instantiations().getContextInstantiation()
-                                            .prefix())) {
-            throw new SVInstantiationParserException(instantiation,
-                                                     irow,
-                                                     0,
-                                                     "Name is already in use.",
-                                                     false);
-        }
-
 
         ContextInstantiationEntry contextInstantiation = 
             originalApp.instantiations().getContextInstantiation();

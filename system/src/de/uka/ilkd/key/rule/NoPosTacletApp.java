@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Debug;
 
 /** 
@@ -413,7 +414,7 @@ public class NoPosTacletApp extends TacletApp {
 				  RenameTable.EMPTY_TABLE);
         
 	if ( taclet() instanceof RewriteTaclet ) {
-	    mc = ((RewriteTaclet)taclet ()).checkUpdatePrefix ( pos,
+	    mc = ((RewriteTaclet)taclet ()).checkPrefix ( pos,
 								mc,
 								services );
 	    if (mc==null) {

@@ -111,6 +111,7 @@ public class Conditional extends Operator {
 		return type1;
 	    return tc.getPromotedType(type1, type2);
 	}
+	
 
 	// reference types
 	if (tc.isNullType(type1) &&

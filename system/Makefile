@@ -150,7 +150,7 @@ doc: argfile
 	-sourcepath $(GENERATED_SRC_PATH):$(SRC):$(TEST) -d doc \
 	-link http://recoder.sourceforge.net/doc/api \
 	-link http://download.oracle.com/javase/6/docs/api/ \
-	-link http://www.antlr.org \
+	-link http://www.antlr2.org/javadoc/ \
 	-windowtitle "KeY API Documentation" \
 	-doctitle "KeY API Documentation ($(KEY_VERSION_LONG))" \
 	-header "KeY $(KEY_VERSION_LONG)" \
@@ -166,7 +166,7 @@ dist:	branding all
 	@mkdir -p dist/key/
 	@cp -r $(BINARYPATH)/* dist/key/
 	@cp -r $(RESOURCEPATH)/* dist/key/
-	@cp -r ../examples dist/key/
+	@jar cMf dist/key/examples-heap.jar -C ../examples/heap .
 # for setup.jar
 	@mkdir -p dist/setup/de/uka/ilkd/key/util/
 	@cp -r $(BINARYPATH)/de/uka/ilkd/key/util/* dist/setup/de/uka/ilkd/key/util/
@@ -249,7 +249,7 @@ all_gen:
 	@$(MAKE) -s all_hlp   	
 
 .PHONY: all_hlp
-all_hlp: argfile.normal $(ANTLR_PARSER) $(JAVACC_PARSER) $(PROOFJAVA_PARSER) $(DIFF_PARSER) copyResources
+all_hlp: argfile.normal $(ANTLR_PARSER) $(JAVACC_PARSER) $(PROOFJAVA_PARSER) $(DIFF_PARSER) copy
 ifeq "$(BRANDING)" ""
 # always update SHA1 hash in order to get useful bug reports		
 	@echo $(SHA1) > ${BINARYPATH}/de/uka/ilkd/key/util/sha1
@@ -273,8 +273,8 @@ endif
 	@$(JAVAC) $(OPTIONS) @argfile 2>>error.msg || true
 	@./success
 
-.PHONY: copyResources
-copyResources: javahomeset
+.PHONY: copy
+copy: javahomeset
 	@echo "[copying resources]"
 	@cp -r $(RESOURCEPATH)/* $(BINARYPATH)
 

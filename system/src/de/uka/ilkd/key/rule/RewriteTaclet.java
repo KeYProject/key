@@ -20,6 +20,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.util.TermHelper;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 /** 
  * A RewriteTaclet represents a taclet, whose find can be matched against any
@@ -40,7 +43,27 @@ public final class RewriteTaclet extends FindTaclet {
      * as the sequent */
     public static final int IN_SEQUENT_STATE = 2;
     
+    /**
+     * If the surrounding formula has been decomposed completely, the find-term
+     * will NOT appear on the SUCcedent. The formula "wellformed(h)" in
+     * "wellformed(h) ==>" or in "==> wellformed(h) -> (inv(h) = inv(h2))"
+     * or in "==> \if(b) \then(!wellformed(h)) \else(!wellformed(h2))"
+     * has antecedent polarity. The formula "wellformed(h)" in
+     * "wellformed(h) <-> wellformed(h2) ==>" has NO antecedent polarity.
+     */
+    public static final int ANTECEDENT_POLARITY = 4;
+    
+    /**
+     * If the surrounding formula has been decomposed completely, the find-term
+     * will NOT appear on the ANTEcedent. The formula "wellformed(h)" in
+     * "==> wellformed(h)" or in "wellformed(h) -> (inv(h) = inv(h2)) ==>"
+     * or in "\if(b) \then(!wellformed(h)) \else(!wellformed(h2)) ==>"
+     * has succedent polarity. The formula "wellformed(h)" in
+     * "wellformed(h) <-> wellformed(h2) ==>" has NO succedent polarity.
+     */
+    public static final int SUCCEDENT_POLARITY = 8;
 
+    
     /**
      * encodes restrictions on the state where a rewrite taclet is applicable
      * If the value is equal to 
@@ -55,7 +78,7 @@ public final class RewriteTaclet extends FindTaclet {
      * the sequent</li>
      *</ul>
      */
-    private int stateRestriction;
+    private int applicationRestriction;
 
 
     /**
@@ -71,7 +94,7 @@ public final class RewriteTaclet extends FindTaclet {
      * @param find the find term of the Taclet
      * @param prefixMap a ImmMap<SchemaVariable,TacletPrefix> that contains the
      * prefix for each SchemaVariable in the Taclet
-     * @param p_stateRestriction an int defining state restrictions of the taclet
+     * @param p_applicationRestriction an int defining state restrictions of the taclet
      * (required for location check)
      * @param choices the SetOf<Choices> to which this taclet belongs to
      */
@@ -81,11 +104,11 @@ public final class RewriteTaclet extends FindTaclet {
 			 TacletAttributes          attrs,
 			 Term                      find,
 			 ImmutableMap<SchemaVariable,TacletPrefix> prefixMap, 
-			 int                       p_stateRestriction,
+			 int                       p_applicationRestriction,
 			 ImmutableSet<Choice> choices){
 	super(name, applPart, goalTemplates, ruleSets, attrs,
 	      find, prefixMap, choices);
-	stateRestriction = p_stateRestriction;
+	applicationRestriction = p_applicationRestriction;
 	
 	cacheMatchInfo();
     }	
@@ -97,6 +120,7 @@ public final class RewriteTaclet extends FindTaclet {
      * SuccTaclet but not for a RewriteTaclet
      * @return true if top level updates shall be ignored 
      */
+    @Override
     protected boolean ignoreTopLevelUpdates() {
 	return false;
     }
@@ -107,8 +131,8 @@ public final class RewriteTaclet extends FindTaclet {
      * @return the int encoding the kind of state restriction this rewrite 
      * taclet must obey      
      */
-    public int getStateRestriction () {
-	return stateRestriction;
+    public int getApplicationRestriction () {
+	return applicationRestriction;
     }
 
 
@@ -131,37 +155,56 @@ public final class RewriteTaclet extends FindTaclet {
      * <code>null</code>, if program modalities appear above
      * <code>p_pos</code>
      */
-    public MatchConditions checkUpdatePrefix
+    public MatchConditions checkPrefix
 	( PosInOccurrence p_pos,
 	  MatchConditions p_mc,
 	  Services        p_services ) {
-	if ( getStateRestriction() == NONE)  
+	if ( getApplicationRestriction() == NONE)  
 	    return p_mc;
-
+        
+    int polarity = p_pos.isInAntec() ? -1 : 1;  // init polarity
 	SVInstantiations svi = p_mc.getInstantiations ();
 	if ( p_pos.posInTerm () != null ) {
 	    PIOPathIterator it = p_pos.iterator ();
 	    Operator        op;
 
 	    while ( it.next () != -1 ) {
-		final Term t = it.getSubTerm ();
-		op = t.op ();
+            final Term t = it.getSubTerm ();
+            op = t.op ();
 
-		if ( op instanceof UpdateApplication &&
-		     it.getChild () == UpdateApplication.targetPos()) {		    
-		    if ( getStateRestriction() == IN_SEQUENT_STATE || veto(t) ) {
-			return null;
-		    } else {
-			Term update = UpdateApplication.getUpdate(t);
-			svi = svi.addUpdate ( update );
-		    }
-		    
-		}
-		else if ( op instanceof Modality ||
-			  op instanceof ModalOperatorSV)
-		    return null;
+            if ( op instanceof UpdateApplication &&
+                it.getChild () == UpdateApplication.targetPos()) {		    
+                if ( (getApplicationRestriction() & IN_SEQUENT_STATE) != 0 || veto(t) ) {
+                return null;
+                } else {
+                Term update = UpdateApplication.getUpdate(t);
+                svi = svi.addUpdate ( update );
+                }
+
+            } else if (op instanceof Modality || op instanceof ModalOperatorSV) {
+                return null;
+            }
+
+            // compute polarity
+                                                                                // toggle polarity if find term is subterm of
+            if ((op == Junctor.NOT) ||                                          //   not
+                (op == Junctor.IMP && it.getChild() == 0)) {                    //   left hand side of implication
+                polarity = polarity * -1;
+                                                                                // do not change polarity if find term is subterm of
+            } else if ((op == Junctor.AND) ||                                   //   and
+                       (op == Junctor.OR) ||                                    //   or
+                       (op == Junctor.IMP && it.getChild() != 0) ||             //   right hand side of implication
+                       (op == IfThenElse.IF_THEN_ELSE && it.getChild() != 0)) { //   then or else part of if-then-else
+                // do nothing
+            } else {                                                            // find term has no polarity in any other case
+                polarity = 0;
+            }
 	    }
 	}
+    if (((getApplicationRestriction() & ANTECEDENT_POLARITY) != 0 && polarity != -1) ||
+        ((getApplicationRestriction() & SUCCEDENT_POLARITY) != 0 && polarity != 1)) {
+        return null;
+    }
 
 	return p_mc.setInstantiations ( svi );
     }
@@ -239,7 +282,7 @@ public final class RewriteTaclet extends FindTaclet {
 	    				       TacletApp app) {
 	assert goalTemplates().size() == 1;
 	assert goalTemplates().head().sequent().isEmpty();	
-	assert getStateRestriction() != IN_SEQUENT_STATE;
+	assert getApplicationRestriction() != IN_SEQUENT_STATE;
 	assert app.complete();
 	RewriteTacletGoalTemplate gt 
 		= (RewriteTacletGoalTemplate) goalTemplates().head();
@@ -258,6 +301,7 @@ public final class RewriteTaclet extends FindTaclet {
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
      */
+    @Override
     protected void applyReplacewith(TacletGoalTemplate gt, 
 				    Goal               goal,
 				    PosInOccurrence    posOfFind,
@@ -286,6 +330,7 @@ public final class RewriteTaclet extends FindTaclet {
      * @param services the Services encapsulating all java information
      * @param matchCond the MatchConditions with all required instantiations 
      */
+    @Override
     protected void applyAdd(Sequent         add, 
 			    Goal            goal,
 			    PosInOccurrence posOfFind,
@@ -300,20 +345,30 @@ public final class RewriteTaclet extends FindTaclet {
 	}
     }
     
+    @Override
     protected Taclet setName(String s) {
 	final RewriteTacletBuilder b = new RewriteTacletBuilder();
 	b.setFind(find());
-	b.setStateRestriction ( getStateRestriction() );
+	b.setApplicationRestriction ( getApplicationRestriction() );
 	return super.setName(s, b);
     }
 
 
+    @Override
     StringBuffer toStringFind(StringBuffer sb) {
 	StringBuffer res = super.toStringFind ( sb );
-	if ( getStateRestriction() == SAME_UPDATE_LEVEL )
-	    res.append ( "\\sameUpdateLevel\n" );
-	else if ( getStateRestriction() == IN_SEQUENT_STATE )
-	    res.append ( "\\inSequentState\n" );
+	if ((getApplicationRestriction() & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
+            res.append("\\sameUpdateLevel");
+        }
+        if ((getApplicationRestriction() & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
+            res.append("\\inSequentState");
+        }
+        if ((getApplicationRestriction() & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
+            res.append("\\antecedentPolarity");
+        }
+        if ((getApplicationRestriction() & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
+            res.append("\\succedentPolarity");
+        }
 	return res;
     }
 }

@@ -8,19 +8,14 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
-import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JMenuItem;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -36,6 +31,8 @@ import javax.swing.table.TableColumnModel;
 
 import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
 import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
+import de.uka.ilkd.key.gui.utilities.ClickableMessageBox;
+import de.uka.ilkd.key.gui.utilities.ClickableMessageBox.ClickableMessageBoxListener;
 
 
 
@@ -47,12 +44,13 @@ public class ProgressDialog extends JDialog{
         private JButton  applyButton;
         private JButton  stopButton;
         private JScrollPane scrollPane;
-        private JButton  infoButton;
-        private JPopupMenu infoMenu;
+
         private JProgressBar progressBar;
+        private ClickableMessageBox statusMessages;
         private final ProgressDialogListener listener;
         public enum Modus {stopModus,discardModus};
         private Modus modus = Modus.stopModus;
+        private Box statusMessageBox;
        
         
         public static interface ProgressDialogListener extends ProgressTableListener{
@@ -82,7 +80,7 @@ public class ProgressDialog extends JDialog{
                 Box buttonBox = Box.createHorizontalBox();
                 Box contentBox = Box.createVerticalBox();
                 
-                buttonBox.add(getInfoButton());
+        
                 buttonBox.add(Box.createHorizontalGlue());
                 buttonBox.add(getStopButton());
                 buttonBox.add(Box.createHorizontalStrut(5));
@@ -93,42 +91,29 @@ public class ProgressDialog extends JDialog{
                 getProgressBar().setMaximum(progressBarMax);
                 this.getContentPane().add(contentBox);
                 this.getContentPane().add(Box.createVerticalStrut(5));
+                this.getContentPane().add(getStatusMessageBox());
+                this.getContentPane().add(Box.createVerticalStrut(5));
                 this.getContentPane().add(buttonBox);
                 this.getContentPane().add(Box.createVerticalStrut(5));
-              
               
                 this.pack();
         }
         
         
-        public void setAdditionalInformation(String title,Color color, List<? extends Object> information){
-                getInfoButton().setText(title);
-                getInfoButton().setForeground(color);
-                infoMenu = new JPopupMenu();
-                Collections.sort(information,new Comparator<Object>() {
 
-                        @Override
-                        public int compare(Object o1, Object o2) {
-                               
-                                return o1.toString().compareTo(o2.toString());
-                        }
-                });
-                for(final Object obj : information){
-                     JMenuItem item = new JMenuItem(new AbstractAction(
-                        obj.toString()) {
-                        private static final long serialVersionUID = 1L;
-
-                    @Override
-                        public void actionPerformed(ActionEvent e) {
-                            listener.additionalInformationChosen(obj);
-                        }
-                    });
-                 
-                    infoMenu.add(item);
-                }
-                getInfoButton().setVisible(true);
-                
+        
+        public void addInformation(String title,Color color, Object information){
+        	
+        		getStatusMessages().add(information, title, color);
+        		if(!getStatusMessageBox().isVisible()){
+        			getStatusMessageBox().setVisible(true);        
+        			this.pack();
+        		}
         }
+        
+        
+        
+
         
         public void setProgress(int value){
                 getProgressBar().setValue(value);
@@ -137,37 +122,46 @@ public class ProgressDialog extends JDialog{
         public JProgressBar getProgressBar(){
                 if(progressBar == null){
                         progressBar = new JProgressBar();
-                     
+                  
                 }
                 
                 return progressBar;
         }
+        
+        public ClickableMessageBox getStatusMessages() {
+
+        	if(statusMessages == null){
+        		statusMessages = new ClickableMessageBox();
+           		statusMessages.add(new ClickableMessageBoxListener() {
+					
+					@Override
+					public void eventMessageClicked(Object object) {
+						  listener.additionalInformationChosen(object);
+						
+					}
+				});
+          	}        
+        	return statusMessages;
+		}
      
+        public Box getStatusMessageBox() {
+        	if(statusMessageBox == null){
+        		statusMessageBox = Box.createVerticalBox();
+        		JScrollPane pane = new JScrollPane(getStatusMessages());
+        		Dimension dim = pane.getPreferredSize();
+        		dim.height = 80;
+        		pane.setPreferredSize(dim);
+        		statusMessageBox.add(pane);
+        		statusMessageBox.add(new JLabel("For more information please click on the particular message."));
+        		statusMessageBox.setVisible(false);
+        	}
+        	
+        	return statusMessageBox;
+		}
         
-        private JButton getInfoButton(){
-                if(infoButton == null){
-                        infoButton = new JButton("Info");
-                        infoButton.setVisible(false);
-                        infoButton.addActionListener(new ActionListener() {
-                                
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                        JPopupMenu menu = getInfoMenu();
-                                        int width = Math.max(menu.getPreferredSize().width,infoButton.getWidth());
-                                            menu.setPopupSize(width, menu.getPreferredSize().height);
-                                            menu.show(infoButton,0 ,infoButton.getHeight());       
-                                }
-                        });
-                }
-                return infoButton;
-        }
+
         
-        private JPopupMenu getInfoMenu(){
-                if(infoMenu == null){
-                        infoMenu = new JPopupMenu();
-                }
-                return infoMenu;
-        }
+   
         
         
         private JButton getApplyButton() {

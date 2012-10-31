@@ -432,6 +432,7 @@ TOKEN :
 	  	  // TODO
 	  }
   }
+| < BIGINT: "\\bigint">
 | < BOOLEAN: "boolean" >
 | < BREAK: "break" >
 | < BYTE: "byte" >
@@ -456,6 +457,7 @@ TOKEN :
 | < FINALLY: "finally" >
 | < FLOAT: "float" >
 | < FOR: "for" >
+| < GEN: "\\gen" >
 | < GOTO: "goto" >
 | < IF: "if" >
 | < IMPLEMENTS: "implements" >
@@ -463,6 +465,7 @@ TOKEN :
 | < INSTANCEOF: "instanceof" >
 | < INT: "int" >
 | < INTERFACE: "interface" >
+| < LOCSET: "\\locset">
 | < LONG: "long" >
 | < METHODFRAME: "method-frame" >
 | < NATIVE: "native" >
@@ -473,6 +476,8 @@ TOKEN :
 | < PROTECTED: "protected" >
 | < PUBLIC: "public" >
 | < RETURN: "return" >
+| < SEQ: "\\seq" >
+| < SET: "\\set" >
 | < SHORT: "short" >
 | < STATIC: "static" >
 | < SUPER: "super" >
@@ -481,6 +486,10 @@ TOKEN :
 | < THIS: "this" >
 | < THROW: "throw" >
 | < THROWS: "throws" >
+| < TRANSACTIONBEGIN: "#beginJavaCardTransaction" >
+| < TRANSACTIONCOMMIT: "#commitJavaCardTransaction" >
+| < TRANSACTIONFINISH: "#finishJavaCardTransaction" >
+| < TRANSACTIONABORT: "#abortJavaCardTransaction" >
 | < TRANSIENT: "transient" >
 | < TRUE: "true" >
 | < TRY: "try" >
@@ -1958,10 +1967,13 @@ TypeReference PrimitiveType() :
   | "short"
   | "int"
   | "long"
+  | "\\bigint"
   | "float"
   | "double"
   | "\\locset"
   | "\\seq"
+  | "\\set"
+  | "\\gen"
   )
   {
     Identifier id = factory.createIdentifier(token.image);
@@ -3622,6 +3634,7 @@ Statement Statement() :
 | result = WhileStatement()
 | result = DoStatement()
 | result = ForStatement()
+| result = TransactionStatement()
 | result = BreakStatement()
 | result = ContinueStatement()
 | result = ReturnStatement()
@@ -3760,17 +3773,39 @@ ExecutionContext ExecutionContext() :
 {
   TypeReference classContext;
   Expression runtimeInstance = null;
+  MethodSignature methodSignature;
 } 
 {
 
   "source="
-  classContext = Type() 
+  methodSignature = MethodSignature() "@" classContext = Type()
   [ ",this=" runtimeInstance = Expression() ]
 
   { return new ExecutionContext
-        (classContext, 
+        (classContext, methodSignature,
         (ReferencePrefix)runtimeInstance);
   }
+}
+
+
+MethodSignature MethodSignature() :
+{
+     UncollatedReferenceQualifier name;
+     TypeReference tr;
+     ASTList<TypeReference> paramTypes = new ASTArrayList<TypeReference>();
+}
+{
+     name = Name() "(" 
+        [ tr = Type() { paramTypes.add(tr); }
+         ( "," tr = Type() { 
+                // check if more params are admissible (no more after a vararg) occurs in FormalParameter()
+                paramTypes.add(tr); 
+           } 
+         )* 
+       ] ")"
+     {
+        return factory.createMethodSignature(name.getIdentifier(), paramTypes);    
+     }
 }
 
 StatementBlock Block() :
@@ -4274,6 +4309,32 @@ ASTList<Expression> ForUpdate() :
     return result;
   }
 }
+
+TransactionStatement TransactionStatement() :
+{
+  String name;
+}
+{
+  (  ( <TRANSACTIONBEGIN> { name = token.image; } )
+   | ( <TRANSACTIONCOMMIT> { name = token.image; } )
+   | ( <TRANSACTIONFINISH> { name = token.image; } )
+   | ( <TRANSACTIONABORT> { name = token.image; } ) ) ";" 
+  {
+     int type = 0;
+     if(name.indexOf("#begin") != -1) {
+        type = TransactionStatement.BEGIN;
+     } else if(name.indexOf("#commit") != -1) {
+        type = TransactionStatement.COMMIT;
+     } else if(name.indexOf("#finish") != -1) {
+        type = TransactionStatement.FINISH;
+     } else if(name.indexOf("#abort") != -1) {
+        type = TransactionStatement.ABORT;
+     }
+     return new TransactionStatement(type);
+  }
+}
+
+
 
 Break BreakStatement() :
 {

@@ -31,12 +31,12 @@ public class Config {
     //these two can't be made local to, say, GFinterface because of 
     //static loading
     public static File GF_PATH_FILE = new File
-	(de.uka.ilkd.key.gui.configuration.PathConfig.KEY_CONFIG_DIR+File.separator+"gf-path.props");
+	(de.uka.ilkd.key.gui.configuration.PathConfig.getKeyConfigDir()+File.separator+"gf-path.props");
 
     public static final String GF_PATH_KEY = "[GFPath]";
 
     public static File SIMPLIFY_PATH_FILE = new File
-	(de.uka.ilkd.key.gui.configuration.PathConfig.KEY_CONFIG_DIR+File.separator+"simplify-path.props");
+	(de.uka.ilkd.key.gui.configuration.PathConfig.getKeyConfigDir()+File.separator+"simplify-path.props");
 
     public static final String SIMPLIFY_PATH_KEY = "[SimplifyPath]";
 
@@ -128,8 +128,6 @@ public class Config {
 		}
 		chr = fr.read();		    
 	    }
-	    fr.close();
-	    fw.close();
 	} catch (IOException io) {
 	    System.err.println("File "+filename+" can not be written.\n"+io);
 	    System.exit(-1);	   
@@ -139,14 +137,18 @@ public class Config {
     private static void writeToKeYConfig(File file, String header, 
 					 String key, String prop) {
 	if (!file.exists()) {
-	    new File(de.uka.ilkd.key.gui.configuration.PathConfig.KEY_CONFIG_DIR+File.separator).mkdir();
+	    new File(de.uka.ilkd.key.gui.configuration.PathConfig.getKeyConfigDir()+File.separator).mkdir();
 	}
 	try {
-	    FileOutputStream out = 
-		new FileOutputStream(file);
-	    Properties props = new Properties();
-	    props.setProperty(key, prop);
-	    props.store(out, header);
+            Properties props = new Properties();
+            props.setProperty(key, prop);
+            FileOutputStream out = 
+                    new FileOutputStream(file);
+            try { 
+                props.store(out, header);
+	    } finally {
+	        out.close();
+	    }
 	} catch (Exception e) {
 	    System.err.println("Could not write property to config file "+file);
 	}

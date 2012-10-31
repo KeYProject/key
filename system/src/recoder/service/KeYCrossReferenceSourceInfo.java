@@ -77,7 +77,15 @@ public class KeYCrossReferenceSourceInfo
 	
 	//HEAP
 	name2primitiveType.put("\\locset", new PrimitiveType("\\locset", this));
+	
+	// ADTs
 	name2primitiveType.put("\\seq", new PrimitiveType("\\seq", this));
+	name2primitiveType.put("\\set", new PrimitiveType("\\set", this));
+	name2primitiveType.put("\\gen", new PrimitiveType("\\gen", this));
+	
+	// JML's primitive types
+	name2primitiveType.put("\\bigint", new PrimitiveType("\\bigint", this));
+	name2primitiveType.put("\\real", new PrimitiveType("\\real", this));
     }
 
     /**
@@ -556,7 +564,7 @@ public class KeYCrossReferenceSourceInfo
                 cu = ClassFileDeclarationBuilder.makeEmptyClassDeclaration(serviceConfiguration.getProgramFactory(), typeString);
                 cu.setDataLocation(new SpecDataLocation("stub", typeString));
             } catch (ParserException e) {
-                throw new RuntimeException(e);
+                throw new de.uka.ilkd.key.java.ConvertException(e);
             }
 
             ChangeHistory changeHistory = serviceConfiguration.getChangeHistory();
@@ -594,7 +602,7 @@ public class KeYCrossReferenceSourceInfo
            || expr instanceof Singleton
            || expr instanceof SetUnion
            || expr instanceof AllFields) {
-	    return name2primitiveType.get("\\set");
+	    return name2primitiveType.get("\\locset");
 	} else if(expr instanceof EmptySeqLiteral
                   || expr instanceof SeqSingleton
                   || expr instanceof SeqConcat
@@ -607,7 +615,7 @@ public class KeYCrossReferenceSourceInfo
 	    return getNameInfo().getUnknownType();
 	} else if (expr instanceof SeqLength
 	        || expr instanceof SeqIndexOf){
-	    return name2primitiveType.get("int");
+	    return name2primitiveType.get("\\bigint");
 	    // TODO: handle SeqGet
 	} else {
 	    return super.getType(expr);

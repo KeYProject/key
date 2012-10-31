@@ -15,9 +15,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.BuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.*;
 
 
 /**
@@ -35,7 +33,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     private final FormulaTag      positionTag;
     private final PosInOccurrence applicationPosition;
     
-    private final BuiltInRuleApp bir;
+    private final IBuiltInRuleApp bir;
     
     
 
@@ -43,7 +41,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     //constructors
     //-------------------------------------------------------------------------
         
-    private BuiltInRuleAppContainer(BuiltInRuleApp bir,
+    private BuiltInRuleAppContainer(IBuiltInRuleApp bir,
 			     	    PosInOccurrence pio,
 			     	    RuleAppCost     cost,
 			     	    Goal            goal) {
@@ -72,8 +70,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      */
     private boolean isStillApplicable(Goal goal) {
 	if(applicationPosition == null) {
-	    return bir.rule().isApplicable(goal, 
-		    			   null);	    
+	    return bir.rule().isApplicable(goal,  null);	    
 	} else {
             final PosInOccurrence topPos 
     		= goal.getFormulaTagManager().getPosForTag(positionTag);
@@ -115,7 +112,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * the cost may be an instance of <code>TopRuleAppCost</code>.
      */
     static ImmutableList<RuleAppContainer> createAppContainers( 
-	    					BuiltInRuleApp bir,
+	    					IBuiltInRuleApp bir,
 	    					PosInOccurrence pio,
 	    					Goal goal,
 	    					Strategy strategy ) {
@@ -158,11 +155,16 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         final PosInOccurrence pio = getPosInOccurrence (goal);
         if(!strategy.isApprovedApp(bir, pio, goal)) {
             return null;
-        }
+        }                
         
         final BuiltInRule rule = bir.rule();
-        final ImmutableList<PosInOccurrence> ifInsts = bir.ifInsts();
-	
-        return new BuiltInRuleApp(rule, pio, ifInsts);
+        IBuiltInRuleApp app = rule.createApp(pio);
+		
+		if (!app.complete()) {
+		    app = app.setIfInsts(bir.ifInsts());	        
+			app = (AbstractBuiltInRuleApp) ((IBuiltInRuleApp)app).tryToInstantiate(goal);
+		}
+
+		return app.complete() ? app : null;
     }
 }

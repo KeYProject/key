@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_694a1abd-fd40-4813-9225-3feef4dc6cf6" name="main()" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_0d23d7c5-eb98-47fd-a030-e6e298acdfaa" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_3b3d5922-009d-4204-b44d-d27164f1874d" name="self.main();" pathCondition="true" lineNumber="-1" charStart="92" charEnd="96">
+            <sedStatement xml:id="_55ec00a7-f014-4934-8d38-4f72ca56d5f3" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="104" charEnd="119">
+               <sedLoopNode xml:id="_9a9e1dcb-7e2c-4c9d-83db-8916acac592a" name="for ( int i = 0; false; i++ ) {   result_1++; }" pathCondition="true" lineNumber="-1" charStart="123" charEnd="172">
+                  <sedStatement xml:id="_37c383f8-c9c4-448f-818c-999cf76abea2" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="128" charEnd="137">
+                     <sedLoopCondition xml:id="_cc9b79f4-08fe-4a2d-9807-1bca67c1cca9" name="false" pathCondition="true" lineNumber="-1" charStart="139" charEnd="144">
+                        <sedStatement xml:id="_c524d59b-6f92-4275-bd0a-fb416441bb3b" name="return result_1;" pathCondition="true" lineNumber="-1" charStart="176" charEnd="190">
+                           <sedMethodReturn xml:id="_1bd48f89-4d3b-47ee-b67d-c985b3e00f30" name="&lt;return &apos;0&apos; as result of self.main();&gt;" pathCondition="true" lineNumber="-1" charStart="92" charEnd="96">
+                              <sedTermination xml:id="_86be3166-fe7e-4271-bbb3-14e7dc40749f" name="&lt;end&gt;" pathCondition="true">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedLoopCondition>
+                  </sedStatement>
+               </sedLoopNode>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

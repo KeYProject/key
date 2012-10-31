@@ -10,9 +10,6 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.Recoder2KeY;
-import de.uka.ilkd.key.java.StatementBlock;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;

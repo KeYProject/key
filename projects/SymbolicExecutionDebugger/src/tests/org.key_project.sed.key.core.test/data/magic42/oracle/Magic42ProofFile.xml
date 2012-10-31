@@ -1,0 +1,907 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_7f36ed84-6c62-408c-9593-1d4c9ceb03d6" name="compute(int)" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_79f5f077-cf18-4fcc-a13c-053e464fa346" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_9d7ee539-5c7a-45e5-a4b4-2f0ef16bfb19" name="Magic42.compute(xValue);" pathCondition="true" lineNumber="-1" charStart="43" charEnd="50">
+            <sedVariable xml:id="_40e6781e-05a2-49f2-a9f7-897889e98777" name="exc" referenceTypeName="Null">
+               <sedValue xml:id="_128cc5aa-f5f4-417e-b252-755eb38d311a" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+               </sedValue>
+            </sedVariable>
+            <sedStatement xml:id="_4036db53-e9b2-44d5-aa76-4b87d6a32360" name="int y = computeHelp(xValue);" pathCondition="true" lineNumber="-1" charStart="68" charEnd="96">
+               <sedVariable xml:id="_1b6d04c5-d146-4502-a7f2-8c5a4112a41f" name="xValue" referenceTypeName="int">
+                  <sedValue xml:id="_fb66b730-c793-406b-982a-f95a8ac54932" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                  </sedValue>
+               </sedVariable>
+               <sedVariable xml:id="_3cba7af7-245e-4041-8ef0-5d828cca2ad3" name="exc" referenceTypeName="Null">
+                  <sedValue xml:id="_1c03169d-4a32-4647-97bb-2a238ebaa778" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                  </sedValue>
+               </sedVariable>
+               <sedMethodCall xml:id="_5199dc9e-7f4d-4be2-b6ca-37c698a721c9" name="Magic42.computeHelp(x_1);" pathCondition="true" lineNumber="-1" charStart="297" charEnd="308">
+                  <sedVariable xml:id="_5b077966-2d4c-4e01-bd9c-dbf6bf9349f1" name="xValue" referenceTypeName="int">
+                     <sedValue xml:id="_dff292dc-ec8d-4980-8303-4c068bfbc87a" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                     </sedValue>
+                  </sedVariable>
+                  <sedVariable xml:id="_abd6cd76-36e7-4ed9-b792-11d06fc9ba1b" name="exc" referenceTypeName="Null">
+                     <sedValue xml:id="_5b39d56c-d963-4354-8d67-130edf26e072" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                     </sedValue>
+                  </sedVariable>
+                  <sedVariable xml:id="_9a6e6b71-a769-4f1b-a224-fc6330484bb5" name="x_1" referenceTypeName="int">
+                     <sedValue xml:id="_f657407c-f49f-4250-97e6-0ffa4bcb5d28" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                     </sedValue>
+                  </sedVariable>
+                  <sedStatement xml:id="_e6d3d17e-dc13-4dc3-9e78-25f2268fa6e0" name="int y = (x_1&gt;=0 ?x_1 :-x_1)/2000;" pathCondition="true" lineNumber="-1" charStart="321" charEnd="354">
+                     <sedVariable xml:id="_7c87659a-c757-48e5-aa8e-3dc819c08699" name="x_1" referenceTypeName="int">
+                        <sedValue xml:id="_45282435-fa7c-4a8b-ba4f-f8b90bf6668a" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                        </sedValue>
+                     </sedVariable>
+                     <sedVariable xml:id="_dfa96a80-bfa7-443c-8b6c-b081346a9649" name="exc" referenceTypeName="Null">
+                        <sedValue xml:id="_a17cc194-d08c-4012-8eac-ca9ef1a62e24" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                        </sedValue>
+                     </sedVariable>
+                     <sedBranchCondition xml:id="_4cdd0cdc-b651-4f7b-8452-3cacad7e7687" name="xValue &gt;= 0" pathCondition="!xValue &lt;= -1">
+                        <sedStatement xml:id="_33e3c68f-3c2f-4936-a1c4-2c11e07b918b" name="return 320*y_1+7;" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="358" charEnd="377">
+                           <sedVariable xml:id="_8392d22e-68be-4110-b491-b37a800c2755" name="x_1" referenceTypeName="int">
+                              <sedValue xml:id="_b9acf96c-6024-4a71-b0d1-6276e4546a77" referenceTypeName="int" valueString="x_1" allocated="true" multiValued="false">
+                              </sedValue>
+                           </sedVariable>
+                           <sedVariable xml:id="_4d6bf4c3-7a44-4558-a45e-0140198cb15a" name="exc" referenceTypeName="Null">
+                              <sedValue xml:id="_b7af71eb-da4d-49ee-8c54-3e5c0daa15e7" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                              </sedValue>
+                           </sedVariable>
+                           <sedVariable xml:id="_0de06e0e-33cf-4c42-875f-9ef663328536" name="y_1" referenceTypeName="int">
+                              <sedValue xml:id="_1e8767cd-5f2a-406d-aafc-bb2e6e6de64e" referenceTypeName="int" valueString="quotient_2" allocated="true" multiValued="false">
+                              </sedValue>
+                           </sedVariable>
+                           <sedMethodReturn xml:id="_1482fdc2-aaad-4ed6-a67e-8c5bd3813532" name="&lt;return &apos;7 + quotient_2 * 320&apos; as result of Magic42.computeHelp(x_1);&gt;" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="297" charEnd="308">
+                              <sedVariable xml:id="_67b80ab3-211f-4ef2-8e06-2f9c8f59636f" name="x_1" referenceTypeName="int">
+                                 <sedValue xml:id="_b97d422e-00b6-4400-a84e-1c9302fc0cb6" referenceTypeName="int" valueString="x_1" allocated="true" multiValued="false">
+                                 </sedValue>
+                              </sedVariable>
+                              <sedVariable xml:id="_1d8a460f-0ed3-4237-a470-95147a609274" name="exc" referenceTypeName="Null">
+                                 <sedValue xml:id="_388a5786-5c36-4788-b4ca-726f8977b445" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                 </sedValue>
+                              </sedVariable>
+                              <sedVariable xml:id="_1a70e0e7-8a55-471c-adf0-218cef692a81" name="x" referenceTypeName="int">
+                                 <sedValue xml:id="_74517663-3235-49c3-b446-41fdbd91c9cf" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
+                                 </sedValue>
+                              </sedVariable>
+                              <sedStatement xml:id="_2bdea946-20d7-4d84-9d31-7df5dc360d28" name="int res = 0;" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="100" charEnd="112">
+                                 <sedVariable xml:id="_01e9fabc-27e5-4955-ae91-1feaa2bfc080" name="xValue" referenceTypeName="int">
+                                    <sedValue xml:id="_3b403b15-cba8-45fa-97f3-92a6cdf2e123" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                    </sedValue>
+                                 </sedVariable>
+                                 <sedVariable xml:id="_10442664-06e5-49c4-a0fd-835bb2bf9435" name="exc" referenceTypeName="Null">
+                                    <sedValue xml:id="_fc4ecb49-ca6a-498b-891f-9c6b54ff978f" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                    </sedValue>
+                                 </sedVariable>
+                                 <sedVariable xml:id="_6e2919d1-90ae-4c3c-9286-49e19f962b13" name="y" referenceTypeName="int">
+                                    <sedValue xml:id="_25a45728-7c5c-43b8-bc5c-83d71b515211" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
+                                    </sedValue>
+                                 </sedVariable>
+                                 <sedLoopNode xml:id="_d3140bf7-2683-4ba2-bbc8-2909ca02fcb7" name="while ( y%2!=0 ) {if (res_1%2==0) {     res_1=2*res_1+(y%2);     y=y/2;   }else  {     res_1=2*res_1;   } }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="116" charEnd="250">
+                                    <sedVariable xml:id="_f08b317a-e6a6-44c3-9119-95cd52f42213" name="xValue" referenceTypeName="int">
+                                       <sedValue xml:id="_d123be4b-7df5-4d69-8ea7-51bfda7e9b80" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                       </sedValue>
+                                    </sedVariable>
+                                    <sedVariable xml:id="_2bb67e4b-ee6d-401c-b3b4-d15057e6c553" name="exc" referenceTypeName="Null">
+                                       <sedValue xml:id="_ee16b417-2d45-4d61-b296-bd1caaa99676" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                       </sedValue>
+                                    </sedVariable>
+                                    <sedVariable xml:id="_5d218ecd-ed88-4a24-8e11-1ee298a9cf2e" name="y" referenceTypeName="int">
+                                       <sedValue xml:id="_97b78df2-1029-4d49-b62f-03759a917a29" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
+                                       </sedValue>
+                                    </sedVariable>
+                                    <sedVariable xml:id="_7deda156-2655-4fda-8aad-c3da7af80161" name="res_1" referenceTypeName="int">
+                                       <sedValue xml:id="_75011a0a-c003-4e0c-8f96-1faa5ca3f9dc" referenceTypeName="int" valueString="0" allocated="true" multiValued="false">
+                                       </sedValue>
+                                    </sedVariable>
+                                    <sedLoopCondition xml:id="_fc4d7199-cbde-4d23-a646-82d41ce4561a" name="y%2!=0" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="123" charEnd="133">
+                                       <sedVariable xml:id="_24222eac-58c9-4892-a526-1a946c0eb445" name="xValue" referenceTypeName="int">
+                                          <sedValue xml:id="_cbfba4ef-7ef4-41b6-8db3-6e7f2fe9f1cf" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                          </sedValue>
+                                       </sedVariable>
+                                       <sedVariable xml:id="_bacc1073-8e41-41f7-9c26-1525b0c02096" name="exc" referenceTypeName="Null">
+                                          <sedValue xml:id="_0ca39ff4-8b4f-466b-9493-0866fc458aa3" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                          </sedValue>
+                                       </sedVariable>
+                                       <sedVariable xml:id="_de2ccb44-de3b-41cf-8113-01ead1730d23" name="y" referenceTypeName="int">
+                                          <sedValue xml:id="_f70e55f0-a64e-4e0e-88b4-b8683a4e9be5" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
+                                          </sedValue>
+                                       </sedVariable>
+                                       <sedVariable xml:id="_0d3aed5f-2955-481b-aca5-33b38ca3d6f8" name="res_1" referenceTypeName="int">
+                                          <sedValue xml:id="_09501616-5d41-4f5c-8d17-d81e1c9cbeca" referenceTypeName="int" valueString="0" allocated="true" multiValued="false">
+                                          </sedValue>
+                                       </sedVariable>
+                                       <sedBranchNode xml:id="_39095b33-3d76-4496-8467-ad3d20980cd3" name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="141" charEnd="245">
+                                          <sedVariable xml:id="_9775ebbf-9ef3-4743-8ddf-0e7f6c57ce06" name="xValue" referenceTypeName="int">
+                                             <sedValue xml:id="_1811df83-99f6-41f3-8fe9-b17d31cff867" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                             </sedValue>
+                                          </sedVariable>
+                                          <sedVariable xml:id="_fc60270e-bec3-4a96-8133-83d54799bb8e" name="exc" referenceTypeName="Null">
+                                             <sedValue xml:id="_dee33a75-13a3-4f42-9412-2bdd9de75a70" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                             </sedValue>
+                                          </sedVariable>
+                                          <sedVariable xml:id="_44c78980-776c-495e-93af-d01df438d2da" name="y" referenceTypeName="int">
+                                             <sedValue xml:id="_93b73d6d-4571-4d59-b4fa-5397d2485651" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
+                                             </sedValue>
+                                          </sedVariable>
+                                          <sedVariable xml:id="_7fda8aeb-0837-4193-a7f4-fac4707f52c3" name="res_1" referenceTypeName="int">
+                                             <sedValue xml:id="_dc707a0c-6d71-405c-bbcb-ea6f30af87c3" referenceTypeName="int" valueString="0" allocated="true" multiValued="false">
+                                             </sedValue>
+                                          </sedVariable>
+                                          <sedStatement xml:id="_d028ee5d-8598-42c1-9a5a-d118c0d409d2" name="res_1=2*res_1+(y%2);" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="166" charEnd="190">
+                                             <sedVariable xml:id="_4b708306-946f-4103-b313-16b7cd11bbd9" name="xValue" referenceTypeName="int">
+                                                <sedValue xml:id="_2cb10ff4-99f3-415d-8794-456258bcc1ac" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                </sedValue>
+                                             </sedVariable>
+                                             <sedVariable xml:id="_e54e4be2-807d-41cb-ae95-954db52a5122" name="exc" referenceTypeName="Null">
+                                                <sedValue xml:id="_c34ff9c7-8586-4560-b08f-4f5f3698ba59" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                </sedValue>
+                                             </sedVariable>
+                                             <sedVariable xml:id="_6d6f17d9-2922-4180-bb49-e878e06cc46d" name="y" referenceTypeName="int">
+                                                <sedValue xml:id="_dca21500-bafb-4f29-bbf3-8f1f320ab172" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
+                                                </sedValue>
+                                             </sedVariable>
+                                             <sedVariable xml:id="_2568e2a2-1b16-44c0-8a04-d04626d4c95d" name="res_1" referenceTypeName="int">
+                                                <sedValue xml:id="_2738be2b-a357-4f49-b75a-929234c7e54b" referenceTypeName="int" valueString="0" allocated="true" multiValued="false">
+                                                </sedValue>
+                                             </sedVariable>
+                                             <sedStatement xml:id="_ac9391ed-96fe-49af-b118-94c5e5fe35e1" name="y=y/2;" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="196" charEnd="206">
+                                                <sedVariable xml:id="_9314d354-e2b0-43bf-8a6c-c9cb55ffa749" name="xValue" referenceTypeName="int">
+                                                   <sedValue xml:id="_f2d40663-8b5f-4d20-ac7c-79c83a884284" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                   </sedValue>
+                                                </sedVariable>
+                                                <sedVariable xml:id="_b24186b0-b59e-4525-8295-43b897a8e25b" name="exc" referenceTypeName="Null">
+                                                   <sedValue xml:id="_1e210c6a-3ccb-42a9-9c43-191f165c07cf" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                   </sedValue>
+                                                </sedVariable>
+                                                <sedVariable xml:id="_c97e0b3f-4b90-42ec-b842-8e2f102e4340" name="y" referenceTypeName="int">
+                                                   <sedValue xml:id="_16e93f24-cb7a-45da-ad46-73e11452dc98" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
+                                                   </sedValue>
+                                                </sedVariable>
+                                                <sedVariable xml:id="_43372a12-a797-4b20-87e6-05b6e5ff70bd" name="res_1" referenceTypeName="int">
+                                                   <sedValue xml:id="_15c2a0f7-4bd0-4bd0-ba19-91d2b83ba4a5" referenceTypeName="int" valueString="1" allocated="true" multiValued="false">
+                                                   </sedValue>
+                                                </sedVariable>
+                                                <sedLoopCondition xml:id="_1139250b-fe95-4e4b-a1d4-00b573b35b2c" name="y%2!=0" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="123" charEnd="133">
+                                                   <sedVariable xml:id="_a982d290-e36b-4570-8991-c5d83a18c97e" name="xValue" referenceTypeName="int">
+                                                      <sedValue xml:id="_9739e40b-b7f8-4abb-be86-fe09a9469c52" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                      </sedValue>
+                                                   </sedVariable>
+                                                   <sedVariable xml:id="_4a0819eb-69a1-4842-8d06-4ef5c383f69d" name="exc" referenceTypeName="Null">
+                                                      <sedValue xml:id="_c06860cd-1527-4673-8849-eb3b60e31de6" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                      </sedValue>
+                                                   </sedVariable>
+                                                   <sedVariable xml:id="_48085d09-e97d-40e1-beac-417c44627b08" name="res_1" referenceTypeName="int">
+                                                      <sedValue xml:id="_032e3375-a383-49e7-903c-6c4eff385ceb" referenceTypeName="int" valueString="1" allocated="true" multiValued="false">
+                                                      </sedValue>
+                                                   </sedVariable>
+                                                   <sedVariable xml:id="_e85f3c34-317a-432a-aa66-1b284f9f7568" name="y" referenceTypeName="int">
+                                                      <sedValue xml:id="_48005480-4964-4793-98bc-747f80b2d395" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
+                                                      </sedValue>
+                                                   </sedVariable>
+                                                   <sedBranchNode xml:id="_38d854c9-27ff-4ce8-b3f8-cc2e7b52056c" name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="141" charEnd="245">
+                                                      <sedVariable xml:id="_c84a1bdf-93f3-44f4-bb1a-f008c018b291" name="xValue" referenceTypeName="int">
+                                                         <sedValue xml:id="_00153076-3f45-4203-9069-8f18c808eb39" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                         </sedValue>
+                                                      </sedVariable>
+                                                      <sedVariable xml:id="_c4313d24-6ffb-4602-b740-b6ba07dd9691" name="exc" referenceTypeName="Null">
+                                                         <sedValue xml:id="_53914385-bfc7-4b11-b0ec-cb7489909f09" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                         </sedValue>
+                                                      </sedVariable>
+                                                      <sedVariable xml:id="_7fea0713-d74e-4b70-ab14-89cd4c1c8db4" name="res_1" referenceTypeName="int">
+                                                         <sedValue xml:id="_0ac03e76-6a6a-4117-b473-b3e970cb90a6" referenceTypeName="int" valueString="1" allocated="true" multiValued="false">
+                                                         </sedValue>
+                                                      </sedVariable>
+                                                      <sedVariable xml:id="_16424424-ec35-43da-a792-11d93ff55366" name="y" referenceTypeName="int">
+                                                         <sedValue xml:id="_3d75e89b-61d5-4c02-981f-9fc90472b528" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
+                                                         </sedValue>
+                                                      </sedVariable>
+                                                      <sedStatement xml:id="_7738186a-3368-4845-850c-fce2ac853d24" name="res_1=2*res_1;" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="225" charEnd="239">
+                                                         <sedVariable xml:id="_35d75d8f-b6f1-439c-86bc-59d9a3aff7a2" name="xValue" referenceTypeName="int">
+                                                            <sedValue xml:id="_d0f4ee5f-21e7-4e32-b5be-7ba06c5d4f3c" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                            </sedValue>
+                                                         </sedVariable>
+                                                         <sedVariable xml:id="_18cb2bec-7807-4c0d-a344-ef0fb5d460f5" name="exc" referenceTypeName="Null">
+                                                            <sedValue xml:id="_52dcb499-659d-4bfa-834d-9dad4cedf88d" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                            </sedValue>
+                                                         </sedVariable>
+                                                         <sedVariable xml:id="_101e2158-6c83-479c-b995-ce91ccd9dc5d" name="res_1" referenceTypeName="int">
+                                                            <sedValue xml:id="_323d2730-2c0a-40ee-b507-60e89095d348" referenceTypeName="int" valueString="1" allocated="true" multiValued="false">
+                                                            </sedValue>
+                                                         </sedVariable>
+                                                         <sedVariable xml:id="_389975a5-91b8-4815-ac7c-f117baaec67b" name="y" referenceTypeName="int">
+                                                            <sedValue xml:id="_66d7ef25-e8f7-42c9-886f-81ae76e96ad3" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
+                                                            </sedValue>
+                                                         </sedVariable>
+                                                         <sedLoopCondition xml:id="_dcedda42-16de-44e1-883e-877ff7cb2c65" name="y%2!=0" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="123" charEnd="133">
+                                                            <sedVariable xml:id="_8e88d93a-3151-4d0e-b578-ae6a3ea0fa45" name="xValue" referenceTypeName="int">
+                                                               <sedValue xml:id="_fcd567a4-e43c-4478-ad0b-be475c37a2e8" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                               </sedValue>
+                                                            </sedVariable>
+                                                            <sedVariable xml:id="_495ad4de-6121-47b5-8703-7da88efe241a" name="exc" referenceTypeName="Null">
+                                                               <sedValue xml:id="_3f387336-99d6-4a64-ad0c-0ca21133d3ae" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                               </sedValue>
+                                                            </sedVariable>
+                                                            <sedVariable xml:id="_f13b667c-8821-4227-998e-21e7b330a468" name="y" referenceTypeName="int">
+                                                               <sedValue xml:id="_7c564729-bc92-4df5-b593-3d834e47f0be" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
+                                                               </sedValue>
+                                                            </sedVariable>
+                                                            <sedVariable xml:id="_43ec2047-64d5-4102-87d0-891ccd4c628e" name="res_1" referenceTypeName="int">
+                                                               <sedValue xml:id="_6a2e96b5-184c-429c-bac4-b045bc33507e" referenceTypeName="int" valueString="2" allocated="true" multiValued="false">
+                                                               </sedValue>
+                                                            </sedVariable>
+                                                            <sedBranchNode xml:id="_f16d8bfc-9f32-475b-8c81-15460d07b8d6" name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="141" charEnd="245">
+                                                               <sedVariable xml:id="_f20ac1ab-df91-4388-9cd8-d67a1c7831a7" name="xValue" referenceTypeName="int">
+                                                                  <sedValue xml:id="_23d9a2a1-5916-4795-bd24-b4efc9c95baa" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                  </sedValue>
+                                                               </sedVariable>
+                                                               <sedVariable xml:id="_49c06def-4dbc-4f7d-a600-bb02c2b5fb95" name="exc" referenceTypeName="Null">
+                                                                  <sedValue xml:id="_ae9a6da8-905e-4ff2-b167-2d80ceeb8800" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                  </sedValue>
+                                                               </sedVariable>
+                                                               <sedVariable xml:id="_d189f27a-ceb1-4ee2-b622-a1afc850eae5" name="y" referenceTypeName="int">
+                                                                  <sedValue xml:id="_9037d5d6-55ac-4257-a5ee-c3bba7e5d320" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
+                                                                  </sedValue>
+                                                               </sedVariable>
+                                                               <sedVariable xml:id="_81faed24-b90f-4a87-b955-5c9a73eb21f7" name="res_1" referenceTypeName="int">
+                                                                  <sedValue xml:id="_7e734e9a-fdc5-4bda-a12d-534e4a238c1a" referenceTypeName="int" valueString="2" allocated="true" multiValued="false">
+                                                                  </sedValue>
+                                                               </sedVariable>
+                                                               <sedStatement xml:id="_6b17f0ab-c77a-424e-9534-362cd330bcc7" name="res_1=2*res_1+(y%2);" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="166" charEnd="190">
+                                                                  <sedVariable xml:id="_b284145a-205a-4996-b980-adf0cb049153" name="xValue" referenceTypeName="int">
+                                                                     <sedValue xml:id="_22938c86-a97d-4e90-982a-8254af5fa725" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                     </sedValue>
+                                                                  </sedVariable>
+                                                                  <sedVariable xml:id="_5f9dce34-a230-4594-a44a-902112d807b1" name="exc" referenceTypeName="Null">
+                                                                     <sedValue xml:id="_be3fc733-d05c-4cf4-97b1-4fa793f96677" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                     </sedValue>
+                                                                  </sedVariable>
+                                                                  <sedVariable xml:id="_18fb9ccf-bca5-42f2-b850-8b0bbd9109ce" name="y" referenceTypeName="int">
+                                                                     <sedValue xml:id="_9302ac5c-9965-4a23-b617-10910d0e5413" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
+                                                                     </sedValue>
+                                                                  </sedVariable>
+                                                                  <sedVariable xml:id="_932251db-c959-4a47-9db9-4faa33ae5795" name="res_1" referenceTypeName="int">
+                                                                     <sedValue xml:id="_c1b0afe3-0288-4ee0-91cd-868add99240b" referenceTypeName="int" valueString="2" allocated="true" multiValued="false">
+                                                                     </sedValue>
+                                                                  </sedVariable>
+                                                                  <sedStatement xml:id="_19d1aa22-7de3-42f4-a70a-a47c72b299fb" name="y=y/2;" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="196" charEnd="206">
+                                                                     <sedVariable xml:id="_bfbc2a8d-351d-4da1-9821-397a8f919837" name="xValue" referenceTypeName="int">
+                                                                        <sedValue xml:id="_4c1351d5-4370-4e03-a4aa-2a412ed3b23e" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                        </sedValue>
+                                                                     </sedVariable>
+                                                                     <sedVariable xml:id="_78806431-5bae-47de-ad3a-346bd758c51d" name="exc" referenceTypeName="Null">
+                                                                        <sedValue xml:id="_c7f63cda-43b6-4380-9299-6ffc2a1df3f9" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                        </sedValue>
+                                                                     </sedVariable>
+                                                                     <sedVariable xml:id="_d90e2a0a-fb7f-4685-bd10-068fc0e6aeab" name="y" referenceTypeName="int">
+                                                                        <sedValue xml:id="_a00649bc-424d-4172-9d33-0b396f07b28c" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
+                                                                        </sedValue>
+                                                                     </sedVariable>
+                                                                     <sedVariable xml:id="_ef300298-395b-4713-bd3a-471407f763ad" name="res_1" referenceTypeName="int">
+                                                                        <sedValue xml:id="_e490ba4a-781a-414f-a8bf-433ea05316e4" referenceTypeName="int" valueString="5" allocated="true" multiValued="false">
+                                                                        </sedValue>
+                                                                     </sedVariable>
+                                                                     <sedLoopCondition xml:id="_9293b1c2-1633-4667-b4eb-6469f9f01126" name="y%2!=0" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="123" charEnd="133">
+                                                                        <sedVariable xml:id="_a9290253-7ccb-421b-a09e-094efbc3046d" name="xValue" referenceTypeName="int">
+                                                                           <sedValue xml:id="_05fb560d-0ea9-4b67-8c4d-eb4908ed6b3b" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                           </sedValue>
+                                                                        </sedVariable>
+                                                                        <sedVariable xml:id="_730244dd-8b00-4e85-ac6e-3e715d376c7c" name="exc" referenceTypeName="Null">
+                                                                           <sedValue xml:id="_7f3c204a-95b2-4192-a531-c93db22e7dcc" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                           </sedValue>
+                                                                        </sedVariable>
+                                                                        <sedVariable xml:id="_54cd5982-80b2-48da-b401-2b6fe3d4857d" name="res_1" referenceTypeName="int">
+                                                                           <sedValue xml:id="_1a6520c6-8aca-4a2f-8c08-7e985a845861" referenceTypeName="int" valueString="5" allocated="true" multiValued="false">
+                                                                           </sedValue>
+                                                                        </sedVariable>
+                                                                        <sedVariable xml:id="_83a109af-8b3a-4b1b-ba9e-a3a3ea6a3188" name="y" referenceTypeName="int">
+                                                                           <sedValue xml:id="_507f8184-a5fe-4b1f-a75a-daf40e6bc3b1" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
+                                                                           </sedValue>
+                                                                        </sedVariable>
+                                                                        <sedBranchNode xml:id="_56e1d630-5ecb-432c-b23b-a2794e15139b" name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="141" charEnd="245">
+                                                                           <sedVariable xml:id="_4fd316db-3a7a-4b7c-a22e-8a4f381b1dda" name="xValue" referenceTypeName="int">
+                                                                              <sedValue xml:id="_49b99e53-d1cc-4fec-ae01-8229cc38918f" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                              </sedValue>
+                                                                           </sedVariable>
+                                                                           <sedVariable xml:id="_77c57839-48ca-4848-a497-ec5075d4a995" name="exc" referenceTypeName="Null">
+                                                                              <sedValue xml:id="_ce02cbb3-e62f-42fe-b192-0057081b1a54" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                              </sedValue>
+                                                                           </sedVariable>
+                                                                           <sedVariable xml:id="_3743fb29-6437-426a-9187-07bd2371095c" name="res_1" referenceTypeName="int">
+                                                                              <sedValue xml:id="_731b832f-e69f-4e39-a642-bd6293e33970" referenceTypeName="int" valueString="5" allocated="true" multiValued="false">
+                                                                              </sedValue>
+                                                                           </sedVariable>
+                                                                           <sedVariable xml:id="_aa7f3f3e-9fca-4a58-a4a8-35383311ba1d" name="y" referenceTypeName="int">
+                                                                              <sedValue xml:id="_99be0659-138c-4078-9d3e-f8ff84188d6c" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
+                                                                              </sedValue>
+                                                                           </sedVariable>
+                                                                           <sedStatement xml:id="_c9966924-5259-47b3-bd0b-51cf2c661ec8" name="res_1=2*res_1;" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="225" charEnd="239">
+                                                                              <sedVariable xml:id="_62f7866c-5f73-4309-84e2-ef01d33009ea" name="xValue" referenceTypeName="int">
+                                                                                 <sedValue xml:id="_0d7e9689-595c-4d39-aa65-9975f4cefa2a" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                 </sedValue>
+                                                                              </sedVariable>
+                                                                              <sedVariable xml:id="_fe7b33c1-c24a-4657-ac3f-28657e1120bc" name="exc" referenceTypeName="Null">
+                                                                                 <sedValue xml:id="_cc74dc20-9cc4-41a8-b1a1-d5ed2dcc903d" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                 </sedValue>
+                                                                              </sedVariable>
+                                                                              <sedVariable xml:id="_11776d3c-9e4e-4075-b134-f01f34ad1c20" name="res_1" referenceTypeName="int">
+                                                                                 <sedValue xml:id="_56b4cbd9-cddc-4578-b694-beb04b72f71f" referenceTypeName="int" valueString="5" allocated="true" multiValued="false">
+                                                                                 </sedValue>
+                                                                              </sedVariable>
+                                                                              <sedVariable xml:id="_ee824418-c08b-4258-8204-3ef2764f4d74" name="y" referenceTypeName="int">
+                                                                                 <sedValue xml:id="_ccd32b33-4914-4b0c-93ff-830eb2c918f2" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
+                                                                                 </sedValue>
+                                                                              </sedVariable>
+                                                                              <sedLoopCondition xml:id="_8fc3a7ee-1f36-48ac-a85e-de06c00d04c1" name="y%2!=0" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="123" charEnd="133">
+                                                                                 <sedVariable xml:id="_df7dd52c-435b-43e1-8621-55fda3f5d459" name="xValue" referenceTypeName="int">
+                                                                                    <sedValue xml:id="_f857a5fc-035f-4034-95c7-71d7807d7ab7" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                    </sedValue>
+                                                                                 </sedVariable>
+                                                                                 <sedVariable xml:id="_78afc2f7-7275-4db9-91d1-8192b647135d" name="exc" referenceTypeName="Null">
+                                                                                    <sedValue xml:id="_4f46e902-ebc0-4f32-958a-fd2ecaffc50c" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                    </sedValue>
+                                                                                 </sedVariable>
+                                                                                 <sedVariable xml:id="_165d94fa-861f-4dbe-8d22-e3a9d9b566fb" name="y" referenceTypeName="int">
+                                                                                    <sedValue xml:id="_dcb22962-976a-4103-9ca4-fc4f25cbea1e" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
+                                                                                    </sedValue>
+                                                                                 </sedVariable>
+                                                                                 <sedVariable xml:id="_30c6fa2a-2ddc-4b90-87c8-6adb89daa240" name="res_1" referenceTypeName="int">
+                                                                                    <sedValue xml:id="_7379165b-0a83-47d6-896b-c48a20780836" referenceTypeName="int" valueString="10" allocated="true" multiValued="false">
+                                                                                    </sedValue>
+                                                                                 </sedVariable>
+                                                                                 <sedBranchNode xml:id="_9759b3e9-5970-49bd-a830-7aef2ec6c176" name="if (res_1%2==0) {   res_1=2*res_1+(y%2);   y=y/2; }else  {   res_1=2*res_1; }" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="141" charEnd="245">
+                                                                                    <sedVariable xml:id="_1d082d4e-c044-4e1a-81e3-2938b23fbcb2" name="xValue" referenceTypeName="int">
+                                                                                       <sedValue xml:id="_2242b016-0846-4d2b-8328-bb26d2950c7e" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                       </sedValue>
+                                                                                    </sedVariable>
+                                                                                    <sedVariable xml:id="_1aa8f10c-e779-4eb0-baa5-b9a27fbbdc57" name="exc" referenceTypeName="Null">
+                                                                                       <sedValue xml:id="_10558b47-82b9-46f4-84cf-dce54cf990c7" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                       </sedValue>
+                                                                                    </sedVariable>
+                                                                                    <sedVariable xml:id="_7ad9e5a2-a61c-45fe-8639-b98927542b95" name="y" referenceTypeName="int">
+                                                                                       <sedValue xml:id="_66997a97-5c78-4b43-a137-bf83e1a3126c" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
+                                                                                       </sedValue>
+                                                                                    </sedVariable>
+                                                                                    <sedVariable xml:id="_2a7bb46e-0c9d-40dc-8af8-233f603aa101" name="res_1" referenceTypeName="int">
+                                                                                       <sedValue xml:id="_5a9036dd-61fb-4832-953e-c2112b50a27a" referenceTypeName="int" valueString="10" allocated="true" multiValued="false">
+                                                                                       </sedValue>
+                                                                                    </sedVariable>
+                                                                                    <sedStatement xml:id="_f85cd685-8056-4307-b21c-c46ec288cb87" name="res_1=2*res_1+(y%2);" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="166" charEnd="190">
+                                                                                       <sedVariable xml:id="_2a258162-9d50-4cc7-b50b-f58a79198ff0" name="xValue" referenceTypeName="int">
+                                                                                          <sedValue xml:id="_95ebfc8e-8175-4985-9047-42f130a5159e" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                          </sedValue>
+                                                                                       </sedVariable>
+                                                                                       <sedVariable xml:id="_9fe821a8-8f86-4fdd-931c-827bab675e40" name="exc" referenceTypeName="Null">
+                                                                                          <sedValue xml:id="_c4951e3f-7850-4a25-bfcb-08f8be3ff2c4" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                          </sedValue>
+                                                                                       </sedVariable>
+                                                                                       <sedVariable xml:id="_b10b0e29-b192-4cd8-8b0d-18cf8cddd20c" name="y" referenceTypeName="int">
+                                                                                          <sedValue xml:id="_4bc9159a-3e9d-4645-ba9d-dd6f5d11ac65" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
+                                                                                          </sedValue>
+                                                                                       </sedVariable>
+                                                                                       <sedVariable xml:id="_8bd3a2e0-c04d-4bb1-bdf7-4189a5cbbb9e" name="res_1" referenceTypeName="int">
+                                                                                          <sedValue xml:id="_dbe78dc9-7ef8-46fb-aebe-1ebc66d77ff9" referenceTypeName="int" valueString="10" allocated="true" multiValued="false">
+                                                                                          </sedValue>
+                                                                                       </sedVariable>
+                                                                                       <sedStatement xml:id="_8b4d1d98-825c-4ff2-9824-338ca795d391" name="y=y/2;" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="196" charEnd="206">
+                                                                                          <sedVariable xml:id="_9544328e-fdea-4b34-b5f9-a1d6862e6a3b" name="xValue" referenceTypeName="int">
+                                                                                             <sedValue xml:id="_f7e34d74-34c8-4b8b-94ed-83537170c8fc" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                             </sedValue>
+                                                                                          </sedVariable>
+                                                                                          <sedVariable xml:id="_b0dca9c9-5820-458a-a909-7515851ea90e" name="exc" referenceTypeName="Null">
+                                                                                             <sedValue xml:id="_06deb203-d819-4692-b198-d8c976c3e90e" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                             </sedValue>
+                                                                                          </sedVariable>
+                                                                                          <sedVariable xml:id="_8767ef4b-0c3a-4d48-a410-c4f83df9eb84" name="y" referenceTypeName="int">
+                                                                                             <sedValue xml:id="_ccceaefe-7abe-4728-adfe-efd365164ed8" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
+                                                                                             </sedValue>
+                                                                                          </sedVariable>
+                                                                                          <sedVariable xml:id="_9e8b31ee-7bb9-48bd-8b4f-e3207d254a81" name="res_1" referenceTypeName="int">
+                                                                                             <sedValue xml:id="_3271f8e2-a826-447d-b26a-7d4627f27b7d" referenceTypeName="int" valueString="21" allocated="true" multiValued="false">
+                                                                                             </sedValue>
+                                                                                          </sedVariable>
+                                                                                          <sedLoopCondition xml:id="_d15ff931-8e7f-470c-9e4e-efa401244b75" name="y%2!=0" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="123" charEnd="133">
+                                                                                             <sedVariable xml:id="_8ccd9f6f-e7dd-483d-9616-1c791af8a00b" name="xValue" referenceTypeName="int">
+                                                                                                <sedValue xml:id="_1ba49da0-47d5-4fa1-9687-a47de18b7da4" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                                </sedValue>
+                                                                                             </sedVariable>
+                                                                                             <sedVariable xml:id="_5e6d80e1-98d0-4d19-89f3-9031b44277c5" name="exc" referenceTypeName="Null">
+                                                                                                <sedValue xml:id="_fbd333e1-fd9c-4bd2-a597-cab596cf6884" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                                </sedValue>
+                                                                                             </sedVariable>
+                                                                                             <sedVariable xml:id="_00d65975-d9bc-4be7-801c-70337935fda7" name="res_1" referenceTypeName="int">
+                                                                                                <sedValue xml:id="_626b4272-17a1-428a-b7ca-06a88f9f4991" referenceTypeName="int" valueString="21" allocated="true" multiValued="false">
+                                                                                                </sedValue>
+                                                                                             </sedVariable>
+                                                                                             <sedVariable xml:id="_8d870075-08d3-4b31-9de2-e5f66dccd709" name="y" referenceTypeName="int">
+                                                                                                <sedValue xml:id="_0c00af6b-0b1b-4cf0-ab72-325b014705ce" referenceTypeName="int" valueString="quotient_2 * 40" allocated="true" multiValued="false">
+                                                                                                </sedValue>
+                                                                                             </sedVariable>
+                                                                                             <sedStatement xml:id="_79ed1ab0-71fe-49ac-ab82-1d5c44c75d7a" name="return res_1*2;" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="254" charEnd="269">
+                                                                                                <sedVariable xml:id="_9bc4eb62-0d1a-457a-9536-5f6429231341" name="xValue" referenceTypeName="int">
+                                                                                                   <sedValue xml:id="_c2479cf2-c81e-4904-b1f0-077bd8660cfb" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                                   </sedValue>
+                                                                                                </sedVariable>
+                                                                                                <sedVariable xml:id="_93021990-0820-4bc8-99bc-97ac825924cc" name="exc" referenceTypeName="Null">
+                                                                                                   <sedValue xml:id="_96eb7e8e-d1c4-41c2-ae19-f1ae220d8098" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                                   </sedValue>
+                                                                                                </sedVariable>
+                                                                                                <sedVariable xml:id="_d16f6ff8-dba0-4cf1-8789-6699a5c575dd" name="res_1" referenceTypeName="int">
+                                                                                                   <sedValue xml:id="_c67e26a6-3a49-4c81-af12-aaaf7a5e4a8e" referenceTypeName="int" valueString="21" allocated="true" multiValued="false">
+                                                                                                   </sedValue>
+                                                                                                </sedVariable>
+                                                                                                <sedMethodReturn xml:id="_e726c763-39a8-4019-a132-516fde7447e8" name="&lt;return &apos;42&apos; as result of Magic42.compute(xValue);&gt;" pathCondition="!xValue &lt;= -1" lineNumber="-1" charStart="43" charEnd="50">
+                                                                                                   <sedVariable xml:id="_b77bb2f8-13c7-4509-a50e-dca6b16837bb" name="xValue" referenceTypeName="int">
+                                                                                                      <sedValue xml:id="_c46a566d-0b45-4ef7-be60-4798d523786d" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                                      </sedValue>
+                                                                                                   </sedVariable>
+                                                                                                   <sedVariable xml:id="_ae18f772-acf4-4034-b128-2d967deffe5d" name="exc" referenceTypeName="Null">
+                                                                                                      <sedValue xml:id="_fb8d9c27-9993-4439-a596-916315089e4c" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                                      </sedValue>
+                                                                                                   </sedVariable>
+                                                                                                   <sedTermination xml:id="_4131b544-12ff-44e5-bc37-a4ea5b65a7ea" name="&lt;end&gt;" pathCondition="!xValue &lt;= -1">
+                                                                                                   </sedTermination>
+                                                                                                </sedMethodReturn>
+                                                                                             </sedStatement>
+                                                                                          </sedLoopCondition>
+                                                                                       </sedStatement>
+                                                                                    </sedStatement>
+                                                                                 </sedBranchNode>
+                                                                              </sedLoopCondition>
+                                                                           </sedStatement>
+                                                                        </sedBranchNode>
+                                                                     </sedLoopCondition>
+                                                                  </sedStatement>
+                                                               </sedStatement>
+                                                            </sedBranchNode>
+                                                         </sedLoopCondition>
+                                                      </sedStatement>
+                                                   </sedBranchNode>
+                                                </sedLoopCondition>
+                                             </sedStatement>
+                                          </sedStatement>
+                                       </sedBranchNode>
+                                    </sedLoopCondition>
+                                 </sedLoopNode>
+                              </sedStatement>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedBranchCondition>
+                     <sedBranchCondition xml:id="_2426dfd9-669b-4cee-84b0-4a8f8f2256a2" name="!xValue &gt;= 0" pathCondition="!xValue &gt;= 0">
+                        <sedStatement xml:id="_21342654-2d57-475f-8bdd-e9cf3044022a" name="return 320*y_1+7;" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="358" charEnd="377">
+                           <sedVariable xml:id="_3dcc0d20-0b84-4a29-8744-b90f9b1243f4" name="x_1" referenceTypeName="int">
+                              <sedValue xml:id="_98343a4c-bda4-492b-bcf6-76904e86667f" referenceTypeName="int" valueString="x_1" allocated="true" multiValued="false">
+                              </sedValue>
+                           </sedVariable>
+                           <sedVariable xml:id="_874ce765-eb80-4e1c-b5ec-3ca241b98a5e" name="exc" referenceTypeName="Null">
+                              <sedValue xml:id="_23fd1fe8-5065-4d10-8956-692644659d6d" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                              </sedValue>
+                           </sedVariable>
+                           <sedVariable xml:id="_53889fe4-1548-45cd-af54-364ba44f3f7f" name="y_1" referenceTypeName="int">
+                              <sedValue xml:id="_fde8da72-7b33-4a44-b778-bc6c9126951c" referenceTypeName="int" valueString="quotient_2" allocated="true" multiValued="false">
+                              </sedValue>
+                           </sedVariable>
+                           <sedMethodReturn xml:id="_b8b2a260-098a-4917-a613-af9d3d28b2b2" name="&lt;return &apos;7 + quotient_2 * 320&apos; as result of Magic42.computeHelp(x_1);&gt;" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="297" charEnd="308">
+                              <sedVariable xml:id="_b97c7b5a-00cd-4e13-ac18-3b3a43b3a7bb" name="x_1" referenceTypeName="int">
+                                 <sedValue xml:id="_792690ee-36a2-4f5c-a724-f90fcc465481" referenceTypeName="int" valueString="x_1" allocated="true" multiValued="false">
+                                 </sedValue>
+                              </sedVariable>
+                              <sedVariable xml:id="_6cb61335-418b-4b3f-bed5-90b733529a68" name="exc" referenceTypeName="Null">
+                                 <sedValue xml:id="_1da30e23-02d4-489e-ab0f-fe2d48e51092" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                 </sedValue>
+                              </sedVariable>
+                              <sedVariable xml:id="_b622e895-2d33-4e24-b570-45d45b8670a2" name="x" referenceTypeName="int">
+                                 <sedValue xml:id="_aeb7d832-917e-4c83-a6ed-ae95336bccb4" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
+                                 </sedValue>
+                              </sedVariable>
+                              <sedStatement xml:id="_b4cf51e6-f18e-4369-84b2-16ef119b3506" name="int res = 0;" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="100" charEnd="112">
+                                 <sedVariable xml:id="_87045174-f9a3-4a71-9bc8-dcdbb7158ec4" name="xValue" referenceTypeName="int">
+                                    <sedValue xml:id="_e8072d26-e2ec-41e1-bc9f-871d02ef26db" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                    </sedValue>
+                                 </sedVariable>
+                                 <sedVariable xml:id="_5492b166-c1b5-4149-a679-41b575568a9d" name="exc" referenceTypeName="Null">
+                                    <sedValue xml:id="_186c51d8-14b3-466c-bf49-e1e42f5f77a3" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                    </sedValue>
+                                 </sedVariable>
+                                 <sedVariable xml:id="_869a7555-67f2-4612-a1b6-f61f9d4a26bb" name="y" referenceTypeName="int">
+                                    <sedValue xml:id="_9f0602bc-67f0-4e75-a95b-0f89eadaca70" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
+                                    </sedValue>
+                                 </sedVariable>
+                                 <sedLoopNode xml:id="_4abf7fa2-6be9-4388-94d2-baa5d0823648" name="while ( y%2!=0 ) {if (res%2==0) {     res=2*res+(y%2);     y=y/2;   }else  {     res=2*res;   } }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="116" charEnd="250">
+                                    <sedVariable xml:id="_3e9c3a3f-80c7-4c22-966c-982b1ae06a0d" name="xValue" referenceTypeName="int">
+                                       <sedValue xml:id="_cb39811a-9bf3-46c9-9d97-88ef1785bd21" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                       </sedValue>
+                                    </sedVariable>
+                                    <sedVariable xml:id="_7f1fc384-83eb-416a-ace3-54e964e13fb9" name="exc" referenceTypeName="Null">
+                                       <sedValue xml:id="_98578c6a-5a46-4cfa-a3d9-ebc279ac2f63" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                       </sedValue>
+                                    </sedVariable>
+                                    <sedVariable xml:id="_a76070ab-ee50-41ed-8b90-8b2e48dbe20a" name="y" referenceTypeName="int">
+                                       <sedValue xml:id="_d3fa608c-ba2f-4379-b71b-482a51c206fa" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
+                                       </sedValue>
+                                    </sedVariable>
+                                    <sedVariable xml:id="_94c2398e-5522-45b5-a118-b2a0ecbcc924" name="res" referenceTypeName="int">
+                                       <sedValue xml:id="_c9362511-4694-4731-b49a-f1e43d0d4774" referenceTypeName="int" valueString="0" allocated="true" multiValued="false">
+                                       </sedValue>
+                                    </sedVariable>
+                                    <sedLoopCondition xml:id="_8bb36d2e-4ebc-4810-9690-3864df7596b6" name="y%2!=0" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="123" charEnd="133">
+                                       <sedVariable xml:id="_37481d02-028f-4018-bafe-53685675e0a1" name="xValue" referenceTypeName="int">
+                                          <sedValue xml:id="_81e25a76-3459-44f8-be8e-045cbd2dc456" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                          </sedValue>
+                                       </sedVariable>
+                                       <sedVariable xml:id="_6fbb255e-3963-493b-a18f-c038a8e9d237" name="exc" referenceTypeName="Null">
+                                          <sedValue xml:id="_47995236-da7e-421f-9b6b-05d9f8246d8d" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                          </sedValue>
+                                       </sedVariable>
+                                       <sedVariable xml:id="_3123c669-ef43-4b3d-899f-4257be1e0f67" name="y" referenceTypeName="int">
+                                          <sedValue xml:id="_35283d40-63b6-400b-ae46-9bbb2f240fe4" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
+                                          </sedValue>
+                                       </sedVariable>
+                                       <sedVariable xml:id="_cf9d345b-d8d6-4dc1-bf51-594ede115791" name="res" referenceTypeName="int">
+                                          <sedValue xml:id="_1199f545-14aa-4289-b222-ef047915c2b3" referenceTypeName="int" valueString="0" allocated="true" multiValued="false">
+                                          </sedValue>
+                                       </sedVariable>
+                                       <sedBranchNode xml:id="_7c9ddc9e-fc57-4e2e-a57f-a9fc6393fbcb" name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="141" charEnd="245">
+                                          <sedVariable xml:id="_e4bc7029-0739-474a-be5d-29e2510eb414" name="xValue" referenceTypeName="int">
+                                             <sedValue xml:id="_9fb8db41-b4c7-496d-9ac0-1a36bab56efb" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                             </sedValue>
+                                          </sedVariable>
+                                          <sedVariable xml:id="_4b967e6e-082e-46ca-8660-c73b5844d5dc" name="exc" referenceTypeName="Null">
+                                             <sedValue xml:id="_61030e54-8170-42ca-9653-97f2c34e96f4" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                             </sedValue>
+                                          </sedVariable>
+                                          <sedVariable xml:id="_238a169d-8402-4bdd-9b42-ac8662e3c9c3" name="y" referenceTypeName="int">
+                                             <sedValue xml:id="_1aca50d6-932e-4058-8ccf-179710ad34f5" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
+                                             </sedValue>
+                                          </sedVariable>
+                                          <sedVariable xml:id="_6e3ed1c8-5b4f-4ca3-9ecb-fb2aaeac09d6" name="res" referenceTypeName="int">
+                                             <sedValue xml:id="_337919ee-da81-4cbb-baf7-2a3616b2d033" referenceTypeName="int" valueString="0" allocated="true" multiValued="false">
+                                             </sedValue>
+                                          </sedVariable>
+                                          <sedStatement xml:id="_a27e3fb7-90b0-41f2-b8e7-a5019c9bfb30" name="res=2*res+(y%2);" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="166" charEnd="190">
+                                             <sedVariable xml:id="_692059ff-62bc-498a-98f1-0fec3958f600" name="xValue" referenceTypeName="int">
+                                                <sedValue xml:id="_828508c4-ab0c-44b3-aa54-9797176a9f49" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                </sedValue>
+                                             </sedVariable>
+                                             <sedVariable xml:id="_4212693d-c7cc-4b43-9b3c-b6e59f341551" name="exc" referenceTypeName="Null">
+                                                <sedValue xml:id="_1f3cdca5-8c68-4dfe-b1d4-f87858d7b77a" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                </sedValue>
+                                             </sedVariable>
+                                             <sedVariable xml:id="_9f07b388-84b7-47b4-ac53-2a329f708f06" name="y" referenceTypeName="int">
+                                                <sedValue xml:id="_5f7e62fd-2d7e-4eb6-9707-b04a77a5dc8a" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
+                                                </sedValue>
+                                             </sedVariable>
+                                             <sedVariable xml:id="_a8927f9f-f6d1-4d0b-bcd8-cc3d450d6a55" name="res" referenceTypeName="int">
+                                                <sedValue xml:id="_092b1fe5-1c61-462d-8cb2-92c002ea9a82" referenceTypeName="int" valueString="0" allocated="true" multiValued="false">
+                                                </sedValue>
+                                             </sedVariable>
+                                             <sedStatement xml:id="_5db5a590-120f-418b-8fe9-68763652319f" name="y=y/2;" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="196" charEnd="206">
+                                                <sedVariable xml:id="_4c423af4-b2fb-4e6a-b638-56380180cc99" name="xValue" referenceTypeName="int">
+                                                   <sedValue xml:id="_07847569-7164-43e5-adf2-6dcb9d17d0dd" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                   </sedValue>
+                                                </sedVariable>
+                                                <sedVariable xml:id="_0912d831-f5a0-4d92-a8c6-6fbd7e08b88d" name="exc" referenceTypeName="Null">
+                                                   <sedValue xml:id="_55d1457b-efde-45e6-b7cf-b836b306f338" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                   </sedValue>
+                                                </sedVariable>
+                                                <sedVariable xml:id="_c37d783d-c698-4b8c-bcbd-225f69ec4a49" name="y" referenceTypeName="int">
+                                                   <sedValue xml:id="_7d20b16f-873d-4f7b-ac6f-c370a2f6bf06" referenceTypeName="int" valueString="7 + quotient_2 * 320" allocated="true" multiValued="false">
+                                                   </sedValue>
+                                                </sedVariable>
+                                                <sedVariable xml:id="_17ea2e6f-1fdc-40eb-bac5-f6bed8774c2e" name="res" referenceTypeName="int">
+                                                   <sedValue xml:id="_81c9359e-5ecd-42c3-9a52-d0f4dae02847" referenceTypeName="int" valueString="1" allocated="true" multiValued="false">
+                                                   </sedValue>
+                                                </sedVariable>
+                                                <sedLoopCondition xml:id="_0702253e-42bb-403c-8813-88a2988c7477" name="y%2!=0" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="123" charEnd="133">
+                                                   <sedVariable xml:id="_7b8c61a6-555d-4117-986e-9372655b3386" name="xValue" referenceTypeName="int">
+                                                      <sedValue xml:id="_5507b6e0-4cc0-4a8d-a64b-334208e7bc1a" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                      </sedValue>
+                                                   </sedVariable>
+                                                   <sedVariable xml:id="_33f4aa20-d743-4db3-870c-9d483023a43b" name="exc" referenceTypeName="Null">
+                                                      <sedValue xml:id="_d3a9bed3-950c-4cc5-8519-8a364654bd1a" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                      </sedValue>
+                                                   </sedVariable>
+                                                   <sedVariable xml:id="_ae801d55-a16b-49fc-b202-a0d79ef3c99d" name="res" referenceTypeName="int">
+                                                      <sedValue xml:id="_5b7a479d-3f7c-4655-9a5a-78a562f29da1" referenceTypeName="int" valueString="1" allocated="true" multiValued="false">
+                                                      </sedValue>
+                                                   </sedVariable>
+                                                   <sedVariable xml:id="_f40911ac-86f5-4ceb-bb85-07573299ee9c" name="y" referenceTypeName="int">
+                                                      <sedValue xml:id="_031baab3-059b-452c-8952-55be83340485" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
+                                                      </sedValue>
+                                                   </sedVariable>
+                                                   <sedBranchNode xml:id="_251f86bc-f5c8-487b-9068-f0dfe4120f99" name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="141" charEnd="245">
+                                                      <sedVariable xml:id="_25631c83-6797-4e54-bbc6-5bfd34ef1f52" name="xValue" referenceTypeName="int">
+                                                         <sedValue xml:id="_f5e94c15-51d2-406e-86ec-c373d7bb9a8d" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                         </sedValue>
+                                                      </sedVariable>
+                                                      <sedVariable xml:id="_596d326a-79c8-4f60-b70a-3f4cd31635df" name="exc" referenceTypeName="Null">
+                                                         <sedValue xml:id="_2121fc2c-6610-4254-be5e-f1a5677fd1a7" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                         </sedValue>
+                                                      </sedVariable>
+                                                      <sedVariable xml:id="_b78b0713-3984-400a-987d-4cec2cdc268e" name="res" referenceTypeName="int">
+                                                         <sedValue xml:id="_358e5a0a-8927-4930-b688-ac652857c903" referenceTypeName="int" valueString="1" allocated="true" multiValued="false">
+                                                         </sedValue>
+                                                      </sedVariable>
+                                                      <sedVariable xml:id="_33683dcc-3594-4eeb-97b6-9697f992d895" name="y" referenceTypeName="int">
+                                                         <sedValue xml:id="_e7a5effb-b3fb-423a-924e-ad9a1a19ba4f" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
+                                                         </sedValue>
+                                                      </sedVariable>
+                                                      <sedStatement xml:id="_bb986a4b-6b65-4951-9996-7775bd9d26a3" name="res=2*res;" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="225" charEnd="239">
+                                                         <sedVariable xml:id="_49349ebe-f70d-4e66-9fbe-ee824621ed65" name="xValue" referenceTypeName="int">
+                                                            <sedValue xml:id="_c607f39f-d482-4264-876a-046c46e5c5c7" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                            </sedValue>
+                                                         </sedVariable>
+                                                         <sedVariable xml:id="_8cebd7b2-8689-4ff3-bf60-911f7422d1cb" name="exc" referenceTypeName="Null">
+                                                            <sedValue xml:id="_c0f7e203-95dd-4a16-88ea-b958b4506628" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                            </sedValue>
+                                                         </sedVariable>
+                                                         <sedVariable xml:id="_58169956-ef09-4c7a-bf77-187407c627a2" name="res" referenceTypeName="int">
+                                                            <sedValue xml:id="_d36703aa-a5d4-4612-9cb0-cdecb74328f3" referenceTypeName="int" valueString="1" allocated="true" multiValued="false">
+                                                            </sedValue>
+                                                         </sedVariable>
+                                                         <sedVariable xml:id="_0e251be5-8316-40ed-85cf-35c71df5024f" name="y" referenceTypeName="int">
+                                                            <sedValue xml:id="_534eb374-243c-45f1-a243-e55f4f3d5619" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
+                                                            </sedValue>
+                                                         </sedVariable>
+                                                         <sedLoopCondition xml:id="_7b958fd9-15e3-423b-9891-f4c20ae49ef5" name="y%2!=0" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="123" charEnd="133">
+                                                            <sedVariable xml:id="_d14c9d57-18a0-4838-8717-75dc7018a844" name="xValue" referenceTypeName="int">
+                                                               <sedValue xml:id="_89305d63-f94a-4110-8ece-e8dee0346f23" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                               </sedValue>
+                                                            </sedVariable>
+                                                            <sedVariable xml:id="_af812475-50fa-4bf9-bf1c-9eba04ad1ffc" name="exc" referenceTypeName="Null">
+                                                               <sedValue xml:id="_c9d940a2-90d1-444f-a597-f1f64bd22848" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                               </sedValue>
+                                                            </sedVariable>
+                                                            <sedVariable xml:id="_5e8602b9-725e-4270-9d5d-36e3e182bf66" name="y" referenceTypeName="int">
+                                                               <sedValue xml:id="_5db9bde5-157d-4e38-95a3-25f8d68ca455" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
+                                                               </sedValue>
+                                                            </sedVariable>
+                                                            <sedVariable xml:id="_4a39d181-5ba5-4e13-a7aa-8967ea01c3aa" name="res" referenceTypeName="int">
+                                                               <sedValue xml:id="_90a1baa7-af6d-454a-b158-a7955788fc58" referenceTypeName="int" valueString="2" allocated="true" multiValued="false">
+                                                               </sedValue>
+                                                            </sedVariable>
+                                                            <sedBranchNode xml:id="_9ed3a8e0-1d78-4f09-9eb0-93278745a610" name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="141" charEnd="245">
+                                                               <sedVariable xml:id="_4b5a50e7-1e5f-4032-a376-b4642fb434ca" name="xValue" referenceTypeName="int">
+                                                                  <sedValue xml:id="_21ace532-e9bd-4ecb-b283-701b441dc82e" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                  </sedValue>
+                                                               </sedVariable>
+                                                               <sedVariable xml:id="_e17bf972-5c24-4a1e-a2d6-327a748cd280" name="exc" referenceTypeName="Null">
+                                                                  <sedValue xml:id="_c224789d-721d-46c7-a1f3-a92d3b02126d" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                  </sedValue>
+                                                               </sedVariable>
+                                                               <sedVariable xml:id="_a15dc07b-80c7-4015-89f4-9cb60f3b0f79" name="y" referenceTypeName="int">
+                                                                  <sedValue xml:id="_07e74efe-29ce-4536-a9a4-a7ff29da4595" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
+                                                                  </sedValue>
+                                                               </sedVariable>
+                                                               <sedVariable xml:id="_dc690fc5-1b4b-43cb-a141-007b3d90b65d" name="res" referenceTypeName="int">
+                                                                  <sedValue xml:id="_5c833fb6-029c-48d0-b524-f008f3149a00" referenceTypeName="int" valueString="2" allocated="true" multiValued="false">
+                                                                  </sedValue>
+                                                               </sedVariable>
+                                                               <sedStatement xml:id="_f576125e-1de1-48f9-8d1f-fe6c2c9f3bf8" name="res=2*res+(y%2);" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="166" charEnd="190">
+                                                                  <sedVariable xml:id="_fa147254-a0f5-4f69-921d-db92cd17c8b7" name="xValue" referenceTypeName="int">
+                                                                     <sedValue xml:id="_521af937-dcdf-496e-98fb-0472e0be314f" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                     </sedValue>
+                                                                  </sedVariable>
+                                                                  <sedVariable xml:id="_16c7fb73-4936-4fec-b126-6e661aa12c51" name="exc" referenceTypeName="Null">
+                                                                     <sedValue xml:id="_f250f9ab-b629-4bfb-a6fb-88095e68e749" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                     </sedValue>
+                                                                  </sedVariable>
+                                                                  <sedVariable xml:id="_daec14a4-c415-4fba-9b71-1d38754d355b" name="y" referenceTypeName="int">
+                                                                     <sedValue xml:id="_5647f3c8-6441-47b5-b81c-2be01e0253b1" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
+                                                                     </sedValue>
+                                                                  </sedVariable>
+                                                                  <sedVariable xml:id="_bb658f35-75e9-42fd-922e-2ef3b9c34b76" name="res" referenceTypeName="int">
+                                                                     <sedValue xml:id="_c6329ee6-0231-43de-a598-c351b35ae36d" referenceTypeName="int" valueString="2" allocated="true" multiValued="false">
+                                                                     </sedValue>
+                                                                  </sedVariable>
+                                                                  <sedStatement xml:id="_138fea30-7bb4-488b-bb28-1d1caadf111f" name="y=y/2;" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="196" charEnd="206">
+                                                                     <sedVariable xml:id="_dabbd2a9-c979-4635-a095-353a9d06e3d3" name="xValue" referenceTypeName="int">
+                                                                        <sedValue xml:id="_3b06e9b4-13cd-460a-90e7-48c821516af8" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                        </sedValue>
+                                                                     </sedVariable>
+                                                                     <sedVariable xml:id="_d796197d-776b-4bc3-bf14-03562c5cbc0c" name="exc" referenceTypeName="Null">
+                                                                        <sedValue xml:id="_6a80fe49-b0b1-4543-97f9-8e6be6e02657" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                        </sedValue>
+                                                                     </sedVariable>
+                                                                     <sedVariable xml:id="_82393f3b-f6e3-48da-9a73-fa51934d8fef" name="y" referenceTypeName="int">
+                                                                        <sedValue xml:id="_871a7137-7438-4bdb-9a10-9ac6a73f32d2" referenceTypeName="int" valueString="3 + quotient_2 * 160" allocated="true" multiValued="false">
+                                                                        </sedValue>
+                                                                     </sedVariable>
+                                                                     <sedVariable xml:id="_cf7d83bd-6f6a-49cc-9192-78e0a29d2444" name="res" referenceTypeName="int">
+                                                                        <sedValue xml:id="_11a90a17-c921-4e95-981d-b86c9ebc1412" referenceTypeName="int" valueString="5" allocated="true" multiValued="false">
+                                                                        </sedValue>
+                                                                     </sedVariable>
+                                                                     <sedLoopCondition xml:id="_e9ba6a90-6c81-4758-b861-8ceb735ebe1d" name="y%2!=0" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="123" charEnd="133">
+                                                                        <sedVariable xml:id="_21bd64f7-7ab1-4a9a-bd3a-d6d2a3b4df20" name="xValue" referenceTypeName="int">
+                                                                           <sedValue xml:id="_a0d27f35-33d0-4be8-aeb6-3475b641d304" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                           </sedValue>
+                                                                        </sedVariable>
+                                                                        <sedVariable xml:id="_2e8eb3c8-1ca5-4055-a1d3-2e51f096f9e7" name="exc" referenceTypeName="Null">
+                                                                           <sedValue xml:id="_7e798962-2e59-4eb6-951b-34340dd7be76" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                           </sedValue>
+                                                                        </sedVariable>
+                                                                        <sedVariable xml:id="_123cecdc-f534-4fc6-a315-5718671fec31" name="res" referenceTypeName="int">
+                                                                           <sedValue xml:id="_d7cef693-9156-40d1-ab68-01fb627e4507" referenceTypeName="int" valueString="5" allocated="true" multiValued="false">
+                                                                           </sedValue>
+                                                                        </sedVariable>
+                                                                        <sedVariable xml:id="_30d2dd55-df7c-4d36-963e-558e78111625" name="y" referenceTypeName="int">
+                                                                           <sedValue xml:id="_84cdc67d-d1dd-401a-b920-c761b104d163" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
+                                                                           </sedValue>
+                                                                        </sedVariable>
+                                                                        <sedBranchNode xml:id="_df0d2100-d8aa-4674-8c60-f43de9fc7074" name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="141" charEnd="245">
+                                                                           <sedVariable xml:id="_b73a288b-9443-4339-977d-622b3528e303" name="xValue" referenceTypeName="int">
+                                                                              <sedValue xml:id="_79b8d718-d8c1-47c8-a577-48f7306e6703" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                              </sedValue>
+                                                                           </sedVariable>
+                                                                           <sedVariable xml:id="_3ca5368c-771d-45fb-9157-e711b5393e87" name="exc" referenceTypeName="Null">
+                                                                              <sedValue xml:id="_c00bd77e-af94-40e5-9b0d-99229d04636d" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                              </sedValue>
+                                                                           </sedVariable>
+                                                                           <sedVariable xml:id="_ccd4fb13-9a44-4ee7-a1f4-d5ade904c892" name="res" referenceTypeName="int">
+                                                                              <sedValue xml:id="_35bfbf40-97a1-429b-a39f-9f407b30d73f" referenceTypeName="int" valueString="5" allocated="true" multiValued="false">
+                                                                              </sedValue>
+                                                                           </sedVariable>
+                                                                           <sedVariable xml:id="_60805870-fc2b-4162-af49-ad86344e34a9" name="y" referenceTypeName="int">
+                                                                              <sedValue xml:id="_5bda5253-9113-48d6-a29e-112a2e88d18f" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
+                                                                              </sedValue>
+                                                                           </sedVariable>
+                                                                           <sedStatement xml:id="_b556a624-3e94-401e-89f8-53f77d9242f6" name="res=2*res;" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="225" charEnd="239">
+                                                                              <sedVariable xml:id="_7c66a03c-ac6c-4d71-ad6f-60b4e19f4498" name="xValue" referenceTypeName="int">
+                                                                                 <sedValue xml:id="_d531d2d5-768a-4bef-8312-d005d2ec50b3" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                 </sedValue>
+                                                                              </sedVariable>
+                                                                              <sedVariable xml:id="_234aec25-eff0-48b1-be3c-7cf5bda2d4d9" name="exc" referenceTypeName="Null">
+                                                                                 <sedValue xml:id="_a2d054a3-3614-4a57-b3f8-d7f3bd881ece" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                 </sedValue>
+                                                                              </sedVariable>
+                                                                              <sedVariable xml:id="_e389f48a-9b6e-4a84-8c25-a76a4db41eb0" name="res" referenceTypeName="int">
+                                                                                 <sedValue xml:id="_0ead5eba-4dc3-4b5a-9a66-835280f3eac5" referenceTypeName="int" valueString="5" allocated="true" multiValued="false">
+                                                                                 </sedValue>
+                                                                              </sedVariable>
+                                                                              <sedVariable xml:id="_92973cd6-3bf4-4d53-9636-680e047c9b8c" name="y" referenceTypeName="int">
+                                                                                 <sedValue xml:id="_4a9eb136-ec22-4c0e-a8be-fe94a1988bef" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
+                                                                                 </sedValue>
+                                                                              </sedVariable>
+                                                                              <sedLoopCondition xml:id="_651f9dc0-8b6e-4dd5-94c9-d63847d3600f" name="y%2!=0" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="123" charEnd="133">
+                                                                                 <sedVariable xml:id="_41b19088-4b14-426d-8999-31c9349170ce" name="xValue" referenceTypeName="int">
+                                                                                    <sedValue xml:id="_23fa2252-e19b-4400-b170-6743602abdf2" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                    </sedValue>
+                                                                                 </sedVariable>
+                                                                                 <sedVariable xml:id="_449581ed-9709-45df-a65b-00e8ca369036" name="exc" referenceTypeName="Null">
+                                                                                    <sedValue xml:id="_fcd97de5-85f8-4a3f-98ba-72ebdd3281b3" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                    </sedValue>
+                                                                                 </sedVariable>
+                                                                                 <sedVariable xml:id="_daf50c1f-76cc-42d7-ad0d-eb57380e5183" name="y" referenceTypeName="int">
+                                                                                    <sedValue xml:id="_78f0f766-ebdf-4c5d-ba51-4d01840af873" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
+                                                                                    </sedValue>
+                                                                                 </sedVariable>
+                                                                                 <sedVariable xml:id="_e391edd7-fc92-4b19-bea0-12aff843effc" name="res" referenceTypeName="int">
+                                                                                    <sedValue xml:id="_ea55306d-455a-4fb2-9f17-ccf1f0cc80c3" referenceTypeName="int" valueString="10" allocated="true" multiValued="false">
+                                                                                    </sedValue>
+                                                                                 </sedVariable>
+                                                                                 <sedBranchNode xml:id="_dc652238-35f5-4263-a38e-5c2b49be7326" name="if (res%2==0) {   res=2*res+(y%2);   y=y/2; }else  {   res=2*res; }" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="141" charEnd="245">
+                                                                                    <sedVariable xml:id="_c5537f4f-d293-4772-b7d4-c0cae0ae6701" name="xValue" referenceTypeName="int">
+                                                                                       <sedValue xml:id="_32033287-7963-4dc6-ac17-8e6d3832188b" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                       </sedValue>
+                                                                                    </sedVariable>
+                                                                                    <sedVariable xml:id="_11dfa0c3-a679-4f5c-ab77-7b8888494afa" name="exc" referenceTypeName="Null">
+                                                                                       <sedValue xml:id="_c82fcdb5-4344-417c-b108-a30c5e13e17d" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                       </sedValue>
+                                                                                    </sedVariable>
+                                                                                    <sedVariable xml:id="_3259007b-1d1b-4d53-a43f-5a1e32b5c96c" name="y" referenceTypeName="int">
+                                                                                       <sedValue xml:id="_edbe0e69-44a7-4db9-af2e-45176d6e075f" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
+                                                                                       </sedValue>
+                                                                                    </sedVariable>
+                                                                                    <sedVariable xml:id="_6a5476f6-df70-4988-bc42-2e251a71a655" name="res" referenceTypeName="int">
+                                                                                       <sedValue xml:id="_4c90a8cf-ed12-418d-837f-ff135615dda3" referenceTypeName="int" valueString="10" allocated="true" multiValued="false">
+                                                                                       </sedValue>
+                                                                                    </sedVariable>
+                                                                                    <sedStatement xml:id="_8d21f27d-ec91-40ed-b933-8405d2bc6be5" name="res=2*res+(y%2);" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="166" charEnd="190">
+                                                                                       <sedVariable xml:id="_d6eb7e7e-6b7c-4347-a1b0-c2152ed7c5ec" name="xValue" referenceTypeName="int">
+                                                                                          <sedValue xml:id="_1d3c5fda-43a7-4a94-aa99-2cf54546d2d2" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                          </sedValue>
+                                                                                       </sedVariable>
+                                                                                       <sedVariable xml:id="_b357c692-c31d-484c-ae7e-96c92a202b3b" name="exc" referenceTypeName="Null">
+                                                                                          <sedValue xml:id="_858719ef-db5b-456e-868a-b8674d048664" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                          </sedValue>
+                                                                                       </sedVariable>
+                                                                                       <sedVariable xml:id="_d8ac2f4e-a12e-4413-aadf-613313539044" name="y" referenceTypeName="int">
+                                                                                          <sedValue xml:id="_b67f12d8-8704-4925-b96b-f62560935b58" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
+                                                                                          </sedValue>
+                                                                                       </sedVariable>
+                                                                                       <sedVariable xml:id="_9d68f4e6-c6f2-4923-bba5-f67bac1c8e7f" name="res" referenceTypeName="int">
+                                                                                          <sedValue xml:id="_8bdffd77-64c4-480f-9e45-11ad9ff6e4e9" referenceTypeName="int" valueString="10" allocated="true" multiValued="false">
+                                                                                          </sedValue>
+                                                                                       </sedVariable>
+                                                                                       <sedStatement xml:id="_d1e32ccf-a54d-4d43-9cb3-27ecbe62a902" name="y=y/2;" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="196" charEnd="206">
+                                                                                          <sedVariable xml:id="_009da664-2562-4603-9a47-8218b7a0f994" name="xValue" referenceTypeName="int">
+                                                                                             <sedValue xml:id="_3f734e03-3217-4e0e-b135-10bf7c0e3827" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                             </sedValue>
+                                                                                          </sedVariable>
+                                                                                          <sedVariable xml:id="_80361070-bd25-4fc5-bb38-03d25f2803da" name="exc" referenceTypeName="Null">
+                                                                                             <sedValue xml:id="_6d217ce3-1676-42ed-bbfb-034aa5bf5d2c" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                             </sedValue>
+                                                                                          </sedVariable>
+                                                                                          <sedVariable xml:id="_88c79cac-2d09-4a5e-8c05-c29f2282bdd1" name="y" referenceTypeName="int">
+                                                                                             <sedValue xml:id="_c0118840-f076-476c-8e86-dc46c552f1d2" referenceTypeName="int" valueString="1 + quotient_2 * 80" allocated="true" multiValued="false">
+                                                                                             </sedValue>
+                                                                                          </sedVariable>
+                                                                                          <sedVariable xml:id="_994ae7ea-70d0-4036-9aa5-c77ad2aa1876" name="res" referenceTypeName="int">
+                                                                                             <sedValue xml:id="_95934ff8-bf5f-4c7a-88db-12b4b29666e6" referenceTypeName="int" valueString="21" allocated="true" multiValued="false">
+                                                                                             </sedValue>
+                                                                                          </sedVariable>
+                                                                                          <sedLoopCondition xml:id="_e3d6e506-b8c4-45d3-9f84-63b01161b719" name="y%2!=0" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="123" charEnd="133">
+                                                                                             <sedVariable xml:id="_b3abfad9-2568-45fc-ae56-bb511ee72337" name="xValue" referenceTypeName="int">
+                                                                                                <sedValue xml:id="_d78d7e19-02df-4349-a57b-f989768558c7" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                                </sedValue>
+                                                                                             </sedVariable>
+                                                                                             <sedVariable xml:id="_0f2c8df6-282a-439d-a802-c57697593acc" name="exc" referenceTypeName="Null">
+                                                                                                <sedValue xml:id="_bbc306d0-329d-4248-b62f-3bbcaa60c9b7" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                                </sedValue>
+                                                                                             </sedVariable>
+                                                                                             <sedVariable xml:id="_1a8c18e8-60af-4a49-a36d-de361edcdda5" name="res" referenceTypeName="int">
+                                                                                                <sedValue xml:id="_8023c008-c5d8-41bf-9f7a-13a4df77d1d8" referenceTypeName="int" valueString="21" allocated="true" multiValued="false">
+                                                                                                </sedValue>
+                                                                                             </sedVariable>
+                                                                                             <sedVariable xml:id="_6f59b154-0118-4609-8d06-9b41f9cc9126" name="y" referenceTypeName="int">
+                                                                                                <sedValue xml:id="_58726fd8-04d7-449d-8f84-03c037d01d48" referenceTypeName="int" valueString="quotient_2 * 40" allocated="true" multiValued="false">
+                                                                                                </sedValue>
+                                                                                             </sedVariable>
+                                                                                             <sedStatement xml:id="_07d3f081-f132-45ed-bf31-e3e759c0b03c" name="return res*2;" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="254" charEnd="269">
+                                                                                                <sedVariable xml:id="_09959e3f-2385-4645-a8be-ecf36851f242" name="xValue" referenceTypeName="int">
+                                                                                                   <sedValue xml:id="_e35ae2b3-ccb6-41d3-b760-4fb4d3d60138" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                                   </sedValue>
+                                                                                                </sedVariable>
+                                                                                                <sedVariable xml:id="_88ce3279-f763-4bfc-a51d-82c64930e0e1" name="exc" referenceTypeName="Null">
+                                                                                                   <sedValue xml:id="_d0f58919-6101-476b-a492-e098b09683ad" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                                   </sedValue>
+                                                                                                </sedVariable>
+                                                                                                <sedVariable xml:id="_ce027260-e495-45f4-a7d2-69140cf9fb57" name="res" referenceTypeName="int">
+                                                                                                   <sedValue xml:id="_9d4e2316-f3c3-4dac-a96a-841777642b2a" referenceTypeName="int" valueString="21" allocated="true" multiValued="false">
+                                                                                                   </sedValue>
+                                                                                                </sedVariable>
+                                                                                                <sedMethodReturn xml:id="_03c31160-5631-4982-9736-c891fa5e17ae" name="&lt;return &apos;42&apos; as result of Magic42.compute(xValue);&gt;" pathCondition="!xValue &gt;= 0" lineNumber="-1" charStart="43" charEnd="50">
+                                                                                                   <sedVariable xml:id="_d55fa104-9210-45d5-af8b-bf2601aa0930" name="xValue" referenceTypeName="int">
+                                                                                                      <sedValue xml:id="_1d453cff-9e49-442a-b052-7c768ef3a190" referenceTypeName="int" valueString="xValue" allocated="true" multiValued="false">
+                                                                                                      </sedValue>
+                                                                                                   </sedVariable>
+                                                                                                   <sedVariable xml:id="_82f3b173-6385-4c05-826a-f00ec888e485" name="exc" referenceTypeName="Null">
+                                                                                                      <sedValue xml:id="_90c0c570-5b84-4844-bd1a-d44298804e12" referenceTypeName="Null" valueString="null" allocated="true" multiValued="false">
+                                                                                                      </sedValue>
+                                                                                                   </sedVariable>
+                                                                                                   <sedTermination xml:id="_0792e500-e5a1-4adf-a340-6d3d597959b9" name="&lt;end&gt;" pathCondition="!xValue &gt;= 0">
+                                                                                                   </sedTermination>
+                                                                                                </sedMethodReturn>
+                                                                                             </sedStatement>
+                                                                                          </sedLoopCondition>
+                                                                                       </sedStatement>
+                                                                                    </sedStatement>
+                                                                                 </sedBranchNode>
+                                                                              </sedLoopCondition>
+                                                                           </sedStatement>
+                                                                        </sedBranchNode>
+                                                                     </sedLoopCondition>
+                                                                  </sedStatement>
+                                                               </sedStatement>
+                                                            </sedBranchNode>
+                                                         </sedLoopCondition>
+                                                      </sedStatement>
+                                                   </sedBranchNode>
+                                                </sedLoopCondition>
+                                             </sedStatement>
+                                          </sedStatement>
+                                       </sedBranchNode>
+                                    </sedLoopCondition>
+                                 </sedLoopNode>
+                              </sedStatement>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedBranchCondition>
+                  </sedStatement>
+               </sedMethodCall>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

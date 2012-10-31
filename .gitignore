@@ -5,6 +5,7 @@
 *~
 system/genSrc
 system/binary
+system/lib
 *#*
 system/key.jar
 system/setup.jar
@@ -12,7 +13,10 @@ system/GenMakefile
 system/Makefile.mk
 system/resources/de/uka/ilkd/key/util/version
 system/resources/de/uka/ilkd/key/util/sha1
+eclipse/.classpath
+eclipse/.settings
 eclipse/KeYPlugin/bin
+eclipse/bin
 eclipse/VisualDebugger/.settings
 eclipse/VisualDebugger/bin
 system/argfile
@@ -33,3 +37,17 @@ tags
 /netbeans/eclipse/build/
 /netbeans/eclipse/nbproject/private/
 /netbeans/eclipse/dist/
+*.class
+
+smt-solvers
+
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.toc
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.aux
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.bbl
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.blg
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.len
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.log
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.nav
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.out
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.pdf
+/projects/SymbolicExecutionDebugger/doc/presentations/Roadmap/Roadmap.snm

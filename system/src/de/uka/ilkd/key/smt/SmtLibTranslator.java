@@ -20,8 +20,6 @@ import de.uka.ilkd.key.util.Debug;
 public class SmtLibTranslator extends AbstractSMTTranslator {
 
 
-    // counter used for making names unique
-    private int counter = 0;
 
     private static StringBuffer INTSTRING = new StringBuffer("Int");
 
@@ -120,7 +118,7 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	String [] commentPredicate = new String[2];
 	commentPredicate[ContextualBlock.PREDICATE_FORMULA] = "\n\n:notes \"Predicates used in formula:\"";
 	commentPredicate[ContextualBlock.PREDICATE_TYPE]    = "\n\n:notes \"Types expressed by predicates:\"";
-	String [] commentAssumption = new String[8];
+	String [] commentAssumption = new String[9];
 	commentAssumption[ContextualBlock.ASSUMPTION_DUMMY_IMPLEMENTATION] = "\n\n:notes \"Assumptions for dummy variables:\"";
 	commentAssumption[ContextualBlock.ASSUMPTION_FUNCTION_DEFINTION] = "\n\n:notes \"Assumptions for function definitions:\""; 
 	commentAssumption[ContextualBlock.ASSUMPTION_SORT_PREDICATES] = "\n\n:notes \"Assumptions for sort predicates:\"";
@@ -129,6 +127,8 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	commentAssumption[ContextualBlock.ASSUMPTION_DISTINCT]= "\n\n:notes \"Assumptions for uniqueness of functions:\"";
 	commentAssumption[ContextualBlock.ASSUMPTION_INTEGER]= "\n\n:notes \"Assumptions for very small and very big integers:\"";
 	commentAssumption[ContextualBlock.ASSUMPTION_MULTIPLICATION]= "\n\n:notes \"Assumptions for uninterpreted multiplication:\"";
+	commentAssumption[ContextualBlock.ASSUMPTION_SORTS_NOT_EMPTY]= "\n\n:notes \"Assumptions for sorts - there is at least one object of every sort:\"";
+	
 	
 	
 	//add the logic definition
@@ -593,64 +593,8 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 	return toReturn;
     }
 
-    private StringBuffer removeIllegalChars(StringBuffer template, ArrayList<String> toReplace, ArrayList<String> replacement) {
-	//replace one String
-	for (int i = 0; i < toReplace.size(); i++) {
-	    String toRep = toReplace.get(i);
-	    String replace = replacement.get(i);
-	    int index = template.indexOf(toRep);
-	    while (index >= 0) {
-		template.replace(index, index + toRep.length(), replace);
-		index = template.indexOf(toRep);
-	    }
-	}
-	
-	return template;
-    }
+
     
     
-    
-    private StringBuffer makeUnique(StringBuffer name) {
-	StringBuffer toReturn = new StringBuffer(name);
-	
-	//build the replacement pairs
-	ArrayList<String> toReplace = new ArrayList<String>();
-	ArrayList<String> replacement = new ArrayList<String>();
-	
-	toReplace.add("[]");
-	replacement.add("_Array");
-	
-	toReplace.add("<");
-	replacement.add("_abo_");
-	
-	toReplace.add(">");
-	replacement.add("_abc_");
-	
-	toReplace.add("{");
-	replacement.add("_cbo_");
-	
-	toReplace.add("}");
-	replacement.add("_cbc_");
-	
-	toReplace.add(".");
-	replacement.add("_dot_");
-	
-	toReplace.add(":");
-	replacement.add("_col_");
-	
-	toReplace.add("\\");
-	replacement.add("_");
-	
-	toReplace.add("$");
-	replacement.add("_dollar_");
-	
-	toReturn = this.removeIllegalChars(toReturn, toReplace, replacement);
-	// names are must not begin with special characters
-	toReturn = (new StringBuffer()).append("a").append(toReturn);
-	
-	toReturn.append("_").append(counter);
-	counter++;
-	return toReturn;
-    }
 
 }

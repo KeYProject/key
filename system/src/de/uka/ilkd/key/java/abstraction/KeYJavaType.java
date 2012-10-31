@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.PackageReference;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.*;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * The KeY java type realises a tuple (sort, type) of a logic sort and
@@ -24,6 +25,8 @@ import de.uka.ilkd.key.logic.sort.*;
  */
 public class KeYJavaType implements Type {
 
+    /** Special return "type" for void methods. */
+    public static final KeYJavaType VOID_TYPE = new KeYJavaType(null,Sort.ANY);
 
     /** the AST type */
     private Type javaType=null;
@@ -67,16 +70,20 @@ public class KeYJavaType implements Type {
     }
 
     /** 
-     * returns the default value of the given type 
-     * according to JLS Sect. 4.5.5 
+     * Returns the default value of the given type 
+     * according to JLS Sect. 4.5.5;
+     * returns null if this is not a real Java type. 
      * @return the default value of the given type 
      * according to JLS Sect. 4.5.5
      */
     public Literal getDefaultValue() {
-	return javaType.getDefaultValue();
+        if (javaType == null) return null;
+        return javaType.getDefaultValue();
     }
     
     public String toString() {
+        if (this == VOID_TYPE)
+            return "KeYJavaType:void";
 	if (javaType == null) return "KeYJavaType:null,"+sort;
 	return "(type, sort): ("+javaType.getName()+","+sort+")"; 
     }
@@ -91,7 +98,7 @@ public class KeYJavaType implements Type {
     
     public boolean equals (Object o){
         try {
-            return javaType.equals(((KeYJavaType)o).javaType) && sort.equals(((KeYJavaType)o).sort);
+            return MiscTools.equalsOrNull(javaType,((KeYJavaType)o).javaType) && MiscTools.equalsOrNull(sort,((KeYJavaType)o).sort);
         } catch (Exception e) {
         return false;
         }

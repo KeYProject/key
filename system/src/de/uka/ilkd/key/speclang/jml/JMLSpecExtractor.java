@@ -10,25 +10,47 @@
 
 package de.uka.ilkd.key.speclang.jml;
 
-import de.uka.ilkd.key.collection.*;
-import de.uka.ilkd.key.java.Comment;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.*;
+import de.uka.ilkd.key.java.declaration.FieldDeclaration;
+import de.uka.ilkd.key.java.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
+import de.uka.ilkd.key.java.declaration.MemberDeclaration;
+import de.uka.ilkd.key.java.declaration.Modifier;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.*;
-import de.uka.ilkd.key.speclang.jml.pretranslation.*;
+import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
+import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassAxiom;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLDepends;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLInitially;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
+
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * Extracts JML class invariants and operation contracts from JML comments. 
@@ -86,7 +108,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
     }
 
     
-    private int getIndexOfMethodDecl(ProgramMethod pm,
+    private int getIndexOfMethodDecl(IProgramMethod pm,
                                      TextualJMLConstruct[] constructsArray) {
         for(int i = 0; i < constructsArray.length; i++) {
             if(constructsArray[i] instanceof TextualJMLMethodDecl) {
@@ -102,7 +124,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
     
  
-    private String getDefaultSignalsOnly(ProgramMethod pm) {
+    private String getDefaultSignalsOnly(IProgramMethod pm) {
         if(pm.getThrown() == null) {
             return "signals_only \\nothing;";
         }
@@ -205,6 +227,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	}
                 for(FieldSpecification field 
                       : ((FieldDeclaration) member).getFieldSpecifications()) {
+                    // add a static invariant for static fields
+                    boolean isStatic = member.isStatic();
                     
                     //add invariant only for fields of reference types
                     //and not for implicit fields.
@@ -216,7 +240,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 		    fileName, member.getEndPosition(),services);
                 	for(PositionedString classInv : nonNullInvs) {
                 	    result = result.add(jsf.createJMLClassInvariant(kjt,
-                		    					    visibility,
+                		    					    visibility, isStatic,
                 		            				    classInv));
                 	}
                     }
@@ -237,8 +261,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 if((child instanceof FieldDeclaration 
                        && (((FieldDeclaration) child).isGhost()
                            || ((FieldDeclaration) child).isModel()))
-                    || (child instanceof ProgramMethod 
-                        && ((ProgramMethod) child).isModel())) {
+                    || (child instanceof IProgramMethod 
+                        && ((IProgramMethod) child).isModel())) {
                     continue;
                 }
             } else if(td.getComments() != null) {
@@ -284,7 +308,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	    } else if (c instanceof TextualJMLClassAxiom){
         		ClassAxiom ax = jsf.createJMLClassAxiom(kjt, (TextualJMLClassAxiom)c);
         		result = result.add(ax);
-        	    } // else might be some other specification
+        	    } else {
+        	        // DO NOTHING
+        	        // There may be ohter kinds of JML constructs which are not specifications.
+        	    }
         	} catch (SLWarningException e) {
         	    warnings = warnings.add(e.getWarning());
         	}
@@ -294,9 +321,20 @@ public final class JMLSpecExtractor implements SpecExtractor {
         return result;
     }
 
-    
+
     @Override    
-    public ImmutableSet<SpecificationElement> extractMethodSpecs(ProgramMethod pm)
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm)
+    throws SLTranslationException {
+        return extractMethodSpecs(pm,true);
+    }
+    
+    /**
+     * Extracts method specifications (i.e., contracts) from Java+JML input.
+     * @param pm method to extract for
+     * @param addInvariant whether to add <i>static</i> invarants to pre- and post-conditions
+     */
+    @Override    
+    public ImmutableSet<SpecificationElement> extractMethodSpecs(IProgramMethod pm, boolean addInvariant)
     throws SLTranslationException {
         ImmutableSet<SpecificationElement> result 
         = DefaultImmutableSet.<SpecificationElement>nil();
@@ -307,6 +345,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         String fileName = td.getPositionInfo().getFileName();
 
         //determine purity
+        final boolean isStrictlyPure = JMLInfoExtractor.isStrictlyPure(pm);
         final boolean isPure = JMLInfoExtractor.isPure(pm);
         final boolean isHelper = JMLInfoExtractor.isHelper(pm);
 
@@ -344,21 +383,28 @@ public final class JMLSpecExtractor implements SpecExtractor {
             TextualJMLSpecCase specCase 
             = (TextualJMLSpecCase) constructsArray[i];
 
-            //add purity
-            if(isPure) {
+            //add purity. Strict purity overrides purity.
+            if(isStrictlyPure) {
+                specCase.addAssignable(new PositionedString("assignable \\less_than_nothing"));
+            } else if(isPure) {
                 specCase.addAssignable(new PositionedString("assignable \\nothing"));
             }
 
             //add invariants
-            if(!pm.isStatic() && !isHelper) {
+            if(!isHelper && (!pm.isStatic() || addInvariant)) {
+                // for a static method translate \inv once again, otherwise use the internal symbol
+                final String invString = pm.isStatic()? "\\inv": "<inv>";
                 if(!pm.isConstructor()) {
-                    specCase.addRequires(new PositionedString("<inv>"));
+                    specCase.addRequires(new PositionedString(invString));
+                } else if (addInvariant) {
+                    // add static invariant to constructor's precondition
+                    specCase.addRequires(new PositionedString(""+pm.getName()+".\\inv"));
                 }
                 if(specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-                    specCase.addEnsures(new PositionedString("ensures <inv>"));
+                    specCase.addEnsures(new PositionedString("ensures "+invString));
                 }
                 if(specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR) {
-                    specCase.addSignals(new PositionedString("signals (Exception e) <inv>"));
+                    specCase.addSignals(new PositionedString("signals (Exception e) "+invString));
                 }
             }
 
@@ -380,9 +426,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
             }
 
             //add non-null postcondition
-            KeYJavaType resultType = pm.getKeYJavaType();
+            KeYJavaType resultType = pm.getReturnType();
 
-            if(resultType != null &&
+            if(!pm.isVoid() && !pm.isConstructor() &&
                     !JMLInfoExtractor.resultIsNullable(pm) &&
                     specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
                 final ImmutableSet<PositionedString> resultNonNull = 
@@ -414,10 +460,79 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
         return result;
     }
+    
+    
+    @Override
+    public ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method, final StatementBlock block) throws SLTranslationException
+    {
+        return createBlockContracts(method, new LinkedList<Label>(), block, block.getComments());
+    }
+
+    @Override
+    public ImmutableSet<BlockContract> extractBlockContracts(final IProgramMethod method, final LabeledStatement labeled) throws SLTranslationException
+    {
+        final List<Label> labels = new LinkedList<Label>();
+        labels.add(labeled.getLabel());
+        Statement nextNonLabeled = labeled.getBody();
+        while (nextNonLabeled instanceof LabeledStatement) {
+            final LabeledStatement currentLabeled = (LabeledStatement) nextNonLabeled;
+            labels.add(currentLabeled.getLabel());
+            nextNonLabeled = currentLabeled.getBody();
+        }
+        if (nextNonLabeled instanceof StatementBlock) {
+            return createBlockContracts(method, labels, (StatementBlock) nextNonLabeled, labeled.getComments());
+        }
+        else {
+            return DefaultImmutableSet.nil();
+        }
+    }
+
+    private ImmutableSet<BlockContract> createBlockContracts(final IProgramMethod method,
+                                                             final List<Label> labels,
+                                                             final StatementBlock block,
+                                                             final Comment[] comments)
+            throws SLTranslationException
+    {
+        ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
+        // For some odd reason every comment block appears twice; thus we remove duplicates.
+        final TextualJMLConstruct[] constructs = parseMethodLevelComments(removeDuplicates(comments), getFileName(method));
+        for (int i = constructs.length - 1; i >= 0 && constructs[i] instanceof TextualJMLSpecCase; i--) {
+            final TextualJMLSpecCase specificationCase = (TextualJMLSpecCase) constructs[i];
+            try {
+                result = result.union(jsf.createJMLBlockContracts(method, labels, block, specificationCase));
+            }
+            catch (final SLWarningException exception) {
+                warnings = warnings.add(exception.getWarning());
+            }
+        }
+        return result;
+    }
+
+    private String getFileName(final IProgramMethod method) {
+        final TypeDeclaration type = (TypeDeclaration) method.getContainerType().getJavaType();
+        return type.getPositionInfo().getFileName();
+    }
+
+    private TextualJMLConstruct[] parseMethodLevelComments(final Comment[] comments, final String fileName) throws SLTranslationException {
+        if (comments.length == 0) {
+            return new TextualJMLConstruct[0];
+        }
+        final String concatenatedComment = concatenate(comments);
+        final Position position = comments[0].getStartPosition();
+        final KeYJMLPreParser preParser = new KeYJMLPreParser(concatenatedComment, fileName, position);
+        final ImmutableList<TextualJMLConstruct> constructs = preParser.parseMethodlevelComment();
+        warnings = warnings.union(preParser.getWarnings());
+        return constructs.toArray(new TextualJMLConstruct[constructs.size()]);
+    }
+
+    private Comment[] removeDuplicates(final Comment[] comments) {
+        final Set<Comment> uniqueComments = new LinkedHashSet<Comment>(Arrays.asList(comments));
+        return uniqueComments.toArray(new Comment[uniqueComments.size()]);
+    }
 
     
     @Override    
-    public LoopInvariant extractLoopInvariant(ProgramMethod pm,
+    public LoopInvariant extractLoopInvariant(IProgramMethod pm,
                                               LoopStatement loop) 
             throws SLTranslationException {
         LoopInvariant result = null;
@@ -457,7 +572,6 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 warnings = warnings.add(e.getWarning());
             }
         }
-
         return result;
     }
 

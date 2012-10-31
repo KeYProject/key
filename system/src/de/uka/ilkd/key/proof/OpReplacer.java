@@ -29,14 +29,14 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 public class OpReplacer {
     private static final TermFactory TF = TermFactory.DEFAULT;
     
-    private final Map<? extends SVSubstitute, ? extends SVSubstitute> /*Operator -> Operator, Term -> Term*/ map;
+    private final Map<? extends SVSubstitute, ? extends SVSubstitute> map;
     
     
     /**
      * @param map mapping from the operators/terms to be replaced to the ones to 
      * replace them with
      */
-    public OpReplacer(Map<? extends SVSubstitute, ? extends SVSubstitute> /*Operator -> Operator, Term -> Term*/ map) {
+    public OpReplacer(Map<? extends SVSubstitute, ? extends SVSubstitute> map) {
 	assert map != null;
         this.map = map;
     }

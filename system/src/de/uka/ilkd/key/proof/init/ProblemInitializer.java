@@ -11,7 +11,11 @@
 package de.uka.ilkd.key.proof.init;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Vector;
 
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
@@ -28,17 +32,29 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.init.LDTInput.LDTInputListener;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.IProofFileParser;
+import de.uka.ilkd.key.proof.JavaModel;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.io.EnvInput;
+import de.uka.ilkd.key.proof.io.KeYFile;
+import de.uka.ilkd.key.proof.io.LDTInput;
+import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
+import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.GlobalProofMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
@@ -62,7 +78,6 @@ public final class ProblemInitializer {
     }    
     private static InitConfig baseConfig;
  
-    //private final IMain main;
     private final Profile profile;
     private final Services services;
     private final ProgressMonitor progMon;
@@ -286,6 +301,8 @@ public final class ProblemInitializer {
      * Removes all schema variables, all generic sorts and all sort
      * depending symbols for a generic sort out of the namespaces.
      * Helper for readEnvInput().
+     * 
+     * See bug report #1185, #1189
      */
     private void cleanupNamespaces(InitConfig initConfig) {
 	Namespace newVarNS = new Namespace();	    
@@ -446,7 +463,7 @@ public final class ProblemInitializer {
 	alreadyParsed.clear();
 
         //the first time, read in standard rules
-        if(baseConfig == null) {
+        if(baseConfig == null || profile != baseConfig.getProfile()) {
             baseConfig = new InitConfig(services, profile);
 
 	    RuleSource tacletBase = profile.getStandardRules().getTacletBase();
@@ -497,9 +514,9 @@ public final class ProblemInitializer {
                         }
                     }
                 }
-                for(ProgramMethod pm
+                for(IProgramMethod pm
                         : javaInfo.getAllProgramMethodsLocallyDeclared(kjt)) {
-                    if(pm.getKeYJavaType() != null) {
+                    if(!(pm.isVoid() || pm.isConstructor())) {
                         functions.add(pm);
                     }
                 }
@@ -518,7 +535,7 @@ public final class ProblemInitializer {
     }
 
     
-    public void startProver(InitConfig initConfig, ProofOblInput po) 
+    public Proof startProver(InitConfig initConfig, ProofOblInput po, int proofNum) 
     		throws ProofInputException {
 	assert initConfig != null;
 	if(listener!= null){
@@ -533,12 +550,13 @@ public final class ProblemInitializer {
     	    po.readProblem();
     	    ProofAggregate pa = po.getPO();
     	    //final work
-    	    setUpProofHelper(po, pa,initConfig);
+    	    setUpProofHelper(po, pa, initConfig);
 
 	    //done
     	    if(listener != null){
                 listener.proofCreated(this, pa);
             }
+          return pa.getProofs()[proofNum];
                	    
         } catch (ProofInputException e) {    
             if(listener != null){
@@ -558,7 +576,7 @@ public final class ProblemInitializer {
     public void startProver(ProofEnvironment env, ProofOblInput po) 
     		throws ProofInputException {
 	assert env.getInitConfig().getProofEnv() == env;
-        startProver(env.getInitConfig(), po);
+        startProver(env.getInitConfig(), po, 0);
     }
     
     
@@ -566,7 +584,7 @@ public final class ProblemInitializer {
     		throws ProofInputException {
 	try {
 	    InitConfig initConfig = prepare(envInput);
-	    startProver(initConfig, po);
+	    startProver(initConfig, po, 0);
 	} catch(ProofInputException e) {
 	    reportStatus(envInput.name() + " failed");
 	    throw e;
@@ -574,9 +592,9 @@ public final class ProblemInitializer {
     }
     
     
-    public void tryReadProof(ProblemLoader prl, KeYUserProblemFile kupf) 
+    public void tryReadProof(IProofFileParser pfp, KeYUserProblemFile kupf) 
     		throws ProofInputException {
 	reportStatus("Loading proof", kupf.getNumberOfChars());
-	kupf.readProof(prl);
+	kupf.readProof(pfp);
     }
 }

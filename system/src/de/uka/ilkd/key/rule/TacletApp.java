@@ -10,50 +10,23 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
-import de.uka.ilkd.key.collection.ImmutableArray;
-import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableMapEntry;
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ClashFreeSubst;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.PIOPathIterator;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.RenameTable;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.TacletInstantiationsTableModel;
 import de.uka.ilkd.key.proof.VariableNameProposer;
-import de.uka.ilkd.key.rule.inst.GenericSortCondition;
-import de.uka.ilkd.key.rule.inst.GenericSortException;
-import de.uka.ilkd.key.rule.inst.IllegalInstantiationException;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
+import de.uka.ilkd.key.rule.inst.*;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -570,6 +543,10 @@ public abstract class TacletApp implements RuleApp {
 			// name clash
 			nameclash = true;
 		    }
+                    // FIXME: This loop is never executed more than once
+                    // The following line might belong to the try-block.
+                    // Leave it untouched, however, since no problems
+                    // reported with this established code. MU 10-2012
 		    nameclash = false;
 		} while (nameclash);
 	    } else if (sv instanceof SkolemTermSV) {
@@ -593,10 +570,16 @@ public abstract class TacletApp implements RuleApp {
 		if (app == null)
 		    return null;
 
-		String proposal = VariableNameProposer.DEFAULT.getProposal(
-			this, sv, services, null, null);
-		final LogicVariable v = new LogicVariable(new Name(proposal),
-			getRealSort(sv, services));
+		String proposal;
+		Collection<String> conflictNames = collectClashNames(sv, services);
+		do {
+		    proposal = VariableNameProposer.DEFAULT.getProposal(
+		            this, sv, services, null, proposals);
+		    proposals = proposals.prepend(proposal);
+		} while(conflictNames.contains(proposal));
+
+		LogicVariable v = new LogicVariable(new Name(proposal), getRealSort(sv, services));
+
 		app = app
 			.addCheckedInstantiation(sv, tb.var(v), services, true);
 	    } else {
@@ -618,6 +601,49 @@ public abstract class TacletApp implements RuleApp {
 	    return null;
 	}
 	return app;
+    }
+
+    /**
+     * Collect names which would result in a clash for a new logical variable.
+     * 
+     * The clashing names include the names of the bound and unbound variables
+     * of "notFreeIn" clauses. Additionally, equally-named program variables are
+     * avoided.
+     * 
+     * While this analysis is not strictly necessary (two different variables
+     * may bear the same name), it is vital not to cause confusion with the
+     * user.
+     * 
+     * @param sv
+     *            the schema variable to instantiate with a fresh variable, not
+     *            <code>null</code>
+     * @param services
+     *            the services object, not <code>null</code>
+     * @return a fresh created collection of strings in which a freshly created
+     *         variable name should not fall.
+     */
+    private Collection<String> collectClashNames(SchemaVariable sv, Services services) {
+        Collection<String> result = new HashSet<String>();
+        VariableCollectVisitor vcv = new VariableCollectVisitor();
+        Iterator<NotFreeIn> it = taclet().varsNotFreeIn();
+        while(it.hasNext()) {
+            NotFreeIn nv;
+            nv = it.next();
+            if(nv.first() == sv) {
+                Term term = (Term) instantiations.getInstantiation(nv.second());
+                term.execPostOrder(vcv);
+            }
+        }
+
+        for (QuantifiableVariable var : vcv.vars()) {
+            result.add(var.name().toString());
+        }
+
+        for(Named progvar : services.getNamespaces().programVariables().allElements()) {
+            result.add(progvar.name().toString());
+        }
+
+        return result;
     }
 
     /**
@@ -722,6 +748,7 @@ public abstract class TacletApp implements RuleApp {
 	    final SchemaVariable sv = svIt.next();
 	    if(sv instanceof SkolemTermSV) {
 		final Term inst = (Term) insts.getInstantiation(sv);
+		
 		services.getNamespaces().functions().addSafely(inst.op());
 	    }
 	}

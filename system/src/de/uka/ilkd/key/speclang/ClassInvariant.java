@@ -31,6 +31,14 @@ public interface ClassInvariant extends SpecificationElement {
      * the receiver object.
      */
     public Term getInv(ParsableVariable selfVar, Services services);
+
+
+    /**
+     * Returns the invariant formula without implicit all-quantification over
+     * the receiver object.
+     */
+    public Term getOriginalInv();
+
     
     /**
      * Tells whether the invariant is static (i.e., does not refer to a

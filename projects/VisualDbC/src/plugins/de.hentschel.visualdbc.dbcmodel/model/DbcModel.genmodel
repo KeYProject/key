@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/de.hentschel.visualdbc.dbcmodel/src"
+    modelPluginID="de.hentschel.visualdbc.dbcmodel" modelName="DbC" importerID="org.eclipse.emf.importer.ecore"
+    complianceLevel="6.0" copyrightFields="false">
+  <foreignModel>DbcModel.ecore</foreignModel>
+  <genPackages prefix="Dbcmodel" basePackage="de.hentschel.visualdbc" disposableProviderFactory="true"
+      fileExtensions="dbc" ecorePackage="DbcModel.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="DbcModel.ecore#//DbcVisibility">
+      <genEnumLiterals ecoreEnumLiteral="DbcModel.ecore#//DbcVisibility/DEFAULT"/>
+      <genEnumLiterals ecoreEnumLiteral="DbcModel.ecore#//DbcVisibility/PRIVATE"/>
+      <genEnumLiterals ecoreEnumLiteral="DbcModel.ecore#//DbcVisibility/PROTECTED"/>
+      <genEnumLiterals ecoreEnumLiteral="DbcModel.ecore#//DbcVisibility/PUBLIC"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="DbcModel.ecore#//DbcProofStatus">
+      <genEnumLiterals ecoreEnumLiteral="DbcModel.ecore#//DbcProofStatus/FAILED"/>
+      <genEnumLiterals ecoreEnumLiteral="DbcModel.ecore#//DbcProofStatus/OPEN"/>
+      <genEnumLiterals ecoreEnumLiteral="DbcModel.ecore#//DbcProofStatus/FULFILLED"/>
+    </genEnums>
+    <genDataTypes ecoreDataType="DbcModel.ecore#//Properties"/>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcModel">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcModel/driverId"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//DbcModel/connectionSettings"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//DbcModel/proofObligations"/>
+      <genOperations ecoreOperation="DbcModel.ecore#//DbcModel/toConnectionProperties"/>
+      <genOperations ecoreOperation="DbcModel.ecore#//DbcModel/getProofObligation">
+        <genParameters ecoreParameter="DbcModel.ecore#//DbcModel/getProofObligation/proofObligation"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcPackage">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcPackage/name"/>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcClass">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcClass/abstract"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcClass/final"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DbcModel.ecore#//DbcClass/extends"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcClass/anonymous"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="DbcModel.ecore#//AbstractDbcProofContainer">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcProofContainer/proofs"/>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcMethod">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcMethod/returnType"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcMethod/abstract"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcMethod/final"/>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcInvariant">
+      <genFeatures createChild="false" propertyMultiLine="true" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcInvariant/condition"/>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcProof">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DbcModel.ecore#//DbcProof/target"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//DbcProof/proofReferences"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcProof/obligation"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcProof/status"/>
+      <genOperations ecoreOperation="DbcModel.ecore#//DbcProof/getProofReference">
+        <genParameters ecoreParameter="DbcModel.ecore#//DbcProof/getProofReference/target"/>
+        <genParameters ecoreParameter="DbcModel.ecore#//DbcProof/getProofReference/kind"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcConstructor"/>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcProofReference">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DbcModel.ecore#//DbcProofReference/target"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcProofReference/kind"/>
+      <genFeatures property="Readonly" notify="false" createChild="false" propertySortChoices="true"
+          ecoreFeature="ecore:EReference DbcModel.ecore#//DbcProofReference/source"/>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcAttribute">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcAttribute/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcAttribute/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcAttribute/visibility"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcAttribute/static"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcAttribute/final"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="DbcModel.ecore#//AbstractDbcClass">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcClass/constructors"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcClass/implements"/>
+      <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcClass/getConstructor">
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcClass/getConstructor/signature"/>
+      </genOperations>
+    </genClasses>
+    <genClasses image="false" ecoreClass="DbcModel.ecore#//AbstractDbcInterface">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcInterface/methods"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcInterface/attributes"/>
+      <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcInterface/getMethod">
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcInterface/getMethod/signature"/>
+      </genOperations>
+      <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcInterface/getAttribute">
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcInterface/getAttribute/name"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcInterface">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DbcModel.ecore#//DbcInterface/extends"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="DbcModel.ecore#//AbstractDbcType">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//AbstractDbcType/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//AbstractDbcType/visibility"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//AbstractDbcType/static"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcType/invariants"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcType/axioms"/>
+      <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcType/getInvariant">
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcType/getInvariant/condition"/>
+      </genOperations>
+      <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcType/getAxiom">
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcType/getAxiom/definition"/>
+      </genOperations>
+    </genClasses>
+    <genClasses image="false" ecoreClass="DbcModel.ecore#//AbstractDbcEnum">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcEnum/literals"/>
+      <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcEnum/getLiteral">
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcEnum/getLiteral/name"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcEnum"/>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcEnumLiteral">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcEnumLiteral/name"/>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcOperationContract">
+      <genFeatures createChild="false" propertyMultiLine="true" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcOperationContract/pre"/>
+      <genFeatures createChild="false" propertyMultiLine="true" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcOperationContract/post"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcOperationContract/modifies"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcOperationContract/termination"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="DbcModel.ecore#//AbstractDbcSpecification">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//AbstractDbcSpecification/name"/>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcProperty">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcProperty/key"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcProperty/value"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="DbcModel.ecore#//AbstractDbcOperation">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcOperation/operationContracts"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//AbstractDbcOperation/signature"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//AbstractDbcOperation/visibility"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//AbstractDbcOperation/static"/>
+      <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcOperation/getOperationContract">
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcOperation/getOperationContract/pre"/>
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcOperation/getOperationContract/post"/>
+      </genOperations>
+    </genClasses>
+    <genClasses image="false" ecoreClass="DbcModel.ecore#//AbstractDbCContainer">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbCContainer/packages"/>
+      <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbCContainer/getPackage">
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbCContainer/getPackage/name"/>
+      </genOperations>
+    </genClasses>
+    <genClasses image="false" ecoreClass="DbcModel.ecore#//AbstractDbcTypeContainer">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//AbstractDbcTypeContainer/types"/>
+      <genOperations ecoreOperation="DbcModel.ecore#//AbstractDbcTypeContainer/getType">
+        <genParameters ecoreParameter="DbcModel.ecore#//AbstractDbcTypeContainer/getType/name"/>
+      </genOperations>
+    </genClasses>
+    <genClasses image="false" ecoreClass="DbcModel.ecore#//IDbCProvable">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference DbcModel.ecore#//IDbCProvable/proofObligations"/>
+      <genFeatures property="None" notify="false" createChild="false" propertySortChoices="true"
+          ecoreFeature="ecore:EReference DbcModel.ecore#//IDbCProvable/allProofs"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="DbcModel.ecore#//IDbCProofReferencable">
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference DbcModel.ecore#//IDbCProofReferencable/allReferences"/>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcProofObligation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcProofObligation/obligation"/>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbcAxiom">
+      <genFeatures createChild="false" propertyMultiLine="true" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbcAxiom/definition"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference DbcModel.ecore#//DbcAxiom/axiomContracts"/>
+      <genOperations ecoreOperation="DbcModel.ecore#//DbcAxiom/getAxiomContract">
+        <genParameters ecoreParameter="DbcModel.ecore#//DbcAxiom/getAxiomContract/pre"/>
+        <genParameters ecoreParameter="DbcModel.ecore#//DbcAxiom/getAxiomContract/dep"/>
+      </genOperations>
+    </genClasses>
+    <genClasses ecoreClass="DbcModel.ecore#//DbCAxiomContract">
+      <genFeatures createChild="false" propertyMultiLine="true" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbCAxiomContract/pre"/>
+      <genFeatures createChild="false" propertyMultiLine="true" ecoreFeature="ecore:EAttribute DbcModel.ecore#//DbCAxiomContract/dep"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

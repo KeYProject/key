@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -25,11 +26,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
@@ -45,6 +45,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
@@ -56,6 +57,7 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
@@ -68,9 +70,9 @@ import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
 import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
@@ -81,6 +83,7 @@ import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
 import de.uka.ilkd.key.gui.actions.ProofManagementAction;
 import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
 import de.uka.ilkd.key.gui.actions.SaveFileAction;
+import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
 import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
 import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
 import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
@@ -102,33 +105,30 @@ import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
+import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofSaver;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
-import de.uka.ilkd.key.util.KeYExceptionHandler;
-import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
+import de.uka.ilkd.key.util.UnicodeHelper;
 
 
 @SuppressWarnings("serial")
@@ -243,7 +243,7 @@ public final class MainWindow extends JFrame  {
     /** for locking of threads waiting for the prover to exit */
     public final Object monitor = new Object();
     
-    public static MainWindow instance = null;    
+    private static MainWindow instance = null;    
     
 //    private ProverTaskListener taskListener;
     
@@ -270,25 +270,18 @@ public final class MainWindow extends JFrame  {
     
     /**
      * initialize the singleton object of this class.
-     * 
-     * @param title
-     *            the frame's title
      */
-    private void initialize(String title) {
-        setTitle(title);
+    private void initialize() {
+        setTitle(KeYResourceManager.getManager().getUserInterfaceTitle());
+        setLaF();
         setIconImage(IconFactory.keyLogo());
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         proofListener = new MainProofListener();
         guiListener = new MainGUIListener();
         
-        // will be: userInterface = new WindowUserInterface(this);
-        userInterface = Main.makeUserInterface();
+        userInterface = new WindowUserInterface(this);
         
-//        taskListener = (Main.batchMode ? (ProverTaskListener)
-//                new MainTaskListenerBatchMode() : 
-//            (ProverTaskListener) new MainTaskListener());
-        
-        setMediator(new KeYMediator(this));
+        setMediator(new KeYMediator(userInterface));
         
         initNotification();
         layoutMain();
@@ -300,31 +293,32 @@ public final class MainWindow extends JFrame  {
         
     }
     
-    private void initNotification() {
-        if (!Main.batchMode) {
-            notificationManager = new NotificationManager(mediator);
+
+    /**
+     * Tries to set the system look and feel if this option is activated.
+     */
+    private void setLaF() {
+        try{
+            if (ProofSettings.DEFAULT_SETTINGS.getViewSettings().useSystemLaF()) {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+                // Workarounds for GTK+
+                // TODO: check whether they apply to other LaFs
+                UIManager.put("Slider.paintValue", Boolean.FALSE);
+                UIManager.put("Menu.background", Color.GRAY); // menu background is still white....
+
+                SwingUtilities.updateComponentTreeUI(this);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
+
     
-//    public void updateUI() {
-//        if (goalView != null)
-//            goalView.updateUI();
-//        if (proofView != null)
-//            proofView.updateUI();
-//        if (openGoalsView != null)
-//            openGoalsView.updateUI();
-//        if (ruleView != null)
-//            ruleView.updateUI();
-//        if (proofListView != null)
-//            proofListView.updateUI();
-//    }
-    
-    public ProblemInitializer createProblemInitializer(){
-        ProblemInitializer pi = new ProblemInitializer(getUserInterface(),
-                getMediator().getProfile(), new Services(getMediator()
-                        .getExceptionHandler()), true, getUserInterface());
-        return pi;
+    private void initNotification() {
+    	notificationManager = new NotificationManager(mediator, this);
     }
+    
     
     /**
      * sets the mediator to corresspond with other gui elements
@@ -376,10 +370,10 @@ public final class MainWindow extends JFrame  {
         // FIXME FIXME
         recentFiles = new RecentFileMenu(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                loadProblem(new File(recentFiles.getAbsolutePath((JMenuItem) e.getSource())));
+                mediator.getUI().loadProblem(new File(recentFiles.getAbsolutePath((JMenuItem) e.getSource())));
             }
         }, MAX_RECENT_FILES, null);
-        recentFiles.load(PathConfig.RECENT_FILES_STORAGE);
+        recentFiles.load(PathConfig.getRecentFileStorage());
         
         
         // FIXME do this NOT in layout of GUI
@@ -404,10 +398,8 @@ public final class MainWindow extends JFrame  {
         lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
         
 
-        
 	
 	
-	mediator.addKeYSelectionListener(OneStepSimplifier.INSTANCE);
         
 
 	// create empty views
@@ -436,7 +428,7 @@ public final class MainWindow extends JFrame  {
         // create tabbed pane
         tabbedPane = createTabbedPane();
 
-        proofListView.setPreferredSize(new java.awt.Dimension(250, 100));
+        proofListView.setPreferredSize(new java.awt.Dimension(350, 100));
         GuiUtilities.paintEmptyViewComponent(proofListView, "Proofs");
         
         JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView, tabbedPane);
@@ -448,19 +440,6 @@ public final class MainWindow extends JFrame  {
         splitPane.setOneTouchExpandable(true);
         splitPane.setName("splitPane");
         getContentPane().add(splitPane, BorderLayout.CENTER);
-        
-//      // work around bug in
-//      // com.togethersoft.util.ui.plaf.metal.OIMetalSplitPaneUI
-//      // removed since together is no longer supported (mulbrich 2011)        
-//        {
-//            public void setUI(javax.swing.plaf.SplitPaneUI ui) {
-//                try {
-//                    super.setUI(ui);
-//                } catch (NullPointerException e) {
-//                    Debug.out("Exception thrown by class Main at setUI");
-//                }
-//            }
-//        }; 
         
         statusLine = new MainStatusLine("<html>" + PARA + Main.COPYRIGHT + PARA
                 + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
@@ -542,7 +521,7 @@ public final class MainWindow extends JFrame  {
         oneStep.setHideActionText(true);
         toolBar.addSeparator();
         toolBar.add(oneStep);
-	return toolBar;
+        return toolBar;
     }
     
     private void createViews() {
@@ -696,7 +675,7 @@ public final class MainWindow extends JFrame  {
     
  
     public void makePrettyView() {
-        if (getMediator().ensureProofLoadedSilent()) {
+        if (getMediator().ensureProofLoaded()) {
             getMediator().getNotationInfo().refresh(mediator.getServices());
             getMediator().getProof().fireProofGoalsChanged();
         }        
@@ -710,10 +689,6 @@ public final class MainWindow extends JFrame  {
         return "";
     }
     
-    /** the number of goals the goal list currently contains */
-    public int displayedOpenGoalNumber() {
-        return goalList.getModel().getSize();
-    }
     
     /**
      * create the goal list, proof tree, proof list. Add to their respective
@@ -785,7 +760,38 @@ public final class MainWindow extends JFrame  {
         JMenu view = new JMenu("View");
         view.setMnemonic(KeyEvent.VK_V);
         
+        JMenuItem laf = new JCheckBoxMenuItem("Use system look and feel (experimental)");
+        laf.setToolTipText("If checked KeY tries to appear in the look and feel of your window manager, if not in the default Java LaF (aka Metal).");
+        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofSettings.DEFAULT_SETTINGS.getViewSettings();
+        laf.setSelected(vs.useSystemLaF());
+        laf.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                vs.setUseSystemLaF(((JCheckBoxMenuItem)e.getSource()).
+                isSelected());
+                // TODO: inform that this requires a restart
+                System.out.println("Info: Look and feel changed for next start of KeY.");
+            }});
+//        view.add(laf); // uncomment this line to include the option in the menu
+        
+       
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
+        
+
+        final MainWindowAction pp2 = new MainWindowAction(this, 
+                "Use Unicode symbols", 
+                "If checked formulae are displayed with special Unicode characters" +
+                " (such as \""+UnicodeHelper.AND+"\") instead of the traditional ASCII ones. \n"+
+                "Only works in combination with pretty printing (see above).",
+                NotationInfo.UNICODE_ENABLED){
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                NotationInfo.UNICODE_ENABLED = ((JCheckBoxMenuItem) e.getSource()).isSelected();
+                mainWindow.makePrettyView();
+            }
+        };
+        view.add(new JCheckBoxMenuItem(pp2));
+        
         view.addSeparator();
         {
             JMenu fontSize = new JMenu("Font Size");
@@ -795,6 +801,7 @@ public final class MainWindow extends JFrame  {
         }
         view.add(new ToolTipOptionsAction(this));
         
+        view.add(new ProofDiffFrame.Action(this));
         return view;
     }
 
@@ -805,6 +812,8 @@ public final class MainWindow extends JFrame  {
         proof.add(autoModeAction);
         proof.add(new UndoLastStepAction(this, true));
         proof.add(new AbandonTaskAction(this));
+        proof.addSeparator();
+        proof.add(new SearchInProofTreeAction(this));
         proof.addSeparator();
 	proof.add(new ShowUsedContractsAction(this));
         proof.add(new ShowActiveTactletOptionsAction(this));
@@ -924,7 +933,6 @@ public final class MainWindow extends JFrame  {
 	   }
     
     JCheckBoxMenuItem saveSMTFile;
-//    private JCheckBoxMenuItem waitForAllProvers;
     
     private JMenuItem setupSpeclangMenu() {
         JMenu result = new JMenu("Specification Parser");       
@@ -967,12 +975,6 @@ public final class MainWindow extends JFrame  {
         return proofTreeView;
     }
     
-//    /**
-//     * returns the toolbar
-//     */
-//    public JToolBar getToolBar() {
-//        return toolBar;
-//    }
     
     /**
      * Sets the content of the current goal view. Do not use this method from outside, take method
@@ -1025,18 +1027,6 @@ public final class MainWindow extends JFrame  {
     
     
     /** saves a proof */
-    private void saveProof() {
-        final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
-        final String defaultName 
-        	= MiscTools.toValidFileName(mediator.getSelectedProof()
-        		                            .name()
-        		                            .toString()).toString();
-        boolean saved = jFC.showSaveDialog(this, defaultName + ".proof");
-        if (saved) {
-            saveProof(jFC.getSelectedFile());
-        }
-    }
-    
     public void saveProof(File proofFile) {
         String filename = proofFile.getAbsolutePath();    
         ProofSaver saver = new ProofSaver(getMediator().getSelectedProof(), filename, Main.INTERNAL_VERSION);
@@ -1051,28 +1041,6 @@ public final class MainWindow extends JFrame  {
         if (errorMsg != null) {
             notify(new GeneralFailureEvent
                     ("Saving Proof failed.\n Error: " + errorMsg));
-        }
-    }
-    
-    public void loadProblem(File file) {
-        recentFiles.addRecentFile(file.getAbsolutePath());
-        final ProblemLoader pl = 
-            new ProblemLoader(file, this);
-        pl.addTaskListener(getUserInterface());
-        pl.run();
-    }
-
-    // FIXME DOES NOT DO THE SAME AS THE ONE ONE ABOVE
-    @Deprecated
-    public void closeTaskWithoutInteraction() {
-        final Proof proof = mediator.getProof();
-        if (proof != null) {
-            final TaskTreeNode rootTask = 
-                proof.getBasicTask().getRootTask();     
-            proofList.removeTaskWithoutInteraction(rootTask);   
-            proof.getServices().getSpecificationRepository().removeProof(proof);
-            proof.mgt().removeProofListener();
-            proofTreeView.removeProofs(rootTask.allProofs());
         }
     }
     
@@ -1105,7 +1073,6 @@ public final class MainWindow extends JFrame  {
         return proof;
     }
     
-
     
     /**
      * The progress monitor that displays a progress bar in a corner of the main window.
@@ -1140,7 +1107,6 @@ public final class MainWindow extends JFrame  {
         private Set<Component> doNotReenable;
         
 	private void setToolBarDisabled() {
-	    
 	    assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
 	    assert doNotReenable == null : "toolbar disabled w/o prior enable";
 	    
@@ -1162,7 +1128,6 @@ public final class MainWindow extends JFrame  {
 	}
         
         private void setToolBarEnabled() {
-            
             assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
             assert doNotReenable != null : "toolbar enabled w/o prior disable";
             
@@ -1232,9 +1197,6 @@ public final class MainWindow extends JFrame  {
 
     private synchronized void setProofNodeDisplay() {
         // FIXME
-        if(Main.batchMode) {
-            return;
-        }
         if (!disableCurrentGoalView) {
             Goal goal;
             if(getMediator()!=null && getMediator().getSelectedProof()!=null){
@@ -1304,8 +1266,11 @@ public final class MainWindow extends JFrame  {
          * invoked if automatic execution has stopped
          */
         public synchronized void autoModeStopped(ProofEvent e) {
-            Debug.log4jWarn("Automode stopped", MainWindow.class.getName());
-            Debug.log4jDebug("From " + Debug.stackTrace(), MainWindow.class.getName());
+            if (Debug.ENABLE_DEBUG) {
+		Debug.log4jWarn("Automode stopped", MainWindow.class.getName());
+		Debug.log4jDebug("From " + Debug.stackTrace(),
+				 MainWindow.class.getName());
+	    }
             unfreezeExceptAutoModeButton();
             disableCurrentGoalView = false;
             setProofNodeDisplay();
@@ -1317,75 +1282,14 @@ public final class MainWindow extends JFrame  {
             if ( proof.getSettings().getStrategySettings() == (StrategySettings) e.getSource() ) {
                 // updateAutoModeConfigButton();
             }         
-        }
-        
-    }
-        
-
-    /** 
-     * used when in batch mode to write out some statistic data
-     * @param file the String with the filename where to write the statistic data
-     * @param result the Object encapsulating informtation about the result, e.g.
-     * String "Error" if an error has occurred. 
-     * @param time the long giving the needed time in ms 
-     * @param appliedRules the int giving the number of applied rules
-     */
-    private void printStatistics(String file, Object result, 
-            long time, int appliedRules) {
-        try {
-            final FileWriter statistics = new FileWriter ( file, true );
-            final PrintWriter statPrinter = new PrintWriter ( statistics );
-            
-            String fileName = Main.getFileNameOnStartUp();
-            final int slashIndex = fileName.lastIndexOf ( "examples/" );
-            if ( slashIndex >= 0 )
-                fileName = fileName.substring ( slashIndex );
-            
-            statPrinter.print ( fileName + ", " );
-            if ("Error".equals ( result ) )
-                statPrinter.println ( "-1, -1" );
-            else
-                statPrinter.println ( "" + appliedRules + ", " + time );                
-            statPrinter.close();
-        } catch ( IOException e ) {}
-    }
-
-    /**
-     * This mechanism is not good and will vanish.
-     * @param info
-     */
-    @Deprecated
-    public void taskFinished(TaskFinishedInfo info) {
-        final MainStatusLine sl = getStatusLine();
-
-        if (info.getSource() instanceof ApplyStrategy) {
-            sl.reset();
-            displayResults(info.getTime(), 
-                    info.getAppliedRules(), 
-                    info.getClosedGoals());                
-        } else if (info.getSource() instanceof ProblemLoader) {
-            if (!"".equals(info.getResult())) {
-                final KeYExceptionHandler exceptionHandler = 
-                    ((ProblemLoader)info.getSource()).getExceptionHandler();
-                ExceptionDialog.showDialog(MainWindow.this,     
-                        exceptionHandler.getExceptions());
-                exceptionHandler.clear();
-            } else {
-                sl.reset();                    
-                mediator.getNotationInfo().refresh(mediator.getServices());
-            }
-        } else {
-            sl.reset();
-        }
-    }
+        }        
+    }        
     
     /** displays some status information */
-    void displayResults ( long time, int appliedRules, int closedGoals ) {
+    void displayResults ( long time, int appliedRules, int closedGoals, int openGoals ) {
         String message;       
         String timeString = "" + (time/1000)+"."+((time%1000)/100);        
-        
-        int closed = getMediator().getNrGoalsClosedByAutoMode();
-        
+                
         // display message in the status bar
         
         if ( appliedRules != 0 ) {
@@ -1393,8 +1297,8 @@ public final class MainWindow extends JFrame  {
             if ( appliedRules != 1 ) message += "s";
             message += " (" + timeString + " sec), ";
             message += " closed " + closedGoals + " goal";
-            if ( closed != 1 ) message += "s";             
-            message += ", " + displayedOpenGoalNumber ();
+            if ( closedGoals != 1 ) message += "s";             
+            message += ", " + openGoals;
             message += " remaining"; 
             setStatusLine ( message );
         }                              
@@ -1695,7 +1599,8 @@ public final class MainWindow extends JFrame  {
 	  
 	public void actionPerformed(ActionEvent e) {
 	    if (!mediator.ensureProofLoaded() || solverUnion ==SolverTypeCollection.EMPTY_COLLECTION){
-		return;
+            MainWindow.this.popupWarning("No proof loaded or no solvers selected.", "Oops...");
+	    	return;
 	    }
 	    final Proof proof = mediator.getProof();
 	  
@@ -1733,14 +1638,12 @@ public final class MainWindow extends JFrame  {
 	    
 	    return this.solverUnion.equals(((SMTInvokeAction)obj).solverUnion);
 	}
+
+    @Override
+    public int hashCode() {
+        return solverUnion.hashCode() * 7;
     }
-    
-    public void loadCommandLineFile() {
-        if (Main.getFileNameOnStartUp() != null) {
-            loadProblem(new File(Main.getFileNameOnStartUp()));
-        } else if(Main.getExamplesDir() != null) {
-            openExampleAction.actionPerformed(null);
-        }
+
     }
     
     /**
@@ -1754,12 +1657,6 @@ public final class MainWindow extends JFrame  {
             notificationManager.notify(event);
         }
     }
-    
-
-    public static boolean hasInstance() {
-        return instance != null;
-    }   
-    
     
     /**
      * returns an instance of Main and creates one if necessary
@@ -1777,51 +1674,60 @@ public final class MainWindow extends JFrame  {
      * @throws IllegalStateException 
      */
     public static MainWindow getInstance() throws IllegalStateException {
-        return getInstance(true);
+	if (instance == null) {
+	    instance = new MainWindow();
+	    instance.initialize();
+	}
+
+	return instance;
+    }
+    
+    /**
+     * <p>
+     * Checks if an instance of the main window is already created or not.
+     * </p>
+     * <p>
+     * This method is required, because the Eclipse integration of KeY has
+     * to do some cleanup only if a main window exists.
+     * </p>
+     * @return {@code true} {@link MainWindow} exists and is available via {@link #getInstance()}, {@code false} {@link MainWindow} is not instantiated and will be instantiated via {@link #getInstance()}.
+     */
+    public static boolean hasInstance() {
+       return instance != null;
+    }
+    
+    
+    public void popupInformationMessage(Object message, String title) {
+        JOptionPane.showMessageDialog
+        (this, message,
+         title, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void popupWarning(Object message, String title) {
+        JOptionPane.showMessageDialog(this, message, title, 
+                JOptionPane.WARNING_MESSAGE);
     }
 
     /**
-     * returns an instance of Main and creates one if necessary
-     * <strong>Do not use</strong> this method to access the mediator as long as
-     * you do not attempt create a GUI element. In particular be aware that the 
-     * pattern <tt>getInstance(boolean).mediator().getProof()</tt> breaks GUI and prover 
-     * separation and will not work if an alternative GUI is used (e.g. soon for 
-     * the visual debugger). 
-     * 
-     * Further the above pattern is very fragile as the mediator may have changed 
-     * the selected proof. Usually if you want to have access to a proof e.g. in
-     * the strategy hand the proof object over at the creation time of the component.
-     * 
-     * @param visible a boolean indicating if Main shall be made visible
-     * @return the instance of Main
-     * @throws Exception 
+     * Brings up a dialog displaying a message.
+     * @param modal whether or not the message should be displayed in a modal dialog.
      */
-    public static MainWindow getInstance(final boolean visible) throws IllegalStateException {
-        
-        if(instance == null) {
-            // TODO Come up with a better exception class
-            throw new IllegalStateException("There is no GUI main window. Sorry.");
-        }
-        
-        // in a getter method the state ought not be changed. -> Lead to trouble.
-//        if(visible && !instance.isVisible()) {
-//            GuiUtilities.invokeOnEventQueue(new Runnable() {
-//                public void run() {                            
-//                    instance.setVisible(true);
-//                }
-//            });
-//        }
-        
-        return instance;
+    public void popupInformationMessage(Object message, String title, boolean modal) {
+        if (modal) {
+        popupInformationMessage(message, title);
+    } else {
+        if (!(message instanceof Component))
+        throw new InternalError("only messages of type " + Component.class + " supported, yet");
+        // JFrame dlg = new JDialog(mainFrame(),title, modal);
+        JFrame dlg = new JFrame(title);
+        dlg.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        dlg.getContentPane().add((Component)message);
+        dlg.pack();
+        GuiUtilities.setCenter(dlg, this);
+        dlg.setVisible(true);
+    }
     }
 
-    public static void createInstance(String title) {
-	assert instance == null : "Attempt to create a second mainwindow";
-	if(instance == null) {
-	    instance = new MainWindow();
-	    instance.initialize(title);
-	}
-    }
 
     public static void setVisibleMode(boolean visible) {
 	MainWindow.visible = visible;
@@ -1859,4 +1765,47 @@ public final class MainWindow extends JFrame  {
         }
     }
 
+    /**
+     * <p>
+     * Returns the {@link ExitMainAction} that is used to exit the {@link MainWindow}.
+     * </p>
+     * <p>
+     * This functionality is required because for instance other projects
+     * like the Eclipse integration has to close the main window.
+     * </p>
+     * @return The used {@link ExitMainAction}.
+     */
+    public ExitMainAction getExitMainAction() {
+        return exitMainAction;
+    }
+
+    /**
+     * <p>
+     * Returns the {@link NotificationManager}.
+     * </p>
+     * <p>
+     * This functionality is required because in other project is it
+     * required to execute the automatic mode without opening the result dialog
+     * which can be disabled in the {@link NotificationManager}.
+     * </p>
+     * @return
+     */
+    public NotificationManager getNotificationManager() {
+        return notificationManager;
+    }
+
+	protected void addRecentFile(String absolutePath) {
+		recentFiles.addRecentFile(absolutePath);
+	}
+
+	public void openExamples() {
+		openExampleAction.actionPerformed(null);    }
+
+	public void loadProblem(File file) {
+		getUserInterface().loadProblem(file);
+	}
+
+   public void loadProblem(File file, List<File> classPath, File bootClassPath) {
+      getUserInterface().loadProblem(file, classPath, bootClassPath);
+   }
 }

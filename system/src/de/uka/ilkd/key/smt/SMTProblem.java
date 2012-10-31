@@ -97,7 +97,9 @@ public class SMTProblem {
                 SMTSolverResult valid = null;
                 SMTSolverResult invalid = null;
                 for (SMTSolver solver : solvers) {
-                        if (solver.getFinalResult().isValid() == ThreeValuedTruth.TRUE) {
+                	    if(solver.getFinalResult() == null){
+                	    	// do nothing
+                	    }else if (solver.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
                                 valid = solver.getFinalResult();
                         } else if (solver.getFinalResult().isValid() == ThreeValuedTruth.FALSIFIABLE) {
                                 invalid = solver.getFinalResult();

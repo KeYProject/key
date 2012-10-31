@@ -16,6 +16,7 @@ import de.uka.ilkd.key.smt.SolverType;
 
 
 public class TestSimplify extends TestSMTSolver {
+    private static final String SYSTEM_PROPERTY_SOLVER_PATH = "simplifySolverPath";
 
     private static boolean isInstalled = false;
     private static boolean installChecked = false;
@@ -28,15 +29,26 @@ public class TestSimplify extends TestSMTSolver {
 	    installChecked = true;
 	    if(!isInstalled) {
 		System.out.println("Warning: " + getSolverType().getName() + " is not installed, tests skipped.");
-	    }	    
+		System.out.println("Maybe use JVM system property \"" + SYSTEM_PROPERTY_SOLVER_PATH + "\" to define the path to the simplify command.");
+		}	    
+		if(isInstalled &&!getSolverType().supportHasBeenChecked()){
+			if(!getSolverType().checkForSupport()){
+				System.out.println("Warning: " + "The version of the solver "+ getSolverType().getName() + " used for the following tests may not be supported.");
+			}    			
+		}
 	}
 	
-        return false;
+        return !isInstalled;
     }
     
     @Override
     public SolverType getSolverType() {
-	return SolverType.SIMPLIFY_SOLVER;
+       SolverType type = SolverType.SIMPLIFY_SOLVER;
+       String solverPathProperty = System.getProperty(SYSTEM_PROPERTY_SOLVER_PATH);
+       if (solverPathProperty != null && !solverPathProperty.isEmpty()) {
+          type.setSolverCommand(solverPathProperty);
+       }
+       return type;
     }
 
 

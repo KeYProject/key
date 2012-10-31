@@ -93,7 +93,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
 
       }
 
-      public void proofIsBeingPruned(ProofTreeEvent e){              
+      public void proofIsBeingPruned(ProofTreeEvent e){    
             pruningInProcess = e.getNode();   
       }
 
@@ -104,7 +104,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
        * The method proofPruned is called, when the nodes are disconnect from
        * node.
        */
-      public void proofPruned(ProofTreeEvent e){              
+      public void proofPruned(ProofTreeEvent e){        
               updateTree(getProofTreeNode(pruningInProcess));
               pruningInProcess = null;   
       }

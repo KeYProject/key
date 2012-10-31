@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
+      <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
+         <loopNode name="do {result_1++;}while ( false );" pathCondition="true" pathConditionChanged="false">
+            <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
+               <loopCondition name="false" pathCondition="true" pathConditionChanged="false">
+                  <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
+                     <methodReturn name="&lt;return of self.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;1&apos; as result of self.main();&gt;">
+                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </loopCondition>
+            </statement>
+         </loopNode>
+      </statement>
+   </methodCall>
+</startNode>

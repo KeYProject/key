@@ -15,7 +15,6 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.MiscTools;
 
 
 /**
@@ -29,7 +28,7 @@ import de.uka.ilkd.key.util.MiscTools;
  * the targets of contracts (i.e., as the subjects that the contracts are
  * about).
  */
-public class ObserverFunction extends Function {
+public class ObserverFunction extends Function implements IObserverFunction {
             
     private final KeYJavaType container;
     private final boolean isStatic;
@@ -98,73 +97,57 @@ public class ObserverFunction extends Function {
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
-    
-    public boolean equals (Object o){
-        if (o instanceof ObserverFunction){
-            ObserverFunction p = (ObserverFunction)o;
-            boolean b = (p.isStatic == isStatic);
-            b = b && MiscTools.equalsOrNull(p.name(), name());
-            b = b && MiscTools.equalsOrNull(p.container, container);
-            b = b && MiscTools.equalsOrNull(p.paramTypes, paramTypes);
-            b = b && MiscTools.equalsOrNull(p.type, type);
-            return b;
-        } else {
-            return false;
-        }
-    }
-    
-    /**
-     * Returns the result type of this symbol.
-     */
-    public final KeYJavaType getType() {
+        
+    /* (non-Javadoc)
+    * @see de.uka.ilkd.key.logic.op.IObserverFunction#getType()
+    */
+    @Override
+   public final KeYJavaType getType() {
 	return type;
     }
     
     
-    /**
-     * Returns the container type of this symbol; for non-static observer 
-     * symbols, this corresponds to the sort of its second argument.
-     */
-    public final KeYJavaType getContainerType() {
+    /* (non-Javadoc)
+    * @see de.uka.ilkd.key.logic.op.IObserverFunction#getContainerType()
+    */
+    @Override
+   public final KeYJavaType getContainerType() {
 	return container;
     }
     
     
-    /**
-     * Tells whether the observer symbol is static.
-     */
-    public final boolean isStatic() {
+    /* (non-Javadoc)
+    * @see de.uka.ilkd.key.logic.op.IObserverFunction#isStatic()
+    */
+    @Override
+   public final boolean isStatic() {
 	return isStatic;
     }
     
     
-    /**
-     * Gives the number of parameters of the observer symbol. "Parameters" here
-     * includes only the *explicit* parameters, not the heap and the receiver
-     * object. Thus, for observer symbols representing model fields, this will
-     * always return 0.
-     */
-    public final int getNumParams() {
+    /* (non-Javadoc)
+    * @see de.uka.ilkd.key.logic.op.IObserverFunction#getNumParams()
+    */
+    @Override
+   public final int getNumParams() {
 	return paramTypes.size();
     }
     
     
-    /**
-     * Gives the type of the i-th parameter of this observer symbol. 
-     * "Parameters" here includes only the *explicit* parameters, not the heap 
-     * and the receiver object. 
-     */
-    public final KeYJavaType getParamType(int i) {
+    /* (non-Javadoc)
+    * @see de.uka.ilkd.key.logic.op.IObserverFunction#getParamType(int)
+    */
+    @Override
+   public final KeYJavaType getParamType(int i) {
 	return paramTypes.get(i);
     }
     
     
-    /**
-     * Returns the parameter types of this observer symbol. "Parameters" here
-     * includes only the *explicit* parameters, not the heap and the receiver
-     * object. 
-     */
-    public final ImmutableArray<KeYJavaType> getParamTypes() {
+    /* (non-Javadoc)
+    * @see de.uka.ilkd.key.logic.op.IObserverFunction#getParamTypes()
+    */
+    @Override
+   public final ImmutableArray<KeYJavaType> getParamTypes() {
 	return paramTypes;
     }
 }

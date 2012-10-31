@@ -9,18 +9,17 @@ import java.util.LinkedList;
 import de.uka.ilkd.key.proof.Proof;
 
 public class LemmataAutoModeOptions {
+        private static final int DEFAULT_TIMEOUT = -1;
+        private static final int DEFAULT_MAXRULES = 10000;
         private static final String PRINT_TERMINAL = "terminal";
         private static final String PRINT_DISABLE = "disable";
         private static final String KEY_PREFIX = "?";
         private static final String MAX_RULES = KEY_PREFIX + "maxRules";
-        private static final String PATH_OF_RULE_FILE = KEY_PREFIX
-                        + "pathOfRuleFile";
-        private static final String PATH_OF_RESULT = KEY_PREFIX
-                        + "pathOfResult";
+        private static final String PATH_OF_RULE_FILE = KEY_PREFIX + "pathOfRuleFile";
+        private static final String PATH_OF_RESULT = KEY_PREFIX + "pathOfResult";
         private static final String TIMEOUT = KEY_PREFIX + "timeout";
         private static final String PRINT = KEY_PREFIX + "print";
-        private static final String SAVE_RESULTS_TO_FILE = KEY_PREFIX
-                        + "saveProofToFile";
+        private static final String SAVE_RESULTS_TO_FILE = KEY_PREFIX + "saveProofToFile";
         private static final String FILE_FOR_AXIOMS = KEY_PREFIX + "axioms";
         private static final String FILE_FOR_DEFINITION = KEY_PREFIX +"signature";
 
@@ -43,12 +42,12 @@ public class LemmataAutoModeOptions {
          * The time out for each proof. If <code>timeout<0</code> no time out is
          * used.
          */
-        private long timeout = -1;
+        private long timeout = DEFAULT_TIMEOUT;
 
         /**
          * The maximum number of rules that are used within a proof.
          */
-        private int maxRules = 10000;
+        private int maxRules = DEFAULT_MAXRULES;
 
         private String pathOfResult = "";
         
@@ -85,7 +84,8 @@ public class LemmataAutoModeOptions {
                         String internalVersion, String homePath) {
                 this.internalVersion = internalVersion;
                 if (options.isEmpty()) {
-                        throwError("No parameters are specified");
+                    printUsage();
+                    throwError("No parameters were specified");
                 }
                 if (!options.getFirst().equals(PATH_OF_RULE_FILE)) {
                         options.addFirst(PATH_OF_RULE_FILE);
@@ -230,6 +230,24 @@ public class LemmataAutoModeOptions {
 
         public Collection<String> getFilesForAxioms() {
                 return filesForAxioms;
+        }
+
+        public static void printUsage() {
+            System.out.println("The 'justifyrules' command has a number options you can set.");
+            System.out.println("Provide the option name and the value as separate arguments.");
+            System.out.println(" ?print           where to send output (use 'terminal' or 'disable')");
+            System.out.println(" ?maxRules        the maximum number of rule application to perform ");
+            System.out.println("                    (default: " + DEFAULT_MAXRULES + ")");
+            System.out.println(" ?pathOfRuleFile  the file to load the rules from");
+            System.out.println(" ?pathOfResult    the folder to store proofs to");
+            System.out.println(" ?timeout         the timeout in ms (default: " + DEFAULT_TIMEOUT +")");
+            System.out.println(" ?saveProofToFile flag to save or drop proofs (use 'true'/'false'),"); 
+            System.out.println("                    (then stored to path given by ?pathOfResult)");
+            System.out.println(" ?signature       file to read definitions from");
+            System.out.println();
+            System.out.println("If first argument does not start with '?', an implicit leading");
+            System.out.println("?pathOfRuleFile is assumed. For further information see the help");
+            System.out.println("for the dialog reached under \"File > Prove > Userdefined Taclets\"");
         }
 
 }

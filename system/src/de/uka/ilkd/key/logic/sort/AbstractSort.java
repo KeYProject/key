@@ -115,4 +115,8 @@ public abstract class AbstractSort implements Sort {
     public final String toString() {
         return name.toString();
     }
+
+    public String declarationString() {
+        return name.toString();
+    }
 }

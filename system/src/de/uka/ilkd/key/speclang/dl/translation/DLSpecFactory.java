@@ -10,6 +10,9 @@
 
 package de.uka.ilkd.key.speclang.dl.translation;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
@@ -18,14 +21,25 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.ClassInvariantImpl;
+import de.uka.ilkd.key.speclang.ContractFactory;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 
 /**
@@ -75,7 +89,7 @@ public final class DLSpecFactory {
 	    if(!(eu.lhs() instanceof ProgramVariable)) {
 		throw new ProofInputException("Program variable expected, "
 				              + "but found: " + eu.lhs());
-	    } else if(!update.sub(0).equals(TB.heap(services))) {
+	    } else if(!update.sub(0).equals(TB.getBaseHeap(services))) {
 		throw new ProofInputException("heap expected, "
 					      + "but found: " + update.sub(0));
 	    } else {
@@ -115,7 +129,7 @@ public final class DLSpecFactory {
     }
 
     
-    private ProgramMethod extractProgramMethod(
+    private IProgramMethod extractProgramMethod(
 	    			UseOperationContractRule.Instantiation inst) 
     		throws ProofInputException {
 	return inst.pm;
@@ -239,7 +253,7 @@ public final class DLSpecFactory {
 	LocationVariable heapAtPreVar = extractHeapAtPre(fma);
 	ProgramVariable excVar = extractExcVar(fma);	
 	final UseOperationContractRule.Instantiation inst = extractInst(fma);
-	final ProgramMethod pm = extractProgramMethod(inst);
+	final IProgramMethod pm = extractProgramMethod(inst);
 	final Modality modality = extractModality(inst);
 	final ProgramVariable selfVar = pm.isConstructor() 
 	                                ? extractResultVar(inst) 
@@ -262,13 +276,18 @@ public final class DLSpecFactory {
 	    }
 	}
 	
+	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	//heapAtPre variable may be omitted
 	if(heapAtPreVar == null) {
-	    heapAtPreVar = TB.heapAtPreVar(services, "heapAtPre", false);
+	    heapAtPreVar = TB.heapAtPreVar(services, heapLDT.getHeap() + "AtPre", heapLDT.getHeap().sort(), false);
 	}
+        Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
+        atPreVars.put(heapLDT.getHeap(), heapAtPreVar);
+        Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
+        mods.put(heapLDT.getHeap(), modifies);
 
 	//result variable may be omitted
-	if(resultVar == null && pm.getKeYJavaType() != null) {
+	if(resultVar == null && !pm.isVoid()) {
 	    resultVar = TB.resultVar(services, pm, false);
 	}
 
@@ -286,7 +305,13 @@ public final class DLSpecFactory {
 		                + modality + "; please use #catchAll block");
 	    }
 	}
-	
+
+        Map<LocationVariable,Term> pres = new LinkedHashMap<LocationVariable,Term>();
+        pres.put(heapLDT.getHeap(), pre);
+
+        Map<LocationVariable,Term> posts = new LinkedHashMap<LocationVariable,Term>();
+        posts.put(heapLDT.getHeap(), post);
+      	
 	final boolean isLibraryClass 
 		= ((TypeDeclaration)pm.getContainerType() 
 			              .getJavaType()).isLibraryClass();
@@ -294,15 +319,16 @@ public final class DLSpecFactory {
 					 pm.getContainerType(),		
 					 pm, 
 					 modality, 
-					 pre,
-					 null,//measured_by in DL contracts not supported yet					 
-					 post, 
-					 modifies, 
+					 pres,
+					 null,// TODO measured_by in DL contracts not supported yet
+					 posts, 
+					 mods, 
+					 true, // TODO strictly pure in DL contracts not supported yet
 					 selfVar, 
 					 paramVars, 
 					 resultVar, 
 					 excVar,
-					 heapAtPreVar,
+					 atPreVars,
 					 !isLibraryClass);
     }
 }

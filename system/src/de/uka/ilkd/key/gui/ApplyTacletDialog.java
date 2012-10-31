@@ -53,10 +53,10 @@ public abstract class ApplyTacletDialog extends JDialog {
     private JTextArea statusArea;
     private JPanel statusPanel;
 
-    public ApplyTacletDialog(ApplyTacletDialogModel[] model,
+    public ApplyTacletDialog(Frame parent, ApplyTacletDialogModel[] model,
 			     KeYMediator mediator) { 
 
-        super(mediator.mainFrame(), "Choose Taclet Instantiation", false);
+        super(parent, "Choose Taclet Instantiation", false);
 //	setSize(800,700);
 //	setLocation(70,50);
 
@@ -69,11 +69,11 @@ public abstract class ApplyTacletDialog extends JDialog {
 	mediator.requestModalAccess(this); 
 	addWindowListener(new WindowAdapter() {
 		public void windowClosed(WindowEvent e) {
-		    ApplyTacletDialog.this.closeDlg();		    
+		    //ApplyTacletDialog.this.closeDlg();		    
 		}
 
 		public void windowClosing(WindowEvent e) {
-		    ApplyTacletDialog.this.closeDlg();
+		    //ApplyTacletDialog.this.closeDlg();
 		}
 	    });
     }

@@ -9,31 +9,25 @@
 //
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
-import java.util.Iterator;
+import java.util.*;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.speclang.PositionedString;
-
-
 
 /**
  * A JML specification case (i.e., more or less an operation contract) in 
- * textual form.
+ * textual form. Is also used for block contracts.
  */
 public final class TextualJMLSpecCase extends TextualJMLConstruct {
-
+   
     private final Behavior behavior;
     private PositionedString workingSpace = null;
-    private ImmutableList<PositionedString> requires =
-            ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> measuredBy =
             ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> assignable =
-            ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> accessible =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> ensures =
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> signals =
             ImmutableSLList.<PositionedString>nil();
@@ -43,19 +37,32 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> depends =
             ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> secureFor =
+    private ImmutableList<PositionedString> breaks =
             ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> declassify =
+    private ImmutableList<PositionedString> continues =
             ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> declassifyVar =
+    private ImmutableList<PositionedString> returns =
             ImmutableSLList.<PositionedString>nil();
 
+    private Map<String, ImmutableList<PositionedString>>
+      assignables = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+
+    private Map<String, ImmutableList<PositionedString>>
+      requires = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+
+    private Map<String, ImmutableList<PositionedString>>
+      ensures = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
     public TextualJMLSpecCase(ImmutableList<String> mods,
                               Behavior behavior) {
         super(mods);
         assert behavior != null;
         this.behavior = behavior;
+        for(Name hName : HeapLDT.VALID_HEAP_NAMES) {
+          assignables.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+          requires.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+          ensures.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+        }
     }
 
 
@@ -63,16 +70,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         this.name = n.text;
     }
 
-
     public void addRequires(PositionedString ps) {
-        requires = requires.append(ps);
+        addGeneric(requires, ps);
     }
 
 
     public void addRequires(ImmutableList<PositionedString> l) {
-        requires = requires.append(l);
+        for(PositionedString ps : l) {
+           addRequires(ps);
+        }
     }
-
 
     public void addMeasuredBy(PositionedString ps) {
         measuredBy = measuredBy.append(ps);
@@ -85,14 +92,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public void addAssignable(PositionedString ps) {
-        assignable = assignable.append(ps);
+        addGeneric(assignables, ps);
     }
-
-
-    public void addAssignable(ImmutableList<PositionedString> l) {
-        assignable = assignable.append(l);
-    }
-
 
     public void addAccessible(PositionedString ps) {
         accessible = accessible.append(ps);
@@ -105,12 +106,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public void addEnsures(PositionedString ps) {
-        ensures = ensures.append(ps);
+        addGeneric(ensures, ps);
     }
 
 
     public void addEnsures(ImmutableList<PositionedString> l) {
-        ensures = ensures.append(l);
+        for(PositionedString ps : l) {
+           addEnsures(ps);
+        }
     }
 
 
@@ -134,36 +137,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public void addSecureFor(PositionedString ps) {
-        secureFor = secureFor.append(ps);
-    }
-
-
-    public void addSecureFor(ImmutableList<PositionedString> l) {
-        secureFor = secureFor.append(l);
-    }
-
-
-    public void addDeclassify(PositionedString ps) {
-        declassify = declassify.append(ps);
-    }
-
-
-    public void addDeclassify(ImmutableList<PositionedString> l) {
-        declassify = declassify.append(l);
-    }
-
-
-    public void addDeclassifyVar(PositionedString ps) {
-        declassifyVar = declassifyVar.append(ps);
-    }
-
-
-    public void addDeclassifyVar(ImmutableList<PositionedString> l) {
-        declassifyVar = declassifyVar.append(l);
-    }
-
-
     public void setWorkingSpace(PositionedString ps) {
         workingSpace = ps;
     }
@@ -178,6 +151,36 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         depends = depends.append(ps);
     }
 
+    
+    public void addBreaks(PositionedString ps) {
+        breaks = breaks.append(ps);
+    }
+
+
+    public void addBreaks(ImmutableList<PositionedString> l) {
+        breaks = breaks.append(l);
+    }
+
+
+    public void addContinues(PositionedString ps) {
+        continues = continues.append(ps);
+    }
+
+
+    public void addContinues(ImmutableList<PositionedString> l) {
+        continues = continues.append(l);
+    }
+
+
+    public void addReturns(PositionedString ps) {
+        returns = returns.append(ps);
+    }
+
+
+    public void addReturns(ImmutableList<PositionedString> l) {
+        returns = returns.append(l);
+    }
+
 
     public Behavior getBehavior() {
         return behavior;
@@ -185,9 +188,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public ImmutableList<PositionedString> getRequires() {
-        return requires;
+        return requires.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
 
+    public ImmutableList<PositionedString> getRequires(String hName) {
+        return requires.get(hName);
+    }
 
     public ImmutableList<PositionedString> getMeasuredBy() {
         return measuredBy;
@@ -195,9 +201,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public ImmutableList<PositionedString> getAssignable() {
-        return assignable;
+        return assignables.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
 
+    public ImmutableList<PositionedString> getAssignable(String hName) {
+        return assignables.get(hName);
+    }
 
     public ImmutableList<PositionedString> getAccessible() {
         return accessible;
@@ -205,7 +214,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
 
     public ImmutableList<PositionedString> getEnsures() {
-        return ensures;
+        return ensures.get(HeapLDT.BASE_HEAP_NAME.toString());
+    }
+
+    public ImmutableList<PositionedString> getEnsures(String hName) {
+        return ensures.get(hName);
     }
 
 
@@ -239,18 +252,18 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public ImmutableList<PositionedString> getSecureFor() {
-        return secureFor;
+    public ImmutableList<PositionedString> getBreaks() {
+        return breaks;
     }
 
 
-    public ImmutableList<PositionedString> getDeclassify() {
-        return declassify;
+    public ImmutableList<PositionedString> getContinues() {
+        return continues;
     }
 
 
-    public ImmutableList<PositionedString> getDeclassifyVar() {
-        return declassifyVar;
+    public ImmutableList<PositionedString> getReturns() {
+        return returns;
     }
 
 
@@ -260,21 +273,27 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         Iterator<PositionedString> it;
 
         sb.append(behavior).append("\n");
-        it = requires.iterator();
-        while (it.hasNext()) {
-            sb.append("requires: ").append(it.next()).append("\n");
+        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+          it = requires.get(h.toString()).iterator();
+          while(it.hasNext()) {
+            sb.append("requires<"+h+">: " + it.next() + "\n");
+          }
         }
-        it = assignable.iterator();
-        while (it.hasNext()) {
-            sb.append("assignable: ").append(it.next()).append("\n");
+        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+          it = assignables.get(h.toString()).iterator();
+          while(it.hasNext()) {
+            sb.append("assignable<"+h+">: " + it.next() + "\n");
+          }
         }
         it = accessible.iterator();
         while (it.hasNext()) {
             sb.append("accessible: " + it.next() + "\n");
         }
-        it = ensures.iterator();
-        while (it.hasNext()) {
-            sb.append("ensures: ").append(it.next()).append("\n");
+        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+          it = ensures.get(h.toString()).iterator();
+          while(it.hasNext()) {
+            sb.append("ensures<"+h+">: " + it.next() + "\n");
+          }
         }
         it = signals.iterator();
         while (it.hasNext()) {
@@ -292,19 +311,18 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("depends: ").append(it.next()).append("\n");
         }
-        it = secureFor.iterator();
+        it = breaks.iterator();
         while (it.hasNext()) {
-            sb.append("saveFor: ").append(it.next()).append("\n");
+            sb.append("breaks: ").append(it.next()).append("\n");
         }
-        it = declassify.iterator();
+        it = continues.iterator();
         while (it.hasNext()) {
-            sb.append("declassify: ").append(it.next()).append("\n");
+            sb.append("continues: ").append(it.next()).append("\n");
         }
-        it = declassifyVar.iterator();
+        it = returns.iterator();
         while (it.hasNext()) {
-            sb.append("declassifyVar: ").append(it.next()).append("\n");
+            sb.append("returns: ").append(it.next()).append("\n");
         }
-
         return sb.toString();
     }
 
@@ -318,16 +336,16 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return mods.equals(sc.mods)
                && behavior.equals(sc.behavior)
                && requires.equals(sc.requires)
-               && assignable.equals(sc.assignable)
+               && assignables.equals(sc.assignables)
                && accessible.equals(sc.accessible)
                && ensures.equals(sc.ensures)
                && signals.equals(sc.signals)
                && signalsOnly.equals(sc.signalsOnly)
                && diverges.equals(sc.diverges)
                && depends.equals(sc.depends)
-               && secureFor.equals(sc.secureFor)
-               && declassify.equals(sc.declassify)
-               && declassifyVar.equals(sc.declassifyVar);
+               && breaks.equals(sc.breaks)
+               && continues.equals(sc.continues)
+               && returns.equals(sc.returns);
     }
 
 
@@ -336,15 +354,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return mods.hashCode()
                + behavior.hashCode()
                + requires.hashCode()
-               + assignable.hashCode()
+               + assignables.hashCode()
                + accessible.hashCode()
                + ensures.hashCode()
                + signals.hashCode()
                + signalsOnly.hashCode()
                + diverges.hashCode()
                + depends.hashCode()
-               + secureFor.hashCode()
-               + declassify.hashCode()
-               + declassifyVar.hashCode();
+               + breaks.hashCode()
+               + continues.hashCode()
+               + returns.hashCode();
     }
 }

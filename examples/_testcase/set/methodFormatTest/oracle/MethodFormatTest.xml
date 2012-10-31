@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="MethodFormatTest.main();" pathCondition="true" pathConditionChanged="false">
+      <statement name="return a();" pathCondition="true" pathConditionChanged="false">
+         <methodCall name="MethodFormatTest.a();" pathCondition="true" pathConditionChanged="false">
+            <statement name="return b();" pathCondition="true" pathConditionChanged="false">
+               <methodCall name="MethodFormatTest.b();" pathCondition="true" pathConditionChanged="false">
+                  <statement name="return c();" pathCondition="true" pathConditionChanged="false">
+                     <methodCall name="MethodFormatTest.c();" pathCondition="true" pathConditionChanged="false">
+                        <statement name="return d();" pathCondition="true" pathConditionChanged="false">
+                           <methodCall name="MethodFormatTest.d();" pathCondition="true" pathConditionChanged="false">
+                              <statement name="return e();" pathCondition="true" pathConditionChanged="false">
+                                 <methodCall name="MethodFormatTest.e();" pathCondition="true" pathConditionChanged="false">
+                                    <statement name="return f();" pathCondition="true" pathConditionChanged="false">
+                                       <methodCall name="MethodFormatTest.f();" pathCondition="true" pathConditionChanged="false">
+                                          <statement name="return g();" pathCondition="true" pathConditionChanged="false">
+                                             <methodCall name="MethodFormatTest.g();" pathCondition="true" pathConditionChanged="false">
+                                                <statement name="return 42;" pathCondition="true" pathConditionChanged="false">
+                                                   <methodReturn name="&lt;return of MethodFormatTest.g();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.g();&gt;">
+                                                      <methodReturn name="&lt;return of MethodFormatTest.f();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.f();&gt;">
+                                                         <methodReturn name="&lt;return of MethodFormatTest.e();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.e();&gt;">
+                                                            <methodReturn name="&lt;return of MethodFormatTest.d();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.d();&gt;">
+                                                               <methodReturn name="&lt;return of MethodFormatTest.c();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.c();&gt;">
+                                                                  <methodReturn name="&lt;return of MethodFormatTest.b();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.b();&gt;">
+                                                                     <methodReturn name="&lt;return of MethodFormatTest.a();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.a();&gt;">
+                                                                        <methodReturn name="&lt;return of MethodFormatTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of MethodFormatTest.main();&gt;">
+                                                                           <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                                                                           </termination>
+                                                                        </methodReturn>
+                                                                     </methodReturn>
+                                                                  </methodReturn>
+                                                               </methodReturn>
+                                                            </methodReturn>
+                                                         </methodReturn>
+                                                      </methodReturn>
+                                                   </methodReturn>
+                                                </statement>
+                                             </methodCall>
+                                          </statement>
+                                       </methodCall>
+                                    </statement>
+                                 </methodCall>
+                              </statement>
+                           </methodCall>
+                        </statement>
+                     </methodCall>
+                  </statement>
+               </methodCall>
+            </statement>
+         </methodCall>
+      </statement>
+   </methodCall>
+</startNode>

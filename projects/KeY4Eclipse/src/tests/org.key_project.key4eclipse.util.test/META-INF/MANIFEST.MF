@@ -1,0 +1,34 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KeY Project Utilities Tests
+Bundle-SymbolicName: org.key_project.util.test;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.util.test.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.ui.navigator.resources;bundle-version="3.4.300",
+ org.eclipse.ui.ide;bundle-version="3.6.2",
+ org.eclipse.core.resources;bundle-version="3.6.1",
+ org.eclipse.jdt.core;bundle-version="3.6.2",
+ org.eclipse.jdt.ui;bundle-version="3.6.2",
+ org.junit4;bundle-version="4.8.1",
+ org.eclipse.swtbot.go;bundle-version="2.0.4",
+ org.key_project.swtbot.swing;bundle-version="1.0.0",
+ org.key_project.key4eclipse;bundle-version="1.0.0",
+ org.key_project.util;bundle-version="1.0.0",
+ org.eclipse.graphiti;bundle-version="0.8.1",
+ org.eclipse.graphiti.examples.common;bundle-version="0.8.1",
+ org.eclipse.graphiti.examples.tutorial;bundle-version="0.8.1",
+ org.eclipse.graphiti.ui;bundle-version="0.8.1",
+ org.eclipse.emf.transaction;bundle-version="1.4.0",
+ org.eclipse.ui.views.properties.tabbed;bundle-version="3.5.200",
+ org.eclipse.gef;bundle-version="3.7.1"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: KeY Project
+Export-Package: org.key_project.util.test.editor,
+ org.key_project.util.test.perspective,
+ org.key_project.util.test.suite,
+ org.key_project.util.test.suite.swtbot,
+ org.key_project.util.test.util,
+ org.key_project.util.test.view

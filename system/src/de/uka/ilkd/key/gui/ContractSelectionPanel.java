@@ -116,9 +116,16 @@ class ContractSelectionPanel extends JPanel {
 		//set border
 		TitledBorder border = new TitledBorder(
 				BorderFactory.createEtchedBorder(),
-                                contract.getName());
-		border.setTitleFont(border.getTitleFont()
-					  .deriveFont(Font.BOLD));
+                                contract.getDisplayName());
+
+                Font borderFont = border.getTitleFont();
+                if (borderFont == null) { // MS Windows issues
+                    borderFont = result.getFont();
+                    if (borderFont == null) {
+                        borderFont = PLAINFONT;
+                    }
+                }
+		border.setTitleFont(borderFont.deriveFont(Font.BOLD));
 		result.setBorder(border);
 		
 		return result;
@@ -138,7 +145,7 @@ class ContractSelectionPanel extends JPanel {
     //public interface
     //-------------------------------------------------------------------------
     
-    public void addMouseListener(MouseListener ml) {
+    public synchronized void addMouseListener(MouseListener ml) {
         contractList.addMouseListener(ml);
     }
     

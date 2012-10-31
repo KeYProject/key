@@ -11,9 +11,9 @@
 package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
 /**
@@ -43,7 +43,7 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
         if ( op instanceof Quantifier ) return false;
 
         if ( op instanceof Modality ) return true;
-        if ( considerQueries && op instanceof ProgramMethod ) return true;
+        if ( considerQueries && op instanceof IProgramMethod ) return true;
         
         for ( int i = 0; i != op.arity (); ++i ) {
             final boolean res = filter ( t.sub ( i ) );

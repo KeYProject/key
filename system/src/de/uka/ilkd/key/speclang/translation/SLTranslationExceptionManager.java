@@ -119,6 +119,16 @@ public class SLTranslationExceptionManager {
                                           createAbsolutePosition(t.getLine(),
                                                                  t.getColumn()));
     }
+
+    /**
+     * Creates an SLTranslationException with current absolute position 
+     * information.
+     */
+    public SLTranslationException createException(String message, Throwable cause){
+        SLTranslationException result = createException(message);
+        result.initCause(cause);
+        return result;
+    }
     
     /**
      * Creates an SLTranslationException with the position information of the
@@ -142,7 +152,10 @@ public class SLTranslationExceptionManager {
                                       fileName, 
                                       getPosition());
     }
-
+    
+    public SLTranslationException createWarningException(String message, Token t) {
+        return new SLWarningException(new PositionedString(message, t));
+    }
     
     /**
      * Converts an ANTLRException into an SLTranslationException with the same

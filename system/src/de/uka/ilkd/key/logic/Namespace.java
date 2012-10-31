@@ -15,6 +15,7 @@ import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 
 
 /**
@@ -108,6 +109,15 @@ public class Namespace implements java.io.Serializable {
         }
     }
     
+    public void remove(Name name){
+    	if(symbols != null && symbols.containsKey(name)){
+    		symbols.remove(name);
+    	}
+       	if(protocol != null && protocol.containsKey(name)){
+    		protocol.remove(name);
+    	}
+    }
+    
     /** Adds the object <code>sym</code> to this namespace. 
      * Throws a runtime exception if an object with the same name is 
      * already there. */
@@ -183,6 +193,11 @@ public class Namespace implements java.io.Serializable {
 	}
     }
     
+    /** Convenience method to look up. */
+    public Named lookup(String name){
+        return lookup(new Name(name));
+    }
+    
     /** returns list of the elements (not the keys) in this
      * namespace (not about the one of the parent)
      * @return the list of the named objects
@@ -241,6 +256,12 @@ public class Namespace implements java.io.Serializable {
         }
     }
 
+    public <T extends Named> void addSafely(ImmutableSet<T> names) {
+        for (Named name : names) {
+            addSafely(name);
+        }
+    }
+    
     public Namespace copy() {
 	Namespace copy;
 	if(protocol != null){
@@ -260,5 +281,10 @@ public class Namespace implements java.io.Serializable {
 	symbols=null;	
 	localSym=null;
 	numLocalSyms=0;
+    }
+    
+    public <T extends Named> void set(ImmutableSet<T> names) {
+        reset();
+        addSafely(names);
     }
 }

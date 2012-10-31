@@ -11,30 +11,41 @@
 package de.uka.ilkd.key.smt;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.*;
 
-public class RuleAppSMT implements RuleApp {
+/**
+ * The rule application that is used when a goal is closed by means of an external solver. So far 
+ * it stores the rule that that has been used and a title containing some information for the user.
+ */
+public class RuleAppSMT extends AbstractBuiltInRuleApp { 
 
-    private final static SMTRule rule = new SMTRule();
-    private String title;
+    public final static SMTRule rule = new SMTRule();
+    private final String title;
 
-    public RuleAppSMT(Goal goal, String title) {
-	this.title = title;
-	goal.proof().env().getJustifInfo().addJustification(rule,
-	        new RuleJustification() {
 
-		    @Override
-		    public boolean isAxiomJustification() {
-		        return false;
-		    }
-	        });
+    RuleAppSMT( SMTRule rule, PosInOccurrence pio ) {
+    	this(rule, pio,  null, "SMT Rule App");
+    }
+
+    private RuleAppSMT(SMTRule rule, PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts, String title) {
+        super(rule, pio, ifInsts);
+        this.title = title;
+    }
+
+    
+    private RuleAppSMT(SMTRule rule, String title) {
+    	super(rule, null);
+    	this.title = title;
+    }
+    
+	public RuleAppSMT replacePos(PosInOccurrence newPos) {
+	    return this;
     }
 
     @Override
@@ -42,16 +53,9 @@ public class RuleAppSMT implements RuleApp {
 	return true;
     }
 
-    @Override
-    public ImmutableList<Goal> execute(Goal goal, Services services) {
-	goal.addAppliedRuleApp(this);
-
-	goal.split(1);
-
-	goal.proof().closeGoal(goal);
-	goal.node().getNodeInfo().setBranchLabel(title);
-	return null;
-    }
+    public String getTitle() {
+		return title;
+	}
 
     @Override
     public PosInOccurrence posInOccurrence() {
@@ -59,14 +63,19 @@ public class RuleAppSMT implements RuleApp {
     }
 
     @Override
-    public Rule rule() {
+    public BuiltInRule rule() {
 
 	return rule;
     }
 
-    private static class SMTRule implements BuiltInRule {
+    public static class SMTRule implements BuiltInRule {
 	private Name name = new Name("SMTRule");
 
+	public RuleAppSMT createApp( PosInOccurrence pos ) {
+		return new RuleAppSMT( this, pos );
+	}
+
+	
 	@Override
 	public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 	    return false;
@@ -75,7 +84,21 @@ public class RuleAppSMT implements RuleApp {
 	@Override
 	public ImmutableList<Goal> apply(Goal goal, Services services,
 	        RuleApp ruleApp) {
-	    return null;
+		if (goal.proof().env().getJustifInfo().getJustification(rule) == null) {
+			goal.proof().env().getJustifInfo().addJustification(rule,
+					new RuleJustification() {
+
+				@Override
+				public boolean isAxiomJustification() {
+					return false;
+				}
+			});
+		}
+
+		goal.split(1);	
+		RuleAppSMT app = (RuleAppSMT) ruleApp;
+		goal.setBranchLabel(app.getTitle());
+	    return ImmutableSLList.<Goal>nil();
 	}
 
 	@Override
@@ -92,6 +115,21 @@ public class RuleAppSMT implements RuleApp {
 	    return name;
 	}
 
+    }
+
+	public RuleAppSMT setTitle(String title) {
+	    return new RuleAppSMT(rule, title);
+    }
+
+    @Override
+    public RuleAppSMT setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
+        setMutable(ifInsts);
+        return this;
+    }
+
+    @Override
+    public RuleAppSMT tryToInstantiate(Goal goal) {
+        return this;
     }
 
 }
