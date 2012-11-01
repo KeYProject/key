@@ -1,3 +1,13 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License.
+// See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.gui.macros;
 
 import java.util.Arrays;
@@ -91,6 +101,9 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         return false;
     }
 
+    /*
+     * Checks if a rule is marked as not suited for interaction.
+     */
     private static boolean isNonHumanInteractionTagged(Rule rule, Services services) {
         if (rule instanceof Taclet) {
             Taclet taclet = (Taclet) rule;
@@ -122,8 +135,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            // TODO it this sensible?
-            return true;
+            return computeCost(app, pio, goal) != TopRuleAppCost.INSTANCE;
         }
 
         @Override
