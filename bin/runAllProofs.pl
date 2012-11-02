@@ -304,7 +304,7 @@ sub reloadFile {
 	return;
     }
 
-    my $command = $absolute_bin_path . "/runProver --auto_loadonly $dk";
+    my $command = $absolute_bin_path . "/runProver --auto-loadonly $dk";
     # print "Command is: $command\n";
     my $result = &system_timeout($time_limit, $command);
 #    print "\nReturn value: $result\n";
