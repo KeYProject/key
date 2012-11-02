@@ -725,7 +725,9 @@ public final class UseOperationContractRule implements BuiltInRule {
                                 	     	             post}))));
        
         // prepare information flow analysis
-        assert anonUpdateDatas.size() == 1; // information flow extension is at the moment not compatible to non-base-heap setting
+        assert anonUpdateDatas.size() == 1; // information flow extension is at
+                                            // the moment not compatible with
+                                            // the non-base-heap setting
         Term contractApplPredTerm =
                 storePrePostInPredAndGenInfoFlowTaclet(inst,
                                                        anonUpdateDatas.head(),
@@ -733,7 +735,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                        contractResult,
                                                        TB.var(excVar),
                                                        goal, services);
-        
+
         //create "Pre" branch
 	int i = 0;
 	for(Term arg : contractParams) {
@@ -1013,7 +1015,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                                 IProgramMethod pm,
                                                 Services services) {
         Name tacletName =
-                MiscTools.toValidTacletName("use information flow contract for "
+                MiscTools.toValidTacletName("Use information flow contract for "
                 + pm.getFullName());
         ObserverWithType target =
                 new ObserverWithType(pm.getContainerType(), pm);
@@ -1048,7 +1050,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                               ImmutableSLList.<Taclet>nil(),
                                               schemaFind);
         tacletBuilder.addTacletGoalTemplate(goal);
-        tacletBuilder.addRuleSet(new RuleSet(new Name("userTaclets1")));
+        tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
         tacletBuilder.setSurviveSmbExec(true);
         return tacletBuilder.getTaclet();
     }
