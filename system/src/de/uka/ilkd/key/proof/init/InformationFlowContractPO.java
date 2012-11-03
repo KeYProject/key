@@ -30,6 +30,8 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
+import de.uka.ilkd.key.speclang.LoopInvariant;
+
 import java.util.*;
 
 
@@ -89,7 +91,22 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
 
         return TB.and(inputRelations);
     }
+    
+    private static Term buildInputRelation(LoopInvariant loopInv,
+            IFProofObligationVars vs,
+            ImmutableList<Term> referenceLocSet1,
+            ImmutableList<Term> referenceLocSet2,
+            Services services) {
+        final Term mainInputEqRelation =
+            buildMainInputEqualsRelation(loopInv, referenceLocSet1,
+                    referenceLocSet2, vs, services);        
 
+        ImmutableList<Term> inputRelations =
+            ImmutableSLList.<Term>nil();
+        inputRelations = inputRelations.append(mainInputEqRelation);
+
+        return TB.and(inputRelations);
+    }
 
     private static Term buildOutputRelation(InformationFlowContract contract,
                                             IFProofObligationVars vs,
@@ -103,7 +120,19 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
         outputRelations = outputRelations.append(mainEqRelation);
         return TB.and(outputRelations);
     }
-
+    
+    private static Term buildOutputRelation(LoopInvariant loopInv,
+            IFProofObligationVars vs,
+            ImmutableList<Term> referenceLocSet1,
+            ImmutableList<Term> referenceLocSet2,
+            Services services) {
+        Term mainEqRelation =
+            buildMainOutputEqualsRelation(loopInv, referenceLocSet1,
+                    referenceLocSet2, vs, services);
+        ImmutableList<Term> outputRelations = ImmutableSLList.<Term>nil();
+        outputRelations = outputRelations.append(mainEqRelation);
+        return TB.and(outputRelations);
+    }
 
     private Term buildExecution(ProofObligationVars c,
                                 Map<Term, Term> vsMap,
@@ -119,30 +148,29 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
         return TB.applyElementary(services, c.heap, renamedExec);
     }
 
-
     private static Term buildInputOutputRelations(InformationFlowContract contract,
                                                   IFProofObligationVars vs,
                                                   Services services) {
         ImmutableList<ImmutableList<Term>> respectsAtPre1 =
                 contract.getRespects(vs.c1.heapAtPre, vs.c1.self, vs.c1.params,
-                                     vs.c1.resultAtPost, services);
+                                     vs.c1.resultsAtPost.head(), services);
         ImmutableList<ImmutableList<Term>> respectsAtPre2 =
                 contract.getRespects(vs.c2.heapAtPre, vs.c2.self, vs.c2.params,
-                                     vs.c2.resultAtPost, services);
+                                     vs.c2.resultsAtPost.head(), services);
         ImmutableList<ImmutableList<Term>> respectsAtPost1 =
                 contract.getRespects(vs.c1.heapAtPost, vs.c1.selfAtPost, vs.c1.params,
-                                     vs.c1.resultAtPost, services);
+                                     vs.c1.resultsAtPost.head(), services);
         ImmutableList<ImmutableList<Term>> respectsAtPost2 =
                 contract.getRespects(vs.c2.heapAtPost, vs.c2.selfAtPost, vs.c2.params,
-                                     vs.c2.resultAtPost, services);
+                                     vs.c2.resultsAtPost.head(), services);
 
 
         ImmutableList<ImmutableList<Term>> declassClause1 =
                 contract.getDeclassifies(vs.c1.heapAtPre, vs.c1.self, vs.c1.params,
-                                       vs.c1.resultAtPost, services);
+                                       vs.c1.resultsAtPost.head(), services);
         ImmutableList<ImmutableList<Term>> declassClause2 =
                 contract.getDeclassifies(vs.c2.heapAtPre, vs.c2.self, vs.c2.params,
-                                       vs.c2.resultAtPost, services);
+                                       vs.c2.resultsAtPost.head(), services);
 
         ImmutableList<Term> inputOutputRelations = ImmutableSLList.<Term>nil();
 
@@ -166,7 +194,44 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
 
         return TB.and(inputOutputRelations);
     }
+    
+    private static Term buildInputOutputRelations(LoopInvariant loopInv,
+            IFProofObligationVars vs,
+            Services services) {
+        ImmutableList<ImmutableList<Term>> respectsAtPre1 =
+            loopInv.getRespects(vs.c1.heapAtPre, vs.c1.self,
+                    vs.c1.params, services);
+        ImmutableList<ImmutableList<Term>> respectsAtPre2 =
+            loopInv.getRespects(vs.c2.heapAtPre, vs.c2.self,
+                    vs.c2.params, services);
+        ImmutableList<ImmutableList<Term>> respectsAtPost1 =
+            loopInv.getRespects(vs.c1.heapAtPost, vs.c1.selfAtPost,
+                    vs.c1.params, services);
+        ImmutableList<ImmutableList<Term>> respectsAtPost2 =
+            loopInv.getRespects(vs.c2.heapAtPost, vs.c2.selfAtPost,
+                    vs.c2.params, services);
 
+
+        ImmutableList<Term> inputOutputRelations = ImmutableSLList.<Term>nil();
+
+        Iterator<ImmutableList<Term>> respectsAtPre2It = respectsAtPre2.iterator();
+        Iterator<ImmutableList<Term>> respectsAtPost1It = respectsAtPost1.iterator();
+        Iterator<ImmutableList<Term>> respectsAtPost2It = respectsAtPost2.iterator();
+        for (ImmutableList<Term> referenceLocSetAtPre1 : respectsAtPre1) {
+            ImmutableList<Term> referenceLocSetAtPre2 = respectsAtPre2It.next();
+            ImmutableList<Term> referenceLocSetAtPost1 = respectsAtPost1It.next();
+            ImmutableList<Term> referenceLocSetAtPost2 = respectsAtPost2It.next();
+            Term inputOutputRelation =
+                buildInputOutputRelation(loopInv, referenceLocSetAtPre1,
+                        referenceLocSetAtPre2,
+                        referenceLocSetAtPost1,
+                        referenceLocSetAtPost2, vs, services);
+            inputOutputRelations =
+                inputOutputRelations.append(inputOutputRelation);
+        }
+
+        return TB.and(inputOutputRelations);
+    }
 
     private static Term buildInputOutputRelation(InformationFlowContract contract,
                                                  ImmutableList<Term> referenceLocSetAtPre1,
@@ -187,7 +252,23 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
 
         return TB.imp(inputRelation, outputRelation);
     }
+    
+    private static Term buildInputOutputRelation(LoopInvariant loopInv,
+            ImmutableList<Term> referenceLocSetAtPre1,
+            ImmutableList<Term> referenceLocSetAtPre2,
+            ImmutableList<Term> referenceLocSetAtPost1,
+            ImmutableList<Term> referenceLocSetAtPost2,
+            IFProofObligationVars vs,
+            Services services) {
+        Term inputRelation =
+            buildInputRelation(loopInv, vs, referenceLocSetAtPre1,
+                    referenceLocSetAtPre2, services);
+        Term outputRelation =
+            buildOutputRelation(loopInv, vs, referenceLocSetAtPost1,
+                    referenceLocSetAtPost2, services);
 
+        return TB.imp(inputRelation, outputRelation);
+    }
 
     private static Term buildMainInputEqualsRelation(InformationFlowContract contract,
                                                      ImmutableList<Term> referenceLocSet1,
@@ -216,7 +297,7 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
 //                                TB.intersect(services, refLoc2Term,
 //                                             framingLocs2));
 //            } else {
-                SearchVisitor search = new SearchVisitor(vs.c1.resultAtPost);
+                SearchVisitor search = new SearchVisitor(vs.c1.resultsAtPost.head());
                 refLoc1Term.execPreOrder(search);
                 if (!search.termFound) {
                     // refLocTerms which contain \result are not included in
@@ -226,6 +307,47 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
                     eqAtLocs[i] = TB.tt();
                 }
 //            }
+        }
+        return TB.and(eqAtLocs);
+    }
+    
+    private static Term buildMainInputEqualsRelation(LoopInvariant loopInv,
+            ImmutableList<Term> referenceLocSet1,
+            ImmutableList<Term> referenceLocSet2,
+            IFProofObligationVars vs,
+            Services services) {        
+        Term[] eqAtLocs = new Term[referenceLocSet1.size()];
+        Iterator<Term> refLoc1It = referenceLocSet1.iterator();
+        Iterator<Term> refLoc2It = referenceLocSet2.iterator();
+        for(int i=0; i < eqAtLocs.length; i++) {
+            Term refLoc1Term = refLoc1It.next();
+            Term refLoc2Term = refLoc2It.next();
+            //// hack ?
+            //if(refLoc1Term.sort().name().equals(services.getTypeConverter().getLocSetLDT().name())) {
+            //eqAtLocs[i] = TB.eqAtLocs(services,
+            //vs.c1.heapAtPre,
+            //TB.intersect(services, refLoc1Term,
+            //    framingLocs1),
+            //vs.c2.heapAtPre,
+            //TB.intersect(services, refLoc2Term,
+            //    framingLocs2));
+            //} else {
+            SearchVisitor[] search = new SearchVisitor[vs.c1.resultsAtPost.size()];
+            int j = 0;
+            for(Term resPost: vs.c1.resultsAtPost) {
+                search[j] = new SearchVisitor(resPost);
+                refLoc1Term.execPreOrder(search[j]);
+                eqAtLocs[i] = TB.tt();
+                if (!search[j].termFound) {
+                    // refLocTerms which contain \result are not included in
+                    // the precondition
+                    eqAtLocs[i] = TB.and(eqAtLocs[i],TB.equals(refLoc1Term, refLoc2Term));
+                } else {
+                    eqAtLocs[i] = TB.and(eqAtLocs[i],TB.tt());
+                }
+                j++;
+            }                
+            //}
         }
         return TB.and(eqAtLocs);
     }
@@ -509,7 +631,40 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
         }
         return TB.and(eqAtLocs);
     }
+    
+    private static Term buildMainOutputEqualsRelation(LoopInvariant loopInv,
+            ImmutableList<Term> referenceLocSet1,
+            ImmutableList<Term> referenceLocSet2,
+            IFProofObligationVars vs,
+            Services services) {        
+        Term framingLocs1 =
+            loopInv.getModifies(vs.c1.self, loopInv.getInternalAtPres(), services); //vs.c1.heapAtPre?
+        Term framingLocs2 =
+            loopInv.getModifies(vs.c2.self, loopInv.getInternalAtPres(), services); //vs.c2.heapAtPre?
 
+        Term[] eqAtLocs = new Term[referenceLocSet1.size()];
+        Iterator<Term> refLoc1It = referenceLocSet1.iterator();
+        Iterator<Term> refLoc2It = referenceLocSet2.iterator();
+        for(int i=0; i < eqAtLocs.length; i++) {
+            Term refLoc1Term = refLoc1It.next();
+            Term refLoc2Term = refLoc2It.next();
+            // TOTO: hack ?
+            //if(refLoc1Term.sort().name().equals(services.getTypeConverter().getLocSetLDT().name())) {
+            //eqAtLocs[i] = TB.eqAtLocsPost(services,
+            //vs.c1.heapAtPre,
+            //vs.c1.heapAtPost,
+            //TB.intersect(services, refLoc1Term,
+            //       framingLocs1),
+            //vs.c2.heapAtPre,
+            //vs.c2.heapAtPost,
+            //TB.intersect(services, refLoc2Term,
+            //       framingLocs2));
+            //} else {
+            eqAtLocs[i] = TB.equals(refLoc1Term, refLoc2Term);
+            //}
+        }
+        return TB.and(eqAtLocs);
+    }
 
     private static ImmutableList<Term> buildDeclassifiesRelations(
             ImmutableList<Term> referenceLocSet1,
@@ -683,7 +838,7 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
 //        register(t);
 //        return findTerm;
 //    }
-//    private ImmutableList<ProgramVariable> collectProgramVaribles(
+//    private ImmutableList<ProgramVariable> collectProgramVariables(
 //            IFProofObligationVars vs) {
 //        ImmutableList<ProgramVariable> progVars =
 //                ImmutableSLList.<ProgramVariable>nil();
@@ -814,52 +969,6 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
         }
         return TB.and(contractsApplications);
     }
-
-    
-//    public static Term buildContractApplication(
-//            LoopInvariant targetContracts,
-//            LoopInvariantApplicationData contAppData,
-//            LoopInvariantApplicationData contAppData2,
-//            Services services) {
-//        ProofObligationVars targetC1 =
-//                new ProofObligationVars((ProgramMethod) target.obs,
-//                                        target.kjt,
-//                                        contAppData.self,
-//                                        contAppData.self,
-//                                        contAppData.params,
-//                                        contAppData.result,
-//                                        contAppData.result,
-//                                        contAppData.heapAtPre,
-//                                        contAppData.heapAtPre,
-//                                        contAppData.heapAtPost, false,
-//                                        "", services, false);
-//        ProofObligationVars targetC2 =
-//                new ProofObligationVars((ProgramMethod) target.obs,
-//                                        target.kjt,
-//                                        contAppData2.self,
-//                                        contAppData2.self,
-//                                        contAppData2.params,
-//                                        contAppData2.result,
-//                                        contAppData2.result,
-//                                        contAppData2.heapAtPre,
-//                                        contAppData2.heapAtPre,
-//                                        contAppData2.heapAtPost, false,
-//                                        "", services, false);
-//        final IFProofObligationVars targetVs =
-//                new IFProofObligationVars(targetC1, targetC2,
-//                                          cont.getTarget(), cont.getKJT(),
-//                                          null, null);
-//
-//        Term preCond1 = cont.getPre(contAppData.heapAtPre, contAppData.self,
-//                contAppData.params, null, services);
-//        Term preCond2 = cont.getPre(contAppData2.heapAtPre,
-//                contAppData2.self, contAppData2.params, null,
-//                services);
-//
-//        Term inOutRelations = buildInputOutputRelations(cont, targetVs, services);
-//        return TB.imp(TB.and(preCond1, preCond2), inOutRelations);
-//    }
-    
     
     private static Term buildContractApplication(ObserverWithType target,
                                           InformationFlowContract cont,
@@ -899,6 +1008,47 @@ public final class InformationFlowContractPO extends AbstractOperationPO impleme
                 contAppData.params, services);
         Term preCond2 = cont.getPre(contAppData2.heapAtPre,
                 contAppData2.self, contAppData2.params, services);
+
+        Term inOutRelations = buildInputOutputRelations(cont, targetVs, services);
+        return TB.imp(TB.and(preCond1, preCond2), inOutRelations);
+    }
+    
+    public static Term buildContractApplication(
+            LoopInvariant cont,
+            LoopInvariantApplicationData contAppData,
+            LoopInvariantApplicationData contAppData2,
+            Services services) {
+        ProofObligationVars targetC1 =
+            new ProofObligationVars(contAppData.self,
+                    contAppData.self,
+                    contAppData.localIns,
+                    contAppData.localOuts,
+                    contAppData.localOuts,
+                    null, null,
+                    contAppData.heapAtPre,
+                    contAppData.heapAtPre,
+                    contAppData.heapAtPost,
+                    "", services);
+        ProofObligationVars targetC2 =
+            new ProofObligationVars(contAppData2.self,
+                    contAppData2.self,
+                    contAppData2.localIns,
+                    contAppData2.localOuts,
+                    contAppData2.localOuts,
+                    null, null,
+                    contAppData2.heapAtPre,
+                    contAppData2.heapAtPre,
+                    contAppData2.heapAtPost,
+                    "", services);
+        final IFProofObligationVars targetVs =
+            new IFProofObligationVars(targetC1, targetC2,
+                    null, null,
+                    null, null);
+
+        Term preCond1 = cont.getInvariant(contAppData.self,  //contAppData.heapAtPre?
+                                          cont.getInternalAtPres(), services);
+        Term preCond2 = cont.getInvariant(contAppData2.self, //contAppData2.heapAtPre?
+                                          cont.getInternalAtPres(), services);
 
         Term inOutRelations = buildInputOutputRelations(cont, targetVs, services);
         return TB.imp(TB.and(preCond1, preCond2), inOutRelations);

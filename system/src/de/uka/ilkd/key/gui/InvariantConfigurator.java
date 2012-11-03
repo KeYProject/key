@@ -18,6 +18,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -44,6 +45,7 @@ public class InvariantConfigurator {
     private static final int INV_IDX = 0;
     private static final int MOD_IDX = 1;
     private static final int VAR_IDX = 2;
+    private static final int RSP_IDX = 4;
     private static final String DEFAULT = "Default";
 
     private static InvariantConfigurator configurator = null;
@@ -111,11 +113,14 @@ public class InvariantConfigurator {
 
             private Term variantTerm = null;
             private Map<LocationVariable,Term> modifiesTerm = new LinkedHashMap<LocationVariable,Term>();
+            private Map<LocationVariable,ImmutableList<ImmutableList<Term>>> respectsTermList
+                = new LinkedHashMap<LocationVariable,ImmutableList<ImmutableList<Term>>>();
             private Map<LocationVariable,Term> invariantTerm = new LinkedHashMap<LocationVariable,Term>();
 
             private static final String INVARIANTTITLE = "Invariant%s: ";
             private static final String VARIANTTITLE = "Variant%s: ";
             private static final String MODIFIESTITLE = "Modifies%s: ";
+            private static final String RESPECTSTITLE = "Respects%s: ";
 
 
             /**
@@ -264,6 +269,22 @@ public class InvariantConfigurator {
                     loopInvTexts[MOD_IDX].put(heap.toString(), printTerm(modifies, false));
                   }
                 }
+                
+                loopInvTexts[RSP_IDX] = new LinkedHashMap<String,String>();
+
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+                  final ImmutableList<ImmutableList<Term>> respects = loopInv.getRespects(heap, loopInv.getInternalSelfTerm(), atPres, services);
+                
+                  if (respects == null) {                    
+                    loopInvTexts[RSP_IDX].put(heap.toString(), "noRespects");
+                  } else {
+                    for (ImmutableList<Term> tl : respects) {
+                        for (Term t : tl) {
+                            loopInvTexts[RSP_IDX].put(heap.toString(), printTerm(t, false));
+                        }
+                    }                    
+                  }
+                }
 
                 loopInvTexts[VAR_IDX] = new LinkedHashMap<String,String>();
                 final Term variant = loopInv.getVariant(loopInv.getInternalSelfTerm(), atPres, services);
@@ -325,6 +346,15 @@ public class InvariantConfigurator {
                    JTextArea textArea = createInputTextArea(title, mods.get(k), i);
                    setModifiesListener(textArea, k, i);
                    modPane.add(k, textArea);
+                }
+                
+                JTabbedPane respPane = new JTabbedPane(JTabbedPane.BOTTOM);
+                Map<String,String> resps = invariants.get(i)[RSP_IDX];
+                for(String k : resps.keySet()) {
+                   String title = String.format(RESPECTSTITLE, k.equals(HeapLDT.BASE_HEAP_NAME.toString()) ? "" : "["+k+"]");
+                   JTextArea textArea = createInputTextArea(title, resps.get(k), i);
+                   setRespectsListener(textArea, k, i);
+                   respPane.add(k, textArea);
                 }
 
                 JTextArea vararea = createInputTextArea(String.format(VARIANTTITLE,""),
@@ -412,6 +442,24 @@ public class InvariantConfigurator {
 
                     public void changedUpdate(DocumentEvent e) {
                         modUdatePerformed(e, key);
+                    }
+                });
+            }
+            
+            private void setRespectsListener(JTextArea ta, final String key, int i) {
+                index = i;
+                ta.getDocument().addDocumentListener(new DocumentListener() {
+
+                    public void removeUpdate(DocumentEvent e) {
+                        respUdatePerformed(e, key);
+                    }
+
+                    public void insertUpdate(DocumentEvent e) {
+                        respUdatePerformed(e, key);
+                    }
+
+                    public void changedUpdate(DocumentEvent e) {
+                        respUdatePerformed(e, key);
                     }
                 });
             }
@@ -595,6 +643,19 @@ public class InvariantConfigurator {
                     parse();
                 }
             }
+            
+            public void respUdatePerformed(DocumentEvent d, String key) {
+                Document doc = d.getDocument();
+                index = inputPane.getSelectedIndex();
+
+                Map<String,String>[] inv = invariants.get(index);
+                try {
+                    inv[RSP_IDX].put(key, doc.getText(0, doc.getLength()));
+                } catch (Exception e) {
+                } finally {
+                    parse();
+                }
+            }
 
             public void varUdatePerformed(DocumentEvent d, String key) {
                 assert key.equals(DEFAULT);
@@ -635,7 +696,7 @@ public class InvariantConfigurator {
 
                 if (requirementsAreMet) {
                     newInvariant = new LoopInvariantImpl(loopInv.getLoop(),
-                            invariantTerm, modifiesTerm, variantTerm, loopInv
+                            invariantTerm, modifiesTerm, respectsTermList, variantTerm, loopInv
                                     .getInternalSelfTerm(), loopInv
                                     .getInternalAtPres());
                     return true;
@@ -649,8 +710,10 @@ public class InvariantConfigurator {
             private void parse() {
                 Map<String,String> invErrors = new LinkedHashMap<String,String>();
                 Map<String,Color>  invCols = new LinkedHashMap<String,Color>();
-                Map<String,String> modErrors = new LinkedHashMap<String,String>();
+                Map<String,String> modErrors = new LinkedHashMap<String,String>();                
                 Map<String,Color>  modCols = new LinkedHashMap<String,Color>();
+                Map<String,String> respErrors = new LinkedHashMap<String,String>();
+                Map<String,Color>  respCols = new LinkedHashMap<String,Color>();
                 for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                   try {
                     invariantTerm.put(heap, parseInvariant(heap));
@@ -660,11 +723,18 @@ public class InvariantConfigurator {
                   }
                   try {
                     modifiesTerm.put(heap, parseModifies(heap));
-                    setOK(modErrors,modCols,heap.toString());
+                    setOK(respErrors,modCols,heap.toString());
                   } catch (Exception e) {
-                      setError(modErrors,modCols,heap.toString(),e.getMessage());
+                      setError(respErrors,modCols,heap.toString(),e.getMessage());
                   }
                 }
+                LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+                try {
+                    respectsTermList.put(baseHeap, parseRespects(baseHeap));
+                    setOK(respErrors,respCols,baseHeap.toString());
+                  } catch (Exception e) {
+                      setError(respErrors,respCols,baseHeap.toString(),e.getMessage());
+                  }
                 Map<String,String> varErrors = new LinkedHashMap<String,String>();
                 Map<String,Color>  varCols = new LinkedHashMap<String,Color>();
 
@@ -778,6 +848,17 @@ public class InvariantConfigurator {
                 // antlr
                 result = parser.parse(
                         new StringReader(invariants.get(index)[MOD_IDX].get(heap.toString())), Sort.ANY,
+                        services, services.getNamespaces(), getAbbrevMap());
+                return result;
+            }
+            
+            protected ImmutableList<ImmutableList<Term>> parseRespects(LocationVariable heap) throws Exception {
+                ImmutableList<ImmutableList<Term>> result = null;
+                index = inputPane.getSelectedIndex();
+                // might throw parserException or some obscure
+                // antlr
+                result = parser.parse( // FIXME
+                        new StringReader(invariants.get(index)[RSP_IDX].get(heap.toString())), Sort.ANY,
                         services, services.getNamespaces(), getAbbrevMap());
                 return result;
             }

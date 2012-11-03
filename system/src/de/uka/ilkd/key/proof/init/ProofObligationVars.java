@@ -30,8 +30,8 @@ class ProofObligationVars {
     final Term self;
     final Term selfAtPost;
     final ImmutableList<Term> params;
-    final Term result;
-    final Term resultAtPost;
+    final ImmutableList<Term> results;
+    final ImmutableList<Term> resultsAtPost;
     final Term exception;
     final Term exceptionAtPost;
     final Term heap;
@@ -49,8 +49,8 @@ class ProofObligationVars {
     public ProofObligationVars(Term self,
                                Term selfAtPost,
                                ImmutableList<Term> params,
-                               Term result,
-                               Term resultAtPost,
+                               ImmutableList<Term> results,
+                               ImmutableList<Term> resultsAtPost,
                                Term exception,
                                Term exceptionAtPost,
                                Term heap,
@@ -63,8 +63,8 @@ class ProofObligationVars {
         this.self = self;
         this.selfAtPost = selfAtPost;
         this.params = params;
-        this.result = result;
-        this.resultAtPost = resultAtPost;
+        this.results = results;
+        this.resultsAtPost = resultsAtPost;
         this.exception = exception;
         this.exceptionAtPost = exceptionAtPost;
         this.heap = heap;
@@ -76,8 +76,8 @@ class ProofObligationVars {
         terms = terms.append(self);
         terms = terms.append(selfAtPost);
         terms = terms.append(params);
-        terms = terms.append(result);
-        terms = terms.append(resultAtPost);
+        terms = terms.append(results);
+        terms = terms.append(resultsAtPost);
         terms = terms.append(exception);
         terms = terms.append(exceptionAtPost);
         terms = terms.append(heap);
@@ -85,7 +85,23 @@ class ProofObligationVars {
         terms = terms.append(heapAtPost);
         termList = terms;
     }
-
+    
+    public ProofObligationVars(Term self,
+            Term selfAtPost,
+            ImmutableList<Term> params,
+            Term result,
+            Term resultAtPost,
+            Term exception,
+            Term exceptionAtPost,
+            Term heap,
+            Term heapAtPre,
+            Term heapAtPost,
+            String postfix,
+            Services services) {
+        this(self, selfAtPost, params, ImmutableSLList.<Term>nil().append(result),
+             ImmutableSLList.<Term>nil().append(resultAtPost), exception,
+             exceptionAtPost, heap, heapAtPre, heapAtPost, postfix, services);
+    }
 
     public ProofObligationVars(IProgramMethod pm,
                                KeYJavaType kjt,
@@ -167,11 +183,15 @@ class ProofObligationVars {
         //register the variables so they are declared in proof header
         //if the proof is saved to a file
         register(ops(params, ProgramVariable.class), services);
-        if (result != null){ 
-            register(result.op(ProgramVariable.class), services);
+        if (results != null){
+            for(Term res: results) {
+                register(res.op(ProgramVariable.class), services);
+            }
         }
-        if (resultAtPost != null){
-            register(resultAtPost.op(ProgramVariable.class), services);
+        if (resultsAtPost != null){            
+            for(Term resPost: resultsAtPost) {
+                register(resPost.op(ProgramVariable.class), services);
+            }
         }
         register(heapAtPre.op(LocationVariable.class), services);
         register(heapAtPost.op(LocationVariable.class), services);

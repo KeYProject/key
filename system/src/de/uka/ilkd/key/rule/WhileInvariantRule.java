@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
@@ -34,8 +35,12 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.LoopInvariantApplicationData;
+import de.uka.ilkd.key.proof.init.InformationFlowContractPO;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -143,18 +148,26 @@ public final class WhileInvariantRule implements BuiltInRule {
     
     /**
      * @return (anon update, anon heap)
-     */
-    private Pair<Term,Term> createAnonUpdate(LocationVariable heap,
+     */    
+    private static AnonUpdateData createAnonUpdate(LocationVariable heap,
 	    			While loop, 
 	    			Term mod,
 	    			Services services) {
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+	final Name loopHeapName 
+        = new Name(TB.newName(services, heap.name()+"heapAfter_loop"));
+        final Function loopHeapFunc = new Function(loopHeapName,
+                                             heapLDT.targetSort(), true);
+        services.getNamespaces().functions().addSafely(loopHeapFunc);
+        final Term loopHeapTerm = TB.func(loopHeapFunc);
 	final Name anonHeapName = new Name(TB.newName(services, "anon_"+heap.name()+"_loop"));
 	final Function anonHeapFunc = new Function(anonHeapName,
 					     heapLDT.targetSort(), true);
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
 	final Term anonHeapTerm = TB.func(anonHeapFunc);
 	
+	final Term assumption = TB.equals(TB.anon(services, TB.var(heap), mod, anonHeapTerm),
+	                                  loopHeapTerm);
 	// check for strictly pure loops
 	final Term anonUpdate;
 	if(TB.lessThanNothing().equals(mod)) {
@@ -163,7 +176,14 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    anonUpdate = TB.anonUpd(heap, services, mod, anonHeapTerm);
 	}
 	
-	return new Pair<Term,Term>(anonUpdate, anonHeapTerm);
+	return new AnonUpdateData(assumption, anonUpdate, anonHeapTerm, loopHeapTerm);
+    }
+    
+    private Term createTermSV(String svName,
+            Sort predArgSort,
+            Services services) {
+        Name name = services.getVariableNamer().getTemporaryNameProposal(svName);
+        return TB.var(SchemaVariableFactory.createTermSV(name, predArgSort));
     }
     
     private static boolean checkFocus(final Term progPost) {
@@ -214,26 +234,26 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
-	final KeYJavaType booleanKJT = services.getTypeConverter()
-	                                       .getBooleanType();
-	final KeYJavaType intKJT 
-		= services.getJavaInfo()
-	                  .getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
-	//get instantiation
-	Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);	
-	
-    final Map<LocationVariable,Term> atPres = inst.inv.getInternalAtPres();
-    final List<LocationVariable> heapContext = ((IBuiltInRuleApp)ruleApp).getHeapContext();
+        final KeYJavaType booleanKJT = services.getTypeConverter()
+        .getBooleanType();
+        final KeYJavaType intKJT 
+        = services.getJavaInfo()
+        .getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
+        //get instantiation
+        Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);	
 
-    Term invTerm = null;
-    for(LocationVariable heap : heapContext) {
-      final Term i = inst.inv.getInvariant(heap, inst.selfTerm, atPres, services);
-      if(invTerm == null) {
-        invTerm = i;
-      }else{
-        invTerm = TB.and(invTerm, i);
-      }
-    }
+        final Map<LocationVariable,Term> atPres = inst.inv.getInternalAtPres();
+        final List<LocationVariable> heapContext = ((IBuiltInRuleApp)ruleApp).getHeapContext();
+
+        Term invTerm = null;
+        for(LocationVariable heap : heapContext) {
+            final Term i = inst.inv.getInvariant(heap, inst.selfTerm, atPres, services);
+            if(invTerm == null) {
+                invTerm = i;
+            } else{
+                invTerm = TB.and(invTerm, i);
+            }
+        }
 
     final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
     for(LocationVariable heap : heapContext) {
@@ -295,21 +315,25 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//prepare anon update, frame condition, etc.
 
         Term anonUpdate = createLocalAnonUpdate(localOuts, services); // can still be null
+        Term assumption = TB.tt();
+        Term loopHeap = TB.tt();
         Term wellFormedAnon = null;
         Term frameCondition = null;
         Term reachableState = reachableIn;
         for(LocationVariable heap : heapContext) {
-	  final Pair<Term,Term> tAnon 
+	  final AnonUpdateData tAnon
 	      = createAnonUpdate(heap, inst.loop, mods.get(heap), services);
+	  assumption = TB.and(assumption,tAnon.assumption);
+	  loopHeap = TB.and(loopHeap,tAnon.loopHeap);
           if(anonUpdate == null) {
-            anonUpdate = tAnon.first;
+            anonUpdate = tAnon.anonUpdate;
           }else{
-            anonUpdate = TB.parallel(anonUpdate, tAnon.first);
+            anonUpdate = TB.parallel(anonUpdate, tAnon.anonUpdate);
           }
           if(wellFormedAnon == null) {
-            wellFormedAnon = TB.wellFormed(tAnon.second, services);
+            wellFormedAnon = TB.wellFormed(tAnon.anonHeap, services);
           }else{
-            wellFormedAnon = TB.and(wellFormedAnon, TB.wellFormed(tAnon.second, services));
+            wellFormedAnon = TB.and(wellFormedAnon, TB.wellFormed(tAnon.anonHeap, services));
           }
           final Term m = mods.get(heap);
           final Term fc;
@@ -393,6 +417,22 @@ public final class WhileInvariantRule implements BuiltInRule {
 							      reachableOut, 
 			                                      variantNonNeg}));
 	
+	final Term anonLoopHeap = loopHeap;
+	final Term anonAssumption = assumption;
+	final Term postAssumption 
+        = TB.applySequential(new Term[]{inst.u, beforeLoopUpdate}, 
+                             TB.and(anonAssumption,TB.apply(anonUpdate,uAnonInv)));
+	final AnonUpdateData anonUpdateAndHeap
+	    = new AnonUpdateData(anonAssumption, anonUpdate, wellFormedAnon, anonLoopHeap);
+	
+	// prepare information flow analysis
+	Term contractApplPredTerm =
+	    storeInvInPredAndGenInfoFlowTaclet(inst,
+	                                       anonUpdateAndHeap,
+	                                       TB.var(localIns),
+	                                       TB.var(localOuts),
+	                                       goal, services);
+	
 	//"Invariant Initially Valid":
 	// \replacewith (==> inv );
 	initGoal.changeFormula(new SequentFormula(
@@ -463,6 +503,12 @@ public final class WhileInvariantRule implements BuiltInRule {
 		 	   true, 
 		 	   false);		
 	useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
+	useGoal.addFormula(new SequentFormula(postAssumption), // TODO: Is this correct? 
+                true, 
+                false);
+        useGoal.addFormula(new SequentFormula(contractApplPredTerm),
+                true,
+                false);
 
 	Term restPsi = TB.prog((Modality)inst.progPost.op(),
 			       JavaTools.removeActiveStatement(
@@ -477,7 +523,35 @@ public final class WhileInvariantRule implements BuiltInRule {
                               ruleApp.posInOccurrence());
 	return result;
     }
-
+    
+    /**
+     * Store invariant of the loop invocation and generate information
+     * flow taclet.
+     */
+    private Term storeInvInPredAndGenInfoFlowTaclet(final Instantiation inst,
+                                                        final AnonUpdateData anonUpdateAndHeap,
+                                                        final ImmutableList<Term> localIns,
+                                                        final ImmutableList<Term> localOuts,
+                                                        final Goal goal,
+                                                        final Services services) {
+        LoopInvariantApplicationData appData =
+                new LoopInvariantApplicationData(inst.selfTerm, localIns,                                                 
+                                                 TB.getBaseHeap(services),
+                                                 localOuts,
+                                                 anonUpdateAndHeap.loopHeap);
+        IProgramMethod pm = JavaTools.getInnermostMethodFrame(inst.progPost.javaBlock(), 
+                services).getProgramMethod();
+        final Function contLoopApplPred = generateContLoopApplPredicate(inst, appData, pm,
+                                                                services);
+        final Term contractLoopApplPredTerm =
+            TB.apply(inst.u, 
+                instantiateContApplPredicate(contLoopApplPred, appData, pm));
+        final Taclet informationFlowContractLoopApp =
+                genInfFlowContractLoopApplTaclet(contLoopApplPred, inst.inv, appData, pm, services);
+        goal.addTaclet(informationFlowContractLoopApp,
+                       SVInstantiations.EMPTY_SVINSTANTIATIONS, true);        
+        return contractLoopApplPredTerm;
+    }
     
     @Override
     public Name name() {
@@ -494,6 +568,189 @@ public final class WhileInvariantRule implements BuiltInRule {
     @Override
     public String toString() {
 	return NAME.toString();
+    }
+    
+    
+    private Function generateContLoopApplPredicate(Instantiation inst,
+            LoopInvariantApplicationData appData,
+            IProgramMethod pm,
+            Services services) {
+        String nameString =
+            MiscTools.toValidTacletName(inst.loop.getBody() +
+                    inst.loop.getGuardExpression().toString() +
+                    inst.innermostExecutionContext +
+                    inst.inv
+                    + "::" + inst.loop + "__LOOP").toString();
+        final Name name = new Name(nameString);
+        Function pred = (Function) services.getNamespaces().functions().lookup(
+                name);
+        if (pred == null) {
+            // Arguments: local variables, heapAtPre, heapAtPost
+            int length = appData.localIns.size() + appData.localOuts.size() + 2;            
+            // Arguments: + self            
+            if(!pm.isStatic()) {
+                length++;
+            }            
+            Sort[] predArgSorts =
+                new Sort[length];
+
+            int i = 0;            
+            // type of self
+            if(!pm.isStatic()) {
+                predArgSorts[i++] = inst.selfTerm.sort();
+            }            
+            // types of local variables (in)
+            for(Term t : appData.localIns){
+                predArgSorts[i++] = t.sort();
+            }
+            // type of heapAtPre
+            predArgSorts[i++] = TB.getBaseHeap(services).sort();
+            // types of local variables (out)
+            for(Term t : appData.localOuts){
+                predArgSorts[i++] = t.sort();
+            }
+            // type of heapAtPost
+            predArgSorts[i++] = TB.getBaseHeap(services).sort();
+
+            pred = new Function(name, Sort.FORMULA, predArgSorts);
+            services.getNamespaces().functions().addSafely(pred);
+        }
+        return pred;
+    }
+
+
+    private Term instantiateContApplPredicate(Function pred,
+            LoopInvariantApplicationData appData,
+            IProgramMethod pm) {
+        Sort[] predArgSorts = new Sort[pred.argSorts().size()];
+        pred.argSorts().toArray(predArgSorts);
+        Term[] predArgs = new Term[predArgSorts.length];        
+
+        int i = 0;        
+
+        if(!pm.isStatic()) {
+            // self
+            predArgs[i++] = appData.self;
+        }        
+        // local variables (in)
+        for(Term t : appData.localIns){
+            predArgSorts[i] = t.sort();
+            predArgs[i++] = t;
+        }        
+        // local variables (out)
+        for(Term t : appData.localOuts){
+            predArgSorts[i] = t.sort();
+            predArgs[i++] = t;
+        }        
+        // heapAtPre
+        predArgs[i++] = appData.heapAtPre;        
+        // heapAtPost
+        predArgs[i++] = appData.heapAtPost;
+
+        return TB.func(pred, predArgs);
+    }    
+
+
+    private LoopInvariantApplicationData generateLoopApplicationDataSVs(Function pred,
+            String schemaPrefix,
+            LoopInvariantApplicationData appData,
+            IProgramMethod pm,
+            Services services) {
+        Sort[] predArgSorts = new Sort[pred.argSorts().size()];
+        pred.argSorts().toArray(predArgSorts);        
+        final int numLocalIns = appData.localIns.size();
+        Term[] localInsSVs = new Term[numLocalIns];
+        final int numLocalOuts = appData.localOuts.size();
+        Term[] localOutsSVs = new Term[numLocalOuts];
+
+        int i = 0;
+        Term selfAtPreSV;
+        if(!pm.isStatic()) {
+            selfAtPreSV = createTermSV(schemaPrefix + "_self",
+                    predArgSorts[i], services);
+            i++;
+        } else {
+            selfAtPreSV = null;            
+        }
+        int j = 0;        
+        for(Term t : appData.localIns){
+            predArgSorts[i] = t.sort();
+            localInsSVs[j] = createTermSV(schemaPrefix + "_param_" + (j + 1),
+                    predArgSorts[i], services);
+            i++;
+            j++;
+        }        
+        Term heapAtPreSV = createTermSV(schemaPrefix + "_heapAtPre",
+                predArgSorts[i], services);
+        i++;
+        j = 0;        
+        for(Term t : appData.localOuts){
+            predArgSorts[i] = t.sort();
+            localOutsSVs[j] = createTermSV(schemaPrefix + "_res_" + (j + 1),
+                    predArgSorts[i], services);
+            i++;
+            j++;
+        }
+        Term heapAtPostSV = createTermSV(schemaPrefix + "_heapAtPost",
+                predArgSorts[i], services);
+        i++;
+
+        return new LoopInvariantApplicationData(selfAtPreSV, localInsSVs, heapAtPreSV,
+                localOutsSVs, heapAtPostSV);
+    }
+
+    private Taclet genInfFlowContractLoopApplTaclet(Function contractLoopApplPred,
+            LoopInvariant loopInv,
+            LoopInvariantApplicationData appData,
+            IProgramMethod pm,
+            Services services) {
+        Name tacletName =
+            MiscTools.toValidTacletName("use information flow contract for "
+                    + contractLoopApplPred.name());
+
+        LoopInvariantApplicationData schemaDataFind = generateLoopApplicationDataSVs(
+                contractLoopApplPred, "find", appData, pm, services);
+        LoopInvariantApplicationData schemaDataAssumes = generateLoopApplicationDataSVs(
+                contractLoopApplPred, "assumes", appData, pm, services);
+        Term schemaFind = instantiateContApplPredicate(contractLoopApplPred,
+                schemaDataFind, pm);
+        Term schemaAssumes = instantiateContApplPredicate(contractLoopApplPred,
+                schemaDataAssumes, pm);
+
+        Term schemaContApps = InformationFlowContractPO.buildContractApplication(
+                loopInv, schemaDataFind, schemaDataAssumes, services);
+        Term schemaContPrev = InformationFlowContractPO.buildContractApplication(
+                loopInv, schemaDataFind, schemaDataAssumes, services); // TODO: Here we
+        //want the new formula
+        //(Lemma 1 slightly changed)
+
+        //create sequents
+        Sequent assumesSeq = Sequent.createAnteSequent(
+                new Semisequent(new SequentFormula(schemaAssumes)));
+        Sequent axiomSeq = Sequent.createAnteSequent(
+                new Semisequent(new SequentFormula(schemaContApps)));
+        Sequent bodySeq = Sequent.createSuccSequent(
+                new Semisequent(new SequentFormula(schemaContPrev)));
+
+        //create taclet
+        RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder(); // TODO: create new branch for body preserves
+        // -> Not exactly clear. Make a new predicate with changed formula?
+        tacletBuilder.setName(tacletName);
+        tacletBuilder.setFind(schemaFind); // TODO: is this correct? has to match only in the antecedent!
+        tacletBuilder.setIfSequent(assumesSeq); //concerning above comment -> write eMail to remind Christoph!
+        RewriteTacletGoalTemplate goal =
+            new RewriteTacletGoalTemplate(axiomSeq,
+                    ImmutableSLList.<Taclet>nil(),
+                    schemaFind);
+        tacletBuilder.addTacletGoalTemplate(goal);
+        RewriteTacletGoalTemplate goal2 =
+            new RewriteTacletGoalTemplate(bodySeq,
+                    ImmutableSLList.<Taclet>nil(),
+                    schemaFind);
+        tacletBuilder.addTacletGoalTemplate(goal2);
+        tacletBuilder.addRuleSet(new RuleSet(new Name("userTaclets1")));
+        tacletBuilder.setSurviveSmbExec(true);
+        return tacletBuilder.getTaclet();
     }
 
 
@@ -534,6 +791,20 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    this.innermostExecutionContext = innermostExecutionContext;
 	}
     }
+    
+    private static class AnonUpdateData {
+
+        public final Term assumption, anonUpdate, anonHeap, loopHeap;
 
 
+        public AnonUpdateData(Term assumption,
+                              Term anonUpdate,
+                              Term anonHeap,
+                              Term loopHeap) {
+            this.assumption = assumption;
+            this.anonUpdate = anonUpdate;
+            this.loopHeap = loopHeap;
+            this.anonHeap = anonHeap;
+        }
+    }
 }

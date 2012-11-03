@@ -13,12 +13,16 @@ package de.uka.ilkd.key.speclang;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 
@@ -30,6 +34,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     private final LoopStatement loop;
     private final Map<LocationVariable,Term> originalInvariants;
     private final Map<LocationVariable,Term> originalModifies;
+    private final Map<LocationVariable,ImmutableList<ImmutableList<Term>>> originalRespects;
     private final Term originalVariant;
     private final Term originalSelfTerm;
     private final Map<LocationVariable,Term> originalAtPres;
@@ -44,13 +49,15 @@ public final class LoopInvariantImpl implements LoopInvariant {
      * @param loop the loop to which the invariant belongs
      * @param invariant the invariant formula
      * @param modifies the modifier set
+     * @param respects low variables for information flow
      * @param variant the variant term
      * @param selfTerm the term used for the receiver object
      * @param heapAtPre the term used for the at pre heap
      */
     public LoopInvariantImpl(LoopStatement loop,
                              Map<LocationVariable,Term> invariants,
-                             Map<LocationVariable,Term> modifies,  
+                             Map<LocationVariable,Term> modifies,
+                             Map<LocationVariable,ImmutableList<ImmutableList<Term>>> respects,
                              Term variant, 
                              Term selfTerm,
                              Map<LocationVariable,Term> atPres) {
@@ -61,6 +68,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         this.originalInvariants         = invariants == null ? new LinkedHashMap<LocationVariable,Term>() : invariants;
         this.originalVariant            = variant;
         this.originalModifies           = modifies == null ? new LinkedHashMap<LocationVariable,Term>() : modifies;
+        this.originalRespects           = respects;
         this.originalSelfTerm           = selfTerm;   
         this.originalAtPres             = atPres == null ? new LinkedHashMap<LocationVariable,Term>() : atPres;
     }
@@ -83,6 +91,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
 	    		     Map<LocationVariable,Term> atPres) {
         this(loop, 
              null, 
+             null,
              null,
              null,
              selfTerm,
@@ -161,6 +170,16 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     @Override
+    public Term getInvariant(Term selfTerm, Map<LocationVariable,Term> atPres, Services services){
+        assert (selfTerm == null) == (originalSelfTerm == null);
+        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        Map<Term, Term> replaceMap = 
+            getReplaceMap(selfTerm, atPres, services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalModifies.get(baseHeap));
+    }
+    
+    @Override
     public Term getModifies(LocationVariable heap, Term selfTerm,
             		    Map<LocationVariable,Term> atPres,
             		    Services services) {
@@ -171,6 +190,37 @@ public final class LoopInvariantImpl implements LoopInvariant {
         return or.replace(originalModifies.get(heap));
     }
     
+    @Override
+    public Term getModifies(Term selfTerm, Map<LocationVariable,Term> atPres, Services services) {
+        assert (selfTerm == null) == (originalSelfTerm == null);
+        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        Map<Term, Term> replaceMap = 
+            getReplaceMap(selfTerm, atPres, services);
+        OpReplacer or = new OpReplacer(replaceMap);
+        return or.replace(originalModifies.get(baseHeap));
+    }
+    
+    @Override
+    public ImmutableList<ImmutableList<Term>> getRespects(LocationVariable heap,
+                                                          Term selfTerm,
+                                                          Map<LocationVariable,Term> atPres,
+                                                          Services services) {
+        assert (selfTerm == null) == (originalSelfTerm == null);        
+        return TermBuilder.DF.replace2(originalRespects.get(heap),atPres.get(heap),originalSelfTerm,
+                                       selfTerm,ImmutableSLList.<Term>nil(),
+                                       ImmutableSLList.<Term>nil(),services);
+    }
+    
+    @Override
+    public ImmutableList<ImmutableList<Term>> getRespects(Term heapTerm,
+                                                          Term selfTerm,
+                                                          ImmutableList<Term> localIns,
+                                                          Services services) {
+        assert (selfTerm == null) == (originalSelfTerm == null);
+        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        return TermBuilder.DF.replace2(originalRespects.get(baseHeap),heapTerm,originalSelfTerm,
+                                       selfTerm, localIns,localIns,services);
+    }
 
     @Override
     public Term getVariant(Term selfTerm, 
@@ -199,6 +249,11 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     @Override
+    public Map<LocationVariable,ImmutableList<ImmutableList<Term>>> getInternalRespects(){
+        return originalRespects;
+    }
+    
+    @Override
     public Term getInternalSelfTerm() {
         return originalSelfTerm;
     }
@@ -219,6 +274,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
         return new LoopInvariantImpl(loop,
                                      originalInvariants,
                                      originalModifies,
+                                     originalRespects,
                                      originalVariant,
                                      originalSelfTerm,
                                      originalAtPres);
@@ -240,7 +296,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
         }
         return new LoopInvariantImpl(loop, 
                                      newInvariants,
-                                     originalModifies, 
+                                     originalModifies,
+                                     originalRespects,
                                      originalVariant, 
                                      originalSelfTerm,
                                      originalAtPres);
@@ -258,6 +315,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
                 + originalInvariants
                 + "; modifies: " 
                 + originalModifies
+                + "; respects: " 
+                + originalRespects
                 + "; variant: "
                 + originalVariant;
     }

@@ -185,9 +185,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
             var = v.getResult();
         }}
 		return new LoopInvariantImpl(rawInv.getLoop(), newInvs, rawInv.getInternalModifies(),
-				var, rawInv.getInternalSelfTerm(),
-				rawInv.getInternalAtPres());
-    	
+		                             rawInv.getInternalRespects(), var,
+		                             rawInv.getInternalSelfTerm(),
+		                             rawInv.getInternalAtPres());
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,

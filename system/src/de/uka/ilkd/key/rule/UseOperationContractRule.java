@@ -879,10 +879,10 @@ public final class UseOperationContractRule implements BuiltInRule {
     
     private Function generateContApplPredicate(IProgramMethod pm,
                                                Services services) {
-        String nameSting =
+        String nameString =
                 MiscTools.toValidTacletName(pm.getContainerType().getFullName()
                 + "::" + pm.getFullName() + "__RELATES").toString();
-        final Name name = new Name(nameSting);
+        final Name name = new Name(nameString);
         Function pred = (Function) services.getNamespaces().functions().lookup(
                 name);
         if (pred == null) {

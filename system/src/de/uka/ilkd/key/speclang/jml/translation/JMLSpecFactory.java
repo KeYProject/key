@@ -257,7 +257,7 @@ public class JMLSpecFactory {
      * and the map for atPre-Functions
      */
 
-    private ProgramVariableCollection createProgramVaribales(IProgramMethod pm) {
+    private ProgramVariableCollection createProgramVariables(IProgramMethod pm) {
         ProgramVariableCollection progVar = new ProgramVariableCollection();
         progVar.selfVar = TB.selfVar(services, pm, pm.getContainerType(), false);
         progVar.paramVars = TB.paramVars(services, pm, false);
@@ -352,18 +352,18 @@ public class JMLSpecFactory {
                 originalBehavior,
                 textualSpecCase.getReturns());
         clauses.respects =
-                translateIndependetClauses(pm, progVars.selfVar,
+                translateIndependentClauses(pm, progVars.selfVar,
                                           progVars.paramVars, progVars.resultVar,
                                           textualSpecCase.getRespects());
         clauses.declassifies =
-                translateIndependetClauses(pm, progVars.selfVar,
+                translateIndependentClauses(pm, progVars.selfVar,
                                            progVars.paramVars, progVars.resultVar,
                                            textualSpecCase.getDeclassifies());
         return clauses;
     }
 
 
-    private ImmutableList<ImmutableList<Term>> translateIndependetClauses(
+    private ImmutableList<ImmutableList<Term>> translateIndependentClauses(
             IProgramMethod pm,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
@@ -1048,7 +1048,7 @@ public class JMLSpecFactory {
 
         // prepare program variables, translateToTerm JML clauses and generate post
         // condition
-        ProgramVariableCollection progVars = createProgramVaribales(pm);
+        ProgramVariableCollection progVars = createProgramVariables(pm);
         ContractClauses clauses =
                 translateJMLClauses(pm, textualSpecCase,
                                     progVars, originalBehavior);
@@ -1179,12 +1179,14 @@ public class JMLSpecFactory {
             LoopStatement loop,
             Map<String,ImmutableList<PositionedString>> originalInvariants,
             Map<String,ImmutableList<PositionedString>> originalAssignables,
+            ImmutableList<PositionedString> originalRespects,
             PositionedString originalVariant)
             throws SLTranslationException {
         assert pm != null;
         assert loop != null;
         assert originalInvariants != null;
         assert originalAssignables != null;
+        assert originalRespects != null;
 
         //create variables for self, parameters, other relevant local variables 
         //(disguised as parameters to the translator) and the map for 
@@ -1200,6 +1202,8 @@ public class JMLSpecFactory {
                     paramVars.prepend(
                     (ProgramVariable) pd.getVariableSpecification().getProgramVariable());
         }
+        ProgramVariable resultVar =
+            TB.resultVar(services, pm, false);
 
         ImmutableList<ProgramVariable> localVars =
                 collectLocalVariables(pm.getBody(), loop);
@@ -1251,6 +1255,19 @@ public class JMLSpecFactory {
            
            mods.put(services.getTypeConverter().getHeapLDT().getHeapForName(new Name(h)), a);
         }
+        
+        //translateToListOfTermLists respects
+        Map<LocationVariable,ImmutableList<ImmutableList<Term>>> respects
+            = new LinkedHashMap<LocationVariable,ImmutableList<ImmutableList<Term>>>();
+        ImmutableList<ImmutableList<Term>> respectsTermList;
+        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        if(originalRespects.isEmpty()) {
+            respectsTermList = null;
+        } else {
+            respectsTermList = translateIndependentClauses(pm, selfVar, paramVars,
+                                                    resultVar, originalRespects);
+        }
+        respects.put(baseHeap, respectsTermList);
 
         //translateToTerm variant
         Term variant;
@@ -1268,6 +1285,7 @@ public class JMLSpecFactory {
         return new LoopInvariantImpl(loop,
                                      invariants,
                                      mods,
+                                     respects,
                                      variant,
                                      selfTerm,
                                      atPres);
@@ -1283,6 +1301,7 @@ public class JMLSpecFactory {
                                       loop,
                                       textualLoopSpec.getInvariants(),
                                       textualLoopSpec.getAssignables(),
+                                      textualLoopSpec.getRespects(),
                                       textualLoopSpec.getVariant());
     }
 

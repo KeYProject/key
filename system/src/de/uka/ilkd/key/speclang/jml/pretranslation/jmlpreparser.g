@@ -1126,6 +1126,7 @@ loop_specification[ImmutableList<String> mods]
     	options { greedy = true; }
     	:
             ps=loop_invariant       { ls.addInvariant(ps); }
+        |   ps=respects_clause      { ls.addRespects(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); } 
     )*

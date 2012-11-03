@@ -12,6 +12,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -33,11 +34,27 @@ public interface LoopInvariant extends SpecificationElement {
     
     /** Returns the invariant formula. */
     public Term getInvariant(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
+    
+    public Term getInvariant(Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
 
     /**
      * Returns the modifies clause.
      */
     public Term getModifies(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
+    
+    public Term getModifies(Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
+    
+    /**
+     * Returns the respects clause.
+     */
+    public ImmutableList<ImmutableList<Term>> getRespects(LocationVariable heap,Term selfTerm,
+                                                          Map<LocationVariable,Term> atPres,
+                                                          Services services);
+    
+    public ImmutableList<ImmutableList<Term>> getRespects(Term heapTerm,
+                                                          Term selfTerm,
+                                                          ImmutableList<Term> localIns,
+                                                          Services services);
     
     /**
      * Returns the variant term. 
@@ -70,6 +87,8 @@ public interface LoopInvariant extends SpecificationElement {
     public Term getInternalVariant();
     
     public Map<LocationVariable,Term> getInternalModifies();
+    
+    public Map<LocationVariable, ImmutableList<ImmutableList<Term>>> getInternalRespects();
 
     /**
      * Returns a new loop invariant where the loop reference has been
@@ -93,5 +112,4 @@ public interface LoopInvariant extends SpecificationElement {
      * perform some action/transformation on this element.
      */
     public void visit(Visitor v);
-
 }

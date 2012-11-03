@@ -15,6 +15,8 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -164,38 +166,38 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         if(t==null) {
             return null;
         }
-    if(t.op() instanceof ProgramVariable) {
-        if(replaceMap.containsKey(t.op())) {
-        Object o = replaceMap.get(t.op());
-        if(o instanceof ProgramVariable){
-            return TermFactory.DEFAULT.createTerm
-            ((ProgramVariable) replaceMap.get(t.op()));
-        }else{
-            return TermFactory.DEFAULT.createTerm
-            ((SchemaVariable) replaceMap.get(t.op()));
-        }
+        if(t.op() instanceof ProgramVariable) {
+            if(replaceMap.containsKey(t.op())) {
+                Object o = replaceMap.get(t.op());
+                if(o instanceof ProgramVariable){
+                    return TermFactory.DEFAULT.createTerm
+                    ((ProgramVariable) replaceMap.get(t.op()));
+                }else{
+                    return TermFactory.DEFAULT.createTerm
+                    ((SchemaVariable) replaceMap.get(t.op()));
+                }
+            } else {
+                return t;
+            }
         } else {
-        return t;
+            Term subTerms[] = new Term[t.arity()];
+            for(int i = 0, n = t.arity(); i < n; i++) {
+                subTerms[i] = replaceVariablesInTerm(t.sub(i));
+            }
+            Operator op = t.op();
+            if(op instanceof ElementaryUpdate) {
+                ElementaryUpdate uop = (ElementaryUpdate) t.op();
+                if(replaceMap.containsKey(uop.lhs())) {
+                    UpdateableOperator replacedLhs
+                    = (UpdateableOperator) replaceMap.get(uop.lhs());
+                    op = ElementaryUpdate.getInstance(replacedLhs);
+                }
+            }
+            return TermFactory.DEFAULT.createTerm(op,
+                    subTerms,
+                    t.boundVars(),
+                    t.javaBlock());
         }
-    } else {
-        Term subTerms[] = new Term[t.arity()];
-        for(int i = 0, n = t.arity(); i < n; i++) {
-        subTerms[i] = replaceVariablesInTerm(t.sub(i));
-        }
-        Operator op = t.op();
-        if(op instanceof ElementaryUpdate) {
-        ElementaryUpdate uop = (ElementaryUpdate) t.op();
-        if(replaceMap.containsKey(uop.lhs())) {
-            UpdateableOperator replacedLhs
-                = (UpdateableOperator) replaceMap.get(uop.lhs());
-            op = ElementaryUpdate.getInstance(replacedLhs);
-        }
-        }
-        return TermFactory.DEFAULT.createTerm(op,
-                              subTerms,
-                              t.boundVars(),
-                              t.javaBlock());
-    }
     }
 
 
@@ -203,6 +205,23 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         ImmutableSet<Term> res = DefaultImmutableSet.nil();
         for (final Term term : terms) {
             res = res.add(replaceVariablesInTerm(term));
+        }
+        return res;
+    }
+    
+    
+    private ImmutableList<Term> replaceVariablesInTermList(ImmutableList<Term> terms) {
+        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+        for (final Term term : terms) {
+            res = res.append(replaceVariablesInTerm(term));
+        }
+        return res;
+    }
+
+    private ImmutableList<ImmutableList<Term>> replaceVariablesInTermLists(ImmutableList<ImmutableList<Term>> termlists) {
+        ImmutableList<ImmutableList<Term>> res = ImmutableSLList.<ImmutableList<Term>>nil();
+        for (final ImmutableList<Term> terms : termlists) {
+            res = res.append(replaceVariablesInTermList(terms));
         }
         return res;
     }
@@ -318,12 +337,18 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
         Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
+        Map<LocationVariable,ImmutableList<ImmutableList<Term>>> newRespects
+            = new LinkedHashMap<LocationVariable,ImmutableList<ImmutableList<Term>>>();
+        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
 
         for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
            final Term m = replaceVariablesInTerm(inv.getModifies(heap, selfTerm,
                                      atPres,
                                      services));
            newMods.put(heap, m);
+           final ImmutableList<ImmutableList<Term>> r
+               = replaceVariablesInTermLists(inv.getRespects(baseHeap, selfTerm, atPres, services));
+           newRespects.put(baseHeap, r);
            final Term i = replaceVariablesInTerm(inv.getInvariant(heap, selfTerm,
                                      atPres,
                                      services));
@@ -348,6 +373,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             = new LoopInvariantImpl(newLoop,
                                     newInvariants,
                                     newMods,
+                                    newRespects,
                                     newVariant,
                                     newSelfTerm,
                                     atPres);

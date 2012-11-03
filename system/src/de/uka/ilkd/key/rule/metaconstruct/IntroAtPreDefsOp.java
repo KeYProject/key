@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -128,17 +129,24 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     = inv.getVariant(selfTerm, atPres, services);
 
                 Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
+                Map<LocationVariable,ImmutableList<ImmutableList<Term>>> newRespects
+                    = new LinkedHashMap<LocationVariable,ImmutableList<ImmutableList<Term>>>();
+                LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
                 Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
                 for(LocationVariable heap : HeapContext.getModHeaps(services, transaction)) {
                   final Term m = inv.getModifies(heap, selfTerm, atPres, services);
+                  final ImmutableList<ImmutableList<Term>> r
+                      = inv.getRespects(baseHeap, selfTerm, atPres, services); // FIXME: small workaround
                   final Term i = inv.getInvariant(heap, selfTerm, atPres, services);
                   newMods.put(heap, m);
+                  newRespects.put(baseHeap, r); // FIXME: small workaround
                   newInvariants.put(heap, i);
                 }
                 final LoopInvariant newInv
                        = new LoopInvariantImpl(loop,
                                             newInvariants,
                                             newMods,
+                                            newRespects,
                                             newVariant,
                                             selfTerm,
                                             atPres);

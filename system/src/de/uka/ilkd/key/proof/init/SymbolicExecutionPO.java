@@ -70,8 +70,12 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
         if (vs.selfAtPost != null) {
             posts = posts.append(TB.equals(vs.selfAtPost, vs.self));
         }
-        if (vs.resultAtPost != null) {
-            posts = posts.append(TB.equals(vs.resultAtPost, vs.result));
+        if (vs.resultsAtPost != null) {
+            for(Term resPost: vs.resultsAtPost) {
+                for(Term res: vs.results) {
+                    posts = posts.append(TB.equals(resPost, res));
+                }
+            }
         }
         posts = posts.append(TB.equals(vs.exceptionAtPost, vs.exception));
         posts = posts.append(TB.equals(vs.heapAtPost, vs.heap));
@@ -131,7 +135,7 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
         //create method call
         final ImmutableArray<Expression> formalArray =
                 new ImmutableArray<Expression>(formalParVars.toArray(
-                new ProgramVariable[formalParVars.size()]));
+                        new ProgramVariable[formalParVars.size()]));
         final StatementBlock sb;
         if (getContract().getTarget().isConstructor()) {
             assert selfVar != null;
@@ -196,12 +200,13 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
         }
 
         //create java block
+        Term result = vs.results.head();
         final JavaBlock jb = buildJavaBlock(formalParamVars,
                                             vs.self != null
                                                 ? vs.self.op(ProgramVariable.class)
                                                 : null,
-                                            vs.result != null
-                                                ? vs.result.op(ProgramVariable.class)
+                                            result != null
+                                                ? result.op(ProgramVariable.class)
                                                 : null,
                                             vs.exception != null
                                                 ? vs.exception.op(ProgramVariable.class)
