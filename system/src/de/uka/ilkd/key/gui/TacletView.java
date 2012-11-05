@@ -46,7 +46,7 @@ public class TacletView implements ActionListener{
 
     private TacletView() {
 
-        frame = new JDialog();
+        frame = new JDialog(MainWindow.getInstance());
         frame.setTitle("Taclet View");
         frame.setLocationByPlatform(true);
 
@@ -73,6 +73,8 @@ public class TacletView implements ActionListener{
 
         frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
         frame.getContentPane().add(buttonPane, BorderLayout.SOUTH);
+        
+        frame.getRootPane().setDefaultButton(button);
 
         frame.pack();	   
     }
@@ -98,12 +100,10 @@ public class TacletView implements ActionListener{
 
     
     public void showTacletView(DefaultMutableTreeNode node){
-        Taclet tac;
         if (node.getUserObject() instanceof Taclet) {
-            tac = (Taclet) node.getUserObject();        
-        } else return;
-        showTacletView(tac,true);
-
+            Taclet tac = (Taclet) node.getUserObject();
+            showTacletView(tac, false);
+        } 
     }
 
     

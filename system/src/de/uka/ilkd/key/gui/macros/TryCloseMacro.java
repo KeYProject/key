@@ -113,7 +113,7 @@ public class TryCloseMacro implements ProofMacro {
         //
         // set the max number of steps if given
         if(numberSteps > 0) {
-            mediator.setAutomaticApplicationTimeout(numberSteps);
+            mediator.setMaxAutomaticSteps(numberSteps);
         }
 
         //
