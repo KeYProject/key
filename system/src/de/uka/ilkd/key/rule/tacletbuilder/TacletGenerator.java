@@ -4,6 +4,7 @@
  */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -52,7 +53,13 @@ public class TacletGenerator {
 
     private static final TacletGenerator instance = new TacletGenerator();
     private static final TermBuilder TB = TermBuilder.DF;
-
+    
+    /**
+     * Use this switch to decide whether to create replacement or update
+     * taclets. Update taclets use the normal heap variable and have the actual
+     * value set in an update as prefix.
+     */
+    private static final boolean MAKE_UPDATED_REPLACEMENT = true;
 
     private TacletGenerator() {
     }
@@ -213,10 +220,11 @@ public class TacletGenerator {
         //create taclet
         final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
         tacletBuilder.setFind(schemaLhs);
+        Term updatedRhs = makeUpdatedRHS(limitedRhs, heap, heapSV, services);
         tacletBuilder.addTacletGoalTemplate(
                 new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
                                               ImmutableSLList.<Taclet>nil(),
-                                              limitedRhs));
+                                              updatedRhs));
         if (ifSeq != null) {
             tacletBuilder.setIfSequent(ifSeq);
         }
@@ -237,6 +245,26 @@ public class TacletGenerator {
 
         //return
         return result;
+    }
+
+    /*
+     * Change the replacewith term to its updated version.
+     * Instead of "inv(heapSV)" write "{heap:=heapSV}inv(heap)"
+     * which makes the outcome a lot more comprehensible for the human.
+     * And smaller in size.  
+     */
+    private Term makeUpdatedRHS(Term term, ProgramVariable heap, 
+            SchemaVariable heapSV, Services services) {
+        if(!MAKE_UPDATED_REPLACEMENT) {
+            return term;
+        }
+
+        final OpReplacer or = new OpReplacer(
+                Collections.<ParsableVariable, ProgramVariable>singletonMap(heapSV, heap));
+        final Term replaced = or.replace(term);
+        final Term update = TB.elementary(services, TB.var(heapSV));
+
+        return TB.apply(update, replaced);
     }
 
 

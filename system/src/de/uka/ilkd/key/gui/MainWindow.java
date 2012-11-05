@@ -81,6 +81,7 @@ import de.uka.ilkd.key.gui.actions.OpenFileAction;
 import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
 import de.uka.ilkd.key.gui.actions.ProofManagementAction;
+import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
 import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
 import de.uka.ilkd.key.gui.actions.SaveFileAction;
 import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
@@ -775,22 +776,7 @@ public final class MainWindow extends JFrame  {
         
        
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
-        
-
-        final MainWindowAction pp2 = new MainWindowAction(this, 
-                "Use Unicode symbols", 
-                "If checked formulae are displayed with special Unicode characters" +
-                " (such as \""+UnicodeHelper.AND+"\") instead of the traditional ASCII ones. \n"+
-                "Only works in combination with pretty printing (see above).",
-                NotationInfo.UNICODE_ENABLED){
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                NotationInfo.UNICODE_ENABLED = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-                mainWindow.makePrettyView();
-            }
-        };
-        view.add(new JCheckBoxMenuItem(pp2));
+        view.add(new JCheckBoxMenuItem(new UnicodeToggleAction(this)));
         
         view.addSeparator();
         {
@@ -833,6 +819,7 @@ public final class MainWindow extends JFrame  {
 	options.add(setupSpeclangMenu());
 	options.addSeparator();
         options.add(new JCheckBoxMenuItem(new MinimizeInteraction(this)));
+        options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
         options.add(new JCheckBoxMenuItem(oneStepSimplAction));
         
         return options;

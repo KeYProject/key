@@ -22,7 +22,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 
+import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
@@ -30,6 +32,8 @@ import javax.swing.event.PopupMenuListener;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.PosInSequent;
@@ -129,7 +133,8 @@ class SequentViewListener extends MouseInputAdapter
 	    // if a popup menu is cancelled by a click we do not want to 
 	    // activate another using the same click event 
 	    if (Math.abs(System.currentTimeMillis()-block)>=400) {   
-		mousePos = seqView.getPosInSequent(me.getPoint());                                    
+		mousePos = seqView.getPosInSequent(me.getPoint());  
+		boolean macroActive = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().isRightClickMacro();
 		if (mediator!= null && mousePos != null) {
 		    if (me.isShiftDown()) {
 			if (mediator.getInteractiveProver() != null) {
@@ -137,6 +142,15 @@ class SequentViewListener extends MouseInputAdapter
 				startFocussedAutoMode ( mousePos.getPosInOccurrence (),
 							mediator.getSelectedGoal () );
 			}
+		    } else if(macroActive && SwingUtilities.isRightMouseButton(me)) { 
+		        ProofMacroMenu menu = new ProofMacroMenu(mediator, 
+		                mousePos.getPosInOccurrence());
+		        if(menu.isEmpty()) {
+		            menu.add(new JLabel("no strategies available"));
+		        } 
+		        JPopupMenu popupMenu = menu.getPopupMenu();
+		        popupMenu.setLabel("Strategy macros");
+		        popupMenu.show(seqView, me.getX()-5, me.getY()-5);
 		    } else {		    		  
 			//done before collecting the taclets because initialising 
 			//built in rules may have side effects on the set of applicable
