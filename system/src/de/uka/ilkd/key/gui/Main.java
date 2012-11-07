@@ -17,6 +17,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.sound.midi.SysexMessage;
+
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -159,8 +161,9 @@ public class Main {
 			UserInterface userInterface = createUserInterface();
 			loadCommandLineFile(userInterface);
 		} catch (CommandLineException e) {
-			e.printStackTrace();
-			System.out.println("Exception during parsing of commandline options");
+		//	e.printStackTrace();
+		//	System.out.println("Exception during parsing of commandline options");
+			printUsageAndExit(true, "Unrecognized Option");
 		}
         
     }
@@ -261,7 +264,7 @@ public class Main {
         if(cl.isSet(PRINT_STATISTICS)){
         	statisticsFile = cl.getString(PRINT_STATISTICS, null);
         	if(statisticsFile.equals(null)){
-        		printUsageAndExit(true,null);
+        		printUsageAndExit(true,"Statistics file not found");
         	}
         }
         if(cl.isSet(TIMEOUT)){
@@ -285,7 +288,7 @@ public class Main {
         if(cl.isSet(EXAMPLES)){
         	examplesDir = cl.getString(EXAMPLES, null);
         	if (examplesDir.equals(null)){
-        		printUsageAndExit(true, null);
+        		printUsageAndExit(true, "Example Directory not found");
         	}
         }
         
@@ -319,7 +322,7 @@ public class Main {
       			//System.out.println("Loading: "+fileArguments.get(0));
       			fileNameOnStartUp=fileArguments.get(0);    	
       		}else{
-      			printUsageAndExit(true, null);
+      			printUsageAndExit(true, "File not found");
       		}
       	}
         	
@@ -396,11 +399,18 @@ public class Main {
 
     private static void printUsageAndExit(boolean exitWithError, String offending) {
         final PrintStream ps = System.out;
-        if (exitWithError) 
-            ps.println("File not found or unrecognized option" +
-                    (offending != null? ": "+offending: ".")+"\n");
-          cl.printUsage(ps);
-          System.exit(exitWithError? -1: 0);
+        if (exitWithError){ 
+//            ps.println("File not found or unrecognized option" +
+//                    (offending != null? ": "+offending: ".")+"\n");
+        	ps.println(offending);
+        	if(offending.equals("Unrecognized Option")){
+        		cl.printUsage(ps);
+        	}
+        	System.exit(-1);
+    	}
+        cl.printUsage(ps);
+//        System.exit(exitWithError? -1: 0);
+        System.exit(0);
     }
 
     public static String getExamplesDir() {
