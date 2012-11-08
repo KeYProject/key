@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
@@ -104,6 +105,8 @@ public class DefaultProblemLoader {
     */
    public String load() throws ProofInputException, IOException {
       // Read environment
+	  Boolean oneStepSimplifier = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+	  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
       envInput = createEnvInput();
       problemInitializer = createProblemInitializer();
       initConfig = createInitConfig();
@@ -118,6 +121,7 @@ public class DefaultProblemLoader {
          return ""; // Everything fine
       }
       finally {
+    	  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(oneStepSimplifier);
          getMediator().resetNrGoalsClosedByHeuristics();
          if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
             ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
