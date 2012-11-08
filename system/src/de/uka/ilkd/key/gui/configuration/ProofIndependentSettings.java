@@ -25,7 +25,9 @@ public class ProofIndependentSettings implements SettingsListener {
         private final String filename;
 
         private final Settings[] settingsSet = { smtSettings,
-                        lemmaGeneratorSettings };
+                        lemmaGeneratorSettings,
+                        generalSettings,
+                        viewSettings};
 
         
 
@@ -108,13 +110,7 @@ public class ProofIndependentSettings implements SettingsListener {
         public ProofIndependentSMTSettings getSMTSettings() {
                return smtSettings;
         }
-        public void setGeneralSettings() {
-            
-        }
 
-        public void setViewSettings() {
-            
-    }
         
 
 }

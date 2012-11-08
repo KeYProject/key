@@ -22,6 +22,7 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -188,21 +189,24 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     
 
     public boolean hideClosedSubtrees () {
-        return ProofSettings.DEFAULT_SETTINGS.getViewSettings()
-            .getHideClosedSubtrees();
+    	return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHideClosedSubtrees();
+//        return ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+  //          .getHideClosedSubtrees();
     }
 
     public void setHideClosedSubtrees (boolean hide) {
         if ( hide != hideClosedSubtrees() ) {
-            ProofSettings.DEFAULT_SETTINGS.getViewSettings()
-                .setHideClosedSubtrees(hide);
+        	ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHideClosedSubtrees(hide);
+//            ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+//                .setHideClosedSubtrees(hide);
             updateTree((TreeNode) null);
         }
     }
 
     public boolean isHidingIntermediateProofsteps() {
-        return ProofSettings.DEFAULT_SETTINGS.getViewSettings()
-            .getHideIntermediateProofsteps();
+    	return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHideIntermediateProofsteps();
+//        return ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+//            .getHideIntermediateProofsteps();
     }
 
     /**
@@ -211,8 +215,9 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
      */
     public void hideIntermediateProofsteps(boolean hide) {
 	if (hide != isHidingIntermediateProofsteps()) {
-            ProofSettings.DEFAULT_SETTINGS.getViewSettings()
-                .setHideIntermediateProofsteps(hide);
+		ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHideIntermediateProofsteps(hide);
+//            ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+//                .setHideIntermediateProofsteps(hide);
             updateTree((TreeNode) null);
 	}
     }
