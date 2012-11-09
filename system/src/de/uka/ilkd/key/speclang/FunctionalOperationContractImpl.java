@@ -931,11 +931,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 
+    @Override
     public String getBaseName() {
         return baseName;
     }
 
 
+    @Override
     public Term getPre() {
         assert originalPres.values().size() == 1
                : "information flow extension not compatible with multi-heap setting";
@@ -943,6 +945,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 
+    @Override
     public Term getPost() {
         assert originalPosts.values().size() == 1
                : "information flow extension not compatible with multi-heap setting";
@@ -950,18 +953,19 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 
+    @Override
     public Term getMod() {
-        assert originalMods.values().size() == 1
-               : "information flow extension not compatible with multi-heap setting";
         return originalMods.values().iterator().next();
     }
 
 
+    @Override
     public Term getMby() {
         return originalMby;
     }
 
 
+    @Override
     public Term getSelf() {
         if (originalSelfVar == null){
             assert pm.isStatic() : "missing self variable in non-static method contract";
@@ -971,6 +975,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 
+    @Override
     public ImmutableList<Term> getParams() {
         if (originalParamVars == null) {
             return null;
@@ -979,6 +984,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 
+    @Override
     public Term getResult() {
         if (originalResultVar == null) {
             return null;
@@ -987,6 +993,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 
+    @Override
     public Term getExc() {
         if (originalExcVar == null) {
             return null;
