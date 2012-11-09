@@ -1,0 +1,53 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package de.uka.ilkd.key.proof.init.po.snippet;
+
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.init.ProofObligationVars;
+
+/**
+ * Generate term "self != null".
+ *
+ * @author christoph
+ */
+class BasicFreePreSnippet implements FactoryMethod {
+
+    @Override
+    public Term produce(BasicPOSnippetFactory f,
+                        BasicSnippetData d,
+                        ProofObligationVars poVars)
+            throws UnsupportedOperationException {
+        // "wellformed(heap)"
+        final Term wellFormed = d.tb.wellFormed(poVars.heap);
+
+        // "heap == heapAtPre"
+        final Term eqHeapAndHeapAtPre =
+                d.tb.equals(poVars.heap, poVars.heapAtPre);
+
+        // "self != null"
+        final Term selfNotNull = f.create(
+                BasicPOSnippetFactoryImpl.Snippet.SELF_NOT_NULL);
+
+        // "self.<created> = TRUE"
+        final Term selfCreated = f.create(
+                BasicPOSnippetFactoryImpl.Snippet.SELF_CREATED);
+
+        // "MyClass::exactInstance(self) = TRUE"
+        final Term selfExactType = f.create(
+                BasicPOSnippetFactoryImpl.Snippet.SELF_EXACT_TYPE);
+
+        // conjunction of...
+        // - "p_i.<created> = TRUE | p_i = null" for object parameters, and
+        // - "inBounds(p_i)" for integer parameters
+        Term paramsOK = f.create(BasicPOSnippetFactoryImpl.Snippet.PARAMS_OK);
+
+        // initial value of measured_by clause
+        final Term mbyAtPreDef = f.create(
+                BasicPOSnippetFactoryImpl.Snippet.MBY_AT_PRE_DEF);
+
+        return d.tb.and(wellFormed, eqHeapAndHeapAtPre, selfNotNull, selfCreated,
+                        selfExactType, paramsOK, mbyAtPreDef);
+    }
+}

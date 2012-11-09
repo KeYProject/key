@@ -196,32 +196,15 @@ public class ContractFactory {
                                           selfVar, paramVars);
     }
 
-    public SymbolicExecData createSymbolicExecData(KeYJavaType forClass,
-                                                   IProgramMethod pm,
-                                                   KeYJavaType specifiedIn,
-                                                   Modality modality,
-                                                   Term requires,
-                                                   Term measuredBy,
-                                                   Term modifies,
-                                                   boolean hasMod,
-                                                   ProgramVariableCollection progVars,
-                                                   boolean toBeSaved) {
-        final Term self = progVars.selfVar != null ? tb.var(progVars.selfVar) : null;
-        final ImmutableList<Term> params = tb.var(progVars.paramVars);
-        final Term result = progVars.resultVar != null ? tb.var(progVars.resultVar) : null;
-        final Term exc = progVars.excVar != null ? tb.var(progVars.excVar) : null;
-        return new SymbolicExecDataImpl(SYMB_EXEC_CONTRACT_BASENAME,
-                                        forClass, pm, specifiedIn, modality, requires, measuredBy,
-                                        modifies, hasMod,
-                                        self,
-                                        params,
-                                        result,
-                                        exc,
-                                        toBeSaved );
-    }
-
     public InformationFlowContract createInformationFlowContract(
-            SymbolicExecData symbData,
+            KeYJavaType forClass,
+            IProgramMethod pm,
+            KeYJavaType specifiedIn,
+            Modality modality,
+            Term requires,
+            Term measuredBy,
+            Term modifies,
+            boolean hasMod,
             ProgramVariableCollection progVars,
             Term accessible,
             ImmutableList<ImmutableList<Term>> respects,
@@ -229,24 +212,13 @@ public class ContractFactory {
             boolean toBeSaved) {
         final Term self = progVars.selfVar != null ? tb.var(progVars.selfVar) : null;
         final ImmutableList<Term> params = tb.var(progVars.paramVars);
-        final Term result = progVars.resultVar != null ? tb.var(progVars.resultVar) : null;
+        final Term result = progVars.resultVar != null ? tb.var(
+                progVars.resultVar) : null;
         final Term exc = progVars.excVar != null ? tb.var(progVars.excVar) : null;
-        return new InformationFlowContractImpl(INFORMATION_FLOW_CONTRACT_BASENAME,
-                                               symbData.getKJT(),
-                                               symbData.getTarget(),
-                                               symbData.getSpecifiedIn(),
-                                               symbData.getModality(),
-                                               symbData.getPre(),
-                                               symbData.getMby(),
-                                               symbData.getMod(),
-                                               symbData.hasModifiesClause(),
-                                               self,
-                                               params,
-                                               result,
-                                               exc,
-                                               accessible, respects,
-                                               declassifies,
-                                               toBeSaved);
+        return new InformationFlowContractImpl(
+                INFORMATION_FLOW_CONTRACT_BASENAME, forClass, pm, specifiedIn,
+                modality, requires, measuredBy, modifies, hasMod, self, params,
+                result, exc, accessible, respects, declassifies, toBeSaved);
     }
     
     @Override

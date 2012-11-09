@@ -10,29 +10,55 @@
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
+import java.util.List;
+import java.util.Map;
 
 
 
 /**
  * Standard implementation of the DependencyContract interface.
  */
-final class InformationFlowContractImpl extends SymbolicExecDataImpl
-        implements InformationFlowContract {
+final class InformationFlowContractImpl implements InformationFlowContract {
 
+    protected static final TermBuilder TB = TermBuilder.DF;
+    private final int id;
+    private final KeYJavaType forClass;
+    private final IProgramMethod pm;
+    private final KeYJavaType specifiedIn;
+    private final String baseName;
+    private final String name;
+    private final Term origPre;
+    private final Term origMby;
+    private final Term origMod;
+    private final Modality modality;
+    private final Term origSelf;
+    private final ImmutableList<Term> origParams;
+    private final Term origResult;
+    private final Term origExc;
+    private final boolean toBeSaved;
     private final Term origDep;
     private final ImmutableList<ImmutableList<Term>> origRespects;
     private final ImmutableList<ImmutableList<Term>> origDeclassifies;
-    SymbolicExecData symExecData;
 
+    /**
+     * If a method is strictly pure, it has no modifies clause which could
+     * anonymised.
+     * @see #hasModifiesClause()
+     */
+    final boolean hasRealModifiesClause;
+
+    
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
@@ -50,19 +76,49 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
                                           Term self,
                                           ImmutableList<Term> params,
                                           Term result,
-                                          Term exec,
+                                          Term exc,
                                           Term dep,
                                           ImmutableList<ImmutableList<Term>> respects,
                                           ImmutableList<ImmutableList<Term>> declassifies,
                                           boolean toBeSaved,
                                           int id) {
-        super(baseName, name, forClass, pm, specifiedIn, modality, pre, mby, mod,
-              hasRealMod, self, params, result, exec, toBeSaved, id);
-
+        assert baseName != null;
+        assert forClass != null;
+        assert pm != null;
+        assert modality != null;
+        assert pre != null;
+        assert mod != null;
+        assert (self == null) == pm.isStatic();
+        assert params != null;
+        assert params.size() == pm.getParameterDeclarationCount();
+        if (result == null){
+            assert (pm.isVoid() || pm.isConstructor()) : "resultVar == null for method "+pm;
+        } else {
+            assert (!pm.isVoid() && !pm.isConstructor()) : "non-null result variable for void method or constructor "+pm+" with return type "+pm.getReturnType();
+        }
+        assert exc != null;
         assert dep != null;
         assert respects != null;
         assert declassifies != null;
 
+        this.baseName = baseName;
+        this.name = name != null
+                    ? name
+                    : ContractFactory.generateContractName(baseName, forClass, pm, specifiedIn, id);
+        this.forClass = forClass;
+        this.pm = pm;
+        this.specifiedIn = specifiedIn;
+        this.origPre = pre;
+        this.origMby = mby;
+        this.origMod = mod;
+        this.origSelf = self;
+        this.origParams = params;
+        this.origResult = result;
+        this.origExc = exc;
+        this.id = id;
+        this.modality = modality;
+        this.hasRealModifiesClause  = hasRealMod;
+        this.toBeSaved = toBeSaved;
         this.origDep = dep;
         this.origRespects = respects;
         this.origDeclassifies = declassifies;
@@ -81,14 +137,14 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
                                        Term self,
                                        ImmutableList<Term> params,
                                        Term result,
-                                       Term exec,
+                                       Term exc,
                                        Term dep,
                                        ImmutableList<ImmutableList<Term>> respects,
                                        ImmutableList<ImmutableList<Term>> declassifies,
                                        boolean toBeSaved) {
 
         this(baseName, null, forClass, pm, specifiedIn, modality, pre, mby, mod,
-             hasRealMod, self, params, result, exec, dep, respects, declassifies,
+             hasRealMod, self, params, result, exc, dep, respects, declassifies,
              toBeSaved, INVALID_ID);
     }
 
@@ -97,6 +153,114 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------    
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+
+    @Override
+    public int id() {
+        return id;
+    }
+
+
+    @Override
+    public KeYJavaType getKJT() {
+        return forClass;
+    }
+
+
+    @Override
+    public IProgramMethod getTarget() {
+        return pm;
+    }
+
+
+    @Override
+    public boolean hasMby() {
+        return origMby != null;
+    }
+
+    
+    @Override
+    public String getBaseName() {
+        return baseName;
+    }
+
+    
+    @Override
+    public Term getPre() {
+        return origPre;
+    }
+
+    
+    @Override
+    public Term getMod() {
+        return origMod;
+    }
+
+    
+    @Override
+    public Term getMby() {
+        return origMby;
+    }
+
+    
+    @Override
+    public Modality getModality() {
+        return modality;
+    }
+
+
+    @Override
+    public Term getSelf() {
+        if (origSelf == null){
+            assert pm.isStatic() : "missing self variable in non-static method contract";
+            return null;
+        }
+        return origSelf;
+    }
+
+    
+    @Override
+    public ImmutableList<Term> getParams() {
+        return origParams;
+    }
+    
+    
+    @Override
+    public Term getResult() {
+        return origResult;
+    }
+    
+
+    @Override
+    public Term getExc() {
+        return origExc;
+    }
+    
+
+    @Override
+    public boolean isReadOnlyContract() {
+        return origMod.toString().equals("empty");
+    }
+
+
+    @Override
+    public String getTypeName() {
+        return ContractFactory.generateContractTypeName(baseName, forClass, pm,
+                                                        specifiedIn);
+    }
+
+
+    @Override
+    public boolean hasModifiesClause() {
+        return hasRealModifiesClause;
+    }
+    
+    
     @Override
     public boolean hasRespects() {
         return !origRespects.isEmpty();
@@ -110,73 +274,74 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
 
 
     @Override
-    public Term getDep(Term heapTerm,
-                       Term selfTerm,
-                       ImmutableList<Term> paramTerms,
-                       Services services) {
-        assert heapTerm != null;
-        assert (selfTerm == null) == (getSelf() == null);
-        assert paramTerms != null;
-        assert paramTerms.size() == getParams().size();
-        assert services != null;
-        return TB.replace(origDep, services,
-                          TB.getBaseHeap(services), heapTerm,
-                          getSelf(), selfTerm,
-                          getParams(), paramTerms);
+    public String getHTMLText(Services services) {
+        return "<html>"
+               + getHTMLBody(services)
+               + "</html>";
     }
 
-
-    @Override
-    public ImmutableList<ImmutableList<Term>> getRespects(Term heapTerm,
-                                           Term selfTerm,
-                                           ImmutableList<Term> paramTerms,
-                                           Term resultTerm,
-                                           Services services) {
-        assert heapTerm != null;
-        assert (selfTerm == null) == (getSelf() == null);
-        assert paramTerms != null;
-        assert paramTerms.size() == getParams().size();
-        assert services != null;
-        ImmutableList<Term> origParamTerms = getParams();
-        if (getResult() != null) {
-            origParamTerms = origParamTerms.append(getResult());
-            paramTerms = paramTerms.append(resultTerm);
-        }
-        return TB.replace2(origRespects, heapTerm,
-                          getSelf(), selfTerm,
-                          origParamTerms, paramTerms, services);
-    }
-
-
-    @Override
-    public ImmutableList<ImmutableList<Term>> getDeclassifies(Term heapTerm,
-                                                            Term selfTerm,
-                                                            ImmutableList<Term> paramTerms,
-                                                            Term resultTerm,
-                                                            Services services) {
-        assert heapTerm != null;
-        assert (selfTerm == null) == (getSelf() == null);
-        assert paramTerms != null;
-        assert paramTerms.size() == getParams().size();
-        assert services != null;
-        ImmutableList<Term> origParamTerms = getParams();
-        if (getResult() != null) {
-            origParamTerms = origParamTerms.append(getResult());
-            paramTerms = paramTerms.append(resultTerm);
-        }
-        return TB.replace2(origDeclassifies, heapTerm,
-                           getSelf(), selfTerm,
-                           origParamTerms, paramTerms, services);
-    }
-
-
-    @Override
+    
     public String getHTMLBody(Services services) {
         return "<html>"
-               + super.getHTMLBody(services)
+               + getHTMLSignature()
+               + getHTMLFor(origPre, "pre", services)
+               + getHTMLFor(origMod, "mod", services)
+               + (hasRealModifiesClause ? "" : "<b>, creates no new objects</b>")
+               + getHTMLFor(origMby, "measured-by", services)
+               + "<br><b>termination</b> " + modality
                + getHTMLFor2(origRespects, "respects", services)
                + getHTMLForDeclassifies(services)
                + "</html>";
+    }
+
+
+    private String getHTMLSignature() {
+        return "<i>" + LogicPrinter.escapeHTML(getHTMLSignatureBody().toString(),
+                                               false) + "</i>";
+    }
+
+    
+    private StringBuffer getHTMLSignatureBody() {
+        final StringBuffer sig = new StringBuffer();
+	if(origResult != null) {
+	    sig.append(origResult);
+	    sig.append(" = ");
+	} else if(pm.isConstructor()) {
+	    sig.append(origSelf);
+	    sig.append(" = new ");
+	}
+        if (!pm.isStatic() && !pm.isConstructor()) {
+	    sig.append(origSelf);
+	    sig.append(".");
+	}
+	sig.append(pm.getName());
+	sig.append("(");
+        for (Term pv : origParams) {
+	    sig.append(pv.toString()).append(", ");
+	}
+        if (!origParams.isEmpty()) {
+	    sig.setLength(sig.length() - 2);
+	}
+	sig.append(")");
+        sig.append(" catch(");
+        sig.append(origExc);
+	sig.append(")");
+        return sig;
+    }
+
+        
+    protected String getHTMLFor(Term originalTerm,
+                                String htmlName,
+                                Services services) {
+        if (originalTerm == null) {
+            return "";
+        } else {
+            final String quickPrint =
+                    LogicPrinter.quickPrintTerm(originalTerm, services);
+            return "<br>"
+                   + "<b>" + htmlName + "</b> "
+                   + LogicPrinter.escapeHTML(quickPrint, false);
+        }
     }
 
 
@@ -227,259 +392,116 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
     @Override
     public String toString() {
         // TODO: all fields should be printed!!
-        return super.toString();
-    }
-
-
-    @Override
-    public boolean toBeSaved() {
-        return false;   // because information flow contracts currently cannot
-        // be specified directly in DL
-    }
-
-
-    @Override
-    public String proofToString(Services services) {
-        assert false;
-        return null;
+        return name + ":: kjt: " + forClass + "; pm: " + pm + "; modality: "
+               + modality + "; pre: " + origPre + "; mby: " + origMby
+               + "; mod: " + origMod + "; selfVar: " + origSelf
+               + "; paramVars: " + origParams + "; id:" + id;
     }
 
 
     @Override
     public ContractPO createProofObl(InitConfig initConfig) {
-        return new InformationFlowContractPO(initConfig, this);
+        return new InfFlowContractPO(initConfig, this);
     }
 
 
     @Override
+    public ProofOblInput getProofObl(Services services) {
+        return services.getSpecificationRepository().getPO(this);
+    }
+
+
+    @Override
+    public String getDisplayName() {
+        return ContractFactory.generateDisplayName(baseName, forClass, pm,
+                                                   specifiedIn, id);
+    }
+
+
+    @Override
+    public VisibilityModifier getVisibility() {
+        assert false; // this is currently not applicable for contracts
+        return null;
+    }
+
+
+    @Override
+    public boolean transactionApplicableContract() {
+        return false;
+    }
+
+    
+    @Override
+    public KeYJavaType getSpecifiedIn() {
+        return specifiedIn;
+    }
+
+    
+    @Override
     public InformationFlowContract setID(int newId) {
-        SymbolicExecData op = super.setID(newId);
-        return new InformationFlowContractImpl(op.getBaseName(), op.getName(),
-                                               op.getKJT(), op.getTarget(),
-                                               op.getSpecifiedIn(),
-                                               op.getModality(),
-                                               op.getPre(), op.getMby(),
-                                               op.getMod(),
-                                               op.hasModifiesClause(),
-                                               op.getSelf(),
-                                               op.getParams(),
-                                               op.getResult(),
-                                               op.getExc(),
-                                               origDep,
-                                               origRespects,
-                                               origDeclassifies,
-                                               op.toBeSaved(),
-                                               op.id());
+        return new InformationFlowContractImpl(baseName, name, forClass, pm,
+                                               specifiedIn, modality, origPre,
+                                               origMby, origMod,
+                                               hasRealModifiesClause, origSelf,
+                                               origParams, origResult, origExc,
+                                               origDep, origRespects,
+                                               origDeclassifies, toBeSaved,
+                                               newId);
     }
 
 
     @Override
     public InformationFlowContract setTarget(KeYJavaType newKJT,
                                              IObserverFunction newPM) {
-        SymbolicExecData op = super.setTarget(newKJT, newPM);
-        return new InformationFlowContractImpl(op.getBaseName(), op.getName(),
-                                               op.getKJT(), op.getTarget(),
-                                               op.getSpecifiedIn(),
-                                               op.getModality(),
-                                               op.getPre(), op.getMby(),
-                                               op.getMod(),
-                                               op.hasModifiesClause(),
-                                               op.getSelf(),
-                                               op.getParams(),
-                                               op.getResult(),
-                                               op.getExc(),
-                                               origDep,
-                                               origRespects,
-                                               origDeclassifies,
-                                               op.toBeSaved(),
-                                               op.id());
-    }
-
-
-    @Override
-    public InformationFlowContract andPre(Term pre,
-                                          Term usedSelf,
-                                          ImmutableList<Term> usedoldParams,
-                                          Services services) {
-        SymbolicExecData op = super.andPre(pre, usedSelf, usedoldParams,
-                                            services);
-        return new InformationFlowContractImpl(op.getBaseName(), op.getName(),
-                                               op.getKJT(), op.getTarget(),
-                                               op.getSpecifiedIn(),
-                                               op.getModality(),
-                                               op.getPre(), op.getMby(),
-                                               op.getMod(),
-                                               op.hasModifiesClause(),
-                                               op.getSelf(),
-                                               op.getParams(),
-                                               op.getResult(),
-                                               op.getExc(),
-                                               origDep,
-                                               origRespects,
-                                               origDeclassifies,
-                                               op.toBeSaved(),
-                                               op.id());
-    }
-
-
-    @Override
-    public InformationFlowContract orPre(Term pre,
-                                         Term usedSelf,
-                                         ImmutableList<Term> usedParams,
-                                         Services services) {
-        SymbolicExecData op = super.orPre(pre, usedSelf, usedParams, services);
-        return new InformationFlowContractImpl(op.getBaseName(), op.getName(),
-                                               op.getKJT(), op.getTarget(),
-                                               op.getSpecifiedIn(),
-                                               op.getModality(),
-                                               op.getPre(), op.getMby(),
-                                               op.getMod(),
-                                               op.hasModifiesClause(),
-                                               op.getSelf(),
-                                               op.getParams(),
-                                               op.getResult(),
-                                               op.getExc(),
-                                               origDep,
-                                               origRespects,
-                                               origDeclassifies,
-                                               op.toBeSaved(),
-                                               op.id());
-    }
-
-
-    @Override
-    public InformationFlowContract addMby(Term condition,
-                                          Term mby) {
-        SymbolicExecData op = super.addMby(condition, mby);
-        return new InformationFlowContractImpl(op.getBaseName(), op.getName(),
-                                               op.getKJT(), op.getTarget(),
-                                               op.getSpecifiedIn(),
-                                               op.getModality(),
-                                               op.getPre(), op.getMby(),
-                                               op.getMod(),
-                                               op.hasModifiesClause(),
-                                               op.getSelf(),
-                                               op.getParams(),
-                                               op.getResult(),
-                                               op.getExc(),
-                                               origDep,
-                                               origRespects,
-                                               origDeclassifies,
-                                               op.toBeSaved(),
-                                               op.id());
-    }
-
-
-    @Override
-    public InformationFlowContract addMod(Term mod,
-                                          Services services) {
-        SymbolicExecData op = super.addMod(mod, services);
-        return new InformationFlowContractImpl(op.getBaseName(), op.getName(),
-                                               op.getKJT(), op.getTarget(),
-                                               op.getSpecifiedIn(),
-                                               op.getModality(),
-                                               op.getPre(), op.getMby(),
-                                               op.getMod(),
-                                               op.hasModifiesClause(),
-                                               op.getSelf(),
-                                               op.getParams(),
-                                               op.getResult(),
-                                               op.getExc(),
-                                               origDep,
-                                               origRespects,
-                                               origDeclassifies,
-                                               op.toBeSaved(),
-                                               op.id());
+        assert newPM instanceof IProgramMethod;
+        return new InformationFlowContractImpl(baseName, name, newKJT,
+                                               (IProgramMethod)newPM,
+                                               specifiedIn, modality, origPre,
+                                               origMby, origMod,
+                                               hasRealModifiesClause, origSelf,
+                                               origParams, origResult, origExc,
+                                               origDep, origRespects,
+                                               origDeclassifies, toBeSaved,
+                                               id);
     }
 
 
     @Override
     public InformationFlowContract setName(String name) {
-        SymbolicExecData op = super.setName(name);
-        return new InformationFlowContractImpl(op.getBaseName(), op.getName(),
-                                               op.getKJT(), op.getTarget(),
-                                               op.getSpecifiedIn(),
-                                               op.getModality(),
-                                               op.getPre(), op.getMby(),
-                                               op.getMod(),
-                                               op.hasModifiesClause(),
-                                               op.getSelf(),
-                                               op.getParams(),
-                                               op.getResult(),
-                                               op.getExc(),
-                                               origDep,
-                                               origRespects,
-                                               origDeclassifies,
-                                               op.toBeSaved(),
-                                               op.id());
+        return new InformationFlowContractImpl(baseName, name, forClass, pm,
+                                               specifiedIn, modality, origPre,
+                                               origMby, origMod,
+                                               hasRealModifiesClause, origSelf,
+                                               origParams, origResult, origExc,
+                                               origDep, origRespects,
+                                               origDeclassifies, toBeSaved,
+                                               id);
     }
 
 
     @Override
     public InformationFlowContract setModality(Modality modality) {
-        SymbolicExecData op = super.setModality(modality);
-        return new InformationFlowContractImpl(op.getBaseName(), op.getName(),
-                                               op.getKJT(), op.getTarget(),
-                                               op.getSpecifiedIn(),
-                                               op.getModality(),
-                                               op.getPre(), op.getMby(),
-                                               op.getMod(),
-                                               op.hasModifiesClause(),
-                                               op.getSelf(),
-                                               op.getParams(),
-                                               op.getResult(),
-                                               op.getExc(),
-                                               origDep,
-                                               origRespects,
-                                               origDeclassifies,
-                                               op.toBeSaved(),
-                                               op.id());
+        return new InformationFlowContractImpl(baseName, name, forClass, pm,
+                                               specifiedIn, modality, origPre,
+                                               origMby, origMod,
+                                               hasRealModifiesClause, origSelf,
+                                               origParams, origResult, origExc,
+                                               origDep, origRespects,
+                                               origDeclassifies, toBeSaved,
+                                               id);
     }
 
 
     @Override
     public InformationFlowContract setModifies(Term modifies) {
-        SymbolicExecData op = super.setModifies(modifies);
-        return new InformationFlowContractImpl(op.getBaseName(), op.getName(),
-                                               op.getKJT(), op.getTarget(),
-                                               op.getSpecifiedIn(),
-                                               op.getModality(),
-                                               op.getPre(), op.getMby(),
-                                               op.getMod(),
-                                               op.hasModifiesClause(),
-                                               op.getSelf(),
-                                               op.getParams(),
-                                               op.getResult(),
-                                               op.getExc(),
-                                               origDep,
-                                               origRespects,
-                                               origDeclassifies,
-                                               op.toBeSaved(),
-                                               op.id());
-    }
-
-
-    @Override
-    public SymbolicExecData getSymbExecData(Services services) {
-        int n = 0;
-        String name = ContractFactory.generateContractName(
-                    ContractFactory.SYMB_EXEC_CONTRACT_BASENAME, getKJT(),
-                    getTarget(), getSpecifiedIn(), n);
-        while(name != null) {
-            SymbolicExecData data =
-                    (SymbolicExecData) services.getSpecificationRepository().getContractByName(
-                    name);
-            if (equalsData(data)) {
-                return data;
-            } else {
-                n++;
-                name = ContractFactory.generateContractName(
-                        ContractFactory.SYMB_EXEC_CONTRACT_BASENAME, getKJT(),
-                        getTarget(), getSpecifiedIn(), n);
-            }
-        }
-        throw new RuntimeException("Could not find symbolic exection data for "
-                + getName());
+        return new InformationFlowContractImpl(baseName, name, forClass, pm,
+                                               specifiedIn, modality, origPre,
+                                               origMby, modifies,
+                                               hasRealModifiesClause, origSelf,
+                                               origParams, origResult, origExc,
+                                               origDep, origRespects,
+                                               origDeclassifies, toBeSaved,
+                                               id);
     }
 
 
@@ -506,11 +528,36 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
         if (c == null || !(c instanceof InformationFlowContract)) {
             return false;
         }
+        assert name != null;
+        assert forClass != null;
+        assert pm != null;
+        assert modality != null;
+        assert origPre != null;
+        assert origMod != null;
+        assert origParams != null;
         assert origDep != null;
         assert origRespects != null;
         assert origDeclassifies != null;
         InformationFlowContract ifc = (InformationFlowContract) c;
-        return super.equals(c)
+        return name.equals(ifc.getName())
+               && forClass.equals(ifc.getKJT())
+               && pm.equals(ifc.getTarget())
+               && modality.equals(ifc.getModality())
+               && origPre.equals(ifc.getPre())
+               && (origMby != null
+                   ? origMby.equals(ifc.getMby())
+                   : ifc.getMby() == null)
+               && origMod.equals(ifc.getMod())
+               && (origSelf != null
+                   ? origSelf.equals(ifc.getSelf())
+                   : ifc.getSelf() == null)
+               && origParams.equals(ifc.getParams())
+               && (origResult != null
+                   ? origResult.equals(ifc.getResult())
+                   : ifc.getResult() == null)
+               && origExc.equals(ifc.getExc())
+               && id == ifc.id()
+               && toBeSaved == ifc.toBeSaved()
                && origDep.equals(ifc.getDep())
                && origRespects.equals(ifc.getRespects())
                && origDeclassifies.equals(ifc.getDeclassifies());
@@ -518,13 +565,87 @@ final class InformationFlowContractImpl extends SymbolicExecDataImpl
     
     
     @Override
-    public ImmutableList<Contract> getContractsToBeStartedBefore(Services services) {
-        SymbolicExecData symbExecCont = getSymbExecData(services);
-        ProofOblInput symbExecPO = symbExecCont.getProofObl(services);
-        if (symbExecPO == null) {
-            return ImmutableSLList.<Contract>nil().append(symbExecCont);
-        } else {
-            return ImmutableSLList.<Contract>nil();
-        }
+    public boolean toBeSaved() {
+        return false;   // because information flow contracts currently cannot
+                        // be specified directly in DL
     }
+
+
+    @Override
+    public String proofToString(Services services) {
+        throw new UnsupportedOperationException("Operation not supported.");
+    }
+
+
+    // the following code is legacy code
+    
+    @Override
+    @Deprecated
+    public Term getPre(LocationVariable heap,
+                       ProgramVariable selfVar,
+                       ImmutableList<ProgramVariable> paramVars,
+                       Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+                       Services services) {
+                throw new UnsupportedOperationException("Not supported any more. "
+                + "Please use the POSnippetFactory instead.");
+    }
+
+    @Override
+    @Deprecated
+    public Term getPre(List<LocationVariable> heapContext,
+                       ProgramVariable selfVar,
+                       ImmutableList<ProgramVariable> paramVars,
+                       Map<LocationVariable, ? extends ProgramVariable> atPreVars,
+                       Services services) {
+                throw new UnsupportedOperationException("Not supported any more. "
+                + "Please use the POSnippetFactory instead.");
+
+    }
+
+    @Override
+    @Deprecated
+    public Term getPre(LocationVariable heap,
+                       Term heapTerm,
+                       Term selfTerm,
+                       ImmutableList<Term> paramTerms,
+                       Map<LocationVariable, Term> atPres,
+                       Services services) {
+        throw new UnsupportedOperationException("Not supported any more. "
+                + "Please use the POSnippetFactory instead.");
+
+    }
+
+    @Override
+    @Deprecated
+    public Term getPre(List<LocationVariable> heapContext,
+                       Map<LocationVariable, Term> heapTerms,
+                       Term selfTerm,
+                       ImmutableList<Term> paramTerms,
+                       Map<LocationVariable, Term> atPres,
+                       Services services) {
+        throw new UnsupportedOperationException("Not supported any more. "
+                + "Please use the POSnippetFactory instead.");
+
+    }
+
+    @Override
+    @Deprecated
+    public Term getMby(ProgramVariable selfVar,
+                       ImmutableList<ProgramVariable> paramVars,
+                       Services services) {
+        throw new UnsupportedOperationException("Not supported any more. "
+                + "Please use the POSnippetFactory instead.");
+    }
+
+    
+    @Override
+    @Deprecated
+    public Term getMby(Term heapTerm,
+                       Term selfTerm,
+                       ImmutableList<Term> paramTerms,
+                       Services services) {
+        throw new UnsupportedOperationException("Not supported any more. "
+                + "Please use the POSnippetFactory instead.");
+    }
+
 }

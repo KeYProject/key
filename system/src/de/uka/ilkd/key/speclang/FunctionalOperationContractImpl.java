@@ -931,11 +931,4 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     public String getTypeName() {
         return ContractFactory.generateContractTypeName(baseName, kjt, pm, specifiedIn);
     }
-
-    
-    @Override
-    public ImmutableList<Contract> getContractsToBeStartedBefore(Services services) {
-        return ImmutableSLList.<Contract>nil();
-    }
-
 }

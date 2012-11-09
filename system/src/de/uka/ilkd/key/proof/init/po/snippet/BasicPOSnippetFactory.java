@@ -1,0 +1,56 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package de.uka.ilkd.key.proof.init.po.snippet;
+
+import de.uka.ilkd.key.logic.Term;
+
+/**
+ *
+ * @author christoph
+ */
+public interface BasicPOSnippetFactory {
+
+    /**
+     * The snippets which can be produced by this factory.
+     */
+    public static enum Snippet {
+        // free precondition (the "general assumption")
+        FREE_PRE (BasicFreePreSnippet.class),
+        
+        // precondition of the contract (without free precondition)
+        CONTRACT_PRE (BasicPreconditionSnippet.class),
+
+        // postcondition of the contract
+        CONTRACT_POST (BasicPostconditionSnippet.class),
+        
+        // modifies of the contract
+        CONTRACT_MOD (BasicModifiesSnippet.class),
+        
+        // dependencies of the contract
+        CONTRACT_DEP (BasicDependsSnippet.class),
+        
+        // miscellaneous snippets
+        SELF_NOT_NULL (BasicSelfNotNullSnippet.class),       // "self != null"
+        SELF_CREATED (BasicSelfCreatedSnippet.class),        // "self.<created> = TRUE"
+        SELF_EXACT_TYPE (BasicSelfExactTypeSnippet.class),   // "MyClass::exactInstance(self) = TRUE"
+        PARAMS_OK (BasicParamsOkSnippet.class),              // the general assumption that all parameter
+                                                        // arguments are valid
+        MBY_AT_PRE_DEF (BasicMbyAtPreDefSnippet.class);      // initial value of measured_by clause
+        
+
+        // type of the factory method
+        public final Class c;
+        
+        // contructor
+        Snippet(Class c) {
+            this.c = c;
+        }
+    };
+
+
+    public Term create(Snippet snippet)
+            throws UnsupportedOperationException;
+
+}

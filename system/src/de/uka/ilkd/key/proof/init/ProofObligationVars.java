@@ -8,6 +8,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -22,22 +23,23 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * @author christoph
  *
  */
-class ProofObligationVars {
+public class ProofObligationVars {
 
     protected static final TermBuilder TB = TermBuilder.DF;
-    final ImmutableList<Term> termList;
-    final String postfix;
-    final Term self;
-    final Term selfAtPost;
-    final ImmutableList<Term> params;
-    final Term result;
-    final Term resultAtPost;
-    final Term exception;
-    final Term exceptionAtPost;
-    final Term heap;
-    final Term heapAtPre;
-    final Term heapAtPost;
-
+    public final ImmutableList<Term> termList;
+    public final String postfix;
+    public final Term self;
+    public final Term selfAtPost;
+    public final ImmutableList<Term> params;
+    public final Term result;
+    public final Term resultAtPost;
+    public final Term exception;
+    public final Term exceptionAtPost;
+    public final Term heap;
+    public final Term heapAtPre;
+    public final Term heapAtPost;
+    public final Term mbyAtPre;
+    
 
     ProofObligationVars(IProgramMethod pm,
                         KeYJavaType kjt, // contract.getKJT()
@@ -70,6 +72,14 @@ class ProofObligationVars {
         this.heap = heap;
         this.heapAtPre = heapAtPre;
         this.heapAtPost = heapAtPost;
+        
+        final Sort intSort =
+                services.getTypeConverter().getIntegerLDT().targetSort();
+        final Function mbyAtPreFunc =
+                new Function(new Name(TB.newName(services, "mbyAtPre")), intSort);
+        register(mbyAtPreFunc, services);
+        this.mbyAtPre = TB.func(mbyAtPreFunc);
+        
 
         ImmutableList<Term> terms =
                 ImmutableSLList.<Term>nil();
@@ -83,6 +93,7 @@ class ProofObligationVars {
         terms = terms.append(heap);
         terms = terms.append(heapAtPre);
         terms = terms.append(heapAtPost);
+        terms = terms.append(mbyAtPre);
         termList = terms;
     }
 

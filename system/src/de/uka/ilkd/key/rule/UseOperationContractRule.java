@@ -52,7 +52,11 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ObserverWithType;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.InformationFlowContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
+import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
+import de.uka.ilkd.key.proof.init.po.snippet.POSinppetFactory;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
@@ -1030,8 +1034,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         ImmutableSet<InformationFlowContract> ifContracts =
                 getInfromFlowContracts(pm, services);
-        Term schemaContApps = InformationFlowContractPO.buildContractApplications(
-                target, ifContracts, schemaDataFind, schemaDataAssumes, services);
+        Term schemaContApps =
+                buildContractApplications(target, ifContracts, schemaDataFind,
+                                          schemaDataAssumes, services);
         
         //create sequents
         Sequent assumesSeq = Sequent.createAnteSequent(
@@ -1079,7 +1084,73 @@ public final class UseOperationContractRule implements BuiltInRule {
         return TB.var(SchemaVariableFactory.createTermSV(name, predArgSort));
     }
         
-    
+
+    public Term buildContractApplications(
+            ObserverWithType target,
+            ImmutableSet<InformationFlowContract> targetContracts,
+            ContractApplicationData contAppData,
+            ContractApplicationData contAppData2,
+            Services services) {
+        ImmutableList<Term> contractsApplications = ImmutableSLList.<Term>nil();
+        for (InformationFlowContract cont : targetContracts) {
+            contractsApplications = contractsApplications.append(
+                    buildContractApplication(target, cont, contAppData,
+                    contAppData2, services));
+        }
+        return TB.and(contractsApplications);
+    }
+
+
+    private static Term buildContractApplication(ObserverWithType target,
+                                                 InformationFlowContract cont,
+                                                 ContractApplicationData contAppData,
+                                                 ContractApplicationData contAppData2,
+                                                 Services services) {
+        ProofObligationVars targetC1 =
+                new ProofObligationVars((ProgramMethod) target.obs,
+                                        target.kjt,
+                                        contAppData.self,
+                                        contAppData.self,
+                                        contAppData.params,
+                                        contAppData.result,
+                                        contAppData.result,
+                                        contAppData.heapAtPre,
+                                        contAppData.heapAtPre,
+                                        contAppData.heapAtPost,
+                                        "", services, false);
+        ProofObligationVars targetC2 =
+                new ProofObligationVars((ProgramMethod) target.obs,
+                                        target.kjt,
+                                        contAppData2.self,
+                                        contAppData2.self,
+                                        contAppData2.params,
+                                        contAppData2.result,
+                                        contAppData2.result,
+                                        contAppData2.heapAtPre,
+                                        contAppData2.heapAtPre,
+                                        contAppData2.heapAtPost,
+                                        "", services, false);
+        final InfFlowContractPO.IFProofObligationVars targetVs =
+                new InfFlowContractPO.IFProofObligationVars(targetC1, targetC2,
+                                          cont.getTarget(), cont.getKJT(),
+                                          null);
+
+        BasicPOSnippetFactory f1 =
+                POSinppetFactory.getBasicFactory(cont, targetC1, services);
+        BasicPOSnippetFactory f2 =
+                POSinppetFactory.getBasicFactory(cont, targetC2, services);
+
+        Term preCond1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
+        Term preCond2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
+
+        InfFlowPOSnippetFactory iff =
+                POSinppetFactory.getInfFlowFactory(cont, targetC1, targetC2,
+                                                   services);
+        Term inOutRelations =
+                iff.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_POST);
+        return TB.imp(TB.and(preCond1, preCond2), inOutRelations);
+    }
+
 
     
     //-------------------------------------------------------------------------

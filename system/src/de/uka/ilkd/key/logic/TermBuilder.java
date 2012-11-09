@@ -665,7 +665,7 @@ public class TermBuilder {
         return tf.createTerm(Equality.EQUALS, t1, t2);
     }
     }
-
+    
 
     /**
      * Creates a substitution term
@@ -1854,116 +1854,6 @@ public class TermBuilder {
     
     
     //-------------------------------------------------------------------------
-    // Term manipulation (e.g. for contract generation)
-    //-------------------------------------------------------------------------
-
-    public Term replace(Term t,
-                        Services services,
-                        Term originalSelfTerm,
-                        Term selfTerm,
-                        ImmutableList<Term> originalParamTerms,
-                        ImmutableList<Term> paramTerms,
-                        Term... moreReplacementPairs) {
-        return replace(t, services, null, null, originalSelfTerm,
-                       selfTerm, originalParamTerms, paramTerms,
-                       moreReplacementPairs);
-    }
-
-    
-    public Term replace(Term t,
-                        Services services,
-                        Term originalHeapTerm,
-                        Term heapTerm,
-                        Term originalSelfTerm,
-                        Term selfTerm,
-                        ImmutableList<Term> originalParamTerms,
-                        ImmutableList<Term> paramTerms,
-                        Term... moreReplacementPairs) {
-        de.uka.ilkd.key.util.LinkedHashMap<Term, Term> map =
-                new de.uka.ilkd.key.util.LinkedHashMap<Term, Term>();
-        
-        if (heapTerm != null) {
-            assert heapTerm.sort().equals(
-                    services.getTypeConverter().getHeapLDT().targetSort());
-            map.put(TermBuilder.DF.getBaseHeap(services), heapTerm);
-        }
-
-        assert (selfTerm == null && originalSelfTerm == null)
-               || selfTerm.sort().extendsTrans(originalSelfTerm.sort());
-        map.put(originalSelfTerm, selfTerm);
-
-        assert equalSorts(originalParamTerms, paramTerms);
-        map.putAll(originalParamTerms, paramTerms);
-
-        assert moreReplacementPairs.length % 2 == 0;
-        for (int i = 0; i < moreReplacementPairs.length; i = i + 2) {
-            if (moreReplacementPairs[i] != null
-                && moreReplacementPairs[i + 1] != null) {
-                assert moreReplacementPairs[i].sort().equals(
-                        moreReplacementPairs[i + 1].sort());
-                map.put(moreReplacementPairs[i], moreReplacementPairs[i + 1]);
-            }
-        }
-
-        OpReplacer or = new OpReplacer(map);
-        Term result = or.replace(t);
-        
-        return result;
-    }
-    
-
-    private boolean equalSorts(ImmutableList<Term> originalParamTerms,
-                                      ImmutableList<Term> paramTerms) {
-        Iterator<Term> origIt = originalParamTerms.iterator();
-        for (Term param : paramTerms) {
-            if (!origIt.next().sort().getClass().isInstance(param.sort())) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    public ImmutableList<Term> replace(ImmutableList<Term> ts,
-                                       Term heapTerm,
-                                       Term originalSelfTerm,
-                                       Term selfTerm,
-                                       ImmutableList<Term> originalParamTerms,
-                                       ImmutableList<Term> paramTerms,
-                                       Services services) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        for (Term origTerm : ts) {
-            result = result.append(replace(origTerm, services,
-                                           getBaseHeap(services), heapTerm,
-                                           originalSelfTerm, selfTerm,
-                                           originalParamTerms, paramTerms));
-
-        }
-        return result;
-    }
-
-
-    public ImmutableList<ImmutableList<Term>> replace2(
-            ImmutableList<ImmutableList<Term>> tss,
-            Term heapTerm,
-            Term originalSelfTerm,
-            Term selfTerm,
-            ImmutableList<Term> originalParamTerms,
-            ImmutableList<Term> paramTerms,
-            Services services) {
-        ImmutableList<ImmutableList<Term>> result =
-                ImmutableSLList.<ImmutableList<Term>>nil();
-        for (ImmutableList<Term> ts : tss) {
-            ImmutableList<Term> clause =
-                    replace(ts, heapTerm, originalSelfTerm, selfTerm,
-                            originalParamTerms, paramTerms, services);
-            result = result.append(clause);
-        }
-        return result;
-    }
-    
-    
-    //-------------------------------------------------------------------------
     // Serviced TermBuilder
     //-------------------------------------------------------------------------
 
@@ -1975,6 +1865,10 @@ public class TermBuilder {
         {
             assert services != null;
             this.services = services;
+        }
+        
+        public Services getServices() {
+            return services;
         }
 
         public String newName(final String baseName)
@@ -2059,6 +1953,26 @@ public class TermBuilder {
         public Term union(final Term firstLocationSet, final Term secondLocationSet)
         {
             return union(services, firstLocationSet, secondLocationSet);
+        }
+        
+        public Term created(Term o) {
+            return created(services, o);
+        }
+        
+        public Term exactInstance(Sort s, Term t) {
+            return exactInstance(services, s, t);
+        }
+    
+        public Term getBaseHeap() {
+            return getBaseHeap(services);
+        }
+
+        public Term seq(Term... terms) {
+            return seq(services, terms);
+        }
+
+        public Term seq(ImmutableList<Term> terms) {
+            return seq(services, terms);
         }
 
     }
