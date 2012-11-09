@@ -20,7 +20,7 @@ class BasicSelfExactTypeSnippet implements FactoryMethod {
     public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        if (d.contract.getTarget() instanceof IProgramMethod) {
+        if (!(d.contract.getTarget() instanceof IProgramMethod)) {
             throw new UnsupportedOperationException("Tried to produce "
                     + "SELF_EXACT_TYPE for an observer "
                     + "which is no IProgramMethod.");
