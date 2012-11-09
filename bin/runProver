@@ -97,7 +97,7 @@ list_help(){
   echo "Runscript for the KeY system\n"
   echo "Usage: ./runProver [technical options] [options for KeY prover] [filename]\n"
   echo "\nOptions for using this script"
-  echo "  -J-option: pass option to the JVM following the -J option convention of javac\n"
+  echo "  --J-option: pass option to the JVM following the -J option convention of javac\n"
   echo "Debugging:\n"
   echo "  --K-keydebug: turn debugging on"
   echo "  --K-debugclassloader: switch the Debugclassloadflag on to load classes for debugging"
@@ -107,7 +107,7 @@ list_help(){
   echo "  --K-assertionflag: switch assertionflag on, s.t. debug assertions are used\n"
   echo "Other:\n"
   echo "  --K-server:  switches Java -server on "
-  echo "  --Khelp, -Kh	: prints this help message"
+  echo "  --K-help, -Kh	: prints this help message"
   echo "  --help	: prints help message of the KeY prover"
 
 }
@@ -119,7 +119,7 @@ list_help(){
 
 keysysprops=""
 keyoptions=""
-tempString=""
+
 while [ $# -ne 0 ]; do
     case $1 in
 #     -K options for configuration options of KeY, such as debugmode, flags,
@@ -128,7 +128,7 @@ while [ $# -ne 0 ]; do
 # 	    set ${1} #removes the minus from the option, s.t. it can be passed to key as option
 	    list_help
 	    exit;;
-	--Khelp)
+	--K-help)
 # 	    set ${1#--} #removes the minus from the option, s.t. it can be passed to key as option
 	    list_help
 	    exit;;
@@ -149,26 +149,24 @@ keysysprops="${keysysprops}-DKeyDebugClassLoader=on
 	    shift
 	    continue;;
 
-	--K-remotedebug) tempString="-Xdebug -Xnoagent -Djava.compiler=NONE
--Xrunjdwp:transport=dt_socket,server=y,suspend=${3},address=${2}"
-	    if [ ${3} != "y" ] && [ ${3} != "n" ];
-	     then
-		echo "The suspend option for remote debugging has to be set either to n or to y"
-		echo "Type ./runProver --help for more information"
-		exit 1
-	      else
-		JAVA_OPTIONS=${tempString}
-	    fi
-	    shift
+	--K-remotedebug-wait) JAVA_OPTIONS="-Xdebug -Xnoagent -Djava.compiler=NONE
+-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=${2}"	   
 	    shift
 	    shift
 	    continue;;
+	    
+	--K-remotedebug) JAVA_OPTIONS="-Xdebug -Xnoagent -Djava.compiler=NONE
+-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${2}"	   
+	    shift
+	    shift
+	    continue;;
+
 
 	--K-server) keysysprops="${keysysprops}-server "
             shift
             continue;;
 # -J options follwing conventions of Java for -J options
-	-J*)
+	--J*)
 	    option=${1#-J}
 	    JAVA_OPTIONS="${JAVA_OPTIONS}${option} "
 	    shift
