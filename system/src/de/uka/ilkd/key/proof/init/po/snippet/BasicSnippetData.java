@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import java.util.EnumMap;
 
@@ -42,7 +41,7 @@ class BasicSnippetData {
         @Override
         public Object put(Key key,
                           Object value) {
-            assert key.getType().isInstance(value);
+            assert value == null || key.getType().isInstance(value);
             return super.put(key, value);
         }
     };
