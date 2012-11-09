@@ -102,7 +102,7 @@ list_help(){
   echo "  --K-keydebug: turn debugging on"
   echo "  --K-debugclassloader: switch the Debugclassloadflag on to load classes for debugging"
   echo "  --K-debugprefix <debugclass> : send debug output of debugclass to stadard out"
-  echo "  --K-remotedebug <port>: turn remote debugging on; parameter for listening port"
+  echo "  --K-remotedebug <port> <y/n>: turn remote debugging on; parameter for listening port; suspend option for remote debugger: (y)es or (n)o"
   echo "  --K-assertionflag: switch assertionflag on, s.t. debug assertions are used\n"
   echo "Other:\n"
   echo "  --K-server:  switches Java -server on "
@@ -118,6 +118,7 @@ list_help(){
 
 keysysprops=""
 keyoptions=""
+tempString=""
 while [ $# -ne 0 ]; do
     case $1 in
 #     -K options for configuration options of KeY, such as debugmode, flags,
@@ -147,8 +148,17 @@ keysysprops="${keysysprops}-DKeyDebugClassLoader=on
 	    shift
 	    continue;;
 
-	--K-remotedebug) JAVA_OPTIONS="-Xdebug -Xnoagent -Djava.compiler=NONE
--Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${2}"
+	--K-remotedebug) tempString="-Xdebug -Xnoagent -Djava.compiler=NONE
+-Xrunjdwp:transport=dt_socket,server=y,suspend=${3},address=${2}"
+	    if [ ${3} != "y" ] && [ ${3} != "n" ];
+	     then
+		echo "The suspend option for remote debugging has to be set either to n or to y"
+		echo "Type ./runProver --help for more information"
+		exit 1
+	      else
+		JAVA_OPTIONS=${tempString}
+	    fi
+	    shift
 	    shift
 	    shift
 	    continue;;
