@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import java.util.EnumMap;
 import java.util.logging.Level;
@@ -18,12 +19,12 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
     /**
      * Collection of data important for the production of snippets.
      */
-    final BasicSnippetData data;
+    private final BasicSnippetData data;
     
     /**
      * Variables belonging to the proof obligation.
      */
-    final ProofObligationVars poVars;
+    private final ProofObligationVars poVars;
 
     /**
      * Registered snippet factory methods.
@@ -34,6 +35,15 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
 
     BasicPOSnippetFactoryImpl(BasicSnippetData data, ProofObligationVars poVars) {
         this.data = data;
+        this.poVars = poVars;
+        registerFactoryMethods();
+    }
+
+
+    BasicPOSnippetFactoryImpl(FunctionalOperationContract contract,
+                              ProofObligationVars poVars,
+                              Services services) {
+        this.data = new BasicSnippetData(contract, services);
         this.poVars = poVars;
         registerFactoryMethods();
     }
@@ -72,7 +82,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
                 throw new UnsupportedOperationException("Unknown factory "
                         + "method for snippet \"" + snippet.name() + ".");
             }
-            return m.produce(this, data, poVars);
+            return m.produce(data, poVars);
         } catch (TermCreationException e) {
             throw new UnsupportedOperationException("Factory method for "
                     + "snippet \"" + snippet.name() + "threw "

@@ -30,6 +30,13 @@ public interface BasicPOSnippetFactory {
         
         // dependencies of the contract
         CONTRACT_DEP (BasicDependsSnippet.class),
+
+        // [P] (heap = heapAtPost & self = selfAtPost & result = resultAtPost &
+        //      exc = excAtPost)
+        SYMBOLIC_EXEC (SymbolicExecutionSnippet.class),
+
+        // package.class::m_RELATES(self, param1, ..., paramN, heap, result, exc, heapAtPost)
+        TWO_STATE_METHOD_PRED (TwoStateMethodPredicateSnippet.class),
         
         // miscellaneous snippets
         SELF_NOT_NULL (BasicSelfNotNullSnippet.class),       // "self != null"

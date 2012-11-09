@@ -10,15 +10,8 @@
 
 package de.uka.ilkd.key.speclang;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -45,6 +38,11 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Standard implementation of the OperationContract interface.
@@ -930,5 +928,69 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     @Override
     public String getTypeName() {
         return ContractFactory.generateContractTypeName(baseName, kjt, pm, specifiedIn);
+    }
+
+
+    public String getBaseName() {
+        return baseName;
+    }
+
+
+    public Term getPre() {
+        assert originalPres.values().size() == 1
+               : "information flow extension not compatible with multi-heap setting";
+        return originalPres.values().iterator().next();
+    }
+
+
+    public Term getPost() {
+        assert originalPosts.values().size() == 1
+               : "information flow extension not compatible with multi-heap setting";
+        return originalPosts.values().iterator().next();
+    }
+
+
+    public Term getMod() {
+        assert originalMods.values().size() == 1
+               : "information flow extension not compatible with multi-heap setting";
+        return originalMods.values().iterator().next();
+    }
+
+
+    public Term getMby() {
+        return originalMby;
+    }
+
+
+    public Term getSelf() {
+        if (originalSelfVar == null){
+            assert pm.isStatic() : "missing self variable in non-static method contract";
+            return null;
+        }
+        return TB.var(originalSelfVar);
+    }
+
+
+    public ImmutableList<Term> getParams() {
+        if (originalParamVars == null) {
+            return null;
+        }
+        return TB.var(originalParamVars);
+    }
+
+
+    public Term getResult() {
+        if (originalResultVar == null) {
+            return null;
+        }
+        return TB.var(originalResultVar);
+    }
+
+
+    public Term getExc() {
+        if (originalExcVar == null) {
+            return null;
+        }
+        return TB.var(originalExcVar);
     }
 }

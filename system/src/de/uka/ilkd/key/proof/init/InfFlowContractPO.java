@@ -15,7 +15,6 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSinppetFactory;
-import de.uka.ilkd.key.proof.init.po.snippet.SymbExecPOSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Rule;
@@ -37,7 +36,6 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
     private final InformationFlowContract contract;
     private final ProofObligationVars symbExecVars;
     private final IFProofObligationVars ifVars;
-    private final SymbExecPOSnippetFactory symbExecFactory;
 
 
     public InfFlowContractPO(InitConfig initConfig,
@@ -51,32 +49,39 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
         assert (symbExecVars.self == null) == (pm.isStatic());
         ifVars = new IFProofObligationVars(pm, contract.getKJT(), symbExecVars,
                                            services);
-        
-        // generate snippet factory
-        this.symbExecFactory = POSinppetFactory.getSymbExecFactory(
-                contract, javaInfo, symbExecVars, services);
     }
 
 
     @Override
     public void readProblem() throws ProofInputException {
+        // generate snippet factory for symbolic execution
+        BasicPOSnippetFactory symbExecFactory =
+                POSinppetFactory.getBasicFactory(contract, symbExecVars, services);
+
         // precondition
         final Term freePre = symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_PRE);
         final Term contractPre = symbExecFactory.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
         final Term pre = TB.and(freePre, contractPre);
         
         // symbolic execution
-        Term symExec = symbExecFactory.create(SymbExecPOSnippetFactory.Snippet.SYMBOLIC_EXEC);
+        Term symExec = symbExecFactory.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC);
 
         // final symbolic execution term
         Term finalSymbolicExecutionTerm = TB.not(TB.and(pre, symExec));
 
         // information flow po
+        BasicPOSnippetFactory execPredFactory1 =
+                POSinppetFactory.getBasicFactory(contract, ifVars.c1, services);
+        BasicPOSnippetFactory execPredFactory2 =
+                POSinppetFactory.getBasicFactory(contract, ifVars.c2, services);
+
         final Term exec1 =
-                buildExecution(ifVars.c1, ifVars.map1, symbExecVars.heap, symbExecGoals);
+                execPredFactory1.create(BasicPOSnippetFactory.Snippet.TWO_STATE_METHOD_PRED);
+//                buildExecution(ifVars.c1, ifVars.map1, symbExecVars.heap, symbExecGoals);
         final Term exec2 =
-                buildExecution(ifVars.c2, ifVars.map2, symbExecVars.heap, symbExecGoals);
-        addContractApplicationTaclets(symbExecProof);
+                execPredFactory2.create(BasicPOSnippetFactory.Snippet.TWO_STATE_METHOD_PRED);
+//                buildExecution(ifVars.c2, ifVars.map2, symbExecVars.heap, symbExecGoals);
+//        addContractApplicationTaclets(symbExecProof);
 
         InfFlowPOSnippetFactory f =
                 POSinppetFactory.getInfFlowFactory(contract, ifVars.c1,

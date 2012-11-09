@@ -7,7 +7,9 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
+
 
 /**
  *
@@ -16,18 +18,23 @@ import de.uka.ilkd.key.speclang.InformationFlowContract;
 public class POSinppetFactory {
 
     public static BasicPOSnippetFactory getBasicFactory(
+            FunctionalOperationContract contract,
+            ProofObligationVars vars,
+            Services services) {
+        return new BasicPOSnippetFactoryImpl(contract, vars, services);
+    }
+
+    public static BasicPOSnippetFactory getBasicFactory(
             InformationFlowContract contract,
             ProofObligationVars vars,
             Services services) {
         return new BasicPOSnippetFactoryImpl(contract, vars, services);
     }
 
-    public static SymbExecPOSnippetFactory getSymbExecFactory(
-            InformationFlowContract contract,
-            JavaInfo javaInfo,
-            ProofObligationVars vars,
-            Services services) {
-        return new SymbExecPOSnippetFactoryImpl(contract, javaInfo, vars, services);
+    static BasicPOSnippetFactory getBasicFactory(
+            BasicSnippetData data,
+            ProofObligationVars poVars) {
+        return new BasicPOSnippetFactoryImpl(data, poVars);
     }
 
     public static InfFlowPOSnippetFactory getInfFlowFactory(
@@ -38,9 +45,5 @@ public class POSinppetFactory {
         return new InfFlowPOSnippetFactoryImpl(contract, vars1, vars2, services);
     }
 
-    static BasicPOSnippetFactory getBasicFactory(
-            BasicSnippetData data, ProofObligationVars poVars) {
-        return new BasicPOSnippetFactoryImpl(data, poVars);
-    }
 
 }

@@ -36,13 +36,11 @@ import java.util.Iterator;
  * @author christoph
  */
 class SymbolicExecutionSnippet extends ReplaceAnRegisterMethod
-        implements SymbExecFactoryMethod {
+        implements FactoryMethod {
 
     @Override
-    public Term produce(SymbExecPOSnippetFactory f,
-                        BasicSnippetData d,
-                        ProofObligationVars poVars,
-                        JavaInfo javaInfo)
+    public Term produce(BasicSnippetData d,
+                        ProofObligationVars poVars)
             throws UnsupportedOperationException {
         ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
         if (poVars.selfAtPost != null) {
@@ -55,12 +53,11 @@ class SymbolicExecutionSnippet extends ReplaceAnRegisterMethod
         posts = posts.append(d.tb.equals(poVars.exceptionAtPost,
                                          poVars.exception));
         posts = posts.append(d.tb.equals(poVars.heapAtPost, poVars.heap));
-        final Term prog = buildProgramTerm(d, javaInfo, poVars, d.tb.and(posts), d.tb);
+        final Term prog = buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
         return prog;
     }
 
     private Term buildProgramTerm(BasicSnippetData d,
-                                  JavaInfo javaInfo,
                                   ProofObligationVars vs,
                                   Term postTerm,
                                   TermBuilder.Serviced tb) {
@@ -87,7 +84,7 @@ class SymbolicExecutionSnippet extends ReplaceAnRegisterMethod
         }
 
         //create java block
-        final JavaBlock jb = buildJavaBlock(d, javaInfo, formalParamVars,
+        final JavaBlock jb = buildJavaBlock(d, formalParamVars,
                                             vs.self != null
                                             ? vs.self.op(ProgramVariable.class)
                                             : null,
@@ -127,7 +124,6 @@ class SymbolicExecutionSnippet extends ReplaceAnRegisterMethod
 
     private JavaBlock buildJavaBlock(
             BasicSnippetData d,
-            JavaInfo javaInfo,
             ImmutableList<LocationVariable> formalParVars,
             ProgramVariable selfVar,
             ProgramVariable resultVar,
@@ -136,10 +132,7 @@ class SymbolicExecutionSnippet extends ReplaceAnRegisterMethod
             throw new UnsupportedOperationException("Tried to produce a "
                     + "java-block for an observer which is no progam method.");
         }
-        if (javaInfo == null) {
-            throw new UnsupportedOperationException("Tried to produce a "
-                    + "java-block without an javaInfo.");
-        }
+        JavaInfo javaInfo = d.tb.getServices().getJavaInfo();
         IProgramMethod pm = (IProgramMethod) d.contract.getTarget();
 
         //create method call

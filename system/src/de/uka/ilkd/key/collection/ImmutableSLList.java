@@ -83,7 +83,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
      * Convert the list to a Java array (O(n))
      */
     @Override
-    public <S> S[] toArray(Class type) {
+    public <S> S[] toArray(Class<S> type) {
         S[] result = (S[]) Array.newInstance(type.getComponentType(), size());
         ImmutableList<T> rest = this;
         for (int i = 0; i<size(); i++) {

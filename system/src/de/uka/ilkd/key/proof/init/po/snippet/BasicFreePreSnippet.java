@@ -15,10 +15,12 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 class BasicFreePreSnippet implements FactoryMethod {
 
     @Override
-    public Term produce(BasicPOSnippetFactory f,
-                        BasicSnippetData d,
+    public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
+        BasicPOSnippetFactory f =
+                POSinppetFactory.getBasicFactory(d, poVars);
+
         // "wellformed(heap)"
         final Term wellFormed = d.tb.wellFormed(poVars.heap);
 

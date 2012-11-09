@@ -77,4 +77,14 @@ public interface FunctionalOperationContract extends OperationContract {
 	    	        Map<LocationVariable,Term> atPres,
 	    	        Services services);
 
+
+    public String getBaseName();
+    public Term getPre();
+    public Term getPost();
+    public Term getMod();
+    public Term getMby();
+    public Term getSelf();
+    public ImmutableList<Term> getParams();
+    public Term getResult();
+    public Term getExc();
 }

@@ -16,8 +16,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 class BasicSelfNotNullSnippet implements FactoryMethod {
 
     @Override
-    public Term produce(BasicPOSnippetFactory f,
-                        BasicSnippetData d,
+    public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         if (d.contract.getTarget() instanceof IProgramMethod) {

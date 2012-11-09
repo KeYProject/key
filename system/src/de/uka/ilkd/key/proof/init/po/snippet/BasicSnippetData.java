@@ -7,6 +7,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContractImpl;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import java.util.EnumMap;
 
@@ -68,6 +70,25 @@ class BasicSnippetData {
             return type;
         }
     };
+
+
+    BasicSnippetData(FunctionalOperationContract contract,
+                     Services services) {
+        this.contract = contract;
+        this.tb = new TermBuilder.Serviced(services);
+
+        contractContents.put(Key.PRECONDITION, contract.getPre());
+        contractContents.put(Key.POSTCONDITION, contract.getPost());
+        contractContents.put(Key.MODIFIES, contract.getMod());
+        contractContents.put(Key.MEASURED_BY, contract.getMby());
+        contractContents.put(Key.MODALITY, contract.getModality());
+
+        final Term heap = TermBuilder.DF.getBaseHeap(services);
+        origVars = new ProofObligationVars(contract.getSelf(), null,
+                contract.getParams(), contract.getResult(), null,
+                contract.getExc(), null, heap, null, null, "", services);
+
+    }
 
 
     BasicSnippetData(InformationFlowContract contract,

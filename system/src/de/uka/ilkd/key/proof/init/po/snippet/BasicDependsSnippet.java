@@ -15,8 +15,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 class BasicDependsSnippet extends ReplaceAnRegisterMethod implements FactoryMethod {
 
     @Override
-    public Term produce(BasicPOSnippetFactory f,
-                        BasicSnippetData d,
+    public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         if (d.getContractContent(BasicSnippetData.Key.DEPENDENS) == null) {
