@@ -33,6 +33,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.util.LRUCache;
+import de.uka.ilkd.key.util.Pair;
 
 
 public final class OneStepSimplifier implements BuiltInRule, 	
@@ -224,6 +225,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    RewriteTaclet taclet = (RewriteTaclet) app.rule();		
 	    SequentFormula result = taclet.getRewriteResult(services, app);
 	    return result;
+	    // TODO Idea: return new Pair<TacletApp, SequentFormula>(null, null);
 	}
 	return null;
     }

@@ -105,8 +105,8 @@ public class DefaultProblemLoader {
     */
    public String load() throws ProofInputException, IOException {
       // Read environment
-	  Boolean oneStepSimplifier = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
-	  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+      boolean oneStepSimplifier = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
       envInput = createEnvInput();
       problemInitializer = createProblemInitializer();
       initConfig = createInitConfig();
