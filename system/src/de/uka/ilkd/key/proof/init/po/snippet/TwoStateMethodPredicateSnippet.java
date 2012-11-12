@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.util.MiscTools;
 
 
 /**
@@ -23,7 +22,7 @@ import de.uka.ilkd.key.util.MiscTools;
  * <p/>
  * @author christoph
  */
-class TwoStateMethodPredicateSnippet implements FactoryMethod {
+abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
     @Override
     public Term produce(BasicSnippetData d,
@@ -37,8 +36,7 @@ class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
     private Function generateContApplPredicate(IProgramMethod pm,
                                                TermBuilder.Serviced tb) {
-        String nameSting =
-                MiscTools.toValidTacletName(pm.getFullName() + "__RELATES").toString();
+        String nameSting = generatePredicateName(pm);
         final Name name = new Name(nameSting);
         final JavaInfo javaInfo = tb.getServices().getJavaInfo();
         final Namespace functionNS =
@@ -121,4 +119,8 @@ class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
         return tb.func(pred, predArgs);
     }
+
+
+    abstract String generatePredicateName(IProgramMethod pm);
+
 }

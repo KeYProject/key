@@ -76,10 +76,10 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
                 POSinppetFactory.getBasicFactory(contract, ifVars.c2, services);
 
         final Term exec1 =
-                execPredFactory1.create(BasicPOSnippetFactory.Snippet.TWO_STATE_METHOD_PRED);
+                execPredFactory1.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_WITH_PRE_RELATION);
 //                buildExecution(ifVars.c1, ifVars.map1, symbExecVars.heap, symbExecGoals);
         final Term exec2 =
-                execPredFactory2.create(BasicPOSnippetFactory.Snippet.TWO_STATE_METHOD_PRED);
+                execPredFactory2.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_WITH_PRE_RELATION);
 //                buildExecution(ifVars.c2, ifVars.map2, symbExecVars.heap, symbExecGoals);
 //        addContractApplicationTaclets(symbExecProof);
 
