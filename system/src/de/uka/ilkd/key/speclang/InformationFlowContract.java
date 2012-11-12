@@ -10,10 +10,10 @@
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
 
 
@@ -22,87 +22,68 @@ import de.uka.ilkd.key.logic.op.Modality;
  * A contract about the dependencies of an observer symbol, consisting of 
  * a precondition, a depends clause, and a measured-by clause.
  */
-public interface InformationFlowContract extends SymbolicExecData {
+public interface InformationFlowContract extends Contract {
+
+    public String getBaseName();
+
+    
+    @Override
+    public IProgramMethod getTarget();
+    
+    
+    public KeYJavaType getSpecifiedIn();
+    
 
     /**
-     * Returns the dependency set of the contract.
+     * Returns <code>true</code> iff the method (according to the contract) does
+     * not modify the heap at all, i.e., iff it is "strictly pure."
+     * 
+     * @return whether this contract is strictly pure.
      */
-    public Term getDep(Term heapTerm,
-                       Term selfTerm,
-                       ImmutableList<Term> paramTerms,
-                       Services services);
+    public boolean hasModifiesClause();
+    
+    
+    /**
+     * Returns the original precondition of the contract.
+     */
+    Term getPre();
+    
 
-
-    Term getDep();
-
-
-    public ImmutableList<ImmutableList<Term>> getRespects(Term heapTerm,
-                                           Term selfTerm,
-                                           ImmutableList<Term> paramTerms,
-                                           Term resultTerm,
-                                           Services services);
-
-
-    ImmutableList<ImmutableList<Term>> getRespects();
+    /**
+     * Returns the original modifies clause of the contract.
+     */
+    Term getMod();
 
 
     /**
-     * Returns the declassification formulas.
+     * Returns the original measured_by clause of the contract.
      */
-    public ImmutableList<ImmutableList<Term>> getDeclassifies(
-            Term heapTerm,
-            Term selfTerm,
-            ImmutableList<Term> paramTerms,
-            Term resultTerm,
-            Services services);
+    Term getMby();
+
+    
+    /**
+     * Get the exception-variable which is used in this contract.
+     * @return used exception-variable
+     */
+    public Term getExc();
+    
+
+    public boolean isReadOnlyContract();
 
 
-    public ImmutableList<ImmutableList<Term>> getDeclassifies();
-
-
-    public boolean hasDeclassifies();
-
-
-    public boolean hasRespects();
-
-
-    @Override
-    public InformationFlowContract andPre(Term pre,
-                                          Term usedSelf,
-                                          ImmutableList<Term> usedParams,
-                                          Services services);
-
-
-    @Override
-    public InformationFlowContract orPre(Term pre,
-                                         Term usedSelf,
-                                         ImmutableList<Term> usedParams,
-                                         Services services);
-
-
-    @Override
-    public InformationFlowContract addMby(Term condition,
-                                          Term mby);
-
-
-    @Override
-    public InformationFlowContract addMod(Term mod,
-                                          Services services);
-
-
-    @Override
+    /**
+     * Returns the modality of the contract.
+     */
+    public Modality getModality();
+    
+    
     public InformationFlowContract setName(String name);
 
 
-    @Override
     public InformationFlowContract setModality(Modality modality);
 
 
-    @Override
     public InformationFlowContract setModifies(Term modifies);
-
-
-    public SymbolicExecData getSymbExecData(Services services);
 
 
     /**
@@ -112,6 +93,20 @@ public interface InformationFlowContract extends SymbolicExecData {
     @Override
     public InformationFlowContract setID(int newId);
 
+    
+    /**
+     * Get the self-variable which is used in this contract.
+     * @return originally used self-variable
+     */
+    Term getSelf();
+
+
+    /**
+     * Get the parameter-variables which is used in this contract.
+     * @return originally used parameter-variables
+     */
+    ImmutableList<Term> getParams();
+
 
     /**
      * Return a new contract which equals this contract except that the
@@ -120,5 +115,38 @@ public interface InformationFlowContract extends SymbolicExecData {
     @Override
     public InformationFlowContract setTarget(KeYJavaType newKJT,
                                              IObserverFunction newPM);
+
+
+    /**
+     * Get the result-variable which is used in this contract.
+     * @return used result-variable
+     */
+    Term getResult();
     
+    
+    public boolean equals(Contract c);
+    
+    
+    /**
+     * Returns the dependency set of the contract.
+     */
+    Term getDep();
+
+
+    /**
+     * Returns the set of views.
+     */
+    ImmutableList<ImmutableList<Term>> getRespects();
+
+
+    /**
+     * Returns the declassification formulas.
+     */
+    public ImmutableList<ImmutableList<Term>> getDeclassifies();
+
+
+    public boolean hasDeclassifies();
+
+
+    public boolean hasRespects();
 }

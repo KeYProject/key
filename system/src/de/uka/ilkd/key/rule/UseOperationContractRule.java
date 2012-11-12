@@ -47,12 +47,13 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.ContractApplicationData;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.ObserverWithType;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.InformationFlowContractPO;
+import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
+import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
+import de.uka.ilkd.key.proof.init.po.snippet.POSinppetFactory;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
@@ -65,7 +66,6 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 
 /**
@@ -725,15 +725,17 @@ public final class UseOperationContractRule implements BuiltInRule {
                                 	     	             post}))));
        
         // prepare information flow analysis
-        assert anonUpdateDatas.size() == 1; // information flow extension is at the moment not compatible to non-base-heap setting
+        assert anonUpdateDatas.size() == 1; // information flow extension is at
+                                            // the moment not compatible with
+                                            // the non-base-heap setting
         Term contractApplPredTerm =
-                storePrePostInPredAndGenInfoFlowTaclet(inst,
+                storePrePostInPredAndGenInfoFlowTaclet(contract, inst,
                                                        anonUpdateDatas.head(),
                                                        contractSelf,
                                                        contractResult,
                                                        TB.var(excVar),
                                                        goal, services);
-        
+
         //create "Pre" branch
 	int i = 0;
 	for(Term arg : contractParams) {
@@ -852,32 +854,38 @@ public final class UseOperationContractRule implements BuiltInRule {
      * flow taclet.
      */
     // TODO: add exception var
-    private Term storePrePostInPredAndGenInfoFlowTaclet(final Instantiation inst,
+    private Term storePrePostInPredAndGenInfoFlowTaclet(final FunctionalOperationContract contract,
+                                                        final Instantiation inst,
                                                         final AnonUpdateData anonUpdateData,
                                                         final Term contractSelf,
                                                         final Term contractResult,
                                                         final Term exceptionVar,
                                                         final Goal goal,
                                                         final Services services) {
-        ContractApplicationData appData =
-                new ContractApplicationData(contractSelf, inst.actualParams,
-                                            anonUpdateData.methodHeapAtPre,
-                                            contractResult, exceptionVar,
-                                            anonUpdateData.methodHeap);
-        final Function contApplPred = generateContApplPredicate(inst.pm,
-                                                                services);
+        ProofObligationVars appData =
+                new ProofObligationVars(contractSelf, null, inst.actualParams,
+                                        contractResult, null, exceptionVar,
+                                        null, null,
+                                        anonUpdateData.methodHeapAtPre,
+                                        anonUpdateData.methodHeap, "", services);
+        BasicPOSnippetFactory f =
+                POSinppetFactory.getBasicFactory(contract, appData, services);
         final Term contractApplPredTerm =
-                TB.apply(inst.u, 
-                    instantiateContApplPredicate(contApplPred, appData, inst.pm));
+                f.create(BasicPOSnippetFactory.Snippet.TWO_STATE_METHOD_PRED);
+        final Term updatedContractApplPredTerm =
+                TB.apply(inst.u, contractApplPredTerm);
+
+        final Function contApplPred = (Function)contractApplPredTerm.op();
         final Taclet informationFlowContractApp =
-                genInfFlowContractApplTaclet(contApplPred, inst.pm, services);
+                genInfFlowContractApplTaclet(contract, contApplPred, inst.pm,
+                                             inst.u, services);
         goal.addTaclet(informationFlowContractApp,
                        SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-        return contractApplPredTerm;
+        return updatedContractApplPredTerm;
     }
 
     
-    private Function generateContApplPredicate(IProgramMethod pm,
+    /*private Function generateContApplPredicate(IProgramMethod pm,
                                                Services services) {
         String nameString =
                 MiscTools.toValidTacletName(pm.getContainerType().getFullName()
@@ -923,53 +931,16 @@ public final class UseOperationContractRule implements BuiltInRule {
             pred = new Function(name, Sort.FORMULA, predArgSorts);
             services.getNamespaces().functions().addSafely(pred);
         }
-        return pred;
-    }
-     
+        return pred;*/
+
     
-    private Term instantiateContApplPredicate(Function pred,
-                                              ContractApplicationData appData,
-                                              IProgramMethod pm) {
+    private ProofObligationVars generateApplicationDataSVs(Function pred,
+                                                           String schemaPrefix,
+                                                           IProgramMethod pm,
+                                                           Services services) {
         Sort[] predArgSorts = new Sort[pred.argSorts().size()];
         pred.argSorts().toArray(predArgSorts);
-        Term[] predArgs = new Term[predArgSorts.length];
-
-        int i = 0;
-        ImmutableList<Term> params = appData.params;
-
-        if (!pm.isStatic()) {
-            // self
-            predArgs[i++] = appData.self;
-        }
-        // params
-        for (KeYJavaType t : pm.getParamTypes()) {
-            predArgSorts[i] = t.getSort();
-            predArgs[i++] = params.head();
-            params = params.tail();
-        }
-        // heapAtPre
-        predArgs[i++] = appData.heapAtPre;
-        if (!pm.isVoid() && !pm.isConstructor()) {
-            // result
-            predArgs[i++] = appData.result;
-        }
-        // exception
-        predArgs[i++] = appData.exception;
-        // heapAtPost
-        predArgs[i++] = appData.heapAtPost;
-
-        return TB.func(pred, predArgs);
-    }
-     
-    
-    private ContractApplicationData generateApplicationDataSVs(Function pred,
-                                                               String schemaPrefix,
-                                                               IProgramMethod pm,
-                                                               Services services) {
-        Sort[] predArgSorts = new Sort[pred.argSorts().size()];
-        pred.argSorts().toArray(predArgSorts);
-        final int numParams = pm.getParamTypes().size();
-        Term[] paramsSVs = new Term[numParams];
+        ImmutableList<Term> paramsSVs = ImmutableSLList.<Term>nil();
 
         int i = 0;
         Term selfAtPreSV;
@@ -983,8 +954,10 @@ public final class UseOperationContractRule implements BuiltInRule {
         int j = 0;
         for (KeYJavaType t : pm.getParamTypes()) {
             predArgSorts[i] = t.getSort();
-            paramsSVs[j] = createTermSV(schemaPrefix + "_param_" + (j + 1),
-                                        predArgSorts[i], services);
+            paramsSVs =
+                    paramsSVs.append(createTermSV(schemaPrefix + "_param_" +
+                                                  (j + 1), predArgSorts[i],
+                                                  services));
             i++;
             j++;
         }
@@ -1004,33 +977,39 @@ public final class UseOperationContractRule implements BuiltInRule {
                                          predArgSorts[i], services);
         i++;
 
-        return new ContractApplicationData(selfAtPreSV, paramsSVs, heapAtPreSV,
-                                           resSV, exceptionSV, heapAtPostSV);
+        return new ProofObligationVars(selfAtPreSV, selfAtPreSV, paramsSVs, resSV,
+                                       resSV, exceptionSV, exceptionSV, heapAtPreSV,
+                                       heapAtPreSV, heapAtPostSV, "", services);
     }
     
     
-    private Taclet genInfFlowContractApplTaclet(Function contractApplPred,
+    private Taclet genInfFlowContractApplTaclet(FunctionalOperationContract contract,
+                                                Function contractApplPred,
                                                 IProgramMethod pm,
+                                                Term stateUpdate,
                                                 Services services) {
         Name tacletName =
-                MiscTools.toValidTacletName("use information flow contract for "
+                MiscTools.toValidTacletName("Use information flow contract for "
                 + pm.getFullName());
-        ObserverWithType target =
-                new ObserverWithType(pm.getContainerType(), pm);
 
-        ContractApplicationData schemaDataFind = generateApplicationDataSVs(
+        ProofObligationVars schemaDataFind = generateApplicationDataSVs(
                 contractApplPred, "find", pm, services);
-        ContractApplicationData schemaDataAssumes = generateApplicationDataSVs(
+        ProofObligationVars schemaDataAssumes = generateApplicationDataSVs(
                 contractApplPred, "assumes", pm, services);
-        Term schemaFind = instantiateContApplPredicate(contractApplPred,
-                schemaDataFind, pm);
-        Term schemaAssumes = instantiateContApplPredicate(contractApplPred,
-                schemaDataAssumes, pm);
+        BasicPOSnippetFactory fFind =
+                POSinppetFactory.getBasicFactory(contract, schemaDataFind, services);
+        BasicPOSnippetFactory fAssumes =
+                POSinppetFactory.getBasicFactory(contract, schemaDataAssumes, services);
+        Term schemaFind =
+                TB.apply(stateUpdate, fFind.create(BasicPOSnippetFactory.Snippet.TWO_STATE_METHOD_PRED));
+        Term schemaAssumes =
+                TB.apply(stateUpdate, fAssumes.create(BasicPOSnippetFactory.Snippet.TWO_STATE_METHOD_PRED));
 
         ImmutableSet<InformationFlowContract> ifContracts =
                 getInfromFlowContracts(pm, services);
-        Term schemaContApps = InformationFlowContractPO.buildContractApplications(
-                target, ifContracts, schemaDataFind, schemaDataAssumes, services);
+        Term schemaContApps =
+                buildContractApplications(ifContracts, schemaDataFind,
+                                          schemaDataAssumes, services);
         
         //create sequents
         Sequent assumesSeq = Sequent.createAnteSequent(
@@ -1048,7 +1027,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                               ImmutableSLList.<Taclet>nil(),
                                               schemaFind);
         tacletBuilder.addTacletGoalTemplate(goal);
-        tacletBuilder.addRuleSet(new RuleSet(new Name("userTaclets1")));
+        tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
         tacletBuilder.setSurviveSmbExec(true);
         return tacletBuilder.getTaclet();
     }
@@ -1078,7 +1057,42 @@ public final class UseOperationContractRule implements BuiltInRule {
         return TB.var(SchemaVariableFactory.createTermSV(name, predArgSort));
     }
         
-    
+
+    public Term buildContractApplications(
+            ImmutableSet<InformationFlowContract> targetContracts,
+            ProofObligationVars contAppData,
+            ProofObligationVars contAppData2,
+            Services services) {
+        ImmutableList<Term> contractsApplications = ImmutableSLList.<Term>nil();
+        for (InformationFlowContract cont : targetContracts) {
+            contractsApplications = contractsApplications.append(
+                    buildContractApplication(cont, contAppData,
+                                             contAppData2, services));
+        }
+        return TB.and(contractsApplications);
+    }
+
+
+    private static Term buildContractApplication(InformationFlowContract cont,
+                                                 ProofObligationVars contAppData,
+                                                 ProofObligationVars contAppData2,
+                                                 Services services) {
+        BasicPOSnippetFactory f1 =
+                POSinppetFactory.getBasicFactory(cont, contAppData, services);
+        BasicPOSnippetFactory f2 =
+                POSinppetFactory.getBasicFactory(cont, contAppData2, services);
+
+        Term preCond1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
+        Term preCond2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
+
+        InfFlowPOSnippetFactory iff =
+                POSinppetFactory.getInfFlowFactory(cont, contAppData,
+                                                   contAppData2, services);
+        Term inOutRelations =
+                iff.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_POST);
+        return TB.imp(TB.and(preCond1, preCond2), inOutRelations);
+    }
+
 
     
     //-------------------------------------------------------------------------

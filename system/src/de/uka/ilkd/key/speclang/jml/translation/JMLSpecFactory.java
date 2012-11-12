@@ -77,58 +77,73 @@ public class JMLSpecFactory {
         modelFields = new HashSet<Pair<KeYJavaType, IObserverFunction>>();
     }
 
-    private ImmutableSet<SymbolicExecData> createSymbExecDatas(ContractClauses clauses,
-                                                               IProgramMethod pm,
-                                                               ProgramVariableCollection progVars) {
-        LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
-        
+    private ImmutableSet<Contract> createInformationFlowContracts(ContractClauses clauses,
+                                                                      IProgramMethod pm,
+                                                                      ProgramVariableCollection progVars) {
+        LocationVariable heap =
+                services.getTypeConverter().getHeapLDT().getHeap();
+
         // create contracts
-        ImmutableSet<SymbolicExecData> symbDatas = DefaultImmutableSet.<SymbolicExecData>nil();
+        ImmutableSet<Contract> symbDatas =
+                DefaultImmutableSet.<Contract>nil();
         if (clauses.diverges.equals(TB.ff())) {
-            SymbolicExecData symbData =
-                    cf.createSymbolicExecData(pm.getContainerType(), pm,
-                                              pm.getContainerType(),
-                                              Modality.DIA,
-                                              clauses.requires.get(heap),
-                                              clauses.measuredBy,
-                                              clauses.assignables.get(heap),
-                                              !clauses.strictlyPure,
-                                              progVars,
-                                              false);
+            InformationFlowContract symbData =
+                    cf.createInformationFlowContract(pm.getContainerType(), pm,
+                                                     pm.getContainerType(),
+                                                     Modality.DIA,
+                                                     clauses.requires.get(heap),
+                                                     clauses.measuredBy,
+                                                     clauses.assignables.get(heap),
+                                                     !clauses.strictlyPure,
+                                                     progVars,
+                                                     clauses.accessible,
+                                                     clauses.respects,
+                                                     clauses.declassifies,
+                                                     false);
             symbDatas = symbDatas.add(symbData);
         } else if (clauses.diverges.equals(TB.tt())) {
-            SymbolicExecData symbData =
-                    cf.createSymbolicExecData(pm.getContainerType(), pm,
-                                              pm.getContainerType(),
-                                              Modality.BOX,
-                                              clauses.requires.get(heap),
-                                              clauses.measuredBy,
-                                              clauses.assignables.get(heap),
-                                              !clauses.strictlyPure,
-                                              progVars, false);
+            InformationFlowContract symbData =
+                    cf.createInformationFlowContract(pm.getContainerType(), pm,
+                                                     pm.getContainerType(),
+                                                     Modality.BOX,
+                                                     clauses.requires.get(heap),
+                                                     clauses.measuredBy,
+                                                     clauses.assignables.get(heap),
+                                                     !clauses.strictlyPure,
+                                                     progVars,
+                                                     clauses.accessible,
+                                                     clauses.respects,
+                                                     clauses.declassifies,
+                                                     false);
             symbDatas = symbDatas.add(symbData);
         } else {
-            SymbolicExecData symbData1 =
-                    cf.createSymbolicExecData(pm.getContainerType(), pm,
-                                              pm.getContainerType(),
-                                              Modality.DIA,
-                                              TB.and(clauses.requires.get(heap),
-                                                     TB.not(clauses.diverges)),
-                                              clauses.measuredBy,
-                                              clauses.assignables.get(heap),
-                                              !clauses.strictlyPure,
-                                              progVars,
-                                              false);
-            SymbolicExecData symbData2 =
-                    cf.createSymbolicExecData(pm.getContainerType(), pm,
-                                              pm.getContainerType(),
-                                              Modality.BOX,
-                                              clauses.requires.get(heap),
-                                              clauses.measuredBy,
-                                              clauses.assignables.get(heap),
-                                              !clauses.strictlyPure,
-                                              progVars,
-                                              false);
+            InformationFlowContract symbData1 =
+                    cf.createInformationFlowContract(pm.getContainerType(), pm,
+                                                     pm.getContainerType(),
+                                                     Modality.DIA,
+                                                     TB.and(clauses.requires.get(heap),
+                                                            TB.not(clauses.diverges)),
+                                                     clauses.measuredBy,
+                                                     clauses.assignables.get(heap),
+                                                     !clauses.strictlyPure,
+                                                     progVars,
+                                                     clauses.accessible,
+                                                     clauses.respects,
+                                                     clauses.declassifies,
+                                                     false);
+            InformationFlowContract symbData2 =
+                    cf.createInformationFlowContract(pm.getContainerType(), pm,
+                                                     pm.getContainerType(),
+                                                     Modality.BOX,
+                                                     clauses.requires.get(heap),
+                                                     clauses.measuredBy,
+                                                     clauses.assignables.get(heap),
+                                                     !clauses.strictlyPure,
+                                                     progVars,
+                                                     clauses.accessible,
+                                                     clauses.respects,
+                                                     clauses.declassifies,
+                                                     false);
             symbDatas = symbDatas.add(symbData1).add(symbData2);
         }
         return symbDatas;
@@ -1053,23 +1068,11 @@ public class JMLSpecFactory {
                 translateJMLClauses(pm, textualSpecCase,
                                     progVars, originalBehavior);
         Map<LocationVariable,Term> posts = generatePostCondition(progVars, clauses, originalBehavior);
-        ImmutableSet<SymbolicExecData> symbDatas =
-                createSymbExecDatas(clauses, pm, progVars);
 
         // create contracts
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract>nil();
-        for (SymbolicExecData symbData : symbDatas) {
-            if (!clauses.respects.isEmpty()) {
-                result = result.add(
-                        cf.createInformationFlowContract(symbData,
-                                                        progVars,
-                                                        clauses.accessible,
-                                                        clauses.respects,
-                                                        clauses.declassifies,
-                                                        false));
-            }
-            result = result.add(symbData);
-        }
+        result = result.union(createInformationFlowContracts(clauses, pm,
+                                                             progVars));
         result = result.union(createFunctionalOperationContracts(name, pm,
                                                                  progVars,
                                                                  clauses, posts));

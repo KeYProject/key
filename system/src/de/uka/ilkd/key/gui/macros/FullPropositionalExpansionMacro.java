@@ -1,3 +1,13 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License.
+// See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.gui.macros;
 
 import java.util.Set;
@@ -5,19 +15,19 @@ import java.util.Set;
 /**
  * The macro FullPropositionalExpansionMacro apply rules to decompose
  * propositional toplevel formulas; it even splits the goal if necessary.
- * 
+ *
  * The rules that are applied can be set in {@link #ADMITTED_RULES}.
- * 
+ *
  * @author mattias ulbrich
  */
 public class FullPropositionalExpansionMacro extends AbstractPropositionalExpansionMacro {
 
-    @Override 
+    @Override
     public String getName() {
         return "Propositional expansion (w/ splits)";
     }
 
-    @Override 
+    @Override
     public String getDescription() {
         return "Apply rules to decompose propositional toplevel formulas; " +
                 "splits the goal if necessary";
@@ -30,7 +40,7 @@ public class FullPropositionalExpansionMacro extends AbstractPropositionalExpans
 
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
 
-    @Override 
+    @Override
     protected Set<String> getAdmittedRuleNames() {
         return ADMITTED_RULES_SET;
     }

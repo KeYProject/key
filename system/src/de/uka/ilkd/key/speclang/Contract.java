@@ -151,11 +151,4 @@ public interface Contract extends SpecificationElement {
      */
     public String getTypeName();
     
-    
-    /**
-     * Checks whether there are other contracts which have to be started before
-     * this one.
-     */
-    public ImmutableList<Contract> getContractsToBeStartedBefore(Services services);
-
 }

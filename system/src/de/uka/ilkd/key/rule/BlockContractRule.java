@@ -572,7 +572,7 @@ public class BlockContractRule implements BuiltInRule {
             for (LocationVariable heap : heaps) {
                 final Term modifiesClause = modifiesClauses.get(heap);
                 final Term frameCondition;
-                if (modifiesClause.equals(lessThanNothing()) && heap == getBaseHeap()) {
+                if (modifiesClause.equals(lessThanNothing()) && heap == getBaseHeapFunction()) {
                     frameCondition = frameStrictlyEmpty(var(heap), remembranceVariables.get(heap));
                 }
                 else {
@@ -592,12 +592,12 @@ public class BlockContractRule implements BuiltInRule {
                 result.get(heap).put(var(heap), var(remembranceHeap.getValue()));
             }
             for (Map.Entry<LocationVariable, LocationVariable> remembranceLocalVariable : variables.remembranceLocalVariables.entrySet()) {
-                result.get(getBaseHeap()).put(var(remembranceLocalVariable.getKey()), var(remembranceLocalVariable.getValue()));
+                result.get(getBaseHeapFunction()).put(var(remembranceLocalVariable.getKey()), var(remembranceLocalVariable.getValue()));
             }
             return result;
         }
 
-        private LocationVariable getBaseHeap()
+        private LocationVariable getBaseHeapFunction()
         {
             return services.getTypeConverter().getHeapLDT().getHeap();
         }

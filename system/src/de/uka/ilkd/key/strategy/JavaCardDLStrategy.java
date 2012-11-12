@@ -517,6 +517,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             bindRuleSet ( d, "auto_induction_lemma", inftyConst());        	
         }
 
+        bindRuleSet(d, "information_flow_contract_appl",
+                    add(NonDuplicateAppModPositionFeature.INSTANCE,
+                        longConst(-500)));
         
         return d;
     }

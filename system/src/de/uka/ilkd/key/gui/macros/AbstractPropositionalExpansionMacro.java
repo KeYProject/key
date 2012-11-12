@@ -1,3 +1,13 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License.
+// See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.gui.macros;
 
 import java.util.Arrays;
@@ -19,19 +29,19 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 /**
  * The Class AbstractPropositionalExpansionMacro applies purely propositional
  * rules.
- * 
+ *
  * The names of the set of rules to be applied is defined by the abstract method
  * {@link #getAdmittedRuleNames()}.
- * 
+ *
  * This is very helpful to perform many "andLeft", "impRight" or even "andRight"
  * steps at a time.
- * 
+ *
  * @author mattias ulbrich
  */
 public abstract class AbstractPropositionalExpansionMacro extends StrategyProofMacro {
 
     /*
-     * convert a string array to a set of strings 
+     * convert a string array to a set of strings
      */
     protected static Set<String> asSet(String[] strings) {
         return Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(strings)));
@@ -39,22 +49,36 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
 
     /**
      * Gets the set of admitted rule names.
-     * 
+     *
      * @return a constant non-<code>null</code> set
      */
     protected abstract Set<String> getAdmittedRuleNames();
 
+    @Override
     protected PropExpansionStrategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
         return new PropExpansionStrategy(getAdmittedRuleNames());
+    }
+    
+    /**
+     * Checks whether the application of the passed rule is ok in the given
+     * context.
+     * 
+     * @param ruleApp   rule to be applied
+     * @param pio       context
+     * @param goal      context
+     * @return          true if rule may be applied
+     */
+    protected boolean ruleApplicationInContextAllowed(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
+        return true;
     }
 
     /**
      * This strategy accepts all rule apps for which the rule name is in the
      * admitted set and rejects everything else.
      */
-    private static class PropExpansionStrategy implements Strategy {
+    private class PropExpansionStrategy implements Strategy {
 
-        private static final Name NAME = new Name(PropExpansionStrategy.class.getSimpleName());
+        private final Name NAME = new Name(PropExpansionStrategy.class.getSimpleName());
 
         private final Set<String> admittedRuleNames;
 
@@ -62,27 +86,28 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
             this.admittedRuleNames = admittedRuleNames;
         }
 
-        @Override 
+        @Override
         public Name name() {
             return NAME;
         }
 
-        @Override 
+        @Override
         public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
             String name = ruleApp.rule().name().toString();
-            if(admittedRuleNames.contains(name)) {
+            if(admittedRuleNames.contains(name) &&
+                    ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
                 return LongRuleAppCost.ZERO_COST;
             } else {
                 return TopRuleAppCost.INSTANCE;
             }
         }
 
-        @Override 
+        @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
             return true;
         }
 
-        @Override 
+        @Override
         public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
                 RuleAppCostCollector collector) {
         }

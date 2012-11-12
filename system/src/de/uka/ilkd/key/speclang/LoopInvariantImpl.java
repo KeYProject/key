@@ -206,9 +206,9 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                                           Map<LocationVariable,Term> atPres,
                                                           Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);        
-        return TermBuilder.DF.replace2(originalRespects.get(heap),atPres.get(heap),originalSelfTerm,
-                                       selfTerm,ImmutableSLList.<Term>nil(),
-                                       ImmutableSLList.<Term>nil(),services);
+        return originalRespects.get(heap);//TermBuilder.DF.replace2(originalRespects.get(heap),atPres.get(heap),originalSelfTerm,
+                                       //selfTerm,ImmutableSLList.<Term>nil(),
+                                       //ImmutableSLList.<Term>nil(),services);
     }
     
     @Override
@@ -216,10 +216,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                                           Term selfTerm,
                                                           ImmutableList<Term> localIns,
                                                           Services services) {
-        assert (selfTerm == null) == (originalSelfTerm == null);
+        //assert (selfTerm == null) == (originalSelfTerm == null);
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-        return TermBuilder.DF.replace2(originalRespects.get(baseHeap),heapTerm,originalSelfTerm,
-                                       selfTerm, localIns,localIns,services);
+        return originalRespects.get(baseHeap);//TermBuilder.DF.replace2(originalRespects.get(baseHeap),heapTerm,originalSelfTerm,
+                                       //selfTerm, localIns,localIns,services);
     }
 
     @Override

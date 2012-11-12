@@ -436,11 +436,4 @@ public final class DependencyContractImpl implements DependencyContract {
         return ContractFactory.generateContractTypeName(baseName, kjt, target,
                                                         specifiedIn);
     }
-    
-    
-    @Override
-    public ImmutableList<Contract> getContractsToBeStartedBefore(Services services) {
-        return ImmutableSLList.<Contract>nil();
-    }
-
 }

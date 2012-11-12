@@ -289,7 +289,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return The term representing the general assumption.
     */
    protected Term generateSelfNotNull(IProgramMethod pm, ProgramVariable selfVar) {
-      return generateSelfNotNull(pm, TB.var(selfVar));
+      return selfVar == null || pm.isConstructor() ? 
+             TB.tt() : generateSelfNotNull(pm, TB.var(selfVar));
    }
 
    /**
@@ -311,7 +312,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return The term representing the general assumption.
     */
    protected Term generateSelfCreated(IProgramMethod pm, ProgramVariable selfVar) {
-      return generateSelfCreated(pm, TB.var(selfVar));
+      return selfVar == null || pm.isConstructor() ? 
+             TB.tt() : generateSelfCreated(pm, TB.var(selfVar));
    }
 
    /**
@@ -336,7 +338,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
    protected Term generateSelfExactType(IProgramMethod pm, 
                                         ProgramVariable selfVar, 
                                         KeYJavaType selfKJT) {
-      return generateSelfExactType(pm, TB.var(selfVar), selfKJT);
+       return selfVar == null || pm.isConstructor()
+              ? TB.tt() : generateSelfExactType(pm, TB.var(selfVar), selfKJT);
    }
 
    /**

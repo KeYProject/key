@@ -464,15 +464,9 @@ public final class ProofManagementDialog extends JDialog {
             ProblemInitializer pi = 
             		new ProblemInitializer(ui, mediator.getProfile(), services, true, ui);
             try {
-                ImmutableList<Contract> preContracts
-                        = contract.getContractsToBeStartedBefore(services);
-                for (Contract c : preContracts) {
-                    pi.startProver(initConfig, c.createProofObl(initConfig), 0);
-                    pi = new ProblemInitializer(ui, mediator.getProfile(), services, true, ui);
-                }
                 pi.startProver(initConfig, contract.createProofObl(initConfig), 0);
             } catch(ProofInputException exc) {
-        	ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
+            	ExceptionDialog.showDialog(MainWindow.getInstance(), exc);
             }
         } else {
             mediator.setProof(proof);
