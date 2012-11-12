@@ -131,15 +131,15 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
                 Map<LocationVariable,ImmutableList<ImmutableList<Term>>> newRespects
                     = new LinkedHashMap<LocationVariable,ImmutableList<ImmutableList<Term>>>();
-                LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+                //LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
                 Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
                 for(LocationVariable heap : HeapContext.getModHeaps(services, transaction)) {
                   final Term m = inv.getModifies(heap, selfTerm, atPres, services);
                   final ImmutableList<ImmutableList<Term>> r
-                      = inv.getRespects(baseHeap, selfTerm, atPres, services); // FIXME: small workaround
+                      = inv.getRespects(heap);
                   final Term i = inv.getInvariant(heap, selfTerm, atPres, services);
                   newMods.put(heap, m);
-                  newRespects.put(baseHeap, r); // FIXME: small workaround
+                  newRespects.put(heap, r);
                   newInvariants.put(heap, i);
                 }
                 final LoopInvariant newInv

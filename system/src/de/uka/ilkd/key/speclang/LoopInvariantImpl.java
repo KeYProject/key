@@ -201,20 +201,20 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     @Override
-    public ImmutableList<ImmutableList<Term>> getRespects(LocationVariable heap,
-                                                          Term selfTerm,
+    public ImmutableList<ImmutableList<Term>> getRespects(LocationVariable heap)
+                                                          /*Term selfTerm,
                                                           Map<LocationVariable,Term> atPres,
-                                                          Services services) {
-        assert (selfTerm == null) == (originalSelfTerm == null);        
+                                                          Services services)*/ {
+        //assert (selfTerm == null) == (originalSelfTerm == null);        
         return originalRespects.get(heap);//TermBuilder.DF.replace2(originalRespects.get(heap),atPres.get(heap),originalSelfTerm,
                                        //selfTerm,ImmutableSLList.<Term>nil(),
                                        //ImmutableSLList.<Term>nil(),services);
     }
     
     @Override
-    public ImmutableList<ImmutableList<Term>> getRespects(Term heapTerm,
+    public ImmutableList<ImmutableList<Term>> getRespects(/*Term heapTerm,
                                                           Term selfTerm,
-                                                          ImmutableList<Term> localIns,
+                                                          ImmutableList<Term> localIns,*/
                                                           Services services) {
         //assert (selfTerm == null) == (originalSelfTerm == null);
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();

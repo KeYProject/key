@@ -19,6 +19,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -273,7 +274,7 @@ public class InvariantConfigurator {
                 loopInvTexts[RSP_IDX] = new LinkedHashMap<String,String>();
 
                 for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                  final ImmutableList<ImmutableList<Term>> respects = loopInv.getRespects(heap, loopInv.getInternalSelfTerm(), atPres, services);
+                  final ImmutableList<ImmutableList<Term>> respects = loopInv.getRespects(heap);
                 
                   if (respects == null) {                    
                     loopInvTexts[RSP_IDX].put(heap.toString(), "noRespects");
@@ -853,13 +854,17 @@ public class InvariantConfigurator {
             }
             
             protected ImmutableList<ImmutableList<Term>> parseRespects(LocationVariable heap) throws Exception {
-                ImmutableList<ImmutableList<Term>> result = null;
+                Term res = null;
+                //ImmutableList<ImmutableList<Term>> result = null;
                 index = inputPane.getSelectedIndex();
                 // might throw parserException or some obscure
-                // antlr
-                result = parser.parse( // FIXME
-                        new StringReader(invariants.get(index)[RSP_IDX].get(heap.toString())), Sort.ANY,
-                        services, services.getNamespaces(), getAbbrevMap());
+                // antlr                
+                final String respAsString = invariants.get(index)[RSP_IDX].get(heap.toString());
+                res = parser.parse(
+                      new StringReader(respAsString), Sort.ANY,
+                      services, services.getNamespaces(), getAbbrevMap());
+                ImmutableList<ImmutableList<Term>> result =
+                    ImmutableSLList.<ImmutableList<Term>>nil().append(ImmutableSLList.<Term>nil().append(res));
                 return result;
             }
 

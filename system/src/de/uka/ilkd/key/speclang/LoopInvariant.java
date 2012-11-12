@@ -47,14 +47,9 @@ public interface LoopInvariant extends SpecificationElement {
     /**
      * Returns the respects clause.
      */
-    public ImmutableList<ImmutableList<Term>> getRespects(LocationVariable heap,Term selfTerm,
-                                                          Map<LocationVariable,Term> atPres,
-                                                          Services services);
+    public ImmutableList<ImmutableList<Term>> getRespects(LocationVariable heap);
     
-    public ImmutableList<ImmutableList<Term>> getRespects(Term heapTerm,
-                                                          Term selfTerm,
-                                                          ImmutableList<Term> localIns,
-                                                          Services services);
+    public ImmutableList<ImmutableList<Term>> getRespects(Services services);
     
     /**
      * Returns the variant term. 
