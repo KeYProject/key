@@ -16,7 +16,8 @@ public interface InfFlowPOSnippetFactory {
      * The snippets which can be produced by this factory.
      */
     public static enum Snippet {
-        INF_FLOW_POST (InfFlowPostSnippet.class);
+        INF_FLOW_POST (InfFlowPostSnippet.class),
+        INF_FLOW_CONTRACT_APPL (InfFlowContractAppSnippet.class);
 
 
         // type of the factory method

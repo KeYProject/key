@@ -439,7 +439,7 @@ final class InformationFlowContractImpl implements InformationFlowContract {
     
     @Override
     public InformationFlowContract setID(int newId) {
-        return new InformationFlowContractImpl(baseName, name, forClass, pm,
+        return new InformationFlowContractImpl(baseName, null, forClass, pm,
                                                specifiedIn, modality, origPre,
                                                origMby, origMod,
                                                hasRealModifiesClause, origSelf,
@@ -454,7 +454,7 @@ final class InformationFlowContractImpl implements InformationFlowContract {
     public InformationFlowContract setTarget(KeYJavaType newKJT,
                                              IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
-        return new InformationFlowContractImpl(baseName, name, newKJT,
+        return new InformationFlowContractImpl(baseName, null, newKJT,
                                                (IProgramMethod)newPM,
                                                specifiedIn, modality, origPre,
                                                origMby, origMod,

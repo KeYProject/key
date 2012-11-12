@@ -84,7 +84,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
      */
     @Override
     public <S> S[] toArray(Class<S> type) {
-        S[] result = (S[]) Array.newInstance(type.getComponentType(), size());
+        S[] result = (S[]) Array.newInstance(type, size());
         ImmutableList<T> rest = this;
         for (int i = 0; i<size(); i++) {
             result[i] = (S) rest.head();

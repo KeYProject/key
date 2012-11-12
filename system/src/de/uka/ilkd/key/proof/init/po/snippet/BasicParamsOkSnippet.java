@@ -21,7 +21,7 @@ class BasicParamsOkSnippet implements FactoryMethod {
             throws UnsupportedOperationException {
         Term paramsOK = d.tb.tt();
         for (Term param : poVars.params) {
-            if (param.op() instanceof ProgramVariable) {
+            if (!(param.op() instanceof ProgramVariable)) {
                 throw new UnsupportedOperationException("Tried to produce "
                         + "PARAMS_OK for an term "
                         + "which is no ProgramVariable.");

@@ -4,7 +4,6 @@
  */
 package de.uka.ilkd.key.proof.init.po.snippet;
 
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -24,6 +23,7 @@ public class POSinppetFactory {
         return new BasicPOSnippetFactoryImpl(contract, vars, services);
     }
 
+
     public static BasicPOSnippetFactory getBasicFactory(
             InformationFlowContract contract,
             ProofObligationVars vars,
@@ -31,11 +31,13 @@ public class POSinppetFactory {
         return new BasicPOSnippetFactoryImpl(contract, vars, services);
     }
 
+
     static BasicPOSnippetFactory getBasicFactory(
             BasicSnippetData data,
             ProofObligationVars poVars) {
         return new BasicPOSnippetFactoryImpl(data, poVars);
     }
+
 
     public static InfFlowPOSnippetFactory getInfFlowFactory(
             InformationFlowContract contract,
@@ -46,4 +48,10 @@ public class POSinppetFactory {
     }
 
 
+    static InfFlowPOSnippetFactory getInfFlowFactory(
+            BasicSnippetData data,
+            ProofObligationVars vars1,
+            ProofObligationVars vars2) {
+        return new InfFlowPOSnippetFactoryImpl(data, vars1, vars2);
+    }
 }

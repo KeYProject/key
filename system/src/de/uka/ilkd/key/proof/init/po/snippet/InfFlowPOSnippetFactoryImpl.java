@@ -36,8 +36,21 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
         this.data = new BasicSnippetData(contract, services);
         this.poVars1 = vars1;
         this.poVars2 = vars2;
-        
-        // register FactoryMethods
+        registerFactoryMethods();
+    }
+
+
+    InfFlowPOSnippetFactoryImpl(BasicSnippetData d,
+                               ProofObligationVars vars1,
+                               ProofObligationVars vars2) {
+        this.data = d;
+        this.poVars1 = vars1;
+        this.poVars2 = vars2;
+        registerFactoryMethods();
+    }
+
+
+    private void registerFactoryMethods() {
         try {
             for (Snippet s : Snippet.values()) {
                 InfFlowFactoryMethod fm = (InfFlowFactoryMethod)s.c.newInstance();

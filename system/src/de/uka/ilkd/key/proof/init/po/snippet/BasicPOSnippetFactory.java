@@ -35,9 +35,20 @@ public interface BasicPOSnippetFactory {
         //      exc = excAtPost)
         SYMBOLIC_EXEC (SymbolicExecutionSnippet.class),
 
-        // package.class::m_RELATES(self, param1, ..., paramN, heap, result, exc, heapAtPost)
-        TWO_STATE_METHOD_PRED (TwoStateMethodPredicateSnippet.class),
-        
+        // RELATED_BY_package.class::m(self, param1, ..., paramN, heap, result, exc, heapAtPost)
+        // This predicate is semantically equivalent to:
+        // [P] (heap = heapAtPost & self = selfAtPost & result = resultAtPost &
+        //      exc = excAtPost)
+        METHOD_CALL_RELATION (MethodCallPredicateSnippet.class),
+
+        // EXECUTION_OF_package.class::m_WITH_PRE(self, param1, ..., paramN, heap, result, exc, heapAtPost)
+        // This predicate is semantically equivalent to:
+        // Pre & [P] (heap = heapAtPost & self = selfAtPost &
+        //            result = resultAtPost & exc = excAtPost)
+        METHOD_CALL_WITH_PRE_RELATION (MethodCallWithPreconditionPredicateSnippet.class),
+
+
+
         // miscellaneous snippets
         SELF_NOT_NULL (BasicSelfNotNullSnippet.class),       // "self != null"
         SELF_CREATED (BasicSelfCreatedSnippet.class),        // "self.<created> = TRUE"

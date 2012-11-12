@@ -871,7 +871,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         BasicPOSnippetFactory f =
                 POSinppetFactory.getBasicFactory(contract, appData, services);
         final Term contractApplPredTerm =
-                f.create(BasicPOSnippetFactory.Snippet.TWO_STATE_METHOD_PRED);
+                f.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
         final Term updatedContractApplPredTerm =
                 TB.apply(inst.u, contractApplPredTerm);
 
@@ -1001,9 +1001,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         BasicPOSnippetFactory fAssumes =
                 POSinppetFactory.getBasicFactory(contract, schemaDataAssumes, services);
         Term schemaFind =
-                TB.apply(stateUpdate, fFind.create(BasicPOSnippetFactory.Snippet.TWO_STATE_METHOD_PRED));
+                TB.apply(stateUpdate, fFind.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION));
         Term schemaAssumes =
-                TB.apply(stateUpdate, fAssumes.create(BasicPOSnippetFactory.Snippet.TWO_STATE_METHOD_PRED));
+                TB.apply(stateUpdate, fAssumes.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION));
 
         ImmutableSet<InformationFlowContract> ifContracts =
                 getInfromFlowContracts(pm, services);
@@ -1065,32 +1065,13 @@ public final class UseOperationContractRule implements BuiltInRule {
             Services services) {
         ImmutableList<Term> contractsApplications = ImmutableSLList.<Term>nil();
         for (InformationFlowContract cont : targetContracts) {
+            InfFlowPOSnippetFactory f =
+                    POSinppetFactory.getInfFlowFactory(cont, contAppData2,
+                                                       contAppData2, services);
             contractsApplications = contractsApplications.append(
-                    buildContractApplication(cont, contAppData,
-                                             contAppData2, services));
+                    f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL));
         }
         return TB.and(contractsApplications);
-    }
-
-
-    private static Term buildContractApplication(InformationFlowContract cont,
-                                                 ProofObligationVars contAppData,
-                                                 ProofObligationVars contAppData2,
-                                                 Services services) {
-        BasicPOSnippetFactory f1 =
-                POSinppetFactory.getBasicFactory(cont, contAppData, services);
-        BasicPOSnippetFactory f2 =
-                POSinppetFactory.getBasicFactory(cont, contAppData2, services);
-
-        Term preCond1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
-        Term preCond2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
-
-        InfFlowPOSnippetFactory iff =
-                POSinppetFactory.getInfFlowFactory(cont, contAppData,
-                                                   contAppData2, services);
-        Term inOutRelations =
-                iff.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_POST);
-        return TB.imp(TB.and(preCond1, preCond2), inOutRelations);
     }
 
 
