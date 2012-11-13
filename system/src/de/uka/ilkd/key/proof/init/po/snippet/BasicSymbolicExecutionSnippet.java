@@ -35,7 +35,7 @@ import java.util.Iterator;
  *
  * @author christoph
  */
-class SymbolicExecutionSnippet extends ReplaceAnRegisterMethod
+class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
         implements FactoryMethod {
 
     @Override
