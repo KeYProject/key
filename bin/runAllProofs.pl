@@ -280,27 +280,27 @@ sub writeXmlReport {
   </properties>
 HEADER
     foreach (keys(%successes)) {
-	print OUT '  <testcase classname="run" name="' . 
+	print OUT '  <testcase classname="runallproofs.run" name="' . 
 	    $_ . '" time="0.0" />'  . "\n";
     }
     foreach (@reloadSuccesses) {
-	print OUT '  <testcase classname="reload" name="' . 
+	print OUT '  <testcase classname="runallproofs.reload" name="' . 
 	    $_ . '" time="0.0" />'  . "\n";
     }
     foreach (keys(%erroneous)) {
-	print OUT '  <testcase classname="run" name="' . 
+	print OUT '  <testcase classname="runallproofs.run" name="' . 
 	    $_ . '" time="0.0" />'  . "\n";
 	print OUT '     <error type="ERR">error during proof for ' .
 	    $_ . "</error>\n  </testcase>\n";
     }
     foreach (keys(%failing)) {
-	print OUT '  <testcase classname="run" name="' . 
+	print OUT '  <testcase classname="runallproofs.run" name="' . 
 	    $_ . '" time="0.0" />'  . "\n";
 	print OUT '     <failure type="FAIL">proof for ' .
 	    $_ . " failed</failure>\n  </testcase>\n";
     }
     foreach (@reloadFailed) {
-	print OUT '  <testcase classname="reload" name="' . 
+	print OUT '  <testcase classname="runallproofs.reload" name="' . 
 	    $_ . '" time="0.0" />'  . "\n";
 	print OUT '     <failure type="FAIL">could not reload proof for ' .
 	    $_ . "</failure>\n  </testcase>\n";
