@@ -519,7 +519,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "information_flow_contract_appl",
                     add(NonDuplicateAppModPositionFeature.INSTANCE,
-                        longConst(-500)));
+                        longConst(400)));
         
         return d;
     }
