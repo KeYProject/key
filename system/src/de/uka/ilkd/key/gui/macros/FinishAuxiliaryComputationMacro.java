@@ -117,31 +117,44 @@ public class FinishAuxiliaryComputationMacro implements ProofMacro {
                                           SymbolicExecutionPO po,
                                           IFProofObligationVars ifVars,
                                           Services services) {
-        Term exec1 =
+        Term[] goalFormulas1 =
                 buildExecution(ifVars.c1, ifVars.map1, ifVars.symbExecVars.heap,
                                proof.openGoals(), services);
-        Term exec2 =
+        Term[] goalFormulas2 =
                 buildExecution(ifVars.c2, ifVars.map2, ifVars.symbExecVars.heap,
                                proof.openGoals(), services);
 
-        return TB.and(exec1, exec2);
+        Term composedStates = TB.ff();
+        for (int i = 0; i < goalFormulas1.length; i++) {
+            for (int j = i; j < goalFormulas2.length; j++) {
+                Term composedState = TB.and(goalFormulas1[i], goalFormulas2[j]);
+                composedStates = TB.or(composedStates, composedState);
+            }
+        }
+        return composedStates;
+//        return TB.and(TB.or(goalFormulas1), TB.or(goalFormulas2));
     }
 
 
-    private Term buildExecution(ProofObligationVars c,
-                                Map<Term, Term> vsMap,
-                                Term symbExecHeap,
-                                ImmutableList<de.uka.ilkd.key.proof.Goal> symbExecGoals,
-                                Services services) {
-        final Term exec = buildOrNotFormulaFromGoals(symbExecGoals);
+    private Term[] buildExecution(ProofObligationVars c,
+                                  Map<Term, Term> vsMap,
+                                  Term symbExecHeap,
+                                  ImmutableList<de.uka.ilkd.key.proof.Goal> symbExecGoals,
+                                  Services services) {
+        final Term[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
         // the build in heap symbol has to be handled with care
         final HashMap<Operator, Boolean> doNotReplace =
                 new HashMap<Operator, Boolean>();
         doNotReplace.put(symbExecHeap.op(), Boolean.TRUE);
-        final Term renamedExec =
-                renameVariablesAndSkolemConstants(exec, vsMap, doNotReplace,
+        final Term[] renamedGoalFormulas =
+                renameVariablesAndSkolemConstants(goalFormulas, vsMap, doNotReplace,
                                                   c.postfix, services);
-        return TB.applyElementary(services, c.heap, renamedExec);
+        Term[] result = new Term[renamedGoalFormulas.length];
+        for (int i = 0; i < renamedGoalFormulas.length; i++) {
+            result[i] =
+                    TB.applyElementary(services, c.heap, renamedGoalFormulas[i]);
+        }
+        return result;
     }
 
 
@@ -277,22 +290,40 @@ public class FinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    private Term buildOrNotFormulaFromGoals(ImmutableList<Goal> symbExecGoals) {
-        Term result = TB.ff();
+    private Term[] buildFormulasFromGoals(ImmutableList<Goal> symbExecGoals) {
+        Term[] result = new Term[symbExecGoals.size()];
+        int i = 0;
         for (Goal symbExecGoal : symbExecGoals) {
-            result = TB.or(result, buildNotFormulaFromGoal(symbExecGoal));
+            result[i] = buildFormulaFromGoal(symbExecGoal);
+            i++;
         }
         return result;
     }
 
 
-    private Term buildNotFormulaFromGoal(Goal symbExecGoal) {
+    private Term buildFormulaFromGoal(Goal symbExecGoal) {
         Term result = TB.tt();
         for (SequentFormula f : symbExecGoal.sequent().antecedent()) {
             result = TB.and(result, f.formula());
         }
         for (SequentFormula f : symbExecGoal.sequent().succedent()) {
             result = TB.and(result, TB.not(f.formula()));
+        }
+        return result;
+    }
+
+
+    private Term[] renameVariablesAndSkolemConstants(Term[] terms,
+                                                     Map<Term, Term> replaceMap,
+                                                     Map<Operator, Boolean> notReplaceMap,
+                                                     String postfix,
+                                                     Services services) {
+        Term[] result = new Term[terms.length];
+        for (int i = 0; i < terms.length; i++) {
+            result[i] =
+                    renameVariablesAndSkolemConstants(terms[i], replaceMap,
+                                                      notReplaceMap, postfix,
+                                                      services);
         }
         return result;
     }
