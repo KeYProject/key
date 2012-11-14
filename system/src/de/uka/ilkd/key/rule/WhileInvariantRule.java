@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
@@ -36,18 +35,15 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.LoopInvariantApplicationData;
-import de.uka.ilkd.key.proof.init.InformationFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.proof.init.InformationFlowContractPO.IFProofObligationVars;
-import de.uka.ilkd.key.proof.init.InformationFlowContractPO.SearchVisitor;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
+import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
+import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -431,7 +427,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         = new AnonUpdateData(anonAssumption, anonUpdate, wellFormedAnon, anonLoopHeap);
 
         // prepare information flow analysis
-        Term contractApplPredTerm =
+        Term contractLoopApplPredTerm =
             storeInvInPredAndGenInfoFlowTaclet(inst,
                     anonUpdateAndHeap,
                     TB.var(localIns),
@@ -511,7 +507,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         useGoal.addFormula(new SequentFormula(postAssumption), // TODO: Is this correct? 
                 true, 
                 false);
-        useGoal.addFormula(new SequentFormula(contractApplPredTerm),
+        useGoal.addFormula(new SequentFormula(contractLoopApplPredTerm),
                 true,
                 false);
 
@@ -539,42 +535,45 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                         final ImmutableList<Term> localOuts,
                                                         final Goal goal,
                                                         final Services services) {
-        LoopInvariantApplicationData appData =
+        /*LoopInvariantApplicationData appData =
                 new LoopInvariantApplicationData(inst.selfTerm, localIns,                                                 
                                                  TB.getBaseHeap(services),
                                                  localOuts,
-                                                 anonUpdateAndHeap.loopHeap);
-        /*ProofObligationVars appData2 =
+                                                 anonUpdateAndHeap.loopHeap);*/
+        ProofObligationVars appData =
             new ProofObligationVars(inst.selfTerm, null, localIns,
                                     localOuts, null, null,
                                     null, null,
                                     TB.getBaseHeap(services),
                                     anonUpdateAndHeap.loopHeap, "", services);
-        final Term contractApplPredTerm =
-            f.create(BasicPOSnippetFactory.Snippet.TWO_STATE_METHOD_PRED);
-        final Term updatedContractApplPredTerm =
-            TB.apply(inst.u, contractApplPredTerm);
-        
-        final Function contApplPred = (Function)contractApplPredTerm.op();
-        final Taclet informationFlowContractApp =
-            genInfFlowContractApplTaclet(contract, contApplPred, inst.pm,
-                                         inst.u, services);
-        goal.addTaclet(informationFlowContractApp,
-                SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-        return updatedContractApplPredTerm;*/
-        
         IProgramMethod pm = JavaTools.getInnermostMethodFrame(inst.progPost.javaBlock(), 
                 services).getProgramMethod();
-        final Function contLoopApplPred = generateContLoopApplPredicate(inst, appData, pm,
-                                                                services);
-        final Term contractLoopApplPredTerm =
-            TB.apply(inst.u, 
-                instantiateContApplPredicate(contLoopApplPred, appData, pm));
+        BasicPOSnippetFactory f =
+            POSnippetFactory.getBasicFactory(inst.inv, appData, services);
+        final Term loopInvariantApplPredTerm =
+            f.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION); // Different Snippet?
+        final Term updatedLoopInvariantApplPredTerm =
+            TB.apply(inst.u, loopInvariantApplPredTerm);
+        
+        final Function loopInvariantApplPred = (Function)loopInvariantApplPredTerm.op();
         final Taclet informationFlowContractLoopApp =
-                genInfFlowContractLoopApplTaclet(contLoopApplPred, inst.inv, appData, pm, services);
+                genInfFlowContractLoopApplTaclet(inst.inv, loopInvariantApplPred, appData, pm,
+                                             inst.u, services);
         goal.addTaclet(informationFlowContractLoopApp,
-                       SVInstantiations.EMPTY_SVINSTANTIATIONS, true);        
-        return contractLoopApplPredTerm;
+                       SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        return updatedLoopInvariantApplPredTerm;
+        
+        
+        //final Function contLoopApplPred = generateContLoopApplPredicate(inst, appData, pm,
+        //                                                        services);
+        //final Term contractLoopApplPredTerm =
+        //    TB.apply(inst.u, 
+        //        instantiateContApplPredicate(contLoopApplPred, appData, pm));
+        //final Taclet informationFlowContractLoopApp =
+        //        genInfFlowContractLoopApplTaclet(contLoopApplPred, inst.inv, appData, pm, services);
+        //goal.addTaclet(informationFlowContractLoopApp,
+        //               SVInstantiations.EMPTY_SVINSTANTIATIONS, true);        
+        //return contractLoopApplPredTerm;
     }
     
     @Override
@@ -595,7 +594,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
     
     
-    private Function generateContLoopApplPredicate(Instantiation inst,
+    /*private Function generateContLoopApplPredicate(Instantiation inst,
             LoopInvariantApplicationData appData,
             IProgramMethod pm,
             Services services) {
@@ -640,10 +639,10 @@ public final class WhileInvariantRule implements BuiltInRule {
             services.getNamespaces().functions().addSafely(pred);
         }
         return pred;
-    }
+    }*/
 
 
-    private Term instantiateContApplPredicate(Function pred,
+    /*private Term instantiateContApplPredicate(Function pred,
             LoopInvariantApplicationData appData,
             IProgramMethod pm) {
         Sort[] predArgSorts = new Sort[pred.argSorts().size()];
@@ -672,20 +671,20 @@ public final class WhileInvariantRule implements BuiltInRule {
         predArgs[i++] = appData.heapAtPost;
 
         return TB.func(pred, predArgs);
-    }    
+    }*/
 
 
-    private LoopInvariantApplicationData generateLoopApplicationDataSVs(Function pred,
+    private ProofObligationVars generateLoopApplicationDataSVs(Function pred,
             String schemaPrefix,
-            LoopInvariantApplicationData appData,
+            ProofObligationVars appData,
             IProgramMethod pm,
-            Services services) {
+            Services services) {        
         Sort[] predArgSorts = new Sort[pred.argSorts().size()];
         pred.argSorts().toArray(predArgSorts);        
-        final int numLocalIns = appData.localIns.size();
-        Term[] localInsSVs = new Term[numLocalIns];
-        final int numLocalOuts = appData.localOuts.size();
-        Term[] localOutsSVs = new Term[numLocalOuts];
+        //final int numLocalIns = appData.params.size();
+        ImmutableList<Term> localInsSVs = ImmutableSLList.<Term>nil();
+        //final int numLocalOuts = appData.results.size();
+        ImmutableList<Term> localOutsSVs = ImmutableSLList.<Term>nil();
 
         int i = 0;
         Term selfAtPreSV;
@@ -697,54 +696,91 @@ public final class WhileInvariantRule implements BuiltInRule {
             selfAtPreSV = null;            
         }
         int j = 0;        
-        for(Term t : appData.localIns){
+        for(Term t : appData.params){
             predArgSorts[i] = t.sort();
-            localInsSVs[j] = createTermSV(schemaPrefix + "_param_" + (j + 1),
-                    predArgSorts[i], services);
+            localInsSVs.append(createTermSV(schemaPrefix + "_param_" +
+                    (j + 1), predArgSorts[i],
+                    services));
             i++;
             j++;
         }        
         Term heapAtPreSV = createTermSV(schemaPrefix + "_heapAtPre",
                 predArgSorts[i], services);
         i++;
-        j = 0;        
-        for(Term t : appData.localOuts){
-            predArgSorts[i] = t.sort();
-            localOutsSVs[j] = createTermSV(schemaPrefix + "_res_" + (j + 1),
-                    predArgSorts[i], services);
-            i++;
-            j++;
+        j = 0;
+        localOutsSVs = ImmutableSLList.<Term>nil();
+        if (!pm.isVoid() && !pm.isConstructor()) {
+            for(Term t : appData.results){
+                predArgSorts[i] = t.sort();
+                localOutsSVs.append(createTermSV(schemaPrefix + "_res_" +
+                        (j + 1), predArgSorts[i],
+                        services));
+                i++;
+                j++;
+            }
         }
         Term heapAtPostSV = createTermSV(schemaPrefix + "_heapAtPost",
                 predArgSorts[i], services);
         i++;
 
-        return new LoopInvariantApplicationData(selfAtPreSV, localInsSVs, heapAtPreSV,
-                localOutsSVs, heapAtPostSV);
+        return new ProofObligationVars(selfAtPreSV, selfAtPreSV, localInsSVs, localOutsSVs,
+                localOutsSVs, TB.ff(), TB.ff(), heapAtPreSV,
+                heapAtPreSV, heapAtPostSV, "", services);
     }
 
-    private Taclet genInfFlowContractLoopApplTaclet(Function contractLoopApplPred,
-            LoopInvariant loopInv,
-            LoopInvariantApplicationData appData,
+    private Taclet genInfFlowContractLoopApplTaclet(LoopInvariant loopInv,
+            Function contractLoopApplPred,
+            ProofObligationVars appData,
             IProgramMethod pm,
+            Term stateUpdate,
             Services services) {
         Name tacletName =
-            MiscTools.toValidTacletName("use information flow contract for "
+            MiscTools.toValidTacletName("use information flow loop contract for "
                     + contractLoopApplPred.name());
 
-        LoopInvariantApplicationData schemaDataFind = generateLoopApplicationDataSVs(
+//        LoopInvariantApplicationData schemaDataFind = generateLoopApplicationDataSVs(
+//                contractLoopApplPred, "find", appData, pm, services);
+//        LoopInvariantApplicationData schemaDataAssumes = generateLoopApplicationDataSVs(
+//                contractLoopApplPred, "assumes", appData, pm, services);        
+        ProofObligationVars schemaDataFind = generateLoopApplicationDataSVs(
                 contractLoopApplPred, "find", appData, pm, services);
-        LoopInvariantApplicationData schemaDataAssumes = generateLoopApplicationDataSVs(
+        ProofObligationVars schemaDataAssumes = generateLoopApplicationDataSVs(
                 contractLoopApplPred, "assumes", appData, pm, services);
-        Term schemaFind = instantiateContApplPredicate(contractLoopApplPred,
-                schemaDataFind, pm);
-        Term schemaAssumes = instantiateContApplPredicate(contractLoopApplPred,
-                schemaDataAssumes, pm);
+        
+        
+        /*generateLoopApplicationDataSVs(Function pred,
+                String schemaPrefix,
+                ProofObligationVars appData,
+                IProgramMethod pm,
+                Services services)*/
+        
+        
+        BasicPOSnippetFactory fFind =
+            POSnippetFactory.getBasicFactory(loopInv, schemaDataFind, services);
+        BasicPOSnippetFactory fAssumes =
+            POSnippetFactory.getBasicFactory(loopInv, schemaDataAssumes, services);
+        
+//        Term schemaFind = instantiateContApplPredicate(contractLoopApplPred,
+//                schemaDataFind, pm);
+//        Term schemaAssumes = instantiateContApplPredicate(contractLoopApplPred,
+//                schemaDataAssumes, pm);
+        
+        Term schemaFind = // Different Snippet?
+            TB.apply(stateUpdate, fFind.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION));
+        Term schemaAssumes = // Different Snippet?
+            TB.apply(stateUpdate, fAssumes.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION));
+        
+        /*ImmutableSet<InformationFlowContract> ifContracts =
+            getInfromFlowContracts(pm, services);*/
+        // Why should we have multiple loop invariants?
+        Term schemaContApps =
+            buildContractApplication(loopInv, schemaDataFind,
+                    schemaDataAssumes, services);
 
-        Term schemaContApps = InformationFlowContractPO.buildContractApplication(
+        /*Term schemaContApps = InformationFlowContractPO.buildContractApplication(
                 loopInv, schemaDataFind, schemaDataAssumes, services);
         Term schemaContPrev = InformationFlowContractPO.buildContractApplication(
-                loopInv, schemaDataFind, schemaDataAssumes, services); // TODO: Here we
+                loopInv, schemaDataFind, schemaDataAssumes, services);*/ // TODO: Here we
         //want the new formula
         //(Lemma 1 slightly changed)
 
@@ -753,8 +789,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                 new Semisequent(new SequentFormula(schemaAssumes)));
         Sequent axiomSeq = Sequent.createAnteSequent(
                 new Semisequent(new SequentFormula(schemaContApps)));
-        Sequent bodySeq = Sequent.createSuccSequent(
-                new Semisequent(new SequentFormula(schemaContPrev)));
+//        Sequent bodySeq = Sequent.createSuccSequent(
+//                new Semisequent(new SequentFormula(schemaContPrev)));
 
         //create taclet
         RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder(); // TODO: create new branch for body preserves
@@ -767,12 +803,12 @@ public final class WhileInvariantRule implements BuiltInRule {
                     ImmutableSLList.<Taclet>nil(),
                     schemaFind);
         tacletBuilder.addTacletGoalTemplate(goal);
-        RewriteTacletGoalTemplate goal2 =
-            new RewriteTacletGoalTemplate(bodySeq,
-                    ImmutableSLList.<Taclet>nil(),
-                    schemaFind);
-        tacletBuilder.addTacletGoalTemplate(goal2);
-        tacletBuilder.addRuleSet(new RuleSet(new Name("userTaclets1")));
+//        RewriteTacletGoalTemplate goal2 =
+//            new RewriteTacletGoalTemplate(bodySeq,
+//                    ImmutableSLList.<Taclet>nil(),
+//                    schemaFind);
+//        tacletBuilder.addTacletGoalTemplate(goal2);
+        tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_loop_invariant_appl")));
         tacletBuilder.setSurviveSmbExec(true);
         return tacletBuilder.getTaclet();
     }
@@ -781,6 +817,17 @@ public final class WhileInvariantRule implements BuiltInRule {
     @Override
     public LoopInvariantBuiltInRuleApp createApp(PosInOccurrence pos) {
         return new LoopInvariantBuiltInRuleApp(this, pos);
+    }
+    
+    public static Term buildContractApplication(
+            LoopInvariant loopInv,
+            ProofObligationVars contAppData,
+            ProofObligationVars contAppData2,
+            Services services) {
+        InfFlowPOSnippetFactory f =
+            POSnippetFactory.getInfFlowFactory(loopInv, contAppData,
+                    contAppData2, services);
+        return f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL);
     }
     
     /*private static Term buildInputRelation(LoopInvariant loopInv,
@@ -940,47 +987,6 @@ public final class WhileInvariantRule implements BuiltInRule {
             //}
         }
         return TB.and(eqAtLocs);
-    }*/
-    
-    /*public static Term buildContractApplication(
-            LoopInvariant cont,
-            LoopInvariantApplicationData contAppData,
-            LoopInvariantApplicationData contAppData2,
-            Services services) {
-        ProofObligationVars targetC1 =
-            new ProofObligationVars(contAppData.self,
-                    contAppData.self,
-                    contAppData.localIns,
-                    contAppData.localOuts,
-                    contAppData.localOuts,
-                    null, null,
-                    contAppData.heapAtPre,
-                    contAppData.heapAtPre,
-                    contAppData.heapAtPost,
-                    "", services);
-        ProofObligationVars targetC2 =
-            new ProofObligationVars(contAppData2.self,
-                    contAppData2.self,
-                    contAppData2.localIns,
-                    contAppData2.localOuts,
-                    contAppData2.localOuts,
-                    null, null,
-                    contAppData2.heapAtPre,
-                    contAppData2.heapAtPre,
-                    contAppData2.heapAtPost,
-                    "", services);
-        final IFProofObligationVars targetVs =
-            new IFProofObligationVars(targetC1, targetC2,
-                    null, null,
-                    null, null);
-
-        Term preCond1 = cont.getInvariant(contAppData.self,  //contAppData.heapAtPre?
-                                          cont.getInternalAtPres(), services);
-        Term preCond2 = cont.getInvariant(contAppData2.self, //contAppData2.heapAtPre?
-                                          cont.getInternalAtPres(), services);
-
-        Term inOutRelations = buildInputOutputRelations(cont, targetVs, services);
-        return TB.imp(TB.and(preCond1, preCond2), inOutRelations);
     }*/
     
     //-------------------------------------------------------------------------

@@ -44,6 +44,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -1283,6 +1284,10 @@ public class JMLSpecFactory {
                                             paramVars, null, null, atPres, Term.class, services);
             variant = translated;
         }
+        
+        ImmutableList<Term> localIns = TB.var(MiscTools.getLocalIns(loop, services));
+        ImmutableList<Term> localOuts = TB.var(MiscTools.getLocalOuts(loop, services));
+        
         //create loop invariant annotation
         Term selfTerm = selfVar == null ? null : TB.var(selfVar);
         return new LoopInvariantImpl(loop,
@@ -1291,6 +1296,8 @@ public class JMLSpecFactory {
                                      respects,
                                      variant,
                                      selfTerm,
+                                     localIns,
+                                     localOuts,
                                      atPres);
     }
 

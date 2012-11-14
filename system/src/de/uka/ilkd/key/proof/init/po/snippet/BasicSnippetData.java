@@ -9,6 +9,9 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
+import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.SpecificationElement;
+
 import java.util.EnumMap;
 
 /**
@@ -18,9 +21,15 @@ import java.util.EnumMap;
 class BasicSnippetData {
     
     /**
-     * The contract for which the snippets are produces.
+     * The contract for which the snippets are produced.
      */
     final Contract contract;
+    
+    /**
+     * The loop invariant for which the snippets are produced (then contract is set to null).
+     */
+    final LoopInvariant invariant;
+    // FIXME: Until now this is a workaround, has to be done more nicely!
     
     /**
      * Variables originally used during parsing.
@@ -74,6 +83,7 @@ class BasicSnippetData {
     BasicSnippetData(FunctionalOperationContract contract,
                      Services services) {
         this.contract = contract;
+        this.invariant = null;
         this.tb = new TermBuilder.Serviced(services);
 
         contractContents.put(Key.PRECONDITION, contract.getPre());
@@ -88,11 +98,31 @@ class BasicSnippetData {
                 contract.getExc(), null, heap, null, null, "", services);
 
     }
+    
+    BasicSnippetData(LoopInvariant invariant, Services services) {
+        this.invariant = invariant;
+        this.contract = null;
+        this.tb = new TermBuilder.Serviced(services);
+        
+        contractContents.put(Key.PRECONDITION, invariant);
+        contractContents.put(Key.POSTCONDITION, null);
+        contractContents.put(Key.MODIFIES, invariant.getModifies());
+        contractContents.put(Key.MEASURED_BY, null);
+        contractContents.put(Key.MODALITY, null);
+
+        
+        final Term heap = TermBuilder.DF.getBaseHeap(services);
+        origVars = new ProofObligationVars(invariant.getInternalSelfTerm(), null,
+                invariant.getParams(), invariant.getResults(), null,
+                null, null, heap, null, null, "", services);
+
+    }
 
 
     BasicSnippetData(InformationFlowContract contract,
                      Services services) {
         this.contract = contract;
+        this.invariant = null;
         this.tb = new TermBuilder.Serviced(services);
 
         

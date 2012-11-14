@@ -17,8 +17,8 @@ class MethodCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
 
     @Override
     String generatePredicateName(IProgramMethod pm) {
-        String nameSting =
+        String nameString =
                 MiscTools.toValidTacletName("RELATED_BY_" + pm.getFullName()).toString();
-        return nameSting;
+        return nameString;
     }
 }

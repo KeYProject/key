@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.*;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
@@ -142,6 +143,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                   newRespects.put(heap, r);
                   newInvariants.put(heap, i);
                 }
+                ImmutableList<Term> newLocalIns = TB.var(MiscTools.getLocalIns(loop, services));
+                ImmutableList<Term> newLocalOuts = TB.var(MiscTools.getLocalOuts(loop, services));
                 final LoopInvariant newInv
                        = new LoopInvariantImpl(loop,
                                             newInvariants,
@@ -149,6 +152,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                                             newRespects,
                                             newVariant,
                                             selfTerm,
+                                            newLocalIns,
+                                            newLocalOuts,
                                             atPres);
                 services.getSpecificationRepository().setLoopInvariant(newInv);
             }

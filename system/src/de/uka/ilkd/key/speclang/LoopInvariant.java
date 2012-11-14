@@ -64,6 +64,12 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public Term getInternalSelfTerm();
     
+    public ImmutableList<Term> getParams();
+    
+    public ImmutableList<Term> getResults();
+    
+    public Term getModifies();
+    
     /**
      * Returns operators internally used for the pre-heap.
      */

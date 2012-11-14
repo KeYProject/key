@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
@@ -34,6 +35,7 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.ExtList;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Walks through a java AST in depth-left-first-order. This visitor
@@ -327,6 +329,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     public void performActionOnLoopInvariant(LoopStatement oldLoop,
                                              LoopStatement newLoop) {
+        final TermBuilder TB = TermBuilder.DF;
         LoopInvariant inv
             = services.getSpecificationRepository().getLoopInvariant(oldLoop);
         if(inv == null) {
@@ -368,6 +371,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
            if(t == null) continue;
            atPres.put(h, replaceVariablesInTerm(t));
         }
+        
+        ImmutableList<Term> newLocalIns = TB.var(MiscTools.getLocalIns(newLoop, services));
+        ImmutableList<Term> newLocalOuts = TB.var(MiscTools.getLocalOuts(newLoop, services));
 
         LoopInvariant newInv
             = new LoopInvariantImpl(newLoop,
@@ -376,6 +382,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                     newRespects,
                                     newVariant,
                                     newSelfTerm,
+                                    newLocalIns,
+                                    newLocalOuts,
                                     atPres);
         services.getSpecificationRepository().setLoopInvariant(newInv);
     }

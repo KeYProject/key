@@ -14,7 +14,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
-import de.uka.ilkd.key.proof.init.po.snippet.POSinppetFactory;
+import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Rule;
@@ -56,7 +56,7 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
     public void readProblem() throws ProofInputException {
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
-                POSinppetFactory.getBasicFactory(contract, symbExecVars, services);
+                POSnippetFactory.getBasicFactory(contract, symbExecVars, services);
 
         // precondition
         final Term freePre = symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_PRE);
@@ -71,9 +71,9 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
 
         // information flow po
         BasicPOSnippetFactory execPredFactory1 =
-                POSinppetFactory.getBasicFactory(contract, ifVars.c1, services);
+                POSnippetFactory.getBasicFactory(contract, ifVars.c1, services);
         BasicPOSnippetFactory execPredFactory2 =
-                POSinppetFactory.getBasicFactory(contract, ifVars.c2, services);
+                POSnippetFactory.getBasicFactory(contract, ifVars.c2, services);
 
         final Term exec1 =
                 execPredFactory1.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_WITH_PRE_RELATION);
@@ -84,7 +84,7 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
 //        addContractApplicationTaclets(symbExecProof);
 
         InfFlowPOSnippetFactory f =
-                POSinppetFactory.getInfFlowFactory(contract, ifVars.c1,
+                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
                                                    ifVars.c2, services);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_POST);
 

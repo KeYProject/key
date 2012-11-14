@@ -37,6 +37,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
     private final Map<LocationVariable,ImmutableList<ImmutableList<Term>>> originalRespects;
     private final Term originalVariant;
     private final Term originalSelfTerm;
+    private final ImmutableList<Term> localIns;
+    private final ImmutableList<Term> localOuts;
     private final Map<LocationVariable,Term> originalAtPres;
     
     
@@ -60,6 +62,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
                              Map<LocationVariable,ImmutableList<ImmutableList<Term>>> respects,
                              Term variant, 
                              Term selfTerm,
+                             ImmutableList<Term> localIns,
+                             ImmutableList<Term> localOuts,
                              Map<LocationVariable,Term> atPres) {
         assert loop != null;
         //assert modifies != null;
@@ -69,7 +73,9 @@ public final class LoopInvariantImpl implements LoopInvariant {
         this.originalVariant            = variant;
         this.originalModifies           = modifies == null ? new LinkedHashMap<LocationVariable,Term>() : modifies;
         this.originalRespects           = respects;
-        this.originalSelfTerm           = selfTerm;   
+        this.originalSelfTerm           = selfTerm;
+        this.localIns                   = localIns;
+        this.localOuts                  = localOuts;
         this.originalAtPres             = atPres == null ? new LinkedHashMap<LocationVariable,Term>() : atPres;
     }
 
@@ -93,8 +99,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
              null, 
              null,
              null,
-             null,
+             null,             
              selfTerm,
+             null,
+             null,
              atPres);
     }
     
@@ -258,6 +266,20 @@ public final class LoopInvariantImpl implements LoopInvariant {
         return originalSelfTerm;
     }
     
+    @Override
+    public ImmutableList<Term> getParams() {
+        return localIns;
+    }
+
+    @Override
+    public ImmutableList<Term> getResults() {
+        return localOuts;
+    }
+    
+    @Override
+    public Term getModifies() {
+        return originalModifies.values().iterator().next();
+    }
     
     @Override
     public Map<LocationVariable,Term> getInternalAtPres() {
@@ -277,6 +299,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                      originalRespects,
                                      originalVariant,
                                      originalSelfTerm,
+                                     localIns,
+                                     localOuts,
                                      originalAtPres);
     }
     
@@ -300,6 +324,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                      originalRespects,
                                      originalVariant, 
                                      originalSelfTerm,
+                                     localIns,
+                                     localOuts,
                                      originalAtPres);
     }
     
@@ -318,7 +344,11 @@ public final class LoopInvariantImpl implements LoopInvariant {
                 + "; respects: " 
                 + originalRespects
                 + "; variant: "
-                + originalVariant;
+                + originalVariant
+                + "; input parameters: " 
+                + localIns
+                + "; output parameters: " 
+                + localOuts;
     }
 
 
