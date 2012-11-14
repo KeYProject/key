@@ -14,11 +14,16 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSinppetFactory;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 
 /**
@@ -135,6 +140,39 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
 
     public IFProofObligationVars getIFVars() {
         return ifVars;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void fillSaveProperties(Properties properties) throws IOException {
+        super.fillSaveProperties(properties);
+        properties.setProperty("contract", contract.getName());
+    }
+
+
+    /**
+     * Instantiates a new proof obligation with the given settings.
+     * <p/>
+     * @param initConfig The already load {@link InitConfig}.
+     * @param properties The settings of the proof obligation to instantiate.
+     * @return The instantiated proof obligation.
+     * @throws IOException Occurred Exception.
+     */
+    public static LoadedPOContainer loadFrom(InitConfig initConfig,
+                                             Properties properties) throws IOException {
+        String contractName = properties.getProperty("contract");
+        SpecificationRepository specs =
+                initConfig.getServices().getSpecificationRepository();
+        final Contract contract = specs.getContractByName(contractName);
+        if (contract == null) {
+            throw new RuntimeException("Contract not found: " + contractName);
+        } else {
+            ProofOblInput po = contract.createProofObl(initConfig);
+            return new LoadedPOContainer(po, 0);
+        }
     }
 
 
