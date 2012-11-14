@@ -9,7 +9,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
  *
  * @author christoph
  */
-class InfFlowContractAppSnippet extends ReplaceAnRegisterMethod
+class SelfcomposedExecutionSnippet extends ReplaceAnRegisterMethod
         implements InfFlowFactoryMethod {
 
     @Override
@@ -22,13 +22,11 @@ class InfFlowContractAppSnippet extends ReplaceAnRegisterMethod
         BasicPOSnippetFactory f2 =
                 POSnippetFactory.getBasicFactory(d, poVars2);
 
-        Term preCond1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
-        Term preCond2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
+        final Term exec1 =
+                f1.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_WITH_PRE_RELATION);
+        final Term exec2 =
+                f2.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_WITH_PRE_RELATION);
 
-        InfFlowPOSnippetFactory iff =
-                POSnippetFactory.getInfFlowFactory(d, poVars1, poVars2);
-        Term inOutRelations =
-                iff.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_POST);
-        return d.tb.imp(d.tb.and(preCond1, preCond2), inOutRelations);
+        return d.tb.and(exec1, exec2);
     }
 }

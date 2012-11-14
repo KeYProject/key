@@ -878,7 +878,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Function contApplPred = (Function)contractApplPredTerm.op();
         final Taclet informationFlowContractApp =
                 genInfFlowContractApplTaclet(contract, contApplPred, inst.pm,
-                                             inst.u, services);
+                                             services);
         goal.addTaclet(informationFlowContractApp,
                        SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         return updatedContractApplPredTerm;
@@ -986,7 +986,6 @@ public final class UseOperationContractRule implements BuiltInRule {
     private Taclet genInfFlowContractApplTaclet(FunctionalOperationContract contract,
                                                 Function contractApplPred,
                                                 IProgramMethod pm,
-                                                Term stateUpdate,
                                                 Services services) {
         Name tacletName =
                 MiscTools.toValidTacletName("Use information flow contract for "
@@ -1001,9 +1000,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         BasicPOSnippetFactory fAssumes =
                 POSnippetFactory.getBasicFactory(contract, schemaDataAssumes, services);
         Term schemaFind =
-                TB.apply(stateUpdate, fFind.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION));
+                  fFind.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
         Term schemaAssumes =
-                TB.apply(stateUpdate, fAssumes.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION));
+                fAssumes.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
 
         ImmutableSet<InformationFlowContract> ifContracts =
                 getInfromFlowContracts(pm, services);
@@ -1020,7 +1019,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         //create taclet
         RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
         tacletBuilder.setName(tacletName);
-        tacletBuilder.setFind(schemaFind); // TODO: is this correct? has to match only in the antecedent!
+        tacletBuilder.setFind(schemaFind);
+        tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);
         tacletBuilder.setIfSequent(assumesSeq);
         RewriteTacletGoalTemplate goal =
                 new RewriteTacletGoalTemplate(axiomSeq,

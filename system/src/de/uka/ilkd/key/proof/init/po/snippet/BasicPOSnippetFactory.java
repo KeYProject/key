@@ -33,7 +33,7 @@ public interface BasicPOSnippetFactory {
 
         // [P] (heap = heapAtPost & self = selfAtPost & result = resultAtPost &
         //      exc = excAtPost)
-        SYMBOLIC_EXEC (SymbolicExecutionSnippet.class),
+        SYMBOLIC_EXEC (BasicSymbolicExecutionSnippet.class),
 
         // RELATED_BY_package.class::m(self, param1, ..., paramN, heap, result, exc, heapAtPost)
         // This predicate is semantically equivalent to:

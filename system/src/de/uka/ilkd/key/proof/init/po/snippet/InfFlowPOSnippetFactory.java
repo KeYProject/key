@@ -25,8 +25,11 @@ public interface InfFlowPOSnippetFactory {
         //  -> (   (   {s1}respects = {s2}respects
         //          &  {s1}declassifies = {s2}declassifies )
         //      -> {s1_post}respects = {s2_post}respects )
-       INF_FLOW_CONTRACT_APPL (InfFlowContractAppSnippet.class);
+        INF_FLOW_CONTRACT_APPL (InfFlowContractAppSnippet.class),
 
+        //     {s1}EXECUTION_OF_package.class::m_WITH_PRE(self, param1, ..., paramN, heap, result, exc, heapAtPost)
+        //  &  {s2}EXECUTION_OF_package.class::m_WITH_PRE(self, param1, ..., paramN, heap, result, exc, heapAtPost)
+        SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION (SelfcomposedExecutionSnippet.class);
 
         // type of the factory method
         public final Class c;
