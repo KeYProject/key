@@ -74,7 +74,11 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
 
     @Override
     public Term getMbyAtPre() {
-        return symbExecVars.mbyAtPre;
+        if (contract.hasMby()) {
+            return symbExecVars.mbyAtPre;
+        } else {
+            return null;
+        }
     }
 
 

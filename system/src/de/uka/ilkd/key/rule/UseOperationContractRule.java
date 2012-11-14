@@ -1018,7 +1018,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         ImmutableList<Term> contractsApplications = ImmutableSLList.<Term>nil();
         for (InformationFlowContract cont : targetContracts) {
             InfFlowPOSnippetFactory f =
-                    POSinppetFactory.getInfFlowFactory(cont, contAppData2,
+                    POSinppetFactory.getInfFlowFactory(cont, contAppData,
                                                        contAppData2, services);
             contractsApplications = contractsApplications.append(
                     f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL));

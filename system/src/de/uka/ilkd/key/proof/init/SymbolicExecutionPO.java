@@ -76,7 +76,11 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
 
     @Override
     public Term getMbyAtPre() {
-        return symbExecVars.mbyAtPre;
+        if (contract.hasMby()) {
+            return symbExecVars.mbyAtPre;
+        } else {
+            return null;
+        }
     }
 
 
