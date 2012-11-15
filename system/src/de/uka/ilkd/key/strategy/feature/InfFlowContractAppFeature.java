@@ -181,6 +181,9 @@ public class InfFlowContractAppFeature extends BinaryTacletAppFeature {
         final boolean antec = pos.isInAntec();
         final SequentFormula assumesFor =
                 app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
+
+        // assumtion has to occour before the find-term in the sequent in order
+        // to avoid duplicated applications
         int focusPos =
                 goal.node().sequent().formulaNumberInSequent(antec, focusFor);
         int assumesPos =
@@ -229,7 +232,7 @@ public class InfFlowContractAppFeature extends BinaryTacletAppFeature {
                           Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
 
-        if (!app.ifInstsComplete()){
+        if (!app.ifInstsComplete()) {
             return true;
         }
         if (app.ifFormulaInstantiations().size() < 1) {
