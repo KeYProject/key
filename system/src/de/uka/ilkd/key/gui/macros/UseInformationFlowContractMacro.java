@@ -6,7 +6,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.*;
-import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
+import de.uka.ilkd.key.strategy.feature.InfFlowContractAppFeature;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,7 +24,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
     
     @Override 
     public String getName() {
-        return "Use information flow contract";
+        return "Use information flow contracts";
     }
 
     @Override 
@@ -95,7 +95,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
             String name = ruleApp.rule().name().toString();
             if(prefixContainedInAdmittedRuleNamePrefixes(name) &&
                     ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
-                return NonDuplicateAppFeature.INSTANCE.compute(
+                return InfFlowContractAppFeature.INSTANCE.compute(
                         ruleApp, pio, goal);
             } else {
                 return TopRuleAppCost.INSTANCE;
