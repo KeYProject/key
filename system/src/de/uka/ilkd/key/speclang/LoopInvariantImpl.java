@@ -79,16 +79,27 @@ public final class LoopInvariantImpl implements LoopInvariant {
         this.originalAtPres             = atPres == null ? new LinkedHashMap<LocationVariable,Term>() : atPres;
     }
 
-/*
     public LoopInvariantImpl(LoopStatement loop,
-                             Term invariant,
+                             Map<LocationVariable,Term> invariants,
                              Map<LocationVariable,Term> modifies,   
-                             Term variant, 
-                             Term selfTerm,
+                             Term variant,
+                             Term selfTerm,                             
+                             ImmutableList<Term> localIns,
+                             ImmutableList<Term> localOuts,
                              Map<LocationVariable,Term> atPres) {
-        this(loop,invariant,null,modifies,variant,selfTerm,atPres);
+        this(loop,invariants,modifies,null,variant,selfTerm,localIns,localOuts,atPres);
     }
-*/    
+    
+    public LoopInvariantImpl(LoopStatement loop,
+            Map<LocationVariable,Term> invariants,
+            Map<LocationVariable,Term> modifies,   
+            Term variant,
+            Term selfTerm,
+            Map<LocationVariable,Term> atPres) {
+        this(loop,invariants,modifies,null,variant,selfTerm,
+             ImmutableSLList.<Term>nil(),ImmutableSLList.<Term>nil(),atPres);
+    }
+    
     /**
      * Creates an empty, default loop invariant for the passed loop.
      */
@@ -209,25 +220,14 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     @Override
-    public ImmutableList<ImmutableList<Term>> getRespects(LocationVariable heap)
-                                                          /*Term selfTerm,
-                                                          Map<LocationVariable,Term> atPres,
-                                                          Services services)*/ {
-        //assert (selfTerm == null) == (originalSelfTerm == null);        
-        return originalRespects.get(heap);//TermBuilder.DF.replace2(originalRespects.get(heap),atPres.get(heap),originalSelfTerm,
-                                       //selfTerm,ImmutableSLList.<Term>nil(),
-                                       //ImmutableSLList.<Term>nil(),services);
+    public ImmutableList<ImmutableList<Term>> getRespects(LocationVariable heap) {
+        return originalRespects.get(heap);
     }
     
     @Override
-    public ImmutableList<ImmutableList<Term>> getRespects(/*Term heapTerm,
-                                                          Term selfTerm,
-                                                          ImmutableList<Term> localIns,*/
-                                                          Services services) {
-        //assert (selfTerm == null) == (originalSelfTerm == null);
+    public ImmutableList<ImmutableList<Term>> getRespects(Services services) {
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-        return originalRespects.get(baseHeap);//TermBuilder.DF.replace2(originalRespects.get(baseHeap),heapTerm,originalSelfTerm,
-                                       //selfTerm, localIns,localIns,services);
+        return originalRespects.get(baseHeap);
     }
 
     @Override
