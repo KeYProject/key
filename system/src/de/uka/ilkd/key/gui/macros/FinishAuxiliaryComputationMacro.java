@@ -88,18 +88,18 @@ public class FinishAuxiliaryComputationMacro implements ProofMacro {
     public void applyTo(KeYMediator mediator,
                         PosInOccurrence posInOcc) {
         Proof proof = mediator.getSelectedProof();
-        Services services = proof.getServices();
         ContractPO poForProof =
-                services.getSpecificationRepository().getPOForProof(proof);
+                proof.getServices().getSpecificationRepository().getPOForProof(proof);
         if (!(poForProof instanceof SymbolicExecutionPO)) {
             return;
         }
         SymbolicExecutionPO po = (SymbolicExecutionPO) poForProof;
         Goal initiatingGoal = po.getInitiatingGoal();
         Proof initiatingProof = initiatingGoal.proof();
+        Services services = initiatingProof.getServices();
         InfFlowContractPO ifPO =
-                (InfFlowContractPO) initiatingProof.getServices().
-                getSpecificationRepository().getPOForProof(initiatingProof);
+                (InfFlowContractPO) services.getSpecificationRepository().
+                getPOForProof(initiatingProof);
 
         // create and register resulting taclets
         Term result = calculateResultingTerm(proof, po, ifPO.getIFVars(),
@@ -230,7 +230,7 @@ public class FinishAuxiliaryComputationMacro implements ProofMacro {
                                                             new Name(pv.name() +
                                                                      postfix));
             Operator renamedPv = pv.rename(newName);
-            services.getNamespaces().functions().addSafely(renamedPv);
+            services.getNamespaces().programVariables().addSafely(renamedPv);
             Term pvTerm = TermFactory.DEFAULT.createTerm(renamedPv);
             replaceMap.put(term, pvTerm);
             return pvTerm;
