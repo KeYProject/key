@@ -49,7 +49,7 @@ if ($option{'help'}) {
 my $reloadTests = $option{'reload'};
 
 if($option{'delete'}) {
-    &cleanDirectories ($path_to_key . $path_to_examples);
+    &cleanDirectories ($path_to_examples);
     exit 0;
 }
 
