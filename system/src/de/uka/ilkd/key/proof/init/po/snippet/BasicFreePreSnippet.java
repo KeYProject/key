@@ -19,7 +19,7 @@ class BasicFreePreSnippet implements FactoryMethod {
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         BasicPOSnippetFactory f =
-                POSinppetFactory.getBasicFactory(d, poVars);
+                POSnippetFactory.getBasicFactory(d, poVars);
 
         // "wellformed(heap)"
         final Term wellFormed = d.tb.wellFormed(poVars.heap);

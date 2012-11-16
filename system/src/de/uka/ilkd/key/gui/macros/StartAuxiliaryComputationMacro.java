@@ -19,7 +19,7 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
-import de.uka.ilkd.key.proof.init.po.snippet.POSinppetFactory;
+import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 
 
 /**
@@ -60,7 +60,7 @@ public class StartAuxiliaryComputationMacro implements ProofMacro {
         InfFlowContractPO po = (InfFlowContractPO) poForProof;
 
         InfFlowPOSnippetFactory f =
-                POSinppetFactory.getInfFlowFactory(po.getContract(),
+                POSnippetFactory.getInfFlowFactory(po.getContract(),
                                                    po.getIFVars().c1,
                                                    po.getIFVars().c2, services);
         Term selfComposedExec =

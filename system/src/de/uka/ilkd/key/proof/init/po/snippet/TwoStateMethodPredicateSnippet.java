@@ -28,7 +28,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        final IProgramMethod pm = (IProgramMethod) d.contract.getTarget();
+        final IProgramMethod pm = (IProgramMethod) d.target;
         final Function contApplPred = generateContApplPredicate(pm, d.tb);
         return instantiateContApplPredicate(contApplPred, poVars, pm, d.tb);
     }

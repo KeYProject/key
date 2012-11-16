@@ -19,12 +19,12 @@ class BasicSelfNotNullSnippet implements FactoryMethod {
     public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        if (!(d.contract.getTarget() instanceof IProgramMethod)) {
+        if (!(d.target instanceof IProgramMethod)) {
             throw new UnsupportedOperationException("Tried to produce "
                     + "SELF_NOT_NULL for an observer "
                     + "which is no IProgramMethod.");
         }
-        final IProgramMethod pm = (IProgramMethod) d.contract.getTarget();
+        final IProgramMethod pm = (IProgramMethod) d.target;
         return (poVars.self == null || pm.isConstructor())
                ? d.tb.tt() : d.tb.not(d.tb.equals(poVars.self, d.tb.NULL()));
     }

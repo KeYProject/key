@@ -15,6 +15,8 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -208,6 +210,19 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
 
+    private ImmutableList<ImmutableList<Term>> replaceVariablesInTerms(ImmutableList<ImmutableList<Term>> terms) {
+        ImmutableList<ImmutableList<Term>> res = ImmutableSLList.<ImmutableList<Term>>nil();
+        for (final ImmutableList<Term> innerTerms : terms) {
+            ImmutableList<Term> tmp = ImmutableSLList.<Term>nil();
+            for (final Term term : innerTerms) {
+                tmp = tmp.append(replaceVariablesInTerm(term));
+            }
+            res = res.append(tmp);
+        }
+        return res;
+    }
+
+
     public void performActionOnLocationVariable(LocationVariable x) {
        performActionOnProgramVariable(x);
     }
@@ -235,7 +250,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             newPostconditions.put(heap, replaceVariablesInTerm(oldContract.getPostcondition(heap, services)));
             newModifiesClauses.put(heap, replaceVariablesInTerm(oldContract.getModifiesClause(heap, services)));
         }
-        return oldContract.update(newBlock, newPreconditions, newPostconditions, newModifiesClauses, newVariables);
+        final ImmutableList<ImmutableList<Term>> newRespects =
+                replaceVariablesInTerms(oldContract.getRespects());
+        final ImmutableList<ImmutableList<Term>> newDeclassifies =
+                replaceVariablesInTerms(oldContract.getDeclassifies());
+        return oldContract.update(newBlock, newPreconditions, newPostconditions,
+                                  newModifiesClauses, newRespects,
+                                  newDeclassifies, newVariables);
     }
 
     private BlockContract.Variables replaceBlockContractVariables(final BlockContract.Variables variables)

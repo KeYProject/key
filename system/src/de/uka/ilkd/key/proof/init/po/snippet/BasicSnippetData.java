@@ -2,13 +2,18 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.BlockContract.Terms;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
+import java.util.Collection;
 import java.util.EnumMap;
 
 /**
@@ -18,10 +23,21 @@ import java.util.EnumMap;
 class BasicSnippetData {
     
     /**
-     * The contract for which the snippets are produces.
+     * Tells whether the contract contains a measured_by clause.
      */
-    final Contract contract;
+    final boolean hasMby;
+
+    /**
+     * Returns the contracted function symbol.
+     */
+    final IObserverFunction target;
     
+    /**
+     * Returns the KeYJavaType representing the class/interface to which the
+     * specification element belongs.
+     */
+    final KeYJavaType forClass;
+
     /**
      * Variables originally used during parsing.
      */
@@ -73,7 +89,9 @@ class BasicSnippetData {
 
     BasicSnippetData(FunctionalOperationContract contract,
                      Services services) {
-        this.contract = contract;
+        this.hasMby = contract.hasMby();
+        this.target = contract.getTarget();
+        this.forClass = contract.getKJT();
         this.tb = new TermBuilder.Serviced(services);
 
         contractContents.put(Key.PRECONDITION, contract.getPre());
@@ -92,7 +110,9 @@ class BasicSnippetData {
 
     BasicSnippetData(InformationFlowContract contract,
                      Services services) {
-        this.contract = contract;
+        this.hasMby = contract.hasMby();
+        this.target = contract.getTarget();
+        this.forClass = contract.getKJT();
         this.tb = new TermBuilder.Serviced(services);
 
         
@@ -114,6 +134,34 @@ class BasicSnippetData {
     }
     
     
+    BasicSnippetData(BlockContract contract,
+                     Services services) {
+        this.hasMby = contract.hasMby();
+        this.target = contract.getTarget();
+        this.forClass = contract.getKJT();
+        this.tb = new TermBuilder.Serviced(services);
+
+
+        contractContents.put(Key.PRECONDITION, contract.getPre(services));
+        contractContents.put(Key.MODIFIES, contract.getMod(services));
+        contractContents.put(Key.MODALITY, contract.getModality());
+        contractContents.put(Key.RESPECTS,
+                             doubleListToArray(contract.getRespects()));
+        contractContents.put(Key.DECLASSIFIES,
+                             doubleListToArray(contract.getDeclassifies()));
+
+        final Term heapTerm = TermBuilder.DF.getBaseHeap(services);
+        Terms vars = contract.getVariablesAsTerms();
+        final Collection<Term> localVariables =
+                vars.remembranceLocalVariables.values();
+        origVars = new ProofObligationVars(vars.self, null /*selfAtPost*/,
+                localVariables, vars.result, null /*resultAtPost*/,
+                vars.exception, null /*excptionAtPost*/, heapTerm,
+                null /*heapAtPre*/, null /*heapAtPost*/, "", services);
+
+    }
+
+
     private Term[][] doubleListToArray(ImmutableList<ImmutableList<Term>> termss) {
         Term[][] result = new Term[termss.size()][];
         int i = 0;

@@ -53,7 +53,7 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
-import de.uka.ilkd.key.proof.init.po.snippet.POSinppetFactory;
+import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
@@ -869,7 +869,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                         anonUpdateData.methodHeapAtPre,
                                         anonUpdateData.methodHeap, "", services);
         BasicPOSnippetFactory f =
-                POSinppetFactory.getBasicFactory(contract, appData, services);
+                POSnippetFactory.getBasicFactory(contract, appData, services);
         final Term contractApplPredTerm =
                 f.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
         final Term updatedContractApplPredTerm =
@@ -948,9 +948,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         ProofObligationVars schemaDataAssumes = generateApplicationDataSVs(
                 contractApplPred, "assumes", pm, services);
         BasicPOSnippetFactory fFind =
-                POSinppetFactory.getBasicFactory(contract, schemaDataFind, services);
+                POSnippetFactory.getBasicFactory(contract, schemaDataFind, services);
         BasicPOSnippetFactory fAssumes =
-                POSinppetFactory.getBasicFactory(contract, schemaDataAssumes, services);
+                POSnippetFactory.getBasicFactory(contract, schemaDataAssumes, services);
         Term schemaFind =
                   fFind.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
         Term schemaAssumes =
@@ -1018,7 +1018,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         ImmutableList<Term> contractsApplications = ImmutableSLList.<Term>nil();
         for (InformationFlowContract cont : targetContracts) {
             InfFlowPOSnippetFactory f =
-                    POSinppetFactory.getInfFlowFactory(cont, contAppData,
+                    POSnippetFactory.getInfFlowFactory(cont, contAppData,
                                                        contAppData2, services);
             contractsApplications = contractsApplications.append(
                     f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL));

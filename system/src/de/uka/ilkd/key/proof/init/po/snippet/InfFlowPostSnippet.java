@@ -126,8 +126,8 @@ class InfFlowPostSnippet extends ReplaceAnRegisterMethod implements InfFlowFacto
                                               ProofObligationVars vs2,
                                               Term[] respects1,
                                               Term[] respects2) {
-        BasicPOSnippetFactory f1 = POSinppetFactory.getBasicFactory(d, vs1);
-        BasicPOSnippetFactory f2 = POSinppetFactory.getBasicFactory(d, vs2);
+        BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, vs1);
+        BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, vs2);
         Term framingLocs1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
         Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
 
@@ -216,8 +216,8 @@ class InfFlowPostSnippet extends ReplaceAnRegisterMethod implements InfFlowFacto
                                                       ProofObligationVars vs2,
                                                       Term[] referenceLocSet1,
                                                       Term[] referenceLocSet2) {
-        BasicPOSnippetFactory f1 = POSinppetFactory.getBasicFactory(d, vs1);
-        BasicPOSnippetFactory f2 = POSinppetFactory.getBasicFactory(d, vs2);
+        BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, vs1);
+        BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, vs2);
         Term framingLocs1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_MOD);
         Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_MOD);
 

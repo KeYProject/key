@@ -12,7 +12,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
-import de.uka.ilkd.key.proof.init.po.snippet.POSinppetFactory;
+import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,7 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
     public void readProblem() throws ProofInputException {
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
-                POSinppetFactory.getBasicFactory(contract, symbExecVars, services);
+                POSnippetFactory.getBasicFactory(contract, symbExecVars, services);
 
         // precondition
         final Term freePre = symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_PRE);

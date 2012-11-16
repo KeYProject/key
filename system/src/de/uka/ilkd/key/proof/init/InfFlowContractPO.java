@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
-import de.uka.ilkd.key.proof.init.po.snippet.POSinppetFactory;
+import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -55,7 +55,7 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
     public void readProblem() throws ProofInputException {
         // create proof obligation
         InfFlowPOSnippetFactory f =
-                POSinppetFactory.getInfFlowFactory(contract, ifVars.c1,
+                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
                                                    ifVars.c2, services);
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);

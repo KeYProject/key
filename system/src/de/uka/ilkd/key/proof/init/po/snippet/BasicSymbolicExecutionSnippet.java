@@ -128,12 +128,12 @@ class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
             ProgramVariable selfVar,
             ProgramVariable resultVar,
             ProgramVariable exceptionVar) {
-        if (!(d.contract.getTarget() instanceof IProgramMethod)) {
+        if (!(d.target instanceof IProgramMethod)) {
             throw new UnsupportedOperationException("Tried to produce a "
                     + "java-block for an observer which is no progam method.");
         }
         JavaInfo javaInfo = d.tb.getServices().getJavaInfo();
-        IProgramMethod pm = (IProgramMethod) d.contract.getTarget();
+        IProgramMethod pm = (IProgramMethod) d.target;
 
         //create method call
         final ImmutableArray<Expression> formalArray =
@@ -146,7 +146,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
             final Expression[] formalArray2 =
                     formalArray.toArray(new Expression[formalArray.size()]);
             final New n =
-                    new New(formalArray2, new TypeRef(d.contract.getKJT()),
+                    new New(formalArray2, new TypeRef(d.forClass),
                             null);
             final CopyAssignment ca = new CopyAssignment(selfVar, n);
             sb = new StatementBlock(ca);

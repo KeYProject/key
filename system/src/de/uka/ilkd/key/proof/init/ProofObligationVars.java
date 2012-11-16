@@ -14,14 +14,14 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-
+import java.util.Collection;
 
 
 /**
  * Prepare program and location variables.
- * 
+ * <p/>
  * @author christoph
- *
+ * <p/>
  */
 public class ProofObligationVars {
 
@@ -39,7 +39,7 @@ public class ProofObligationVars {
     public final Term heapAtPre;
     public final Term heapAtPost;
     public final Term mbyAtPre;
-    
+
 
     ProofObligationVars(IProgramMethod pm,
                         KeYJavaType kjt, // contract.getKJT()
@@ -72,14 +72,14 @@ public class ProofObligationVars {
         this.heap = heap;
         this.heapAtPre = heapAtPre;
         this.heapAtPost = heapAtPost;
-        
+
         final Sort intSort =
                 services.getTypeConverter().getIntegerLDT().targetSort();
         final Function mbyAtPreFunc =
                 new Function(new Name(TB.newName(services, "mbyAtPre")), intSort);
         register(mbyAtPreFunc, services);
         this.mbyAtPre = TB.func(mbyAtPreFunc);
-        
+
 
         ImmutableList<Term> terms =
                 ImmutableSLList.<Term>nil();
@@ -95,6 +95,32 @@ public class ProofObligationVars {
         terms = terms.append(heapAtPost);
         terms = terms.append(mbyAtPre);
         termList = terms;
+    }
+
+
+    public ProofObligationVars(Term self,
+                               Term selfAtPost,
+                               Collection<Term> localVars,
+                               Term result,
+                               Term resultAtPost,
+                               Term exception,
+                               Term exceptionAtPost,
+                               Term heap,
+                               Term heapAtPre,
+                               Term heapAtPost,
+                               String postfix,
+                               Services services) {
+        this(self, selfAtPost, toList(localVars), result, resultAtPost, exception,
+             exceptionAtPost, heap, heapAtPre, heapAtPost, postfix, services);
+    }
+
+
+    static ImmutableList<Term> toList(Collection<Term> localVars) {
+        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
+        for (Term var : localVars) {
+            res = res.append(var);
+        }
+        return res;
     }
 
 
@@ -114,7 +140,7 @@ public class ProofObligationVars {
              heapAtPre, heapAtPost, postfix, services, true);
     }
 
-    
+
     public ProofObligationVars(IProgramMethod pm,
                                KeYJavaType kjt,
                                Term self,
@@ -132,8 +158,8 @@ public class ProofObligationVars {
              TB.var(TB.excVar(services, "exc" + postfix, pm, true)),
              TB.var(TB.excVar(services, "excAtPost" + postfix, pm, true)),
              heap, heapAtPre, heapAtPost, postfix, services);
-        
-        
+
+
         if (register) {
             //register the variables so they are declared in proof header
             //if the proof is saved to a file
@@ -147,41 +173,42 @@ public class ProofObligationVars {
             }
         }
     }
-    
+
 
     ProofObligationVars(IProgramMethod pm,
                         KeYJavaType kjt,
                         String postfix,
                         Services services) {
         this(pm, kjt,
-             TB.selfVar(services, pm, kjt, true, postfix) != null
-                ? TB.var(TB.selfVar(services, pm, kjt, true, postfix))
-                : null,
-             TB.selfVar(services, pm, kjt, true, postfix) != null
-                ? TB.var(TB.selfVar(services, pm, kjt, true, "AtPost" + postfix))
-                : null,
+             TB.selfVar(services, pm, kjt, true, postfix) != null ?
+                 TB.var(TB.selfVar(services, pm, kjt, true, postfix)) :
+                 null,
+             TB.selfVar(services, pm, kjt, true, postfix) != null ?
+                 TB.var(TB.selfVar(services, pm, kjt, true, "AtPost" + postfix)) :
+                 null,
              TB.var(TB.paramVars(services, postfix, pm, true)),
-             (!pm.isVoid() && !pm.isConstructor())
-                ? TB.var(TB.resultVar(services, "result" + postfix, pm, true))
-                : null,
-             (!pm.isVoid() && !pm.isConstructor())
-                ? TB.var(TB.resultVar(services, "resultAtPost" + postfix, pm, true))
-                : null,
-             "".equals(postfix)
-                ? TB.getBaseHeap(services)
-                : TB.var(TB.heapAtPreVar(services, "heap" + postfix, true)),
+             (!pm.isVoid() && !pm.isConstructor()) ?
+                 TB.var(TB.resultVar(services, "result" + postfix, pm, true)) :
+                 null,
+             (!pm.isVoid() && !pm.isConstructor()) ?
+
+             TB.var(TB.resultVar(services, "resultAtPost" + postfix, pm, true)) :
+                 null,
+             "".equals(postfix) ?
+                 TB.getBaseHeap(services) :
+                 TB.var(TB.heapAtPreVar(services, "heap" + postfix, true)),
              TB.var(TB.heapAtPreVar(services, "heapAtPre" + postfix, true)),
              TB.var(TB.heapAtPreVar(services, "heapAtPost" + postfix, true)),
              postfix,
              services);
-        
+
         //register the variables so they are declared in proof header
         //if the proof is saved to a file
         register(ops(params, ProgramVariable.class), services);
-        if (result != null){ 
+        if (result != null) {
             register(result.op(ProgramVariable.class), services);
         }
-        if (resultAtPost != null){
+        if (resultAtPost != null) {
             register(resultAtPost.op(ProgramVariable.class), services);
         }
         register(heapAtPre.op(LocationVariable.class), services);

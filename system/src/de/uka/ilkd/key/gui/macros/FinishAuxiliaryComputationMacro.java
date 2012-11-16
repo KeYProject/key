@@ -32,7 +32,7 @@ import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
-import de.uka.ilkd.key.proof.init.po.snippet.POSinppetFactory;
+import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -413,7 +413,7 @@ public class FinishAuxiliaryComputationMacro implements ProofMacro {
         // create find term
         IFProofObligationVars ifVars = infPO.getIFVars();
         InfFlowPOSnippetFactory f =
-                POSinppetFactory.getInfFlowFactory(infPO.getContract(),
+                POSnippetFactory.getInfFlowFactory(infPO.getContract(),
                                                    ifVars.c1, ifVars.c2,
                                                    services);
         Term find =

@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import java.util.EnumMap;
@@ -50,6 +51,15 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
 
 
     BasicPOSnippetFactoryImpl(InformationFlowContract contract,
+                              ProofObligationVars poVars,
+                              Services services) {
+        this.data = new BasicSnippetData(contract, services);
+        this.poVars = poVars;
+        registerFactoryMethods();
+    }
+
+
+    BasicPOSnippetFactoryImpl(BlockContract contract,
                               ProofObligationVars poVars,
                               Services services) {
         this.data = new BasicSnippetData(contract, services);

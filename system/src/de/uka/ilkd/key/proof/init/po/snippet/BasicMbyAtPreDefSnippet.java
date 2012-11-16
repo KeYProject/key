@@ -19,7 +19,7 @@ class BasicMbyAtPreDefSnippet extends ReplaceAnRegisterMethod
     public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        if (!d.contract.hasMby()) {
+        if (!d.hasMby) {
             return d.tb.tt();
         }
 

@@ -15,11 +15,15 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -239,6 +243,32 @@ public class InfFlowContractAppFeature extends BinaryTacletAppFeature {
             return false;
         }
 
-        return noDuplicateFindTaclet(app, pos, goal);
+        return appOnDiffernetExecs(app, pos, goal) &&
+               noDuplicateFindTaclet(app, pos, goal);
+    }
+
+
+    private boolean appOnDiffernetExecs(TacletApp app,
+                                        PosInOccurrence pos,
+                                        Goal goal) {
+        Proof proof = goal.proof();
+        ContractPO po =
+                proof.getServices().getSpecificationRepository().getPOForProof(proof);
+        if (!(po instanceof InfFlowContractPO)) {
+            return false;
+        }
+        return true;
+
+//        assert pos != null : "Feature is only applicable to rules with find.";
+//        assert app.ifFormulaInstantiations().size() >= 1 :
+//                "Featureis only applicable to rules with at least one assumes.";
+//
+//        final Term focusFor = pos.constrainedFormula().formula();
+//        final boolean antec = pos.isInAntec();
+//        final Term assumesFor =
+//                app.ifFormulaInstantiations().iterator().next().getConstrainedFormula().formula();
+//
+//        return focusFor.sub(focusFor.arity() - 1).toString();
+
     }
 }

@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.speclang;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import java.util.*;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -15,6 +16,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -67,7 +69,57 @@ public interface BlockContract extends SpecificationElement {
                                 Map<LocationVariable,Term> newPreconditions,
                                 Map<LocationVariable,Term> newPostconditions,
                                 Map<LocationVariable,Term> newModifiesClauses,
+                                final ImmutableList<ImmutableList<Term>> respects,
+                                final ImmutableList<ImmutableList<Term>> declassifies,
                                 Variables newVariables);
+
+    /**
+     * Returns the method in which the block is located.
+     */
+    public IProgramMethod getTarget();
+
+
+    /**
+     * Tells whether the contract contains a measured_by clause.
+     */
+    public boolean hasMby();
+
+
+    /**
+     * Returns the original precondition of the contract.
+     */
+    Term getPre(Services services);
+
+
+    /**
+     * Returns the original modifies clause of the contract.
+     */
+    Term getMod(Services services);
+
+
+    /**
+     * Returns the original respects clause of the contract.
+     */
+    public ImmutableList<ImmutableList<Term>> getRespects();
+
+
+    /**
+     * Returns the original declassifies clause of the contract.
+     */
+    public ImmutableList<ImmutableList<Term>> getDeclassifies();
+
+
+    /**
+     * Returns the original used variables like self, result etc..
+     */
+    public Variables getVariables();
+
+
+    /**
+     * Returns the original used variables like self, result etc. as terms.
+     */
+    public Terms getVariablesAsTerms();
+
 
     public static class Variables {
 
@@ -111,6 +163,12 @@ public interface BlockContract extends SpecificationElement {
             result.putAll(remembranceLocalVariables);
             return result;
         }
+
+
+        public Terms termify() {
+            return termify(termifyVariable(self));
+        }
+
 
         public Terms termify(final Term self)
         {

@@ -18,9 +18,9 @@ class SelfcomposedExecutionSnippet extends ReplaceAnRegisterMethod
                         ProofObligationVars poVars2)
             throws UnsupportedOperationException {
         BasicPOSnippetFactory f1 =
-                POSinppetFactory.getBasicFactory(d, poVars1);
+                POSnippetFactory.getBasicFactory(d, poVars1);
         BasicPOSnippetFactory f2 =
-                POSinppetFactory.getBasicFactory(d, poVars2);
+                POSnippetFactory.getBasicFactory(d, poVars2);
 
         final Term exec1 =
                 f1.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_WITH_PRE_RELATION);
