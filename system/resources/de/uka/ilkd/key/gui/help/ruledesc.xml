@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>These properties define the help comments which are to be displayed in the 
+rule pane when selecting non-taclet tree elements</comment>
+<entry key="Lemmas">Under Lemmas you find the taclets which have been introduced using menupuoin File.Load USer defined taclets.
+
+They have side branches for proofs. Lemmas
+
+TODO</entry>
+<entry key="One Step Simplifier">Explanation of the OSS
+50</entry>
+</properties>
+

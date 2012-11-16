@@ -27,6 +27,7 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 
+@Deprecated
 public class TacletView implements ActionListener{
 
     private JDialog frame;

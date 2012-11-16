@@ -11,6 +11,8 @@
 package de.uka.ilkd.key.util;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -532,4 +534,21 @@ public final class MiscTools {
 	}
     }
 
+    /**
+     * read an input stream to its end into a string.
+     * 
+     * @param is
+     *            a non-null open input stream
+     * @return the string created from the input of the stream
+     * @throws IOException may occur while reading the stream
+     */
+    public static String toString(InputStream is) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        byte[] buffer = new byte[2048];
+        int read;
+        while((read=is.read(buffer)) > 0) {
+            sb.append(new String(buffer, 0, read));
+        }
+        return sb.toString();
+    }
 }

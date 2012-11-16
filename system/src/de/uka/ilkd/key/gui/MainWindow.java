@@ -473,7 +473,7 @@ public final class MainWindow extends JFrame  {
 	        "The currently open goals");
 	pane.addTab("Proof Search Strategy", null, strategySelectionView,
 	        "Select strategy for automated proof search");
-	pane.addTab("Rules", null, new JScrollPane(ruleView),
+	pane.addTab("Rules", null, ruleView,
 	        "All available rules");
 	
         pane.setSelectedIndex(0);
