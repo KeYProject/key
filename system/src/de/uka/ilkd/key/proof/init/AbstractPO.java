@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -154,13 +155,26 @@ public abstract class AbstractPO implements IPersistablePO {
                     getSCC(axiom, axioms);
             for (Taclet axiomTaclet : axiom.getTaclets(scc, services)) {
                 assert axiomTaclet != null : "class axiom returned null taclet: "
-                                             + axiom.getName();
-                taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
-                        axiomTaclet));
-                initConfig.getProofEnv().registerRule(axiomTaclet,
-                                                      AxiomJustification.INSTANCE);
+                        + axiom.getName();
+
+                // only include if choices are appropriate
+                if (choicesApply(axiomTaclet, initConfig.getActivatedChoices())) {
+                    taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
+                            axiomTaclet));
+                    initConfig.getProofEnv().registerRule(axiomTaclet,
+                            AxiomJustification.INSTANCE);
+                }
             }
         }
+    }
+    
+    /** Check whether a taclet conforms with the currently active choices.
+     * I.e., whether the taclet's given choices is a subset of <code>choices</code>.
+     */
+    private boolean choicesApply (Taclet taclet, ImmutableSet<Choice> choices) {
+        for (Choice tacletChoices: taclet.getChoices())
+            if (!choices.contains(tacletChoices)) return false;
+        return true;
     }
 
 

@@ -15,6 +15,8 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -28,6 +30,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;
@@ -130,7 +133,6 @@ public final class RepresentsAxiom extends ClassAxiom {
     public ImmutableSet<Taclet> getTaclets(
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
-        final boolean satisfiabilityGuard = true; // XXX
         LocationVariable heap =
                 services.getTypeConverter().getHeapLDT().getHeap();
         ProgramVariable self = (!target.isStatic() ? originalSelfVar : null);
@@ -140,26 +142,30 @@ public final class RepresentsAxiom extends ClassAxiom {
         Name tacletName = MiscTools.toValidTacletName(name);
         TacletGenerator TG = TacletGenerator.getInstance();
         if (isFunctional()) {
-            return TG.generateFunctionalRepresentsTaclets(tacletName,
-                                                          originalRep,
-                                                          kjt,
-                                                          target,
-                                                          heap,
-                                                          self,
-                                                          toLimit,
-                                                          satisfiabilityGuard,
-                                                          services);
+            ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
+            res = res.union(TG.generateFunctionalRepresentsTaclets(tacletName, originalRep, kjt, target, heap, self, toLimit, true, services));
+            res = res.union(TG.generateFunctionalRepresentsTaclets(tacletName, originalRep, kjt, target, heap, self, toLimit, false, services));
+            return res;
         } else {
-            Taclet taclet =
+            Taclet tacletWithShowSatisfiability =
                     TG.generateRelationalRepresentsTaclet(tacletName,
                                                           originalRep,
                                                           kjt,
                                                           target,
                                                           heap,
                                                           self,
-                                                          satisfiabilityGuard,
+                                                          true,
                                                           services);
-            return DefaultImmutableSet.<Taclet>nil().add(taclet);
+            Taclet tacletWithTreatAsAxiom =
+                    TG.generateRelationalRepresentsTaclet(tacletName,
+                                                          originalRep,
+                                                          kjt,
+                                                          target,
+                                                          heap,
+                                                          self,
+                                                          false,
+                                                          services);
+            return DefaultImmutableSet.<Taclet>nil().add(tacletWithShowSatisfiability).add(tacletWithTreatAsAxiom);
         }
     }
     
