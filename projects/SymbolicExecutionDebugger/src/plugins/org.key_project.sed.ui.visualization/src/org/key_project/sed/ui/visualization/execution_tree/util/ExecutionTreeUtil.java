@@ -6,7 +6,6 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.URIConverter;
@@ -14,7 +13,6 @@ import org.eclipse.emf.ecore.resource.impl.ExtensibleURIConverterImpl;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeatureProvider;
-import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.key_project.sed.core.model.ISEDDebugTarget;
@@ -27,13 +25,6 @@ import org.key_project.util.java.StringUtil;
  * @author Martin Hentschel
  */
 public final class ExecutionTreeUtil {
-   /**
-    * Property which is used in {@link IContext} instances to define
-    * an {@link IProgressMonitor} used during feature execution. It is
-    * accessible via {@link IContext#getProperty(Object)}.
-    */
-   public static final String CONTEXT_PROPERTY_MONITOR = "org.key_project.sed.ui.visualization.executionTree.monitor";
-   
    /**
     * The file extension of Symbolic Execution Tree diagram files.
     */

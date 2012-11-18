@@ -98,7 +98,9 @@ public class DLEmbeddedExpression extends Operator {
             KeYJavaType kjtActual = javaServ.getTypeConverter().getKeYJavaType(child);
             
             // or use equals here?! Subtyping?!
-            if(kjtActual != kjtExpected) {
+            // if unknown type (null), be content and go on
+            // XXX Check this
+            if(kjtExpected != null && kjtActual != kjtExpected) {
                 throw new ConvertException("Received " + child
                         + " as argument " + i + " for function "
                         + functionSymbol + ". Was expecting type "

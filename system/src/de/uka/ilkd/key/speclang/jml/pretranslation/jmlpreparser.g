@@ -1103,13 +1103,14 @@ loop_specification[ImmutableList<String> mods]
    result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ls);
 }
 :
+    ps=loop_invariant       { ls.addInvariant(ps); }
     (
     	options { greedy = true; }
     	:
-    	    ps=loop_invariant       { ls.addInvariant(ps); }
+            ps=loop_invariant       { ls.addInvariant(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
         |   ps=variant_function     { ls.setVariant(ps); } 
-    )+
+    )*
 ;
 
 

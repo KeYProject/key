@@ -35,7 +35,7 @@ class UninstantiatedNoPosTacletApp extends NoPosTacletApp {
     protected MatchConditions setupMatchConditions (PosInOccurrence pos,
                                                     Services services) {
         if ( taclet() instanceof RewriteTaclet )
-            return ((RewriteTaclet)taclet ()).checkUpdatePrefix
+            return ((RewriteTaclet)taclet ()).checkPrefix
             ( pos, MatchConditions.EMPTY_MATCHCONDITIONS, services );
 
         return MatchConditions.EMPTY_MATCHCONDITIONS;

@@ -1,3 +1,13 @@
+// This file is part of KeY - Integrated Deductive Software Design
+// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+//                         Universitaet Koblenz-Landau, Germany
+//                         Chalmers University of Technology, Sweden
+//
+// The KeY system is protected by the GNU General Public License.
+// See LICENSE.TXT for details.
+//
+//
+
 package de.uka.ilkd.key.gui.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -6,6 +16,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.ProverTaskListener;
 import de.uka.ilkd.key.gui.TaskFinishedInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
@@ -15,22 +26,27 @@ import de.uka.ilkd.key.strategy.Strategy;
 /**
  * The abstract class StrategyProofMacro can be used to define proof macros
  * which use their own strategy.
- * 
+ *
  * In order to implement a {@link StrategyProofMacro}, override
  * {@link #createStrategy(KeYMediator, PosInOccurrence)}.
- * 
+ *
  * This class is aware of Position in occurrences and can also be applied to
  * inner nodes. Both {@link AutomatedRuleApplicationManager} and
  * {@link Strategy} are changed for the course of the macro but are restored
  * afterwards using a {@link ProverTaskListener}.
- * 
+ *
  * @see ProverTaskListener
  * @see Strategy
  */
 public abstract class StrategyProofMacro implements ProofMacro {
 
     protected abstract Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc);
-    
+
+    protected ProverTaskListener createTaskListener(InteractiveProver interactiveProver,
+            Strategy oldStrategy) {
+        return new StopListener(interactiveProver, oldStrategy);
+    }
+
     /**
      * When a prove run is finished, we need to reset the goals' rule
      * application managers using this listener.
@@ -49,11 +65,11 @@ public abstract class StrategyProofMacro implements ProofMacro {
         public void taskStarted(String message, int size) {
         }
 
-        @Override 
+        @Override
         public void taskProgress(int position) {
         }
 
-        @Override 
+        @Override
         public void taskFinished(TaskFinishedInfo info) {
             Proof proof = interactiveProver.getProof();
             for (final Goal goal : proof.openGoals()) {
@@ -73,35 +89,35 @@ public abstract class StrategyProofMacro implements ProofMacro {
         }
     }
 
-    /** 
+    /**
      * {@inheritDoc}
-     * 
+     *
      * This macro can always be applied (does not change anything perhaps)
-     * 
+     *
      * TODO make this only applicable if it has an impact.
-     * 
+     *
      */
-    @Override 
+    @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
         return true;
     }
-    
+
     /*
      * Set a new rule app manager similar to the focussed mode.
      * Set a new strategy which only allows for the named admitted rules.
      * Then run automation mode and in the end reset the managers.
      * and the strategy
      */
-    @Override 
+    @Override
     public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
         InteractiveProver interactiveProver = mediator.getInteractiveProver();
-        Goal goal = mediator.getSelectedGoal();
 
         // add a focus manager if there is a focus
         if(posInOcc != null) {
+            Goal goal = mediator.getSelectedGoal();
             AutomatedRuleApplicationManager realManager = goal.getRuleAppManager();
             realManager.clearCache();
-            FocussedRuleApplicationManager manager = 
+            FocussedRuleApplicationManager manager =
                     new FocussedRuleApplicationManager(realManager, goal, posInOcc);
             goal.setRuleAppManager(manager);
         }
@@ -114,7 +130,7 @@ public abstract class StrategyProofMacro implements ProofMacro {
         // this resets the proof strategy and the managers after the automation
         // has run
         interactiveProver.addProverTaskListener(
-                new StopListener(interactiveProver, oldStrategy));
+                createTaskListener(interactiveProver, oldStrategy));
 
         // find the relevant goals
         // and start

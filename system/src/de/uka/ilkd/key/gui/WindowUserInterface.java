@@ -280,27 +280,29 @@ public class WindowUserInterface extends AbstractUserInterface {
      */
     @Override
     public void removeProof(Proof proof) {
-        // The following was copied from AbandonTaskAction when I redirected
-        // the abandon method there to this method.
-        // The code seems to do more than the original code of this method...
-        final TaskTreeNode rootTask = proof.getBasicTask().getRootTask();
-        mainWindow.getProofList().removeTask(rootTask);
-        final Proof[] rootTaskProofs = rootTask.allProofs();
-        for (Proof p : rootTaskProofs) {
-            //In a previous revision the following statement was performed only
-            //on one proof object, namely on: mediator.getProof()
-            p.getServices().getSpecificationRepository().removeProof(p);
-            p.mgt().removeProofListener();
-            p.dispose();
+        if (!proof.isDisposed()) {
+           // The following was copied from AbandonTaskAction when I redirected
+           // the abandon method there to this method.
+           // The code seems to do more than the original code of this method...
+           final TaskTreeNode rootTask = proof.getBasicTask().getRootTask();
+           mainWindow.getProofList().removeTask(rootTask);
+           final Proof[] rootTaskProofs = rootTask.allProofs();
+           for (Proof p : rootTaskProofs) {
+               //In a previous revision the following statement was performed only
+               //on one proof object, namely on: mediator.getProof()
+               p.getServices().getSpecificationRepository().removeProof(p);
+               p.mgt().removeProofListener();
+               p.dispose();
+           }
+           proof.dispose();
+           mainWindow.getProofView().removeProofs(rootTaskProofs);
+           
+           // The original code of this method. Neccessary?
+           mainWindow.getProofList().removeProof(proof);
+           
+           // Run the garbage collector.
+           Runtime r = Runtime.getRuntime();
+           r.gc();
         }
-        proof.dispose();
-        mainWindow.getProofView().removeProofs(rootTaskProofs);
-        
-        // The original code of this method. Neccessary?
-        mainWindow.getProofList().removeProof(proof);
-        
-        // Run the garbage collector.
-        Runtime r = Runtime.getRuntime();
-        r.gc();
     }
 }

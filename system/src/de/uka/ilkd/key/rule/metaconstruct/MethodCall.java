@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.operator.NewArray;
+import de.uka.ilkd.key.java.recoderext.ConstructorNormalformBuilder;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.IExecutionContext;
@@ -267,7 +268,10 @@ public class MethodCall extends ProgramTransformer {
 	    result = KeYJavaASTFactory.methodBody(pvar,
 		    execContext.getRuntimeInstance(), superMethod, arguments);
 	} else {    // Instance invocation mode
-	    if (pm.isPrivate()) { // private methods are bound statically
+	    if (pm.isPrivate() || (methRef.implicit() && 
+				methRef.getName().
+					equals(ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
+	    	// private methods or constructor invocations are bound statically
 		Debug.out("method-call: invocation of private method detected." + 
 			  "Requires static resolving.");
                 result = makeMbs(staticPrefixType, services);

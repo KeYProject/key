@@ -4,6 +4,7 @@
  */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,6 +19,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -52,7 +54,13 @@ public class TacletGenerator {
 
     private static final TacletGenerator instance = new TacletGenerator();
     private static final TermBuilder TB = TermBuilder.DF;
-
+    
+    /**
+     * Use this switch to decide whether to create replacement or update
+     * taclets. Update taclets use the normal heap variable and have the actual
+     * value set in an update as prefix.
+     */
+    private static final boolean MAKE_UPDATED_REPLACEMENT = true;
 
     private TacletGenerator() {
     }
@@ -152,14 +160,19 @@ public class TacletGenerator {
                 new RewriteTacletGoalTemplate(addedSeq,
                                               ImmutableSLList.<Taclet>nil(),
                                               findTerm);
+        
+        // choices, rule set
+        Choice choice = new Choice(satisfiabilityGuard? "showSatisfiability" : "treatAsAxiom", "modelFields");
+        final RuleSet ruleSet = new RuleSet(new Name(
+                satisfiabilityGuard? "inReachableStateImplication" : "classAxiom"));
 
         //create taclet
         tacletBuilder.setName(tacletName);
+        tacletBuilder.setChoices(DefaultImmutableSet.<Choice>nil().add(choice));
         tacletBuilder.setFind(findTerm);
         tacletBuilder.addTacletGoalTemplate(axiomTemplate);
         tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, heapSV, selfSV);
-        tacletBuilder.addRuleSet(
-                new RuleSet(new Name("inReachableStateImplication")));
+        tacletBuilder.addRuleSet(ruleSet);
         return tacletBuilder.getTaclet();
     }
 
@@ -172,7 +185,7 @@ public class TacletGenerator {
             ProgramVariable heap,
             ProgramVariable self,
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
-            boolean satisfiabilityGuard,
+            boolean satisfiability,
             Services services) {
         ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
 
@@ -213,30 +226,56 @@ public class TacletGenerator {
         //create taclet
         final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
         tacletBuilder.setFind(schemaLhs);
+        Term updatedRhs = makeUpdatedRHS(limitedRhs, heap, heapSV, services);
         tacletBuilder.addTacletGoalTemplate(
                 new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
                                               ImmutableSLList.<Taclet>nil(),
-                                              limitedRhs));
+                                              updatedRhs));
         if (ifSeq != null) {
             tacletBuilder.setIfSequent(ifSeq);
         }
         tacletBuilder.setName(name);
         tacletBuilder.addRuleSet(new RuleSet(new Name("classAxiom")));
+        if (satisfiability)
+            tacletBuilder.addRuleSet(new RuleSet(new Name("split")));
         for (VariableSV boundSV : schemaRepresents.boundVars) {
             tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
             if (selfSV != null) {
                 tacletBuilder.addVarsNotFreeIn(boundSV, selfSV);
             }
         }
+        Choice c = new Choice(satisfiability? "showSatisfiability" : "treatAsAxiom",
+                "modelFields");
+        tacletBuilder.setChoices(DefaultImmutableSet.<Choice>nil().add(c));
 
-        if (satisfiabilityGuard)
+        if (satisfiability)
             functionalRepresentsAddSatisfiabilityBranch(target, services, heapSV,
                     selfSV, schemaRepresents, tacletBuilder);
-        tacletBuilder.setStateRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         result = result.add(tacletBuilder.getTaclet());
 
         //return
         return result;
+    }
+
+    /*
+     * Change the replacewith term to its updated version.
+     * Instead of "inv(heapSV)" write "{heap:=heapSV}inv(heap)"
+     * which makes the outcome a lot more comprehensible for the human.
+     * And smaller in size.  
+     */
+    private Term makeUpdatedRHS(Term term, ProgramVariable heap, 
+            SchemaVariable heapSV, Services services) {
+        if(!MAKE_UPDATED_REPLACEMENT) {
+            return term;
+        }
+
+        final OpReplacer or = new OpReplacer(
+                Collections.<ParsableVariable, ProgramVariable>singletonMap(heapSV, heap));
+        final Term replaced = or.replace(term);
+        final Term update = TB.elementary(services, TB.var(heapSV));
+
+        return TB.apply(update, replaced);
     }
 
 

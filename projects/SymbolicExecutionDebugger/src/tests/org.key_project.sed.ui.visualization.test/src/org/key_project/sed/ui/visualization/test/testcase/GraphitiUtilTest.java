@@ -37,6 +37,18 @@ import org.key_project.util.test.util.TestUtilsUtil;
  */
 public class GraphitiUtilTest extends TestCase {
    /**
+    * Tests {@link GraphitiUtil#getDefaultFont(Diagram)}.
+    */
+   @Test
+   public void testGetDefaultFont() {
+      // Test null
+      assertNull(GraphitiUtil.getDefaultFont(null));
+      // Test diagram
+      Diagram diagram = GraphitiUi.getPeService().createDiagram(ExecutionTreeDiagramTypeProvider.DIAGRAM_TYPE_ID, "Test", 5, true);
+      assertNotNull(GraphitiUtil.getDefaultFont(diagram));
+   }
+   
+   /**
     * Tests {@link GraphitiUtil#calculateStringSize(String, Font)}
     */
    @Test

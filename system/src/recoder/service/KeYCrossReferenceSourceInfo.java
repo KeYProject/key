@@ -77,7 +77,10 @@ public class KeYCrossReferenceSourceInfo
 	
 	//HEAP
 	name2primitiveType.put("\\locset", new PrimitiveType("\\locset", this));
+	
+	// ADTs
 	name2primitiveType.put("\\seq", new PrimitiveType("\\seq", this));
+	name2primitiveType.put("\\free", new PrimitiveType("\\free", this));
 	
 	// JML's primitive types
 	name2primitiveType.put("\\bigint", new PrimitiveType("\\bigint", this));

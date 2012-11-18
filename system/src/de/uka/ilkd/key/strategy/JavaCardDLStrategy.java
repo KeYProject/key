@@ -38,44 +38,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.strategy.feature.AgeFeature;
-import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
-import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
-import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
-import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
-import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
-import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
-import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
-import de.uka.ilkd.key.strategy.feature.DiffFindAndIfFeature;
-import de.uka.ilkd.key.strategy.feature.DiffFindAndReplacewithFeature;
-import de.uka.ilkd.key.strategy.feature.DirectlyBelowSymbolFeature;
-import de.uka.ilkd.key.strategy.feature.EqNonDuplicateAppFeature;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.FindDepthFeature;
-import de.uka.ilkd.key.strategy.feature.FindRightishFeature;
-import de.uka.ilkd.key.strategy.feature.FocusInAntecFeature;
-import de.uka.ilkd.key.strategy.feature.InEquationMultFeature;
-import de.uka.ilkd.key.strategy.feature.MatchedIfFeature;
-import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
-import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
-import de.uka.ilkd.key.strategy.feature.NotBelowBinderFeature;
-import de.uka.ilkd.key.strategy.feature.NotBelowQuantifierFeature;
-import de.uka.ilkd.key.strategy.feature.NotInScopeOfModalityFeature;
-import de.uka.ilkd.key.strategy.feature.OnlyInScopeOfQuantifiersFeature;
-import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
-import de.uka.ilkd.key.strategy.feature.PurePosDPathFeature;
-import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
-import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
-import de.uka.ilkd.key.strategy.feature.ScaleFeature;
-import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
-import de.uka.ilkd.key.strategy.feature.SumFeature;
-import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.ThrownExceptionFeature;
-import de.uka.ilkd.key.strategy.feature.TopLevelFindFeature;
-import de.uka.ilkd.key.strategy.feature.TrivialMonomialLCRFeature;
+import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
@@ -207,12 +170,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final SetRuleFilter depFilter = new SetRuleFilter();
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if (depProp.equals(StrategyProperties.DEP_ON)) {
-            depSpecF = ConditionalFeature.createConditional(depFilter, 
-        	    					    longConst(2500));            
-        } else {
-            depSpecF = ConditionalFeature.createConditional(depFilter, 
-        	    					    inftyConst());
-        }
+                depSpecF = ConditionalFeature.createConditional(depFilter,
+                                                                longConst(400));            
+            } else {
+                depSpecF = ConditionalFeature.createConditional(depFilter,
+                                                                inftyConst());
+            }        
         
         final Feature loopInvF;
         final String loopProp
@@ -456,7 +419,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final String queryAxProp = strategyProperties.
                            getProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY);
         if (queryAxProp.equals(StrategyProperties.QUERYAXIOM_ON)) {
-            bindRuleSet ( d, "query_axiom", longConst(0) ); //Originally the QueryAxiom rule was assigned the strategy "simplify". Hence, the cost should be probably low.
+            bindRuleSet ( d, "query_axiom", longConst(-3000) ); //Originally the QueryAxiom rule was assigned the strategy "simplify". Hence, the cost should be probably low.
         } else if (queryAxProp.equals(StrategyProperties.QUERYAXIOM_OFF)) {
             bindRuleSet ( d, "query_axiom", inftyConst());
         } else {

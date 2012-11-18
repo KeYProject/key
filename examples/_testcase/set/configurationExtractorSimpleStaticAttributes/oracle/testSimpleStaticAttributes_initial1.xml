@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="null">
+      <term term="newInstance"/>
+      <term term="null"/>
+   </equivalenceClass>
+   <state name="One Step Simplification resulting in return instance.x+finalInstance.x+staticInt+finalStaticint;">
+      <value name="newInstance" programVariable="newInstance" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
+   </state>
+</model>

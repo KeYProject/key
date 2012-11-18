@@ -799,7 +799,10 @@ options {
                     
                     if (vars.size() == 0) {
                         semanticError("There is no attribute '" + attributeName + 
-                            "' declared in type '" + prefixSort + "'");
+                            "' declared in type '" + prefixSort + "'.\n"+
+                            "If you wanted to use observer symbols, "+
+                            "please make sure to use raw (i.e., not pretty-printed) syntax, "+
+                            "e.g., 'java.lang.Object::<inv>(heap,t)'");
                     }                    
 
                     if (LogicPrinter.printInShortForm(attributeName, 
@@ -1052,6 +1055,7 @@ options {
      */
     private Operator lookupVarfuncId(String varfunc_name, Term[] args) 
         throws NotDeclException, SemanticException {
+        
 
         // case 1: variable
         Operator v = (Operator) variables().lookup(new Name(varfunc_name));
@@ -1205,20 +1209,27 @@ options {
 
 
     private TacletBuilder createTacletBuilderFor
-        (Object find, int stateRestriction) 
+        (Object find, int applicationRestriction) 
         throws InvalidFindException {
-        if ( stateRestriction != RewriteTaclet.NONE && !( find instanceof Term ) ) {        
-            String mod;
-            switch (stateRestriction) {
-                case RewriteTaclet.SAME_UPDATE_LEVEL: 
-                       mod = "\"\\sameUpdateLevel\""; 
-                break;
-                case RewriteTaclet.IN_SEQUENT_STATE: 
-                       mod = "\"\\inSequentState\""; 
-                break;                
-                default: 
-                       mod = "State restrictions"; 
-                break;                
+        if ( applicationRestriction != RewriteTaclet.NONE && !( find instanceof Term ) ) {        
+            String mod = "";
+            if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
+                mod = "\"\\sameUpdateLevel\"";
+            }
+            if ((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
+                if (mod != "") mod += " and ";
+                mod += "\"\\inSequentState\""; 
+            }
+            if ((applicationRestriction & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
+                if (mod != "") mod += " and ";
+                mod += "\"\\antecedentPolarity\""; 
+            }
+            if ((applicationRestriction & RewriteTaclet.SUCCEDENT_POLARITY) != 0) {
+                if (mod != "") mod += " and ";
+                mod += "\"\\succedentPolarity\"";
+            }
+            if (mod == "") {
+                mod = "Application restrictions";               
             }
             
             throw new InvalidFindException
@@ -1229,7 +1240,7 @@ options {
             return new NoFindTacletBuilder();
         } else if ( find instanceof Term ) {
             return new RewriteTacletBuilder().setFind((Term)find)
-                .setStateRestriction(stateRestriction);
+                .setApplicationRestriction(applicationRestriction);
         } else if ( find instanceof Sequent ) {
             Sequent findSeq = (Sequent) find;
             if ( findSeq.isEmpty() ) {
@@ -3375,7 +3386,7 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
     Object  find = null;
     r = null;
     TacletBuilder b = null;
-    int stateRestriction = RewriteTaclet.NONE;
+    int applicationRestriction = RewriteTaclet.NONE;
 }
     : 
         name:IDENT (choices=option_list[choices])? 
@@ -3385,12 +3396,15 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
         } 
 	( SCHEMAVAR one_schema_var_decl ) *
         ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
-        ( FIND LPAREN find = termorseq RPAREN 
-            ( SAMEUPDATELEVEL { stateRestriction = RewriteTaclet.SAME_UPDATE_LEVEL; } |
-              INSEQUENTSTATE { stateRestriction = RewriteTaclet.IN_SEQUENT_STATE; } 
-            ) ? ) ?
+        ( FIND LPAREN find = termorseq RPAREN
+            (   SAMEUPDATELEVEL { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
+              | INSEQUENTSTATE { applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE; }
+              | ANTECEDENTPOLARITY { applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY; }
+              | SUCCEDENTPOLARITY { applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY; }
+            )*
+        ) ?
         { 
-            b = createTacletBuilderFor(find, stateRestriction);
+            b = createTacletBuilderFor(find, applicationRestriction);
             b.setName(new Name(name.getText()));
             b.setIfSequent(ifSeq);
         }
@@ -3419,11 +3433,7 @@ modifiers[TacletBuilder b]
            while(it.hasNext())
                b.addRuleSet((RuleSet)it.next());
          }
-        | NONINTERACTIVE { 
-                //      b.setNoninteractive(true);  
-                // "noninteractive" (as it is now) is confusing
-                // dropped this completely until a better solution (->Uwe)
-            }       
+        | NONINTERACTIVE { b.addRuleSet((RuleSet)ruleSets().lookup(new Name("notHumanReadable"))); }
         | DISPLAYNAME dname = string_literal 
             {b.setDisplayName(dname);}
         | HELPTEXT htext = string_literal

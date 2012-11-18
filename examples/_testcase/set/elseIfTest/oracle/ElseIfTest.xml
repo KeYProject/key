@@ -15,13 +15,13 @@
             </branchCondition>
             <branchCondition name="!x = 0" pathCondition="!x = 0" pathConditionChanged="true" branchCondition="!x = 0" mergedBranchCondition="false">
                <branchNode name="if (x==1||x==2||x==3) {if (x==1||x==2) {     a=-1;   }   a=x*x; }else if (x==4) {return 42;   }else  {     a=x;   }" pathCondition="!x = 0" pathConditionChanged="false">
-                  <branchCondition name="x = 1" pathCondition="!x = 0 &amp; x = 1" pathConditionChanged="true" branchCondition="x = 1" mergedBranchCondition="false">
-                     <branchNode name="if (x==1||x==2) {   a=-1; }" pathCondition="!x = 0 &amp; x = 1" pathConditionChanged="false">
-                        <statement name="a=-1;" pathCondition="!x = 0 &amp; x = 1" pathConditionChanged="false">
-                           <statement name="a=x*x;" pathCondition="!x = 0 &amp; x = 1" pathConditionChanged="false">
-                              <statement name="return a;" pathCondition="!x = 0 &amp; x = 1" pathConditionChanged="false">
-                                 <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="!x = 0 &amp; x = 1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;1&apos; as result of self.elseIf(x);&gt;">
-                                    <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; x = 1" pathConditionChanged="false" exceptionalTermination="false">
+                  <branchCondition name="x = 1" pathCondition="x = 1" pathConditionChanged="true" branchCondition="x = 1" mergedBranchCondition="false">
+                     <branchNode name="if (x==1||x==2) {   a=-1; }" pathCondition="x = 1" pathConditionChanged="false">
+                        <statement name="a=-1;" pathCondition="x = 1" pathConditionChanged="false">
+                           <statement name="a=x*x;" pathCondition="x = 1" pathConditionChanged="false">
+                              <statement name="return a;" pathCondition="x = 1" pathConditionChanged="false">
+                                 <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="x = 1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;1&apos; as result of self.elseIf(x);&gt;">
+                                    <termination name="&lt;end&gt;" pathCondition="x = 1" pathConditionChanged="false" exceptionalTermination="false">
                                     </termination>
                                  </methodReturn>
                               </statement>
@@ -30,13 +30,13 @@
                      </branchNode>
                   </branchCondition>
                   <branchCondition name="!x = 1" pathCondition="!x = 0 &amp; !x = 1" pathConditionChanged="true" branchCondition="!x = 1" mergedBranchCondition="false">
-                     <branchCondition name="x = 2" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" pathConditionChanged="true" branchCondition="x = 2" mergedBranchCondition="false">
-                        <branchNode name="if (x==1||x==2) {   a=-1; }" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" pathConditionChanged="false">
-                           <statement name="a=-1;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" pathConditionChanged="false">
-                              <statement name="a=x*x;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" pathConditionChanged="false">
-                                 <statement name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" pathConditionChanged="false">
-                                    <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;4&apos; as result of self.elseIf(x);&gt;">
-                                       <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; x = 2" pathConditionChanged="false" exceptionalTermination="false">
+                     <branchCondition name="x = 2" pathCondition="x = 2" pathConditionChanged="true" branchCondition="x = 2" mergedBranchCondition="false">
+                        <branchNode name="if (x==1||x==2) {   a=-1; }" pathCondition="x = 2" pathConditionChanged="false">
+                           <statement name="a=-1;" pathCondition="x = 2" pathConditionChanged="false">
+                              <statement name="a=x*x;" pathCondition="x = 2" pathConditionChanged="false">
+                                 <statement name="return a;" pathCondition="x = 2" pathConditionChanged="false">
+                                    <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="x = 2" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;4&apos; as result of self.elseIf(x);&gt;">
+                                       <termination name="&lt;end&gt;" pathCondition="x = 2" pathConditionChanged="false" exceptionalTermination="false">
                                        </termination>
                                     </methodReturn>
                                  </statement>
@@ -45,12 +45,12 @@
                         </branchNode>
                      </branchCondition>
                      <branchCondition name="!x = 2" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2" pathConditionChanged="true" branchCondition="!x = 2" mergedBranchCondition="false">
-                        <branchCondition name="x = 3" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" pathConditionChanged="true" branchCondition="x = 3" mergedBranchCondition="false">
-                           <branchNode name="if (x==1||x==2) {   a=-1; }" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" pathConditionChanged="false">
-                              <statement name="a=x*x;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" pathConditionChanged="false">
-                                 <statement name="return a;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" pathConditionChanged="false">
-                                    <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;9&apos; as result of self.elseIf(x);&gt;">
-                                       <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; x = 3" pathConditionChanged="false" exceptionalTermination="false">
+                        <branchCondition name="x = 3" pathCondition="x = 3" pathConditionChanged="true" branchCondition="x = 3" mergedBranchCondition="false">
+                           <branchNode name="if (x==1||x==2) {   a=-1; }" pathCondition="x = 3" pathConditionChanged="false">
+                              <statement name="a=x*x;" pathCondition="x = 3" pathConditionChanged="false">
+                                 <statement name="return a;" pathCondition="x = 3" pathConditionChanged="false">
+                                    <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="x = 3" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;9&apos; as result of self.elseIf(x);&gt;">
+                                       <termination name="&lt;end&gt;" pathCondition="x = 3" pathConditionChanged="false" exceptionalTermination="false">
                                        </termination>
                                     </methodReturn>
                                  </statement>
@@ -59,10 +59,10 @@
                         </branchCondition>
                         <branchCondition name="!x = 3" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3" pathConditionChanged="true" branchCondition="!x = 3" mergedBranchCondition="false">
                            <branchNode name="if (x==4) {return 42; }else  {   a=x; }" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3" pathConditionChanged="false">
-                              <branchCondition name="x = 4" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4" pathConditionChanged="true" branchCondition="x = 4" mergedBranchCondition="false">
-                                 <statement name="return 42;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4" pathConditionChanged="false">
-                                    <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.elseIf(x);&gt;">
-                                       <termination name="&lt;end&gt;" pathCondition="!x = 0 &amp; !x = 1 &amp; !x = 2 &amp; !x = 3 &amp; x = 4" pathConditionChanged="false" exceptionalTermination="false">
+                              <branchCondition name="x = 4" pathCondition="x = 4" pathConditionChanged="true" branchCondition="x = 4" mergedBranchCondition="false">
+                                 <statement name="return 42;" pathCondition="x = 4" pathConditionChanged="false">
+                                    <methodReturn name="&lt;return of self.elseIf(x);&gt;" pathCondition="x = 4" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.elseIf(x);&gt;">
+                                       <termination name="&lt;end&gt;" pathCondition="x = 4" pathConditionChanged="false" exceptionalTermination="false">
                                        </termination>
                                     </methodReturn>
                                  </statement>

@@ -7,6 +7,8 @@ import org.eclipse.debug.ui.IValueDetailListener;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISEDValue;
+import org.key_project.sed.core.model.ISEDVariable;
 import org.key_project.sed.ui.util.LogUtil;
 import org.key_project.sed.ui.util.SEDImages;
 import org.key_project.util.java.StringUtil;
@@ -40,6 +42,14 @@ public abstract class AbstractSEDDebugModelPresentation extends LabelProvider im
          if (element instanceof ISEDDebugNode) {
             String name = ((ISEDDebugNode)element).getName();
             return StringUtil.toSingleLinedString(name);
+         }
+         else if (element instanceof ISEDVariable) { // Used if no columns are shown in the variables view
+            String name = ((ISEDVariable)element).getName();
+            return StringUtil.toSingleLinedString(name);
+         }
+         else if (element instanceof ISEDValue) { // Used if no columns are shown in the variables view
+            String valueString = ((ISEDValue)element).getValueString();
+            return StringUtil.toSingleLinedString(valueString);
          }
          else {
             return null; // Text is computed somewhere else in the Eclipse Debug API.

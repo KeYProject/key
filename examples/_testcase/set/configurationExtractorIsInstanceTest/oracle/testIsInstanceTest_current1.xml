@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="obj">
+      <term term="IsInstanceTest.A"/>
+      <term term="obj"/>
+   </equivalenceClass>
+   <state name="return 1;">
+      <association name="IsInstanceTest::A" programVariable="IsInstanceTest::A" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="obj" programVariable="obj" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+   </state>
+   <object xml:id="o1" name="obj" type="IsInstanceTest">
+   </object>
+</model>

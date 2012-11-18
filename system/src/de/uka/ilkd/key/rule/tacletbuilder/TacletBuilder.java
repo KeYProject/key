@@ -260,13 +260,6 @@ public abstract class TacletBuilder {
 	ruleSets = rs;
     }
 
-    /** sets the noninteractive flag to the given value.
-     */
-    public void setNoninteractive(boolean ni) {
-	attrs.setNoninteractive(ni);
-    }
-
-
     public Sequent ifSequent() {
 	return ifseq;
     }

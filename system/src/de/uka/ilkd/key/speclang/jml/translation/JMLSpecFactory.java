@@ -732,7 +732,7 @@ public class JMLSpecFactory {
         if (!clauses.accessible.equalsModRenaming(TB.allLocs(services))) {
             assert (progVars.selfVar == null) == pm.isStatic();
             final Contract depContract = cf.dep(
-                    pm.getContainerType(), pm,
+                    pm.getContainerType(), pm, pm.getContainerType(),
                     TB.convertToFormula(clauses.requires.get(services.getTypeConverter().getHeapLDT().getHeap()),services), clauses.measuredBy,
                     clauses.accessible, progVars.selfVar,
                     progVars.paramVars);
@@ -1015,7 +1015,7 @@ public class JMLSpecFactory {
         final ContractClauses clauses = translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new SimpleBlockContract.Creator(
             block, labels, method, behavior, variables, clauses.requires, clauses.ensures, clauses.breaks, clauses.continues,
-            clauses.returns, clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables, services
+            clauses.returns, clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables, !clauses.strictlyPure, services
         ).create();
     }
 

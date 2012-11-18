@@ -2110,6 +2110,7 @@ TypeReference PrimitiveType() :
      | "double"
      | "\\seq"
      | "\\locset"
+     | "\\free"
      | "\\bigint"
      )
 	{

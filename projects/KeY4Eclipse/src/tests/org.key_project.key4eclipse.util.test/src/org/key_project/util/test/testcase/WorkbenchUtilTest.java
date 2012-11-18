@@ -24,18 +24,33 @@ import org.key_project.util.test.view.GraphitiEditorInViewView;
  */
 public class WorkbenchUtilTest extends TestCase {
    /**
-    * Tests {@link WorkbenchUtil#openPerspective(String)} and
-    * {@link WorkbenchUtil#closePerspective(IPerspectiveDescriptor, boolean, boolean)}.
+    * Tests {@link WorkbenchUtil#getPerspectiveName(String)}.
     */
    @Test
-   public void testOpenAndClosePerspective() {
+   public void testGetPerspectiveName() {
+      assertNull(WorkbenchUtil.getPerspectiveName("invalid"));
+      assertEquals("Empty Test Perspective", WorkbenchUtil.getPerspectiveName(EmptyTestPerspectiveFactory.PERSPECTIVE_ID));
+   }
+   
+   /**
+    * Tests {@link WorkbenchUtil#openPerspective(String)},
+    * {@link WorkbenchUtil#closePerspective(IPerspectiveDescriptor, boolean, boolean)} and
+    * {@link WorkbenchUtil#isPerspectiveOpen(String, IWorkbenchPage)}.
+    */
+   @Test
+   public void testOpenCloseAndIsOpenPerspective() {
       IWorkbenchPage activePage = WorkbenchUtil.getActivePage();
       IPerspectiveDescriptor oldPerspective = activePage.getPerspective();
+      assertFalse(WorkbenchUtil.isPerspectiveOpen(EmptyTestPerspectiveFactory.PERSPECTIVE_ID, activePage));
       IPerspectiveDescriptor newPerspective = WorkbenchUtil.openPerspective(EmptyTestPerspectiveFactory.PERSPECTIVE_ID);
+      assertTrue(WorkbenchUtil.isPerspectiveOpen(EmptyTestPerspectiveFactory.PERSPECTIVE_ID, activePage));
+      assertFalse(WorkbenchUtil.isPerspectiveOpen(EmptyTestPerspectiveFactory.PERSPECTIVE_ID, null));
+      assertFalse(WorkbenchUtil.isPerspectiveOpen(null, activePage));
       assertNotNull(newPerspective);
       assertEquals(EmptyTestPerspectiveFactory.PERSPECTIVE_ID, newPerspective.getId());
       assertEquals(newPerspective, activePage.getPerspective());
       WorkbenchUtil.closePerspective(newPerspective, false, false);
+      assertFalse(WorkbenchUtil.isPerspectiveOpen(EmptyTestPerspectiveFactory.PERSPECTIVE_ID, activePage));
       assertEquals(oldPerspective, activePage.getPerspective());
       WorkbenchUtil.closePerspective(null, false, false);
       assertEquals(oldPerspective, activePage.getPerspective());

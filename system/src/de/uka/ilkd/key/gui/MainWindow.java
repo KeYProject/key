@@ -10,7 +10,17 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.Frame;
+import java.awt.GridBagLayout;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -24,14 +34,72 @@ import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.JViewport;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
 
-import de.uka.ilkd.key.gui.actions.*;
-import de.uka.ilkd.key.gui.configuration.*;
+import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
+import de.uka.ilkd.key.gui.actions.AboutAction;
+import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
+import de.uka.ilkd.key.gui.actions.ExitMainAction;
+import de.uka.ilkd.key.gui.actions.FontSizeAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
+import de.uka.ilkd.key.gui.actions.LicenseAction;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
+import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
+import de.uka.ilkd.key.gui.actions.OpenExampleAction;
+import de.uka.ilkd.key.gui.actions.OpenFileAction;
+import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
+import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
+import de.uka.ilkd.key.gui.actions.ProofManagementAction;
+import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
+import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
+import de.uka.ilkd.key.gui.actions.SaveFileAction;
+import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
+import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
+import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
+import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
+import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
+import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
+import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
+import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
+import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
+import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.configuration.GeneralSettings;
+import de.uka.ilkd.key.gui.configuration.PathConfig;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.gui.configuration.SettingsListener;
+import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
@@ -44,12 +112,15 @@ import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
+import de.uka.ilkd.key.pp.ProgramPrinter;
+import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
@@ -705,22 +776,7 @@ public final class MainWindow extends JFrame  {
         
        
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
-        
-
-        final MainWindowAction pp2 = new MainWindowAction(this, 
-                "Use Unicode symbols", 
-                "If checked formulae are displayed with special Unicode characters" +
-                " (such as \""+UnicodeHelper.AND+"\") instead of the traditional ASCII ones. \n"+
-                "Only works in combination with pretty printing (see above).",
-                NotationInfo.UNICODE_ENABLED){
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                NotationInfo.UNICODE_ENABLED = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-                mainWindow.makePrettyView();
-            }
-        };
-        view.add(new JCheckBoxMenuItem(pp2));
+        view.add(new JCheckBoxMenuItem(new UnicodeToggleAction(this)));
         
         view.addSeparator();
         {
@@ -763,6 +819,7 @@ public final class MainWindow extends JFrame  {
 	options.add(setupSpeclangMenu());
 	options.addSeparator();
         options.add(new JCheckBoxMenuItem(new MinimizeInteraction(this)));
+        options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
         options.add(new JCheckBoxMenuItem(oneStepSimplAction));
         
         return options;
@@ -1610,6 +1667,20 @@ public final class MainWindow extends JFrame  {
 	}
 
 	return instance;
+    }
+    
+    /**
+     * <p>
+     * Checks if an instance of the main window is already created or not.
+     * </p>
+     * <p>
+     * This method is required, because the Eclipse integration of KeY has
+     * to do some cleanup only if a main window exists.
+     * </p>
+     * @return {@code true} {@link MainWindow} exists and is available via {@link #getInstance()}, {@code false} {@link MainWindow} is not instantiated and will be instantiated via {@link #getInstance()}.
+     */
+    public static boolean hasInstance() {
+       return instance != null;
     }
     
     

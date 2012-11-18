@@ -48,8 +48,10 @@ public abstract class LDT implements Named {
     //-------------------------------------------------------------------------
     
     protected LDT(Name name, Services services) {
-	sort = (Sort) services.getNamespaces().sorts().lookup(name);
-	assert sort != null;
+        sort = (Sort) services.getNamespaces().sorts().lookup(name);
+	    if (sort == null)
+	        throw new RuntimeException("LDT "+name+" not found.\n"+
+	                "It seems that there are definitions missing from the .key files.");
         this.name = name;
     }
     
@@ -77,7 +79,9 @@ public abstract class LDT implements Named {
     protected final Function addFunction(Services services, String funcName) {
 	final Namespace funcNS = services.getNamespaces().functions();
         final Function f = (Function)funcNS.lookup(new Name(funcName));
-        assert f != null : "LDT: Function " + funcName + " not found";
+        if (f == null)
+        	throw new RuntimeException("LDT: Function " + funcName + " not found.\n" +
+        			"It seems that there are definitions missing from the .key files.");
         return addFunction(f);
     }
     
@@ -206,6 +210,7 @@ public abstract class LDT implements Named {
 
     public abstract boolean hasLiteralFunction(Function f);
 
+    /** Is called whenever <code>hasLiteralFunction()</code> returns true. */
     public abstract Expression translateTerm(Term t, ExtList children, Services services);
     
     public abstract Type getType(Term t);

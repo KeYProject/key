@@ -457,6 +457,7 @@ TOKEN :
 | < FINALLY: "finally" >
 | < FLOAT: "float" >
 | < FOR: "for" >
+| < FREE: "\\free" >
 | < GOTO: "goto" >
 | < IF: "if" >
 | < IMPLEMENTS: "implements" >
@@ -476,6 +477,7 @@ TOKEN :
 | < PUBLIC: "public" >
 | < RETURN: "return" >
 | < SEQ: "\\seq" >
+| < SET: "\\set" >
 | < SHORT: "short" >
 | < STATIC: "static" >
 | < SUPER: "super" >
@@ -1970,6 +1972,7 @@ TypeReference PrimitiveType() :
   | "double"
   | "\\locset"
   | "\\seq"
+  | "\\free"
   )
   {
     Identifier id = factory.createIdentifier(token.image);

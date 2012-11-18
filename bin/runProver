@@ -38,10 +38,9 @@ else
 fi
 echo "Using JDK installation from:      $JAVA_HOME"
 
-# !!! JAVA_OPTIONS need to be separated by ${IFS_NEW} !!!
 
 # For debugging reasons disable JIT (otherwise strace doesn't work)
-JAVA_OPTIONS=
+JAVA_OPTIONS=""
 #JAVA_OPTIONS=-classic
 
 # Uncomment the following definition for remote debugging on port 1234
@@ -88,11 +87,29 @@ for i in $key_ext_jars ; do
     fi
 done
 
-if [ "x$ASPECTJRTPATH" != x ]
-then
-  echo "Using AspectJ runtime from:       $ASPECTJRTPATH"
-  keyclasspath=$keyclasspath:$ASPECTJRTPATH
-fi
+
+
+#
+#Function prints help message
+#
+
+list_help(){
+  echo "Runscript for the KeY system\n"
+  echo "Usage: ./runProver [technical options] [options for KeY prover] [filename]\n"
+  echo "\nOptions for using this script"
+  echo "  -J-option: pass option to the JVM following the -J option convention of javac\n"
+  echo "Debugging:\n"
+  echo "  --K-keydebug: turn debugging on"
+  echo "  --K-debugclassloader: switch the Debugclassloadflag on to load classes for debugging"
+  echo "  --K-debugprefix <debugclass> : send debug output of debugclass to stadard out"
+  echo "  --K-remotedebug <port>: turn remote debugging on; parameter for listening port"
+  echo "  --K-assertionflag: switch assertionflag on, s.t. debug assertions are used\n"
+  echo "Other:\n"
+  echo "  --K-server:  switches Java -server on "
+  echo "  --Khelp, -Kh	: prints this help message"
+  echo "  --help	: prints help message of the KeY prover"
+
+}
 
 #
 # KeY-specific command line options
@@ -100,25 +117,58 @@ fi
 
 
 keysysprops=""
+keyoptions=""
 while [ $# -ne 0 ]; do
     case $1 in
-        -keydebug) keysysprops="${keysysprops}-DKeyDebugFlag=on "
+#     -K options for configuration options of KeY, such as debugmode, flags,
+# remote debugging
+	--Kh)
+# 	    set ${1} #removes the minus from the option, s.t. it can be passed to key as option
+	    list_help
+	    exit;;
+	--Khelp)
+# 	    set ${1#--} #removes the minus from the option, s.t. it can be passed to key as option
+	    list_help
+	    exit;;
+        --K-keydebug) keysysprops="${keysysprops}-DKeyDebugFlag=on "
+            shift
+            continue;;
+        --K-debugclassloader)
+keysysprops="${keysysprops}-DKeyDebugClassLoader=on
+"
             shift
             continue;;
 
-        -server) keysysprops="${keysysprops}-server "
+	--K-debugprefix) keysysprops="${keysysprops}-Dkey.debug.prefix=${2}"
+	    shift
+	    shift
+	    continue;;
+	--K-assertionflag) keysysprops="${keysysprops}-DKeyAssertionFlag=true "
+	    shift
+	    continue;;
+
+	--K-remotedebug) JAVA_OPTIONS="-Xdebug -Xnoagent -Djava.compiler=NONE
+-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${2}"
+	    shift
+	    shift
+	    continue;;
+
+	--K-server) keysysprops="${keysysprops}-server "
             shift
             continue;;
+# -J options follwing conventions of Java for -J options
+	-J*)
+	    option=${1#-J}
+	    JAVA_OPTIONS="${JAVA_OPTIONS}${option} "
+	    shift
+	    continue;;
 
-        -debugclassloader) keysysprops="${keysysprops}-DKeyDebugClassLoader=on "
-            shift
-            continue;;
 
-        -*)  keysysprops="${keysysprops}${1} "
-            shift
-            continue;;
+# 	  key options beginning with a minus or filenames
 
-        *)  break;;
+	  
+	  *) break;;
+
     esac
 done	
 

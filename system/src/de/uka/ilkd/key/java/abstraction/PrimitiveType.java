@@ -13,7 +13,24 @@ package de.uka.ilkd.key.java.abstraction;
 import java.util.HashMap;
 
 import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.*;
+import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
+import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.expression.literal.CharLiteral;
+import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptySeqLiteral;
+import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
+import de.uka.ilkd.key.java.expression.literal.FloatLiteral;
+import de.uka.ilkd.key.java.expression.literal.FreeLiteral;
+import de.uka.ilkd.key.java.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.expression.literal.LongLiteral;
+import de.uka.ilkd.key.ldt.BooleanLDT;
+import de.uka.ilkd.key.ldt.DoubleLDT;
+import de.uka.ilkd.key.ldt.FloatLDT;
+import de.uka.ilkd.key.ldt.FreeLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 /**
@@ -21,63 +38,66 @@ import de.uka.ilkd.key.logic.ProgramElementName;
    @author AL
    @author RN
  */
-public class PrimitiveType
-    implements Type {
+public final class PrimitiveType implements Type {
+    
+    // must be first in file.
+    private static final HashMap<String,PrimitiveType> typeMap = 
+            new HashMap<String, PrimitiveType>(); 
+    // must be first in file.
+    private static final HashMap<Name,PrimitiveType> ldtMap = 
+            new HashMap<Name, PrimitiveType>(); 
 
     public static final PrimitiveType JAVA_BYTE  = 
-	new PrimitiveType("byte", new IntLiteral(0));
+	new PrimitiveType("byte", new IntLiteral(0), IntegerLDT.NAME);
     public static final PrimitiveType JAVA_SHORT = 
-	new PrimitiveType("short", new IntLiteral(0));
+	new PrimitiveType("short", new IntLiteral(0), IntegerLDT.NAME);
     public static final PrimitiveType JAVA_INT = 
-	new PrimitiveType("int", new IntLiteral(0));
+	new PrimitiveType("int", new IntLiteral(0), IntegerLDT.NAME);
     public static final PrimitiveType JAVA_CHAR = 
-	new PrimitiveType("char", new CharLiteral('\u0000'));
+	new PrimitiveType("char", new CharLiteral('\u0000'), IntegerLDT.NAME);
     public static final PrimitiveType JAVA_LONG  = 
-	new PrimitiveType("long", new LongLiteral(0L));
+	new PrimitiveType("long", new LongLiteral(0L), IntegerLDT.NAME);
     public static final PrimitiveType JAVA_BIGINT =
-            new PrimitiveType("\\bigint", new BigintLiteral(0));
+            new PrimitiveType("\\bigint", new BigintLiteral(0), IntegerLDT.NAME);
     public static final PrimitiveType JAVA_FLOAT = 
-	new PrimitiveType("float", new FloatLiteral(0.0f));
+	new PrimitiveType("float", new FloatLiteral(0.0f), FloatLDT.NAME);
     public static final PrimitiveType JAVA_DOUBLE  = 
-	new PrimitiveType("double", new DoubleLiteral(0.0d));
+	new PrimitiveType("double", new DoubleLiteral(0.0d), DoubleLDT.NAME);
     public static final PrimitiveType JAVA_BOOLEAN = 
-	new PrimitiveType("boolean", BooleanLiteral.FALSE);
+	new PrimitiveType("boolean", BooleanLiteral.FALSE, BooleanLDT.NAME);
     public static final PrimitiveType JAVA_LOCSET = 
-	new PrimitiveType("\\locset", EmptySetLiteral.INSTANCE);
+	new PrimitiveType("\\locset", EmptySetLiteral.LOCSET, LocSetLDT.NAME);
     public static final PrimitiveType JAVA_SEQ =
-	new PrimitiveType("\\seq", EmptySeqLiteral.INSTANCE);    
-    public static final PrimitiveType PROGRAM_SV   = new PrimitiveType("SV", null);
+	new PrimitiveType("\\seq", EmptySeqLiteral.INSTANCE, SeqLDT.NAME);
+    public static final PrimitiveType JAVA_FREE_ADT =
+            new PrimitiveType("\\free", FreeLiteral.INSTANCE, FreeLDT.NAME);
+
+    public static final PrimitiveType PROGRAM_SV   = new PrimitiveType("SV", null, null);
 
     private ProgramElementName arrayElementName = null;
 
-    private static final HashMap<String,PrimitiveType> typeMap = 
-        new HashMap<String, PrimitiveType>(); 
-    static {
-	typeMap.put("byte", JAVA_BYTE);
-	typeMap.put("short", JAVA_SHORT);
-	typeMap.put("int", JAVA_INT);
-	typeMap.put("char", JAVA_CHAR);
-	typeMap.put("long", JAVA_LONG);
-	typeMap.put("\\bigint", JAVA_BIGINT);
-	typeMap.put("float", JAVA_FLOAT);
-	typeMap.put("double", JAVA_DOUBLE);
-	typeMap.put("boolean", JAVA_BOOLEAN);	
-	typeMap.put("\\locset", JAVA_LOCSET);
-	typeMap.put("\\seq", JAVA_SEQ);
-    }
 
     public static PrimitiveType getPrimitiveType(String name) {
 	return typeMap.get(name);
     }
 
-
+    public static PrimitiveType getPrimitiveTypeByLDT(Name ldtName) {
+        return ldtMap.get(ldtName);
+    }
 
     private final String name;
     private final Literal defaultValue;
+    private Name ldtName;
 
-    private PrimitiveType(String name, Literal defaultValue) {
+    private PrimitiveType(String name, Literal defaultValue, Name ldtName) {
 	this.defaultValue = defaultValue;
 	this.name = name.intern();
+	this.ldtName = ldtName;
+	typeMap.put(name, this);
+	
+	if(ldtName != null) {
+	    ldtMap.put(ldtName, this);
+	}
     }
 
     /**
@@ -156,6 +176,15 @@ public class PrimitiveType
 	}
 	assert arrayElementName != null;
 	return arrayElementName;
+    }
+
+    /**
+     * Gets the name of the LDT corresponding to this primitive type.
+     * 
+     * @return may be null if no name set
+     */
+    public Name getCorrespondingLDTName() {
+        return ldtName;
     }
 
 }
