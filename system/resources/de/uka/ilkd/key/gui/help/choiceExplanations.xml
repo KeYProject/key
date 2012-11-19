@@ -6,21 +6,41 @@
   in the taclet option dialog
 </comment>
 <entry key="assertions">
-  Assertions can be handled in three different ways in KeY.
-  If switched off (assertions:off) they are something, else ...
+Assertions can be handled in three different ways in KeY.
+If switched off, evaluation of assert statements is skipped.
+If switched on, assertions are treated like Java would treat them:
+Asserted Statements are evaluated and an AssertionException is raised if they turn out to be false.
+Setting this to safe ensures that the shown property is valid no
+matter if assertions are globally enabled or disabled. Proofs
+with this option are typically harder.
 </entry>
 
-<entry key="JavaCard">This will be a definitely longer entry.
+<entry key="JavaCard">This will definitely be a longer entry.
+JavaCard is a dialect of Java designed for the use in SmartCards.
+It lacks floating point operations and concurrency, but provides stronger object persistence guarantees.
+</entry>
 
-  Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-  nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam
-  erat, sed diam voluptua. At vero eos et accusam et justo duo dolores
-  et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est
-  Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur
-  sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore
-  et dolore magna aliquyam erat, sed diam voluptua. At vero eos et
-  accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren,
-  no sea takimata sanctus est Lorem ipsum dolor sit.
+<entry key="initialisation">
+Specifies whether static initialization should be considered. (?)
+</entry>
+
+<entry key="intRules">
+This option controls how integers are modelled.
+Java semantics treat integers the same way java would treat them. 
+Sound and complete, but inconvenient to handle.
+Arithmetic without overflow checking treats integers as pure mathematical objects.
+Easy to use but not sound.
+Arithmetic with overflow checking also treats integers as mathematical objects,
+but checks for overflow problems.
+Sound, but may not be able to verify programs depending on Java modulo semantics.
+</entry>
+
+<entry key="programRules">
+TODO: comment about programRules
+</entry>
+
+<entry key="runtimeExceptions">
+If Exceptions are banned, we assume they just don't ever happen. 
 </entry>
 
 </properties>

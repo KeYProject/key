@@ -141,6 +141,8 @@ public class ChoiceSelector extends JDialog {
         {
             explanationArea = new JTextArea("Explanation!");
             explanationArea.setEditable(false);
+            explanationArea.setLineWrap(true);
+            explanationArea.setWrapStyleWord(true);
             JScrollPane scrollPane = new JScrollPane(explanationArea);
             Dimension paneDim = new Dimension(500, 200);
             scrollPane.setPreferredSize(paneDim);
