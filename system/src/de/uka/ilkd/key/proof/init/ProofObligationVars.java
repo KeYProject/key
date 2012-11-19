@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
@@ -164,6 +165,67 @@ public class ProofObligationVars {
     }
 
 
+    ProofObligationVars(ProofObligationVars orig,
+                        String postfix,
+                        Services services) {
+        this(newLocationVariable(orig.self, postfix, services),
+             newLocationVariable(orig.selfAtPost, postfix, services),
+             newLocationVariable(orig.localIns, postfix, services),
+             newLocationVariable(orig.localOuts, postfix, services),
+             newLocationVariable(orig.result, postfix, services),
+             newLocationVariable(orig.resultAtPost, postfix, services),
+             newLocationVariable(orig.exception, postfix, services),
+             newLocationVariable(orig.exceptionAtPost, postfix, services),
+             newLocationVariable(orig.heap, postfix, services),
+             newLocationVariable(orig.heapAtPre, postfix, services),
+             newLocationVariable(orig.heapAtPost, postfix, services),
+             newFunction(orig.mbyAtPre, postfix, services),
+             postfix,
+             services);
+    }
+
+
+    private static Term newLocationVariable(Term t,
+                                            String postfix,
+                                            Services services) {
+        if (t == null) {
+            return null;
+        }
+        String newName = TB.newName(services, t.toString() + postfix);
+        ProgramElementName pen =
+                new ProgramElementName(newName);
+        LocationVariable newVar = new LocationVariable(pen, t.sort());
+        register(newVar, services);
+        return TB.var(newVar);
+    }
+
+
+    private static ImmutableList<Term> newLocationVariable(
+            ImmutableList<Term> ts,
+                                                           String postfix,
+                                                           Services services) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (Term t : ts) {
+            result = result.append(newLocationVariable(t, postfix, services));
+        }
+        return result;
+    }
+
+
+    private static Term newFunction(Term t,
+                                    String postfix,
+                                    Services services) {
+        if (t == null) {
+            return null;
+        }
+        String newName = TB.newName(services, t.toString() + postfix);
+        final Function newFunc =
+                new Function(new Name(newName), t.sort());
+        register(newFunc, services);
+        return TB.func(newFunc);
+    }
+
+
     ProofObligationVars(IProgramMethod pm,
                         KeYJavaType kjt,
                         String postfix,
@@ -177,9 +239,9 @@ public class ProofObligationVars {
              buildExceptionVar(services, postfix, pm),
              buildExceptionAtPostVar(services, postfix, pm),
              buildHeapVar(postfix, services),
-             buildHeapAtPreVar(services, postfix),
-             buildHeapAtPostVar(services, postfix),
-             buildMbyVar(services),
+             buildHeapAtPreVar(postfix, services),
+             buildHeapAtPostVar(postfix, services),
+             buildMbyVar(postfix, services),
              postfix,
              services);
     }
@@ -261,8 +323,8 @@ public class ProofObligationVars {
     }
 
 
-    private static Term buildHeapAtPreVar(Services services,
-                                          String postfix) {
+    private static Term buildHeapAtPreVar(String postfix,
+                                          Services services) {
         Term heapAtPreVar =
                 TB.var(TB.heapAtPreVar(services, "heapAtPre" + postfix, true));
         register(heapAtPreVar.op(LocationVariable.class), services);
@@ -270,8 +332,8 @@ public class ProofObligationVars {
     }
 
 
-    private static Term buildHeapAtPostVar(Services services,
-                                           String postfix) {
+    private static Term buildHeapAtPostVar(String postfix,
+                                           Services services) {
         Term heapAtPostVar =
                 TB.var(TB.heapAtPreVar(services, "heapAtPost" + postfix, true));
         register(heapAtPostVar.op(LocationVariable.class), services);
@@ -298,11 +360,13 @@ public class ProofObligationVars {
     }
 
 
-    private static Term buildMbyVar(Services services) {
+    private static Term buildMbyVar(String postfix,
+                                    Services services) {
         final Sort intSort =
                 services.getTypeConverter().getIntegerLDT().targetSort();
+        String newName = TB.newName(services, "mbyAtPre" + postfix);
         final Function mbyAtPreFunc =
-                new Function(new Name(TB.newName(services, "mbyAtPre")), intSort);
+                new Function(new Name(newName), intSort);
         register(mbyAtPreFunc, services);
         return TB.func(mbyAtPreFunc);
     }

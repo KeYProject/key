@@ -14,10 +14,13 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -93,5 +96,42 @@ public final class InfFlowBlockContractTacletBuilder
                     f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL));
         }
         return and(contractsApplications);
+    }
+
+
+    @Override
+    boolean hasBodyPreservesBranch() {
+        return true;
+    }
+
+
+    @Override
+    RewriteTacletGoalTemplate buildBodyPreservesGoal(
+            ProofObligationVars symbExecVars,
+            Term findTerm) {
+        // generate proof obligation variables
+        IProgramMethod pm = blockContract.getTarget();
+        assert (symbExecVars.self == null) == (pm.isStatic() ||
+                                               pm.isConstructor());
+        final InfFlowContractPO.IFProofObligationVars ifVars =
+                new InfFlowContractPO.IFProofObligationVars(symbExecVars,
+                                                            services);
+        // create proof obligation
+        InfFlowPOSnippetFactory f =
+                POSnippetFactory.getInfFlowFactory(blockContract, ifVars.c1,
+                                                   ifVars.c2, services);
+        Term selfComposedExec =
+                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
+        Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_POST);
+
+        // register final term
+        final Term finalTerm = imp(selfComposedExec, post);
+        Sequent goalSeq = Sequent.createAnteSequent(
+                new Semisequent(new SequentFormula(finalTerm)));
+        RewriteTacletGoalTemplate goalTemplate =
+                new RewriteTacletGoalTemplate(goalSeq,
+                                              ImmutableSLList.<Taclet>nil(),
+                                              findTerm);
+        return goalTemplate;
     }
 }

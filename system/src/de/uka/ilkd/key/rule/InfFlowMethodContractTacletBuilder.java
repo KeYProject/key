@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -114,5 +115,19 @@ public final class InfFlowMethodContractTacletBuilder
             }
         }
         return ifContracts;
+    }
+
+
+    @Override
+    boolean hasBodyPreservesBranch() {
+        return false;
+    }
+
+
+    @Override
+    RewriteTacletGoalTemplate buildBodyPreservesGoal(
+            ProofObligationVars symbExecVars,
+            Term findTerm) {
+        throw new UnsupportedOperationException("Not supported.");
     }
 }

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.Contract;
@@ -211,6 +212,11 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                                               ImmutableSLList.<Taclet>nil(),
                                               schemaFind);
         tacletBuilder.addTacletGoalTemplate(goalTemplate);
+        if (hasBodyPreservesBranch()) {
+            RewriteTacletGoalTemplate goalTemplate2 =
+                    buildBodyPreservesGoal(appData, schemaFind);
+            tacletBuilder.addTacletGoalTemplate(goalTemplate2);
+        }
         tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
         tacletBuilder.setSurviveSmbExec(true);
         return tacletBuilder.getTaclet();
@@ -263,4 +269,12 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     abstract Term buildContractApplications(ProofObligationVars contAppData,
                                             ProofObligationVars contAppData2,
                                             Services services);
+
+
+    abstract boolean hasBodyPreservesBranch();
+
+
+    abstract RewriteTacletGoalTemplate buildBodyPreservesGoal(
+            ProofObligationVars symbExecVars,
+            Term findTerm);
 }

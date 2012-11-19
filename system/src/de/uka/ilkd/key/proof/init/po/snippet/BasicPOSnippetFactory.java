@@ -53,6 +53,7 @@ public interface BasicPOSnippetFactory {
         //            result = resultAtPost & exc = excAtPost)
         METHOD_CALL_WITH_PRE_RELATION (MethodCallWithPreconditionPredicateSnippet.class),
 
+        BLOCK_CALL_WITH_PRE_RELATION (BlockCallWithPreconditionPredicateSnippet.class),
 
 
         // miscellaneous snippets

@@ -29,7 +29,9 @@ public interface InfFlowPOSnippetFactory {
 
         //     {s1}EXECUTION_OF_package.class::m_WITH_PRE(self, param1, ..., paramN, heap, result, exc, heapAtPost)
         //  &  {s2}EXECUTION_OF_package.class::m_WITH_PRE(self, param1, ..., paramN, heap, result, exc, heapAtPost)
-        SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION (SelfcomposedExecutionSnippet.class);
+        SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION (SelfcomposedExecutionSnippet.class),
+
+        SELFCOMPOSED_BLOCK_WITH_PRE_RELATION (SelfcomposedBlockSnippet.class);
 
         // type of the factory method
         public final Class c;
