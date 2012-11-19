@@ -18,7 +18,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.BlockContract.Terms;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -174,6 +176,37 @@ public class BlockContractRule implements BuiltInRule {
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate = updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps, /*anonymisationLocalVariables, */modifiesClauses);
 
+        // prepare information flow analysis
+        assert anonymisationHeaps.size() == 1; // information flow extension is at
+                                               // the moment not compatible with
+                                               // the non-base-heap setting
+        final Term preHeap = TB.var(anonymisationHeaps.keySet().iterator().next());
+        final Term postHeap = TB.func(anonymisationHeaps.values().iterator().next());
+
+        final InfFlowBlockContractTacletBuilder ifContractBuilder =
+                new InfFlowBlockContractTacletBuilder(services);
+        ifContractBuilder.setContract(contract);
+        ifContractBuilder.setContextUpdate(contextUpdate);
+        ifContractBuilder.setBaseHeap(TB.getBaseHeap(services));
+        ifContractBuilder.setHeapAtPre(preHeap);
+        ifContractBuilder.setHeapAtPost(postHeap);
+        final Terms vars = contract.getVariablesAsTerms();
+        ifContractBuilder.setSelf(vars.self);
+        ifContractBuilder.setLocalIns(localInVariables);
+        ifContractBuilder.setLocalOuts(localOutVariables);
+        ifContractBuilder.setResult(vars.result);
+        ifContractBuilder.setException(vars.exception);
+
+        // generate information flow contract application predicate
+        // and associated taclet
+        final Term contractApplPredTerm =
+                ifContractBuilder.buildContractApplPredTerm();
+        final Taclet informationFlowContractApp =
+                ifContractBuilder.buildContractApplTaclet();
+        goal.addTaclet(informationFlowContractApp,
+                       SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+
+
         final ImmutableList<Goal> result = goal.split(3);
         final GoalsConfigurator configurator = new GoalsConfigurator(instantiation, contract.getLabels(), variables, application.posInOccurrence(), services);
         configurator.setUpValidityGoal(
@@ -190,7 +223,7 @@ public class BlockContractRule implements BuiltInRule {
         configurator.setUpUsageGoal(
             result.head(),
             new Term[] {contextUpdate, remembranceUpdate, anonymisationUpdate},
-            new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition}
+            new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition, contractApplPredTerm}
         );
         return result;
     }

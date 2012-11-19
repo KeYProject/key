@@ -15,7 +15,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
  *
  * @author christoph
  */
-class InfFlowPostSnippet extends ReplaceAnRegisterMethod implements InfFlowFactoryMethod {
+class InfFlowPostSnippet extends ReplaceAndRegisterMethod implements InfFlowFactoryMethod {
 
     @Override
     public Term produce(BasicSnippetData d,
@@ -126,10 +126,10 @@ class InfFlowPostSnippet extends ReplaceAnRegisterMethod implements InfFlowFacto
                                               ProofObligationVars vs2,
                                               Term[] respects1,
                                               Term[] respects2) {
-        BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, vs1);
-        BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, vs2);
-        Term framingLocs1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
-        Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
+//        BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, vs1);
+//        BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, vs2);
+//        Term framingLocs1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
+//        Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
 
         Term[] eqAtLocs = new Term[respects1.length];
         for (int i = 0; i < eqAtLocs.length; i++) {

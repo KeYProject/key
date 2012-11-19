@@ -20,7 +20,7 @@ class BasicParamsOkSnippet implements FactoryMethod {
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         Term paramsOK = d.tb.tt();
-        for (Term param : poVars.params) {
+        for (Term param : poVars.localIns) {
             if (!(param.op() instanceof ProgramVariable)) {
                 throw new UnsupportedOperationException("Tried to produce "
                         + "PARAMS_OK for an term "

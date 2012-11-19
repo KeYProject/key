@@ -12,7 +12,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
  *
  * @author christoph
  */
-class BasicMbyAtPreDefSnippet extends ReplaceAnRegisterMethod
+class BasicMbyAtPreDefSnippet extends ReplaceAndRegisterMethod
         implements FactoryMethod {
 
     @Override

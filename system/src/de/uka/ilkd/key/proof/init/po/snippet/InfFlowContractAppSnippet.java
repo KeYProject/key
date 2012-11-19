@@ -9,7 +9,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
  *
  * @author christoph
  */
-class InfFlowContractAppSnippet extends ReplaceAnRegisterMethod
+class InfFlowContractAppSnippet extends ReplaceAndRegisterMethod
         implements InfFlowFactoryMethod {
 
     @Override

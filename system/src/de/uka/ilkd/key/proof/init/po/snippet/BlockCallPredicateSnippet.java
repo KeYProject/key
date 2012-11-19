@@ -14,13 +14,13 @@ import de.uka.ilkd.key.util.MiscTools;
  * <p/>
  * @author christoph
  */
-class MethodCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
+class BlockCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
 
     @Override
     String generatePredicateName(IProgramMethod pm,
                                  StatementBlock block) {
         String nameSting =
-                MiscTools.toValidTacletName("RELATED_BY_" + pm.getFullName()).toString();
+                MiscTools.toValidTacletName("RELATED_BY_BLOCK_" + block.toString()).toString();
         return nameSting;
     }
 }

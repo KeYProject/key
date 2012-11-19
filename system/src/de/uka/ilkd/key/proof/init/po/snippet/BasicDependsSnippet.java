@@ -12,7 +12,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
  *
  * @author christoph
  */
-class BasicDependsSnippet extends ReplaceAnRegisterMethod implements FactoryMethod {
+class BasicDependsSnippet extends ReplaceAndRegisterMethod implements FactoryMethod {
 
     @Override
     public Term produce(BasicSnippetData d,

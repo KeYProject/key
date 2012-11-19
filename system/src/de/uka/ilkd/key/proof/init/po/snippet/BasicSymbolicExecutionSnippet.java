@@ -35,7 +35,7 @@ import java.util.Iterator;
  *
  * @author christoph
  */
-class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
+class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
         implements FactoryMethod {
 
     @Override
@@ -73,7 +73,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
         //create formal parameters
         ImmutableList<LocationVariable> formalParamVars =
                 ImmutableSLList.<LocationVariable>nil();
-        for (Term param : vs.params) {
+        for (Term param : vs.localIns) {
             ProgramVariable paramVar = param.op(ProgramVariable.class);
             ProgramElementName pen = new ProgramElementName("_"
                     + paramVar.name());
@@ -112,7 +112,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
         //create update
         Term update = tb.skip();
         Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
-        Iterator<Term> paramIt = vs.params.iterator();
+        Iterator<Term> paramIt = vs.localIns.iterator();
         while (formalParamIt.hasNext()) {
             Term paramUpdate = tb.elementary(formalParamIt.next(),
                                              paramIt.next());
@@ -128,12 +128,12 @@ class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
             ProgramVariable selfVar,
             ProgramVariable resultVar,
             ProgramVariable exceptionVar) {
-        if (!(d.target instanceof IProgramMethod)) {
+        if (!(d.targetMethod instanceof IProgramMethod)) {
             throw new UnsupportedOperationException("Tried to produce a "
                     + "java-block for an observer which is no progam method.");
         }
         JavaInfo javaInfo = d.tb.getServices().getJavaInfo();
-        IProgramMethod pm = (IProgramMethod) d.target;
+        IProgramMethod pm = (IProgramMethod) d.targetMethod;
 
         //create method call
         final ImmutableArray<Expression> formalArray =
