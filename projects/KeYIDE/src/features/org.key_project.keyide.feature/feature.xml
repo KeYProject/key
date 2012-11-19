@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.key_project.keyide.feature"
+      label="KeYIDE"
+      version="1.0.0.qualifier"
+      provider-name="KeY Project">
+
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <includes
+         id="org.key_project.key4eclipse.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.key_project.key4eclipse.bugfix_mac_os"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.key_project.keyide.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.key_project.keyide.product.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.key_project.keyide.link"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

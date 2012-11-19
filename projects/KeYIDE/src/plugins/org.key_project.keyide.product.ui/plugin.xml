@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.ui.ide.workbench"
+            name="KeYIDE">
+         <property
+               name="appName"
+               value="KeYIDE">
+         </property>
+         <property
+               name="aboutImage"
+               value="icons/About.gif">
+         </property>
+         <property
+               name="aboutText"
+               value="KeYIDE">
+         </property>
+         <property
+               name="windowImages"
+               value="icons/logo16.gif,icons/logo32.gif,icons/logo48.gif,icons/logo64.gif,icons/logo128.gif">
+         </property>
+         <property
+               name="startupForegroundColor"
+               value="000000">
+         </property>
+         <property
+               name="startupMessageRect"
+               value="30,252,445,20">
+         </property>
+         <property
+               name="startupProgressRect"
+               value="30,275,445,15">
+         </property>
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
+      </product>
+   </extension>
+
+</plugin>

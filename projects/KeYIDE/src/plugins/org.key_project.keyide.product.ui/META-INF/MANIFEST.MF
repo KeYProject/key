@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KeY Product
+Bundle-SymbolicName: org.key_project.keyide.product.ui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.keyide.product.ui.Activator
+Bundle-Vendor: KeY Project
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ui.console;bundle-version="3.5.100",
+ org.eclipse.jdt.ui;bundle-version="3.7.2",
+ org.eclipse.jface.text;bundle-version="3.7.2",
+ org.eclipse.ui.editors;bundle-version="3.7.0",
+ org.key_project.util;bundle-version="1.0.0",
+ org.key_project.keyide.ui;bundle-version="1.0.0",
+ org.key_project.key4eclipse;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Import-Package: de.uka.ilkd.key.collection,
+ de.uka.ilkd.key.gui,
+ org.eclipse.core.resources,
+ org.eclipse.jdt.core,
+ recoder.parser

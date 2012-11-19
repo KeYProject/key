@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="KeYIDE" uid="org.key_project.keyide" id="org.key_project.keyide.product.ui.product" application="org.eclipse.ui.ide.workbench" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
+
+   <aboutInfo>
+      <image path="/org.key_project.keyide.product.ui/icons/About.gif"/>
+      <text>
+         KeYIDE
+      </text>
+   </aboutInfo>
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
+   </launcherArgs>
+
+   <windowImages i16="/org.key_project.keyide.product.ui/icons/logo16.gif" i32="/org.key_project.keyide.product.ui/icons/logo32.gif" i48="/org.key_project.keyide.product.ui/icons/logo48.gif" i64="/org.key_project.keyide.product.ui/icons/logo64.gif" i128="/org.key_project.keyide.product.ui/icons/logo128.gif"/>
+
+   <splash
+      location="org.key_project.keyide.product.ui"
+      startupProgressRect="30,275,445,15"
+      startupMessageRect="30,252,445,20"
+      startupForegroundColor="000000" />
+   <launcher>
+      <solaris/>
+      <win useIco="false">
+         <ico path="/org.key_project.keyide.product.ui/icons/logo.ico"/>
+         <bmp/>
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
+   <plugins>
+   </plugins>
+
+   <features>
+      <feature id="org.eclipse.platform" version="3.7.2.v20120207-1839-9gF7UHPDFxGjd-PqDr2jX_4yKaumkoHTz04_q-q"/>
+      <feature id="org.eclipse.jdt" version="3.7.2.v20120120-1414-7z8gFcuFMP7BW5XTz0jLTnz0l9B1"/>
+      <feature id="org.key_project.key4eclipse.bugfix_mac_os" version="1.0.0.qualifier"/>
+      <feature id="org.key_project.keyide.feature" version="1.0.0.qualifier"/>
+   </features>
+
+
+</product>
