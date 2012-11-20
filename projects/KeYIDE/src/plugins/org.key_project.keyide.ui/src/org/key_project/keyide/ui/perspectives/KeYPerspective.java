@@ -6,10 +6,10 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 
 /**
- *  This class is meant to serve as an example for how various contributions 
- *  are made to a perspective. Note that some of the extension point id's are
- *  referred to as API constants while others are hardcoded and may be subject 
- *  to change. 
+ * This class defines the layout of the KeY-View.
+ * This view should be used whenever a {@link Proof} is started or a KeY-associated file is opened.
+ * 
+ * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class KeYPerspective implements IPerspectiveFactory {
 
