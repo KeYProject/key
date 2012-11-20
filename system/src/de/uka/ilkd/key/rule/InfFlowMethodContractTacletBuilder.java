@@ -116,18 +116,4 @@ public final class InfFlowMethodContractTacletBuilder
         }
         return ifContracts;
     }
-
-
-    @Override
-    boolean hasBodyPreservesBranch() {
-        return false;
-    }
-
-
-    @Override
-    RewriteTacletGoalTemplate buildBodyPreservesGoal(
-            ProofObligationVars symbExecVars,
-            Term findTerm) {
-        throw new UnsupportedOperationException("Not supported.");
-    }
 }

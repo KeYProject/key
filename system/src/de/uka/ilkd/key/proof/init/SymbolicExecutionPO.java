@@ -129,7 +129,7 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
     
     @Override
     public InformationFlowContract getContract() {
-        return (InformationFlowContract) contract;
+        return contract;
     }
 
 

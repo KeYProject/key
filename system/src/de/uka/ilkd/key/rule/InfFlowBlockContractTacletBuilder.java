@@ -97,41 +97,4 @@ public final class InfFlowBlockContractTacletBuilder
         }
         return and(contractsApplications);
     }
-
-
-    @Override
-    boolean hasBodyPreservesBranch() {
-        return true;
-    }
-
-
-    @Override
-    RewriteTacletGoalTemplate buildBodyPreservesGoal(
-            ProofObligationVars symbExecVars,
-            Term findTerm) {
-        // generate proof obligation variables
-        IProgramMethod pm = blockContract.getTarget();
-        assert (symbExecVars.self == null) == (pm.isStatic() ||
-                                               pm.isConstructor());
-        final InfFlowContractPO.IFProofObligationVars ifVars =
-                new InfFlowContractPO.IFProofObligationVars(symbExecVars,
-                                                            services);
-        // create proof obligation
-        InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(blockContract, ifVars.c1,
-                                                   ifVars.c2, services);
-        Term selfComposedExec =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
-        Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_POST);
-
-        // register final term
-        final Term finalTerm = imp(selfComposedExec, post);
-        Sequent goalSeq = Sequent.createAnteSequent(
-                new Semisequent(new SequentFormula(finalTerm)));
-        RewriteTacletGoalTemplate goalTemplate =
-                new RewriteTacletGoalTemplate(goalSeq,
-                                              ImmutableSLList.<Taclet>nil(),
-                                              findTerm);
-        return goalTemplate;
-    }
 }

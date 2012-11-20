@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.speclang.*;
 
 public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
@@ -16,6 +17,7 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private StatementBlock block;
     private BlockContract contract;
     private List<LocationVariable> heaps;
+    private IFProofObligationVars infFlowVars;
 	
 	public BlockContractBuiltInRuleApp(final BuiltInRule rule, final PosInOccurrence occurrence)
     {
@@ -106,4 +108,11 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
         this.heaps = heaps;
     }
 
+    public void update(IFProofObligationVars vars) {
+        this.infFlowVars = vars;
+    }
+
+    public IFProofObligationVars getInformationFlowProofObligationVars() {
+        return infFlowVars;
+    }
 }

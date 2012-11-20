@@ -10,6 +10,7 @@
 package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -29,7 +30,7 @@ import java.util.Map;
 /**
  * Standard implementation of the DependencyContract interface.
  */
-final class InformationFlowContractImpl implements InformationFlowContract {
+public final class InformationFlowContractImpl implements InformationFlowContract {
 
     protected static final TermBuilder TB = TermBuilder.DF;
     private final int id;
@@ -148,7 +149,18 @@ final class InformationFlowContractImpl implements InformationFlowContract {
              toBeSaved, INVALID_ID);
     }
 
-    
+
+    public InformationFlowContractImpl(BlockContract bc, Services services) {
+
+        this(bc.getName(), null, bc.getKJT(), bc.getMethod(), bc.getKJT(),
+             bc.getModality(), bc.getPre(services), null, bc.getMod(services),
+             bc.hasModifiesClause(), bc.getVariablesAsTerms().self,
+             ImmutableSLList.<Term>nil(), bc.getVariablesAsTerms().result,
+             bc.getVariablesAsTerms().exception, null, bc.getRespects(),
+             bc.getDeclassifies(), false, INVALID_ID);
+    }
+
+
 
     //-------------------------------------------------------------------------
     //public interface

@@ -23,6 +23,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
+import de.uka.ilkd.key.util.MiscTools;
 
 
 /**
@@ -78,26 +79,8 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     }
 
 
-    public void setLocalIns(ImmutableSet<ProgramVariable> localIns) {
-        ImmutableList<Term> ins = ImmutableSLList.<Term>nil();
-        for (ProgramVariable in : localIns) {
-            ins = ins.append(var(in));
-        }
-        this.localIns = ins;
-    }
-
-
     public void setLocalOuts(ImmutableList<Term> localOuts) {
         this.localOuts = localOuts;
-    }
-
-
-    public void setLocalOuts(ImmutableSet<ProgramVariable> localOuts) {
-        ImmutableList<Term> outs = ImmutableSLList.<Term>nil();
-        for (ProgramVariable out : localOuts) {
-            outs = outs.append(var(out));
-        }
-        this.localOuts = outs;
     }
 
 
@@ -212,31 +195,9 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                                               ImmutableSLList.<Taclet>nil(),
                                               schemaFind);
         tacletBuilder.addTacletGoalTemplate(goalTemplate);
-        if (hasBodyPreservesBranch()) {
-            RewriteTacletGoalTemplate goalTemplate2 =
-                    buildBodyPreservesGoal(appData, schemaFind);
-            tacletBuilder.addTacletGoalTemplate(goalTemplate2);
-        }
         tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_contract_appl")));
         tacletBuilder.setSurviveSmbExec(true);
         return tacletBuilder.getTaclet();
-    }
-
-
-    private ImmutableSet<InformationFlowContract> getInfromFlowContracts(
-            IProgramMethod pm,
-            Services services) {
-        ImmutableSet<Contract> contracts =
-                services.getSpecificationRepository().getContracts(
-                pm.getContainerType(), pm);
-        ImmutableSet<InformationFlowContract> ifContracts =
-                DefaultImmutableSet.<InformationFlowContract>nil();
-        for (Contract c : contracts) {
-            if (c instanceof InformationFlowContract) {
-                ifContracts = ifContracts.add((InformationFlowContract) c);
-            }
-        }
-        return ifContracts;
     }
 
 
@@ -269,12 +230,4 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     abstract Term buildContractApplications(ProofObligationVars contAppData,
                                             ProofObligationVars contAppData2,
                                             Services services);
-
-
-    abstract boolean hasBodyPreservesBranch();
-
-
-    abstract RewriteTacletGoalTemplate buildBodyPreservesGoal(
-            ProofObligationVars symbExecVars,
-            Term findTerm);
 }

@@ -16,6 +16,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -29,6 +31,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -532,4 +535,15 @@ public final class MiscTools {
 	}
     }
 
+    public static ImmutableList<Term> toTermList(
+            Iterable<ProgramVariable> list) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (ProgramVariable pv : list) {
+            if (pv != null) {
+                Term t = TermBuilder.DF.var(pv);
+                result = result.append(t);
+            }
+        }
+        return result;
+    }
 }

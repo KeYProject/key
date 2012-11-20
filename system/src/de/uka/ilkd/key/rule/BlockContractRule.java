@@ -17,6 +17,12 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
+import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
+import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -192,8 +198,8 @@ public class BlockContractRule implements BuiltInRule {
         ifContractBuilder.setHeapAtPost(postHeap);
         final Terms vars = contract.getVariablesAsTerms();
         ifContractBuilder.setSelf(vars.self);
-        ifContractBuilder.setLocalIns(localInVariables);
-        ifContractBuilder.setLocalOuts(localOutVariables);
+        ifContractBuilder.setLocalIns(MiscTools.toTermList(localInVariables));
+        ifContractBuilder.setLocalOuts(MiscTools.toTermList(localOutVariables));
         ifContractBuilder.setResult(vars.result);
         ifContractBuilder.setException(vars.exception);
 
@@ -206,8 +212,25 @@ public class BlockContractRule implements BuiltInRule {
         goal.addTaclet(informationFlowContractApp,
                        SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
 
-
-        final ImmutableList<Goal> result = goal.split(3);
+        ImmutableList<Goal> result;
+        final ContractPO po =
+                services.getSpecificationRepository().getPOForProof(goal.proof());
+        if (po instanceof InfFlowContractPO || po instanceof SymbolicExecutionPO) {
+            ProofObligationVars poVars =
+                    new ProofObligationVars(TB.getBaseHeap(services), vars.self,
+                                            MiscTools.toTermList(localInVariables),
+                                            preHeap,
+                                            MiscTools.toTermList(localOutVariables),
+                                            vars.result, vars.exception, postHeap,
+                                            services);
+            Sequent seq = buildBodyPreservesSequent(contract, application,
+                                                    poVars, services);
+            Goal infFlowGoal = goal.getCleanGoal(seq);
+            infFlowGoal.setBranchLabel("Information Flow Validity");
+            result = goal.split(3).append(infFlowGoal);
+        } else {
+            result = goal.split(3);
+        }
         final GoalsConfigurator configurator = new GoalsConfigurator(instantiation, contract.getLabels(), variables, application.posInOccurrence(), services);
         configurator.setUpValidityGoal(
             result.tail().tail().head(),
@@ -264,6 +287,33 @@ public class BlockContractRule implements BuiltInRule {
     public String toString()
     {
         return NAME.toString();
+    }
+
+    Sequent buildBodyPreservesSequent(BlockContract contract,
+                                      BlockContractBuiltInRuleApp app,
+                                      ProofObligationVars symbExecVars,
+                                      Services services) {
+        // generate proof obligation variables
+        IProgramMethod pm = contract.getTarget();
+        assert (symbExecVars.self == null) == (pm.isStatic() ||
+                                               pm.isConstructor());
+        final InfFlowContractPO.IFProofObligationVars ifVars =
+                new InfFlowContractPO.IFProofObligationVars(symbExecVars,
+                                                            services);
+        app.update(ifVars);
+
+        // create proof obligation
+        InfFlowPOSnippetFactory f =
+                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
+                                                   ifVars.c2, services);
+        Term selfComposedExec =
+                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
+        Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_POST);
+
+        // register final term
+        final Term finalTerm = TB.imp(selfComposedExec, post);
+        return Sequent.createSuccSequent(
+                new Semisequent(new SequentFormula(finalTerm)));
     }
 
     public static final class Instantiation {
