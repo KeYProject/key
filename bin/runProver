@@ -165,9 +165,9 @@ keysysprops="${keysysprops}-DKeyDebugClassLoader=on
 	--K-server) keysysprops="${keysysprops}-server "
             shift
             continue;;
-# -J options follwing conventions of Java for -J options
+        # -J options follwing conventions of Java for -J options
 	--J*)
-	    option=${1#-J}
+	    option=${1#--J}
 	    JAVA_OPTIONS="${JAVA_OPTIONS}${option} "
 	    shift
 	    continue;;
