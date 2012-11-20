@@ -21,6 +21,7 @@ import java.util.Properties;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -44,6 +45,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.speclang.HeapContext;
 
 /**
@@ -639,4 +641,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
       String value = properties.getProperty("addUninterpretedPredicate"); 
       return value != null && !value.isEmpty() ? Boolean.valueOf(value) : false;
    }
+
+
+   public ImmutableSet<NoPosTacletApp> getInitialTaclets() {
+        return taclets;
+    }
 }

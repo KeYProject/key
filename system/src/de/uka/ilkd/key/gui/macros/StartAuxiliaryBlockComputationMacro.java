@@ -65,7 +65,7 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
         SymbolicExecutionPO po = (SymbolicExecutionPO) poForProof;
 
         Goal goal = po.getInitiatingGoal();
-        RuleApp app = goal.node().getAppliedRuleApp();
+        RuleApp app = goal.node().parent().getAppliedRuleApp();
         if (!(app instanceof BlockContractBuiltInRuleApp)) {
             return false;
         }
@@ -102,7 +102,7 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
         InitConfig initConfig = proof.env().getInitConfig();
 
         Goal initiatingGoal = po.getInitiatingGoal();
-        RuleApp app = initiatingGoal.node().getAppliedRuleApp();
+        RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
         if (!(app instanceof BlockContractBuiltInRuleApp)) {
             return;
         }
