@@ -5,19 +5,24 @@
   These properties define the help comments which are to be displayed
   in the taclet option dialog
 </comment>
-<entry key="assertions">
-Assertions can be handled in three different ways in KeY.
-If switched off, evaluation of assert statements is skipped.
-If switched on, assertions are treated like Java would treat them:
-Asserted Statements are evaluated and an AssertionException is raised if they turn out to be false.
-Setting this to safe ensures that the shown property is valid no
-matter if assertions are globally enabled or disabled. Proofs
-with this option are typically harder.
+<entry key="assertions">Treatment of Java assertion statements
+
+Java assertions can be handled in three different ways in KeY:
+* If switched off, assert statements are skipped.
+* If switched on, assertions are treated like Java would treat them:
+  Asserted Statements are evaluated and an AssertionException is 
+  raised if they turn out to be false.
+* If set to safe, the following proof obligations have to be shown:
+  - The program with assertions removed must ...
+  - The asserted conditions must hold (including termination, no exceptions)
+  - The assertions do not have side effects influencing the post condition
+  Proofs with this option are typically harder.
 </entry>
 
 <entry key="JavaCard">This will definitely be a longer entry.
 JavaCard is a dialect of Java designed for the use in SmartCards.
 It lacks floating point operations and concurrency, but provides stronger object persistence guarantees.
+TODO -> Talk to Wojciech
 </entry>
 
 <entry key="initialisation">
@@ -26,21 +31,27 @@ Specifies whether static initialization should be considered. (?)
 
 <entry key="intRules">
 This option controls how integers are modelled.
-Java semantics treat integers the same way java would treat them. 
-Sound and complete, but inconvenient to handle.
-Arithmetic without overflow checking treats integers as pure mathematical objects.
-Easy to use but not sound.
-Arithmetic with overflow checking also treats integers as mathematical objects,
-but checks for overflow problems.
-Sound, but may not be able to verify programs depending on Java modulo semantics.
+* Java semantics treat integers the same way java would treat them. 
+  Sound and complete, but inconvenient to handle.
+* Arithmetic without overflow checking treats integers as pure mathematical objects.
+  Easy to use but not sound.
+* Arithmetic with overflow checking also treats integers as mathematical objects,
+  but ensures that no overflow occurs.
+  Sound, but incomplete for programs exploiting overflow semantics.
 </entry>
 
 <entry key="programRules">
-TODO: comment about programRules
+Rules dealing Java language constructs can be turned off by setting
+this to None.
 </entry>
 
-<entry key="runtimeExceptions">
-If Exceptions are banned, we assume they just don't ever happen. 
+<entry key="runtimeExceptions">Treatment of runtime exceptions
+
+* If set to allow, runtime exceptions are treated as specified in the
+  Java language specification.
+
+* If set to ban, any occurrence of a runtime exception is treated
+  as a program failure.
 </entry>
 
 </properties>
