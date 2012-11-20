@@ -91,14 +91,14 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         assert mod != null;
         assert (self == null) == pm.isStatic();
         assert params != null;
-        assert params.size() == pm.getParameterDeclarationCount();
+//        assert params.size() == pm.getParameterDeclarationCount();
         if (result == null){
             assert (pm.isVoid() || pm.isConstructor()) : "resultVar == null for method "+pm;
         } else {
             assert (!pm.isVoid() && !pm.isConstructor()) : "non-null result variable for void method or constructor "+pm+" with return type "+pm.getReturnType();
         }
         assert exc != null;
-        assert dep != null;
+//        assert dep != null;
         assert respects != null;
         assert declassifies != null;
 

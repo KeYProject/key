@@ -4,6 +4,7 @@
  */
 package de.uka.ilkd.key.gui.macros;
 
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -12,6 +13,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -21,6 +24,7 @@ import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -57,20 +61,17 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
         }
         Proof proof = mediator.getSelectedProof();
         Services services = proof.getServices();
-        ContractPO poForProof =
-                services.getSpecificationRepository().getPOForProof(proof);
-        if (!(poForProof instanceof SymbolicExecutionPO)) {
+
+        Goal goal = mediator.getSelectedGoal();
+        if (goal.node().parent() == null) {
             return false;
         }
-        SymbolicExecutionPO po = (SymbolicExecutionPO) poForProof;
-
-        Goal goal = po.getInitiatingGoal();
         RuleApp app = goal.node().parent().getAppliedRuleApp();
         if (!(app instanceof BlockContractBuiltInRuleApp)) {
             return false;
         }
         BlockContractBuiltInRuleApp blockRuleApp =
-                (BlockContractBuiltInRuleApp)app;
+                (BlockContractBuiltInRuleApp) app;
         BlockContract contract = blockRuleApp.getContract();
         IFProofObligationVars ifVars =
                 blockRuleApp.getInformationFlowProofObligationVars();
@@ -91,32 +92,33 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
                         PosInOccurrence posInOcc) {
         Proof proof = mediator.getSelectedProof();
         Goal goal = mediator.getSelectedGoal();
-        Services services = proof.getServices();
-
-        ContractPO poForProof =
-                services.getSpecificationRepository().getPOForProof(proof);
-        if (!(poForProof instanceof SymbolicExecutionPO)) {
-            return;
-        }
-        SymbolicExecutionPO po = (SymbolicExecutionPO) poForProof;
         InitConfig initConfig = proof.env().getInitConfig();
 
-        Goal initiatingGoal = po.getInitiatingGoal();
-        RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
+        if (goal.node().parent() == null) {
+            return;
+        }
+        RuleApp app = goal.node().parent().getAppliedRuleApp();
         if (!(app instanceof BlockContractBuiltInRuleApp)) {
             return;
         }
         BlockContractBuiltInRuleApp blockRuleApp =
-                (BlockContractBuiltInRuleApp)app;
+                (BlockContractBuiltInRuleApp) app;
         BlockContract contract = blockRuleApp.getContract();
         IFProofObligationVars ifVars =
                 blockRuleApp.getInformationFlowProofObligationVars();
 
-        InformationFlowContract ifContract =
-                new InformationFlowContractImpl(contract, services);
-        SymbolicExecutionPO symbExecPO =
-                new SymbolicExecutionPO(initConfig, ifContract,
-                                        ifVars.symbExecVars, goal);
+        ContractPO poForProof =
+                proof.getServices().getSpecificationRepository().getPOForProof(proof);
+        if (!(poForProof instanceof AbstractOperationPO)) {
+            return;
+        }
+        ImmutableSet<NoPosTacletApp> initialTaclets =
+                ((SymbolicExecutionPO) poForProof).getInitialTaclets();
+
+
+        BlockExecutionPO symbExecPO =
+                new BlockExecutionPO(initConfig, contract, ifVars.symbExecVars,
+                                     goal, initialTaclets);
 
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(), mediator.getProfile(),

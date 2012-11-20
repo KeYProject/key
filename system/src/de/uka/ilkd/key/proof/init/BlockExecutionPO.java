@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -14,8 +15,11 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
+import de.uka.ilkd.key.speclang.InformationFlowContractImpl;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -26,21 +30,26 @@ import java.util.Properties;
  *
  * @author christoph
  */
-public class SymbolicExecutionPO extends AbstractOperationPO implements ContractPO {
+public class BlockExecutionPO extends AbstractOperationPO implements ContractPO {
 
-    private final InformationFlowContract contract;
+    private final BlockContract contract;
+    private final InformationFlowContract generatedIFContract;
     private final ProofObligationVars symbExecVars;
     private final Goal initiatingGoal;
 
 
-    public SymbolicExecutionPO(InitConfig initConfig,
-                               InformationFlowContract contract,
-                               ProofObligationVars symbExecVars,
-                               Goal initiatingGoal) {
+    public BlockExecutionPO(InitConfig initConfig,
+                            BlockContract contract,
+                            ProofObligationVars symbExecVars,
+                            Goal initiatingGoal,
+                            ImmutableSet<NoPosTacletApp> taclets) {
         super(initConfig, contract.getName());
         this.contract = contract;
+        this.generatedIFContract =
+                new InformationFlowContractImpl(contract, services);
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
+        this.taclets = taclets;
     }
 
 
@@ -59,26 +68,23 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
 
         // symbolic execution
         Term symExec =
-                symbExecFactory.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC);
+                symbExecFactory.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC);
 
         // final symbolic execution term
         Term finalTerm = TB.not(TB.and(pre, symExec));
 
         // register final term
         assignPOTerms(finalTerm);
-
-        InfFlowContractPO infFlowPO =
-                (InfFlowContractPO) services.getSpecificationRepository().getPO(contract);
-        taclets = infFlowPO.getInitialTaclets();
+//        collectClassAxioms(contract.getKJT());
     }
 
 
     @Override
     public boolean implies(ProofOblInput po) {
-        if (!(po instanceof SymbolicExecutionPO)) {
+        if (!(po instanceof BlockExecutionPO)) {
             return false;
         }
-        SymbolicExecutionPO cPO = (SymbolicExecutionPO) po;
+        BlockExecutionPO cPO = (BlockExecutionPO) po;
         return contract.equals(cPO.contract);
     }
 
@@ -140,14 +146,13 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
 
     @Override
     public InformationFlowContract getContract() {
-        return contract;
+        return generatedIFContract;
     }
 
 
     public Goal getInitiatingGoal() {
         return initiatingGoal;
     }
-
 
 
     /**
@@ -182,16 +187,16 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
         }
     }
 
-    
+
     // the following code is legacy code
     @Override
     @Deprecated
     protected StatementBlock buildOperationBlock(
             ImmutableList<LocationVariable> formalParVars,
-                                                 ProgramVariable selfVar,
-                                                 ProgramVariable resultVar) {
+            ProgramVariable selfVar,
+            ProgramVariable resultVar) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                 "Please use the POSnippetFactory instead.");
+                                                "Please use the POSnippetFactory instead.");
     }
 
 
@@ -203,7 +208,7 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
                           Map<LocationVariable, LocationVariable> atPreVars,
                           Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                 "Please use the POSnippetFactory instead.");
+                                                "Please use the POSnippetFactory instead.");
     }
 
 
@@ -217,7 +222,7 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
                            Map<LocationVariable, LocationVariable> atPreVars,
                            Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                 "Please use the POSnippetFactory instead.");
+                                                "Please use the POSnippetFactory instead.");
     }
 
 
@@ -228,7 +233,7 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
                                     ProgramVariable selfVar,
                                     ImmutableList<ProgramVariable> paramVars) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                 "Please use the POSnippetFactory instead.");
+                                                "Please use the POSnippetFactory instead.");
     }
 
 
@@ -237,7 +242,7 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
     protected Term generateMbyAtPreDef(ProgramVariable selfVar,
                                        ImmutableList<ProgramVariable> paramVars) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                 "Please use the POSnippetFactory instead.");
+                                                "Please use the POSnippetFactory instead.");
     }
 
 
@@ -246,6 +251,6 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
     protected Term generateMbyAtPreDef(Term selfVar,
                                        ImmutableList<Term> paramVars) {
         throw new UnsupportedOperationException("Not supported any more. " +
-                 "Please use the POSnippetFactory instead.");
+                                                "Please use the POSnippetFactory instead.");
     }
 }

@@ -35,6 +35,8 @@ public interface BasicPOSnippetFactory {
         //      exc = excAtPost)
         SYMBOLIC_EXEC (BasicSymbolicExecutionSnippet.class),
 
+        BLOCK_EXEC (BasicBlockExecutionSnippet.class),
+
         // RELATED_BY_package.class::m(self, localIn1, ..., localInN, heap, localOut1, ..., localOutN, result, exc, heapAtPost)
         // This predicate is semantically equivalent to:
         // [P] (heap = heapAtPost & self = selfAtPost & result = resultAtPost &

@@ -853,7 +853,7 @@ public class BlockContractRule implements BuiltInRule {
 
     }
 
-    private static final class ValidityProgramConstructor {
+    public static final class ValidityProgramConstructor {
 
         private final List<Label> labels;
         private final StatementBlock block;

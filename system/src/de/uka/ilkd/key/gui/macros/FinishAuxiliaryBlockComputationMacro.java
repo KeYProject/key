@@ -4,55 +4,38 @@
  */
 package de.uka.ilkd.key.gui.macros;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.VariableNameProposer;
+import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
-import de.uka.ilkd.key.proof.mgt.AxiomJustification;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.MiscTools;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
  *
  * @author christoph
  */
-public class FinishAuxiliaryComputationMacro
+public class FinishAuxiliaryBlockComputationMacro
         extends AbstractFinishAuxiliaryComputationMacro {
 
     @Override
@@ -62,7 +45,7 @@ public class FinishAuxiliaryComputationMacro
         Services services = proof.getServices();
         ContractPO poForProof =
                 services.getSpecificationRepository().getPOForProof(proof);
-        return poForProof instanceof SymbolicExecutionPO;
+        return poForProof instanceof BlockExecutionPO;
     }
 
 
@@ -72,21 +55,33 @@ public class FinishAuxiliaryComputationMacro
         Proof proof = mediator.getSelectedProof();
         ContractPO poForProof =
                 proof.getServices().getSpecificationRepository().getPOForProof(proof);
-        if (!(poForProof instanceof SymbolicExecutionPO)) {
+        if (!(poForProof instanceof BlockExecutionPO)) {
             return;
         }
-        SymbolicExecutionPO po = (SymbolicExecutionPO) poForProof;
+        BlockExecutionPO po = (BlockExecutionPO) poForProof;
+
         Goal initiatingGoal = po.getInitiatingGoal();
         Proof initiatingProof = initiatingGoal.proof();
         Services services = initiatingProof.getServices();
-        InfFlowContractPO ifPO =
-                (InfFlowContractPO) services.getSpecificationRepository().
-                getPOForProof(initiatingProof);
+
+        if (initiatingGoal.node().parent() == null) {
+            return;
+        }
+        RuleApp app = initiatingGoal.node().parent().getAppliedRuleApp();
+        if (!(app instanceof BlockContractBuiltInRuleApp)) {
+            return;
+        }
+        BlockContractBuiltInRuleApp blockRuleApp =
+                (BlockContractBuiltInRuleApp)app;
+        BlockContract contract = blockRuleApp.getContract();
+        IFProofObligationVars ifVars =
+                blockRuleApp.getInformationFlowProofObligationVars();
+
 
         // create and register resulting taclets
-        Term result = calculateResultingTerm(proof, ifPO.getIFVars(),
+        Term result = calculateResultingTerm(proof, ifVars,
                                              services);
-        Taclet rwTaclet = generateRewriteTaclet(result, ifPO, services);
+        Taclet rwTaclet = generateRewriteTaclet(result, contract, ifVars, services);
         initiatingGoal.addNoPosTacletApp(NoPosTacletApp.createNoPosTacletApp(rwTaclet));
         addContractApplicationTaclets(proof, initiatingGoal);
 
@@ -96,18 +91,18 @@ public class FinishAuxiliaryComputationMacro
 
 
     private Taclet generateRewriteTaclet(Term replacewith,
-                                         InfFlowContractPO infPO,
+                                         BlockContract contract,
+                                         IFProofObligationVars ifVars,
                                          Services services) {
         Name tacletName =
                 MiscTools.toValidTacletName("unfold computed formula");
         // create find term
-        IFProofObligationVars ifVars = infPO.getIFVars();
         InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(infPO.getContract(),
+                POSnippetFactory.getInfFlowFactory(contract,
                                                    ifVars.c1, ifVars.c2,
                                                    services);
         Term find =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
+                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
 
         //create taclet
         RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();

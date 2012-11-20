@@ -63,7 +63,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
                                   TermBuilder.Serviced tb) {
         if (d.getContractContent(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException("Tried to produce a "
-                    + "precondition for a contract without precondition.");
+                    + "program-term for a contract without modality.");
         }
         assert Modality.class.equals(BasicSnippetData.Key.MODALITY.getType());
         Modality modality = (Modality) d.getContractContent(
@@ -100,12 +100,8 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
         final Modality symbExecMod;
         if (modality == Modality.BOX) {
             symbExecMod = Modality.DIA;
-        } else if (modality == Modality.DIA) {
-            symbExecMod = Modality.BOX;
-        } else if (modality == Modality.BOX_TRANSACTION) {
-            symbExecMod = Modality.DIA_TRANSACTION;
         } else {
-            symbExecMod = Modality.BOX_TRANSACTION;
+            symbExecMod = Modality.BOX;
         }
         final Term programTerm = tb.prog(symbExecMod, jb, postTerm);
 
