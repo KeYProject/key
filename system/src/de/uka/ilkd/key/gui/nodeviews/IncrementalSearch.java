@@ -316,6 +316,7 @@ public class IncrementalSearch {
                 }
             });
             checkBox.setSelected(regExpSearch);
+            checkBox.setToolTipText("Evaluate as regular expression");
             return checkBox;
         }
 
