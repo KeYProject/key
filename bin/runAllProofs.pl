@@ -1,18 +1,22 @@
 #!/usr/bin/perl -w
 use strict;
-use Cwd;
+use Cwd 'getcwd', 'realpath';
 use File::Find;
 use File::Basename;
 use Getopt::Long;
+use POSIX qw(strftime);
 # use File::Copy;
 # use Net::SMTP;
 
 #
 # Configuration variables
-my $bin_path = dirname($0);
-my $path_to_examples = "system/proofExamples/";
+my $orig_path = &getcwd;
+my $path_to_key = realpath(dirname($0) . "/..");
+my $path_to_examples = $path_to_key . "/examples/";
 my $path_to_automated = "index/";
-my $automaticjavadl_txt = "automaticJAVADL.txt";
+my $path_to_header = $path_to_examples . $path_to_automated . "headerJavaDL.txt";
+my $path_to_index = $path_to_examples . $path_to_automated . "automaticJAVADL.txt";
+
 # time out set to 30 minutes
 my $time_limit = 30*60; 
 
@@ -21,17 +25,14 @@ my $time_limit = 30*60;
 # output of the time command
 #my $time_format = '   user %U sec\n system %S sec\nelapsed %E sec\nMax. size %M kB\nAvg. size %t kB';
 
-my $absolute_bin_path = &getcwd."/".$bin_path;
-
-
 #
-# Command line
+# Command line options
 my %option = ();
-GetOptions(\%option, 'help|h', 'silent|z', 'delete|d', 'reload|l', 'stopfail|t', 'storefailed|s=s', 'file|f=s');
+GetOptions(\%option, 'help|h', 'silent|z', 'delete|d', 'reload|l', 'stopfail|t', 'storefailed|s=s', 'file|f=s', 'xml-junit|x=s');
 
 if ($option{'help'}) {
-  print "Runs all proofs listed in the file \'$automaticjavadl_txt\'.\n";
-  print "\'$automaticjavadl_txt\' can be found in the directory \'$bin_path/$path_to_examples$path_to_automated\'.\n\n";
+  print "Runs all proofs listed in the file \'$path_to_index\'.\n";
+#  print "\'$path_to_index\' can be found in the directory \'$key_path/$path_to_examples$path_to_automated\'.\n\n";
   print "Use '-h' or '--help' to get this text (very necessary this line).\n";
   print "Use '-z' or '--silent' to reduce verbosity (only final results are displayed).\n";
   print "Use '-l' or '--reload' to save proofs and reload them directly afterwards. (Test cases for proof loading.)\n";
@@ -39,6 +40,7 @@ if ($option{'help'}) {
   print "Use '-t' or '--stopfail' to stop immediately upon a failure.\n";
   print "Use '-s <filename>' or '--storefailed <filename>' to store the file names of failures in file <filename>.\n";
   print "Use '-f <filename>' or '--file <filename>' to load the problems from <filename>.\n";
+  print "Use '-x <filename>' or '--xml-junit <filename>' to store the results in junit's xml result format to <filename>.\n";
 #  print "[DEFUNCT] Use '-m email\@address.com' to send the report as an email to the specified address.\n";
 #  print "[DEFUNCT] Use '-c' to get the debug messages from the smtp part if there are email problems.\n";
   exit;
@@ -47,30 +49,29 @@ if ($option{'help'}) {
 my $reloadTests = $option{'reload'};
 
 if($option{'delete'}) {
-    &cleanDirectories (".");
+    &cleanDirectories ($path_to_examples);
     exit 0;
 }
 
 #
 # read in the configuration files and store them in arrays.
 
-open (HEADER_JAVADL, $path_to_examples.$path_to_automated."headerJavaDL.txt") or
-  die $path_to_examples.$path_to_automated."headerJavaDL.txt couldn't be opened.";
+open (HEADER_JAVADL, $path_to_header) or die $path_to_header . " couldn't be opened.";
 binmode(HEADER_JAVADL);
 my @headerJavaDL = <HEADER_JAVADL>;
 close HEADER_JAVADL;
 
 my $testFile;
 if (not $option{'file'}) {
-  $testFile = $path_to_examples.$path_to_automated.$automaticjavadl_txt;
+  $testFile = $path_to_index;
 } else {
   $testFile = $option{'file'};
 }
-if (not $option{'silent'}) {print "Reading from $testFile.\n\n";}
+
+print "Reading from $testFile.\n\n" unless $option{'silent'};
 
 my @automatic_JAVADL;
-open (AUTOMATIC, $testFile) or
-  die $testFile." couldn't be opened.";
+open (AUTOMATIC, $testFile) or die $testFile . " couldn't be opened.";
 @automatic_JAVADL = <AUTOMATIC>;
 close AUTOMATIC;
 
@@ -79,6 +80,7 @@ my $correct = 0;
 my $failures = 0;
 my $errors = 0;
 my @reloadFailed;
+my @reloadSuccesses;
 my %successes;
 my %failing;
 my %erroneous;
@@ -88,14 +90,19 @@ my %erroneous;
 #
 chdir $path_to_examples;
 foreach my $dotkey (@automatic_JAVADL) {
-if (! ($option{'stopfail'} && 
-		($failures + $errors + scalar(@reloadFailed) > 0))) {
+   if ($option{'stopfail'} && 
+		($failures + $errors + scalar(@reloadFailed) > 0)) {
+      print "Bailing out due to error\n";
+      last;
+   }
+
    # ignore empty lines and comments
    next if $dotkey =~ /^\s*#/;
    next if $dotkey =~ /^\s*$/;
  
    (my $provable, $dotkey) = &fileline($dotkey);
-   if (not $option{silent}) {print "Now running $dotkey ...\n";}
+
+   print "Now running $dotkey ...\n" unless $option{'silent'};
 
    &prepare_file($dotkey);
 
@@ -114,19 +121,21 @@ if (! ($option{'stopfail'} &&
  		    "Error code $success)", $dotkey);
    }
 
-
    # replace trailing .key by .auto.proof
    $dotkey =~ s/\.key$/.auto.proof/;
 
    &reloadFile($dotkey) if ($reloadTests and $provable);
     
-   if (not $option{silent}) {print "\nStatus: $counter examples tested. $failures failures and $errors errors occurred.\n";}
-   if (not $option{silent}) {print "Reload-Tests: " . 
-       (($reloadTests and $provable) ? (scalar(@reloadFailed) . " failures") : "disabled") 
-       . "\n\n";}
+   unless($option{'silent'}) {
+      print "\nStatus: $counter examples tested. $failures failures and $errors errors occurred.\n";
+      print "Reload-Tests: " . 
+         (($reloadTests and $provable) ? (scalar(@reloadFailed) . 
+					  " failures") : "disabled") 
+         . "\n\n";
+   }
 }
-}
-chdir "../";
+
+chdir $orig_path;
 
 print "\n$correct/$counter prover runs according to spec.\n".
      "$failures failures and $errors errors occurred.\n";
@@ -141,6 +150,10 @@ print &produceResultText;
 
 if($option{'storefailed'}) {
   &storeFailedProofs
+}
+
+if($option{'xml-junit'}) {
+    &writeXmlReport($option{'xml-junit'});
 }
 
 if($failures + $errors + scalar(@reloadFailed) > 0) {
@@ -243,6 +256,60 @@ sub storeFailedProofs {
     print "Failed proof attempts stored in \'".$option{'storefailed'}."\'.\n\n";
 }
 
+sub iso8601now {
+    # ISO8601
+    return strftime("%Y-%m-%dT%H:%M:%S", localtime(time()));
+}
+
+sub writeXmlReport {
+    my $filename = $_[0];
+    open OUT, "> $filename" or die "cannot open $filename for writing.";
+
+    my $errors    = scalar(keys(%erroneous));
+    my $failures  = scalar(keys(%failing)) + scalar(@reloadFailed);
+    my $successes = scalar(keys(%successes)) + scalar(@reloadSuccesses);
+    my $tests     = $errors + $failures + $successes;
+    my $timestamp = &iso8601now;
+
+    print OUT <<HEADER;
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="$errors" failures="$failures" name="runAllProofs" tests="$counter" timestamp="$timestamp" host="localhost" time="0.0">
+  <properties>
+    <property name="reload" value="$reloadTests" />
+    <property name="directory" value="$path_to_key" />
+  </properties>
+HEADER
+    foreach (keys(%successes)) {
+	print OUT '  <testcase classname="runallproofs.run" name="' . 
+	    $_ . '" time="0.0" />'  . "\n";
+    }
+    foreach (@reloadSuccesses) {
+	print OUT '  <testcase classname="runallproofs.reload" name="' . 
+	    $_ . '" time="0.0" />'  . "\n";
+    }
+    foreach (keys(%erroneous)) {
+	print OUT '  <testcase classname="runallproofs.run" name="' . 
+	    $_ . '" time="0.0" />'  . "\n";
+	print OUT '     <error type="ERR">error during proof for ' .
+	    $_ . "</error>\n  </testcase>\n";
+    }
+    foreach (keys(%failing)) {
+	print OUT '  <testcase classname="runallproofs.run" name="' . 
+	    $_ . '" time="0.0" />'  . "\n";
+	print OUT '     <failure type="FAIL">proof for ' .
+	    $_ . " failed</failure>\n  </testcase>\n";
+    }
+    foreach (@reloadFailed) {
+	print OUT '  <testcase classname="runallproofs.reload" name="' . 
+	    $_ . '" time="0.0" />'  . "\n";
+	print OUT '     <failure type="FAIL">could not reload proof for ' .
+	    $_ . "</failure>\n  </testcase>\n";
+    }
+
+    print OUT "</testsuite>";
+    close OUT;
+    print "JUnit XML report written to $filename.\n\n";
+}
 
 # first argument: timeout in seconds
 # following arguments: used to call exec.
@@ -270,8 +337,8 @@ sub system_timeout {
  
 sub runAuto {
   my $dk = &getcwd . "/$_[0]";
-  my $command = $absolute_bin_path . "/runProver --auto $dk";
-  # print "Command is: $command\n";
+  my $command = "'" . $path_to_key . "/bin/runProver' --auto '$dk'";
+   print "Command is: $command\n";
   my $starttime = time();
   my $result = &system_timeout($time_limit, $command);
   print "Time elapsed: " . (time() - $starttime) . " sec\n";
@@ -305,15 +372,18 @@ sub reloadFile {
 	return;
     }
 
-    my $command = $absolute_bin_path . "/runProver --auto-loadonly $dk";
+    my $command = "'" . $path_to_key . "/bin/runProver' --auto-loadonly '$dk'";
     # print "Command is: $command\n";
     my $result = &system_timeout($time_limit, $command);
 #    print "\nReturn value: $result\n";
 
     if($result != 0) {
 	if (not $option{'silent'}) {
-		print "\nCould not reload saved file $file\n";}
+	    print "\nCould not reload saved file $file\n";
+        }
 	push @reloadFailed, $file;
+    } else {
+	push @reloadSuccesses, $file;
     }
 }
 
