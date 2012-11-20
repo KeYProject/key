@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
@@ -19,12 +20,14 @@ class BasicSelfCreatedSnippet implements FactoryMethod {
     public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        if (!(d.targetMethod instanceof IProgramMethod)) {
+        IObserverFunction targetMethod =
+                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
+        if (!(targetMethod instanceof IProgramMethod)) {
             throw new UnsupportedOperationException("Tried to produce "
                     + "SELF_CREATED for an observer "
                     + "which is no IProgramMethod.");
         }
-        final IProgramMethod pm = (IProgramMethod) d.targetMethod;
+        final IProgramMethod pm = (IProgramMethod) targetMethod;
         return (poVars.self == null || pm.isConstructor())
                ? d.tb.tt() : d.tb.created(poVars.self);
     }

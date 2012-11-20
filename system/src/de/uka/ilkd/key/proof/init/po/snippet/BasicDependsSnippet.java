@@ -18,12 +18,12 @@ class BasicDependsSnippet extends ReplaceAndRegisterMethod implements FactoryMet
     public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        if (d.getContractContent(BasicSnippetData.Key.DEPENDENS) == null) {
+        if (d.get(BasicSnippetData.Key.DEPENDENS) == null) {
             throw new UnsupportedOperationException("Tried to produce a "
                     + "depends-term for a contract without dependencies.");
         }
         assert Term.class.equals(BasicSnippetData.Key.DEPENDENS.getType());
-        Term origDep = (Term) d.getContractContent(
+        Term origDep = (Term) d.get(
                 BasicSnippetData.Key.DEPENDENS);
         return replace(origDep, d.origVars, poVars);
     }

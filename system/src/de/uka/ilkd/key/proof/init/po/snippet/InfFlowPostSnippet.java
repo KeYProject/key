@@ -24,12 +24,12 @@ class InfFlowPostSnippet extends ReplaceAndRegisterMethod implements InfFlowFact
             throws UnsupportedOperationException {
 
         // get respects terms
-        if (d.getContractContent(BasicSnippetData.Key.RESPECTS) == null) {
+        if (d.get(BasicSnippetData.Key.RESPECTS) == null) {
             throw new UnsupportedOperationException("Tried to produce "
                     + "respects for a contract without respects.");
         }
         assert Term[][].class.equals(BasicSnippetData.Key.RESPECTS.getType());
-        Term[][] origRespects = (Term[][]) d.getContractContent(
+        Term[][] origRespects = (Term[][]) d.get(
                 BasicSnippetData.Key.RESPECTS);
 
         // the respects-sequents evaluated in the pre-state
@@ -52,12 +52,12 @@ class InfFlowPostSnippet extends ReplaceAndRegisterMethod implements InfFlowFact
                     poVars2.exceptionAtPost});
 
         // get declassifies terms
-        if (d.getContractContent(BasicSnippetData.Key.DECLASSIFIES) == null) {
+        if (d.get(BasicSnippetData.Key.DECLASSIFIES) == null) {
             throw new UnsupportedOperationException("Tried to produce "
                     + "declassifies for a contract without declassifies.");
         }
         assert Term[][].class.equals(BasicSnippetData.Key.DECLASSIFIES.getType());
-        Term[][] origDeclassifies = (Term[][]) d.getContractContent(
+        Term[][] origDeclassifies = (Term[][]) d.get(
                 BasicSnippetData.Key.DECLASSIFIES);
 
         // declassifies has only to be evaluated in the pre-state

@@ -4,7 +4,9 @@
  */
 package de.uka.ilkd.key.proof.init.po.snippet;
 
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -20,13 +22,16 @@ class BasicSelfExactTypeSnippet implements FactoryMethod {
     public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        if (!(d.targetMethod instanceof IProgramMethod)) {
+        IObserverFunction targetMethod =
+                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
+        if (!(targetMethod instanceof IProgramMethod)) {
             throw new UnsupportedOperationException("Tried to produce "
                     + "SELF_EXACT_TYPE for an observer "
                     + "which is no IProgramMethod.");
         }
-        final IProgramMethod pm = (IProgramMethod) d.targetMethod;
-        final Sort contractSort = d.forClass.getSort();
+        final IProgramMethod pm = (IProgramMethod) targetMethod;
+        KeYJavaType forClass = (KeYJavaType) d.get(BasicSnippetData.Key.FOR_CLASS);
+        final Sort contractSort = forClass.getSort();
         return (poVars.self == null || pm.isConstructor())
                ? d.tb.tt() : d.tb.exactInstance(contractSort, poVars.self);
     }

@@ -18,12 +18,12 @@ class BasicModifiesSnippet extends ReplaceAndRegisterMethod implements FactoryMe
     public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        if (d.getContractContent(BasicSnippetData.Key.MODIFIES) == null) {
+        if (d.get(BasicSnippetData.Key.MODIFIES) == null) {
             throw new UnsupportedOperationException("Tried to produce a "
                     + "modifies-term for a contract without modifies.");
         }
         assert Term.class.equals(BasicSnippetData.Key.MODIFIES.getType());
-        Term origMod = (Term) d.getContractContent(BasicSnippetData.Key.MODIFIES);
+        Term origMod = (Term) d.get(BasicSnippetData.Key.MODIFIES);
         return replace(origMod, d.origVars, poVars);
     }
 }

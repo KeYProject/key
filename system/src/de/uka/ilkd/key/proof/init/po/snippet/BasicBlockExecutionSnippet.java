@@ -1,8 +1,11 @@
 package de.uka.ilkd.key.proof.init.po.snippet;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -23,6 +26,9 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.speclang.BlockContract.Variables;
+import java.util.ArrayList;
 
 
 /**
@@ -58,15 +64,15 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
                                   ProofObligationVars vs,
                                   Term postTerm,
                                   TermBuilder.Serviced tb) {
-        if (d.getContractContent(BasicSnippetData.Key.MODALITY) == null) {
+        if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException("Tried to produce a " +
-                     "program-term for a contract without modality.");
+                                                    "program-term for a contract without modality.");
         }
 
         //create java block
         Modality modality =
-                (Modality) d.getContractContent(BasicSnippetData.Key.MODALITY);
-        final JavaBlock jb = buildJavaBlock(d);
+                (Modality) d.get(BasicSnippetData.Key.MODALITY);
+        final JavaBlock jb = buildJavaBlock(d, vs);
 
         //create program term
         final Modality symbExecMod;
@@ -80,41 +86,23 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
         return programTerm;
     }
 
-    private JavaBlock buildJavaBlock(BasicSnippetData d) {
-        JavaInfo javaInfo = d.tb.getServices().getJavaInfo();
-        ProgramVariable exceptionVar = (ProgramVariable)d.origVars.exception.op();
 
-        //create method call
-        // TODO: handle break, continue, return...
-        final StatementBlock sb = d.targetBlock;
-//             new BlockContractRule.ValidityProgramConstructor(labels, d.targetBlock, variables, services).construct();
+    private JavaBlock buildJavaBlock(BasicSnippetData d,
+                                     ProofObligationVars vs) {
+        Services services = d.tb.getServices();
 
-        //create variables for try statement
-        final KeYJavaType eType =
-                javaInfo.getTypeByClassName("java.lang.Exception");
-        final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
-        final ProgramElementName ePEN = new ProgramElementName("e");
-        final ProgramVariable eVar = new LocationVariable(ePEN, eType);
-
-        //create try statement
-        final CopyAssignment nullStat =
-                new CopyAssignment(exceptionVar, NullLiteral.NULL);
-        final VariableSpecification eSpec = new VariableSpecification(eVar);
-        final ParameterDeclaration excDecl =
-                new ParameterDeclaration(new Modifier[0], excTypeRef, eSpec,
-                                         false);
-        final CopyAssignment assignStat =
-                new CopyAssignment(exceptionVar, eVar);
-        final Catch catchStat =
-                new Catch(excDecl, new StatementBlock(assignStat));
-        final Try tryStat = new Try(sb, new Branch[]{catchStat});
-        final StatementBlock sb2 = new StatementBlock(
-                new Statement[]{nullStat, tryStat});
-
-        //create java block
-        JavaBlock result = JavaBlock.createJavaBlock(sb2);
+        //create block call
+        Label[] labelsArray = (Label[]) d.get(BasicSnippetData.Key.LABELS);
+        ImmutableArray<Label> labels = new ImmutableArray<Label>(labelsArray);
+        Variables variables =
+                (Variables) d.get(BasicSnippetData.Key.BLOCK_VARS);
+        StatementBlock block =
+                (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
+        final StatementBlock sb =
+                new BlockContractRule.ValidityProgramConstructor(labels, block,
+                                                                 variables, services).construct();
+        JavaBlock result = JavaBlock.createJavaBlock(sb);
 
         return result;
     }
-
 }

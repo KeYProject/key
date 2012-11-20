@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -61,12 +62,12 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
                                   ProofObligationVars vs,
                                   Term postTerm,
                                   TermBuilder.Serviced tb) {
-        if (d.getContractContent(BasicSnippetData.Key.MODALITY) == null) {
+        if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException("Tried to produce a "
                     + "program-term for a contract without modality.");
         }
         assert Modality.class.equals(BasicSnippetData.Key.MODALITY.getType());
-        Modality modality = (Modality) d.getContractContent(
+        Modality modality = (Modality) d.get(
                 BasicSnippetData.Key.MODALITY);
 
 
@@ -124,12 +125,14 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
             ProgramVariable selfVar,
             ProgramVariable resultVar,
             ProgramVariable exceptionVar) {
-        if (!(d.targetMethod instanceof IProgramMethod)) {
+        IObserverFunction targetMethod =
+                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
+        if (!(targetMethod instanceof IProgramMethod)) {
             throw new UnsupportedOperationException("Tried to produce a "
                     + "java-block for an observer which is no progam method.");
         }
         JavaInfo javaInfo = d.tb.getServices().getJavaInfo();
-        IProgramMethod pm = (IProgramMethod) d.targetMethod;
+        IProgramMethod pm = (IProgramMethod) targetMethod;
 
         //create method call
         final ImmutableArray<Expression> formalArray =
@@ -141,8 +144,10 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
             assert resultVar == null;
             final Expression[] formalArray2 =
                     formalArray.toArray(new Expression[formalArray.size()]);
+            KeYJavaType forClass =
+                    (KeYJavaType) d.get(BasicSnippetData.Key.FOR_CLASS);
             final New n =
-                    new New(formalArray2, new TypeRef(d.forClass),
+                    new New(formalArray2, new TypeRef(forClass),
                             null);
             final CopyAssignment ca = new CopyAssignment(selfVar, n);
             sb = new StatementBlock(ca);

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -29,8 +30,12 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        final IProgramMethod pm = (IProgramMethod) d.targetMethod;
-        String nameString = generatePredicateName(pm, d.targetBlock);
+        IObserverFunction targetMethod =
+                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
+        final IProgramMethod pm = (IProgramMethod) targetMethod;
+        StatementBlock targetBlock =
+                (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
+        String nameString = generatePredicateName(pm, targetBlock);
         final Function contApplPred =
                 generateContApplPredicate(nameString, poVars.termList, d.tb);
         return instantiateContApplPredicate(contApplPred, poVars, d.tb);

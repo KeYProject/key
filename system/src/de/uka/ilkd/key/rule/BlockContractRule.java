@@ -864,13 +864,13 @@ public class BlockContractRule implements BuiltInRule {
 
     public static final class ValidityProgramConstructor {
 
-        private final List<Label> labels;
+        private final Iterable<Label> labels;
         private final StatementBlock block;
         private final BlockContract.Variables variables;
         private final Services services;
         private final List<Statement> statements;
 
-        public ValidityProgramConstructor(final List<Label> labels,
+        public ValidityProgramConstructor(final Iterable<Label> labels,
                                           final StatementBlock block,
                                           final BlockContract.Variables variables,
                                           final Services services)
@@ -939,7 +939,7 @@ public class BlockContractRule implements BuiltInRule {
             statements.add(new LabeledStatement(breakOutLabel, safeStatement));
         }
 
-        private Statement label(final StatementBlock block, List<Label> labels)
+        private Statement label(final StatementBlock block, Iterable<Label> labels)
         {
             Statement result = block;
             for (Label label : labels) {

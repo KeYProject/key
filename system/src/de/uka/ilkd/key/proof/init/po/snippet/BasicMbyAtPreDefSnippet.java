@@ -23,14 +23,14 @@ class BasicMbyAtPreDefSnippet extends ReplaceAndRegisterMethod
             return d.tb.tt();
         }
 
-        if (d.getContractContent(BasicSnippetData.Key.MEASURED_BY) == null) {
+        if (d.get(BasicSnippetData.Key.MEASURED_BY) == null) {
             throw new UnsupportedOperationException("Tried to produce a "
                     + "measured_by for a contract without measured_by "
                     + "(though the contract pretends to have one).");
         }
         assert Term.class.equals(BasicSnippetData.Key.MEASURED_BY.getType());
         final Term origMby =
-                (Term) d.getContractContent(BasicSnippetData.Key.MEASURED_BY);
+                (Term) d.get(BasicSnippetData.Key.MEASURED_BY);
         final Term mby = replace(origMby, d.origVars, poVars);
 
         return d.tb.equals(poVars.mbyAtPre, mby);
