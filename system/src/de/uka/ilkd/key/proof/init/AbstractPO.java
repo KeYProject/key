@@ -79,7 +79,7 @@ public abstract class AbstractPO implements IPersistablePO {
     //-------------------------------------------------------------------------
     //methods for use in subclasses
     //-------------------------------------------------------------------------
-    private ImmutableSet<ClassAxiom> getAxiomsForObserver(
+    private static ImmutableSet<ClassAxiom> getAxiomsForObserver(
             Pair<Sort, IObserverFunction> usedObs,
             ImmutableSet<ClassAxiom> axioms) {
         for (ClassAxiom axiom : axioms) {
@@ -92,9 +92,10 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    private boolean reach(Pair<Sort, IObserverFunction> from,
+    private static boolean reach(Pair<Sort, IObserverFunction> from,
                           Pair<Sort, IObserverFunction> to,
-                          ImmutableSet<ClassAxiom> axioms) {
+                          ImmutableSet<ClassAxiom> axioms,
+                          Services services) {
         ImmutableSet<Pair<Sort, IObserverFunction>> reached =
                 DefaultImmutableSet.nil();
         ImmutableSet<Pair<Sort, IObserverFunction>> newlyReached = DefaultImmutableSet.<Pair<Sort, IObserverFunction>>nil().add(
@@ -124,8 +125,9 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    private ImmutableSet<Pair<Sort, IObserverFunction>> getSCC(ClassAxiom startAxiom,
-                                                              ImmutableSet<ClassAxiom> axioms) {
+    public static ImmutableSet<Pair<Sort, IObserverFunction>> getSCC(ClassAxiom startAxiom,
+                                                                     ImmutableSet<ClassAxiom> axioms,
+                                                                     Services services) {
         //TODO: make more efficient
         final Pair<Sort, IObserverFunction> start =
                 new Pair<Sort, IObserverFunction>(startAxiom.getKJT().getSort(),
@@ -137,7 +139,7 @@ public abstract class AbstractPO implements IPersistablePO {
                     new Pair<Sort, IObserverFunction>(
                     nodeAxiom.getKJT().getSort(),
                                                      nodeAxiom.getTarget());
-            if (reach(start, node, axioms) && reach(node, start, axioms)) {
+            if (reach(start, node, axioms, services) && reach(node, start, axioms, services)) {
                 result = result.add(node);
             }
         }
@@ -151,7 +153,7 @@ public abstract class AbstractPO implements IPersistablePO {
 
         for (ClassAxiom axiom : axioms) {
             final ImmutableSet<Pair<Sort, IObserverFunction>> scc =
-                    getSCC(axiom, axioms);
+                    getSCC(axiom, axioms, services);
             for (Taclet axiomTaclet : axiom.getTaclets(scc, services)) {
                 assert axiomTaclet != null : "class axiom returned null taclet: "
                                              + axiom.getName();

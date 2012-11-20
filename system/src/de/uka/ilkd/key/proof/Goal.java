@@ -586,6 +586,8 @@ public final class Goal  {
 
         // make new Goal
         Goal newGoal = copy();
+        newGoal.ruleAppManager.clearCache();
+        newGoal.ruleAppIndex.clearIndexes();
         newGoal.setNode(newNode);
 
         return newGoal;

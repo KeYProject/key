@@ -17,18 +17,22 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.AbstractPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Terms;
+import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 
 import java.util.*;
 
@@ -226,6 +230,9 @@ public class BlockContractRule implements BuiltInRule {
             Sequent seq = buildBodyPreservesSequent(contract, application,
                                                     poVars, services);
             Goal infFlowGoal = goal.getCleanGoal(seq);
+            ImmutableSet<NoPosTacletApp> taclets =
+                    collectClassAxioms(contract.getKJT(), services);
+            infFlowGoal.indexOfTaclets().addTaclets(taclets);
             infFlowGoal.setBranchLabel("Information Flow Validity");
             result = goal.split(3).append(infFlowGoal);
         } else {
@@ -314,6 +321,25 @@ public class BlockContractRule implements BuiltInRule {
         final Term finalTerm = TB.imp(selfComposedExec, post);
         return Sequent.createSuccSequent(
                 new Semisequent(new SequentFormula(finalTerm)));
+    }
+
+    protected ImmutableSet<NoPosTacletApp> collectClassAxioms(KeYJavaType selfKJT, Services services) {
+        final ImmutableSet<ClassAxiom> axioms =
+                services.getSpecificationRepository().getClassAxioms(selfKJT);
+
+        ImmutableSet<NoPosTacletApp> taclets =
+                DefaultImmutableSet.<NoPosTacletApp>nil();
+        for (ClassAxiom axiom : axioms) {
+            final ImmutableSet<Pair<Sort, IObserverFunction>> scc =
+                    AbstractPO.getSCC(axiom, axioms, services);
+            for (Taclet axiomTaclet : axiom.getTaclets(scc, services)) {
+                assert axiomTaclet != null : "class axiom returned null taclet: "
+                                             + axiom.getName();
+                taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(
+                        axiomTaclet));
+            }
+        }
+        return taclets;
     }
 
     public static final class Instantiation {
