@@ -17,23 +17,21 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
-import de.uka.ilkd.key.proof.init.AbstractPO;
+import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
-import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Terms;
-import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 
 import java.util.*;
 
@@ -86,11 +84,10 @@ public class BlockContractRule implements BuiltInRule {
         else if (modality == Modality.BOX_TRANSACTION) {
             collectedContracts = collectedContracts.union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
         }
-        return filterAppliedContracts(collectedContracts, block, goal);
+        return filterAppliedContracts(collectedContracts, goal);
     }
     
     private static ImmutableSet<BlockContract> filterAppliedContracts(final ImmutableSet<BlockContract> collectedContracts,
-                                                                      final StatementBlock block,
                                                                       final Goal goal)
     {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
@@ -118,7 +115,19 @@ public class BlockContractRule implements BuiltInRule {
             }
             selfOrParentNode = selfOrParentNode.parent();
         }
-        return false;
+
+        Services services = goal.proof().getServices();
+        Proof proof = goal.proof();
+        ContractPO po = services.getSpecificationRepository().getPOForProof(proof);
+        if (po instanceof SymbolicExecutionPO) {
+            Goal initiatingGoal = ((SymbolicExecutionPO)po).getInitiatingGoal();
+            return contractApplied(contract, initiatingGoal);
+        } else if (po instanceof BlockExecutionPO) {
+            Goal initiatingGoal = ((BlockExecutionPO)po).getInitiatingGoal();
+            return contractApplied(contract, initiatingGoal);
+        } else {
+            return false;
+        }
     }
     
     private BlockContractRule() {
