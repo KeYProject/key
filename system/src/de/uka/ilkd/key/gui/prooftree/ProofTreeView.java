@@ -441,6 +441,7 @@ public class ProofTreeView extends JPanel {
 
     public void showSearchPanel() {
         proofTreeSearchPanel.setVisible(true);
+        proofTreeSearchPanel.requestFocus();
     }
 
 

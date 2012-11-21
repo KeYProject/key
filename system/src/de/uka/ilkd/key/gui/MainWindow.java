@@ -647,6 +647,10 @@ public final class MainWindow extends JFrame  {
 	setStatusLine(s, 0);
     }
     
+    public void selectTab(int tab) {
+    	this.tabbedPane.setSelectedIndex(0);
+    }
+    
 //    /**
 //     * Get the progress monitor that will update a progress bar in a corner of the main window.
 //     */

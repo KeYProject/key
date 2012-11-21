@@ -21,6 +21,7 @@ public class SearchInProofTreeAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent arg0) {
         if (mainWindow.getMediator().getProof() != null)
+        	mainWindow.selectTab(0);
             mainWindow.getProofView().showSearchPanel();
     }
 
