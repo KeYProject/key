@@ -26,7 +26,7 @@ TODO -> Talk to Wojciech
 </entry>
 
 <entry key="initialisation">
-Specifies whether static initialization should be considered. (?)
+Specifies whether static (class) initialization should be considered.
 </entry>
 
 <entry key="intRules">

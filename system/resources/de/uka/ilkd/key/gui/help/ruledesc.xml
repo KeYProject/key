@@ -3,12 +3,37 @@
 <properties>
 <comment>These properties define the help comments which are to be displayed in the 
 rule pane when selecting non-taclet tree elements</comment>
-<entry key="Lemmas">Under Lemmas you find the taclets which have been introduced using menupuoin File.Load USer defined taclets.
+<entry key="Lemmas">Under Lemmas you find the taclets which have been introduced using File->Load User-Defined Taclets.
 
-They have side branches for proofs. Lemmas
+Lemmas have to be proven as well and create side branches for proofs.
 
 TODO</entry>
-<entry key="One Step Simplifier">Explanation of the OSS
+<entry key="Use Operation Contract">
+A method call is replaced by the method's contract.
+</entry>
+<entry key="Evaluate Query">
+The QueryExpand rule allows to apply contracts or to symbolically execute a query 
+expression in the logic. It replaces the query expression by a new constant and 
+constructs a box formula in the antecedent 'defining' the constant as the result of 
+a method call. The method call is encoded directly as a method call in the box modality. 
+The query is invoked in a context equal to the container type of the query method.
+</entry>
+<entry key="One Step Simplification">
+Java Updates are simplified. This includes:
+* Updates without effects are dropped.
+* If two updates appear in a row and don't influence each other, they are merged into a parallel update.
+* If the assigned variable of an update is changed in a previous update, substitution occurs. 
+  For example, {x_2 := x_1}{x_3:=x_2} becomes {x_3 := x_1}.
+</entry>
+<entry key="Use Dependency Contract">
+A dependency contract provides a limit for the heap locations an observer symbol may depend on.
+If the heap changes in locations the symbol does not depend on, it's value remains unchanged.
+This can be used by adding the necessary conditions and an equality assumption to the sequent.
+In automatic strategy, this rule is applied lazily to avoid endless loops.</entry>
+<entry key="Block Contract">Block contract
 50</entry>
+<entry key="Loop Invariant">
+Loops can be handled by expanding or by using a loop invariant.
+An invariant can be created manually or supplied by the JML specification.</entry>
 </properties>
 
