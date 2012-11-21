@@ -9,6 +9,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
@@ -36,13 +37,15 @@ public class BlockExecutionPO extends AbstractOperationPO implements ContractPO 
     private final InformationFlowContract generatedIFContract;
     private final ProofObligationVars symbExecVars;
     private final Goal initiatingGoal;
+    private final ExecutionContext context;
 
 
     public BlockExecutionPO(InitConfig initConfig,
                             BlockContract contract,
                             ProofObligationVars symbExecVars,
                             Goal initiatingGoal,
-                            ImmutableSet<NoPosTacletApp> taclets) {
+                            ImmutableSet<NoPosTacletApp> taclets,
+                            ExecutionContext context) {
         super(initConfig, contract.getName());
         this.contract = contract;
         this.generatedIFContract =
@@ -50,6 +53,7 @@ public class BlockExecutionPO extends AbstractOperationPO implements ContractPO 
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
         this.taclets = taclets;
+        this.context = context;
     }
 
 
@@ -57,7 +61,8 @@ public class BlockExecutionPO extends AbstractOperationPO implements ContractPO 
     public void readProblem() throws ProofInputException {
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
-                POSnippetFactory.getBasicFactory(contract, symbExecVars, services);
+                POSnippetFactory.getBasicFactory(contract, symbExecVars,
+                                                 context, services);
 
         // precondition
         final Term freePre =
@@ -152,6 +157,11 @@ public class BlockExecutionPO extends AbstractOperationPO implements ContractPO 
 
     public Goal getInitiatingGoal() {
         return initiatingGoal;
+    }
+
+
+    public ExecutionContext getExecutionContext() {
+        return context;
     }
 
 

@@ -239,7 +239,7 @@ public class BlockContractRule implements BuiltInRule {
                                             vars.result, vars.exception, postHeap,
                                             services);
             Sequent seq = buildBodyPreservesSequent(contract, application,
-                                                    poVars, services);
+                                                    poVars, instantiation.context, services);
             Goal infFlowGoal = goal.getCleanGoal(seq);
             ImmutableSet<NoPosTacletApp> taclets = abstPO.getInitialTaclets();
             infFlowGoal.indexOfTaclets().addTaclets(taclets);
@@ -309,6 +309,7 @@ public class BlockContractRule implements BuiltInRule {
     Sequent buildBodyPreservesSequent(BlockContract contract,
                                       BlockContractBuiltInRuleApp app,
                                       ProofObligationVars symbExecVars,
+                                      ExecutionContext context,
                                       Services services) {
         // generate proof obligation variables
         IProgramMethod pm = contract.getTarget();
@@ -317,7 +318,7 @@ public class BlockContractRule implements BuiltInRule {
         final InfFlowContractPO.IFProofObligationVars ifVars =
                 new InfFlowContractPO.IFProofObligationVars(symbExecVars,
                                                             services);
-        app.update(ifVars);
+        app.update(ifVars, context);
 
         // create proof obligation
         InfFlowPOSnippetFactory f =

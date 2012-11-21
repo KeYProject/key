@@ -19,12 +19,15 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -82,7 +85,8 @@ public class FinishAuxiliaryBlockComputationMacro
         Term result = calculateResultingTerm(proof, ifVars,
                                              services);
         Taclet rwTaclet = generateRewriteTaclet(result, contract, ifVars, services);
-        initiatingGoal.addNoPosTacletApp(NoPosTacletApp.createNoPosTacletApp(rwTaclet));
+        initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        initiatingGoal.proof().env().registerRule(rwTaclet, AxiomJustification.INSTANCE);
         addContractApplicationTaclets(proof, initiatingGoal);
 
         // close auxiliary computation proof

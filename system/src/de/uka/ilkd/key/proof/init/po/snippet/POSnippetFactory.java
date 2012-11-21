@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -38,6 +39,15 @@ public class POSnippetFactory {
             ProofObligationVars vars,
             Services services) {
         return new BasicPOSnippetFactoryImpl(contract, vars, services);
+    }
+
+
+    public static BasicPOSnippetFactory getBasicFactory(
+            BlockContract contract,
+            ProofObligationVars vars,
+            ExecutionContext context,
+            Services services) {
+        return new BasicPOSnippetFactoryImpl(contract, vars, context, services);
     }
 
 

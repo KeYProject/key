@@ -6,6 +6,7 @@ import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
@@ -87,7 +88,8 @@ class BasicSnippetData {
          * Variables originally used during parsing.
          */
         BLOCK_VARS(Variables.class),
-        LABELS(Label[].class);
+        LABELS(Label[].class),
+        CONTEXT(ExecutionContext.class); // this does not fit well here
 
         private final Class type;
 
@@ -176,6 +178,14 @@ class BasicSnippetData {
         origVars =
                 new ProofObligationVars(vars.self, ImmutableSLList.<Term>nil(),
                                         vars.result, vars.exception, heapTerm, services);
+    }
+
+
+    BasicSnippetData(BlockContract contract,
+                     ExecutionContext context,
+                     Services services) {
+        this(contract, services);
+        contractContents.put(Key.CONTEXT, context);
     }
 
 

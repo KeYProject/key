@@ -118,7 +118,8 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
 
         BlockExecutionPO symbExecPO =
                 new BlockExecutionPO(initConfig, contract, ifVars.symbExecVars,
-                                     goal, initialTaclets);
+                                     goal, initialTaclets,
+                                     blockRuleApp.getExecutionContext());
 
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(), mediator.getProfile(),
