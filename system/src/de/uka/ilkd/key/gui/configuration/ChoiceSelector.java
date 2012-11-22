@@ -228,6 +228,7 @@ public class ChoiceSelector extends JDialog {
 				    get(selection),false);
 	explanationArea.setBorder(BorderFactory.createTitledBorder(selection));
 	explanationArea.setText(getExplanation(selection));
+	explanationArea.setCaretPosition(0);
     }
 
     private String getExplanation(String selection) {
