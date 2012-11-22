@@ -355,7 +355,8 @@ public class Main {
 
 	    }    
 	    ui = MainWindow.getInstance().getUserInterface();
-	    System.out.println("Loading: "+fileNameOnStartUp);
+	    if (fileNameOnStartUp != null)
+	        System.out.println("Loading: "+fileNameOnStartUp);
 	}
 
 	return ui;
