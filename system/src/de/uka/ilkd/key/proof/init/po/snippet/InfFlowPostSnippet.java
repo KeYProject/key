@@ -9,6 +9,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /**
  * Generate term "self != null".
@@ -52,29 +53,35 @@ class InfFlowPostSnippet extends ReplaceAnRegisterMethod implements InfFlowFacto
                     poVars2.exceptionAtPost});
 
         // get declassifies terms
-        if (d.getContractContent(BasicSnippetData.Key.DECLASSIFIES) == null) {
+        if (d.getContractContent(BasicSnippetData.Key.DECLASSIFIES) == null &&
+                !(d.contract instanceof LoopInvariant)) {
             throw new UnsupportedOperationException("Tried to produce "
-                    + "declassifies for a contract without declassifies.");
+                    + "declassifies for a contract without declassifies.");            
         }
-        assert Term[][].class.equals(BasicSnippetData.Key.DECLASSIFIES.getType());
-        Term[][] origDeclassifies = (Term[][]) d.getContractContent(
-                BasicSnippetData.Key.DECLASSIFIES);
+        Term[][] declassifies1 = null;
+        Term[][] declassifies2 = null;
+        if(!(d.contract instanceof LoopInvariant)) {
+            assert Term[][].class.equals(BasicSnippetData.Key.DECLASSIFIES.getType());
+            Term[][] origDeclassifies = (Term[][]) d.getContractContent(
+                    BasicSnippetData.Key.DECLASSIFIES);
 
-        // declassifies has only to be evaluated in the pre-state
-        Term[][] declassifies1 = replace(origDeclassifies, d.origVars, poVars1);
-        Term[][] declassifies2 = replace(origDeclassifies, d.origVars, poVars2);
+            // declassifies has only to be evaluated in the pre-state
+            declassifies1 = replace(origDeclassifies, d.origVars, poVars1);
+            declassifies2 = replace(origDeclassifies, d.origVars, poVars2);
+        }        
 
         // create input-output-relations
         final Term[] relations = new Term[respectsAtPre1.length];
+        
         for (int i = 0; i < respectsAtPre1.length; i++) {
             relations[i] = buildInputOutputRelation(d, poVars1, poVars2,
-                                                    respectsAtPre1[i],
-                                                    respectsAtPre2[i],
-                                                    respectsAtPost1[i],
-                                                    respectsAtPost2[i],
-                                                    declassifies1,
-                                                    declassifies2);
-        }
+                    respectsAtPre1[i],
+                    respectsAtPre2[i],
+                    respectsAtPost1[i],
+                    respectsAtPost2[i],
+                    declassifies1,
+                    declassifies2);
+        }        
 
         return d.tb.and(relations);
     }
@@ -109,15 +116,17 @@ class InfFlowPostSnippet extends ReplaceAnRegisterMethod implements InfFlowFacto
         final Term mainInputEqRelation =
                 buildMainInputEqualsRelation(d, vs1, vs2, referenceLocSet1,
                                              referenceLocSet2);
-        final Term[] declassifiesRelations =
+        Term[] declassifiesRelations = null;
+        if(!(d.contract instanceof LoopInvariant)) {
+            declassifiesRelations =
                 buildDeclassifiesRelations(d, referenceLocSet1, declassClause1,
-                                           referenceLocSet2, declassClause2);
-
+                        referenceLocSet2, declassClause2);
+        }
         ImmutableList<Term> inputRelations =
                 ImmutableSLList.<Term>nil();
         inputRelations = inputRelations.append(mainInputEqRelation);
-        inputRelations = inputRelations.append(declassifiesRelations);
-
+        if(!(d.contract instanceof LoopInvariant))
+            inputRelations = inputRelations.append(declassifiesRelations);
         return d.tb.and(inputRelations);
     }
 
@@ -131,17 +140,23 @@ class InfFlowPostSnippet extends ReplaceAnRegisterMethod implements InfFlowFacto
         Term framingLocs1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
         Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
 
-        Term[] eqAtLocs = new Term[respects1.length];
+        Term[] eqAtLocs = new Term[respects1.length];        
         for (int i = 0; i < eqAtLocs.length; i++) {
-            SearchVisitor search = new SearchVisitor(vs1.resultsAtPost.head());
-            respects1[i].execPreOrder(search);
-            if (!search.termFound) {
-                // refLocTerms which contain \result are not included in
-                // the precondition
-                eqAtLocs[i] = d.tb.equals(respects1[i], respects2[i]);
-            } else {
-                eqAtLocs[i] = d.tb.tt();
-            }
+            ImmutableList<SearchVisitor> searchList = ImmutableSLList.<SearchVisitor>nil();
+            SearchVisitor search = null;
+            eqAtLocs[i] = d.tb.ff();
+            for(Term res : vs1.resultsAtPost) {
+                search = new SearchVisitor(res);
+                searchList = searchList.append(search);
+                respects1[i].execPreOrder(search);
+                if (!search.termFound) {
+                    // refLocTerms which contain \result are not included in
+                    // the precondition
+                    eqAtLocs[i] = d.tb.or(eqAtLocs[i], d.tb.equals(respects1[i], respects2[i]));
+                } else {
+                    eqAtLocs[i] = d.tb.or(eqAtLocs[i], d.tb.tt());
+                }
+            }            
         }
         return d.tb.and(eqAtLocs);
     }

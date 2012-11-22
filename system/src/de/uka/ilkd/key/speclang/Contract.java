@@ -140,7 +140,7 @@ public interface Contract extends SpecificationElement {
     
     
     /**
-     * Returns a contract which is identical this contract except that
+     * Returns a contract which is identical to this contract except that
      * the KeYJavaType and IObserverFunction are set to the new values.
      */
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM);

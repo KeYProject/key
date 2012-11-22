@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.speclang.Contract;
 
 /**
  * Generate term "self != null".
@@ -19,7 +20,7 @@ class BasicMbyAtPreDefSnippet extends ReplaceAnRegisterMethod
     public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        if (!d.contract.hasMby()) {
+        if (!((Contract) d.contract).hasMby()) {
             return d.tb.tt();
         }
 

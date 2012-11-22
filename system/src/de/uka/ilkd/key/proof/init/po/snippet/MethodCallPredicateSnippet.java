@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -16,7 +18,8 @@ import de.uka.ilkd.key.util.MiscTools;
 class MethodCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
 
     @Override
-    String generatePredicateName(IProgramMethod pm) {
+    String generatePredicateName(SpecificationElement contract) {
+        IProgramMethod pm = (IProgramMethod) ((Contract) contract).getTarget();
         String nameString =
                 MiscTools.toValidTacletName("RELATED_BY_" + pm.getFullName()).toString();
         return nameString;

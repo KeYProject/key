@@ -2,6 +2,8 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 
 
 /**
@@ -24,6 +26,7 @@ class InfFlowContractAppSnippet extends ReplaceAnRegisterMethod
 
         Term preCond1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
         Term preCond2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
+        
 
         InfFlowPOSnippetFactory iff =
                 POSnippetFactory.getInfFlowFactory(d, poVars1, poVars2);

@@ -29,6 +29,9 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.LoopInvariant;
+
 import java.util.Iterator;
 
 /**
@@ -129,52 +132,66 @@ class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
             ProgramVariable selfVar,
             ProgramVariable resultVar,
             ProgramVariable exceptionVar) {
-        if (!(d.contract.getTarget() instanceof IProgramMethod)) {
-            throw new UnsupportedOperationException("Tried to produce a "
-                    + "java-block for an observer which is no progam method.");
-        }
         JavaInfo javaInfo = d.tb.getServices().getJavaInfo();
-        IProgramMethod pm = (IProgramMethod) d.contract.getTarget();
+        IProgramMethod pm = null;
+        if (d.contract instanceof Contract) {
+            if (!(((Contract) d.contract).getTarget() instanceof IProgramMethod)) {
+                throw new UnsupportedOperationException("Tried to produce a "
+                        + "java-block for an observer which is no program method.");
+            }
+            pm = (IProgramMethod) ((Contract) d.contract).getTarget();
+        }
+        else if (d.contract instanceof LoopInvariant) {
+            if (!(((LoopInvariant) d.contract).getTarget() != null)) {
+                throw new UnsupportedOperationException("Tried to produce a "
+                        + "java-block for an observer which is no program method.");
+            }
+            pm = (IProgramMethod) ((LoopInvariant) d.contract).getTarget();
+        }
+        else {
+            throw new UnsupportedOperationException("Tried to produce a "
+                    + "java-block for an observer without a contract.");
+        }
 
         //create method call
         final ImmutableArray<Expression> formalArray =
-                new ImmutableArray<Expression>(formalParVars.toArray(
-                new ProgramVariable[formalParVars.size()]));
+            new ImmutableArray<Expression>(formalParVars.toArray(
+                    new ProgramVariable[formalParVars.size()]));
         final StatementBlock sb;
         if (pm.isConstructor()) {
             assert selfVar != null;
             assert resultVar == null;
             final Expression[] formalArray2 =
-                    formalArray.toArray(new Expression[formalArray.size()]);
+                formalArray.toArray(new Expression[formalArray.size()]);
             final New n =
-                    new New(formalArray2, new TypeRef(d.contract.getKJT()),
-                            null);
+                new New(formalArray2, new TypeRef(d.contract.getKJT()),
+                        null);
             final CopyAssignment ca = new CopyAssignment(selfVar, n);
             sb = new StatementBlock(ca);
         } else {
             final MethodBodyStatement call =
-                    new MethodBodyStatement(pm, selfVar, resultVar, formalArray);
+                new MethodBodyStatement(pm, selfVar, resultVar, formalArray);
             sb = new StatementBlock(call);
         }
 
         //create variables for try statement
         final KeYJavaType eType =
-                javaInfo.getTypeByClassName("java.lang.Exception");
+            javaInfo.getTypeByClassName("java.lang.Exception");
         final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
         final ProgramElementName ePEN = new ProgramElementName("e");
         final ProgramVariable eVar = new LocationVariable(ePEN, eType);
 
         //create try statement
         final CopyAssignment nullStat =
-                new CopyAssignment(exceptionVar, NullLiteral.NULL);
+            new CopyAssignment(exceptionVar, NullLiteral.NULL);
         final VariableSpecification eSpec = new VariableSpecification(eVar);
         final ParameterDeclaration excDecl =
-                new ParameterDeclaration(new Modifier[0], excTypeRef, eSpec,
-                                         false);
+            new ParameterDeclaration(new Modifier[0], excTypeRef, eSpec,
+                    false);
         final CopyAssignment assignStat =
-                new CopyAssignment(exceptionVar, eVar);
+            new CopyAssignment(exceptionVar, eVar);
         final Catch catchStat =
-                new Catch(excDecl, new StatementBlock(assignStat));
+            new Catch(excDecl, new StatementBlock(assignStat));
         final Try tryStat = new Try(sb, new Branch[]{catchStat});
         final StatementBlock sb2 = new StatementBlock(
                 new Statement[]{nullStat, tryStat});

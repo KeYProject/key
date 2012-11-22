@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -16,9 +18,10 @@ import de.uka.ilkd.key.util.MiscTools;
 class MethodCallWithPreconditionPredicateSnippet extends TwoStateMethodPredicateSnippet {
 
     @Override
-    String generatePredicateName(IProgramMethod pm) {
-        String nameSting =
+    String generatePredicateName(SpecificationElement contract) {
+        IProgramMethod pm = (IProgramMethod) ((Contract) contract).getTarget();
+        String nameString =
                 MiscTools.toValidTacletName("EXECUTION_OF_" + pm.getFullName() + "_WITH_PRE").toString();
-        return nameSting;
+        return nameString;
     }
 }

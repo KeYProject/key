@@ -23,13 +23,7 @@ class BasicSnippetData {
     /**
      * The contract for which the snippets are produced.
      */
-    final Contract contract;
-    
-    /**
-     * The loop invariant for which the snippets are produced (then contract is set to null).
-     */
-    final LoopInvariant invariant;
-    // FIXME: Until now this is a workaround, has to be done more nicely!
+    final SpecificationElement contract;    
     
     /**
      * Variables originally used during parsing.
@@ -67,7 +61,8 @@ class BasicSnippetData {
         MEASURED_BY (Term.class),
         MODALITY (Modality.class),
         RESPECTS (Term[][].class),
-        DECLASSIFIES (Term[][].class);
+        DECLASSIFIES (Term[][].class),
+        EXECUTIONCONTEXT (Term.class);
 
         private final Class type;
         Key(Class type) {
@@ -83,7 +78,6 @@ class BasicSnippetData {
     BasicSnippetData(FunctionalOperationContract contract,
                      Services services) {
         this.contract = contract;
-        this.invariant = null;
         this.tb = new TermBuilder.Serviced(services);
 
         contractContents.put(Key.PRECONDITION, contract.getPre());
@@ -100,16 +94,16 @@ class BasicSnippetData {
     }
     
     BasicSnippetData(LoopInvariant invariant, Services services) {
-        this.invariant = invariant;
-        this.contract = null;
+        this.contract = invariant;
         this.tb = new TermBuilder.Serviced(services);
         
         contractContents.put(Key.PRECONDITION, invariant);
-        contractContents.put(Key.POSTCONDITION, null);
+        //contractContents.put(Key.POSTCONDITION, null);
         contractContents.put(Key.MODIFIES, invariant.getModifies());
         contractContents.put(Key.MEASURED_BY, null);
         contractContents.put(Key.MODALITY, null);
-
+        contractContents.put(Key.RESPECTS,
+                             doubleListToArray(invariant.getRespects(services)));
         
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         origVars = new ProofObligationVars(invariant.getInternalSelfTerm(), null,
@@ -122,7 +116,6 @@ class BasicSnippetData {
     BasicSnippetData(InformationFlowContract contract,
                      Services services) {
         this.contract = contract;
-        this.invariant = null;
         this.tb = new TermBuilder.Serviced(services);
 
         

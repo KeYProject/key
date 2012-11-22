@@ -14,9 +14,12 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 
@@ -30,7 +33,13 @@ public interface LoopInvariant extends SpecificationElement {
      * Returns the loop to which the invariant belongs.
      */
     public LoopStatement getLoop();
-
+    
+    /**
+     * Returns the contracted function symbol.
+     */
+    public IProgramMethod getTarget();
+    
+    public ExecutionContext getExecutionContext();
     
     /** Returns the invariant formula. */
     public Term getInvariant(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
@@ -95,7 +104,11 @@ public interface LoopInvariant extends SpecificationElement {
      * Returns a new loop invariant where the loop reference has been
      * replaced with the passed one.
      */
-    public LoopInvariant setLoop(LoopStatement loop); 
+    public LoopInvariant setLoop(LoopStatement loop);
+    
+    public void setTarget(IProgramMethod newPM);
+    
+    public void setExecutionContext(ExecutionContext execCont);
     
     /**
      * Returns a new loop invariant where the invariant formula has been

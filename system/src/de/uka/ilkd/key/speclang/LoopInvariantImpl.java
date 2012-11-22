@@ -18,11 +18,14 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 
@@ -32,6 +35,8 @@ import de.uka.ilkd.key.proof.OpReplacer;
 public final class LoopInvariantImpl implements LoopInvariant {
         
     private final LoopStatement loop;
+    private IProgramMethod pm;
+    private ExecutionContext innermostExecCont;
     private final Map<LocationVariable,Term> originalInvariants;
     private final Map<LocationVariable,Term> originalModifies;
     private final Map<LocationVariable,ImmutableList<ImmutableList<Term>>> originalRespects;
@@ -69,6 +74,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
         //assert modifies != null;
         //assert heapAtPre != null;
         this.loop                       = loop;
+        this.pm                         = null;
+        this.innermostExecCont          = null;
         this.originalInvariants         = invariants == null ? new LinkedHashMap<LocationVariable,Term>() : invariants;
         this.originalVariant            = variant;
         this.originalModifies           = modifies == null ? new LinkedHashMap<LocationVariable,Term>() : modifies;
@@ -175,6 +182,16 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public LoopStatement getLoop() {
         return loop;
+    }
+    
+    @Override
+    public IProgramMethod getTarget() {
+        return pm;
+    }
+    
+    @Override
+    public ExecutionContext getExecutionContext() {
+        return innermostExecCont;
     }
 
     @Override    
@@ -304,6 +321,15 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                      originalAtPres);
     }
     
+    @Override
+    public void setTarget(IProgramMethod newPM) {
+        this.pm = newPM;
+    }
+    
+    @Override
+    public void setExecutionContext(ExecutionContext execCont) {
+        this.innermostExecCont = execCont;
+    }
     
     @Override
     public LoopInvariant setInvariant(Map<LocationVariable,Term> invariants, 

@@ -15,6 +15,8 @@ import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
+import de.uka.ilkd.key.speclang.LoopInvariant;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -61,6 +63,29 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
         // register final term
         assignPOTerms(TB.imp(selfComposedExec, post));
         collectClassAxioms(contract.getKJT());
+    }
+    
+    
+    //@Override
+    public Term buildProblem(LoopInvariant loopInv, ProofObligationVars appData, Services services)
+    throws ProofInputException {
+        IFProofObligationVars ifVars = new IFProofObligationVars(loopInv.getTarget(),
+                                                                 loopInv.getKJT(),
+                                                                 appData, services);
+        // create proof obligation        
+        InfFlowPOSnippetFactory f =
+            POSnippetFactory.getInfFlowFactory(loopInv, ifVars.c1,
+                                               ifVars.c2, services);
+        Term selfComposedExec =
+            f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
+        Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_POST);
+        
+        Term poTerms = TB.imp(selfComposedExec, post);
+        
+        // register final term
+        //assignPOTerms(poTerms);
+        //collectClassAxioms(contract.getKJT());
+        return poTerms;
     }
 
 
