@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -30,10 +29,14 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.strategy.LongRuleAppCost;
+import de.uka.ilkd.key.strategy.RuleAppCost;
+import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 
-public class InfFlowContractAppFeature extends BinaryTacletAppFeature {
+public class InfFlowContractAppFeature implements Feature {
 
     public static final Feature INSTANCE = new InfFlowContractAppFeature();
 
@@ -174,9 +177,9 @@ public class InfFlowContractAppFeature extends BinaryTacletAppFeature {
      * we have reached a point where the formula containing the focus no longer
      * occurs in the sequent
      */
-    protected boolean noDuplicateFindTaclet(TacletApp app,
-                                            PosInOccurrence pos,
-                                            Goal goal) {
+    protected boolean duplicateFindTaclet(TacletApp app,
+                                          PosInOccurrence pos,
+                                          Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert app.ifFormulaInstantiations().size() >= 1 :
                 "Featureis only applicable to rules with at least one assumes.";
@@ -193,9 +196,8 @@ public class InfFlowContractAppFeature extends BinaryTacletAppFeature {
         int assumesPos =
                 goal.node().sequent().formulaNumberInSequent(antec, assumesFor);
         if (focusPos <= assumesPos) {
-            return false;
+            return true;
         }
-
 
         Node node = goal.node();
 
@@ -210,47 +212,70 @@ public class InfFlowContractAppFeature extends BinaryTacletAppFeature {
                 final Sequent pseq = par.sequent();
                 if (antec) {
                     if (!semiSequentContains(pseq.antecedent(), focusFor)) {
-                        return true;
+                        return false;
                     }
                 } else {
                     if (!semiSequentContains(pseq.succedent(), focusFor)) {
-                        return true;
+                        return false;
                     }
                 }
             }
 
             if (sameApplication(par.getAppliedRuleApp(), app, pos)) {
-                return false;
+                return true;
             }
 
             node = par;
         }
 
-        return true;
+        return false;
     }
 
 
     @Override
-    public boolean filter(TacletApp app,
-                          PosInOccurrence pos,
-                          Goal goal) {
+    public RuleAppCost compute(RuleApp ruleApp,
+                               PosInOccurrence pos,
+                               Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
+        assert ruleApp instanceof TacletApp : "Feature is only applicable " +
+                                              "to Taclets.";
+        TacletApp app = (TacletApp) ruleApp;
 
         if (!app.ifInstsComplete()) {
-            return true;
+            return LongRuleAppCost.ZERO_COST;
         }
-        if (app.ifFormulaInstantiations().size() < 1) {
-            return false;
+        
+        if (app.ifFormulaInstantiations().size() < 1 ||
+            !appOnDiffernetExecs(goal) ||
+            duplicateFindTaclet(app, pos, goal)) {
+            return TopRuleAppCost.INSTANCE;
         }
 
-        return appOnDiffernetExecs(app, pos, goal) &&
-               noDuplicateFindTaclet(app, pos, goal);
+        // only relate the n-th called method in execution A with the n-th
+        // called method in execution B automatically
+        final SequentFormula focusFor = pos.constrainedFormula();
+        final SequentFormula assumesFor =
+                app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
+
+        ArrayList<SequentFormula> relatesTerms = getRelatesTerms(goal);
+        final int numOfContractAppls = relatesTerms.size() / 2;
+        int assumesApplNumber = 0;
+        for (int i = 0; i < numOfContractAppls; i++) {
+            if (relatesTerms.get(i).equals(assumesFor)) {
+                assumesApplNumber = i;
+                break;
+            }
+        }
+        final int findApplNumber = assumesApplNumber + numOfContractAppls;
+        if (!relatesTerms.get(findApplNumber).equals(focusFor)) {
+            return TopRuleAppCost.INSTANCE;
+        }
+
+        return LongRuleAppCost.create(assumesApplNumber);
     }
 
 
-    private boolean appOnDiffernetExecs(TacletApp app,
-                                        PosInOccurrence pos,
-                                        Goal goal) {
+    private boolean appOnDiffernetExecs(Goal goal) {
         Proof proof = goal.proof();
         ContractPO po =
                 proof.getServices().getSpecificationRepository().getPOForProof(proof);
@@ -258,17 +283,17 @@ public class InfFlowContractAppFeature extends BinaryTacletAppFeature {
             return false;
         }
         return true;
+    }
 
-//        assert pos != null : "Feature is only applicable to rules with find.";
-//        assert app.ifFormulaInstantiations().size() >= 1 :
-//                "Featureis only applicable to rules with at least one assumes.";
-//
-//        final Term focusFor = pos.constrainedFormula().formula();
-//        final boolean antec = pos.isInAntec();
-//        final Term assumesFor =
-//                app.ifFormulaInstantiations().iterator().next().getConstrainedFormula().formula();
-//
-//        return focusFor.sub(focusFor.arity() - 1).toString();
 
+    private ArrayList<SequentFormula> getRelatesTerms(Goal goal) {
+        ArrayList<SequentFormula> list = new ArrayList<SequentFormula>();
+        Semisequent antecedent = goal.node().sequent().antecedent();
+        for (SequentFormula f : antecedent) {
+            if (f.formula().op().toString().startsWith("RELATED_BY_")) {
+                list.add(f);
+            }
+        }
+        return list;
     }
 }
