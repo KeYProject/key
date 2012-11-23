@@ -457,7 +457,7 @@ public class BlockContractRule implements BuiltInRule {
             for (Map.Entry<LocationVariable, Function> anonymisationHeap : anonymisationHeaps.entrySet()) {
                 Term anonymisationUpdate = skip();
                 final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
-                if (!modifiesClause.equals(lessThanNothing())) {
+                if (!modifiesClause.equals(strictlyNothing())) {
                     anonymisationUpdate = anonUpd(anonymisationHeap.getKey(), modifiesClause, func(anonymisationHeap.getValue()));
                 }
                 result = parallel(result, anonymisationUpdate);
@@ -572,7 +572,7 @@ public class BlockContractRule implements BuiltInRule {
             for (LocationVariable heap : heaps) {
                 final Term modifiesClause = modifiesClauses.get(heap);
                 final Term frameCondition;
-                if (modifiesClause.equals(lessThanNothing()) && heap == getBaseHeap()) {
+                if (modifiesClause.equals(strictlyNothing()) && heap == getBaseHeap()) {
                     frameCondition = frameStrictlyEmpty(var(heap), remembranceVariables.get(heap));
                 }
                 else {

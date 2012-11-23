@@ -157,7 +157,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	
 	// check for strictly pure loops
 	final Term anonUpdate;
-	if(TB.lessThanNothing().equals(mod)) {
+	if(TB.strictlyNothing().equals(mod)) {
 	    anonUpdate = TB.skip();
 	} else {
 	    anonUpdate = TB.anonUpd(heap, services, mod, anonHeapTerm);
@@ -313,7 +313,7 @@ public final class WhileInvariantRule implements BuiltInRule {
           }
           final Term m = mods.get(heap);
           final Term fc;
-          if(TB.lessThanNothing().equals(m) && heap == services.getTypeConverter().getHeapLDT().getHeap()) {
+          if(TB.strictlyNothing().equals(m) && heap == services.getTypeConverter().getHeapLDT().getHeap()) {
             fc = TB.frameStrictlyEmpty(services, TB.var(heap), heapToBeforeLoop.get(heap)); 
           }else{
             fc = TB.frame(services, TB.var(heap), heapToBeforeLoop.get(heap), m);
