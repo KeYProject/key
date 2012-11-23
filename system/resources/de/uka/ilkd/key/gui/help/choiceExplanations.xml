@@ -37,7 +37,7 @@ Specifies whether static (class loading) initialization should be
 taken in consideration.
 
 Both specifications and proof obligations become significantly more
-difficult since class loading make take place at many places.
+difficult since class loading may take place at many places.
 </entry>
 
 <entry key="intRules">

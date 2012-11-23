@@ -30,8 +30,8 @@ A dependency contract provides a limit for the heap locations an observer symbol
 If the heap changes in locations the symbol does not depend on, it's value remains unchanged.
 This can be used by adding the necessary conditions and an equality assumption to the sequent.
 In automatic strategy, this rule is applied lazily to avoid endless loops.</entry>
-<entry key="Block Contract">Block contract
-50</entry>
+<entry key="Block Contract">Similar to method contracts, blocks in Java can be annotated with block contracts.
+The precondition and validity check create new proof obligations and the postcondition can be used. (?)</entry>
 <entry key="Loop Invariant">
 Loops can be handled by expanding or by using a loop invariant.
 An invariant can be created manually or supplied by the JML specification.</entry>
