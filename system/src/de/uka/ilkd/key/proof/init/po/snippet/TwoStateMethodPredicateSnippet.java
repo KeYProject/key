@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
@@ -13,6 +14,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -32,6 +34,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
+//<<<<<<< HEAD
         IProgramMethod pm = null;
         Function contApplPred = null;
         if (d.contract instanceof Contract) {
@@ -53,46 +56,39 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         IProgramMethod pm = (IProgramMethod) contract.getTarget();
         final Name name = new Name(nameString);
         final JavaInfo javaInfo = tb.getServices().getJavaInfo();
+/*=======
+        IObserverFunction targetMethod =
+                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
+        final IProgramMethod pm = (IProgramMethod) targetMethod;
+        StatementBlock targetBlock =
+                (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
+        String nameString = generatePredicateName(pm, targetBlock);
+        final Function contApplPred =
+                generateContApplPredicate(nameString, poVars.termList, d.tb);
+        return instantiateContApplPredicate(contApplPred, poVars, d.tb);
+    }
+
+
+    private Function generateContApplPredicate(String nameString,
+                                               ImmutableList<Term> termList,
+                                               TermBuilder.Serviced tb) {
+        final Name name = new Name(nameString);
+>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6*/
         final Namespace functionNS =
                 tb.getServices().getNamespaces().functions();
         Function pred = (Function) functionNS.lookup(name);
 
         if (pred == null) {
-            // Arguments: params, heapAtPre, exception, heapAtPost
-            int length = pm.getParamTypes().size() + 3;
-            if (!pm.isStatic()) {
-                // Arguments: + self
-                length++;
-            }
-            if (!pm.isVoid() && !pm.isConstructor()) {
-                // Arguments: + result
-                length++;
-            }
-            Sort[] predArgSorts =
-                    new Sort[length];
+            Sort[] argSorts =
+                    new Sort[termList.size()];
 
             int i = 0;
-            if (!pm.isStatic()) {
-                // type of self
-                predArgSorts[i++] = pm.getContainerType().getSort();
+            for (Term arg : termList) {
+                argSorts[i] = arg.sort();
+                i++;
             }
-            // types of params
-            for (KeYJavaType t : pm.getParamTypes()) {
-                predArgSorts[i++] = t.getSort();
-            }
-            // type of heapAtPre
-            predArgSorts[i++] = tb.getBaseHeap().sort();
-            if (!pm.isVoid() && !pm.isConstructor()) {
-                // type of result
-                predArgSorts[i++] = pm.getReturnType().getSort();
-            }
-            // type of exception
-            predArgSorts[i++] =
-                    javaInfo.getTypeByClassName("java.lang.Exception").getSort();
-            // type of heapAtPost
-            predArgSorts[i++] = tb.getBaseHeap().sort();
 
-            pred = new Function(name, Sort.FORMULA, predArgSorts);
+            pred = new Function(name, Sort.FORMULA, argSorts);
             tb.getServices().getNamespaces().functions().addSafely(pred);
         }
         return pred;
@@ -148,35 +144,29 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
     private Term instantiateContApplPredicate(Function pred,
                                               ProofObligationVars appData,
-                                              IProgramMethod pm,
                                               TermBuilder.Serviced tb) {
         Sort[] predArgSorts = new Sort[pred.argSorts().size()];
         pred.argSorts().toArray(predArgSorts);
         Term[] predArgs = new Term[predArgSorts.length];
 
         int i = 0;
-        ImmutableList<Term> params = appData.params;
-
-        if (!pm.isStatic()) {
-            // self
-            predArgs[i++] = appData.self;
+        for (Term arg : appData.termList) {
+            predArgs[i] = arg;
+            i++;
         }
-        // params
-        for (KeYJavaType t : pm.getParamTypes()) {
-            predArgSorts[i] = t.getSort();
-            predArgs[i++] = params.head();
-            params = params.tail();
-        }
+//<<<<<<< HEAD
         // heapAtPre
         predArgs[i++] = appData.heapAtPre;
         if (!pm.isVoid() && !pm.isConstructor()) {
             // result
-            predArgs[i++] = appData.results.head();
+            predArgs[i++] = appData.result;// .results.head();
         }
         // exception
         predArgs[i++] = appData.exception;
         // heapAtPost
         predArgs[i++] = appData.heapAtPost;
+/*=======
+>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6*/
 
         return tb.func(pred, predArgs);
     }
@@ -191,15 +181,15 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         Term[] predArgs = new Term[predArgSorts.length];
 
         int i = 0;
-        ImmutableList<Term> params = appData.params;
-        ImmutableList<Term> results = appData.results;
+        ImmutableList<Term> params = appData.localIns;//.params;
+        ImmutableList<Term> results = appData.localOuts;//.results;
 
         if (!pm.isStatic()) {
             // self
             predArgs[i++] = appData.self;
         }
         // params
-        for (Term t : appData.params) {
+        for (Term t : params) {
             predArgSorts[i] = t.sort();
             predArgs[i++] = params.head();
             params = params.tail();
@@ -210,7 +200,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
             // result
         //    predArgs[i++] = appData.results.head();
         //}
-        for (Term t : appData.results) {
+        for (Term t : results) {
             predArgSorts[i] = t.sort();
             predArgs[i++] = results.head();
             params = results.tail();
@@ -223,6 +213,11 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
 
+//<<<<<<< HEAD
     abstract String generatePredicateName(SpecificationElement contract);
 
+//=======
+    abstract String generatePredicateName(IProgramMethod pm,
+                                          StatementBlock block);
+//>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6
 }

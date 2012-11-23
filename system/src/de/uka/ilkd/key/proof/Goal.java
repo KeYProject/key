@@ -561,6 +561,38 @@ public final class Goal  {
 	return goalList;
     }
 
+    /**
+     * Creates a new node as child of the referenced node which is initialised
+     * with the passed Sequent. A new goal that has a reference to this
+     * new node is created in addition. Please be aware that 'this' is not
+     * changed. Therefore it is neccessary to call split(n) afterwards inorder
+     * to create new 'normal' subgoals. In any way, normally you want to call
+     * split(n) instead of this method (or you know what you are doing!).
+     * <p/>
+     * @return the new goal.
+     */
+    public Goal getCleanGoal(Sequent seq) {
+        Node parent = node();
+
+        // create new node and add to tree
+        Node newNode = new Node(parent.proof(),
+                                seq,
+                                null,
+                                parent);
+
+        // newNode.addNoPosTacletApps(parent.getNoPosTacletApps());
+        newNode.setGlobalProgVars(parent.getGlobalProgVars());
+        parent.add(newNode);
+
+        // make new Goal
+        Goal newGoal = copy();
+        newGoal.ruleAppManager.clearCache();
+        newGoal.ruleAppIndex.clearIndexes();
+        newGoal.setNode(newNode);
+
+        return newGoal;
+    }
+
     private void resetTagManager() {
     
         tagManager = new FormulaTagManager ( this );

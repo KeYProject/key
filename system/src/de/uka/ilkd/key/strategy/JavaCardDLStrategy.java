@@ -518,7 +518,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         }
 
         bindRuleSet(d, "information_flow_contract_appl",
-                    add(InfFlowContractAppFeature.INSTANCE, longConst(400)));
+                    add(InfFlowContractAppFeature.INSTANCE, longConst(-500)));
         
         return d;
     }

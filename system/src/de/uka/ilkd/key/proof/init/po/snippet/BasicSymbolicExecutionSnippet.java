@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -38,7 +39,7 @@ import java.util.Iterator;
  *
  * @author christoph
  */
-class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
+class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
         implements FactoryMethod {
 
     @Override
@@ -49,9 +50,9 @@ class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
         if (poVars.selfAtPost != null) {
             posts = posts.append(d.tb.equals(poVars.selfAtPost, poVars.self));
         }
-        if (poVars.resultsAtPost != null) {
-            posts = posts.append(d.tb.equals(poVars.resultsAtPost.head(),
-                                             poVars.results.head()));
+        if (poVars.resultAtPost != null) {
+            posts = posts.append(d.tb.equals(poVars.resultAtPost,
+                                             poVars.result));
         }
         posts = posts.append(d.tb.equals(poVars.exceptionAtPost,
                                          poVars.exception));
@@ -64,19 +65,19 @@ class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
                                   ProofObligationVars vs,
                                   Term postTerm,
                                   TermBuilder.Serviced tb) {
-        if (d.getContractContent(BasicSnippetData.Key.MODALITY) == null) {
+        if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException("Tried to produce a "
-                    + "precondition for a contract without precondition.");
+                    + "program-term for a contract without modality.");
         }
         assert Modality.class.equals(BasicSnippetData.Key.MODALITY.getType());
-        Modality modality = (Modality) d.getContractContent(
+        Modality modality = (Modality) d.get(
                 BasicSnippetData.Key.MODALITY);
 
 
         //create formal parameters
         ImmutableList<LocationVariable> formalParamVars =
                 ImmutableSLList.<LocationVariable>nil();
-        for (Term param : vs.params) {
+        for (Term param : vs.localIns) {
             ProgramVariable paramVar = param.op(ProgramVariable.class);
             ProgramElementName pen = new ProgramElementName("_"
                     + paramVar.name());
@@ -87,13 +88,12 @@ class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
         }
 
         //create java block
-        Term result = vs.results.head();
         final JavaBlock jb = buildJavaBlock(d, formalParamVars,
                                             vs.self != null
                                             ? vs.self.op(ProgramVariable.class)
                                             : null,
-                                            result != null
-                                            ? result.op(ProgramVariable.class)
+                                            vs.result != null
+                                            ? vs.result.op(ProgramVariable.class)
                                             : null,
                                             vs.exception != null
                                             ? vs.exception.op(
@@ -104,19 +104,15 @@ class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
         final Modality symbExecMod;
         if (modality == Modality.BOX) {
             symbExecMod = Modality.DIA;
-        } else if (modality == Modality.DIA) {
-            symbExecMod = Modality.BOX;
-        } else if (modality == Modality.BOX_TRANSACTION) {
-            symbExecMod = Modality.DIA_TRANSACTION;
         } else {
-            symbExecMod = Modality.BOX_TRANSACTION;
+            symbExecMod = Modality.BOX;
         }
         final Term programTerm = tb.prog(symbExecMod, jb, postTerm);
 
         //create update
         Term update = tb.skip();
         Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
-        Iterator<Term> paramIt = vs.params.iterator();
+        Iterator<Term> paramIt = vs.localIns.iterator();
         while (formalParamIt.hasNext()) {
             Term paramUpdate = tb.elementary(formalParamIt.next(),
                                              paramIt.next());
@@ -132,6 +128,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
             ProgramVariable selfVar,
             ProgramVariable resultVar,
             ProgramVariable exceptionVar) {
+/*<<<<<<< HEAD
         JavaInfo javaInfo = d.tb.getServices().getJavaInfo();
         IProgramMethod pm = null;
         if (d.contract instanceof Contract) {
@@ -149,9 +146,19 @@ class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
             pm = (IProgramMethod) ((LoopInvariant) d.contract).getTarget();
         }
         else {
+=======*/
+        IObserverFunction targetMethod =
+                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
+        if (!(targetMethod instanceof IProgramMethod)) {
+//>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6
             throw new UnsupportedOperationException("Tried to produce a "
                     + "java-block for an observer without a contract.");
         }
+/*<<<<<<< HEAD
+=======*/
+        JavaInfo javaInfo = d.tb.getServices().getJavaInfo();
+        IProgramMethod pm = (IProgramMethod) targetMethod;
+//>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6
 
         //create method call
         final ImmutableArray<Expression> formalArray =
@@ -163,9 +170,17 @@ class BasicSymbolicExecutionSnippet extends ReplaceAnRegisterMethod
             assert resultVar == null;
             final Expression[] formalArray2 =
                 formalArray.toArray(new Expression[formalArray.size()]);
+/*<<<<<<< HEAD            
             final New n =
                 new New(formalArray2, new TypeRef(d.contract.getKJT()),
                         null);
+=======*/
+            KeYJavaType forClass =
+                    (KeYJavaType) d.get(BasicSnippetData.Key.FOR_CLASS);
+            final New n =
+                    new New(formalArray2, new TypeRef(forClass),
+                            null);
+//>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6
             final CopyAssignment ca = new CopyAssignment(selfVar, n);
             sb = new StatementBlock(ca);
         } else {

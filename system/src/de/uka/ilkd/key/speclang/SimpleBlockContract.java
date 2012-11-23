@@ -4,6 +4,8 @@ import java.util.*;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -35,6 +37,9 @@ public final class SimpleBlockContract implements BlockContract {
     private final Map<LocationVariable, Term> preconditions;
     private final Map<LocationVariable, Term> postconditions;
     private final Map<LocationVariable, Term> modifiesClauses;
+    private final ImmutableList<ImmutableList<Term>> respects;
+    private final ImmutableList<ImmutableList<Term>> declassifies;
+
 
     private final Variables variables;
 
@@ -49,6 +54,8 @@ public final class SimpleBlockContract implements BlockContract {
                                final Map<LocationVariable, Term> preconditions,
                                final Map<LocationVariable, Term> postconditions,
                                final Map<LocationVariable, Term> modifiesClauses,
+                               final ImmutableList<ImmutableList<Term>> respects,
+                               final ImmutableList<ImmutableList<Term>> declassifies,
                                final Variables variables,
                                final boolean transactionApplicable,
                                final boolean hasMod)
@@ -72,6 +79,8 @@ public final class SimpleBlockContract implements BlockContract {
         this.preconditions = preconditions;
         this.postconditions = postconditions;
         this.modifiesClauses = modifiesClauses;
+        this.respects = respects;
+        this.declassifies = declassifies;
         this.variables = variables;
         this.transactionApplicable = transactionApplicable;
         this.hasMod = hasMod;
@@ -131,8 +140,20 @@ public final class SimpleBlockContract implements BlockContract {
     public boolean hasModifiesClause() {
         return hasMod;
     }
-    
-    
+
+
+    @Override
+    public Variables getVariables() {
+        return variables;
+    }
+
+
+    @Override
+    public Terms getVariablesAsTerms() {
+        return variables.termify();
+    }
+
+
     @Override
     public Term getPrecondition(final LocationVariable heap,
                                 final ProgramVariable self,
@@ -237,6 +258,31 @@ public final class SimpleBlockContract implements BlockContract {
         return getModifiesClause(heap, variables.self, services);
     }
 
+
+    @Override
+    public Term getPre(Services services) {
+        return preconditions.get(services.getTypeConverter().getHeapLDT().getHeap());
+    }
+
+
+    @Override
+    public Term getMod(Services services) {
+        return modifiesClauses.get(services.getTypeConverter().getHeapLDT().getHeap());
+    }
+
+
+    @Override
+    public ImmutableList<ImmutableList<Term>> getRespects() {
+        return respects;
+    }
+
+
+    @Override
+    public ImmutableList<ImmutableList<Term>> getDeclassifies() {
+        return declassifies;
+    }
+
+
     @Override
     public void visit(final Visitor visitor)
     {
@@ -329,10 +375,15 @@ public final class SimpleBlockContract implements BlockContract {
                                 final Map<LocationVariable,Term> newPreconditions,
                                 final Map<LocationVariable,Term> newPostconditions,
                                 final Map<LocationVariable,Term> newModifiesClauses,
+                                final ImmutableList<ImmutableList<Term>> newRespects,
+                                final ImmutableList<ImmutableList<Term>> newDeclassifies,
                                 final Variables newVariables)
     {
-        return new SimpleBlockContract(newBlock, labels, method, modality, newPreconditions, newPostconditions,
-                                       newModifiesClauses, newVariables, transactionApplicable, hasMod);
+        return new SimpleBlockContract(newBlock, labels, method, modality,
+                                       newPreconditions, newPostconditions,
+                                       newModifiesClauses, newRespects,
+                                       newDeclassifies, newVariables,
+                                       transactionApplicable, hasMod);
     }
 
     // TODO Implement equals and hashCode properly.
@@ -386,6 +437,19 @@ public final class SimpleBlockContract implements BlockContract {
         result.replaceRemembranceLocalVariables(variables.remembranceLocalVariables, newTerms.remembranceLocalVariables);
         return result;
     }
+
+
+    @Override
+    public boolean hasMby() {
+        return false;
+    }
+
+
+    @Override
+    public IProgramMethod getTarget() {
+        return method;
+    }
+
 
     private abstract static class ReplacementMap<S extends Sorted> extends LinkedHashMap<S, S> {
 
@@ -486,6 +550,8 @@ public final class SimpleBlockContract implements BlockContract {
         private final Variables variables;
         private final Map<LocationVariable, Term> requires;
         private final Map<LocationVariable, Term> ensures;
+        private final ImmutableList<ImmutableList<Term>> respects;
+        private final ImmutableList<ImmutableList<Term>> declassifies;
         private final Map<Label, Term> breaks;
         private final Map<Label, Term> continues;
         private final Term returns;
@@ -503,6 +569,8 @@ public final class SimpleBlockContract implements BlockContract {
                        final Variables variables,
                        final Map<LocationVariable, Term> requires,
                        final Map<LocationVariable, Term> ensures,
+                       final ImmutableList<ImmutableList<Term>> respects,
+                       final ImmutableList<ImmutableList<Term>> declassifies,
                        final Map<Label, Term> breaks,
                        final Map<Label, Term> continues,
                        final Term returns,
@@ -521,6 +589,8 @@ public final class SimpleBlockContract implements BlockContract {
             this.variables = variables;
             this.requires = requires;
             this.ensures = ensures;
+            this.respects = respects;
+            this.declassifies = declassifies;
             this.breaks = breaks;
             this.continues = continues;
             this.returns = returns;
@@ -534,7 +604,7 @@ public final class SimpleBlockContract implements BlockContract {
 
         public ImmutableSet<BlockContract> create()
         {
-            return create(buildPreconditions(), buildPostconditions(), buildModifiesClauses());
+            return create(buildPreconditions(), buildPostconditions(), buildModifiesClauses(), respects, declassifies);
         }
 
         private Map<LocationVariable, Term> buildPreconditions()
@@ -720,7 +790,9 @@ public final class SimpleBlockContract implements BlockContract {
 
         private ImmutableSet<BlockContract> create(final Map<LocationVariable, Term> preconditions,
                                                    final Map<LocationVariable, Term> postconditions,
-                                                   final Map<LocationVariable, Term> modifiesClauses)
+                                                   final Map<LocationVariable, Term> modifiesClauses,
+                                                   final ImmutableList<ImmutableList<Term>> respects,
+                                                   final ImmutableList<ImmutableList<Term>> declassifies)
         {
             ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
             final boolean transactionApplicable = modifiesClauses.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null;
@@ -728,6 +800,7 @@ public final class SimpleBlockContract implements BlockContract {
                 new SimpleBlockContract(
                     block, labels, method, diverges.equals(ff()) ? Modality.DIA : Modality.BOX,
                     preconditions, postconditions, modifiesClauses,
+                    respects, declassifies,
                     variables, transactionApplicable, hasMod
                 )
             );
@@ -735,7 +808,8 @@ public final class SimpleBlockContract implements BlockContract {
                 result = result.add(
                     new SimpleBlockContract(
                         block, labels, method, Modality.DIA, addNegatedDivergesConditionToPreconditions(preconditions),
-                        postconditions, modifiesClauses, variables, transactionApplicable, hasMod
+                        postconditions, modifiesClauses, respects, declassifies,
+                        variables, transactionApplicable, hasMod
                     )
                 );
             }
@@ -812,8 +886,15 @@ public final class SimpleBlockContract implements BlockContract {
             for (int i = 1; i < contracts.length && !hasMod; i++) {
                 hasMod = contracts[i].hasModifiesClause();
             }
+            
+            // The information flow part of the contracts can't be combined on
+            // the contract level in a reasonable way. Therefore we omitt it
+            // in the combined contract by adding an empty list.
+            ImmutableList<ImmutableList<Term>> emptyList =
+                    ImmutableSLList.<ImmutableList<Term>>nil();
+
             return new SimpleBlockContract(head.getBlock(), head.getLabels(), head.getMethod(), head.getModality(), preconditions,
-                    postconditions, modifiesClauses, placeholderVariables, head.isTransactionApplicable(), hasMod);
+                    postconditions, modifiesClauses, emptyList, emptyList, placeholderVariables, head.isTransactionApplicable(), hasMod);
         }
 
         private void addConditionsFrom(final BlockContract contract)

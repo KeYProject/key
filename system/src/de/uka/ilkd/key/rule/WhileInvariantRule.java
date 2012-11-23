@@ -647,7 +647,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             selfAtPreSV = null;            
         }
         int j = 0;        
-        for(Term t : appData.params){
+        for(Term t : appData.localIns){
             predArgSorts[i] = t.sort();
             localInsSVs.append(createTermSV(schemaPrefix + "_param_" +
                     (j + 1), predArgSorts[i],
@@ -661,7 +661,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         j = 0;
         localOutsSVs = ImmutableSLList.<Term>nil();
         if (!pm.isVoid() && !pm.isConstructor()) {
-            for(Term t : appData.results){
+            for(Term t : appData.localOuts){
                 predArgSorts[i] = t.sort();
                 localOutsSVs.append(createTermSV(schemaPrefix + "_res_" +
                         (j + 1), predArgSorts[i],

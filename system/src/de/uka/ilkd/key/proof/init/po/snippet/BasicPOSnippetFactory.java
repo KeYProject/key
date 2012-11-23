@@ -35,7 +35,9 @@ public interface BasicPOSnippetFactory {
         //      exc = excAtPost)
         SYMBOLIC_EXEC (BasicSymbolicExecutionSnippet.class),
 
-        // RELATED_BY_package.class::m(self, param1, ..., paramN, heap, result, exc, heapAtPost)
+        BLOCK_EXEC (BasicBlockExecutionSnippet.class),
+
+        // RELATED_BY_package.class::m(self, localIn1, ..., localInN, heap, localOut1, ..., localOutN, result, exc, heapAtPost)
         // This predicate is semantically equivalent to:
         // [P] (heap = heapAtPost & self = selfAtPost & result = resultAtPost &
         //      exc = excAtPost)
@@ -48,6 +50,13 @@ public interface BasicPOSnippetFactory {
         LOOP_CALL_RELATION (LoopCallPredicateSnippet.class),
 
         // EXECUTION_OF_package.class::m_WITH_PRE(self, param1, ..., paramN, heap, result, exc, heapAtPost)
+        // RELATED_BY_package.class::m(self, localIn1, ..., localInN, heap, localOut1, ..., localOutN, result, exc, heapAtPost)
+        // This predicate is semantically equivalent to:
+        // [P] (heap = heapAtPost & self = selfAtPost & result = resultAtPost &
+        //      exc = excAtPost)
+        BLOCK_CALL_RELATION (BlockCallPredicateSnippet.class),
+
+        // EXECUTION_OF_package.class::m_WITH_PRE(self, localIn1, ..., localInN, heap, localOut1, ..., localOutN, result, exc, heapAtPost)
         // This predicate is semantically equivalent to:
         // Pre & [P] (heap = heapAtPost & self = selfAtPost &
         //            result = resultAtPost & exc = excAtPost)
@@ -59,6 +68,8 @@ public interface BasicPOSnippetFactory {
         // Inv & [P] (heap = heapAtPost & self = selfAtPost &
         //            localOuts = localOutsAtPost)
         LOOP_CALL_WITH_INV_RELATION (LoopCallWithInvariantPredicateSnippet.class),
+
+        BLOCK_CALL_WITH_PRE_RELATION (BlockCallWithPreconditionPredicateSnippet.class),
 
 
         // miscellaneous snippets

@@ -6,9 +6,11 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.speclang.*;
 
 public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
@@ -16,6 +18,8 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private StatementBlock block;
     private BlockContract contract;
     private List<LocationVariable> heaps;
+    private IFProofObligationVars infFlowVars;
+    private ExecutionContext context;
 	
 	public BlockContractBuiltInRuleApp(final BuiltInRule rule, final PosInOccurrence occurrence)
     {
@@ -106,4 +110,16 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
         this.heaps = heaps;
     }
 
+    public void update(IFProofObligationVars vars, ExecutionContext context) {
+        this.infFlowVars = vars;
+        this.context = context;
+    }
+
+    public IFProofObligationVars getInformationFlowProofObligationVars() {
+        return infFlowVars;
+    }
+
+    public ExecutionContext getExecutionContext() {
+        return context;
+    }
 }

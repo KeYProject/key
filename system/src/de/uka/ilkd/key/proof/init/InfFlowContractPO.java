@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -44,9 +45,9 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
         // generate proof obligation variables
         IProgramMethod pm = contract.getTarget();
         symbExecVars = new ProofObligationVars(pm, contract.getKJT(), services);
-        assert (symbExecVars.self == null) == (pm.isStatic());
-        ifVars = new IFProofObligationVars(pm, contract.getKJT(), symbExecVars,
-                                           services);
+        assert (symbExecVars.self == null) == (pm.isStatic() ||
+                                               pm.isConstructor());
+        ifVars = new IFProofObligationVars(symbExecVars, services);
     }
 
 
@@ -54,8 +55,8 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
     public void readProblem() throws ProofInputException {
         // create proof obligation        
         InfFlowPOSnippetFactory f =
-            POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
-                                               ifVars.c2, services);
+                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
+                                                   ifVars.c2, services);
         Term selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_POST);
@@ -323,20 +324,16 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
         public final Map<Term, Term> map1, map2;
 
 
-        public IFProofObligationVars(IProgramMethod pm,
-                                     KeYJavaType kjt,
-                                     ProofObligationVars symbExecVars,
+        public IFProofObligationVars(ProofObligationVars symbExecVars,
                                      Services services) {
-            this(new ProofObligationVars(pm, kjt, "_A", services),
-                 new ProofObligationVars(pm, kjt, "_B", services),
-                 pm, kjt, symbExecVars);
+            this(new ProofObligationVars(symbExecVars, "_A", services),
+                 new ProofObligationVars(symbExecVars, "_B", services),
+                 symbExecVars);
         }
 
 
         public IFProofObligationVars(ProofObligationVars c1,
                                      ProofObligationVars c2,
-                                     IProgramMethod pm,
-                                     KeYJavaType kjt,
                                      ProofObligationVars symbExecVars) {
             this.c1 = c1;
             this.c2 = c2;

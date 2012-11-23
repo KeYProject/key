@@ -1,35 +1,51 @@
 package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.BlockContract.Terms;
+import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 
 import java.util.EnumMap;
+import java.util.List;
+
 
 /**
  * Immutable class.
+ * <p/>
  * @author christoph
  */
 class BasicSnippetData {
-    
+
     /**
      * The contract for which the snippets are produced.
      */
-    final SpecificationElement contract;    
+//    final SpecificationElement contract;    
     
+    /**
+     * Tells whether the contract contains a measured_by clause.
+     */
+    final boolean hasMby;
+
     /**
      * Variables originally used during parsing.
      */
     final ProofObligationVars origVars;
-    
+
     /**
      * TermBuilder used by the FactoryMethods.
      */
@@ -41,33 +57,55 @@ class BasicSnippetData {
     private final EnumMap<Key, Object> contractContents =
             new EnumMap<Key, Object>(Key.class) {
 
-        @Override
-        public Object put(Key key,
-                          Object value) {
-            assert value == null || key.getType().isInstance(value);
-            return super.put(key, value);
-        }
-    };
+                @Override
+                public Object put(Key key,
+                                  Object value) {
+                    assert value == null || key.getType().isInstance(value);
+                    return super.put(key, value);
+                }
+            };
 
 
     /**
      * Keys to access the unified contract content.
      */
     static enum Key {
-        PRECONDITION (Term.class),
-        POSTCONDITION (Term.class),
-        MODIFIES (Term.class),
-        DEPENDENS (Term.class),
-        MEASURED_BY (Term.class),
-        MODALITY (Modality.class),
-        RESPECTS (Term[][].class),
-        DECLASSIFIES (Term[][].class),
-        EXECUTIONCONTEXT (Term.class);
+
+        /**
+         * Returns the KeYJavaType representing the class/interface to which the
+         * specification element belongs.
+         */
+        FOR_CLASS(KeYJavaType.class),
+        /**
+         * Returns the contracted function symbol.
+         */
+        TARGET_METHOD(IObserverFunction.class),
+        /**
+         * Returns the contracted block.
+         */
+        TARGET_BLOCK(StatementBlock.class),
+        PRECONDITION(Term.class),
+        POSTCONDITION(Term.class),
+        MODIFIES(Term.class),
+        DEPENDENS(Term.class),
+        MEASURED_BY(Term.class),
+        MODALITY(Modality.class),
+        RESPECTS(Term[][].class),
+        DECLASSIFIES(Term[][].class),
+        /**
+         * Variables originally used during parsing.
+         */
+        BLOCK_VARS(Variables.class),
+        LABELS(Label[].class),
+        CONTEXT(ExecutionContext.class); // this does not fit well here
 
         private final Class type;
+
+
         Key(Class type) {
             this.type = type;
         }
+
 
         public Class getType() {
             return type;
@@ -77,9 +115,11 @@ class BasicSnippetData {
 
     BasicSnippetData(FunctionalOperationContract contract,
                      Services services) {
-        this.contract = contract;
+        this.hasMby = contract.hasMby();
         this.tb = new TermBuilder.Serviced(services);
 
+        contractContents.put(Key.TARGET_METHOD, contract.getTarget());
+        contractContents.put(Key.FOR_CLASS, contract.getKJT());
         contractContents.put(Key.PRECONDITION, contract.getPre());
         contractContents.put(Key.POSTCONDITION, contract.getPost());
         contractContents.put(Key.MODIFIES, contract.getMod());
@@ -87,9 +127,10 @@ class BasicSnippetData {
         contractContents.put(Key.MODALITY, contract.getModality());
 
         final Term heap = TermBuilder.DF.getBaseHeap(services);
-        origVars = new ProofObligationVars(contract.getSelf(), null,
-                contract.getParams(), contract.getResult(), null,
-                contract.getExc(), null, heap, null, null, "", services);
+        origVars =
+                new ProofObligationVars(contract.getSelf(),
+                                        contract.getParams(), contract.getResult(), contract.getExc(),
+                                        heap, services);
 
     }
     
@@ -115,10 +156,11 @@ class BasicSnippetData {
 
     BasicSnippetData(InformationFlowContract contract,
                      Services services) {
-        this.contract = contract;
+        this.hasMby = contract.hasMby();
         this.tb = new TermBuilder.Serviced(services);
 
-        
+        contractContents.put(Key.TARGET_METHOD, contract.getTarget());
+        contractContents.put(Key.FOR_CLASS, contract.getKJT());
         contractContents.put(Key.PRECONDITION, contract.getPre());
         contractContents.put(Key.MODIFIES, contract.getMod());
         contractContents.put(Key.DEPENDENS, contract.getDep());
@@ -128,15 +170,52 @@ class BasicSnippetData {
                              doubleListToArray(contract.getRespects()));
         contractContents.put(Key.DECLASSIFIES,
                              doubleListToArray(contract.getDeclassifies()));
-        
+
         final Term heap = TermBuilder.DF.getBaseHeap(services);
-        origVars = new ProofObligationVars(contract.getSelf(), null,
-                contract.getParams(), contract.getResult(), null,
-                contract.getExc(), null, heap, null, null, "", services);
+        origVars =
+                new ProofObligationVars(contract.getSelf(),
+                                        contract.getParams(), contract.getResult(),
+                                        contract.getExc(), heap, services);
 
     }
-    
-    
+
+
+    BasicSnippetData(BlockContract contract,
+                     Services services) {
+        this.hasMby = contract.hasMby();
+        this.tb = new TermBuilder.Serviced(services);
+
+        contractContents.put(Key.TARGET_METHOD, contract.getTarget());
+        contractContents.put(Key.FOR_CLASS, contract.getKJT());
+        contractContents.put(Key.TARGET_BLOCK, contract.getBlock());
+        contractContents.put(Key.BLOCK_VARS, contract.getVariables());
+        contractContents.put(Key.PRECONDITION, contract.getPre(services));
+        contractContents.put(Key.MODIFIES, contract.getMod(services));
+        contractContents.put(Key.MODALITY, contract.getModality());
+        contractContents.put(Key.RESPECTS,
+                             doubleListToArray(contract.getRespects()));
+        contractContents.put(Key.DECLASSIFIES,
+                             doubleListToArray(contract.getDeclassifies()));
+        List<Label> labels = contract.getLabels();
+        contractContents.put(Key.LABELS,
+                             labels.toArray(new Label[labels.size()]));
+
+        final Term heapTerm = TermBuilder.DF.getBaseHeap(services);
+        Terms vars = contract.getVariablesAsTerms();
+        origVars =
+                new ProofObligationVars(vars.self, ImmutableSLList.<Term>nil(),
+                                        vars.result, vars.exception, heapTerm, services);
+    }
+
+
+    BasicSnippetData(BlockContract contract,
+                     ExecutionContext context,
+                     Services services) {
+        this(contract, services);
+        contractContents.put(Key.CONTEXT, context);
+    }
+
+
     private Term[][] doubleListToArray(ImmutableList<ImmutableList<Term>> termss) {
         Term[][] result = new Term[termss.size()][];
         int i = 0;
@@ -146,9 +225,9 @@ class BasicSnippetData {
         }
         return result;
     }
-    
-    
-    Object getContractContent(Key contentKey) {
+
+
+    Object get(Key contentKey) {
         return contractContents.get(contentKey);
     }
 }

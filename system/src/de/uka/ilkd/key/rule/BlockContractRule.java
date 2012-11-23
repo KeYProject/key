@@ -17,8 +17,19 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.init.BlockExecutionPO;
+import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
+import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
+import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.BlockContract.Terms;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -73,11 +84,10 @@ public class BlockContractRule implements BuiltInRule {
         else if (modality == Modality.BOX_TRANSACTION) {
             collectedContracts = collectedContracts.union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
         }
-        return filterAppliedContracts(collectedContracts, block, goal);
+        return filterAppliedContracts(collectedContracts, goal);
     }
     
     private static ImmutableSet<BlockContract> filterAppliedContracts(final ImmutableSet<BlockContract> collectedContracts,
-                                                                      final StatementBlock block,
                                                                       final Goal goal)
     {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
@@ -105,7 +115,19 @@ public class BlockContractRule implements BuiltInRule {
             }
             selfOrParentNode = selfOrParentNode.parent();
         }
-        return false;
+
+        Services services = goal.proof().getServices();
+        Proof proof = goal.proof();
+        ContractPO po = services.getSpecificationRepository().getPOForProof(proof);
+        if (po instanceof SymbolicExecutionPO) {
+            Goal initiatingGoal = ((SymbolicExecutionPO)po).getInitiatingGoal();
+            return contractApplied(contract, initiatingGoal);
+        } else if (po instanceof BlockExecutionPO) {
+            Goal initiatingGoal = ((BlockExecutionPO)po).getInitiatingGoal();
+            return contractApplied(contract, initiatingGoal);
+        } else {
+            return false;
+        }
     }
     
     private BlockContractRule() {
@@ -174,7 +196,58 @@ public class BlockContractRule implements BuiltInRule {
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate = updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps, /*anonymisationLocalVariables, */modifiesClauses);
 
-        final ImmutableList<Goal> result = goal.split(3);
+        // prepare information flow analysis
+        assert anonymisationHeaps.size() == 1; // information flow extension is at
+                                               // the moment not compatible with
+                                               // the non-base-heap setting
+        final Term preHeap = TB.var(anonymisationHeaps.keySet().iterator().next());
+        final Term postHeap = TB.func(anonymisationHeaps.values().iterator().next());
+
+        final InfFlowBlockContractTacletBuilder ifContractBuilder =
+                new InfFlowBlockContractTacletBuilder(services);
+        ifContractBuilder.setContract(contract);
+        ifContractBuilder.setContextUpdate(contextUpdate);
+        ifContractBuilder.setBaseHeap(TB.getBaseHeap(services));
+        ifContractBuilder.setHeapAtPre(preHeap);
+        ifContractBuilder.setHeapAtPost(postHeap);
+        final Terms vars = contract.getVariablesAsTerms();
+        ifContractBuilder.setSelf(vars.self);
+        ifContractBuilder.setLocalIns(MiscTools.toTermList(localInVariables));
+        ifContractBuilder.setLocalOuts(MiscTools.toTermList(localOutVariables));
+        ifContractBuilder.setResult(vars.result);
+        ifContractBuilder.setException(vars.exception);
+
+        // generate information flow contract application predicate
+        // and associated taclet
+        final Term contractApplPredTerm =
+                ifContractBuilder.buildContractApplPredTerm();
+        final Taclet informationFlowContractApp =
+                ifContractBuilder.buildContractApplTaclet();
+        goal.addTaclet(informationFlowContractApp,
+                       SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+
+        ImmutableList<Goal> result;
+        final ContractPO po =
+                services.getSpecificationRepository().getPOForProof(goal.proof());
+        if (po instanceof InfFlowContractPO || po instanceof SymbolicExecutionPO) {
+            AbstractOperationPO abstPO = (AbstractOperationPO) po;
+            ProofObligationVars poVars =
+                    new ProofObligationVars(TB.getBaseHeap(services), vars.self,
+                                            MiscTools.toTermList(localInVariables),
+                                            preHeap,
+                                            MiscTools.toTermList(localOutVariables),
+                                            vars.result, vars.exception, postHeap,
+                                            services);
+            Sequent seq = buildBodyPreservesSequent(contract, application,
+                                                    poVars, instantiation.context, services);
+            Goal infFlowGoal = goal.getCleanGoal(seq);
+            ImmutableSet<NoPosTacletApp> taclets = abstPO.getInitialTaclets();
+            infFlowGoal.indexOfTaclets().addTaclets(taclets);
+            infFlowGoal.setBranchLabel("Information Flow Validity");
+            result = goal.split(3).append(infFlowGoal);
+        } else {
+            result = goal.split(3);
+        }
         final GoalsConfigurator configurator = new GoalsConfigurator(instantiation, contract.getLabels(), variables, application.posInOccurrence(), services);
         configurator.setUpValidityGoal(
             result.tail().tail().head(),
@@ -190,7 +263,7 @@ public class BlockContractRule implements BuiltInRule {
         configurator.setUpUsageGoal(
             result.head(),
             new Term[] {contextUpdate, remembranceUpdate, anonymisationUpdate},
-            new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition}
+            new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition, contractApplPredTerm}
         );
         return result;
     }
@@ -231,6 +304,34 @@ public class BlockContractRule implements BuiltInRule {
     public String toString()
     {
         return NAME.toString();
+    }
+
+    Sequent buildBodyPreservesSequent(BlockContract contract,
+                                      BlockContractBuiltInRuleApp app,
+                                      ProofObligationVars symbExecVars,
+                                      ExecutionContext context,
+                                      Services services) {
+        // generate proof obligation variables
+        IProgramMethod pm = contract.getTarget();
+        assert (symbExecVars.self == null) == (pm.isStatic() ||
+                                               pm.isConstructor());
+        final InfFlowContractPO.IFProofObligationVars ifVars =
+                new InfFlowContractPO.IFProofObligationVars(symbExecVars,
+                                                            services);
+        app.update(ifVars, context);
+
+        // create proof obligation
+        InfFlowPOSnippetFactory f =
+                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
+                                                   ifVars.c2, services);
+        Term selfComposedExec =
+                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
+        Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_POST);
+
+        // register final term
+        final Term finalTerm = TB.imp(selfComposedExec, post);
+        return Sequent.createSuccSequent(
+                new Semisequent(new SequentFormula(finalTerm)));
     }
 
     public static final class Instantiation {
@@ -762,15 +863,15 @@ public class BlockContractRule implements BuiltInRule {
 
     }
 
-    private static final class ValidityProgramConstructor {
+    public static final class ValidityProgramConstructor {
 
-        private final List<Label> labels;
+        private final Iterable<Label> labels;
         private final StatementBlock block;
         private final BlockContract.Variables variables;
         private final Services services;
         private final List<Statement> statements;
 
-        public ValidityProgramConstructor(final List<Label> labels,
+        public ValidityProgramConstructor(final Iterable<Label> labels,
                                           final StatementBlock block,
                                           final BlockContract.Variables variables,
                                           final Services services)
@@ -839,7 +940,7 @@ public class BlockContractRule implements BuiltInRule {
             statements.add(new LabeledStatement(breakOutLabel, safeStatement));
         }
 
-        private Statement label(final StatementBlock block, List<Label> labels)
+        private Statement label(final StatementBlock block, Iterable<Label> labels)
         {
             Statement result = block;
             for (Label label : labels) {

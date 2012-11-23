@@ -2,8 +2,6 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
 
 
 /**
@@ -11,7 +9,7 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
  *
  * @author christoph
  */
-class InfFlowContractAppSnippet extends ReplaceAndRegisterMethod
+class SelfcomposedBlockSnippet extends ReplaceAndRegisterMethod
         implements InfFlowFactoryMethod {
 
     @Override
@@ -24,14 +22,11 @@ class InfFlowContractAppSnippet extends ReplaceAndRegisterMethod
         BasicPOSnippetFactory f2 =
                 POSnippetFactory.getBasicFactory(d, poVars2);
 
-        Term preCond1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
-        Term preCond2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
-        
+        final Term exec1 =
+                f1.create(BasicPOSnippetFactory.Snippet.BLOCK_CALL_WITH_PRE_RELATION);
+        final Term exec2 =
+                f2.create(BasicPOSnippetFactory.Snippet.BLOCK_CALL_WITH_PRE_RELATION);
 
-        InfFlowPOSnippetFactory iff =
-                POSnippetFactory.getInfFlowFactory(d, poVars1, poVars2);
-        Term inOutRelations =
-                iff.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_POST);
-        return d.tb.imp(d.tb.and(preCond1, preCond2), inOutRelations);
+        return d.tb.and(exec1, exec2);
     }
 }

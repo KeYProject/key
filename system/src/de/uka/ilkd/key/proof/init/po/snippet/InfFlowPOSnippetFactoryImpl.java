@@ -4,6 +4,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
@@ -11,30 +12,41 @@ import java.util.EnumMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 /**
  *
  * @author christoph
  */
 class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
-    
+
     /**
      * Collection of data important for the production of snippets.
      */
     final BasicSnippetData data;
     final ProofObligationVars poVars1;
     final ProofObligationVars poVars2;
-    
     /**
      * Registered snippet factory methods.
      */
-    private final EnumMap<Snippet, InfFlowFactoryMethod> factoryMethods
-             = new EnumMap<Snippet, InfFlowFactoryMethod>(Snippet.class);
+    private final EnumMap<Snippet, InfFlowFactoryMethod> factoryMethods =
+            new EnumMap<Snippet, InfFlowFactoryMethod>(Snippet.class);
 
 
     InfFlowPOSnippetFactoryImpl(InformationFlowContract contract,
-                              ProofObligationVars vars1,
-                              ProofObligationVars vars2,
-                              Services services) {
+                                ProofObligationVars vars1,
+                                ProofObligationVars vars2,
+                                Services services) {
+        this.data = new BasicSnippetData(contract, services);
+        this.poVars1 = vars1;
+        this.poVars2 = vars2;
+        registerFactoryMethods();
+    }
+
+
+    InfFlowPOSnippetFactoryImpl(BlockContract contract,
+                                ProofObligationVars vars1,
+                                ProofObligationVars vars2,
+                                Services services) {
         this.data = new BasicSnippetData(contract, services);
         this.poVars1 = vars1;
         this.poVars2 = vars2;
@@ -53,8 +65,8 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
 
 
     InfFlowPOSnippetFactoryImpl(BasicSnippetData d,
-                               ProofObligationVars vars1,
-                               ProofObligationVars vars2) {
+                                ProofObligationVars vars1,
+                                ProofObligationVars vars2) {
         this.data = d;
         this.poVars1 = vars1;
         this.poVars2 = vars2;
@@ -65,7 +77,8 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
     private void registerFactoryMethods() {
         try {
             for (Snippet s : Snippet.values()) {
-                InfFlowFactoryMethod fm = (InfFlowFactoryMethod)s.c.newInstance();
+                InfFlowFactoryMethod fm =
+                        (InfFlowFactoryMethod) s.c.newInstance();
                 factoryMethods.put(s, fm);
             }
         } catch (InstantiationException ex) {
@@ -76,22 +89,21 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
                     log(Level.SEVERE, null, ex);
         }
     }
-    
-    
+
+
     @Override
     public Term create(Snippet snippet) throws UnsupportedOperationException {
         try {
             InfFlowFactoryMethod m = factoryMethods.get(snippet);
             if (m == null) {
-                throw new UnsupportedOperationException("Unknown factory "
-                        + "method for snippet \"" + snippet.name() + ".");
+                throw new UnsupportedOperationException("Unknown factory " +
+                         "method for snippet \"" + snippet.name() + ".");
             }
             return m.produce(data, poVars1, poVars2);
         } catch (TermCreationException e) {
-            throw new UnsupportedOperationException("Factory method for "
-                    + "snippet \"" + snippet.name() + "threw "
-                    + "TermCreationException: " + e.getMessage());
+            throw new UnsupportedOperationException("Factory method for " +
+                     "snippet \"" + snippet.name() + "threw " +
+                     "TermCreationException: " + e.getMessage());
         }
     }
-
 }

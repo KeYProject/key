@@ -16,7 +16,7 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
  *
  * @author christoph
  */
-class InfFlowPostSnippet extends ReplaceAnRegisterMethod implements InfFlowFactoryMethod {
+class InfFlowPostSnippet extends ReplaceAndRegisterMethod implements InfFlowFactoryMethod {
 
     @Override
     public Term produce(BasicSnippetData d,
@@ -25,12 +25,12 @@ class InfFlowPostSnippet extends ReplaceAnRegisterMethod implements InfFlowFacto
             throws UnsupportedOperationException {
 
         // get respects terms
-        if (d.getContractContent(BasicSnippetData.Key.RESPECTS) == null) {
+        if (d.get(BasicSnippetData.Key.RESPECTS) == null) {
             throw new UnsupportedOperationException("Tried to produce "
                     + "respects for a contract without respects.");
         }
         assert Term[][].class.equals(BasicSnippetData.Key.RESPECTS.getType());
-        Term[][] origRespects = (Term[][]) d.getContractContent(
+        Term[][] origRespects = (Term[][]) d.get(
                 BasicSnippetData.Key.RESPECTS);
 
         // the respects-sequents evaluated in the pre-state
@@ -53,22 +53,32 @@ class InfFlowPostSnippet extends ReplaceAnRegisterMethod implements InfFlowFacto
                     poVars2.exceptionAtPost});
 
         // get declassifies terms
+/*<<<<<<< HEAD
         if (d.getContractContent(BasicSnippetData.Key.DECLASSIFIES) == null &&
                 !(d.contract instanceof LoopInvariant)) {
+=======*/
+        if (d.get(BasicSnippetData.Key.DECLASSIFIES) == null) {
+//>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6
             throw new UnsupportedOperationException("Tried to produce "
                     + "declassifies for a contract without declassifies.");            
         }
+/*<<<<<<< HEAD
         Term[][] declassifies1 = null;
         Term[][] declassifies2 = null;
         if(!(d.contract instanceof LoopInvariant)) {
             assert Term[][].class.equals(BasicSnippetData.Key.DECLASSIFIES.getType());
             Term[][] origDeclassifies = (Term[][]) d.getContractContent(
                     BasicSnippetData.Key.DECLASSIFIES);
+=======*/
+        assert Term[][].class.equals(BasicSnippetData.Key.DECLASSIFIES.getType());
+        Term[][] origDeclassifies = (Term[][]) d.get(
+                BasicSnippetData.Key.DECLASSIFIES);
+//>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6
 
             // declassifies has only to be evaluated in the pre-state
-            declassifies1 = replace(origDeclassifies, d.origVars, poVars1);
-            declassifies2 = replace(origDeclassifies, d.origVars, poVars2);
-        }        
+            Term[][] declassifies1 = replace(origDeclassifies, d.origVars, poVars1);
+            Term[][] declassifies2 = replace(origDeclassifies, d.origVars, poVars2);
+//        }        
 
         // create input-output-relations
         final Term[] relations = new Term[respectsAtPre1.length];
@@ -135,28 +145,23 @@ class InfFlowPostSnippet extends ReplaceAnRegisterMethod implements InfFlowFacto
                                               ProofObligationVars vs2,
                                               Term[] respects1,
                                               Term[] respects2) {
-        BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, vs1);
-        BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, vs2);
-        Term framingLocs1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
-        Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
+//        BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, vs1);
+//        BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, vs2);
+//        Term framingLocs1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
+//        Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
 
         Term[] eqAtLocs = new Term[respects1.length];        
-        for (int i = 0; i < eqAtLocs.length; i++) {
-            ImmutableList<SearchVisitor> searchList = ImmutableSLList.<SearchVisitor>nil();
-            SearchVisitor search = null;
-            eqAtLocs[i] = d.tb.ff();
-            for(Term res : vs1.resultsAtPost) {
-                search = new SearchVisitor(res);
-                searchList = searchList.append(search);
-                respects1[i].execPreOrder(search);
-                if (!search.termFound) {
-                    // refLocTerms which contain \result are not included in
-                    // the precondition
-                    eqAtLocs[i] = d.tb.or(eqAtLocs[i], d.tb.equals(respects1[i], respects2[i]));
-                } else {
-                    eqAtLocs[i] = d.tb.or(eqAtLocs[i], d.tb.tt());
-                }
-            }            
+        for (int i = 0; i < eqAtLocs.length; i++) {            
+            SearchVisitor search = new SearchVisitor(vs1.resultAtPost);
+            respects1[i].execPreOrder(search);
+            if (!search.termFound) {
+                // refLocTerms which contain \result are not included in
+                // the precondition
+                eqAtLocs[i] = d.tb.equals(respects1[i], respects2[i]);
+            } else {
+                eqAtLocs[i] = d.tb.tt();
+            }
+
         }
         return d.tb.and(eqAtLocs);
     }

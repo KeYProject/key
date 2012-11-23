@@ -50,21 +50,19 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ContractPO;
+/*<<<<<<< HEAD
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
+=======
+>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6*/
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -728,14 +726,31 @@ public final class UseOperationContractRule implements BuiltInRule {
         assert anonUpdateDatas.size() == 1; // information flow extension is at
                                             // the moment not compatible with
                                             // the non-base-heap setting
-        Term contractApplPredTerm =
-                storePrePostInPredAndGenInfoFlowTaclet(contract, inst,
-                                                       anonUpdateDatas.head(),
-                                                       contractSelf,
-                                                       contractResult,
-                                                       TB.var(excVar),
-                                                       goal, services);
+        AnonUpdateData anonUpdateData = anonUpdateDatas.head();
 
+        InfFlowMethodContractTacletBuilder ifContractBuilder =
+                new InfFlowMethodContractTacletBuilder(services);
+        ifContractBuilder.setContract(contract);
+        ifContractBuilder.setContextUpdate(inst.u);
+        ifContractBuilder.setBaseHeap(TB.getBaseHeap(services));
+        ifContractBuilder.setHeapAtPre(anonUpdateData.methodHeapAtPre);
+        ifContractBuilder.setHeapAtPost(anonUpdateData.methodHeap);
+        ifContractBuilder.setSelf(contractSelf);
+        ifContractBuilder.setLocalIns(contractParams);
+        ifContractBuilder.setResult(contractResult);
+        ifContractBuilder.setException(TB.var(excVar));
+
+        // generate information flow contract application predicate
+        // and associated taclet
+        Term contractApplPredTerm =
+                ifContractBuilder.buildContractApplPredTerm();
+        Taclet informationFlowContractApp =
+                ifContractBuilder.buildContractApplTaclet();
+        goal.addTaclet(informationFlowContractApp,
+                       SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+
+
+        
         //create "Pre" branch
 	int i = 0;
 	for(Term arg : contractParams) {
@@ -847,12 +862,13 @@ public final class UseOperationContractRule implements BuiltInRule {
     public String toString() {
         return displayName();
     }
+/*<<<<<<< HEAD
     
 
-    /**
+    *//**
      * Store pre- / poststate of the method invocation and generate information
      * flow taclet.
-     */
+     *//*
     // TODO: add exception var
     private Term storePrePostInPredAndGenInfoFlowTaclet(final FunctionalOperationContract contract,
                                                         final Instantiation inst,
@@ -885,7 +901,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
     
-    /*private Function generateContApplPredicate(IProgramMethod pm,
+    private Function generateContApplPredicate(IProgramMethod pm,
                                                Services services) {
         String nameString =
                 MiscTools.toValidTacletName(pm.getContainerType().getFullName()
@@ -931,7 +947,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             pred = new Function(name, Sort.FORMULA, predArgSorts);
             services.getNamespaces().functions().addSafely(pred);
         }
-        return pred;*/
+        return pred;
 
     
     private ProofObligationVars generateApplicationDataSVs(Function pred,
@@ -1074,6 +1090,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         return TB.and(contractsApplications);
     }
 
+=======
+>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6*/
 
     
     //-------------------------------------------------------------------------

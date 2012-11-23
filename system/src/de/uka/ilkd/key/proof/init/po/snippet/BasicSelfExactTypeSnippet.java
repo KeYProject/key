@@ -4,7 +4,9 @@
  */
 package de.uka.ilkd.key.proof.init.po.snippet;
 
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -20,6 +22,7 @@ class BasicSelfExactTypeSnippet implements FactoryMethod {
 
     @Override
     public Term produce(BasicSnippetData d,
+//<<<<<<< HEAD
             ProofObligationVars poVars)
     throws UnsupportedOperationException {
         if (d.contract instanceof Contract) {
@@ -45,9 +48,24 @@ class BasicSelfExactTypeSnippet implements FactoryMethod {
             ? d.tb.tt() : d.tb.exactInstance(contractSort, poVars.self);
         }
         else {
+/*=======
+                        ProofObligationVars poVars)
+            throws UnsupportedOperationException {
+        IObserverFunction targetMethod =
+                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
+        if (!(targetMethod instanceof IProgramMethod)) {
+>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6*/
             throw new UnsupportedOperationException("Tried to produce "
                     + "SELF_EXACT_TYPE for an observer "
                     + "without a contract.");
         }
+/*<<<<<<< HEAD
+=======
+        final IProgramMethod pm = (IProgramMethod) targetMethod;
+        KeYJavaType forClass = (KeYJavaType) d.get(BasicSnippetData.Key.FOR_CLASS);
+        final Sort contractSort = forClass.getSort();
+        return (poVars.self == null || pm.isConstructor())
+               ? d.tb.tt() : d.tb.exactInstance(contractSort, poVars.self);
+>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6*/
     }
 }

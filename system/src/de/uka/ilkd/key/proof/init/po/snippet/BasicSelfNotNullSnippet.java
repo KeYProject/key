@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -20,6 +21,7 @@ class BasicSelfNotNullSnippet implements FactoryMethod {
 
     @Override
     public Term produce(BasicSnippetData d,
+//<<<<<<< HEAD
             ProofObligationVars poVars)
     throws UnsupportedOperationException {
         if (d.contract instanceof Contract) {
@@ -43,9 +45,22 @@ class BasicSelfNotNullSnippet implements FactoryMethod {
             ? d.tb.tt() : d.tb.not(d.tb.equals(poVars.self, d.tb.NULL()));
         }
         else {
+/*=======
+                        ProofObligationVars poVars)
+            throws UnsupportedOperationException {
+        IObserverFunction targetMethod =
+                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
+        if (!(targetMethod instanceof IProgramMethod)) {
+>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6*/
             throw new UnsupportedOperationException("Tried to produce "
                     + "SELF_NOT_NULL for an observer "
                     + "without a contract.");
         }
+/*<<<<<<< HEAD
+=======
+        final IProgramMethod pm = (IProgramMethod) targetMethod;
+        return (poVars.self == null || pm.isConstructor())
+               ? d.tb.tt() : d.tb.not(d.tb.equals(poVars.self, d.tb.NULL()));
+>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6*/
     }
 }
