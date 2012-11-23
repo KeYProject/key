@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.util.ExperimentalFeature;
 
 /**
  * This class wraps the information about the delayed cut. It only wraps data but not functional 
@@ -17,7 +18,15 @@ import de.uka.ilkd.key.rule.RuleApp;
 public class DelayedCut {
         public static final int DECISION_PREDICATE_IN_ANTECEDENT = 0;
         public static final int DECISION_PREDICATE_IN_SUCCEDENT = 1;
-    
+        
+        public static final ExperimentalFeature FEATURE = new ExperimentalFeature(){
+
+            @Override
+            public void deactivate() {
+                // TODO Auto-generated method stub
+            }
+        };
+            
         private final Proof proof;
         private final Node  node;
         private final ImmutableList<Node>  subtrees;
