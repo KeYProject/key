@@ -208,6 +208,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
             }
+            @SuppressWarnings("unused")
             Expression guard =
                     ((Guard) changeList.removeFirst()).getExpression();
             Statement body =

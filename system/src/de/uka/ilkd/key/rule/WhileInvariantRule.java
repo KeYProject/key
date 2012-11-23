@@ -447,8 +447,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 						   	     frameCondition,
 						   	     variantPO}));
 	bodyTerm = wir.transform(bodyTerm, svInst, services);
-	final Term guardTrueBody = TB.box(guardJb, 
-					  TB.imp(guardTrueTerm, bodyTerm)); 
+	final Term guardTrueBody = TB.imp(TB.box(guardJb,guardTrueTerm), 
+					  bodyTerm); 
 
 	bodyGoal.changeFormula(new SequentFormula(TB.applySequential(
 						uBeforeLoopDefAnonVariant, 

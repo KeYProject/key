@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.proof.io;
 
 import java.io.StringReader;
 import java.util.Iterator;
@@ -29,6 +29,10 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.TacletInstantiationsTableModel;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
