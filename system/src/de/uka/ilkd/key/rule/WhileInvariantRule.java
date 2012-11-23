@@ -219,6 +219,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final KeYJavaType intKJT 
 		= services.getJavaInfo()
 	                  .getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
+        final KeYJavaType anyKJT 
+                = services.getJavaInfo().getKeYJavaType(Sort.ANY);
+
 	//get instantiation
 	Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);	
 	
@@ -328,18 +331,19 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//prepare variant
 	final ProgramElementName variantName 
 		= new ProgramElementName(TB.newName(services, "variant"));
-	final LocationVariable variantPV = new LocationVariable(variantName, 
-								intKJT);
+	final LocationVariable variantPV = new LocationVariable(variantName, Sort.ANY);
+								//intKJT);
 	services.getNamespaces().programVariables().addSafely(variantPV);
 	
 	final boolean dia = ((Modality)inst.progPost.op()).terminationSensitive();
 	final Term variantUpdate 
 		= dia ? TB.elementary(services, variantPV, variant) : TB.skip();
 	final Term variantNonNeg 
-		= dia ? TB.leq(TB.zero(services), variant, services) : TB.tt();
+		= TB.tt(); // ? TB.leq(TB.zero(services), variant, services) : TB.tt();
 	final Term variantPO
-		= dia ? TB.and(variantNonNeg, 
-			       TB.lt(variant, TB.var(variantPV), services)) 
+		= dia ? TB.prec(variant, TB.var(variantPV), services)
+//		        TB.and(variantNonNeg, 
+//			       TB.lt(variant, TB.var(variantPV), services)) 
                       : TB.tt();
 	
 	//split goal into three branches
