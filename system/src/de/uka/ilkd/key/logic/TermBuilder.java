@@ -657,7 +657,16 @@ public class TermBuilder {
     return equals(func(s.getExactInstanceofSymbol(services), t),
               TRUE(services));
     }
-
+    
+    public Term prec(Term mby, Term mbyAtPre, Services services) {
+        final Namespace funcNS = services.getNamespaces().functions();
+        final Function f = (Function)funcNS.lookup(new Name("prec"));
+        if (f == null)
+                throw new RuntimeException("LDT: Function prec not found.\n" +
+                                "It seems that there are definitions missing from the .key files.");
+        
+        return func(f, mby, mbyAtPre);
+    }
 
     /**
      * If a is a boolean literal, the method returns the literal as a Formula.
@@ -1847,5 +1856,6 @@ public class TermBuilder {
         }
 
     }
+
 
 }

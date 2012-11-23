@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
@@ -157,7 +158,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         if (contract.hasMby()) {
             final Function mbyAtPreFunc =
                     new Function(new Name(TB.newName(services, "mbyAtPre")),
-                                 services.getTypeConverter().getIntegerLDT().targetSort());
+                            Sort.ANY);
+//                                 services.getTypeConverter().getIntegerLDT().targetSort());
             register(mbyAtPreFunc);
             mbyAtPre = TB.func(mbyAtPreFunc);
             final Term mby = contract.getMby(selfVar, paramVars, services);
