@@ -22,7 +22,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
     public ShowActiveSettingsAction(MainWindow mainWindow) {
 	super(mainWindow);
-	setName("Show Active Settings...");
+	setName("Show All Active Settings...");
     }
 
     @Override

@@ -247,13 +247,8 @@ public final class StrategySelectionView extends JPanel {
         ////////////////////////////////////////////////////////////////////////
 
         
-        addJavaDLOption ( new JLabel ( "Logical splitting" ),
+        addJavaDLOption ( new JLabel ( "Proof splitting" ),
                     javaDLOptionsLayout, 1, yCoord, 7 );
-        
-//        JPanel splittingPanel = new JPanel();
-//        splittingPanel.setBorder(BorderFactory.createTitledBorder(
-//            loweredetched, "Logical Splitting"));
-//        javaDLOptionsPanel.add(splittingPanel);
 
         ++yCoord;
         

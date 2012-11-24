@@ -29,7 +29,9 @@ JavaCard is a dialect of Java designed for the use in SmartCards.  It
 lacks floating point operations and concurrency, but provides stronger
 object persistence guarantees.
 
-TODO -> Talk to Wojciech
+There are two values for this option jcOn and jcOff. Switching
+on or off all taclets axiomatising JavaCard specific features like transac-
+tion.
 </entry>
 
 <entry key="initialisation">

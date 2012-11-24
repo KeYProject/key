@@ -19,7 +19,9 @@ a method call. The method call is encoded directly as a method call in the box m
 The query is invoked in a context equal to the container type of the query method.
 </entry>
 <entry key="One Step Simplification">
-Java Updates are simplified. This includes:
+Diverse Simplifications, including Update simplification, from the "simplify" Taclet set. The aggregation of simplifications to a single rule application can be toggled on and off in menu.
+
+Simplifications include:
 * Updates without effects are dropped.
 * If two updates appear in a row and don't influence each other, they are merged into a parallel update.
 * If the assigned variable of an update is changed in a previous update, substitution occurs. 
@@ -29,7 +31,8 @@ Java Updates are simplified. This includes:
 A dependency contract provides a limit for the heap locations an observer symbol may depend on.
 If the heap changes in locations the symbol does not depend on, it's value remains unchanged.
 This can be used by adding the necessary conditions and an equality assumption to the sequent.
-In automatic strategy, this rule is applied lazily to avoid endless loops.</entry>
+In automatic strategy, this rule is applied lazily (only once all other means of advancing the proof have been exhausted)
+to avoid endless loops.</entry>
 <entry key="Block Contract">Similar to method contracts, blocks in Java can be annotated with block contracts.
 The precondition and validity check create new proof obligations and the postcondition can be used. (?)</entry>
 <entry key="Loop Invariant">

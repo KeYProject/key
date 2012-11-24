@@ -14,6 +14,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.*;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -71,7 +72,7 @@ public class ProofTreeView extends JPanel {
     private GUIProofTreeGUIListener guiListener;
 
     /** KeYStroke for the search panel */
-    private final static KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0);
+    private final static KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
 
     private ConfigChangeListener configChangeListener =  new ConfigChangeListener() {
                                             public void configChanged(ConfigChangeEvent e) {

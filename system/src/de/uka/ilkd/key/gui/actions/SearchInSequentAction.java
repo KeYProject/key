@@ -20,7 +20,7 @@ public class SearchInSequentAction extends MainWindowAction {
 	public SearchInSequentAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Search in sequent view");
-        setTooltip("Search for rule names or node numbers in the proof tree.");
+        setTooltip("Search in the current sequent.");
         this.setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F3,0));
     }
 	
