@@ -34,9 +34,9 @@ final class PrefixSumRec {
       @   requires (left+1)%2 == 0;
       @   requires right < a.length;
       @   requires isPow2(right-left);
-      @   ensures (\forall int k; 2*left-right < k && k <= right && k%2 == 1; 
+      @   ensures (\forall int k; 2*left-right+1 <= k && k <= right && k%2 == 1; 
       @            a[k] == (\sum int i; 2*left-right+1 <= i && i < k+1; \old(a[i])));
-      @   ensures !(\exists int k; 2*left-right < k && k <= right && k%2 == 1;
+      @   ensures !(\exists int k; 2*left-right+1 <= k && k <= right && k%2 == 1;
       @             a[k] != \old(a[k]));
       @   measured_by right - left + 1;
       @   assignable a[*];
@@ -51,12 +51,28 @@ final class PrefixSumRec {
     }
     
 
+    /*@ normal_behavior
+      @   requires right > left;
+      @   requires 2*left-right+1 >= 0;
+      @   requires (2*left-right+1)%2 == 0;
+      @   requires (left+1)%2 == 0;
+      @   requires right < a.length;
+      @   requires isPow2(right-left);
+      @   ensures (\forall int k; 2*left-right+1 <= k && k <= right && k%2 == 0;
+      @                        a[k] == (\sum int i; left <= i && i < k+1;
+      @                        ((isPow2(k-i+1) && k-i != 1) || i == right)? \old(a[i]) : 0));
+      @   ensures (\forall int k; 2*left-right+1 <= k && k <= right && k%2 == 1; 
+      @                        a[k] == (\sum int i; 2*left-right+1 <= i && i < k+1; 
+      @                        (isPow2(k-i) || k == i)? \old(a[i]) : 0 ));
+      @   measured_by right - left + 1;
+      @   assignable a[*];
+      @*/
     public void downsweep(int left, int right) {
         int tmp = a[right];
         a[right] = a[right] + a[left];
         a[left] = tmp;
-        if (right > left+1) {
-            int space = right - left;
+        int space = right - left;
+        if (space > 1) {
             downsweep(left-space/2,left);
             downsweep(right-space/2,right);
         }
