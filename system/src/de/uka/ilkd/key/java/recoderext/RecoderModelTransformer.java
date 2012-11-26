@@ -103,7 +103,7 @@ public abstract class RecoderModelTransformer extends TwoPassTransformation {
 	    } else if("\\set".equals(type.getName())) {
 	        return new DLEmbeddedExpression("emptySet", 
 	                Collections.<Expression>emptyList());
-        } else if("\\gen".equals(type.getName())) {
+        } else if("\\free".equals(type.getName())) {
             return new DLEmbeddedExpression("atom", 
                     Collections.<Expression>emptyList());
 	    }

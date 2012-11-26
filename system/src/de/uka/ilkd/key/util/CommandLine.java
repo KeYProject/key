@@ -111,6 +111,7 @@ public final class CommandLine {
     private class AdditionalHelpTextParts extends HelpElement {
         private String description;
         private String command;
+        @SuppressWarnings("unused")
         private boolean indentToDescriptionColumn;
 
         @Override

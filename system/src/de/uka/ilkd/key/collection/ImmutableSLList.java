@@ -29,6 +29,7 @@ import java.util.Iterator;
  * amortized O(1). This will be done later (if necessary).
  */
 
+@SuppressWarnings("unchecked")
 public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
     /**
@@ -39,7 +40,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
     /** the empty list */
     public static <T> ImmutableSLList<T> nil() {
-	return (ImmutableSLList<T>) NIL.NIL;
+	     return (ImmutableSLList<T>) NIL.NIL;
     }
 
     /**

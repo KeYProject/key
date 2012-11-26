@@ -19,6 +19,7 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -159,14 +160,19 @@ public class TacletGenerator {
                 new RewriteTacletGoalTemplate(addedSeq,
                                               ImmutableSLList.<Taclet>nil(),
                                               findTerm);
+        
+        // choices, rule set
+        Choice choice = new Choice(satisfiabilityGuard? "showSatisfiability" : "treatAsAxiom", "modelFields");
+        final RuleSet ruleSet = new RuleSet(new Name(
+                satisfiabilityGuard? "inReachableStateImplication" : "classAxiom"));
 
         //create taclet
         tacletBuilder.setName(tacletName);
+        tacletBuilder.setChoices(DefaultImmutableSet.<Choice>nil().add(choice));
         tacletBuilder.setFind(findTerm);
         tacletBuilder.addTacletGoalTemplate(axiomTemplate);
         tacletBuilder.addVarsNotFreeIn(schemaAxiom.boundVars, heapSV, selfSV);
-        tacletBuilder.addRuleSet(
-                new RuleSet(new Name("inReachableStateImplication")));
+        tacletBuilder.addRuleSet(ruleSet);
         return tacletBuilder.getTaclet();
     }
 
@@ -179,7 +185,7 @@ public class TacletGenerator {
             ProgramVariable heap,
             ProgramVariable self,
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
-            boolean satisfiabilityGuard,
+            boolean satisfiability,
             Services services) {
         ImmutableSet<Taclet> result = DefaultImmutableSet.nil();
 
@@ -230,14 +236,19 @@ public class TacletGenerator {
         }
         tacletBuilder.setName(name);
         tacletBuilder.addRuleSet(new RuleSet(new Name("classAxiom")));
+        if (satisfiability)
+            tacletBuilder.addRuleSet(new RuleSet(new Name("split")));
         for (VariableSV boundSV : schemaRepresents.boundVars) {
             tacletBuilder.addVarsNotFreeIn(boundSV, heapSV);
             if (selfSV != null) {
                 tacletBuilder.addVarsNotFreeIn(boundSV, selfSV);
             }
         }
+        Choice c = new Choice(satisfiability? "showSatisfiability" : "treatAsAxiom",
+                "modelFields");
+        tacletBuilder.setChoices(DefaultImmutableSet.<Choice>nil().add(c));
 
-        if (satisfiabilityGuard)
+        if (satisfiability)
             functionalRepresentsAddSatisfiabilityBranch(target, services, heapSV,
                     selfSV, schemaRepresents, tacletBuilder);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);

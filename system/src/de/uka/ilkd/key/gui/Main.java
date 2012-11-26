@@ -304,7 +304,8 @@ public class Main {
         }
         if(cl.isSet(EXPERIMENTAL)){
         	System.out.println("Running in experimental mode ...");
-        	//atm do nothing
+        } else {
+            deactivateExperimentalFeatures();
         }
      	List<String> fileArguments = cl.getArguments();
      	Iterator iter = fileArguments.iterator();
@@ -323,6 +324,11 @@ public class Main {
       		}
       	}
         	
+    }
+    
+    /** Activate experimental features. */
+    private static void deactivateExperimentalFeatures () {
+        de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE.deactivate();
     }
 
 
@@ -355,7 +361,8 @@ public class Main {
 
 	    }    
 	    ui = MainWindow.getInstance().getUserInterface();
-	    System.out.println("Loading: "+fileNameOnStartUp);
+	    if (fileNameOnStartUp != null)
+	        System.out.println("Loading: "+fileNameOnStartUp);
 	}
 
 	return ui;
@@ -430,5 +437,4 @@ public class Main {
     public static String getFileNameOnStartUp() {
         return fileNameOnStartUp;
     }
-    
 }

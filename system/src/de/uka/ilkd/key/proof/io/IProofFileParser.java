@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.proof;
+package de.uka.ilkd.key.proof.io;
 
 import de.uka.ilkd.key.parser.KeYParser;
 
