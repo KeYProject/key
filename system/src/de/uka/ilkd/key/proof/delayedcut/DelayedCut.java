@@ -19,12 +19,23 @@ public class DelayedCut {
         public static final int DECISION_PREDICATE_IN_ANTECEDENT = 0;
         public static final int DECISION_PREDICATE_IN_SUCCEDENT = 1;
         
+        /** Controls whether delayed cut is available to the user.
+         * WARNING: You may refresh your GUI elements after (de-)activation.
+         */
         public static final ExperimentalFeature FEATURE = new ExperimentalFeature(){
+            private boolean active = true;
 
             @Override
             public void deactivate() {
-                // TODO Auto-generated method stub
+                de.uka.ilkd.key.gui.join.JoinMenuItem.FEATURE.deactivate();
+                active = false;
             }
+            
+            @Override
+            public void activate() { active = true; }
+            
+            @Override
+            public boolean active() { return active; }
         };
             
         private final Proof proof;
