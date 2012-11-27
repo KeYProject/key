@@ -10,8 +10,10 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -47,26 +49,22 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
+import org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog;
+import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
-import org.key_project.key4eclipse.starter.core.provider.ImmutableCollectionContentProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.sed.key.core.launch.KeYLaunchSettings;
 import org.key_project.sed.key.core.util.KeySEDUtil;
-import org.key_project.sed.key.ui.dialog.ContractSelectionDialog;
 import org.key_project.sed.key.ui.jdt.AllOperationsSearchEngine;
 import org.key_project.sed.key.ui.jdt.AllTypesSearchEngine;
 import org.key_project.sed.key.ui.util.LogUtil;
-import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.viewer.FileExtensionViewerFilter;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.StringUtil;
-import org.key_project.util.java.SwingUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithProgressAndResult;
-import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithProgressAndResult;
-import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -76,6 +74,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Contains the controls to define a project, type, method and an operation contract to debug.
@@ -583,7 +582,10 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
            final IMethod method = getMethod();
            if (method != null && method.exists()) {
                IProject project = method.getResource().getProject();
-               final File location = ResourceUtil.getLocation(project);
+               // Get source paths from class path
+               List<File> sourcePaths = JDTUtil.getSourceLocations(project);
+               Assert.isTrue(1 == sourcePaths.size(), "Multiple source paths are not supported.");
+               final File location = sourcePaths.get(0);
                final File bootClassPath = KeYResourceProperties.getKeYBootClassPathLocation(project);
                final List<File> classPaths = KeYResourceProperties.getKeYClassPathEntries(project);
                // Load location
@@ -591,28 +593,21 @@ public class MainLaunchConfigurationComposite extends AbstractTabbedPropertiesAn
                    IRunnableWithProgressAndResult<InitConfig> run = new AbstractRunnableWithProgressAndResult<InitConfig>() {
                        @Override
                        public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-                           SWTUtil.checkCanceled(monitor);
-                           monitor.beginTask("Receiving contracts.", IProgressMonitor.UNKNOWN);
-                           IRunnableWithResult<InitConfig> run = new AbstractRunnableWithResult<InitConfig>() {
-                               @Override
-                               public void run() {
-                                   try {
-                                       InitConfig initConfig = KeYUtil.internalLoad(location, classPaths, bootClassPath, false);
-                                       setResult(initConfig);
-                                   }
-                                   catch (Exception e) {
-                                       setException(e);
-                                   }
-                               }
-                           };
-                           SWTUtil.checkCanceled(monitor);
-                           SwingUtil.invokeAndWait(run);
-                           if (run.getException() != null) {
-                               throw new InvocationTargetException(run.getException());
+                           try {
+                              SWTUtil.checkCanceled(monitor);
+                              monitor.beginTask("Receiving contracts.", IProgressMonitor.UNKNOWN);
+                              SWTUtil.checkCanceled(monitor);
+                              KeYEnvironment<?> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
+                              SWTUtil.checkCanceled(monitor);
+                              setResult(environment.getInitConfig());
+                              monitor.done();
                            }
-                           SWTUtil.checkCanceled(monitor);
-                           setResult(run.getResult());
-                           monitor.done();
+                           catch (OperationCanceledException e) {
+                              throw e;
+                           }
+                           catch (Exception e) {
+                              throw new InvocationTargetException(e, e.getMessage());
+                           }
                        }
                    };
                    getLaunchConfigurationDialog().run(true, false, run);

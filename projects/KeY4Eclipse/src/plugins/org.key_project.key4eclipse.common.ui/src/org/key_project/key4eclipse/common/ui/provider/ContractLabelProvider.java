@@ -1,4 +1,4 @@
-package org.key_project.sed.key.ui.provider;
+package org.key_project.key4eclipse.common.ui.provider;
 
 import java.awt.image.BufferedImage;
 import java.util.HashMap;

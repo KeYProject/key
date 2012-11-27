@@ -259,7 +259,7 @@ public class MonKeYBatchMode {
     */
    protected void removeProofEnvFromKeY(List<MonKeYProof> proofs) {
       for (MonKeYProof proof : proofs) {
-         proof.removeProofEnvFromKeY();
+         proof.removeProof();
       }
    }
    

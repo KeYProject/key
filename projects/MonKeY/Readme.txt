@@ -34,6 +34,7 @@ It provides the following file structure:
 - org.key_project.monkey.feature
   // Provides the whole functionality
   - org.key_project.monkey.product.ui // The whole functionality.
+  - org.key_project.monkey.help // The help pages.
 - <tests>
   - org.key_project.monkey.all.test // Allows to execute all tests at once
   - org.key_project.monkey.product.ui.test 
