@@ -27,7 +27,7 @@ public void remove (ListNN o, int i){ //Here "o" denotes the beginning of the li
 
 /*@ public normal_behavior
  requires  (\forall ListNN u; u.next!=null);
- assignable \less_than_nothing;
+ assignable \strictly_nothing;
  accessible \infinite_union(ListNN n; n.next); //over approximation
  ensures \result == (\forall int i;0<=i; 
             (\forall int j;0<=j ;((getNextContractNN(o,i)==getNextContractNN(o,j) ==> i==j ))));
@@ -42,7 +42,7 @@ boolean aCyclic( ListNN o){ //Use the contract, not the implementation.
 /*@ public normal_behavior
      requires (\forall ListNN u; u.next!=null);
     requires k>=0;
-    assignable \less_than_nothing;
+    assignable \strictly_nothing;
     ensures getNextContractNN(l,k+1)==getNextContractNN(l,k).next && 
             getNextContractNN(l,k+2)==getNextContractNN(l,k+1).next && 
             getNextContractNN(l,k+3)==getNextContractNN(l,k+2).next;
@@ -61,7 +61,7 @@ public void lem_gNNNexpand2(ListNN l, int k){ } //Use the contract of this metho
    ListNN oldo; oldo = o;
     /*@ loop_invariant 0<=i && i<=n && 
      (o == getNextContractNN(oldo,i)) && o!=null ; 
-     assignable \less_than_nothing;
+     assignable \strictly_nothing;
       decreases n-i; 
     @*/
     while(o!=null &&  i<n){ 
@@ -74,7 +74,7 @@ public void lem_gNNNexpand2(ListNN l, int k){ } //Use the contract of this metho
 
 /*@ public normal_behavior
  requires  o!=null && n>=0 &&  (\forall ListNN l; l.next!=null);
- assignable \less_than_nothing;
+ assignable \strictly_nothing;
  ensures  (n==0 ==> \result == o) &&
           (n>0  ==> \result == getNextContractNN(o,n-1).next);
  diverges true;
@@ -84,7 +84,7 @@ public void lem_gNNNexpand2(ListNN l, int k){ } //Use the contract of this metho
    ListNN oldo; oldo = o;
     /*@ loop_invariant 0<=i && i<=n && 
      (o == getNextContractNN(oldo,i)) ; 
-     assignable \less_than_nothing;
+     assignable \strictly_nothing;
      decreases n-i; 
     @*/
     while(o!=null &&  i<n){ 
@@ -96,7 +96,7 @@ public void lem_gNNNexpand2(ListNN l, int k){ } //Use the contract of this metho
 
 /*@ public normal_behavior
  requires  n>=0 && o!=null; 
- assignable \less_than_nothing;
+ assignable \strictly_nothing;
  accessible \infinite_union(ListNN l; l.next);
  ensures  (n==0 ==> \result == o) &&
           (n>0  ==> \result == getNextContractNN(o,n-1).next);
