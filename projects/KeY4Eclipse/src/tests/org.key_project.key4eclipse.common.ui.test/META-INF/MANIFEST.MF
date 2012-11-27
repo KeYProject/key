@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Test
+Bundle-Name: KeY 4 Eclipse Common UI Test
 Bundle-SymbolicName: org.key_project.key4eclipse.common.ui.test
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.key_project.key4eclipse.common.ui.test.Activator
@@ -12,3 +12,4 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.key_project.key4eclipse.common.ui.test.suite
+Bundle-Vendor: KeY Project
