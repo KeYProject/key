@@ -1,4 +1,4 @@
-package org.key_project.keyide.ui.storage;
+package org.key_project.keyide.ui.editor.input;
 
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
@@ -32,7 +32,7 @@ public class StringStorage implements IStorage {
     * {@inheritDoc}
     */
    @Override
-   public Object getAdapter(Class adapter) {
+   public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
       return null;
    }
 

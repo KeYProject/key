@@ -1,4 +1,4 @@
-package org.key_project.keyide.ui.dialog;
+package org.key_project.keyide.ui.providers;
 
 import java.awt.image.BufferedImage;
 import java.util.HashMap;

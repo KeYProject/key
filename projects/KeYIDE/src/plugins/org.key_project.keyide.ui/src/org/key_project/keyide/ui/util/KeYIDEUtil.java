@@ -1,13 +1,33 @@
-package org.key_project.keyide.ui.visualization;
+package org.key_project.keyide.ui.util;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.ui.IWorkbenchPage;
+import org.key_project.keyide.ui.visualization.VisualizationPreferences;
 import org.key_project.util.eclipse.WorkbenchUtil;
+import org.key_project.util.java.CollectionUtil;
+import org.key_project.util.java.IFilter;
+import org.key_project.util.java.ObjectUtil;
 
-public class VisualizationUtil {
+import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
-   
+public class KeYIDEUtil {
+   /**
+    * Searches a {@link FunctionalOperationContract} with the given name.
+    * @param operationContracts The available {@link FunctionalOperationContract} to search in.
+    * @param contractName The name of the {@link FunctionalOperationContract} to search.
+    * @return The found {@link FunctionalOperationContract} or {@code null} if no one was found.
+    */
+   public static FunctionalOperationContract findContract(ImmutableSet<FunctionalOperationContract> operationContracts, 
+                                                          final String contractName) {
+       return CollectionUtil.search(operationContracts, new IFilter<FunctionalOperationContract>() {
+           @Override
+           public boolean select(FunctionalOperationContract element) {
+               return element != null && ObjectUtil.equals(element.getName(), contractName);
+           }
+       });
+   }
    
    
    /**
@@ -39,4 +59,5 @@ public class VisualizationUtil {
       }
       return switchPerspective;
    }
+
 }

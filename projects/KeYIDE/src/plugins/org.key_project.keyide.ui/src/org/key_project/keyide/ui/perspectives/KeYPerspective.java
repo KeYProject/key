@@ -26,14 +26,14 @@ public class KeYPerspective implements IPerspectiveFactory {
       // Get the editor area.
       String editorArea = layout.getEditorArea();
       // Put the debug view on the left.
-      IFolderLayout leftFolder = layout.createFolder("left", IPageLayout.LEFT, 0.2f, editorArea);
+      IFolderLayout leftFolder = layout.createFolder("left", IPageLayout.LEFT, 0.3f, editorArea);
       leftFolder.addView(IPageLayout.ID_PROJECT_EXPLORER);
       // Put the properties view on bottom left.
-      IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeft", IPageLayout.BOTTOM, 0.8f, "left");
-      bottomLeftFolder.addView(IPageLayout.ID_PROP_SHEET);
+      IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeft", IPageLayout.BOTTOM, 0.7f, "left");
+      bottomLeftFolder.addView("org.key_project.keyide.ui.StrategyProperties");
       // Put the out line on the right.
       IFolderLayout rightFolder = layout.createFolder("right", IPageLayout.RIGHT, 0.8f, editorArea);
-      rightFolder.addView(IPageLayout.ID_OUTLINE);
+      rightFolder.addView("org.key_project.keyide.ui.view.outline");
       // Perspective Shortcuts
       layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaPerspective");
       layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaHierarchyPerspective");
@@ -41,7 +41,7 @@ public class KeYPerspective implements IPerspectiveFactory {
       layout.addPerspectiveShortcut("org.eclipse.debug.ui.DebugPerspective");
       // View Shortcuts
       layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
-      layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
+      layout.addShowViewShortcut("org.key_project.keyide.ui.view.outline");
    }
 
 }

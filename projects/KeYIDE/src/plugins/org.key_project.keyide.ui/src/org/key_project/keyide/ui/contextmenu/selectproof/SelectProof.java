@@ -13,6 +13,8 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.SWT;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewActionDelegate;
@@ -20,6 +22,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PlatformUI;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
+import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
@@ -31,7 +34,15 @@ public class SelectProof implements IViewActionDelegate{
    
       @Override
       public void run(IAction action) {
-         
+         IEditorPart editor = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+//         if (editor instanceof IProofAutomation) {
+//            
+//         }
+//         IProofAutomation obj = (IProofAutomation)editor.getAdapter(IProofAutomation.class);
+//         TreeViewer outlineViewer = new TreeViewer(SWT.BORDER | SWT.SIMPLE | SWT.VIRTUAL);
+//         outlineViewer.setUseHashlookup(true);
+//         outlineViewer.setChildCount(elementOrTreePath, count)
+//         outlineViewer.replace(parentElementOrTreePath, index, element)
          try {
             doExecute(action);
          }

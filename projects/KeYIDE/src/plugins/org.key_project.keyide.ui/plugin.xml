@@ -4,7 +4,8 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="org.key_project.keyide.ui.editor.KeyEditor"
+            class="org.key_project.keyide.ui.editor.KeYEditor"
+            contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
             default="false"
             extensions="proof"
             icon="icons/logo16.gif"
@@ -69,6 +70,30 @@
                      </and>
                   </with></and>
             </or></enabledWhen>
+      </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.StartAutoModeHandler"
+            commandId="org.key_project.keyide.ui.commands.startAutoModeCommand">
+         <enabledWhen>
+            <with
+                  variable="activeEditorId">
+               <equals
+                     value="org.key_project.keyide.ui.editor">
+               </equals>
+            </with>
+         </enabledWhen>
+      </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.StopAutoModeHandler"
+            commandId="org.key_project.keyide.ui.commands.stopAutoModeCommand">
+         <enabledWhen>
+            <with
+                  variable="activeEditorId">
+               <equals
+                     value="org.key_project.keyide.ui.editor">
+               </equals>
+            </with>
+         </enabledWhen>
       </handler>
    </extension>
    <extension
@@ -160,6 +185,45 @@
             </visibleWhen>
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+            <toolbar
+               id="org.key_project.keyide.ui.toolbar">
+                 <command
+                       commandId="org.key_project.keyide.ui.commands.startAutoModeCommand"
+                       icon="icons/autoModeStart.png"
+                       id="org.key_project.keyide.ui.commands.startAutoModeCommand"
+                       label="Start Auto Mode"
+                       tooltip="Start Auto Mode">
+                    <visibleWhen
+                          checkEnabled="false">
+                       <with
+                             variable="activeEditorId">
+                          <equals
+                                value="org.key_project.keyide.ui.editor">
+                          </equals>
+                       </with>
+                    </visibleWhen>
+                </command>
+                 <command
+                       commandId="org.key_project.keyide.ui.commands.stopAutoModeCommand"
+                       icon="icons/autoModeStop.png"
+                       id="org.key_project.keyide.ui.commands.stopAutoModeCommand"
+                       label="Stop Auto Mode"
+                       style="push">
+                    <visibleWhen
+                          checkEnabled="false">
+                       <with
+                             variable="activeEditorId">
+                          <equals
+                                value="org.key_project.keyide.ui.editor">
+                          </equals>
+                       </with>
+                    </visibleWhen>
+                 </command>
+         </toolbar>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -174,6 +238,18 @@
             id="org.key_project.keyide.ui.commands.category"
             name="KeY">
       </category>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Starts the proof auto mode with the current specification."
+            id="org.key_project.keyide.ui.commands.startAutoModeCommand"
+            name="Start Auto Mode">
+      </command>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Stops the automode."
+            id="org.key_project.keyide.ui.commands.stopAutoModeCommand"
+            name="Stop Auto Mode">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
@@ -219,6 +295,42 @@
       <initializer
             class="org.key_project.keyide.ui.visualization.VisualizationPreferencesInitializer">
       </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.key_project.keyide.ui.view.category"
+            name="KeY">
+      </category>
+      <view
+            category="org.key_project.keyide.ui.view.category"
+            class="org.key_project.keyide.ui.views.Outline"
+            icon="icons/logo16.gif"
+            id="org.key_project.keyide.ui.view.outline"
+            name="Proof"
+            restorable="true">
+      </view>
+      <view
+            category="org.key_project.keyide.ui.view.category"
+            class="org.key_project.keyide.ui.views.StrategyProperties"
+            id="org.key_project.keyide.ui.StrategyProperties"
+            name="StrategyProperties"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editorActions">
+      <editorContribution
+            id="org.key_project.keyide.ui.editor.contribution"
+            targetID="org.key_project.keyide.ui.editor">
+         <action
+               class="org.key_project.keyide.ui.editor.actions.StartAutoProof"
+               id="org.key_project.keyide.ui.editor.actions.startautoproof"
+               label="Start Proof"
+               style="push"
+               tooltip="Start the automated proof.">
+         </action>
+      </editorContribution>
    </extension>
 
 </plugin>

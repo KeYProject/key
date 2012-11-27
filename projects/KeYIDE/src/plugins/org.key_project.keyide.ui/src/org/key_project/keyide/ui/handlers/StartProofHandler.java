@@ -10,7 +10,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.key_project.keyide.ui.util.KeyToUIUtil;
+import org.key_project.keyide.ui.util.KeYToUIUtil;
 
 /**
  * An {@link AbstractSaveExecutionHandler} for the Start Proof command.
@@ -31,8 +31,8 @@ public class StartProofHandler extends AbstractSaveExecutionHandler {
            Object[] elements = ((IStructuredSelection)selection).toArray();
            for (Object element : elements) {
                if (element instanceof IMethod) {
-                KeyToUIUtil.createProof((IMethod)element);
-                KeyToUIUtil.switchPerspective();
+                KeYToUIUtil.createProof((IMethod)element);
+                KeYToUIUtil.switchPerspective();
                }
            }
        }
@@ -44,8 +44,8 @@ public class StartProofHandler extends AbstractSaveExecutionHandler {
                IJavaElement element=null;
                   element = SelectionConverter.resolveEnclosingElement(javaEditor, textSelection);
                if (element instanceof IMethod) {
-                  KeyToUIUtil.createProof((IMethod)element);
-                  KeyToUIUtil.switchPerspective();
+                  KeYToUIUtil.createProof((IMethod)element);
+                  KeYToUIUtil.switchPerspective();
                }
            }
        }

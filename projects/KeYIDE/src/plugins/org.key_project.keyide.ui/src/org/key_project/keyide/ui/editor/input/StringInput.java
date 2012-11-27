@@ -1,4 +1,4 @@
-package org.key_project.keyide.ui.storage;
+package org.key_project.keyide.ui.editor.input;
 
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
@@ -67,7 +67,7 @@ public class StringInput implements IStorageEditorInput{
     * {@inheritDoc}
     */
    @Override
-   public Object getAdapter(Class adapter) {
+   public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
       return null;
    }
 
