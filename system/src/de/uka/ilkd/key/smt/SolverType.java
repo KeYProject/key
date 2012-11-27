@@ -145,7 +145,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 };
                 
                 public String[] getSupportedVersions() {
-                	return new String[] {"version 3.2"};
+                	return new String[] {"version 3.2","version 4.1","version 4.3.0","version 4.3.1"};
                 };
                 
                 public String[] getDelimiters() {

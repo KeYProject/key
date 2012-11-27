@@ -20,14 +20,14 @@ final class SimplifiedLinkedList {
     /*@ normal_behaviour
       @ requires n >= 0 && n < size && \invariant_for(this);
       @ ensures \result == (Node)nodeseq[n];
-      @ assignable \less_than_nothing;
+      @ assignable \strictly_nothing;
       @ helper */
     private Node getNext(int n) {
 	Node result = first;
 	/*@ loop_invariant
 	  @   0<=i && i <=n && result == (Node)nodeseq[i];
 	  @ decreases n-i;
-	  @ assignable \less_than_nothing;
+	  @ assignable \strictly_nothing;
 	  @*/
 	for(int i = 0; i < n; i++) {
 	    result = result.next;

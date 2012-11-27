@@ -1,21 +1,22 @@
-// import java.util.Arrays;
+final class PrefixSumRec {
 
-class PrefixSumRec {
-
-    private final int[] a; // non_null
+    private final int[] a;
+    
+    //@ invariant a.length > 0;
+    //@ invariant isPow2(a.length);
+    //@ accessible \inv: \singleton(a);
 
     PrefixSumRec(int [] a) {
 	this.a = a;
     }
 
-
     /*@ public normal_behavior
       @  requires x > 0;
-      @  ensures \result ==> (x % 2 == 0  && isPow2(x/2) || x == 1);
+      @  ensures \result ==> ((x % 2 == 0  && isPow2(x/2)) <=!=> x == 1);
       @  ensures \result == (\exists int b; 0 <= b;
       @                     x == (\product int i; 0 <= i && i < b; 2));
       @  measured_by x;
-      @  strictly_pure
+      @  strictly_pure helper
       @*/
     private boolean isPow2(int x){
       if (x==1) 
@@ -24,19 +25,21 @@ class PrefixSumRec {
           return false;
       else 
           return isPow2(x/2);
-    } // proof requires induction (hypothesis: isPow(pow(2,n)))
+    } // proven with interaction (requires induction)
 
     /*@ public normal_behavior
-          requires right > left;
-          requires left >= 0;
-          requires right < a.length;
-          requires isPow2(a.length);
-          requires isPow2(right - left);
-          // requires right % 2 == 0 && (left % 2 == 0 || right - left == 1);
-          //ensures a[right] == (\sum int i; 0 <= i && i < right; \old(a[i]));
-          ensures a[right] == (\sum int i; 2*left-right+1 <= i && i < right+1; \old(a[i]));
-          measured_by right - left;
-          assignable a[*]; // every second entry <= right
+      @   requires right > left;
+      @   requires 2*left-right+1 >= 0;
+      @   requires (2*left-right+1)%2 == 0;
+      @   requires (left+1)%2 == 0;
+      @   requires right < a.length;
+      @   requires isPow2(right-left);
+      @   ensures (\forall int k; 2*left-right < k && k <= right && k%2 == 1; 
+      @            a[k] == (\sum int i; 2*left-right+1 <= i && i < k+1; \old(a[i])));
+      @   ensures !(\exists int k; 2*left-right < k && k <= right && k%2 == 1;
+      @             a[k] != \old(a[k]));
+      @   measured_by right - left + 1;
+      @   assignable a[*];
       @*/
     public void upsweep(int left, int right) {
         int space = right - left;
@@ -44,7 +47,6 @@ class PrefixSumRec {
             upsweep(left-space/2,left);
             upsweep(right-space/2,right);
         }
-        // @ assert space == 1;
         a[right] = a[left]+a[right];
     }
     
@@ -60,27 +62,18 @@ class PrefixSumRec {
         }
     
     }
-
-/*       
-    public static void main (String [] args) {
-        int [] a = {3,1,7,0,4,1,6,3};
-        PrefixSumRec p = new PrefixSumRec(a);
-        System.out.println(Arrays.toString(a));
-        p.upsweep(3,7);
-        System.out.println(Arrays.toString(a));
-        a[7]=0;
-        p.downsweep(3,7);
-        System.out.println(Arrays.toString(a));
+    
+    /*@ normal_behavior
+      @   requires \invariant_for(p);
+      @   ensures (\forall int i; 0 <= i && i < p.a.length;
+      @             p.a[i] == (\sum int j; 0 <= j && j < i;
+      @                           \old(p.a[i])));
+      @*/
+    public static void main( PrefixSumRec p ) {
+        final int l = (p.a.length/2)-1;
+        final int r = p.a.length-1;
+        p.upsweep(l, r);
+        p.a[r] = 0;
+        p.downsweep(l, r);
     }
-*/
 }
-
-
-/*
-[3, 1, 7, 0, 4, 1, 6, 3]
-[3, 4, 7, 11, 4, 5, 6, 25]
-[0, 3, 4, 11, 11, 15, 16, 22]
-
-
-
-*/

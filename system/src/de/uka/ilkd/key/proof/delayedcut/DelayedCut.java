@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.util.ExperimentalFeature;
 
 /**
  * This class wraps the information about the delayed cut. It only wraps data but not functional 
@@ -17,7 +18,26 @@ import de.uka.ilkd.key.rule.RuleApp;
 public class DelayedCut {
         public static final int DECISION_PREDICATE_IN_ANTECEDENT = 0;
         public static final int DECISION_PREDICATE_IN_SUCCEDENT = 1;
-    
+        
+        /** Controls whether delayed cut is available to the user.
+         * WARNING: You may refresh your GUI elements after (de-)activation.
+         */
+        public static final ExperimentalFeature FEATURE = new ExperimentalFeature(){
+            private boolean active = true;
+
+            @Override
+            public void deactivate() {
+                de.uka.ilkd.key.gui.join.JoinMenuItem.FEATURE.deactivate();
+                active = false;
+            }
+            
+            @Override
+            public void activate() { active = true; }
+            
+            @Override
+            public boolean active() { return active; }
+        };
+            
         private final Proof proof;
         private final Node  node;
         private final ImmutableList<Node>  subtrees;
