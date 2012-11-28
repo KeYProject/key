@@ -6,6 +6,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IStorageEditorInput;
 
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+
 /**
  * This class is used to define an input to display in the editor
  * 
@@ -13,14 +16,28 @@ import org.eclipse.ui.IStorageEditorInput;
  */
 public class StringInput implements IStorageEditorInput{
    
+   public Proof getProof() {
+      return proof;
+   }
+
+   public KeYEnvironment<?> getEnvironment() {
+      return environment;
+   }
+
    private IStorage storage;
+   
+   private Proof proof;
+   
+   private KeYEnvironment<?> environment;
    
    /**
     * Constructor
     * @param storage The storage for this {@link IStorageEditorInput}
     */
-   public StringInput(IStorage storage){
+   public StringInput(IStorage storage, Proof proof, KeYEnvironment<?> environment){
       this.storage=storage;
+      this.proof = proof;
+      this.environment = environment;
    }
 
    /** 

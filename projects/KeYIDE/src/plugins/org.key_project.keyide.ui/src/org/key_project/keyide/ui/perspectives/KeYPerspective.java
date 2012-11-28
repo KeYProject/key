@@ -4,6 +4,8 @@ import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
+import de.uka.ilkd.key.proof.Proof;
+
 
 /**
  * This class defines the layout of the KeY-View.
@@ -33,7 +35,7 @@ public class KeYPerspective implements IPerspectiveFactory {
       bottomLeftFolder.addView("org.key_project.keyide.ui.StrategyProperties");
       // Put the out line on the right.
       IFolderLayout rightFolder = layout.createFolder("right", IPageLayout.RIGHT, 0.8f, editorArea);
-      rightFolder.addView("org.key_project.keyide.ui.view.outline");
+      rightFolder.addView(IPageLayout.ID_OUTLINE);
       // Perspective Shortcuts
       layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaPerspective");
       layout.addPerspectiveShortcut("org.eclipse.jdt.ui.JavaHierarchyPerspective");
@@ -41,7 +43,7 @@ public class KeYPerspective implements IPerspectiveFactory {
       layout.addPerspectiveShortcut("org.eclipse.debug.ui.DebugPerspective");
       // View Shortcuts
       layout.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
-      layout.addShowViewShortcut("org.key_project.keyide.ui.view.outline");
+      layout.addShowViewShortcut(IPageLayout.ID_OUTLINE);
    }
 
 }

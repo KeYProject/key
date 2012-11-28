@@ -11,17 +11,14 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
-import org.key_project.key4eclipse.starter.core.provider.ImmutableCollectionContentProvider;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.keyide.ui.dialog.ContractSelectionDialog;
 import org.key_project.keyide.ui.editor.input.StringInput;
 import org.key_project.keyide.ui.editor.input.StringStorage;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -34,21 +31,12 @@ import org.key_project.util.jdt.JDTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
-import de.uka.ilkd.key.gui.prooftree.GUIAbstractTreeNode;
-import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
-import de.uka.ilkd.key.ui.UserInterface;
-
-import org.key_project.keyide.ui.providers.OutlineContentProvider;
-import org.key_project.keyide.ui.views.*;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * This class provides static methods for the communication between KeY and the Eclipse UI.
@@ -60,31 +48,6 @@ public class KeYToUIUtil {
    
    private KeYToUIUtil(){
       
-   }
-   
-   /**
-    * Last loaded {@link InitConfig}.
-    */
-   private static InitConfig initConfig;
-   
-   /**
-    * Defines the existing contract to use.
-    */
-   private static Text existingContractText;
-   
-   /**
-    * The {@link Proof} to currently use.
-    */
-   private static Proof proof = null;
-   
-   /**
-    * The {@link UserInterface} of KeY.
-    */
-   private static UserInterface ui;
-
-   
-   public static UserInterface getUi() {
-      return ui;
    }
 
    /**
@@ -104,39 +67,37 @@ public class KeYToUIUtil {
                   @Override
                     protected IStatus run(IProgressMonitor monitor) {
                        try {
-                          if (ui==null)
-                             ui = new CustomConsoleUserInterface(false);
-                          if (initConfig == null) {
-                             monitor.beginTask("Loading Proof", 1);
-                             DefaultProblemLoader loader = ui.load(location, classPaths, bootClassPath);
-                             initConfig = loader.getInitConfig();
-                          }
-                          if (initConfig != null) {
+                          monitor.beginTask("Loading Proof", 1);
+                          final KeYEnvironment<?> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
+
+                          if (environment.getInitConfig() != null) {
                              // Get method to proof in KeY
-                             final IProgramMethod pm = KeYUtil.getProgramMethod(method, initConfig.getServices().getJavaInfo());
+                             final IProgramMethod pm = KeYUtil.getProgramMethod(method, environment.getJavaInfo());
                              if (pm != null) {
                                  KeYJavaType type = pm.getContainerType();
-                                 final ImmutableSet<FunctionalOperationContract> operationContracts = initConfig.getServices().getSpecificationRepository().getOperationContracts(type, pm);
-                                 final Services services = initConfig.getServices();
+                                 final ImmutableSet<FunctionalOperationContract> operationContracts = environment.getSpecificationRepository().getOperationContracts(type, pm);
                                  final Display display = Display.getDefault();
-                                 display.asyncExec(new Runnable() {
+                                 Runnable run = new Runnable() {
+                                    @Override
                                     public void run() {
-                                       Shell shell = new Shell(display);
-                                       // Open selection dialog
-                                       ContractSelectionDialog dialog = initializeDialog(operationContracts, shell, services);
-                                       openDialog(dialog, operationContracts, ui);
-                                       //Open proof in Editor if correctly selected
-                                       if(proof!=null){
-                                          KeYToUIUtil.openEditor(proof.toString(), ui);
-                                          //Outline.viewer.setInput("qwe");
-//                                          Outline.viewer.setInput(new GUIProofTreeModel(proof));
-                                         
+                                       try {
+                                          // Open selection dialog
+                                          Proof proof = openDialog(operationContracts, environment);
+                                          //Open proof in Editor if correctly selected
+                                          if(proof != null){
+                                             KeYToUIUtil.openEditor(proof, environment);
+                                          }
+                                       }
+                                       catch (Exception e) {
+                                          LogUtil.getLogger().logError(e);
+                                          LogUtil.getLogger().openErrorDialog(null, e);
                                        }  
                                     }
-                                 });  
-                              }
+                                 };
+                                 display.asyncExec(run);  
+                             }
                              else {
-                                throw new IllegalStateException("Can't find method \"" + JDTUtil.getQualifiedMethodLabel(method) + "\" in KeY.");
+                                return LogUtil.getLogger().createErrorStatus("Can't find method \"" + JDTUtil.getQualifiedMethodLabel(method) + "\" in KeY.");
                              }
                           }
                           SWTUtil.checkCanceled(monitor);
@@ -176,15 +137,6 @@ public class KeYToUIUtil {
            }
        });
    }
-   
-   
-   /**
-    * Returns the ID of the existing contract.
-    * @return The ID of the existing contract.
-    */
-   protected static String getContractId() {
-       return existingContractText.getText();
-   }   
   
    
    
@@ -194,11 +146,11 @@ public class KeYToUIUtil {
     * @param name The  name to display at the editor-tab
     * @param ui The UserInterface that holds the KeYMediator
     */
-   public static void openEditor(final String name, final UserInterface ui){
-      String inputText = NonGoalInfoView.computeText(ui.getMediator(), proof.root());
+   public static void openEditor(Proof proof, KeYEnvironment<?> environment){
+      String inputText = NonGoalInfoView.computeText(environment.getMediator(), proof.root());
       String inputSequent=(String) inputText.subSequence(0, inputText.length()-12);
-      IStorage storage = new StringStorage(inputSequent, name);
-      IStorageEditorInput input = new StringInput(storage);
+      IStorage storage = new StringStorage(inputSequent, inputText);
+      IStorageEditorInput input = new StringInput(storage, proof, environment);
       try {
          PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, "org.key_project.keyide.ui.editor");
       }
@@ -220,39 +172,37 @@ public class KeYToUIUtil {
    }
    
    
-   private static ContractSelectionDialog initializeDialog(ImmutableSet<FunctionalOperationContract> operationContracts, Shell shell, Services services) {
-      Shell dialogShell = new Shell(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-      ContractSelectionDialog dialog = new ContractSelectionDialog(dialogShell, ImmutableCollectionContentProvider.getInstance(), services);
-      dialog.setTitle("Contract selection");
-      dialog.setMessage("Select a contract to debug.");
-      dialog.setInput(operationContracts);
-      existingContractText=new Text(dialogShell, SWT.TOP);
-      return dialog;
-   } 
+//   private static ContractSelectionDialog initializeDialog(ImmutableSet<FunctionalOperationContract> operationContracts, Shell shell, Services services) {
+//      Shell dialogShell = new Shell(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+//      ContractSelectionDialog dialog = new ContractSelectionDialog(dialogShell, ImmutableCollectionContentProvider.getInstance(), services);
+//      dialog.setTitle("Contract selection");
+//      dialog.setMessage("Select a contract to debug.");
+//      dialog.setInput(operationContracts);
+////      existingContractText=new Text(dialogShell, SWT.TOP);
+//      return dialog;
+//   } 
    
-   private static void openDialog(ContractSelectionDialog dialog, ImmutableSet<FunctionalOperationContract> operationContracts, UserInterface ui) {
-      FunctionalOperationContract selectedContract = KeYToUIUtil.findContract(operationContracts, getContractId());
-      if (selectedContract != null) {
-          dialog.setInitialSelections(new Object[] {selectedContract});
-      }
-      if (dialog.open() == ContractSelectionDialog.OK) {
+   private static Proof openDialog(ImmutableSet<FunctionalOperationContract> operationContracts, KeYEnvironment<?> environment) throws ProofInputException 
+   {
+      Shell parent = WorkbenchUtil.getActiveShell();
+      ImmutableCollectionContentProvider contentProvider = ImmutableCollectionContentProvider.getInstance();
+      org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog dialog = new org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog(parent, contentProvider, environment.getServices());
+      dialog.setInput(operationContracts);
+//      ContractSelectionDialog dialog = new ContractSelectionDialog(WorkbenchUtil, contentProvider, services)
+//      FunctionalOperationContract selectedContract = KeYToUIUtil.findContract(operationContracts, getContractId());
+      if (dialog.open() == org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog.OK) {
           Object result = dialog.getFirstResult();
           if (result instanceof FunctionalOperationContract) {
               FunctionalOperationContract foc = (FunctionalOperationContract)result;
-              existingContractText.setText(foc.getName());
-              try {
-                proof = ui.createProof(initConfig, foc.createProofObl(initConfig, foc));
-              }
-            catch (ProofInputException e) {
-               
-               e.printStackTrace();
-            }  
+//              existingContractText.setText(foc.getName());
+              return environment.createProof(foc.createProofObl(environment.getInitConfig(), foc));
          }
+          else {
+             throw new ProofInputException("The selected contract is no FunctionalOperationContract.");
+          }
       }
-   }
-   
-   public static Proof getProof(){
-      return proof;
-   }
-     
+      else {
+         return null;
+      }
+   }     
 }
