@@ -725,7 +725,6 @@ public final class UseOperationContractRule implements BuiltInRule {
                 new InfFlowMethodContractTacletBuilder(services);
         ifContractBuilder.setContract(contract);
         ifContractBuilder.setContextUpdate(inst.u);
-        ifContractBuilder.setBaseHeap(TB.getBaseHeap(services));
         ifContractBuilder.setHeapAtPre(anonUpdateData.methodHeapAtPre);
         ifContractBuilder.setHeapAtPost(anonUpdateData.methodHeap);
         ifContractBuilder.setSelf(contractSelf);

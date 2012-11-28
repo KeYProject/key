@@ -27,21 +27,37 @@ import java.util.Collection;
 public class ProofObligationVars {
 
     protected static final TermBuilder TB = TermBuilder.DF;
+
     public final ImmutableList<Term> termList;
+
     public final ImmutableList<Term> paddedTermList;
+
     public final ImmutableList<Term> paddedTermListWithoutLocalVars;
+
     public final String postfix;
+
     public final Term self;
+
     public final Term selfAtPost;
+
     public final ImmutableList<Term> localIns;
+
     public final ImmutableList<Term> localOuts;
+
     public final Term result;
+
     public final Term resultAtPost;
+
     public final Term exception;
+
     public final Term exceptionAtPost;
+
     public final Term heap;
+
     public final Term heapAtPre;
+
     public final Term heapAtPost;
+
     public final Term mbyAtPre;
 
 
@@ -84,10 +100,10 @@ public class ProofObligationVars {
 
         ImmutableList<Term> terms =
                 ImmutableSLList.<Term>nil();
-        terms = appendIfNotNull(terms, heap);
         terms = appendIfNotNull(terms, self);
         terms = appendIfNotNull(terms, selfAtPost);
         terms = terms.append(localIns);
+        terms = appendIfNotNull(terms, heap);
         terms = appendIfNotNull(terms, heapAtPre);
         terms = terms.append(localOuts);
         terms = appendIfNotNull(terms, result);
@@ -140,17 +156,30 @@ public class ProofObligationVars {
     }
 
 
-    public ProofObligationVars(Term baseHeap,
-                               Term self,
+    public ProofObligationVars(Term self,
                                ImmutableList<Term> localIns,
+                               ImmutableList<Term> localOuts,
+                               Term result,
+                               Term exception,
+                               Term baseHeap,
                                Term heapAtPre,
+                               Term heapAtPost,
+                               Services services) {
+        this(self, null, localIns, localOuts, result, null, exception, null,
+             baseHeap, heapAtPre, heapAtPost, null, "", services);
+    }
+
+
+    public ProofObligationVars(Term self,
+                               ImmutableList<Term> localIns,
+                               Term heap,
                                ImmutableList<Term> localOuts,
                                Term result,
                                Term exception,
                                Term heapAtPost,
                                Services services) {
         this(self, null, localIns, localOuts, result, null, exception, null,
-             baseHeap, heapAtPre, heapAtPost, null, "", services);
+             heap, null, heapAtPost, null, "", services);
     }
 
 
@@ -165,48 +194,81 @@ public class ProofObligationVars {
     }
 
 
-    ProofObligationVars(ProofObligationVars orig,
-                        String postfix,
-                        Services services) {
-        this(newLocationVariable(orig.self, postfix, services),
-             newLocationVariable(orig.selfAtPost, postfix, services),
-             newLocationVariable(orig.localIns, postfix, services),
-             newLocationVariable(orig.localOuts, postfix, services),
-             newLocationVariable(orig.result, postfix, services),
-             newLocationVariable(orig.resultAtPost, postfix, services),
-             newLocationVariable(orig.exception, postfix, services),
-             newLocationVariable(orig.exceptionAtPost, postfix, services),
-             newLocationVariable(orig.heap, postfix, services),
-             newLocationVariable(orig.heapAtPre, postfix, services),
-             newLocationVariable(orig.heapAtPost, postfix, services),
+    public ProofObligationVars(ProofObligationVars orig,
+                               String postfix,
+                               Services services) {
+        this(copyLocationVariable(orig.self, postfix, services),
+             copyLocationVariable(orig.selfAtPost, postfix, services),
+             copyLocationVariable(orig.localIns, postfix, services),
+             copyLocationVariable(orig.localOuts, postfix, services),
+             copyLocationVariable(orig.result, postfix, services),
+             copyLocationVariable(orig.resultAtPost, postfix, services),
+             copyLocationVariable(orig.exception, postfix, services),
+             copyLocationVariable(orig.exceptionAtPost, postfix, services),
+             copyLocationVariable(orig.heap, postfix, services),
+             copyLocationVariable(orig.heapAtPre, postfix, services),
+             copyLocationVariable(orig.heapAtPost, postfix, services),
              newFunction(orig.mbyAtPre, postfix, services),
              postfix,
              services);
     }
 
 
+    private static Term copyLocationVariable(Term t,
+                                             String postfix,
+                                             Services services) {
+        if (t != null) {
+            return newLocationVariable(t, t.toString() + postfix, services);
+        } else {
+            return null;
+        }
+    }
+
+
     private static Term newLocationVariable(Term t,
-                                            String postfix,
+                                            String name,
                                             Services services) {
         if (t == null) {
             return null;
         }
-        String newName = TB.newName(services, t.toString() + postfix);
-        ProgramElementName pen =
-                new ProgramElementName(newName);
-        LocationVariable newVar = new LocationVariable(pen, t.sort());
+        String newName = TB.newName(services, name);
+        ProgramElementName pen = new ProgramElementName(newName);
+        LocationVariable newVar;
+        if (t.op() instanceof ProgramVariable) {
+            // normal case
+            ProgramVariable progVar = (ProgramVariable) t.op();
+            newVar = new LocationVariable(pen, progVar.getKeYJavaType(),
+                                          progVar.getContainerType(),
+                                          progVar.isStatic(), progVar.isModel());
+        } else if (t.op() instanceof Function) {
+            // might be the case if a new heap-symbol has been introduced
+            Function f = (Function) t.op();
+            LocationVariable heapVar =
+                    services.getTypeConverter().getHeapLDT().getHeap();
+            if (f.sort() == heapVar.sort()) {
+                newVar = new LocationVariable(pen, heapVar.getKeYJavaType());
+            } else {
+                throw new IllegalArgumentException("Expected a program " +
+                                                   "variable or a function " +
+                                                   "of sort Heap.");
+            }
+        } else {
+            throw new IllegalArgumentException("Expected a program " +
+                                               "variable or a function of " +
+                                               "sort Heap.");
+        }
         register(newVar, services);
         return TB.var(newVar);
     }
 
 
-    private static ImmutableList<Term> newLocationVariable(
+    private static ImmutableList<Term> copyLocationVariable(
             ImmutableList<Term> ts,
-                                                           String postfix,
-                                                           Services services) {
+            String postfix,
+            Services services) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         for (Term t : ts) {
-            result = result.append(newLocationVariable(t, postfix, services));
+            result = result.append(copyLocationVariable(t, postfix, services));
         }
         return result;
     }

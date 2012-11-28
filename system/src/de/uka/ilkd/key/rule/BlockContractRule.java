@@ -22,10 +22,12 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -207,7 +209,6 @@ public class BlockContractRule implements BuiltInRule {
                 new InfFlowBlockContractTacletBuilder(services);
         ifContractBuilder.setContract(contract);
         ifContractBuilder.setContextUpdate(contextUpdate);
-        ifContractBuilder.setBaseHeap(TB.getBaseHeap(services));
         ifContractBuilder.setHeapAtPre(preHeap);
         ifContractBuilder.setHeapAtPost(postHeap);
         final Terms vars = contract.getVariablesAsTerms();
@@ -229,17 +230,21 @@ public class BlockContractRule implements BuiltInRule {
         ImmutableList<Goal> result;
         final ContractPO po =
                 services.getSpecificationRepository().getPOForProof(goal.proof());
-        if (po instanceof InfFlowContractPO || po instanceof SymbolicExecutionPO) {
+        if (po instanceof InfFlowContractPO ||
+            po instanceof SymbolicExecutionPO ||
+            po instanceof BlockExecutionPO) {
             AbstractOperationPO abstPO = (AbstractOperationPO) po;
-            ProofObligationVars poVars =
-                    new ProofObligationVars(TB.getBaseHeap(services), vars.self,
+            ProofObligationVars instantiationVars =
+                    new ProofObligationVars(vars.self,
                                             MiscTools.toTermList(localInVariables),
-                                            preHeap,
                                             MiscTools.toTermList(localOutVariables),
-                                            vars.result, vars.exception, postHeap,
-                                            services);
+                                            vars.result, vars.exception,
+                                            TB.getBaseHeap(services), preHeap,
+                                            postHeap, services);
             Sequent seq = buildBodyPreservesSequent(contract, application,
-                                                    poVars, instantiation.context, services);
+                                                    instantiationVars,
+                                                    instantiation.context,
+                                                    services);
             Goal infFlowGoal = goal.getCleanGoal(seq);
             ImmutableSet<NoPosTacletApp> taclets = abstPO.getInitialTaclets();
             infFlowGoal.indexOfTaclets().addTaclets(taclets);
@@ -312,12 +317,8 @@ public class BlockContractRule implements BuiltInRule {
                                       ExecutionContext context,
                                       Services services) {
         // generate proof obligation variables
-        IProgramMethod pm = contract.getTarget();
-        assert (symbExecVars.self == null) == (pm.isStatic() ||
-                                               pm.isConstructor());
-        final InfFlowContractPO.IFProofObligationVars ifVars =
-                new InfFlowContractPO.IFProofObligationVars(symbExecVars,
-                                                            services);
+        final IFProofObligationVars ifVars =
+                new IFProofObligationVars(symbExecVars, services);
         app.update(ifVars, context);
 
         // create proof obligation

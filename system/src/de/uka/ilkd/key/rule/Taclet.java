@@ -966,7 +966,7 @@ public abstract class Taclet implements Rule, Named {
      * Schemavariables to concrete logic elements
      * @return the instanted formulas of the semisquent as list
      */
-    private ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi, Services services, 
+    protected ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi, Services services,
             MatchConditions matchCond) {       
         
         ImmutableList<SequentFormula> replacements = ImmutableSLList.<SequentFormula>nil();
