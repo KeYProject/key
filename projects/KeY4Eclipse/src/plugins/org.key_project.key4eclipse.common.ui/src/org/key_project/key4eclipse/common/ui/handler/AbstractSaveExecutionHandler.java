@@ -1,13 +1,11 @@
-package org.key_project.key4eclipse.starter.ui.handler;
+package org.key_project.key4eclipse.common.ui.handler;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.key_project.key4eclipse.starter.ui.Activator;
+import org.key_project.key4eclipse.common.ui.util.LogUtil;
 
 /**
  * Provides a basic implementation of {@link AbstractHandler} that allows
@@ -46,10 +44,6 @@ public abstract class AbstractSaveExecutionHandler extends AbstractHandler {
      * @return The dialog result of the shown {@link ErrorDialog} instance.
      */
     protected int openErrorDialog(ExecutionEvent event, Throwable t) {
-        IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, t.getMessage(), t);
-        return ErrorDialog.openError(HandlerUtil.getActiveShell(event),
-                                     "Error", 
-                                     null,
-                                     status);
+        return LogUtil.getLogger().openErrorDialog(HandlerUtil.getActiveShell(event), t);
     }
 }

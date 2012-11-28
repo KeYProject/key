@@ -141,7 +141,13 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
 
         }
+        
+        //key is the term to identify the bsum, value is the name used for that function.
+        private final HashMap<Term, StringBuffer> usedBsumTerms = new HashMap<Term, StringBuffer>();
 
+        //key is the term to identify the bprod, value is the name used for that function.
+        private final HashMap<Term, StringBuffer> usedBprodTerms = new HashMap<Term, StringBuffer>();
+        
         private HashMap<Operator, ArrayList<Sort>> functionDecls = new HashMap<Operator, ArrayList<Sort>>();
 
         private HashSet<Function> specialFunctions = new HashSet<Function>();
@@ -204,6 +210,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          */
         private Function multiplicationFunction = null;
 
+        private static final String BSUM_STRING = "bsum";
+        
+        private static final String BPROD_STRING = "bprod";
+        
         public TacletSetTranslation getTacletSetTranslation() {
                 return tacletSetTranslation;
         }
@@ -583,7 +593,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 toReturn.add(currentForm);
                         }
                 }
-
+                
                 // add the type predicates for constant values like number
                 // symbols
                 if (!this.isMultiSorted()) {
@@ -736,6 +746,27 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         toReturn.add(element);
                 }
 
+                
+                // add the type definitions for the bsum function symbols
+                for (StringBuffer sb: usedBsumTerms.values()) {
+                    ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
+                    element.add(sb);
+                    element.add(usedDisplaySort.get(integerSort));
+                    element.add(usedDisplaySort.get(integerSort));
+                    element.add(usedDisplaySort.get(integerSort));
+                    toReturn.add(element);
+                }
+                
+                 // add the type definitions for the bprod function symbols
+                for (StringBuffer sb: usedBprodTerms.values()) {
+                    ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
+                    element.add(sb);
+                    element.add(usedDisplaySort.get(integerSort));
+                    element.add(usedDisplaySort.get(integerSort));
+                    element.add(usedDisplaySort.get(integerSort));
+                    toReturn.add(element);
+                }
+                
                 /*
                  * if (this.nullUsed) { //add the null constant to the
                  * declarations ArrayList<StringBuffer> a = new
@@ -1963,7 +1994,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
                                         return translatePred(op, subterms);
                                 }
-                        } else {
+                        } else {                          
                                 // this Function is a function, so translate it
                                 // as such
                                 if (fun == services.getTypeConverter()
@@ -2093,7 +2124,26 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         addConstantTypePredicate(term, numVal);
 
                                         return numVal;
+                                } else if (fun == services.getTypeConverter().getIntegerLDT().getBsum()) {                                   
+                                    //the bsum has to be translated in a special fashion in order to ensure soundness.
+                                    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
+                                    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
+                                    ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
+                                    subterms.add(arg1);
+                                    subterms.add(arg2);
+                                    
+                                    return translateBsumFunction(term, subterms);
+                                } else if (fun == services.getTypeConverter().getIntegerLDT().getBprod()) {
+                                    //the bprod has to be translated in a special fashion in order to ensure soundness.
+                                    StringBuffer arg1 = translateTerm(term.sub(0), quantifiedVars, services);
+                                    StringBuffer arg2 = translateTerm(term.sub(1), quantifiedVars, services);
+                                    ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
+                                    subterms.add(arg1);
+                                    subterms.add(arg2);
+                                    
+                                    return translateBprodFunction(term, subterms);
                                 } else {
+                                
                                         return translateAsUninterpretedFunction(
                                                         fun, quantifiedVars,
                                                         term.subs(), services);
@@ -2405,6 +2455,75 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         }
                 }
                 return translateFunction(name, sub);
+        }
+        
+        /**
+         * translate a bsum function. Alos add the created functionsymbol created depending on the term.
+         * @param iterterm The term used as third argument of the bsum function.
+         * @pram sub The two terms used as first and second argument of the bsum operator.
+         * @return
+         */
+        protected final StringBuffer translateBsumFunction(Term bsumterm, ArrayList<StringBuffer> sub) {
+            StringBuffer name = null;
+            for (Term t: usedBsumTerms.keySet()) {                          
+                if (t.equalsModRenaming(bsumterm)) {                  
+                    name = usedBsumTerms.get(t);
+                    continue;
+                }
+            }
+            if (name == null) {
+                //the term wasnt used yet. Create a new functionsymbol               
+                int i = -1;
+                boolean alreadyContains = true;
+                while (alreadyContains) {
+                    i++;
+                    alreadyContains = false;
+                    for (StringBuffer s: usedBsumTerms.values()) {
+                        if (s.toString().equals(BSUM_STRING + i)) {                           
+                            alreadyContains = true;
+                        }
+                    }
+                }
+                name = new StringBuffer(BSUM_STRING + i);
+                usedBsumTerms.put(bsumterm, name);
+            }
+                
+            return translateFunction(name, sub);
+        }
+        
+        
+        /**
+         * translate a bprod function. Alos add the created functionsymbol created depending on the term.
+         * @param iterterm The term used as third argument of the bsum function.
+         * @pram sub The two terms used as first and second argument of the bsum operator.
+         * @return
+         */
+        protected final StringBuffer translateBprodFunction(Term bprodterm, ArrayList<StringBuffer> sub) {
+            StringBuffer name = null;
+            for (Term t: usedBprodTerms.keySet()) {               
+                if (t.equalsModRenaming(bprodterm)) {                  
+                    name = usedBprodTerms.get(t);
+                    continue;
+                }
+            }
+            if (name == null) {
+                //the term wasnt used yet. Create a new functionsymbol               
+                int i = -1;
+                boolean alreadyContains = true;
+                while (alreadyContains) {
+                    i++;
+                    alreadyContains = false;
+                    for (StringBuffer s: usedBprodTerms.values()) {
+                        if (s.toString().equals(BPROD_STRING + i)) {                           
+                            alreadyContains = true;
+                        }
+                    }
+                }
+                name = new StringBuffer(BPROD_STRING + i);
+                usedBprodTerms.put(bprodterm, name);
+            }
+                
+            return translateFunction(name, sub);
         }
 
         /**

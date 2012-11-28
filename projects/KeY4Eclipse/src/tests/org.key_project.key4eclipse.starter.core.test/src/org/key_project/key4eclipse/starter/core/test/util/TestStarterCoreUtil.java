@@ -19,7 +19,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
@@ -32,6 +31,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Provides static methods that makes testing easier.
@@ -78,12 +78,11 @@ public final class TestStarterCoreUtil {
                   MainWindow main = MainWindow.getInstance();
                   Assert.isNotNull(main, "KeY main window is not available.");
                   // Load location
-                  InitConfig initConfig = KeYUtil.internalLoad(location, classPaths, bootClassPath, true);
+                  KeYEnvironment<?> environment = KeYEnvironment.loadInMainWindow(location, classPaths, bootClassPath, true);
+                  InitConfig initConfig = environment.getInitConfig();
                   // Get method to proof in KeY
                   IProgramMethod pm = KeYUtil.getProgramMethod(method, initConfig.getServices().getJavaInfo());
                   Assert.isNotNull(pm, "Can't find method \"" + method + "\" in KeY.");
-                  // Get contract to proof
-                  Services services = initConfig.getServices();
                   // Create TextualJMLSpecCase
                   ImmutableList<String> mods = ImmutableSLList.nil();
                   mods = mods.append("public");
@@ -92,7 +91,7 @@ public final class TestStarterCoreUtil {
                      textualSpecCase.addRequires(new PositionedString("this.<inv>")); // Assume own invariants
                   }
                   // Create contract
-                  JMLSpecFactory factory = new JMLSpecFactory(services);
+                  JMLSpecFactory factory = new JMLSpecFactory(environment.getServices());
                   ImmutableSet<Contract> contracts = factory.createJMLOperationContracts(pm, textualSpecCase);
                   Contract contract = contracts.iterator().next();
                   // Make sure that a contract is defined

@@ -48,7 +48,7 @@ public class SWTBotExampleTest extends TestCase {
             loadButton.clickAndWait();
             // Start proof
             TestUtilsUtil.keyStartSelectedProofInProofManagementDiaolog();
-            TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MyClass", "MyClass()", "0", null), TestKeY4EclipseUtil.createOperationContractId("MyClass", "MyClass()", "0", null));
+            TestUtilsUtil.keyCheckProofs(TestKeY4EclipseUtil.createOperationContractId("MyClass", "MyClass", "MyClass()", "0", null), TestKeY4EclipseUtil.createOperationContractId("MyClass", "MyClass", "MyClass()", "0", null));
             // Finish proof automatically
             TestUtilsUtil.keyFinishSelectedProofAutomatically(frame, MethodTreatment.EXPAND);
             // Clear proof list

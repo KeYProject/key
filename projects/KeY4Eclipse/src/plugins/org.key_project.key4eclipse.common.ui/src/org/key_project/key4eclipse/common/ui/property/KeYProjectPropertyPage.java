@@ -1,4 +1,4 @@
-package org.key_project.key4eclipse.starter.ui.property;
+package org.key_project.key4eclipse.common.ui.property;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,12 +37,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
+import org.key_project.key4eclipse.common.ui.provider.KeYClassPathEntryLabelProvider;
+import org.key_project.key4eclipse.common.ui.util.LogUtil;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
-import org.key_project.key4eclipse.starter.ui.provider.KeYClassPathEntryLabelProvider;
-import org.key_project.key4eclipse.starter.ui.util.LogUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.viewer.FileExtensionViewerFilter;

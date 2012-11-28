@@ -1,10 +1,10 @@
-package org.key_project.sed.key.ui.dialog;
+package org.key_project.key4eclipse.common.ui.dialog;
 
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
-import org.key_project.sed.key.ui.provider.ContractLabelProvider;
+import org.key_project.key4eclipse.common.ui.provider.ContractLabelProvider;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.key_project.util.eclipse.swt.dialog.ElementTableSelectionDialog;
 

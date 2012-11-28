@@ -1,6 +1,7 @@
 package org.key_project.key4eclipse.starter.ui.handler;
 
 import org.eclipse.core.commands.ExecutionEvent;
+import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 
 /**

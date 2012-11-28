@@ -3,6 +3,7 @@ package org.key_project.monkey.product.ui.batch;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -256,10 +257,12 @@ public class MonKeYBatchMode {
    /**
     * Removes all given {@link MonKeYProof} from KeYs {@link MainWindow}.
     * @param proofs The {@link MonKeYProof} to remove.
+    * @throws InvocationTargetException Occurred Exception.
+    * @throws InterruptedException Occurred Exception.
     */
-   protected void removeProofEnvFromKeY(List<MonKeYProof> proofs) {
+   protected void removeProofEnvFromKeY(List<MonKeYProof> proofs) throws InterruptedException, InvocationTargetException {
       for (MonKeYProof proof : proofs) {
-         proof.removeProofEnvFromKeY();
+         proof.removeProof();
       }
    }
    
