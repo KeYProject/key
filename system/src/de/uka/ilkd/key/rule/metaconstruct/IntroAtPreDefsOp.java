@@ -32,7 +32,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.*;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 public final class IntroAtPreDefsOp extends AbstractTermTransformer {
@@ -81,7 +80,6 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         }.run();
         final MethodFrame frame = frameAndLoopsAndBlocks.first;
         final ImmutableSet<LoopStatement> loops = frameAndLoopsAndBlocks.second;
-        final ImmutableSet<StatementBlock> blocks = frameAndLoopsAndBlocks.third;
 
         //determine "self"
         Term selfTerm;
@@ -102,6 +100,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
         for(LocationVariable heap : HeapContext.getModHeaps(services,transaction)) {
           final LocationVariable l = TB.heapAtPreVar(services, heap.name()+"Before_" + methodName, heap.sort(), true);
+          // buf fix. see #1197
+          services.getNamespaces().programVariables().addSafely(l);
           final Term u = TB.elementary(services,
             l,
             TB.var(heap));

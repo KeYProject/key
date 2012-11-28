@@ -794,7 +794,9 @@ public class ProofTreeView extends JPanel {
 	            }
 	        }
 	    }
-	    this.add(delayedCut);
+	    if (de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE.active())
+	        this.add(delayedCut);
+	    
 	    this.add(new JSeparator());
 
 	    

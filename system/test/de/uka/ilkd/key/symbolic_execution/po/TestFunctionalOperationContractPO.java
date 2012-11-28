@@ -6,6 +6,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
@@ -22,7 +23,7 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
    /**
     * Tests the contract of method {@code doubleValue}.
     */
-   public void testDoubleValue() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testDoubleValue() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/existingContractTest/test/ExistingContractTest.java",
              "ExistingContractTest[ExistingContractTest::doubleValue(int)].JML operation contract.0",
              "examples/_testcase/set/existingContractTest/oracle/ExistingContractTest.xml",
@@ -35,7 +36,7 @@ public class TestFunctionalOperationContractPO extends AbstractSymbolicExecution
    protected void doTest(String javaPathInkeyRepDirectory,
                          String baseContractName,
                          String oraclePathInBaseDirFile,
-                         String expectedTryContent) throws ProofInputException, IOException, ParserConfigurationException, SAXException {
+                         String expectedTryContent) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       String originalRuntimeExceptions = null;
       try {
          // Store original settings of KeY which requires that at least one proof was instantiated.

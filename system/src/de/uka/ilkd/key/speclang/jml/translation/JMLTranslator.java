@@ -55,6 +55,7 @@ import de.uka.ilkd.key.util.Triple;
 final class JMLTranslator {
 
     private final static TermBuilder TB = TermBuilder.DF;
+    @SuppressWarnings("unused")
     private Services services;                          // to be used in future
     private SLTranslationExceptionManager excManager;
 
@@ -856,7 +857,7 @@ final class JMLTranslator {
                 checkSLExpressions(expr1, expr2, excManager, "<=!=>");
                 SLExpression eq =
                         buildEqualityTerm(expr1, expr2, excManager, services);
-                return new SLExpression(TB.not(eq.getTerm()), eq.getType());
+                return new SLExpression(TB.not(eq.getTerm()));
             }
         });
         translationMethods.put(JMLKeyWord.EQ,
@@ -1162,8 +1163,8 @@ final class JMLTranslator {
 
                     try {
                         Term resultTerm = TB.func(function, args, null);
-                        SLExpression result = new SLExpression(resultTerm,
-                                services.getJavaInfo().getKeYJavaType(resultTerm.sort()));
+                        final KeYJavaType type = services.getJavaInfo().getKeYJavaType(resultTerm.sort());
+                        SLExpression result = type==null? new SLExpression(resultTerm) : new SLExpression(resultTerm,type);
                         return result;
                     } catch (TermCreationException ex) {
                         throw excManager.createException("Cannot create term " + function.name() + 

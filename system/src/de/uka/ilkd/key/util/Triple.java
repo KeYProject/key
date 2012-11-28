@@ -29,7 +29,6 @@ public class Triple<T1, T2, T3> {
     }
     
 
-    @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
         if(!(o instanceof Triple<?, ?, ?>)) {
             return false;

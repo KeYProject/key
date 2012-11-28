@@ -110,7 +110,7 @@ public class WebstartMain {
         if(examplesDir != null) {
             String[] newArgs = new String[args.length + 2];
             System.arraycopy(args, 0, newArgs, 0, args.length);
-            newArgs[args.length] = "EXAMPLES";
+            newArgs[args.length] = "--examples";
             newArgs[args.length + 1] = examplesDir.getAbsolutePath();
             args = newArgs;
         }

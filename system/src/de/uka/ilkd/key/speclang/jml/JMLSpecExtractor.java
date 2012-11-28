@@ -31,7 +31,6 @@ import de.uka.ilkd.key.java.recoderext.JMLTransformer;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -49,7 +48,6 @@ import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**

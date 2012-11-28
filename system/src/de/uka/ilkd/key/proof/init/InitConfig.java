@@ -148,8 +148,10 @@ public class InitConfig {
             }
         }
         if(changed) {
+            @SuppressWarnings("unchecked")
+            HashMap<String, String> clone = (HashMap<String, String>)category2DefaultChoice.clone();
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().
-                setDefaultChoices((HashMap<String, String>)category2DefaultChoice.clone());
+                setDefaultChoices(clone);
         }
     }
 
@@ -181,6 +183,7 @@ public class InitConfig {
 	    ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().
 	    getDefaultChoices();
 
+        @SuppressWarnings("unchecked")
         HashMap<String, String> c2DC = (HashMap<String,String>)category2DefaultChoice.clone();
         for (final Choice c : activatedChoices) {
             c2DC.remove(c.category());
@@ -346,11 +349,12 @@ public class InitConfig {
      * the contained JavaInfo while using the immutable set of taclets in the
      * copy
      */
+    @SuppressWarnings("unchecked")
     public InitConfig copy() {
         InitConfig ic = new InitConfig(services.copyPreservesLDTInformation(),
                                        profile);
         ic.setActivatedChoices(activatedChoices);
-        ic.category2DefaultChoice = ((HashMap) category2DefaultChoice.clone());
+        ic.category2DefaultChoice = ((HashMap<String,String>) category2DefaultChoice.clone());
         ic.setTaclet2Builder(
                 (HashMap<Taclet, TacletBuilder>) taclet2Builder.clone());
         ic.setTaclets(taclets);

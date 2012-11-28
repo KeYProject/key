@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: KeY 4 Eclipse Common UI
+Bundle-SymbolicName: org.key_project.key4eclipse.common.ui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.key_project.key4eclipse.common.ui.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.7.101",
+ org.eclipse.ui,
+ org.eclipse.jdt.core;bundle-version="3.7.3";resolution:=optional,
+ org.key_project.key4eclipse;bundle-version="1.0.0",
+ org.key_project.util;bundle-version="1.0.0",
+ org.key_project.key4eclipse.starter.core;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: KeY Project
+Export-Package: org.key_project.key4eclipse.common.ui.dialog,
+ org.key_project.key4eclipse.common.ui.handler,
+ org.key_project.key4eclipse.common.ui.property,
+ org.key_project.key4eclipse.common.ui.provider

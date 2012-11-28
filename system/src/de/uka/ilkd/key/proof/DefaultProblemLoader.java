@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.DefaultProofFileParser;
 import de.uka.ilkd.key.proof.io.EnvInput;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.speclang.Contract;
@@ -102,26 +103,34 @@ public class DefaultProblemLoader {
     * @throws ProofInputException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
-   public String load() throws ProofInputException, IOException {
-      // Read environment
-      envInput = createEnvInput();
-      problemInitializer = createProblemInitializer();
-      initConfig = createInitConfig();
-      // Read proof obligation settings
-      LoadedPOContainer poContainer = createProofObligationContainer();
+   public String load() throws ProblemLoaderException {
       try {
-         if (poContainer == null) {
-            return selectProofObligation();
+         // Read environment
+         envInput = createEnvInput();
+         problemInitializer = createProblemInitializer();
+         initConfig = createInitConfig();
+         // Read proof obligation settings
+         LoadedPOContainer poContainer = createProofObligationContainer();
+         try {
+            if (poContainer == null) {
+               return selectProofObligation();
+            }
+            // Create proof and apply rules again if possible
+            proof = createProof(poContainer);
+            if (proof != null) {
+               replayProof(proof);
+            }
+            return ""; // Everything fine
          }
-         // Create proof and apply rules again if possible
-         proof = createProof(poContainer);
-         return ""; // Everything fine
+         finally {
+            getMediator().resetNrGoalsClosedByHeuristics();
+            if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
+               ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
+            }  
+         }
       }
-      finally {
-         getMediator().resetNrGoalsClosedByHeuristics();
-         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
-            ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
-         }  
+      catch (Exception e) {
+         throw new ProblemLoaderException(this, e);
       }
    }
 
@@ -280,16 +289,18 @@ public class DefaultProblemLoader {
     * @throws ProofInputException Occurred Exception.
     */
    protected Proof createProof(LoadedPOContainer poContainer) throws ProofInputException {
-      mediator.setProof(problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum()));
+      return problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum());
+   }
+   
+   protected void replayProof(Proof proof) throws ProofInputException {
+      mediator.setProof(proof);
 
-      Proof proof = mediator.getSelectedProof();
       mediator.stopInterface(true); // first stop (above) is not enough
 
       if (envInput instanceof KeYUserProblemFile) {
          problemInitializer.tryReadProof(new DefaultProofFileParser(proof, mediator), (KeYUserProblemFile) envInput);
       }
       mediator.getUI().resetStatus(this);
-      return proof;
    }
 
    /**

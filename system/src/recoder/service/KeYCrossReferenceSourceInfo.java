@@ -80,8 +80,7 @@ public class KeYCrossReferenceSourceInfo
 	
 	// ADTs
 	name2primitiveType.put("\\seq", new PrimitiveType("\\seq", this));
-	name2primitiveType.put("\\set", new PrimitiveType("\\set", this));
-	name2primitiveType.put("\\gen", new PrimitiveType("\\gen", this));
+	name2primitiveType.put("\\free", new PrimitiveType("\\free", this));
 	
 	// JML's primitive types
 	name2primitiveType.put("\\bigint", new PrimitiveType("\\bigint", this));

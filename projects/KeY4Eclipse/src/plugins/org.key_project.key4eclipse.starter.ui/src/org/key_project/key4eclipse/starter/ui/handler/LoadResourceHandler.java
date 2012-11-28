@@ -9,6 +9,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 
 /**
