@@ -10,21 +10,19 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.monkey.product.ui.model.MonKeYProof;
 import org.key_project.monkey.product.ui.model.MonKeYProofResult;
 import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.ClassTree;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * Provides static utility methods for MonKeY.
@@ -55,12 +53,17 @@ public final class MonKeYUtil {
          monitor = new NullProgressMonitor();
       }
       monitor.beginTask("Loading in KeY", IProgressMonitor.UNKNOWN);
-      InitConfig init = KeYUtil.internalLoad(location, null, bootClassPath, showKeYMainWindow);
-      Services services = init.getServices();
+      KeYEnvironment<?> environment;
+      if (showKeYMainWindow) {
+         environment = KeYEnvironment.loadInMainWindow(location, null, bootClassPath, true);
+      }
+      else {
+         environment = KeYEnvironment.load(location, null, bootClassPath);
+      }
       boolean skipLibraryClasses = true;
       // get all classes
       SWTUtil.checkCanceled(monitor);
-      final Set<KeYJavaType> kjts = services.getJavaInfo().getAllKeYJavaTypes();
+      final Set<KeYJavaType> kjts = environment.getJavaInfo().getAllKeYJavaTypes();
       monitor.beginTask("Filtering types", kjts.size());
       final Iterator<KeYJavaType> it = kjts.iterator();
       while (it.hasNext()) {
@@ -90,11 +93,11 @@ public final class MonKeYUtil {
       monitor.beginTask("Analysing types", kjtsarr.length);
       for (KeYJavaType type : kjtsarr) {
           SWTUtil.checkCanceled(monitor);
-          ImmutableSet<IObserverFunction> targets = services.getSpecificationRepository().getContractTargets(type);
+          ImmutableSet<IObserverFunction> targets = environment.getSpecificationRepository().getContractTargets(type);
           for (IObserverFunction target : targets) {
-              ImmutableSet<Contract> contracts = services.getSpecificationRepository().getContracts(type, target);
+              ImmutableSet<Contract> contracts = environment.getSpecificationRepository().getContracts(type, target);
               for (Contract contract : contracts) {
-                  proofs.add(new MonKeYProof(type.getFullName(), ClassTree.getDisplayName(services, contract.getTarget()), contract.getDisplayName(), init, contract));
+                  proofs.add(new MonKeYProof(type.getFullName(), ClassTree.getDisplayName(environment.getServices(), contract.getTarget()), contract.getDisplayName(), environment, contract));
               }
           }
           monitor.worked(1);
