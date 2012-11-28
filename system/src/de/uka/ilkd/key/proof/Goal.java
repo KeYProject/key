@@ -11,7 +11,6 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +32,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.util.properties.MapProperties;
+import de.uka.ilkd.key.util.properties.Properties;
+import de.uka.ilkd.key.util.properties.Properties.Property;
+import java.util.ArrayList;
 
 /**
  *  A proof is represented as a tree of nodes containing sequents. The initial
@@ -78,19 +81,28 @@ public final class Goal  {
     private static List<RuleAppListener> ruleAppListenerList = 
         Collections.synchronizedList(new ArrayList<RuleAppListener>(10));
 
+    /**
+     * If an application of a rule added some information for the strategy,
+     * then this information is stored in this map.
+     */
+    private final Properties strategyInfos;
+
+
     /** creates a new goal referencing the given node */
-    private Goal( Node                    node, 
-		  RuleAppIndex            ruleAppIndex, 
-		  ImmutableList<RuleApp>           appliedRuleApps,
-		  FormulaTagManager       tagManager,
-		  AutomatedRuleApplicationManager ruleAppManager ) {  
-	this.node            = node;
-	this.ruleAppIndex    = ruleAppIndex;
-	this.appliedRuleApps = appliedRuleApps;
-	this.tagManager      = tagManager;
-	this.goalStrategy    = null;
-        this.ruleAppIndex.setup ( this );
-        setRuleAppManager ( ruleAppManager );       
+    private Goal(Node node,
+                 RuleAppIndex ruleAppIndex,
+                 ImmutableList<RuleApp> appliedRuleApps,
+                 FormulaTagManager tagManager,
+                 AutomatedRuleApplicationManager ruleAppManager,
+                 Properties strategyInfos) {
+        this.node = node;
+        this.ruleAppIndex = ruleAppIndex;
+        this.appliedRuleApps = appliedRuleApps;
+        this.tagManager = tagManager;
+        this.goalStrategy = null;
+        this.ruleAppIndex.setup(this);
+        this.strategyInfos = strategyInfos;
+        setRuleAppManager(ruleAppManager);
     }
 
     /** 
@@ -101,7 +113,8 @@ public final class Goal  {
                ruleAppIndex,
                ImmutableSLList.<RuleApp>nil(),
                null,
-               new QueueRuleApplicationManager () );
+               new QueueRuleApplicationManager (),
+               new MapProperties());
         tagManager = new FormulaTagManager ( this );
     }
 
@@ -479,16 +492,18 @@ public final class Goal  {
      * clones the goal (with copy of tacletindex and ruleAppIndex)
      * @return Object the clone
      */
-    public Object clone() {	
-	Goal clone = new Goal ( node,
-	                        ruleAppIndex.copy (),
-	                        appliedRuleApps,
-	                        getFormulaTagManager ().copy (),
-				ruleAppManager.copy () );
-	clone.listeners = (List<GoalListener>)
-	    ((ArrayList<GoalListener>) listeners).clone();
-	clone.automatic = this.automatic;
-	return clone;
+    @Override
+    public Object clone() {
+        Goal clone = new Goal(node,
+                              ruleAppIndex.copy(),
+                              appliedRuleApps,
+                              getFormulaTagManager().copy(),
+                              ruleAppManager.copy(),
+                              strategyInfos.clone());
+        clone.listeners =
+                (List<GoalListener>) ((ArrayList<GoalListener>) listeners).clone();
+        clone.automatic = this.automatic;
+        return clone;
     }
 
     /** like the clone method but returns right type
@@ -688,5 +703,23 @@ public final class Goal  {
             names = names.add(elem.name());
         }
         return names;
+    }
+
+
+    public <T> T getStrategyInfo(Property<T> property) {
+        return strategyInfos.get(property);
+    }
+
+
+    public <T> void addStrategyInfo(Property<T> property,
+                                    T info,
+                                    StrategyInfoUndoMethod undoMethod) {
+        strategyInfos.put(property, info);
+        node.addStrategyInfoUndoMethod(undoMethod);
+    }
+
+
+    public void undoStrategyInfoAdd(StrategyInfoUndoMethod undoMethod) {
+        undoMethod.undo(strategyInfos);
     }
 }
