@@ -22,10 +22,11 @@ public class StopAutoModeHandler extends AbstractSaveExecutionHandler {
       
 //      proof.addProofTreeListener(listener)
 //      
-      Outline.viewer.setInput(new GUIProofTreeModel(proof).getRoot());
-      /*KeYToUIUtil.getUi().stopAutoMode();
+//      Outline.viewer.refresh(); // weglassen, denn der gesamte baum wird neu aufgebaut
+      /*KeYToUIUtil.getUi().stopAutoMode(); // nur stoppen
        KeYToUIUtil.getUi().notifyAutomodeStopped();
        */
+      KeYToUIUtil.getUi().stopAutoMode();
       return null;
    }
 

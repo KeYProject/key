@@ -8,6 +8,9 @@ public class OutlineLabelProvider extends LabelProvider {
 
    
    public String getText(Object element){
+      if(element instanceof GUIProofTreeModel){
+         System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+      }
       if(element instanceof GUIAbstractTreeNode){
          return ((GUIAbstractTreeNode)element).toString();
       }

@@ -129,8 +129,8 @@ public class KeYToUIUtil {
                                        if(proof!=null){
                                           KeYToUIUtil.openEditor(proof.toString(), ui);
                                           //Outline.viewer.setInput("qwe");
-                                          Outline.viewer.setInput(new GUIProofTreeModel(proof).getRoot());
-                                          
+//                                          Outline.viewer.setInput(new GUIProofTreeModel(proof));
+                                         
                                        }  
                                     }
                                  });  

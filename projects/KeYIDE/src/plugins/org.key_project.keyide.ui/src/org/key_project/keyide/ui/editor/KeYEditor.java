@@ -3,6 +3,9 @@ package org.key_project.keyide.ui.editor;
 
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.key_project.keyide.ui.views.Outline;
+
+import de.uka.ilkd.key.proof.Proof;
 
 
 
@@ -12,6 +15,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class KeYEditor extends TextEditor {
+   private Outline outline;
 
    /**
     * Constructor.
@@ -19,11 +23,20 @@ public class KeYEditor extends TextEditor {
    public KeYEditor(){
      
    }
+   
+   public Proof getProof() {
+      return null; // return proof from editor input
+   }
 
    @Override
    public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
       if (IContentOutlinePage.class.equals(adapter)) {
-         return null;
+         synchronized (this) {
+            if (outline == null) {
+               outline = new Outline(getProof());
+            }
+         }
+         return outline;
       }
 //      if (IProofAutomation.class.equals(adapter)) {
 //         return this;

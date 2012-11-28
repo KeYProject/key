@@ -25,6 +25,9 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
       protected IStatus run(IProgressMonitor monitor) {
          CustomConsoleUserInterface ui = (CustomConsoleUserInterface) KeYToUIUtil.getUi();
          Proof proof = KeYToUIUtil.getProof();
+         //step by step
+         ui.getMediator().setMaxAutomaticSteps(1);
+         
          ui.startAndWaitForProof(proof);
          
          monitor.beginTask("Auto Mode", 0);
