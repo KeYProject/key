@@ -306,11 +306,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort(), true);
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
 	final Term anonHeap = TB.func(anonHeapFunc);	
-	final Term assumption = TB.equals(TB.anon(services, 
-				          TB.var(heap), 
-				          mod,
-				          anonHeap),
-                            methodHeap); 
+	final Term assumption =
+	        TB.equals(TB.anon(services, TB.var(heap), mod, anonHeap),
+                          methodHeap); 
 	final Term anonUpdate = TB.elementary(services, heap, methodHeap);
 	
 	return new AnonUpdateData(assumption, anonUpdate, methodHeap, TB.getBaseHeap(services), anonHeap);
@@ -544,13 +542,16 @@ public final class UseOperationContractRule implements BuiltInRule {
                 .getInstantiation(); 
         assert contract.getTarget().equals(inst.pm);
 
-        Modality md = (Modality)TermBuilder.DF.goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
+        Modality md =
+                (Modality)TermBuilder.DF.goBelowUpdates(ruleApp.posInOccurrence().subTerm()).op();
         boolean transaction = (md == Modality.DIA_TRANSACTION || md == Modality.BOX_TRANSACTION); 
-        final List<LocationVariable> heapContext = HeapContext.getModHeaps(goal.proof().getServices(), transaction);
+        final List<LocationVariable> heapContext =
+                HeapContext.getModHeaps(goal.proof().getServices(), transaction);
 
 	//prepare heapBefore_method
 
-        Map<LocationVariable,LocationVariable> atPreVars = HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
+        Map<LocationVariable,LocationVariable> atPreVars =
+                HeapContext.getBeforeAtPreVars(heapContext, services, "Before_"+inst.pm.getName());
         for(LocationVariable v : atPreVars.values()) {
      	  goal.addProgramVariable(v);
         }

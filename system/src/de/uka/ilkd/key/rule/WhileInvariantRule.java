@@ -36,13 +36,10 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
@@ -179,7 +176,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    anonUpdate = TB.anonUpd(heap, services, mod, anonHeapTerm);
 	}
 	
-	return new AnonUpdateData(assumption, anonUpdate, anonHeapTerm, loopHeapTerm);
+	return new AnonUpdateData(assumption, anonUpdate, loopHeapTerm, TB.getBaseHeap(services), anonHeapTerm);
     }
     
     private Term createTermSV(String svName,
@@ -236,12 +233,13 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
-        final KeYJavaType booleanKJT = services.getTypeConverter()
-        .getBooleanType();
-        final KeYJavaType intKJT 
-        = services.getJavaInfo()
-        .getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
+    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+            throws RuleAbortException {
+        
+        final KeYJavaType booleanKJT = services.getTypeConverter().getBooleanType();
+        final KeYJavaType intKJT =
+                services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
+        
         //get instantiation
         Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);	
 
@@ -264,15 +262,14 @@ public final class WhileInvariantRule implements BuiltInRule {
             mods.put(heap, m);
         }
 
-        final Term variant = inst.inv.getVariant(inst.selfTerm, 
-                atPres, 
-                services);
+        final Term variant = inst.inv.getVariant(inst.selfTerm, atPres, services);
+        
         //collect input and output local variables, 
         //prepare reachableIn and reachableOut
-        final ImmutableSet<ProgramVariable> localIns 
-        = MiscTools.getLocalIns(inst.loop, services);
-        final ImmutableSet<ProgramVariable> localOuts 
-        = MiscTools.getLocalOuts(inst.loop, services);
+        final ImmutableSet<ProgramVariable> localIns =
+                MiscTools.getLocalIns(inst.loop, services);
+        final ImmutableSet<ProgramVariable> localOuts =
+                MiscTools.getLocalOuts(inst.loop, services);
         Term reachableIn = TB.tt();
         for(ProgramVariable pv : localIns) {
             reachableIn = TB.and(reachableIn, 
@@ -316,18 +313,22 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         //prepare anon update, frame condition, etc.
-
         Term anonUpdate = createLocalAnonUpdate(localOuts, services); // can still be null
-        Term assumption = TB.tt();
-        Term loopHeap = TB.tt();
+        Term anonAssumption = null;
         Term wellFormedAnon = null;
         Term frameCondition = null;
         Term reachableState = reachableIn;
+        ImmutableList<AnonUpdateData> anonUpdateDatas =
+                ImmutableSLList.<AnonUpdateData>nil();
         for(LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon
             = createAnonUpdate(heap, inst.loop, mods.get(heap), services);
-            assumption = TB.and(assumption,tAnon.assumption);
-            loopHeap = TB.and(loopHeap,tAnon.loopHeap);
+            anonUpdateDatas = anonUpdateDatas.append(tAnon);
+            if(anonAssumption == null) {
+                anonAssumption = tAnon.assumption;
+            } else {
+                anonAssumption = TB.and(anonAssumption,tAnon.assumption);
+            }
             if(anonUpdate == null) {
                 anonUpdate = tAnon.anonUpdate;
             }else{
@@ -352,6 +353,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             }
             reachableState = TB.and(reachableState, TB.wellFormed(heap, services));
         }
+        
         //prepare variant
         final ProgramElementName variantName 
         = new ProgramElementName(TB.newName(services, "variant"));
@@ -397,7 +399,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                 : new MethodFrame(null, 
                         inst.innermostExecutionContext,
                         new StatementBlock(guardVarDecl));
-        final JavaBlock guardJb 
+        final JavaBlock guardJb
         = JavaBlock.createJavaBlock(new StatementBlock(
                 guardVarMethodFrame));
         final Term guardTrueTerm = TB.equals(TB.var(guardVar), 
@@ -420,21 +422,41 @@ public final class WhileInvariantRule implements BuiltInRule {
                 reachableOut, 
                 variantNonNeg}));
 
-        final Term anonLoopHeap = loopHeap;
-        final Term anonAssumption = assumption;
         final Term postAssumption 
         = TB.applySequential(new Term[]{inst.u, beforeLoopUpdate}, 
                 TB.and(anonAssumption,TB.apply(anonUpdate,uAnonInv)));
-        final AnonUpdateData anonUpdateAndHeap
-        = new AnonUpdateData(anonAssumption, anonUpdate, wellFormedAnon, anonLoopHeap);
-
+        
         // prepare information flow analysis
-        Term contractLoopApplPredTerm =
-            storeInvInPredAndGenInfoFlowTaclet(inst,
-                    anonUpdateAndHeap,
-                    TB.var(localIns),
-                    TB.var(localOuts),
-                    goal, services);
+        /*Term contractLoopApplPredTerm =
+                storeInvInPredAndGenInfoFlowTaclet(inst,
+                        anonUpdateAndHeap,
+                        TB.var(localIns),
+                        TB.var(localOuts),
+                        goal, services);*/
+        assert anonUpdateDatas.size() == 1; // information flow extension is at
+        // the moment not compatible with
+        // the non-base-heap setting
+        final AnonUpdateData anonUpdateData = anonUpdateDatas.head();
+        
+        InfFlowLoopInvariantTacletBuilder ifLoopBuilder =
+                new InfFlowLoopInvariantTacletBuilder(services);
+        ifLoopBuilder.setInvariant(inst.inv);
+        ifLoopBuilder.setContextUpdate(inst.u);
+        ifLoopBuilder.setBaseHeap(TB.getBaseHeap(services));
+        ifLoopBuilder.setHeapAtPre(anonUpdateData.anonHeap);
+        ifLoopBuilder.setHeapAtPost(anonUpdateData.loopHeap);
+        ifLoopBuilder.setSelf(inst.selfTerm);
+        ifLoopBuilder.setLocalIns(TB.var(localIns));
+        ifLoopBuilder.setLocalOuts(TB.var(localOuts));
+
+        // generate information flow contract application predicate
+        // and associated taclet
+        Term contractApplPredTerm =
+                ifLoopBuilder.buildContractApplPredTerm();
+        Taclet informationFlowContractApp =
+                ifLoopBuilder.buildContractApplTaclet();
+        goal.addTaclet(informationFlowContractApp,
+                SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
 
         //"Invariant Initially Valid":
         // \replacewith (==> inv );
@@ -509,7 +531,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         useGoal.addFormula(new SequentFormula(postAssumption), // TODO: Is this correct? 
                 true, 
                 false);
-        useGoal.addFormula(new SequentFormula(contractLoopApplPredTerm),
+        useGoal.addFormula(new SequentFormula(contractApplPredTerm),
                 true,
                 false);
 
@@ -531,7 +553,7 @@ public final class WhileInvariantRule implements BuiltInRule {
      * Store invariant of the loop invocation and generate information
      * flow taclet.
      */
-    private Term storeInvInPredAndGenInfoFlowTaclet(final Instantiation inst,
+    /*private Term storeInvInPredAndGenInfoFlowTaclet(final Instantiation inst,
                                                         final AnonUpdateData anonUpdateAndHeap,
                                                         final ImmutableList<Term> localIns,
                                                         final ImmutableList<Term> localOuts,
@@ -557,7 +579,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         goal.addTaclet(informationFlowContractLoopApp,
                        SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         return updatedLoopInvariantApplPredTerm;
-    }
+    }*/
     
     @Override
     public Name name() {
@@ -625,7 +647,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }*/
 
 
-    private ProofObligationVars generateLoopApplicationDataSVs(Function pred,
+    /*private ProofObligationVars generateLoopApplicationDataSVs(Function pred,
             String schemaPrefix,
             ProofObligationVars appData,
             IProgramMethod pm,
@@ -677,9 +699,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         return new ProofObligationVars(selfAtPreSV, selfAtPreSV, localInsSVs, localOutsSVs,
                 localOutsSVs, TB.ff(), TB.ff(), heapAtPreSV,
                 heapAtPreSV, heapAtPostSV, "", services);
-    }
+    }*/
 
-    private Taclet genInfFlowContractLoopApplTaclet(LoopInvariant loopInv,
+    /*private Taclet genInfFlowContractLoopApplTaclet(LoopInvariant loopInv,
             Function contractLoopApplPred,
             ProofObligationVars appData,
             Services services) {
@@ -704,8 +726,8 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term schemaContApp =
             buildContractApplication(loopInv, schemaDataFind,
                     schemaDataAssumes, services);        
-        /* Term schemaContPrev = InformationFlowContractPO.buildContractApplication(
-                loopInv, schemaDataFind, schemaDataAssumes, services); */ // TODO: Here we
+         Term schemaContPrev = InformationFlowContractPO.buildContractApplication(
+                loopInv, schemaDataFind, schemaDataAssumes, services);  // TODO: Here we
         //want the new formula
         //(Lemma 1 slightly changed)
 
@@ -737,7 +759,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         tacletBuilder.addRuleSet(new RuleSet(new Name("information_flow_loop_invariant_appl")));
         tacletBuilder.setSurviveSmbExec(true);
         return tacletBuilder.getTaclet();
-    }
+    }*/
     
     
     @Override
@@ -950,16 +972,18 @@ public final class WhileInvariantRule implements BuiltInRule {
     
     private static class AnonUpdateData {
 
-        public final Term assumption, anonUpdate, anonHeap, loopHeap;
+        public final Term assumption, anonUpdate, anonHeap, loopHeap, loopHeapAtPre;
 
 
         public AnonUpdateData(Term assumption,
                               Term anonUpdate,
-                              Term anonHeap,
-                              Term loopHeap) {
+                              Term loopHeap,
+                              Term loopHeapAtPre,
+                              Term anonHeap) {
             this.assumption = assumption;
             this.anonUpdate = anonUpdate;
             this.loopHeap = loopHeap;
+            this.loopHeapAtPre = loopHeapAtPre;
             this.anonHeap = anonHeap;
         }
     }
