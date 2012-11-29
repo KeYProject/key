@@ -260,16 +260,16 @@ public abstract class TestSMTSolver extends TestCommons {
         Assert.assertTrue(correctResult(testFile + "bprod3.key", false));
     }
     
-    public void testBinderPred1() {
-        Assert.assertTrue(correctResult(testFile + "binder2.key", false));
-    }
+//    public void testBinderPred1() {
+//        Assert.assertTrue(correctResult(testFile + "binder2.key", true));
+//    }
     
     public void testBinderPred2() {
-        Assert.assertTrue(correctResult(testFile + "binder4.key", false));
+        Assert.assertTrue(correctResult(testFile + "binder4.key", true));
     }
     
     public void testBinderPred3() {
-        Assert.assertTrue(correctResult(testFile + "binder5.key", false));
+        Assert.assertTrue(correctResult(testFile + "binder5.key", true));
     }
     
     /*public void testAdd2() {
