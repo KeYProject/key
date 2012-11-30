@@ -47,7 +47,7 @@ public class ShowActiveTactletOptionsAction extends MainWindowAction {
             }
             final JTextComponent activeOptions = new JTextArea(message, rows, columns);
             activeOptions.setEditable(false);
-            JOptionPane.showMessageDialog(mainWindow, activeOptions, "Active Taclet Options",
+            JOptionPane.showMessageDialog(mainWindow, activeOptions, "Taclet Options used in the current proof",
                     JOptionPane.INFORMATION_MESSAGE);
         }
     }

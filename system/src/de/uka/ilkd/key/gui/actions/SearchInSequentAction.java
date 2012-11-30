@@ -22,6 +22,8 @@ public class SearchInSequentAction extends MainWindowAction {
         setName("Search in sequent view");
         setTooltip("Search in the current sequent.");
         this.setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F3,0));
+        
+        getMediator().enableWhenProof(this);
     }
 	
 	@Override

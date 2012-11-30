@@ -45,12 +45,11 @@ public class KeYFileChooser {
 		    return 
 			    f.isDirectory() 
 			|| f.toString().endsWith(".key") 
-			|| f.toString().endsWith(".java")
 			|| f.toString().endsWith(".proof");
 		}
 		
 		public String getDescription() {
-		    return "KeY and Java files";
+		    return "KeY files and Directories";
 		}
 	    });
     }

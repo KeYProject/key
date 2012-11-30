@@ -220,28 +220,8 @@ public final class StrategySelectionView extends JPanel {
         
         ++yCoord;
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
-        ////////////////////////////////////////////////////////////////////////
-        ++yCoord;
-        
-        addJavaDLOption ( new JLabel ( "Treatment of new unclosable goals" ),
-                    javaDLOptionsLayout, 1, yCoord, 7 );
-        
-        ++yCoord;
-
-        noRetreat = new JRadioButtonHashMap("None", StrategyProperties.RETREAT_MODE_NONE, true, false);
-        noRetreat.setToolTipText( "<html>Do not retreat after automatic proof.</html>");
-        retreatModeGroup.add(noRetreat);
-        addJavaDLOption ( noRetreat, javaDLOptionsLayout, 2, yCoord, 2 );        
-
-        retreat = new JRadioButtonHashMap(
-                "AutoPrune", StrategyProperties.RETREAT_MODE_RETREAT, false, false);
-        retreat.setToolTipText( "<html>If new goals don't get closed, retreat back<br>" +
-                        "to the goals where the automatic proof<br>" +
-                        "was started.</html>");
-        retreatModeGroup.add(retreat);
-        addJavaDLOption ( retreat, javaDLOptionsLayout, 4, yCoord, 2 );        
+        ////////////////////////////////////////////////////////////////////////        
        
-        
         ++yCoord;
         addJavaDLOptionSpace ( javaDLOptionsLayout, yCoord );
         ////////////////////////////////////////////////////////////////////////
@@ -253,9 +233,9 @@ public final class StrategySelectionView extends JPanel {
         ++yCoord;
         
         splittingNormal = new JRadioButtonHashMap("Free",
-                       StrategyProperties.SPLITTING_NORMAL, true, false);
+                       StrategyProperties.SPLITTING_NORMAL, false, false);
         splittingGroup.add(splittingNormal);
-        addJavaDLOption ( splittingNormal, javaDLOptionsLayout, 4, yCoord, 2 );     
+        addJavaDLOption ( splittingNormal, javaDLOptionsLayout, 2, yCoord, 2 );     
         splittingNormal.setToolTipText("<html>" +
                                         "Split formulas (if-then-else expressions,<br>" +
                                         "disjunctions in the antecedent, conjunctions in<br>" +
@@ -277,10 +257,10 @@ public final class StrategySelectionView extends JPanel {
                                         "improve the performance." +
                                         "</html>");
         splittingGroup.add(splittingDelayed);
-        addJavaDLOption ( splittingDelayed, javaDLOptionsLayout, 2, yCoord, 2 );
+        addJavaDLOption ( splittingDelayed, javaDLOptionsLayout, 4, yCoord, 2 );
 
         splittingOff = new JRadioButtonHashMap("Off",
-                     StrategyProperties.SPLITTING_OFF, true, false);
+                     StrategyProperties.SPLITTING_OFF, false, false);
         splittingOff.setToolTipText("<html>" +
                                     "Do never split formulas (if-then-else expressions,<br>" +
                                     "disjunctions in the antecedent, conjunctions in<br>" +
@@ -684,10 +664,10 @@ public final class StrategySelectionView extends JPanel {
 
         ++yCoord;
 
-        final JLabel userTacletsLabel = new JLabel ( "User-specific taclets" );
+        final JLabel userTacletsLabel = new JLabel ( "User-specific taclet sets" );
         addJavaDLOption ( userTacletsLabel, javaDLOptionsLayout, 1, yCoord, 7 );
         userTacletsLabel.setToolTipText("<html>" +
-                                        "These options define whether user- and problem-specific taclets<br>" +
+                                        "These options define whether user- and problem-specific taclet sets<br>" +
                                         "are applied automatically by the strategy. Problem-specific taclets<br>" +
                                         "can be defined in the \\rules-section of a .key-problem file. For<br>" +
                                         "automatic application, the taclets have to contain a clause<br>" +
@@ -795,8 +775,6 @@ public final class StrategySelectionView extends JPanel {
         blockContractRadioButton.addActionListener(optListener);
         blockExpandRadioButton.addActionListener(optListener);
         //blockNoneRadioButton.addActionListener(optListener);
-        retreat.addActionListener(optListener);
-        noRetreat.addActionListener(optListener);
         depOn.addActionListener(optListener);
         depOff.addActionListener(optListener);
         queryOn.addActionListener(optListener);
@@ -1077,10 +1055,6 @@ public final class StrategySelectionView extends JPanel {
             JRadioButton bStopModeActive = getStrategyOptionButton(stopmodeOptions, 
                     StrategyProperties.STOPMODE_OPTIONS_KEY);
             bStopModeActive.setSelected(true);            
-            String retreatModeOptions = p.getProperty(StrategyProperties.RETREAT_MODE_OPTIONS_KEY);
-            JRadioButton bRetreatModeActive = getStrategyOptionButton(retreatModeOptions, 
-                    StrategyProperties.RETREAT_MODE_OPTIONS_KEY);
-            bRetreatModeActive.setSelected(true);            
             String autoInductionOptions = p.getProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY); 
             JRadioButton bAutoInductionOptions = getStrategyOptionButton(autoInductionOptions, 
                     StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY);
@@ -1197,8 +1171,6 @@ public final class StrategySelectionView extends JPanel {
                        quantifierGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.STOPMODE_OPTIONS_KEY, 
                        stopModeGroup.getSelection().getActionCommand());
-        p.setProperty( StrategyProperties.RETREAT_MODE_OPTIONS_KEY, 
-                retreatModeGroup.getSelection().getActionCommand());
         p.setProperty( StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY, 
                        autoInductionGroup.getSelection().getActionCommand());
         

@@ -44,7 +44,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
 	JScrollPane settingsPane = new JScrollPane(settings);
 
-	JOptionPane.showMessageDialog(mainWindow, settingsPane, "Settings",
+	JOptionPane.showMessageDialog(mainWindow, settingsPane, "Settings used in the current proof",
 	        JOptionPane.INFORMATION_MESSAGE);
     }
 
