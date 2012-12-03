@@ -44,7 +44,7 @@ final class LinkedList implements List {
 	
 	Node node = first;
 	/*@ loop_invariant 0 <= i && i <= index && node == (Node)nodeseq[i];
-	  @ assignable \less_than_nothing;
+	  @ assignable \strictly_nothing;
 	  @ decreases index - i;
 	  @*/
 	for(int i = 0; i < index; i++) {
@@ -63,7 +63,7 @@ final class LinkedList implements List {
 	Node node = first;
 	/*@ loop_invariant 0 <= i && i < size && node == (Node)nodeseq[i]
 	  @   && (\forall int x; 0 <= x && x < i; seq[x] != o);
-	  @ assignable \less_than_nothing;
+	  @ assignable \strictly_nothing;
 	  @ decreases size - 1 - i;
 	  @*/
 	for(int i = 0; i < size - 1; i++) {
@@ -126,7 +126,7 @@ final class LinkedList implements List {
 	/*@ loop_invariant 1 <= i && i <= seq.length && (n == null || n == (Node)nodeseq[i])
 	  @    && m == (Node)nodeseq[i-1] && (n==null ==> i == seq.length)
           @    && (\forall int j; 0<=j && j<i; seq[j] != o);
-	  @ assignable \less_than_nothing;
+	  @ assignable \strictly_nothing;
 	  @ decreases seq.length - i;
 	  @*/
 	for(int i = 1; n != null; i++) {

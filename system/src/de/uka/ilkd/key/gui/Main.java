@@ -11,24 +11,27 @@
 package de.uka.ilkd.key.gui;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Iterator;
 import java.util.List;
 
-import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
-import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.ExperimentalFeature;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.CommandLine;
 
 /**
  * The main entry point for KeY
@@ -36,9 +39,9 @@ import de.uka.ilkd.key.util.KeYResourceManager;
  * This has been extracted from MainWindow to keep GUI and control further apart.
  */
 public class Main {
-    /**
-     * Command line options
-     */
+/**
+ * Command line options
+ */
     private static final String HELP = "--help";
     private static final String AUTO = "--auto";
     private static final String LAST = "--last";
@@ -67,15 +70,15 @@ public class Main {
      * The user interface modes KeY can operate in.
      */
     private enum UiMode {
-        /**
-         * Interactive operation mode.
-         */
-        INTERACTIVE,
+	/**
+	 * Interactive operation mode.
+	 */
+	INTERACTIVE,
 
-        /**
-         * Auto operation mode.
-         */
-        AUTO
+	/**
+	 * Auto operation mode.
+	 */
+	AUTO
     }
 
 
@@ -114,17 +117,23 @@ public class Main {
     private static boolean loadOnly = false;
 
     private static String fileNameOnStartUp = null;
-
     /**
      * Object handling the parsing of commandline options
      */
     private static CommandLine cl;
-
     /**
      * flag whether recent loaded file should be loaded on startup
      */
     private static boolean loadRecentFile=false;
+    
+    /** Lists all features currently marked as experimental.
+     * Unless invoked with command line option --experimental ,
+     * those will be deactivated.
+     */
+    private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES = 
+        {de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE};
 
+    
     /**
      * <p>
      * This flag indicates if the example chooser should be shown
@@ -229,11 +238,11 @@ public class Main {
 
 
         if(cl.isSet(AUTO)){
-            uiMode = UiMode.AUTO;
+        	uiMode = UiMode.AUTO;
         }
         if(cl.isSet(AUTO_LOADONLY)){
-            uiMode = UiMode.AUTO;
-            loadOnly = true;
+        	uiMode = UiMode.AUTO;
+        	loadOnly = true;
         }
 
         if(cl.isSet(HELP)){
@@ -287,7 +296,8 @@ public class Main {
 
         if(cl.isSet(EXPERIMENTAL)){
             System.out.println("Running in experimental mode ...");
-            //atm do nothing
+        } else {
+            deactivateExperimentalFeatures();
         }
 
         if(cl.isSet(LAST)){
@@ -312,6 +322,12 @@ public class Main {
         }
 
     }
+    
+    /** Deactivate experimental features. */
+    private static void deactivateExperimentalFeatures () {
+        for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES)
+            feature.deactivate();
+    }
 
 
     /**
@@ -324,7 +340,7 @@ public class Main {
      *         <code>uiMode</code>
      */
     private static UserInterface createUserInterface() {
-        UserInterface ui;
+	UserInterface ui;
 
         if (uiMode == UiMode.AUTO) {
             BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
@@ -348,8 +364,8 @@ public class Main {
             }
 
             ui = MainWindow.getInstance().getUserInterface();
-
-            Debug.out("Loading file: ", fileNameOnStartUp);
+	    if (fileNameOnStartUp != null)
+	        System.out.println("Loading: "+fileNameOnStartUp);
         }
 
         return ui;
@@ -414,5 +430,4 @@ public class Main {
     public static String getFileNameOnStartUp() {
         return fileNameOnStartUp;
     }
-
 }

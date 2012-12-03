@@ -32,7 +32,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.*;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 public final class IntroAtPreDefsOp extends AbstractTermTransformer {
@@ -81,7 +80,6 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         }.run();
         final MethodFrame frame = frameAndLoopsAndBlocks.first;
         final ImmutableSet<LoopStatement> loops = frameAndLoopsAndBlocks.second;
-        final ImmutableSet<StatementBlock> blocks = frameAndLoopsAndBlocks.third;
 
         //determine "self"
         Term selfTerm;

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -9,6 +8,7 @@ import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProblemLoader;
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -39,12 +39,16 @@ public abstract class AbstractUserInterface implements UserInterface {
      * {@inheritDoc}
      */
     @Override
-    public DefaultProblemLoader load(File file, List<File> classPath, File bootClassPath) throws IOException, ProofInputException {
-       getMediator().stopInterface(true);
-       DefaultProblemLoader loader = new DefaultProblemLoader(file, classPath, bootClassPath, getMediator());
-       loader.load();
-       getMediator().startInterface(true);
-       return loader;
+    public DefaultProblemLoader load(File file, List<File> classPath, File bootClassPath) throws ProblemLoaderException {
+       try {
+          getMediator().stopInterface(true);
+          DefaultProblemLoader loader = new DefaultProblemLoader(file, classPath, bootClassPath, getMediator());
+          loader.load();
+          return loader;
+       }
+       finally {
+          getMediator().startInterface(true);
+       }
     }
     
     /**
@@ -55,14 +59,34 @@ public abstract class AbstractUserInterface implements UserInterface {
        ProblemInitializer init = createProblemInitializer();
        return init.startProver(initConfig, input, 0);
     }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void startAndWaitForAutoMode(Proof proof) {
+       startAutoMode(proof);
+       waitWhileAutoMode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void startAutoMode(Proof proof) {
+       KeYMediator mediator = getMediator();
+       mediator.setProof(proof);
+       mediator.startAutoMode();
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public void startAutoMode(Proof proof, ImmutableList<Goal> goals) {
-       getMediator().setProof(proof);
-       getMediator().startAutoMode(goals);
+       KeYMediator mediator = getMediator();
+       mediator.setProof(proof);
+       mediator.startAutoMode(goals);
     }
 
     /**

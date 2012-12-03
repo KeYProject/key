@@ -224,7 +224,7 @@ class TacletMenu extends JMenu {
                        JoinIsApplicable.INSTANCE.isApplicable(mediator.getSelectedGoal(),pos.getPosInOccurrence());
                if(!partner.isEmpty()){
                    JMenuItem item = new JoinMenuItem(partner,mediator.getProof(),mediator);
-                   add(item);
+                   if (JoinMenuItem.FEATURE.active()) add(item);
                }
         }   
 				      

@@ -349,7 +349,7 @@ public abstract class KeYInstaller {
      * and returns a list of missing files 
      */
     public String[] checkLibraries () {
-	LinkedList l = new LinkedList ();	
+	LinkedList<String> l = new LinkedList<String> ();	
 	for ( int i = 0; i < libs ().length; i++ ) {
 	    File lib = new File ( keyLib () + File.separatorChar + libs () [i] );
 	    if ( ! lib.exists() ) {

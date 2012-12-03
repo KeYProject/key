@@ -12,7 +12,7 @@ class For implements Iterable {
     /*@ maintaining s == (\sum int j; 0 <= j && j < \index; a[j]);
       @ maintaining 0 <= \index && \index <= a.length;
       @ decreasing a.length - \index;
-      @ assignable \less_than_nothing;
+      @ assignable \strictly_nothing;
       @*/
     for (int i: a) s+= i;
     return s;
@@ -24,7 +24,7 @@ class For implements Iterable {
     @*/
   void infiniteLoop() {
     //@ maintaining \invariant_for(f);
-    //@ assignable \less_than_nothing;
+    //@ assignable \strictly_nothing;
     for (Object o: f);
   }
 

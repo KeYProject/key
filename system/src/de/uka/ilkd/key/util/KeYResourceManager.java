@@ -191,7 +191,8 @@ public class KeYResourceManager {
                 
                 long actualTransferredByte = 0;
 	        try { 
-	            final FileChannel targetStream  = new FileOutputStream (targetFile).getChannel();
+	            @SuppressWarnings("resource") // is closed below
+                final FileChannel targetStream  = new FileOutputStream (targetFile).getChannel();
 	            try { 
 	                actualTransferredByte = targetStream.transferFrom(sourceStream, 0, Long.MAX_VALUE);
 	            } finally {
