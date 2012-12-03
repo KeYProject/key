@@ -224,8 +224,6 @@ public class BlockContractRule implements BuiltInRule {
                 ifContractBuilder.buildContractApplPredTerm();
         final Taclet informationFlowContractApp =
                 ifContractBuilder.buildContractApplTaclet();
-        goal.addTaclet(informationFlowContractApp,
-                       SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
 
         ImmutableList<Goal> result;
         final ContractPO po =
@@ -268,7 +266,8 @@ public class BlockContractRule implements BuiltInRule {
         configurator.setUpUsageGoal(
             result.head(),
             new Term[] {contextUpdate, remembranceUpdate, anonymisationUpdate},
-            new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition, contractApplPredTerm}
+            new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition, contractApplPredTerm},
+            informationFlowContractApp
         );
         return result;
     }
@@ -822,11 +821,12 @@ public class BlockContractRule implements BuiltInRule {
             goal.changeFormula(new SequentFormula(TB.apply(update, TB.and(preconditions))), occurrence);
         }
 
-        public void setUpUsageGoal(final Goal goal, final Term[] updates, final Term[] assumptions)
+        public void setUpUsageGoal(final Goal goal, final Term[] updates, final Term[] assumptions, final Taclet informationFlowContractApp)
         {
             goal.setBranchLabel("Usage");
             goal.addFormula(new SequentFormula(TB.applySequential(updates, TB.and(assumptions))), true, false);
             goal.changeFormula(new SequentFormula(TB.applySequential(updates, buildUsageFormula())), occurrence);
+            goal.addTaclet(informationFlowContractApp, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         }
 
         private Term buildUsageFormula()

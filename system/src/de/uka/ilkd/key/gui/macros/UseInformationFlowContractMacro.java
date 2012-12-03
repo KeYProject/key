@@ -5,12 +5,10 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.feature.InfFlowContractAppFeature;
 import de.uka.ilkd.key.strategy.feature.InfFlowImpFeature;
-import de.uka.ilkd.key.util.properties.Properties;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -98,11 +96,6 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
      * string in the admitted set and rejects everything else.
      */
     protected class PropExpansionStrategy implements Strategy {
-
-        public final Properties.Property<Boolean> STOP_INF_FLOW_CONTRACT_APPL_PROPERTY =
-                new Properties.Property<Boolean>(Boolean.class,
-                                                 "Stop information flow contract " +
-                                                 "applicaton property");
 
         private final Name NAME =
                 new Name(UseInformationFlowContractMacro.PropExpansionStrategy.class.getSimpleName());

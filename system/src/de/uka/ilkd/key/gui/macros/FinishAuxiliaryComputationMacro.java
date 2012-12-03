@@ -88,7 +88,7 @@ public class FinishAuxiliaryComputationMacro
                                              services);
         Taclet rwTaclet = generateRewriteTaclet(result, ifPO, services);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-        addContractApplicationTaclets(proof, initiatingGoal);
+        addContractApplicationTaclets(initiatingGoal, proof);
 
         // close auxiliary computation proof
         mediator.getUI().removeProof(proof);
@@ -117,7 +117,7 @@ public class FinishAuxiliaryComputationMacro
         RewriteTacletGoalTemplate goal =
                 new RewriteTacletGoalTemplate(replacewith);
         tacletBuilder.addTacletGoalTemplate(goal);
-        tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
+        tacletBuilder.addRuleSet(new RuleSet(new Name("concrete")));
         tacletBuilder.setSurviveSmbExec(true);
 
         return tacletBuilder.getTaclet();

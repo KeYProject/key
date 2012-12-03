@@ -738,11 +738,8 @@ public final class UseOperationContractRule implements BuiltInRule {
                 ifContractBuilder.buildContractApplPredTerm();
         Taclet informationFlowContractApp =
                 ifContractBuilder.buildContractApplTaclet();
-        goal.addTaclet(informationFlowContractApp,
-                       SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
 
 
-        
         //create "Pre" branch
 	int i = 0;
 	for(Term arg : contractParams) {
@@ -795,6 +792,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         postGoal.addFormula(new SequentFormula(contractApplPredTerm),
                             true,
                             false);
+        postGoal.addTaclet(informationFlowContractApp,
+                           SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
 
 
         

@@ -329,8 +329,8 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    void addContractApplicationTaclets(Proof symbExecProof,
-                                       Goal initiatingGoal) {
+    void addContractApplicationTaclets(Goal initiatingGoal,
+                                       Proof symbExecProof) {
         for (Rule r : symbExecProof.env().getRegisteredRules()) {
             if (r instanceof Taclet) {
                 Taclet t = (Taclet) r;

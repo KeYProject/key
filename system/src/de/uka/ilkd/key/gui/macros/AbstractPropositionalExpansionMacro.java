@@ -20,10 +20,12 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.LongRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 /**
@@ -96,7 +98,9 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
             String name = ruleApp.rule().name().toString();
             if(admittedRuleNames.contains(name) &&
                     ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
-                return LongRuleAppCost.ZERO_COST;
+                Strategy javaDlStrategy =
+                        JavaCardDLStrategy.Factory.create(goal.proof(), "JavaCardDLStrategy", new StrategyProperties());
+                return javaDlStrategy.computeCost(ruleApp, pio, goal);
             } else {
                 return TopRuleAppCost.INSTANCE;
             }

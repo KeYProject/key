@@ -20,7 +20,6 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -81,10 +80,9 @@ public final class InfFlowMethodContractTacletBuilder
 
 
     @Override
-    Term buildContractApplications(
-            ProofObligationVars contAppData,
-            ProofObligationVars contAppData2,
-            Services services) {
+    Term buildContractApplications(ProofObligationVars contAppData,
+                                   ProofObligationVars contAppData2,
+                                   Services services) {
         ImmutableSet<InformationFlowContract> ifContracts =
                 getInfromFlowContracts(methodContract.getTarget(), services);
         ImmutableList<Term> contractsApplications =
