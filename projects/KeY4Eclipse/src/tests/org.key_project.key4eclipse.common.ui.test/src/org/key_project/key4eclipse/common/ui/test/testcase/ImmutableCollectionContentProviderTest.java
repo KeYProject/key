@@ -1,9 +1,9 @@
-package org.key_project.key4eclipse.starter.core.test.testcase;
+package org.key_project.key4eclipse.common.ui.test.testcase;
 
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.key_project.key4eclipse.starter.core.provider.ImmutableCollectionContentProvider;
+import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;

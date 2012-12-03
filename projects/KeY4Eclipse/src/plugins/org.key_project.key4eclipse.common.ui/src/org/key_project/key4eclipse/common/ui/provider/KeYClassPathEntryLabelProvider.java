@@ -1,4 +1,4 @@
-package org.key_project.key4eclipse.starter.ui.provider;
+package org.key_project.key4eclipse.common.ui.provider;
 
 import java.io.File;
 import java.util.HashMap;

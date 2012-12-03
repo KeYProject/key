@@ -17,4 +17,6 @@ package de.uka.ilkd.key.util;
  */
 public interface ExperimentalFeature {
     public void deactivate();
+    public void activate();
+    public boolean active();
 }

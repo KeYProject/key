@@ -348,30 +348,6 @@
       </menuContribution>
    </extension>
    <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            class="org.key_project.key4eclipse.starter.ui.property.KeYProjectPropertyPage"
-            id="org.key_project.key4eclipse.starter.ui.keyProjectProperties"
-            name="KeY">
-         <enabledWhen>
-            <or>
-               <and>
-                  <instanceof
-                        value="org.eclipse.core.resources.IProject">
-                  </instanceof>
-                  <test
-                        property="org.eclipse.core.resources.projectNature"
-                        value="org.eclipse.jdt.core.javanature">
-                  </test>
-               </and>
-               <instanceof
-                     value="org.eclipse.jdt.core.IJavaProject">
-               </instanceof>
-            </or>
-         </enabledWhen>
-      </page>
-   </extension>
-   <extension
          point="org.eclipse.ui.editors">
       <editor
             class="org.eclipse.ui.editors.text.TextEditor"

@@ -1,4 +1,4 @@
-package org.key_project.key4eclipse.starter.core.provider;
+package org.key_project.key4eclipse.common.ui.provider;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
