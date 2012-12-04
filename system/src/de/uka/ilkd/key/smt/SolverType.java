@@ -192,7 +192,9 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 						 }
 						 throw new RuntimeException("Error while executing Z3:\n" +message);
 					 }
-			
+					if (!message.equals("success")) {
+						sc.addMessage(message);
+					}
 			
 				switch (sc.getState()) {
 				case WAIT_FOR_RESULT:
@@ -209,16 +211,16 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 						 sc.setState(WAIT_FOR_DETAILS);
 						
 					 }
-					 if(message.equals("unkown")){
+					 if(message.equals("unknown")){
 						 sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
+						 sc.setState(WAIT_FOR_DETAILS);
+						 pipe.sendMessage("(exit)\n");
 					 }
 					break;
 					
 				case WAIT_FOR_DETAILS:
 					if(message.equals("success")){
-						pipe.close();	
-					}else{
-						sc.addMessage(message);
+						pipe.close();
 					}						
 					break;						
 				}
