@@ -7,7 +7,7 @@
   *     starting at x and y respectively.</ul>
   * @author bruns, woj
   */
-class LCP {
+final class LCP {
 
 
   /*@ normal_behavior
@@ -24,7 +24,7 @@ class LCP {
           @ maintaining (\forall int i; 0 <= i && i < l; a[x+i]==a[y+i]);
           @ maintaining x!=y;
           @ decreasing a.length-l;
-          @ assignable \less_than_nothing;
+          @ assignable \strictly_nothing;
           @*/
         while (x+l<a.length && y+l<a.length && a[x+l]==a[y+l]) {
             l++;
