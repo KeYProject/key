@@ -100,7 +100,6 @@ public class RemovePostFromInfFlowContractPreBranchesMacro extends StrategyProof
                     parent.parent().parent() != null &&
                     getAppRuleName(parent.parent().parent()).startsWith(INF_FLOW_RULENAME_PREFIX);
             }
-
             return false;
         }
 

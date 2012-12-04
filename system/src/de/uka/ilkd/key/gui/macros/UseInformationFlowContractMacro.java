@@ -153,20 +153,23 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
             if (goal.node().parent() != null &&
                 goal.node().parent().parent() != null) {
                 Node parent = goal.node().parent();
-                RuleApp parentRuleApp = parent.getAppliedRuleApp();
-                String parentRuleName = parentRuleApp.rule().name().toString();
-                Node parentParent = parent.parent();
-                RuleApp parentParentRuleApp = parentParent.getAppliedRuleApp();
-                String parentParentRuleName =
-                        parentParentRuleApp.rule().name().toString();
-                if (parentRuleName.equals(IMP_LEFT_RULENAME) &&
-                    parentParentRuleName.startsWith(INF_FLOW_RULENAME_PREFIX) &&
-                    parent.child(0) == goal.node()) {
-                    return false;
-                }
+                return !(getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
+                         getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX) &&
+                         parent.child(0) == goal.node() ||
+                         getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
+                         getAppRuleName(parent.parent()).equals(IMP_LEFT_RULENAME) &&
+                         parent.parent().parent() != null &&
+                         getAppRuleName(parent.parent().parent()).startsWith(INF_FLOW_RULENAME_PREFIX) &&
+                         parent.child(0) == goal.node());
             }
-
             return true;
+        }
+
+
+        private String getAppRuleName(Node parent) {
+            RuleApp parentRuleApp = parent.getAppliedRuleApp();
+            String parentRuleName = parentRuleApp.rule().name().toString();
+            return parentRuleName;
         }
 
 
