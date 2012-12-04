@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
  * fulfilled is that the term matches the structure described by the term of the
  * find-part.
  */
-public final class RewriteTaclet extends FindTaclet {
+public class RewriteTaclet extends FindTaclet {
 
     /** does not pose state restrictions on valid matchings */
     public static final int NONE = 0;

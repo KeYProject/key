@@ -87,7 +87,7 @@ public class FinishAuxiliaryComputationMacro
         Term result = calculateResultingTerm(proof, ifPO.getIFVars(),
                                              services);
         Taclet rwTaclet = generateRewriteTaclet(result, ifPO, services);
-        initiatingGoal.addNoPosTacletApp(NoPosTacletApp.createNoPosTacletApp(rwTaclet));
+        initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         addContractApplicationTaclets(proof, initiatingGoal);
 
         // close auxiliary computation proof

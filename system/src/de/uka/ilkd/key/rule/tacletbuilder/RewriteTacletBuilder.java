@@ -33,7 +33,7 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
      * the sequent</li>
      *</ul>
      */
-    private int applicationRestriction;
+    protected int applicationRestriction;
 
     public RewriteTacletBuilder setApplicationRestriction
 	( int p_applicationRestriction ) {
@@ -43,7 +43,7 @@ public class RewriteTacletBuilder extends FindTacletBuilder{
 
 
     /* for information flow purposes; TODO: find better solution */
-    private boolean surviveSmbExec;
+    protected boolean surviveSmbExec;
     
     public void setSurviveSmbExec(boolean b) {
         surviveSmbExec = b;

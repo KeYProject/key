@@ -86,7 +86,6 @@ public class FinishAuxiliaryBlockComputationMacro
                                              services);
         Taclet rwTaclet = generateRewriteTaclet(result, contract, ifVars, services);
         initiatingGoal.addTaclet(rwTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-        initiatingGoal.proof().env().registerRule(rwTaclet, AxiomJustification.INSTANCE);
         addContractApplicationTaclets(proof, initiatingGoal);
 
         // close auxiliary computation proof

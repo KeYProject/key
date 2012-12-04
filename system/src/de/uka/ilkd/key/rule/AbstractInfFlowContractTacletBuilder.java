@@ -16,7 +16,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.InfFlowTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 
@@ -26,7 +26,6 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced {
 
     private Term contextUpdate;
-    private Term baseHeap;
     private Term contractSelf;
     private ImmutableList<Term> localIns;
     private Term heapAtPre;
@@ -45,11 +44,6 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
 
     public void setContextUpdate(Term contextUpdate) {
         this.contextUpdate = contextUpdate;
-    }
-
-
-    public void setBaseHeap(Term heap) {
-        this.baseHeap = heap;
     }
 
 
@@ -115,7 +109,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
 
 
     private ProofObligationVars getProofObligationVars() {
-        return new ProofObligationVars(baseHeap, contractSelf, localIns,
+        return new ProofObligationVars(contractSelf, localIns,
                                        heapAtPre, localOuts, contractResult,
                                        exceptionVar, heapAtPost, services);
     }
@@ -161,10 +155,10 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
 
         // genreate schemaFind and schemaAssumes terms
         ProofObligationVars schemaDataFind = generateApplicationDataSVs(
-                "find", appData, services);
+                "find_", appData, services);
         Term schemaFind = generateSchemaFind(schemaDataFind, services);
         ProofObligationVars schemaDataAssumes = generateApplicationDataSVs(
-                "assumes", appData, services);
+                "assumes_", appData, services);
         Term schemaAssumes = generateSchemaAssumes(schemaDataAssumes, services);
 
         // generate post term
@@ -179,7 +173,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                 new Semisequent(new SequentFormula(schemaContApps)));
 
         //create taclet
-        RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+        InfFlowTacletBuilder tacletBuilder = new InfFlowTacletBuilder();
         tacletBuilder.setName(tacletName);
         tacletBuilder.setFind(schemaFind);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.ANTECEDENT_POLARITY);

@@ -113,7 +113,7 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
             return;
         }
         ImmutableSet<NoPosTacletApp> initialTaclets =
-                ((SymbolicExecutionPO) poForProof).getInitialTaclets();
+                ((AbstractOperationPO) poForProof).getInitialTaclets();
 
 
         BlockExecutionPO symbExecPO =

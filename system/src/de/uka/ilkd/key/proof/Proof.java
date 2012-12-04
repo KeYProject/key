@@ -625,6 +625,12 @@ public class Proof implements Named {
                                 }
                                
                                 firstGoal.pruneToParent();
+
+                                final List<StrategyInfoUndoMethod> undoMethods =
+                                        visitedNode.getStrategyInfoUndoMethods();
+                                for (StrategyInfoUndoMethod undoMethod : undoMethods) {
+                                    firstGoal.undoStrategyInfoAdd(undoMethod);
+                                }
                         }
                   });
                   

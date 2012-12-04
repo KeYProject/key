@@ -55,6 +55,12 @@ public class Node {
      */
     private ImmutableSet<NoPosTacletApp>  localIntroducedRules = DefaultImmutableSet.<NoPosTacletApp>nil();
     
+    /**
+     * Holds the undo methods for the information added by rules to the
+     * {@link Goal#strategyInfos}.
+     */
+    private List<StrategyInfoUndoMethod>  undoInfoForStrategyInfo =
+            new ArrayList<StrategyInfoUndoMethod>();
     
     /** creates an empty node that is root and leaf.
      */
@@ -525,7 +531,14 @@ public class Node {
     public int siblingNr() {
         return siblingNr;
     }
-   
+
+    public List<StrategyInfoUndoMethod> getStrategyInfoUndoMethods() {
+        return undoInfoForStrategyInfo;
+    }
+
+    public void addStrategyInfoUndoMethod(StrategyInfoUndoMethod undoMethod) {
+        undoInfoForStrategyInfo.add(undoMethod);
+    }
 
     // inner iterator class 
     public static class NodeIterator implements Iterator<Node> {
