@@ -30,6 +30,8 @@ import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Terms;
 import de.uka.ilkd.key.util.ExtList;
@@ -231,22 +233,35 @@ public class BlockContractRule implements BuiltInRule {
         if (po instanceof InfFlowContractPO ||
             po instanceof SymbolicExecutionPO ||
             po instanceof BlockExecutionPO) {
-            AbstractOperationPO abstPO = (AbstractOperationPO) po;
-            ProofObligationVars instantiationVars =
+            // create information flow validity branch
+
+            // generate proof obligation variables
+            final ProofObligationVars instantiationVars =
                     new ProofObligationVars(vars.self,
                                             MiscTools.toTermList(localInVariables),
                                             MiscTools.toTermList(localOutVariables),
                                             vars.result, vars.exception,
                                             TB.getBaseHeap(services), preHeap,
                                             postHeap, services);
-            Sequent seq = buildBodyPreservesSequent(contract, application,
-                                                    instantiationVars,
-                                                    instantiation.context,
-                                                    services);
+            final IFProofObligationVars ifVars =
+                    new IFProofObligationVars(instantiationVars, services);
+            application.update(ifVars, instantiation.context);
+
+            // create proof obligation
+            InfFlowPOSnippetFactory infFlowFactory =
+                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
+                                                   ifVars.c2, services);
+
+            Sequent seq = buildBodyPreservesSequent(infFlowFactory);
             Goal infFlowGoal = goal.getCleanGoal(seq);
-            ImmutableSet<NoPosTacletApp> taclets = abstPO.getInitialTaclets();
-            infFlowGoal.indexOfTaclets().addTaclets(taclets);
             infFlowGoal.setBranchLabel("Information Flow Validity");
+
+            Taclet removePostTaclet =
+                    generateInfFlowPostRemoveTaclet(infFlowFactory);
+            infFlowGoal.addTaclet(removePostTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+
+            // add information flow validity branch and split goal for the
+            // remaining "normal" block contract branches
             result = goal.split(3).append(infFlowGoal);
         } else {
             result = goal.split(3);
@@ -310,28 +325,28 @@ public class BlockContractRule implements BuiltInRule {
         return NAME.toString();
     }
 
-    Sequent buildBodyPreservesSequent(BlockContract contract,
-                                      BlockContractBuiltInRuleApp app,
-                                      ProofObligationVars symbExecVars,
-                                      ExecutionContext context,
-                                      Services services) {
-        // generate proof obligation variables
-        final IFProofObligationVars ifVars =
-                new IFProofObligationVars(symbExecVars, services);
-        app.update(ifVars, context);
-
-        // create proof obligation
-        InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
-                                                   ifVars.c2, services);
+    Sequent buildBodyPreservesSequent(InfFlowPOSnippetFactory f) {
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
-        Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_POST);
+        Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
-        // register final term
         final Term finalTerm = TB.imp(selfComposedExec, post);
         return Sequent.createSuccSequent(
                 new Semisequent(new SequentFormula(finalTerm)));
+    }
+
+    private Taclet generateInfFlowPostRemoveTaclet(InfFlowPOSnippetFactory infFlowFactory)
+            throws UnsupportedOperationException {
+        // create post-remove-taclet
+        RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+        tacletBuilder.setName(InfFlowContractPO.REMOVE_POST_RULENAME);
+        tacletBuilder.setFind(infFlowFactory.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION));
+        tacletBuilder.setApplicationRestriction(RewriteTaclet.SUCCEDENT_POLARITY);
+        tacletBuilder.setSurviveSmbExec(false);
+        RewriteTacletGoalTemplate goal = new RewriteTacletGoalTemplate(TB.ff());
+        tacletBuilder.addTacletGoalTemplate(goal);
+        Taclet removePostTaclet = tacletBuilder.getTaclet();
+        return removePostTaclet;
     }
 
     public static final class Instantiation {

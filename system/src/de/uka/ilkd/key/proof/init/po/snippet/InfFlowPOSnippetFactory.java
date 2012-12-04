@@ -19,7 +19,7 @@ public interface InfFlowPOSnippetFactory {
         //     (   {s1}respects = {s2}respects
         //      &  {s1}declassifies = {s2}declassifies )
         //  -> {s1_post}respects = {s2_post}respects
-        INF_FLOW_POST (InfFlowPostSnippet.class),
+        INF_FLOW_INPUT_OUTPUT_RELATION (InfFlowInputOutputRelationSnippet.class),
 
         //     ( {s1}pre & {s2}pre )
         //  -> (   (   {s1}respects = {s2}respects
@@ -35,7 +35,7 @@ public interface InfFlowPOSnippetFactory {
 
         // type of the factory method
         public final Class c;
-        
+
         // contructor
         Snippet(Class c) {
             this.c = c;

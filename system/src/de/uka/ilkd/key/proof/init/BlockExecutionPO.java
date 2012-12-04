@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -44,7 +45,6 @@ public class BlockExecutionPO extends AbstractOperationPO implements ContractPO 
                             BlockContract contract,
                             ProofObligationVars symbExecVars,
                             Goal initiatingGoal,
-                            ImmutableSet<NoPosTacletApp> taclets,
                             ExecutionContext context) {
         super(initConfig, contract.getName());
         this.contract = contract;
@@ -52,7 +52,6 @@ public class BlockExecutionPO extends AbstractOperationPO implements ContractPO 
                 new InformationFlowContractImpl(contract, services);
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
-        this.taclets = taclets;
         this.context = context;
     }
 
@@ -80,7 +79,12 @@ public class BlockExecutionPO extends AbstractOperationPO implements ContractPO 
 
         // register final term
         assignPOTerms(finalTerm);
-//        collectClassAxioms(contract.getKJT());
+
+        // add class axioms
+        Proof initiatingProof = initiatingGoal.proof();
+        AbstractOperationPO initatingPO =
+                (AbstractOperationPO) services.getSpecificationRepository().getPOForProof(initiatingProof);
+        taclets = initatingPO.getInitialTaclets();
     }
 
 

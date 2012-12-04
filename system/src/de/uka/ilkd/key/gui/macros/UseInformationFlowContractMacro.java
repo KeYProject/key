@@ -35,13 +35,13 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
     public String getDescription() {
         return "Applies all applicable information flow contract rules.";
     }
+    
     private static final String INF_FLOW_RULENAME_PREFIX =
             "Use_information_flow_contract";
 
     private static final String IMP_LEFT_RULENAME = "impLeft";
 
     private static final String[] ADMITTED_RULENAMES = {
-        "andLeft"
     };
 
     private static final Set<String> ADMITTED_RULENAME_SET =

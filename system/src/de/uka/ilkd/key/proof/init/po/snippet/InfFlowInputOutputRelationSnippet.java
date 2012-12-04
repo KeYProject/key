@@ -15,7 +15,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
  *
  * @author christoph
  */
-class InfFlowPostSnippet extends ReplaceAndRegisterMethod implements InfFlowFactoryMethod {
+class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod implements InfFlowFactoryMethod {
 
     @Override
     public Term produce(BasicSnippetData d,

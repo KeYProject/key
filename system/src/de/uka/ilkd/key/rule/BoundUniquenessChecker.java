@@ -90,6 +90,8 @@ public class BoundUniquenessChecker {
 		return false;
 	    }
 	}
+
+        boundVars.removeAll(localVars);
 	return true;
     }
 
