@@ -31,7 +31,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     }
 
     private static final String[] ADMITTED_RULES = {
-        "andLeft", "orLeft", "impRight"
+        "andLeft", "orLeft", "impRight", "unfold_computed_formula"
     };
 
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);

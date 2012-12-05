@@ -21,8 +21,10 @@ import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -246,7 +248,7 @@ public class InfFlowContractAppFeature implements Feature {
         }
         
         if (app.ifFormulaInstantiations().size() < 1 ||
-            !appOnDiffernetExecs(goal) ||
+            !isInfFlowProof(goal.proof()) ||
             duplicateFindTaclet(app, pos, goal)) {
             return TopRuleAppCost.INSTANCE;
         }
@@ -275,14 +277,12 @@ public class InfFlowContractAppFeature implements Feature {
     }
 
 
-    private boolean appOnDiffernetExecs(Goal goal) {
-        Proof proof = goal.proof();
+    private boolean isInfFlowProof(Proof proof) {
         ContractPO po =
                 proof.getServices().getSpecificationRepository().getPOForProof(proof);
-        if (!(po instanceof InfFlowContractPO)) {
-            return false;
-        }
-        return true;
+        return po instanceof InfFlowContractPO ||
+               po instanceof SymbolicExecutionPO ||
+               po instanceof BlockExecutionPO;
     }
 
 

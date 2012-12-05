@@ -31,7 +31,7 @@ class InfFlowContractAppSnippet extends ReplaceAndRegisterMethod
         InfFlowPOSnippetFactory iff =
                 POSnippetFactory.getInfFlowFactory(d, poVars1, poVars2);
         Term inOutRelations =
-                iff.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_POST);
+                iff.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
         return d.tb.imp(d.tb.and(preCond1, preCond2), inOutRelations);
     }
 }

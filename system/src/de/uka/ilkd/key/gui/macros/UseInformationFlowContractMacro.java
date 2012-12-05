@@ -5,12 +5,10 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.feature.InfFlowContractAppFeature;
 import de.uka.ilkd.key.strategy.feature.InfFlowImpFeature;
-import de.uka.ilkd.key.util.properties.Properties;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -37,13 +35,13 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
     public String getDescription() {
         return "Applies all applicable information flow contract rules.";
     }
+    
     private static final String INF_FLOW_RULENAME_PREFIX =
             "Use_information_flow_contract";
 
     private static final String IMP_LEFT_RULENAME = "impLeft";
 
     private static final String[] ADMITTED_RULENAMES = {
-        "andLeft"
     };
 
     private static final Set<String> ADMITTED_RULENAME_SET =
@@ -98,11 +96,6 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
      * string in the admitted set and rejects everything else.
      */
     protected class PropExpansionStrategy implements Strategy {
-
-        public final Properties.Property<Boolean> STOP_INF_FLOW_CONTRACT_APPL_PROPERTY =
-                new Properties.Property<Boolean>(Boolean.class,
-                                                 "Stop information flow contract " +
-                                                 "applicaton property");
 
         private final Name NAME =
                 new Name(UseInformationFlowContractMacro.PropExpansionStrategy.class.getSimpleName());
@@ -160,20 +153,23 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
             if (goal.node().parent() != null &&
                 goal.node().parent().parent() != null) {
                 Node parent = goal.node().parent();
-                RuleApp parentRuleApp = parent.getAppliedRuleApp();
-                String parentRuleName = parentRuleApp.rule().name().toString();
-                Node parentParent = parent.parent();
-                RuleApp parentParentRuleApp = parentParent.getAppliedRuleApp();
-                String parentParentRuleName =
-                        parentParentRuleApp.rule().name().toString();
-                if (parentRuleName.equals(IMP_LEFT_RULENAME) &&
-                    parentParentRuleName.startsWith(INF_FLOW_RULENAME_PREFIX) &&
-                    parent.child(0) == goal.node()) {
-                    return false;
-                }
+                return !(getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
+                         getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX) &&
+                         parent.child(0) == goal.node() ||
+                         getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
+                         getAppRuleName(parent.parent()).equals(IMP_LEFT_RULENAME) &&
+                         parent.parent().parent() != null &&
+                         getAppRuleName(parent.parent().parent()).startsWith(INF_FLOW_RULENAME_PREFIX) &&
+                         parent.child(0) == goal.node());
             }
-
             return true;
+        }
+
+
+        private String getAppRuleName(Node parent) {
+            RuleApp parentRuleApp = parent.getAppliedRuleApp();
+            String parentRuleName = parentRuleApp.rule().name().toString();
+            return parentRuleName;
         }
 
 

@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -67,9 +68,11 @@ public class SymbolicExecutionPO extends AbstractOperationPO implements Contract
         // register final term
         assignPOTerms(finalTerm);
 
-        InfFlowContractPO infFlowPO =
-                (InfFlowContractPO) services.getSpecificationRepository().getPO(contract);
-        taclets = infFlowPO.getInitialTaclets();
+        // add class axioms
+        Proof initiatingProof = initiatingGoal.proof();
+        AbstractOperationPO initatingPO =
+                (AbstractOperationPO) services.getSpecificationRepository().getPOForProof(initiatingProof);
+        taclets = initatingPO.getInitialTaclets();
     }
 
 

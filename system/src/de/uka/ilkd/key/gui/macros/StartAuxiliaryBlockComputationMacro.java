@@ -107,19 +107,9 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
         IFProofObligationVars ifVars =
                 blockRuleApp.getInformationFlowProofObligationVars();
 
-        ContractPO poForProof =
-                proof.getServices().getSpecificationRepository().getPOForProof(proof);
-        if (!(poForProof instanceof AbstractOperationPO)) {
-            return;
-        }
-        ImmutableSet<NoPosTacletApp> initialTaclets =
-                ((AbstractOperationPO) poForProof).getInitialTaclets();
-
-
         BlockExecutionPO symbExecPO =
                 new BlockExecutionPO(initConfig, contract, ifVars.symbExecVars,
-                                     goal, initialTaclets,
-                                     blockRuleApp.getExecutionContext());
+                                     goal, blockRuleApp.getExecutionContext());
 
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(), mediator.getProfile(),

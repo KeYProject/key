@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.gui.macros;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
@@ -26,6 +27,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.VariableNameProposer;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -329,11 +331,14 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
     }
 
 
-    void addContractApplicationTaclets(Proof symbExecProof,
-                                       Goal initiatingGoal) {
-        for (Rule r : symbExecProof.env().getRegisteredRules()) {
-            if (r instanceof Taclet) {
-                Taclet t = (Taclet) r;
+    void addContractApplicationTaclets(Goal initiatingGoal,
+                                       Proof symbExecProof) {
+        ImmutableList<Goal> openGoals = symbExecProof.openGoals();
+        for (Goal openGoal : openGoals) {
+            ImmutableSet<NoPosTacletApp> ruleApps =
+                    openGoal.indexOfTaclets().allNoPosTacletApps();
+            for (NoPosTacletApp ruleApp : ruleApps) {
+                Taclet t = ruleApp.taclet();
                 if (t.getSurviveSymbExec()) {
                     initiatingGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
                 }

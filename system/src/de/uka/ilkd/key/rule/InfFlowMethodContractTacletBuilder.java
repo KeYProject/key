@@ -80,10 +80,9 @@ public final class InfFlowMethodContractTacletBuilder
 
 
     @Override
-    Term buildContractApplications(
-            ProofObligationVars contAppData,
-            ProofObligationVars contAppData2,
-            Services services) {
+    Term buildContractApplications(ProofObligationVars contAppData,
+                                   ProofObligationVars contAppData2,
+                                   Services services) {
         ImmutableSet<InformationFlowContract> ifContracts =
                 getInfromFlowContracts(methodContract.getTarget(), services);
         ImmutableList<Term> contractsApplications =
