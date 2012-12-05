@@ -200,39 +200,42 @@ public class BlockContractRule implements BuiltInRule {
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate = updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps, /*anonymisationLocalVariables, */modifiesClauses);
 
-        // prepare information flow analysis
-        assert anonymisationHeaps.size() == 1; // information flow extension is at
-                                               // the moment not compatible with
-                                               // the non-base-heap setting
-        final Term preHeap = TB.var(anonymisationHeaps.keySet().iterator().next());
-        final Term postHeap = TB.func(anonymisationHeaps.values().iterator().next());
+        ImmutableList<Goal> result = goal.split(3);
 
-        final InfFlowBlockContractTacletBuilder ifContractBuilder =
-                new InfFlowBlockContractTacletBuilder(services);
-        ifContractBuilder.setContract(contract);
-        ifContractBuilder.setContextUpdate(contextUpdate);
-        ifContractBuilder.setHeapAtPre(preHeap);
-        ifContractBuilder.setHeapAtPost(postHeap);
-        final Terms vars = contract.getVariablesAsTerms();
-        ifContractBuilder.setSelf(vars.self);
-        ifContractBuilder.setLocalIns(MiscTools.toTermList(localInVariables));
-        ifContractBuilder.setLocalOuts(MiscTools.toTermList(localOutVariables));
-        ifContractBuilder.setResult(vars.result);
-        ifContractBuilder.setException(vars.exception);
-
-        // generate information flow contract application predicate
-        // and associated taclet
-        final Term contractApplPredTerm =
-                ifContractBuilder.buildContractApplPredTerm();
-        final Taclet informationFlowContractApp =
-                ifContractBuilder.buildContractApplTaclet();
-
-        ImmutableList<Goal> result;
         final ContractPO po =
                 services.getSpecificationRepository().getPOForProof(goal.proof());
+        Term contractApplPredTerm = TB.tt();
+        Taclet informationFlowContractApp = null;
         if (po instanceof InfFlowContractPO ||
             po instanceof SymbolicExecutionPO ||
             po instanceof BlockExecutionPO) {
+            // prepare information flow analysis
+            assert anonymisationHeaps.size() == 1; // information flow extension is at
+                                                   // the moment not compatible with
+                                                   // the non-base-heap setting
+            final Term preHeap = TB.var(anonymisationHeaps.keySet().iterator().next());
+            final Term postHeap = TB.func(anonymisationHeaps.values().iterator().next());
+
+            final InfFlowBlockContractTacletBuilder ifContractBuilder =
+                    new InfFlowBlockContractTacletBuilder(services);
+            ifContractBuilder.setContract(contract);
+            ifContractBuilder.setContextUpdate(contextUpdate);
+            ifContractBuilder.setHeapAtPre(preHeap);
+            ifContractBuilder.setHeapAtPost(postHeap);
+            final Terms vars = contract.getVariablesAsTerms();
+            ifContractBuilder.setSelf(vars.self);
+            ifContractBuilder.setLocalIns(MiscTools.toTermList(localInVariables));
+            ifContractBuilder.setLocalOuts(MiscTools.toTermList(localOutVariables));
+            ifContractBuilder.setResult(vars.result);
+            ifContractBuilder.setException(vars.exception);
+
+            // generate information flow contract application predicate
+            // and associated taclet
+            contractApplPredTerm =
+                    ifContractBuilder.buildContractApplPredTerm();
+            informationFlowContractApp =
+                    ifContractBuilder.buildContractApplTaclet();
+
             // create information flow validity branch
 
             // generate proof obligation variables
@@ -262,10 +265,9 @@ public class BlockContractRule implements BuiltInRule {
 
             // add information flow validity branch and split goal for the
             // remaining "normal" block contract branches
-            result = goal.split(3).append(infFlowGoal);
-        } else {
-            result = goal.split(3);
+            result = result.append(infFlowGoal);
         }
+        
         final GoalsConfigurator configurator = new GoalsConfigurator(instantiation, contract.getLabels(), variables, application.posInOccurrence(), services);
         configurator.setUpValidityGoal(
             result.tail().tail().head(),
@@ -841,7 +843,9 @@ public class BlockContractRule implements BuiltInRule {
             goal.setBranchLabel("Usage");
             goal.addFormula(new SequentFormula(TB.applySequential(updates, TB.and(assumptions))), true, false);
             goal.changeFormula(new SequentFormula(TB.applySequential(updates, buildUsageFormula())), occurrence);
-            goal.addTaclet(informationFlowContractApp, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            if (informationFlowContractApp != null) {
+                goal.addTaclet(informationFlowContractApp, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            }
         }
 
         private Term buildUsageFormula()

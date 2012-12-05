@@ -49,7 +49,10 @@ import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
@@ -714,31 +717,6 @@ public final class UseOperationContractRule implements BuiltInRule {
                                 	     	             excCreated, 
                                 	     	             freeExcPost, 
                                 	     	             post}))));
-       
-        // prepare information flow analysis
-        assert anonUpdateDatas.size() == 1; // information flow extension is at
-                                            // the moment not compatible with
-                                            // the non-base-heap setting
-        AnonUpdateData anonUpdateData = anonUpdateDatas.head();
-
-        InfFlowMethodContractTacletBuilder ifContractBuilder =
-                new InfFlowMethodContractTacletBuilder(services);
-        ifContractBuilder.setContract(contract);
-        ifContractBuilder.setContextUpdate(inst.u);
-        ifContractBuilder.setHeapAtPre(anonUpdateData.methodHeapAtPre);
-        ifContractBuilder.setHeapAtPost(anonUpdateData.methodHeap);
-        ifContractBuilder.setSelf(contractSelf);
-        ifContractBuilder.setLocalIns(contractParams);
-        ifContractBuilder.setResult(contractResult);
-        ifContractBuilder.setException(TB.var(excVar));
-
-        // generate information flow contract application predicate
-        // and associated taclet
-        Term contractApplPredTerm =
-                ifContractBuilder.buildContractApplPredTerm();
-        Taclet informationFlowContractApp =
-                ifContractBuilder.buildContractApplTaclet();
-
 
         //create "Pre" branch
 	int i = 0;
@@ -789,11 +767,40 @@ public final class UseOperationContractRule implements BuiltInRule {
         postGoal.addFormula(new SequentFormula(postAssumption), 
         	            true, 
         	            false);
-        postGoal.addFormula(new SequentFormula(contractApplPredTerm),
-                            true,
-                            false);
-        postGoal.addTaclet(informationFlowContractApp,
-                           SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        if (po instanceof InfFlowContractPO ||
+            po instanceof SymbolicExecutionPO ||
+            po instanceof BlockExecutionPO) {
+            // prepare information flow analysis
+            assert anonUpdateDatas.size() == 1; // information flow extension is at
+                                                // the moment not compatible with
+                                                // the non-base-heap setting
+            AnonUpdateData anonUpdateData = anonUpdateDatas.head();
+
+            InfFlowMethodContractTacletBuilder ifContractBuilder =
+                    new InfFlowMethodContractTacletBuilder(services);
+            ifContractBuilder.setContract(contract);
+            ifContractBuilder.setContextUpdate(inst.u);
+            ifContractBuilder.setHeapAtPre(anonUpdateData.methodHeapAtPre);
+            ifContractBuilder.setHeapAtPost(anonUpdateData.methodHeap);
+            ifContractBuilder.setSelf(contractSelf);
+            ifContractBuilder.setLocalIns(contractParams);
+            ifContractBuilder.setResult(contractResult);
+            ifContractBuilder.setException(TB.var(excVar));
+
+            // generate information flow contract application predicate
+            // and associated taclet
+            Term contractApplPredTerm =
+                    ifContractBuilder.buildContractApplPredTerm();
+            Taclet informationFlowContractApp =
+                    ifContractBuilder.buildContractApplTaclet();
+
+            // add term and taclet to post goal
+            postGoal.addFormula(new SequentFormula(contractApplPredTerm),
+                                true,
+                                false);
+            postGoal.addTaclet(informationFlowContractApp,
+                            SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        }
 
 
         
