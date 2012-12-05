@@ -442,12 +442,12 @@ public final class WhileInvariantRule implements BuiltInRule {
                 new InfFlowLoopInvariantTacletBuilder(services);
         ifLoopBuilder.setInvariant(inst.inv);
         ifLoopBuilder.setContextUpdate(inst.u);
-        ifLoopBuilder.setBaseHeap(TB.getBaseHeap(services));
-        ifLoopBuilder.setHeapAtPre(anonUpdateData.anonHeap);
+        ifLoopBuilder.setHeapAtPre(anonUpdateData.loopHeapAtPre);
         ifLoopBuilder.setHeapAtPost(anonUpdateData.loopHeap);
         ifLoopBuilder.setSelf(inst.selfTerm);
         ifLoopBuilder.setLocalIns(TB.var(localIns));
         ifLoopBuilder.setLocalOuts(TB.var(localOuts));
+        
 
         // generate information flow contract application predicate
         // and associated taclet
