@@ -5,10 +5,7 @@
 package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
@@ -18,17 +15,75 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.SpecificationElement;
 
 
 /**
- * Generate term "self != null".
- * <p/>
- * @author christoph
- */
+* Generate term "self != null".
+* <p/>
+* @author christoph
+*/
 abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
+
+   @Override
+   public Term produce(BasicSnippetData d,
+                       ProofObligationVars poVars)
+           throws UnsupportedOperationException {
+       IObserverFunction targetMethod =
+               (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
+       final IProgramMethod pm = (IProgramMethod) targetMethod;
+       StatementBlock targetBlock =
+               (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
+       LoopInvariant loopInv =
+               (LoopInvariant) d.get(BasicSnippetData.Key.LOOPINVARIANT);
+       String nameString = generatePredicateName(pm, targetBlock, loopInv);
+       final Function contApplPred =
+               generateContApplPredicate(nameString, poVars.termList, d.tb);
+       return instantiateContApplPredicate(contApplPred, poVars, d.tb);
+   }
+
+
+   private Function generateContApplPredicate(String nameString,
+                                              ImmutableList<Term> termList,
+                                              TermBuilder.Serviced tb) {
+       final Name name = new Name(nameString);
+       final Namespace functionNS =
+               tb.getServices().getNamespaces().functions();
+       Function pred = (Function) functionNS.lookup(name);
+
+       if (pred == null) {
+           Sort[] argSorts =
+                   new Sort[termList.size()];
+
+           int i = 0;
+           for (Term arg : termList) {
+               argSorts[i] = arg.sort();
+               i++;
+           }
+
+           pred = new Function(name, Sort.FORMULA, argSorts);
+           tb.getServices().getNamespaces().functions().addSafely(pred);
+       }
+       return pred;
+   }
+
+
+   private Term instantiateContApplPredicate(Function pred,
+                                             ProofObligationVars appData,
+                                             TermBuilder.Serviced tb) {
+       Sort[] predArgSorts = new Sort[pred.argSorts().size()];
+       pred.argSorts().toArray(predArgSorts);
+       Term[] predArgs = new Term[predArgSorts.length];
+
+       int i = 0;
+       for (Term arg : appData.termList) {
+           predArgs[i] = arg;
+           i++;
+       }
+
+       return tb.func(pred, predArgs);
+   }
+   /* Probably not necessary anymore, but you'll never know ;-)
 
     @Override
     public Term produce(BasicSnippetData d,
@@ -56,7 +111,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         IProgramMethod pm = (IProgramMethod) contract.getTarget();
         final Name name = new Name(nameString);
         final JavaInfo javaInfo = tb.getServices().getJavaInfo();
-/*=======
+=======
         IObserverFunction targetMethod =
                 (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
         final IProgramMethod pm = (IProgramMethod) targetMethod;
@@ -73,7 +128,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
                                                ImmutableList<Term> termList,
                                                TermBuilder.Serviced tb) {
         final Name name = new Name(nameString);
->>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6*/
+>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6
         final Namespace functionNS =
                 tb.getServices().getNamespaces().functions();
         Function pred = (Function) functionNS.lookup(name);
@@ -165,17 +220,17 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         predArgs[i++] = appData.exception;
         // heapAtPost
         predArgs[i++] = appData.heapAtPost;
-/*=======
->>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6*/
+=======
+>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6
 
         return tb.func(pred, predArgs);
     }
     
     
     private Term instantiateLoopApplPredicate(Function pred,
-            ProofObligationVars appData,
-            IProgramMethod pm,
-            TermBuilder.Serviced tb) {
+                                              ProofObligationVars appData,
+                                              IProgramMethod pm,
+                                              TermBuilder.Serviced tb) {
         Sort[] predArgSorts = new Sort[pred.argSorts().size()];
         pred.argSorts().toArray(predArgSorts);
         Term[] predArgs = new Term[predArgSorts.length];
@@ -210,14 +265,8 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         predArgs[i++] = appData.heapAtPost;
 
         return tb.func(pred, predArgs);
-    }
-
-
-//<<<<<<< HEAD
-    abstract String generatePredicateName(SpecificationElement contract);
-
-//=======
+    }*/
     abstract String generatePredicateName(IProgramMethod pm,
-                                          StatementBlock block);
-//>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6
+                                          StatementBlock block,
+                                          LoopInvariant loopInv);
 }

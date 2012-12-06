@@ -4,19 +4,18 @@
  */
 package de.uka.ilkd.key.proof.init.po.snippet;
 
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.MiscTools;
 
 public class LoopCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
-    //@Override
-    String generatePredicateName(SpecificationElement contract) {
-        LoopInvariant inv = (LoopInvariant) contract;
+    @Override
+    String generatePredicateName(IProgramMethod pm,
+                                 StatementBlock block,
+                                 LoopInvariant loopInv) {
         String nameString =
-                MiscTools.toValidTacletName("RELATED_BY_" + inv.getLoop().getBody() +
-                        inv.getLoop().getGuardExpression().toString() +
-                        inv.getExecutionContext() + inv + "::" + inv.getLoop()
-                        + "__LOOP").toString();
+                MiscTools.toValidTacletName("RELATED_BY_" + loopInv.getName()).toString();                
         return nameString;
     }
 }

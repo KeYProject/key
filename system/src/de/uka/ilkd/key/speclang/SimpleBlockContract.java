@@ -888,7 +888,7 @@ public final class SimpleBlockContract implements BlockContract {
             }
             
             // The information flow part of the contracts can't be combined on
-            // the contract level in a reasonable way. Therefore we omitt it
+            // the contract level in a reasonable way. Therefore we omit it
             // in the combined contract by adding an empty list.
             ImmutableList<ImmutableList<Term>> emptyList =
                     ImmutableSLList.<ImmutableList<Term>>nil();

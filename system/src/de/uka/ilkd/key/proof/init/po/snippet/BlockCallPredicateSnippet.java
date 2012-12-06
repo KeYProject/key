@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -18,9 +19,10 @@ class BlockCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
 
     @Override
     String generatePredicateName(IProgramMethod pm,
-                                 StatementBlock block) {
-        String nameSting =
+                                 StatementBlock block,
+                                 LoopInvariant loopInv) {
+        String nameString =
                 MiscTools.toValidTacletName("RELATED_BY_BLOCK_" + block.toString()).toString();
-        return nameSting;
+        return nameString;
     }
 }

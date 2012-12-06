@@ -285,12 +285,12 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     @Override
-    public ImmutableList<Term> getParams() {
+    public ImmutableList<Term> getLocalIns() {
         return localIns;
     }
 
     @Override
-    public ImmutableList<Term> getResults() {
+    public ImmutableList<Term> getLocalOuts() {
         return localOuts;
     }
     
@@ -393,7 +393,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
 
     @Override
-    public String getName() {        
+    public String getName() {
+        assert(getExecutionContext() != null);
         return getLoop().getBody() + getLoop().getGuardExpression().toString() +
                 getExecutionContext() + this + "::" + getLoop() + "__loop_invariant";
     }

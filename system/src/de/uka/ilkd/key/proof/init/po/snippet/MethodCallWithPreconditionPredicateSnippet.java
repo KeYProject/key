@@ -7,6 +7,7 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -20,20 +21,12 @@ class MethodCallWithPreconditionPredicateSnippet
         extends TwoStateMethodPredicateSnippet {
 
     @Override
-//<<<<<<< HEAD
-    String generatePredicateName(SpecificationElement contract) {
-        IProgramMethod pm = (IProgramMethod) ((Contract) contract).getTarget();
-        String nameString =
-                MiscTools.toValidTacletName("EXECUTION_OF_" + pm.getFullName() + "_WITH_PRE").toString();
-        return nameString;
-    }
-//=======
     String generatePredicateName(IProgramMethod pm,
-                                 StatementBlock block) {
+                                 StatementBlock block,
+                                 LoopInvariant loopInv) {
         String nameString =
                 MiscTools.toValidTacletName("EXECUTION_OF_" + pm.getFullName() +
                                             "_WITH_PRE").toString();
         return nameString;
-//>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6
     }
 }

@@ -20,6 +20,22 @@ class BasicSelfCreatedSnippet implements FactoryMethod {
 
     @Override
     public Term produce(BasicSnippetData d,
+                        ProofObligationVars poVars)
+            throws UnsupportedOperationException {
+        IObserverFunction targetMethod =
+                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
+        if (!(targetMethod instanceof IProgramMethod)) {
+            throw new UnsupportedOperationException("Tried to produce "
+                    + "SELF_CREATED for an observer "
+                    + "which is no IProgramMethod.");
+        }
+        final IProgramMethod pm = (IProgramMethod) targetMethod;
+        return (poVars.self == null || pm.isConstructor())
+               ? d.tb.tt() : d.tb.created(poVars.self);
+    }
+    
+    /*@Override
+    public Term produce(BasicSnippetData d,
 //<<<<<<< HEAD
             ProofObligationVars poVars)
     throws UnsupportedOperationException {
@@ -44,22 +60,22 @@ class BasicSelfCreatedSnippet implements FactoryMethod {
             ? d.tb.tt() : d.tb.created(poVars.self);
         }
         else {
-/*=======
+=======
                         ProofObligationVars poVars)
             throws UnsupportedOperationException {
         IObserverFunction targetMethod =
                 (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
         if (!(targetMethod instanceof IProgramMethod)) {
->>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6*/
+>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6
             throw new UnsupportedOperationException("Tried to produce "
                     + "SELF_CREATED for an observer "
                     + "without a contract.");
         }
-/*<<<<<<< HEAD
+<<<<<<< HEAD
 =======
         final IProgramMethod pm = (IProgramMethod) targetMethod;
         return (poVars.self == null || pm.isConstructor())
                ? d.tb.tt() : d.tb.created(poVars.self);
->>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6*/
-    }
+>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6
+    }*/
 }

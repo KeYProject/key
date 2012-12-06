@@ -144,22 +144,6 @@ public class ProofObligationVars {
         paddedTermListWithoutLocalVars = allTermsButLocalVars;
     }
     
-/*    public ProofObligationVars(Term self,
-            Term selfAtPost,
-            ImmutableList<Term> params,
-            Term result,
-            Term resultAtPost,
-            Term exception,
-            Term exceptionAtPost,
-            Term heap,
-            Term heapAtPre,
-            Term heapAtPost,
-            String postfix,
-            Services services) {
-        this(self, selfAtPost, params, ImmutableSLList.<Term>nil().append(result),
-             ImmutableSLList.<Term>nil().append(resultAtPost), exception,
-             exceptionAtPost, heap, heapAtPre, heapAtPost, postfix, services);
-    }*/
 
     private ImmutableList<Term> appendIfNotNull(ImmutableList<Term> list,
                                                 Term t) {
@@ -206,6 +190,16 @@ public class ProofObligationVars {
                                Services services) {
         this(self, null, params, ImmutableSLList.<Term>nil(), result, null,
              exception, null, heap, null, null, null, "", services);
+    }
+    
+    
+    public ProofObligationVars(Term self,
+                               ImmutableList<Term> localIns,
+                               ImmutableList<Term> localOuts,
+                               Term heap,
+                               Services services) {
+        this(self, null, localIns, localOuts, null, null,
+                null, null, heap, null, null, null, "", services);
     }
 
 

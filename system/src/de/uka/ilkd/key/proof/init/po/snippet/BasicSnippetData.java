@@ -32,11 +32,6 @@ import java.util.List;
 class BasicSnippetData {
 
     /**
-     * The contract for which the snippets are produced.
-     */
-//    final SpecificationElement contract;    
-    
-    /**
      * Tells whether the contract contains a measured_by clause.
      */
     final boolean hasMby;
@@ -86,6 +81,7 @@ class BasicSnippetData {
         TARGET_BLOCK(StatementBlock.class),
         PRECONDITION(Term.class),
         POSTCONDITION(Term.class),
+        LOOPINVARIANT(Term.class),
         MODIFIES(Term.class),
         DEPENDENS(Term.class),
         MEASURED_BY(Term.class),
@@ -135,22 +131,21 @@ class BasicSnippetData {
     }
     
     BasicSnippetData(LoopInvariant invariant, Services services) {
-        this.contract = invariant;
+        this.hasMby = false;
         this.tb = new TermBuilder.Serviced(services);
         
-        contractContents.put(Key.PRECONDITION, invariant);
-        //contractContents.put(Key.POSTCONDITION, null);
+        contractContents.put(Key.TARGET_METHOD, invariant.getTarget());
+        contractContents.put(Key.FOR_CLASS, invariant.getKJT());
+        contractContents.put(Key.LOOPINVARIANT, invariant);
         contractContents.put(Key.MODIFIES, invariant.getModifies());
-        contractContents.put(Key.MEASURED_BY, null);
-        contractContents.put(Key.MODALITY, null);
         contractContents.put(Key.RESPECTS,
                              doubleListToArray(invariant.getRespects(services)));
         
         final Term heap = TermBuilder.DF.getBaseHeap(services);
-        origVars = new ProofObligationVars(invariant.getInternalSelfTerm(), null,
-                invariant.getParams(), invariant.getResults(), null,
-                null, null, heap, null, null, "", services);
-
+        origVars =
+                new ProofObligationVars(invariant.getInternalSelfTerm(),
+                                        invariant.getLocalIns(), invariant.getLocalOuts(),
+                                        heap, services);
     }
 
 
@@ -205,6 +200,14 @@ class BasicSnippetData {
         origVars =
                 new ProofObligationVars(vars.self, ImmutableSLList.<Term>nil(),
                                         vars.result, vars.exception, heapTerm, services);
+    }
+
+
+    BasicSnippetData(LoopInvariant invariant,
+                     ExecutionContext context,
+                     Services services) {
+        this(invariant, services);
+        contractContents.put(Key.CONTEXT, context);
     }
 
 

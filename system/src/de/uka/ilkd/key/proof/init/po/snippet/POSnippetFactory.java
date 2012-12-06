@@ -7,6 +7,7 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -32,14 +33,35 @@ public class POSnippetFactory {
         return new BasicPOSnippetFactoryImpl(invariant, vars, services);
     }
 
+    public static BasicPOSnippetFactory getBasicFactory(
+            LoopInvariant invariant,
+            ProofObligationVars vars,
+            ExecutionContext context,
+            Services services) {
+        return new BasicPOSnippetFactoryImpl(invariant, vars, context, services);
+    }
 
     public static BasicPOSnippetFactory getBasicFactory(
             InformationFlowContract contract,
             ProofObligationVars vars,
             Services services) {
         return new BasicPOSnippetFactoryImpl(contract, vars, services);
+    }    
+    
+    public static BasicPOSnippetFactory getBasicFactory(
+            BlockContract contract,
+            ProofObligationVars vars,
+            Services services) {
+        return new BasicPOSnippetFactoryImpl(contract, vars, services);
     }
 
+    public static BasicPOSnippetFactory getBasicFactory(
+            BlockContract contract,
+            ProofObligationVars vars,
+            ExecutionContext context,
+            Services services) {
+        return new BasicPOSnippetFactoryImpl(contract, vars, context, services);
+    }
 
     static BasicPOSnippetFactory getBasicFactory(
             BasicSnippetData data,
@@ -49,6 +71,14 @@ public class POSnippetFactory {
 
 
     public static InfFlowPOSnippetFactory getInfFlowFactory(
+            LoopInvariant invariant,
+            ProofObligationVars vars1,
+            ProofObligationVars vars2,
+            Services services) {
+        return new InfFlowPOSnippetFactoryImpl(invariant, vars1, vars2, services);
+    }
+    
+    public static InfFlowPOSnippetFactory getInfFlowFactory(
             InformationFlowContract contract,
             ProofObligationVars vars1,
             ProofObligationVars vars2,
@@ -57,11 +87,11 @@ public class POSnippetFactory {
     }
     
     public static InfFlowPOSnippetFactory getInfFlowFactory(
-            LoopInvariant invariant,
+            BlockContract contract,
             ProofObligationVars vars1,
             ProofObligationVars vars2,
             Services services) {
-        return new InfFlowPOSnippetFactoryImpl(invariant, vars1, vars2, services);
+        return new InfFlowPOSnippetFactoryImpl(contract, vars1, vars2, services);
     }
 
     static InfFlowPOSnippetFactory getInfFlowFactory(

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.MiscTools;
 
 
@@ -19,10 +20,11 @@ class BlockCallWithPreconditionPredicateSnippet
 
     @Override
     String generatePredicateName(IProgramMethod pm,
-                                 StatementBlock block) {
-        String nameSting =
+                                 StatementBlock block,
+                                 LoopInvariant loopInv) {
+        String nameString =
                 MiscTools.toValidTacletName("EXECUTION_OF_BLOCK_" + block.toString() +
                                             "_WITH_PRE").toString();
-        return nameSting;
+        return nameString;
     }
 }

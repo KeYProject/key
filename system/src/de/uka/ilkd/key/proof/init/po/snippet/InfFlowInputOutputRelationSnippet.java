@@ -33,32 +33,31 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
         Term[][] origRespects = (Term[][]) d.get(
                 BasicSnippetData.Key.RESPECTS);
 
-        // the respects-sequents evaluated in the pre-state
+        // the respects-sequences evaluated in the pre-state
         Term[][] respectsAtPre1 = replace(origRespects, d.origVars, poVars1);
         Term[][] respectsAtPre2 = replace(origRespects, d.origVars, poVars2);
-        // the respects-sequents evaluated in the post-state
+        // the respects-sequences evaluated in the post-state
         Term[][] respectsAtPost1 = replace(respectsAtPre1,
                                            new Term[]{poVars1.heap,
-                    poVars1.self,
-                    poVars1.exception},
+                                                      poVars1.self,
+                                                      poVars1.exception},
                                            new Term[]{poVars1.heapAtPost,
-                    poVars1.selfAtPost,
-                    poVars1.exceptionAtPost});
+                                                      poVars1.selfAtPost,
+                                                      poVars1.exceptionAtPost});
         Term[][] respectsAtPost2 = replace(respectsAtPre2,
                                            new Term[]{poVars2.heap,
-                    poVars2.self,
-                    poVars2.exception},
+                                                      poVars2.self,
+                                                      poVars2.exception},
                                            new Term[]{poVars2.heapAtPost,
-                    poVars2.selfAtPost,
-                    poVars2.exceptionAtPost});
+                                                      poVars2.selfAtPost,
+                                                      poVars2.exceptionAtPost});
 
         // get declassifies terms
-/*<<<<<<< HEAD
+/*<<<<<<< HEAD FIXME: version for loop invariants!
         if (d.getContractContent(BasicSnippetData.Key.DECLASSIFIES) == null &&
                 !(d.contract instanceof LoopInvariant)) {
 =======*/
         if (d.get(BasicSnippetData.Key.DECLASSIFIES) == null) {
-//>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6
             throw new UnsupportedOperationException("Tried to produce "
                     + "declassifies for a contract without declassifies.");            
         }
@@ -81,16 +80,15 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
 //        }        
 
         // create input-output-relations
-        final Term[] relations = new Term[respectsAtPre1.length];
-        
+        final Term[] relations = new Term[respectsAtPre1.length];        
         for (int i = 0; i < respectsAtPre1.length; i++) {
             relations[i] = buildInputOutputRelation(d, poVars1, poVars2,
-                    respectsAtPre1[i],
-                    respectsAtPre2[i],
-                    respectsAtPost1[i],
-                    respectsAtPost2[i],
-                    declassifies1,
-                    declassifies2);
+                                                    respectsAtPre1[i],
+                                                    respectsAtPre2[i],
+                                                    respectsAtPost1[i],
+                                                    respectsAtPost2[i],
+                                                    declassifies1,
+                                                    declassifies2);
         }        
 
         return d.tb.and(relations);
@@ -126,16 +124,16 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
         final Term mainInputEqRelation =
                 buildMainInputEqualsRelation(d, vs1, vs2, referenceLocSet1,
                                              referenceLocSet2);
-        Term[] declassifiesRelations = null;
-        if(!(d.contract instanceof LoopInvariant)) {
-            declassifiesRelations =
+        // Term[] declassifiesRelations = null;
+        // if(!(d.contract instanceof LoopInvariant)) {
+        final Term[] declassifiesRelations =
                 buildDeclassifiesRelations(d, referenceLocSet1, declassClause1,
-                        referenceLocSet2, declassClause2);
-        }
+                                           referenceLocSet2, declassClause2);
+        // }
         ImmutableList<Term> inputRelations =
                 ImmutableSLList.<Term>nil();
         inputRelations = inputRelations.append(mainInputEqRelation);
-        if(!(d.contract instanceof LoopInvariant))
+        //if(!(d.contract instanceof LoopInvariant))
             inputRelations = inputRelations.append(declassifiesRelations);
         return d.tb.and(inputRelations);
     }
@@ -161,7 +159,6 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
             } else {
                 eqAtLocs[i] = d.tb.tt();
             }
-
         }
         return d.tb.and(eqAtLocs);
     }

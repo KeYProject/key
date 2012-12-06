@@ -185,12 +185,12 @@ public final class WhileInvariantRule implements BuiltInRule {
 	return new AnonUpdateData(assumption, anonUpdate, loopHeap, TB.getBaseHeap(services), anonHeap);
     }
     
-    private Term createTermSV(String svName,
+    /*private Term createTermSV(String svName,
             Sort predArgSort,
             Services services) {
         Name name = services.getVariableNamer().getTemporaryNameProposal(svName);
         return TB.var(SchemaVariableFactory.createTermSV(name, predArgSort));
-    }
+    }*/
     
     private static boolean checkFocus(final Term progPost) {
         // focus (below update) must be modality term

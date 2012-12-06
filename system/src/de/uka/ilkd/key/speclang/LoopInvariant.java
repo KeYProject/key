@@ -73,9 +73,9 @@ public interface LoopInvariant extends SpecificationElement {
      */
     public Term getInternalSelfTerm();
     
-    public ImmutableList<Term> getParams();
+    public ImmutableList<Term> getLocalIns();
     
-    public ImmutableList<Term> getResults();
+    public ImmutableList<Term> getLocalOuts();
     
     public Term getModifies();
     

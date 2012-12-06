@@ -698,8 +698,8 @@ public class InvariantConfigurator {
                 if (requirementsAreMet) {
                     newInvariant = new LoopInvariantImpl(loopInv.getLoop(),
                             invariantTerm, modifiesTerm, respectsTermList, variantTerm, loopInv
-                                    .getInternalSelfTerm(), loopInv.getParams(),
-                                    loopInv.getResults(), loopInv.getInternalAtPres());
+                                    .getInternalSelfTerm(), loopInv.getLocalIns(),
+                                    loopInv.getLocalOuts(), loopInv.getInternalAtPres());
                     return true;
                 } else
                     return false;

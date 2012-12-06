@@ -94,16 +94,14 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
     //@Override
     public Term buildProblem(LoopInvariant loopInv, ProofObligationVars appData, Services services)
     throws ProofInputException {
-        IFProofObligationVars ifVars = new IFProofObligationVars(loopInv.getTarget(),
-                                                                 loopInv.getKJT(),
-                                                                 appData, services);
+        IFProofObligationVars ifVars = new IFProofObligationVars(appData, services);
         // create proof obligation        
         InfFlowPOSnippetFactory f =
             POSnippetFactory.getInfFlowFactory(loopInv, ifVars.c1,
                                                ifVars.c2, services);
         Term selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
-        Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_POST);
+        Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
         
         Term poTerms = TB.imp(selfComposedExec, post);
         
@@ -356,7 +354,7 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
         }
 
 
-        public IFProofObligationVars(ProofObligationVars c1,
+        private IFProofObligationVars(ProofObligationVars c1,
                                      ProofObligationVars c2,
                                      ProofObligationVars symbExecVars) {
             this.c1 = c1;

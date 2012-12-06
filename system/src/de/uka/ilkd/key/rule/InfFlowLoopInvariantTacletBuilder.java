@@ -25,7 +25,7 @@ import de.uka.ilkd.key.util.MiscTools;
  * Implements the rule which inserts loop invariants for a method call.
  */
 public final class InfFlowLoopInvariantTacletBuilder
-extends AbstractInfFlowContractTacletBuilder {
+        extends AbstractInfFlowContractTacletBuilder {
     
     private LoopInvariant loopinvariant;
     
@@ -39,27 +39,26 @@ extends AbstractInfFlowContractTacletBuilder {
 
     @Override
     Name generateName() {
-        return MiscTools.toValidTacletName("Use information flow contract for" +
-                loopinvariant.getLoop().getBody() +
-                loopinvariant.getLoop().getGuardExpression().toString() +
-                loopinvariant.getExecutionContext() + loopinvariant + "::" + loopinvariant.getLoop()
-                + "__LOOP");
+        return MiscTools.toValidTacletName("Use information flow contract for " +
+                                           loopinvariant.getName().toString());
     }
 
     @Override
     Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
-            Services services) {
+                               Services services) {
         BasicPOSnippetFactory fAssumes =
                 POSnippetFactory.getBasicFactory(loopinvariant, schemaDataAssumes, services);
         return fAssumes.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
+        // TODO: Think about correctness
     }
 
     @Override
     Term generateSchemaFind(ProofObligationVars schemaDataFind,
-            Services services) {
+                            Services services) {
         BasicPOSnippetFactory fFind =
                 POSnippetFactory.getBasicFactory(loopinvariant, schemaDataFind, services);
         return fFind.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
+        // TODO: Think about correctness
     }
 
     @Override
@@ -68,14 +67,17 @@ extends AbstractInfFlowContractTacletBuilder {
                 POSnippetFactory.getBasicFactory(loopinvariant, appData,
                                                  services);
         return f.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
+        // TODO: Think about correctness
     }
 
     @Override
     Term buildContractApplications(ProofObligationVars contAppData,
-            ProofObligationVars contAppData2, Services services) {
+                                   ProofObligationVars contAppData2,
+                                   Services services) {
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(loopinvariant, contAppData,
                         contAppData2, services);
         return f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL);
+        // TODO: Think about correctness
     }
 }
