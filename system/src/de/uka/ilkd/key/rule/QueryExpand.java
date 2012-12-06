@@ -334,7 +334,7 @@ public class QueryExpand implements BuiltInRule {
     	}else if(op== Junctor.NOT){
     		pathInTerm.set(nextLevel, 0);
     		findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars, !curPosIsPositive, qepLevel, qepIsPositive, qeps);
-    	}else if(op instanceof Equality){ 
+    	}else if(op== Equality.EQV){ 
     		// Each subformula of "<->" is in both, positive and negative scope. Query expansion below it would be unsound. 
     		// Alternatively "<->" could be converted into "->" and "<-"
     		return;
