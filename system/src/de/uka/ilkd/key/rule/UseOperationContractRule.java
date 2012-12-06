@@ -779,7 +779,7 @@ public final class UseOperationContractRule implements BuiltInRule {
             InfFlowMethodContractTacletBuilder ifContractBuilder =
                     new InfFlowMethodContractTacletBuilder(services);
             ifContractBuilder.setContract(contract);
-            ifContractBuilder.setContextUpdate(inst.u);
+            ifContractBuilder.setContextUpdate(atPreUpdates, inst.u);
             ifContractBuilder.setHeapAtPre(anonUpdateData.methodHeapAtPre);
             ifContractBuilder.setHeapAtPost(anonUpdateData.methodHeap);
             ifContractBuilder.setSelf(contractSelf);
@@ -799,7 +799,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                 true,
                                 false);
             postGoal.addTaclet(informationFlowContractApp,
-                            SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+                               SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         }
 
 
