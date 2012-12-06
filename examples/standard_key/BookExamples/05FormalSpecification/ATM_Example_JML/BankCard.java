@@ -23,6 +23,8 @@ public /*@ nullable_by_default @*/ class BankCard {
      * object is has been deactivated
      */
     private /*@ spec_public @*/ boolean invalid = false;
+
+    //@ accessible \inv : \empty;
     
     public BankCard (final int accountNumber, final int correctPIN) {
         this.correctPIN = correctPIN;

@@ -43,6 +43,7 @@ public /*@ nullable_by_default @*/ class ATM {
         private invariant insertedCard != null ==>
                                  insertedCard.accountNumber < maxAccountNumber;
 	private invariant (\forall ATM a; a != this; a.insertedCard == null || a.insertedCard != this.insertedCard);
+        accessible \inv: customerAuthenticated, insertedCard;
       @*/
     
     /*@
@@ -74,6 +75,8 @@ public /*@ nullable_by_default @*/ class ATM {
         public normal_behavior
         requires  insertedCard == null;
         requires  card != null;
+        requires  \invariant_for(card);
+        requires  !card.invalid;
         requires  card.accountNumber >= 0;
         requires  card.accountNumber < maxAccountNumber;
 	requires  (\forall ATM a; a.insertedCard != card);
