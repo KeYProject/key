@@ -1,10 +1,12 @@
 package de.uka.ilkd.key.gui.macros;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.*;
 import de.uka.ilkd.key.strategy.feature.InfFlowContractAppFeature;
@@ -91,6 +93,60 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
     }
 
 
+    @Override
+    protected void doPostProcessing(Proof proof, int numOfAppliedRules) {
+        // get last active goal
+        ImmutableList<Goal> openGoals = proof.openGoals();
+        Goal lastActiveGoal = openGoals.head();
+        for (Goal goal : openGoals) {
+            if (goal.node().serialNr() > lastActiveGoal.node().serialNr()) {
+                lastActiveGoal = goal;
+            }
+        }
+
+        // set intuitive branch labels
+        Node node = lastActiveGoal.node();
+        Node parent = node.parent();
+        int i = 0;
+        while (i < numOfAppliedRules && parent != null) {
+            if (parent.parent() != null &&
+                getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
+                getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)) {
+                String appName = getAppRuleName(parent.parent());
+                node.getNodeInfo().setBranchLabel("post " + appName);
+                parent.child(0).getNodeInfo().setBranchLabel("pre " + appName);
+                node = parent.parent();
+                parent = node.parent();
+                i += 2;
+            } else if (parent.parent() != null &&
+                       parent.parent().parent() != null &&
+                       getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
+                       getAppRuleName(parent.parent()).equals(IMP_LEFT_RULENAME) &&
+                       getAppRuleName(parent.parent().parent()).startsWith(INF_FLOW_RULENAME_PREFIX)) {
+                String appName = getAppRuleName(parent.parent().parent());
+                node.getNodeInfo().setBranchLabel("post " + appName);
+                parent.child(0).getNodeInfo().setBranchLabel("pre " + appName);
+                parent.getNodeInfo().setBranchLabel("inf flow part of " + appName);
+                parent.parent().child(0).getNodeInfo().setBranchLabel("pre_A & pre_B " + appName);
+                node = parent.parent().parent();
+                parent = node.parent();
+                i += 3;
+            } else {
+                node = parent;
+                parent = node.parent();
+                i++;
+            }
+        }
+    }
+
+
+    private String getAppRuleName(Node parent) {
+        RuleApp parentRuleApp = parent.getAppliedRuleApp();
+        String parentRuleName = parentRuleApp.rule().name().toString();
+        return parentRuleName;
+    }
+
+
     /**
      * This strategy accepts all rule apps for which the rule name starts with a
      * string in the admitted set and rejects everything else.
@@ -163,13 +219,6 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
                          parent.child(0) == goal.node());
             }
             return true;
-        }
-
-
-        private String getAppRuleName(Node parent) {
-            RuleApp parentRuleApp = parent.getAppliedRuleApp();
-            String parentRuleName = parentRuleApp.rule().name().toString();
-            return parentRuleName;
         }
 
 

@@ -51,14 +51,16 @@ public abstract class StrategyProofMacro implements ProofMacro {
      * When a prove run is finished, we need to reset the goals' rule
      * application managers using this listener.
      */
-    private static class StopListener implements ProverTaskListener {
+    private class StopListener implements ProverTaskListener {
 
         private final InteractiveProver interactiveProver;
         private final Strategy oldStrategy;
+        private int numOfAppliedRules;
 
         public StopListener(InteractiveProver interactiveProver, Strategy oldStrategy) {
             this.interactiveProver = interactiveProver;
             this.oldStrategy = oldStrategy;
+            numOfAppliedRules = 0;
         }
 
         @Override
@@ -67,6 +69,7 @@ public abstract class StrategyProofMacro implements ProofMacro {
 
         @Override
         public void taskProgress(int position) {
+            numOfAppliedRules++;
         }
 
         @Override
@@ -86,8 +89,11 @@ public abstract class StrategyProofMacro implements ProofMacro {
 
             proof.setActiveStrategy(oldStrategy);
             interactiveProver.removeProverTaskListener(this);
+            doPostProcessing(proof, numOfAppliedRules);
         }
     }
+
+    protected void doPostProcessing(Proof proof, int numOfAppliedRules) {}
 
     /**
      * {@inheritDoc}
