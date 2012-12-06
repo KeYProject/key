@@ -42,7 +42,7 @@ public /*@ nullable_by_default @*/ class BankCard {
         public normal_behavior
         ensures  \result <==> !invalid && pin == correctPIN;
       @*/
-    public /*@ pure @*/ boolean pinIsCorrect (int pin) {
+    public /*@ strictly_pure @*/ boolean pinIsCorrect (int pin) {
         if ( cardIsInvalid () ) return false;
         return correctPIN == pin;
     }
@@ -66,7 +66,7 @@ public /*@ nullable_by_default @*/ class BankCard {
         public normal_behavior
         ensures  \result == invalid;
       @*/
-    public /*@ pure @*/ boolean cardIsInvalid () {
+    public /*@ strictly_pure @*/ boolean cardIsInvalid () {
         return invalid;
     }
     
@@ -77,7 +77,7 @@ public /*@ nullable_by_default @*/ class BankCard {
         public normal_behavior
         ensures  \result == accountNumber;
       @*/
-    public /*@ pure @*/ int getAccountNumber () {
+    public /*@ strictly_pure @*/ int getAccountNumber () {
         return accountNumber;
     }
 

@@ -37,6 +37,7 @@ public /*@ nullable_by_default @*/ class ATM {
     /*@
         private invariant customerAuthenticated ==> insertedCard != null;
         private invariant insertedCard != null ==> !insertedCard.invalid;
+        private invariant insertedCard != null ==> \invariant_for(insertedCard);
         private invariant insertedCard != null ==>
                                  insertedCard.accountNumber >= 0;
         private invariant insertedCard != null ==>
@@ -192,7 +193,7 @@ public /*@ nullable_by_default @*/ class ATM {
     /**
      * @return <code>true</code> iff a card is inserted in the ATM
      */
-    private /*@ pure @*/ boolean cardIsInserted () {
+    private /*@ strictly_pure @*/ boolean cardIsInserted () {
         return insertedCard != null;
     }
         
@@ -201,7 +202,7 @@ public /*@ nullable_by_default @*/ class ATM {
      *         i.e. if a valid card is inserted and the correct PIN has be
      *         entered
      */
-    private /*@ pure @*/ boolean customerIsAuthenticated () {
+    private /*@ strictly_pure @*/ boolean customerIsAuthenticated () {
         return customerAuthenticated;
     }
 
@@ -222,7 +223,7 @@ public /*@ nullable_by_default @*/ class ATM {
 	requires insertedCard != null;
         requires customerAuthenticated;
       @*/
-    private /*@ pure @*/ int getAccountNumber () {
+    private /*@ strictly_pure @*/ int getAccountNumber () {
         return insertedCard.getAccountNumber ();
     }
         
