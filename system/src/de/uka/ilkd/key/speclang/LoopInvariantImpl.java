@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Standard implementation of the LoopInvariant interface.
@@ -392,8 +393,9 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
 
     @Override
-    public String getName() {
-	return "loop invariant";
+    public String getName() {        
+        return getLoop().getBody() + getLoop().getGuardExpression().toString() +
+                getExecutionContext() + this + "::" + getLoop() + "__loop_invariant";
     }
 
 

@@ -287,9 +287,10 @@ public final class UseOperationContractRule implements BuiltInRule {
     /**
      * @return (assumption, anon update, anon heap)
      */
-    private static AnonUpdateData createAnonUpdate(LocationVariable heap, IProgramMethod pm, 
-	                                     	    	   Term mod, 
-	                                     	    	   Services services) {
+    private static AnonUpdateData createAnonUpdate(LocationVariable heap,
+                                                   IProgramMethod pm, 
+	                                     	   Term mod, 
+	                                     	   Services services) {
 	assert pm != null;
 	assert mod != null;
 	
@@ -861,9 +862,9 @@ public final class UseOperationContractRule implements BuiltInRule {
     public String toString() {
         return displayName();
     }
-/*<<<<<<< HEAD
-    
 
+
+/*
     *//**
      * Store pre- / poststate of the method invocation and generate information
      * flow taclet.
@@ -1088,9 +1089,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
         return TB.and(contractsApplications);
     }
-
-=======
->>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6*/
+*/
 
     
     //-------------------------------------------------------------------------
