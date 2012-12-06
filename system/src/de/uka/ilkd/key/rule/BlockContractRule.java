@@ -219,7 +219,7 @@ public class BlockContractRule implements BuiltInRule {
             final InfFlowBlockContractTacletBuilder ifContractBuilder =
                     new InfFlowBlockContractTacletBuilder(services);
             ifContractBuilder.setContract(contract);
-            ifContractBuilder.setContextUpdate(contextUpdate);
+            ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
             ifContractBuilder.setHeapAtPre(preHeap);
             ifContractBuilder.setHeapAtPost(postHeap);
             final Terms vars = contract.getVariablesAsTerms();

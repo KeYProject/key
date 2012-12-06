@@ -150,9 +150,9 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
 //        Term framingLocs1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
 //        Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
 
-        Term[] eqAtLocs = new Term[respects1.length];        
-        for (int i = 0; i < eqAtLocs.length; i++) {            
-            SearchVisitor search = new SearchVisitor(vs1.resultAtPost);
+        Term[] eqAtLocs = new Term[respects1.length];
+        for (int i = 0; i < eqAtLocs.length; i++) {
+            SearchVisitor search = new SearchVisitor(vs1.result, vs1.resultAtPost);
             respects1[i].execPreOrder(search);
             if (!search.termFound) {
                 // refLocTerms which contain \result are not included in
@@ -251,10 +251,10 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
     private static class SearchVisitor extends Visitor {
 
         private boolean termFound = false;
-        private Term searchTerm;
+        private Term[] searchTerms;
 
-        public SearchVisitor(Term searchTerm) {
-            this.searchTerm = searchTerm;
+        public SearchVisitor(Term... searchTerms) {
+            this.searchTerms = searchTerms;
         }
 
         public boolean containsTerm() {
@@ -263,7 +263,9 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
 
         @Override
         public void visit(Term visited) {
-            termFound = termFound || visited.equals(searchTerm);
+            for (Term searchTerm : searchTerms) {
+                termFound = termFound || visited.equals(searchTerm);
+            }
         }
     }
 }

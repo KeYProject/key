@@ -25,7 +25,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
  */
 abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced {
 
-    private Term contextUpdate;
+    private Term[] contextUpdates;
     private Term contractSelf;
     private ImmutableList<Term> localIns;
     private Term heapAtPre;
@@ -42,8 +42,8 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     }
 
 
-    public void setContextUpdate(Term contextUpdate) {
-        this.contextUpdate = contextUpdate;
+    public void setContextUpdate(Term... contextUpdates) {
+        this.contextUpdates = contextUpdates;
     }
 
 
@@ -85,8 +85,11 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     // TODO: add exception var
     public Term buildContractApplPredTerm() {
         ProofObligationVars appData = getProofObligationVars();
-        final Term contractApplPredTerm = getContractApplPred(appData);
-        return apply(contextUpdate, contractApplPredTerm);
+        Term contractApplPredTerm = getContractApplPred(appData);
+        for (Term update : contextUpdates) {
+            contractApplPredTerm = apply(update, contractApplPredTerm);
+        }
+        return contractApplPredTerm;
     }
 
 
