@@ -1040,13 +1040,13 @@ public class TermBuilder {
     //-------------------------------------------------------------------------
 
     /**
-     * This value is only used as a marker for "\less_than_nothing" in JML. It
+     * This value is only used as a marker for "\strictly_nothing" in JML. It
      * may return any term. Preferably of type LocSet, but this is not
      * necessary.
      *
      * @return an arbitrary but fixed term.
      */
-    public Term lessThanNothing() {
+    public Term strictlyNothing() {
         return ff();
     }
 

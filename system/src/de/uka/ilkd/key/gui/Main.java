@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
@@ -29,6 +28,7 @@ import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
 import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.ExperimentalFeature;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.CommandLine;
@@ -125,7 +125,13 @@ public class Main {
      * flag whether recent loaded file should be loaded on startup
      */
     private static Boolean loadRecentFile=false;
-
+    
+    /** Lists all features currently marked as experimental.
+     * Unless invoked with command line option --experimental ,
+     * those will be deactivated.
+     */
+    private static final ExperimentalFeature[] EXPERIMENTAL_FEATURES = 
+        {de.uka.ilkd.key.proof.delayedcut.DelayedCut.FEATURE};
 
     
     /**
@@ -304,7 +310,8 @@ public class Main {
         }
         if(cl.isSet(EXPERIMENTAL)){
         	System.out.println("Running in experimental mode ...");
-        	//atm do nothing
+        } else {
+            deactivateExperimentalFeatures();
         }
      	List<String> fileArguments = cl.getArguments();
      	Iterator iter = fileArguments.iterator();
@@ -323,6 +330,12 @@ public class Main {
       		}
       	}
         	
+    }
+    
+    /** Deactivate experimental features. */
+    private static void deactivateExperimentalFeatures () {
+        for (ExperimentalFeature feature: EXPERIMENTAL_FEATURES)
+            feature.deactivate();
     }
 
 
@@ -431,5 +444,4 @@ public class Main {
     public static String getFileNameOnStartUp() {
         return fileNameOnStartUp;
     }
-    
 }

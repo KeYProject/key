@@ -198,7 +198,7 @@ dist_src: distclean branding javaFiles
 	@mkdir -p /tmp/keydist-$(USER)
 	@ln -s "$(shell cd ..;pwd)" /tmp/keydist-$(USER)/key-$(KEY_VERSION_LONG)
 	@tar -C/tmp/keydist-$(USER) --dereference  \
-        -cvf /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar --exclude=key-$(KEY_VERSION_LONG)/.git/'*' \
+        -cf /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar --exclude=key-$(KEY_VERSION_LONG)/.git/'*' \
 	--exclude=key-$(KEY_VERSION_LONG)/key-ext-jars/'*' --exclude=key-$(KEY_VERSION_LONG)/eclipse key-$(KEY_VERSION_LONG)
 	@tar -rf /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar -C /tmp/keydist-$(USER) key-$(KEY_VERSION_LONG)/eclipse/
 	@gzip /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar

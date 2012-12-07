@@ -28,11 +28,14 @@ public class BufferedMessageReader {
 		
 		String message = null;
 		do{
-		  char buf[] = new char[128]; // create buffer in every loop cycle!
-		  message = getNextMessage();
-		  if(message!= null){			
+		  do {
+			message = getNextMessage();
+		  } while (message != null && message.length() == 0); // ignore empty messages (can occur with Z3 on windows due to \r\n line ending)
+		  if (message != null){
+			  //System.out.println("Extracted a message with length " + message.length() + ", remaining buffer: " + messageBuffer.length());
 			  return message;
 		  }
+		  char buf[] = new char[128]; // create new buffer in every loop cycle!
 		  try{
 		    length = reader.read(buf);
 		  }catch(IOException e){
@@ -41,6 +44,7 @@ public class BufferedMessageReader {
 			}  
 		  }
 		  messageBuffer = messageBuffer.append(convert(buf));
+		  //System.out.println("Read " + length + " bytes; new buffer: " + messageBuffer.length());
 		}while(length!=-1 && !Thread.currentThread().isInterrupted());
 		return message;
 	}
@@ -51,10 +55,7 @@ public class BufferedMessageReader {
 		for(String mark : endOfMessage){
 			int temp = messageBuffer.indexOf(mark);
 			// make the message as small as possible: it may not contain delimiters.
-			if(index > -1 && temp > -1){
-				responsibleMark = index < temp ? responsibleMark : mark;
-				index = index < temp ? index : temp;
-			}else if(temp > -1){
+			if(temp > -1 && (index < 0 || temp < index)){
 				responsibleMark = mark;
 				index = temp;
 			}
@@ -64,7 +65,7 @@ public class BufferedMessageReader {
 		if(index == -1){
 			return null;
 		}
-		String message = index > 0 ? messageBuffer.substring(0, index) : null;
+		String message = index >= 0 ? messageBuffer.substring(0, index) : null;
 		messageBuffer = new StringBuffer(messageBuffer.substring( index+responsibleMark.length()));
 		return message;
 	}

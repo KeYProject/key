@@ -11,7 +11,7 @@ class Node {
       @ private invariant next != null ==> \subset(next.*, repr)
       @                                    && \subset(next.repr, repr)
       @                                    && \disjoint(this.*, next.repr)
-      @                                    && seq[1..seq.length-1] == next.seq
+      @                                    && seq[1..seq.length] == next.seq
       @                                    && next.\inv;
       @*/
        
@@ -45,7 +45,7 @@ class Node {
 	int i = 0;
 	/*@ loop_invariant 0 <= i && i <= seq.length
 	  @                && (jj == null && i == seq.length
-	  @                    || jj != null && jj.\inv && jj.seq == seq[i..seq.length-1])
+	  @                    || jj != null && jj.\inv && jj.seq == seq[i..seq.length])
 	  @                && (\forall int x; 0 <= x && x < i; seq[x] != 0);
 	  @ assignable \nothing;
 	  @ decreases seq.length - i;

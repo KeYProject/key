@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -248,8 +249,6 @@ public class QueryExpand implements BuiltInRule {
      * @param term  A formula that potentially contains queries that should be evaluated/expanded.
      * @param positiveContext Set false iff the <code>term</code> is in a logically negated context wrt. to the succedent.
      * @param allowExpandBelowInstQuantifier TODO
-     * @param node   The node of the current goal in the proof
-     * @param newGoal The new goal that will result from query evaluation. This is needed to register new symbols.
      * @return A modified version of the <code>term</code> with inserted "query evalutions".
      * @author gladisch
      */
@@ -317,7 +316,7 @@ public class QueryExpand implements BuiltInRule {
     	final Operator op = t.op();
     	final int nextLevel = level+1;
     	if(op instanceof IProgramMethod){ //Query found
-    		//System.out.println("Query found:"+t+ " position:"+(positive?"positive":"negative"));
+    		//System.out.println("Query found:"+t+ " position:"+(qepIsPositive?"positive":"negative"));
     		QueryEvalPos qep = new QueryEvalPos(t, (Vector<Integer>)pathInTerm.clone(), qepLevel+1, instVars, qepIsPositive);
     		qeps.add(qep);
     		//System.out.println("AddedA: "+qep);
@@ -335,6 +334,10 @@ public class QueryExpand implements BuiltInRule {
     	}else if(op== Junctor.NOT){
     		pathInTerm.set(nextLevel, 0);
     		findQueriesAndEvaluationPositions(t.sub(0), nextLevel, pathInTerm, instVars, !curPosIsPositive, qepLevel, qepIsPositive, qeps);
+    	}else if(op== Equality.EQV){ 
+    		// Each subformula of "<->" is in both, positive and negative scope. Query expansion below it would be unsound. 
+    		// Alternatively "<->" could be converted into "->" and "<-"
+    		return;
     	}else if(t.javaBlock()!=JavaBlock.EMPTY_JAVABLOCK){ //do not descend below java blocks.
     		return;
     	}else if(op== Quantifier.ALL ){ 
@@ -371,11 +374,6 @@ public class QueryExpand implements BuiltInRule {
         		//System.out.println("AddedB: "+qep);
     		}
     	}
-    	/*else if(op instanceof Junctor){
-    		//Other Junctors like <-> must be handled explicitly. E.g. "<->" must be converted to "->" and "<-", so the query occurs in positive and negative position.
-    		return;
-    	}
-    	*/
     }
     
     
@@ -392,6 +390,8 @@ public class QueryExpand implements BuiltInRule {
     		//System.out.println("collectQueriesRec encountered javaBlock.");
     		return;
     	}
+    	// What about checking if an update is encountered?
+    	
     	if(t.op() instanceof IProgramMethod){ //Query found
     		//System.out.println("Query found:"+t);
     		result.add(t);

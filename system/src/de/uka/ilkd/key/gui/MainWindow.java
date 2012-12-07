@@ -115,7 +115,6 @@ import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.proof.Goal;
@@ -130,7 +129,6 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
-import de.uka.ilkd.key.util.UnicodeHelper;
 
 
 @SuppressWarnings("serial")

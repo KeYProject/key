@@ -36,7 +36,7 @@ import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.LogUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.ObjectUtil;
+import org.key_project.util.java.StringUtil;
 
 /**
  * <p>
@@ -164,7 +164,7 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
    protected boolean isNameUpdateNeeded(PictogramElement pictogramElement) throws DebugException {
       String pictogramName = getPictogramName(pictogramElement);
       String businessName = getBusinessName(pictogramElement);
-      return !ObjectUtil.equals(businessName, pictogramName);  
+      return !StringUtil.equalIgnoreWhiteSpace(businessName, pictogramName);
    }
    
    /**
