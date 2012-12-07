@@ -257,79 +257,75 @@ public class Main {
 //        if(cl.isSet(NO_ASSERTION)){
 //        	de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = false;
 //        }
+
         if(cl.isSet(NO_JMLSPECS)){
-        	GeneralSettings.disableSpecs = true;
+            GeneralSettings.disableSpecs = true;
         }
 
+        statisticsFile = cl.getString(PRINT_STATISTICS, statisticsFile);
 
-
-
-        if(cl.isSet(PRINT_STATISTICS)){
-        	statisticsFile = cl.getString(PRINT_STATISTICS, null);
-        	if(statisticsFile.equals(null)){
-        		printUsageAndExit(true,null);
-        	}
-        }
         if(cl.isSet(TIMEOUT)){
            System.out.println("Timeout is set");
            long timeout = -1;
            try {
                timeout = cl.getLong(TIMEOUT, -1);
-               System.out.println("Timeout is: "+ timeout+" ms");
+               if(timeout < -1) {
+                   throw new NumberFormatException();
+               }
+
+               System.out.println("Timeout set to: " + 
+                 (timeout > 0 ? (timeout + " ms") : "no timeout"));
            } catch (NumberFormatException nfe) {
                System.out.println("Illegal timeout (must be a number >=-1).");
                System.exit(-1);
            } catch (CommandLineException e) {
-        	   System.out.println("Wrong argument for timeout");
-		   }
-           if (timeout < -1) {
-               System.out.println("Illegal timeout (must be a number >=-1).");
-               System.exit(-1);
+               System.out.println("Wrong argument for timeout");
            }
+           
            ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
         }
-        if(cl.isSet(EXAMPLES)){
-        	examplesDir = cl.getString(EXAMPLES, null);
-        	if (examplesDir.equals(null)){
-        		printUsageAndExit(true, null);
-        	}
-        }
+        
+        examplesDir = cl.getString(EXAMPLES, examplesDir);
         
         if (Debug.ENABLE_DEBUG) {
             System.out.println("Running in debug mode ...");
         } else {
             System.out.println("Running in normal mode ...");
         }
+        
         if (Debug.ENABLE_ASSERTION) {
             System.out.println("Using assertions ...");
         } else {
             System.out.println("Not using assertions ...");
         }
+
         if(cl.isSet(LAST)){
         	loadRecentFile=true;
         }
+
         if(cl.isSet(EXPERIMENTAL)){
         	System.out.println("Running in experimental mode ...");
         } else {
             deactivateExperimentalFeatures();
         }
      	List<String> fileArguments = cl.getArguments();
-     	Iterator iter = fileArguments.iterator();
 
-        if(cl.isSet(JUSTIFY_RULES))
-        {evaluateLemmataOptions(cl);}
-        
+        if (cl.isSet(JUSTIFY_RULES)) {
+            evaluateLemmataOptions(cl);
+        }
+
         //arguments not assigned to a command line option may be files
 
-      	if(!fileArguments.isEmpty()){
-      		if(new File(fileArguments.get(0)).exists()){
-      			//System.out.println("Loading: "+fileArguments.get(0));
-      			fileNameOnStartUp=fileArguments.get(0);    	
-      		}else{
-      			printUsageAndExit(true, null);
-      		}
-      	}
-        	
+        if(!fileArguments.isEmpty()){
+            String fileArg = fileArguments.get(0);
+            if(new File(fileArg).exists()) {
+                //System.out.println("Loading: "+fileArguments.get(0));
+                fileNameOnStartUp = fileArg;
+            } else {
+                printUsageAndExit(true, fileArg);
+            }
+        }
+
     }
     
     /** Deactivate experimental features. */
