@@ -200,8 +200,7 @@ public class BlockContractRule implements BuiltInRule {
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate = updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps, /*anonymisationLocalVariables, */modifiesClauses);
 
-        ImmutableList<Goal> result = goal.split(3);
-
+        ImmutableList<Goal> result;
         final ContractPO po =
                 services.getSpecificationRepository().getPOForProof(goal.proof());
         Term contractApplPredTerm = TB.tt();
@@ -265,7 +264,9 @@ public class BlockContractRule implements BuiltInRule {
 
             // add information flow validity branch and split goal for the
             // remaining "normal" block contract branches
-            result = result.append(infFlowGoal);
+            result = goal.split(3).append(infFlowGoal);
+        } else {
+            result = goal.split(3);
         }
         
         final GoalsConfigurator configurator = new GoalsConfigurator(instantiation, contract.getLabels(), variables, application.posInOccurrence(), services);
