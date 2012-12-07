@@ -242,9 +242,9 @@ public class BlockContractRule implements BuiltInRule {
             final ProofObligationVars instantiationVars =
                     new ProofObligationVars(vars.self,
                                             MiscTools.toTermList(localInVariables),
+                                            preHeap,
                                             MiscTools.toTermList(localOutVariables),
                                             vars.result, vars.exception,
-                                            TB.getBaseHeap(services), preHeap,
                                             postHeap, services);
             final IFProofObligationVars ifVars =
                     new IFProofObligationVars(instantiationVars, services);

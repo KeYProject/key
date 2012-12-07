@@ -63,8 +63,9 @@ public class ProofObligationVars {
 
     ProofObligationVars(IProgramMethod pm,
                         KeYJavaType kjt, // contract.getKJT()
-                        Services services) {
-        this(pm, kjt, "", services);
+                        Services services,
+                        boolean withHeapAtPre) {
+        this(pm, kjt, "", services, withHeapAtPre);
     }
 
 
@@ -291,7 +292,8 @@ public class ProofObligationVars {
     ProofObligationVars(IProgramMethod pm,
                         KeYJavaType kjt,
                         String postfix,
-                        Services services) {
+                        Services services,
+                        boolean withHeapAtPre) {
         this(buildSelfVar(services, pm, kjt, postfix),
              buildSelfAtPostVar(services, pm, kjt, postfix),
              buildParamVars(services, postfix, pm),
@@ -301,7 +303,7 @@ public class ProofObligationVars {
              buildExceptionVar(services, postfix, pm),
              buildExceptionAtPostVar(services, postfix, pm),
              buildHeapVar(postfix, services),
-             buildHeapAtPreVar(postfix, services),
+             withHeapAtPre ? buildHeapAtPreVar(postfix, services) : null,
              buildHeapAtPostVar(postfix, services),
              buildMbyVar(postfix, services),
              postfix,
