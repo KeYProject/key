@@ -9,6 +9,7 @@
 //
 package de.uka.ilkd.key.java.visitor;
 
+import de.uka.ilkd.key.collection.ImmutableList;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -131,6 +132,14 @@ public class ProgramVariableCollector extends JavaASTVisitor {
             Term modifiesClause = x.getModifiesClause(heap, services);
             if (modifiesClause != null) {
                 modifiesClause.execPostOrder(collector);
+            }
+        }
+        ImmutableList<ImmutableList<Term>> respects = x.getRespects();
+        ImmutableList<ImmutableList<Term>> declassifies = x.getDeclassifies();
+        ImmutableList<ImmutableList<Term>> terms = respects.append(declassifies);
+        for (ImmutableList<Term> ts : terms) {
+            for (Term t : ts) {
+                t.execPostOrder(collector);
             }
         }
         result.addAll(collector.result());
