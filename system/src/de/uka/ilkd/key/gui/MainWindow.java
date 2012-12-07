@@ -139,7 +139,7 @@ public final class MainWindow extends JFrame  {
     private static final int MAX_RECENT_FILES = 8;
     
     /** size of the tool bar icons */
-    public static final int TOOLBAR_ICON_SIZE = 15;
+    public static final int TOOLBAR_ICON_SIZE = 16;
     
     /** the tab bar at the left */
     private JTabbedPane tabbedPane;
