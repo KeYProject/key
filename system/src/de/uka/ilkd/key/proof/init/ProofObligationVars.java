@@ -195,6 +195,18 @@ public class ProofObligationVars {
     }
 
 
+    public ProofObligationVars(Term self,
+                               ImmutableList<Term> localIns,
+                               ImmutableList<Term> localOuts,
+                               Term result,
+                               Term exception,
+                               Term heap,
+                               Services services) {
+        this(self, null, localIns, localOuts, result, null,
+             exception, null, heap, null, null, null, "", services);
+    }
+
+
     public ProofObligationVars(ProofObligationVars orig,
                                String postfix,
                                Services services) {
