@@ -476,4 +476,10 @@ public class ProofObligationVars {
         }
         return ops;
     }
+
+
+    @Override
+    public String toString() {
+        return termList.toString();
+    }
 }

@@ -360,6 +360,11 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
                 }
             }
         }
+
+        @Override
+        public String toString() {
+            return "[" + symbExecVars + "," + c1 + "," + c2 + "]";
+        }
     }
 
 
