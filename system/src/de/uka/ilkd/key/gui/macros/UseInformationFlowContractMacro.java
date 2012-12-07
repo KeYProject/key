@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.*;
+import de.uka.ilkd.key.strategy.feature.BinarySumFeature;
 import de.uka.ilkd.key.strategy.feature.InfFlowContractAppFeature;
 import de.uka.ilkd.key.strategy.feature.InfFlowImpFeature;
 import java.util.Arrays;
@@ -39,9 +40,11 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
     }
     
     private static final String INF_FLOW_RULENAME_PREFIX =
-            "Use_information_flow_contract";
+            "Use_information_flow_contract_for_";
 
     private static final String IMP_LEFT_RULENAME = "impLeft";
+
+    private static final String DOUBLE_IMP_LEFT_RULENAME = "doubleImpLeft";
 
     private static final String[] ADMITTED_RULENAMES = {
     };
@@ -113,24 +116,23 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
                 getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
                 getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)) {
                 String appName = getAppRuleName(parent.parent());
-                node.getNodeInfo().setBranchLabel("post " + appName);
-                parent.child(0).getNodeInfo().setBranchLabel("pre " + appName);
+                appName = appName.substring(INF_FLOW_RULENAME_PREFIX.length());
+                node.getNodeInfo().setBranchLabel("post " + appName + " (information flow)");
+                parent.child(0).getNodeInfo().setBranchLabel("pre " + appName + " (information flow)");
                 node = parent.parent();
                 parent = node.parent();
                 i += 2;
             } else if (parent.parent() != null &&
-                       parent.parent().parent() != null &&
-                       getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
-                       getAppRuleName(parent.parent()).equals(IMP_LEFT_RULENAME) &&
-                       getAppRuleName(parent.parent().parent()).startsWith(INF_FLOW_RULENAME_PREFIX)) {
-                String appName = getAppRuleName(parent.parent().parent());
-                node.getNodeInfo().setBranchLabel("post " + appName);
-                parent.child(0).getNodeInfo().setBranchLabel("pre " + appName);
-                parent.getNodeInfo().setBranchLabel("inf flow part of " + appName);
-                parent.parent().child(0).getNodeInfo().setBranchLabel("pre_A & pre_B " + appName);
-                node = parent.parent().parent();
+                       getAppRuleName(parent).equals(DOUBLE_IMP_LEFT_RULENAME) &&
+                       getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)) {
+                String appName = getAppRuleName(parent.parent());
+                appName = appName.substring(INF_FLOW_RULENAME_PREFIX.length());
+                node.getNodeInfo().setBranchLabel("post " + appName + " (information flow)");
+                parent.child(1).getNodeInfo().setBranchLabel("pre " + appName + " (information flow)");
+                parent.child(0).getNodeInfo().setBranchLabel("pre_A & pre_B " + appName + " (information flow)");
+                node = parent.parent();
                 parent = node.parent();
-                i += 3;
+                i += 2;
             } else {
                 node = parent;
                 parent = node.parent();
@@ -184,6 +186,11 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
                 ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
                 return InfFlowContractAppFeature.INSTANCE.compute(
                         ruleApp, pio, goal);
+            } else if (name.equals(DOUBLE_IMP_LEFT_RULENAME)) {
+                RuleAppCost impLeftCost =
+                        InfFlowImpFeature.INSTANCE.compute(ruleApp, pio, goal);
+                return impLeftCost.add(LongRuleAppCost.create(-10));
+
             } else if (name.equals(IMP_LEFT_RULENAME)) {
                 return InfFlowImpFeature.INSTANCE.compute(ruleApp, pio, goal);
             } else if (admittedRuleNames.contains(name) &&
@@ -212,11 +219,9 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
                 return !(getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
                          getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX) &&
                          parent.child(0) == goal.node() ||
-                         getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
-                         getAppRuleName(parent.parent()).equals(IMP_LEFT_RULENAME) &&
-                         parent.parent().parent() != null &&
-                         getAppRuleName(parent.parent().parent()).startsWith(INF_FLOW_RULENAME_PREFIX) &&
-                         parent.child(0) == goal.node());
+                         getAppRuleName(parent).equals(DOUBLE_IMP_LEFT_RULENAME) &&
+                         getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX) &&
+                         parent.child(2) != goal.node());
             }
             return true;
         }
