@@ -200,12 +200,12 @@ public class BlockContractRule implements BuiltInRule {
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate = updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps, /*anonymisationLocalVariables, */modifiesClauses);
 
-        ImmutableList<Goal> result = goal.split(3);
-
         final ContractPO po =
                 services.getSpecificationRepository().getPOForProof(goal.proof());
+        
         Term contractApplPredTerm = TB.tt();
         Taclet informationFlowContractApp = null;
+        Goal infFlowGoal = null;
         if (po instanceof InfFlowContractPO ||
             po instanceof SymbolicExecutionPO ||
             po instanceof BlockExecutionPO) {
@@ -236,15 +236,15 @@ public class BlockContractRule implements BuiltInRule {
             informationFlowContractApp =
                     ifContractBuilder.buildContractApplTaclet();
 
-            // create information flow validity branch
+            // create information flow validity goal
 
             // generate proof obligation variables
             final ProofObligationVars instantiationVars =
                     new ProofObligationVars(vars.self,
                                             MiscTools.toTermList(localInVariables),
+                                            preHeap,
                                             MiscTools.toTermList(localOutVariables),
                                             vars.result, vars.exception,
-                                            TB.getBaseHeap(services), preHeap,
                                             postHeap, services);
             final IFProofObligationVars ifVars =
                     new IFProofObligationVars(instantiationVars, services);
@@ -256,15 +256,17 @@ public class BlockContractRule implements BuiltInRule {
                                                    ifVars.c2, services);
 
             Sequent seq = buildBodyPreservesSequent(infFlowFactory);
-            Goal infFlowGoal = goal.getCleanGoal(seq);
+            infFlowGoal = goal.getCleanGoal(seq);
             infFlowGoal.setBranchLabel("Information Flow Validity");
 
             Taclet removePostTaclet =
                     generateInfFlowPostRemoveTaclet(infFlowFactory);
             infFlowGoal.addTaclet(removePostTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        }
 
-            // add information flow validity branch and split goal for the
-            // remaining "normal" block contract branches
+        ImmutableList<Goal> result = goal.split(3);
+        if (infFlowGoal != null) {
+            // add information flow validity branch
             result = result.append(infFlowGoal);
         }
         

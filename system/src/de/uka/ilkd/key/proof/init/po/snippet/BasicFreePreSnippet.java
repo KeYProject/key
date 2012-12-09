@@ -26,7 +26,9 @@ class BasicFreePreSnippet implements FactoryMethod {
 
         // "heap == heapAtPre"
         final Term eqHeapAndHeapAtPre =
-                d.tb.equals(poVars.heap, poVars.heapAtPre);
+                poVars.heapAtPre != null ?
+                d.tb.equals(poVars.heap, poVars.heapAtPre) :
+                d.tb.tt();
 
         // "self != null"
         final Term selfNotNull = f.create(

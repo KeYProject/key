@@ -2,6 +2,7 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -11,6 +12,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Terms;
@@ -18,8 +20,7 @@ import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.speclang.SpecificationElement;
-
+import de.uka.ilkd.key.util.MiscTools;
 import java.util.EnumMap;
 import java.util.List;
 
@@ -197,9 +198,16 @@ class BasicSnippetData {
 
         final Term heapTerm = TermBuilder.DF.getBaseHeap(services);
         Terms vars = contract.getVariablesAsTerms();
+        final ImmutableSet<ProgramVariable> localInVariables =
+                MiscTools.getLocalIns(contract.getBlock(), services);
+        final ImmutableSet<ProgramVariable> localOutVariables =
+                MiscTools.getLocalOuts(contract.getBlock(), services);
+        final ImmutableList<Term> localInTerms = toTermList(localInVariables);
+        final ImmutableList<Term> localOutTerms = toTermList(localOutVariables);
         origVars =
-                new ProofObligationVars(vars.self, ImmutableSLList.<Term>nil(),
-                                        vars.result, vars.exception, heapTerm, services);
+                new ProofObligationVars(vars.self, localInTerms, localOutTerms,
+                                        vars.result, vars.exception, heapTerm,
+                                        services);
     }
 
 
@@ -225,6 +233,15 @@ class BasicSnippetData {
         for (ImmutableList<Term> terms : termss) {
             result[i] = terms.toArray(Term.class);
             i++;
+        }
+        return result;
+    }
+
+
+    private ImmutableList<Term> toTermList(ImmutableSet<ProgramVariable> vars) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (ProgramVariable v : vars) {
+            result = result.append(tb.var(v));
         }
         return result;
     }
