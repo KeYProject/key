@@ -184,6 +184,16 @@ public class ProofObligationVars {
 
 
     public ProofObligationVars(Term self,
+                               ImmutableList<Term> localIns,
+                               Term heap,
+                               ImmutableList<Term> localOuts,                               
+                               Term heapAtPost,
+                               Services services) {
+        this(self, localIns, heap, localOuts, null, null, heapAtPost, services);
+    }
+
+
+    public ProofObligationVars(Term self,
                                ImmutableList<Term> params,
                                Term result,
                                Term exception,

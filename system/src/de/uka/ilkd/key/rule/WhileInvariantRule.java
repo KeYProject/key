@@ -38,9 +38,15 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
+import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
+import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
@@ -515,13 +521,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (po instanceof InfFlowContractPO ||
             po instanceof SymbolicExecutionPO ||
             po instanceof BlockExecutionPO) {
-        // prepare information flow analysis
-        /*Term contractLoopApplPredTerm =
-                storeInvInPredAndGenInfoFlowTaclet(inst,
-                        anonUpdateAndHeap,
-                        TB.var(localIns),
-                        TB.var(localOuts),
-                        goal, services);*/
         assert anonUpdateDatas.size() == 1; // information flow extension is at
                                             // the moment not compatible with
                                             // the non-base-heap setting
@@ -540,13 +539,40 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         // generate information flow invariant application predicate
         // and associated taclet
-        Term contractApplPredTerm =
+        Term loopInvApplPredTerm =
                 ifInvariantBuilder.buildContractApplPredTerm();
         Taclet informationFlowInvariantApp =
                 ifInvariantBuilder.buildContractApplTaclet();
         
+        // create information flow validity goal
+
+        // generate proof obligation variables
+        final ProofObligationVars instantiationVars =
+                new ProofObligationVars(inst.selfTerm,
+                                        TB.var(localIns),
+                                        anonUpdateData.loopHeapAtPre,
+                                        TB.var(localOuts),
+                                        anonUpdateData.loopHeap, services);
+        final IFProofObligationVars ifVars =
+                new IFProofObligationVars(instantiationVars, services);
+
+        // create proof obligation
+        InfFlowPOSnippetFactory infFlowFactory =
+            POSnippetFactory.getInfFlowFactory(inst.inv, ifVars.c1,
+                                               ifVars.c2, services);
+        
+        Sequent seq = buildBodyPreservesSequent(infFlowFactory, guardTrueTerm);
+        Goal infFlowGoal = goal.getCleanGoal(seq);
+        infFlowGoal.setBranchLabel("Information Flow Validity");
+
+        Taclet removePostTaclet =
+                generateInfFlowPostRemoveTaclet(infFlowFactory);
+        infFlowGoal.addTaclet(removePostTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        
+        result = result.append(infFlowGoal);
+        
         // add term and taclet to post goal
-        useGoal.addFormula(new SequentFormula(contractApplPredTerm),
+        useGoal.addFormula(new SequentFormula(loopInvApplPredTerm),
                 true,
                 false);
         useGoal.addTaclet(informationFlowInvariantApp,
@@ -566,39 +592,37 @@ public final class WhileInvariantRule implements BuiltInRule {
                 ruleApp.posInOccurrence());
         return result;
     }
-    
-    /**
-     * Store invariant of the loop invocation and generate information
-     * flow taclet.
-     */
-    /*private Term storeInvInPredAndGenInfoFlowTaclet(final Instantiation inst,
-                                                        final AnonUpdateData anonUpdateAndHeap,
-                                                        final ImmutableList<Term> localIns,
-                                                        final ImmutableList<Term> localOuts,
-                                                        final Goal goal,
-                                                        final Services services) {
-        ProofObligationVars appData =
-            new ProofObligationVars(inst.selfTerm, null, localIns,
-                                    localOuts, null, null,
-                                    null, null,
-                                    TB.getBaseHeap(services),
-                                    anonUpdateAndHeap.loopHeap, "", services);
-        BasicPOSnippetFactory f =
-            POSnippetFactory.getBasicFactory(inst.inv, appData, services);
-        final Term loopInvariantApplPredTerm =
-            f.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
-        final Term updatedLoopInvariantApplPredTerm =
-            TB.apply(inst.u, loopInvariantApplPredTerm);
-        
-        final Function loopInvariantApplPred = (Function)loopInvariantApplPredTerm.op();
-        final Taclet informationFlowContractLoopApp =
-                genInfFlowContractLoopApplTaclet(inst.inv, loopInvariantApplPred, appData,
-                                                 services);
-        goal.addTaclet(informationFlowContractLoopApp,
-                       SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-        return updatedLoopInvariantApplPredTerm;
-    }*/
-    
+
+
+    Sequent buildBodyPreservesSequent(InfFlowPOSnippetFactory f, Term guardTrueTerm) {
+        // TODO: How can we "nicely" put the guard term in the two parts of selfComposedExec?
+        Term selfComposedExec =
+                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
+        Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+
+        final Term finalTerm = TB.imp(selfComposedExec, post);
+        return Sequent.createSuccSequent(
+                new Semisequent(new SequentFormula(finalTerm)));
+    }
+
+
+    private Taclet generateInfFlowPostRemoveTaclet(InfFlowPOSnippetFactory infFlowFactory)
+            throws UnsupportedOperationException {
+        // create post-remove-taclet
+        RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
+        tacletBuilder.setName(InfFlowContractPO.REMOVE_POST_RULENAME);
+        tacletBuilder.setFind(
+                infFlowFactory.create(
+                        InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION));
+        tacletBuilder.setApplicationRestriction(RewriteTaclet.SUCCEDENT_POLARITY);
+        tacletBuilder.setSurviveSmbExec(false);
+        RewriteTacletGoalTemplate goal = new RewriteTacletGoalTemplate(TB.ff());
+        tacletBuilder.addTacletGoalTemplate(goal);
+        Taclet removePostTaclet = tacletBuilder.getTaclet();
+        return removePostTaclet;
+    }
+
+
     @Override
     public Name name() {
 	return NAME;

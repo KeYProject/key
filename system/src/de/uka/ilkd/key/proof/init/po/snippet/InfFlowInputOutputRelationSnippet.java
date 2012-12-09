@@ -53,7 +53,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
 
         // get declassifies terms
         if (d.get(BasicSnippetData.Key.DECLASSIFIES) == null &&
-            d.get(BasicSnippetData.Key.LOOPINVARIANT) == null) {
+            d.get(BasicSnippetData.Key.LOOP_INVARIANT) == null) {
             throw new UnsupportedOperationException("Tried to produce "
                     + "declassifies for a contract without declassifies.");            
         }
@@ -61,7 +61,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
         Term[][] declassifies1 = null;
         Term[][] declassifies2 = null;
 
-        if (d.get(BasicSnippetData.Key.LOOPINVARIANT) == null) {
+        if (d.get(BasicSnippetData.Key.LOOP_INVARIANT) == null) {
             assert Term[][].class.equals(BasicSnippetData.Key.DECLASSIFIES.getType());
             Term[][] origDeclassifies = (Term[][]) d.get(
                     BasicSnippetData.Key.DECLASSIFIES);
@@ -116,7 +116,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
                 buildMainInputEqualsRelation(d, vs1, vs2, referenceLocSet1,
                                              referenceLocSet2);
         Term[] declassifiesRelations = null;
-        if (d.get(BasicSnippetData.Key.LOOPINVARIANT) == null) {
+        if (d.get(BasicSnippetData.Key.LOOP_INVARIANT) == null) {
             declassifiesRelations =
                     buildDeclassifiesRelations(d, referenceLocSet1, declassClause1,
                                                referenceLocSet2, declassClause2);
@@ -125,7 +125,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
         ImmutableList<Term> inputRelations =
                 ImmutableSLList.<Term>nil();
         inputRelations = inputRelations.append(mainInputEqRelation);
-        if (d.get(BasicSnippetData.Key.LOOPINVARIANT) == null)
+        if (d.get(BasicSnippetData.Key.LOOP_INVARIANT) == null)
             inputRelations = inputRelations.append(declassifiesRelations);
         return d.tb.and(inputRelations);
     }

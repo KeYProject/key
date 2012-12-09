@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -20,5 +21,4 @@ public class LoopCallWithInvariantPredicateSnippet extends TwoStateMethodPredica
                         "_WITH_INV").toString();
         return nameString;
     }
-
 }

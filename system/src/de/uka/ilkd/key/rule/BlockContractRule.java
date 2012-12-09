@@ -492,7 +492,9 @@ public class BlockContractRule implements BuiltInRule {
         private final BlockContract.Variables placeholderVariables;
         private final Services services;
 
-        public VariablesCreatorAndRegistrar(final Goal goal, final BlockContract.Variables placeholderVariables, final Services services)
+        public VariablesCreatorAndRegistrar(final Goal goal,
+                                            final BlockContract.Variables placeholderVariables,
+                                            final Services services)
         {
             this.goal = goal;
             this.placeholderVariables = placeholderVariables;
