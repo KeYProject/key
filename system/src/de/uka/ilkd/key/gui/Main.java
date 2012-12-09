@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;

@@ -30,10 +30,15 @@ public interface BasicPOSnippetFactory {
         
         // dependencies of the contract
         CONTRACT_DEP (BasicDependsSnippet.class),
+        
+        // invariant of the loop
+        LOOP_INV (BasicLoopInvariantSnippet.class),
 
         // [P] (heap = heapAtPost & self = selfAtPost & result = resultAtPost &
         //      exc = excAtPost)
         SYMBOLIC_EXEC (BasicSymbolicExecutionSnippet.class),
+
+        LOOP_EXEC (BasicLoopExecutionSnippet.class),
 
         BLOCK_EXEC (BasicBlockExecutionSnippet.class),
 
@@ -62,7 +67,7 @@ public interface BasicPOSnippetFactory {
         //            result = resultAtPost & exc = excAtPost)
         METHOD_CALL_WITH_PRE_RELATION (MethodCallWithPreconditionPredicateSnippet.class),
         
-        // EXECUTION_OF_package.class::m_WITH_PRE(self, localIn1, ..., localInN, heap,
+        // EXECUTION_OF_package.class::m_WITH_INV(self, localIn1, ..., localInN, heap,
         // localOut1, ..., LocalOutN, heapAtPost)
         // This predicate is semantically equivalent to:
         // Inv & [P] (heap = heapAtPost & self = selfAtPost &
@@ -77,7 +82,7 @@ public interface BasicPOSnippetFactory {
         SELF_CREATED (BasicSelfCreatedSnippet.class),        // "self.<created> = TRUE"
         SELF_EXACT_TYPE (BasicSelfExactTypeSnippet.class),   // "MyClass::exactInstance(self) = TRUE"
         PARAMS_OK (BasicParamsOkSnippet.class),              // the general assumption that all parameter
-                                                        // arguments are valid
+                                                             // arguments are valid
         MBY_AT_PRE_DEF (BasicMbyAtPreDefSnippet.class);      // initial value of measured_by clause
         
 

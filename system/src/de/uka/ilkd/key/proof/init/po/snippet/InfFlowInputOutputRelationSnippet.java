@@ -9,7 +9,6 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /**
  * Generate term "self != null".
@@ -53,31 +52,23 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
                                                       poVars2.exceptionAtPost});
 
         // get declassifies terms
-/*<<<<<<< HEAD FIXME: version for loop invariants!
-        if (d.getContractContent(BasicSnippetData.Key.DECLASSIFIES) == null &&
-                !(d.contract instanceof LoopInvariant)) {
-=======*/
-        if (d.get(BasicSnippetData.Key.DECLASSIFIES) == null) {
+        if (d.get(BasicSnippetData.Key.DECLASSIFIES) == null &&
+            d.get(BasicSnippetData.Key.LOOPINVARIANT) == null) {
             throw new UnsupportedOperationException("Tried to produce "
                     + "declassifies for a contract without declassifies.");            
         }
-/*<<<<<<< HEAD
+
         Term[][] declassifies1 = null;
         Term[][] declassifies2 = null;
-        if(!(d.contract instanceof LoopInvariant)) {
-            assert Term[][].class.equals(BasicSnippetData.Key.DECLASSIFIES.getType());
-            Term[][] origDeclassifies = (Term[][]) d.getContractContent(
-                    BasicSnippetData.Key.DECLASSIFIES);
-=======*/
-        assert Term[][].class.equals(BasicSnippetData.Key.DECLASSIFIES.getType());
-        Term[][] origDeclassifies = (Term[][]) d.get(
-                BasicSnippetData.Key.DECLASSIFIES);
-//>>>>>>> 7f64f84cfbe7566c50d8bf4b6e6613a3a60fa3f6
 
-            // declassifies has only to be evaluated in the pre-state
-            Term[][] declassifies1 = replace(origDeclassifies, d.origVars, poVars1);
-            Term[][] declassifies2 = replace(origDeclassifies, d.origVars, poVars2);
-//        }        
+        if (d.get(BasicSnippetData.Key.LOOPINVARIANT) == null) {
+            assert Term[][].class.equals(BasicSnippetData.Key.DECLASSIFIES.getType());
+            Term[][] origDeclassifies = (Term[][]) d.get(
+                    BasicSnippetData.Key.DECLASSIFIES);
+         // declassifies has only to be evaluated in the pre-state
+            declassifies1 = replace(origDeclassifies, d.origVars, poVars1);
+            declassifies2 = replace(origDeclassifies, d.origVars, poVars2);
+        }        
 
         // create input-output-relations
         final Term[] relations = new Term[respectsAtPre1.length];        
@@ -124,16 +115,17 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
         final Term mainInputEqRelation =
                 buildMainInputEqualsRelation(d, vs1, vs2, referenceLocSet1,
                                              referenceLocSet2);
-        // Term[] declassifiesRelations = null;
-        // if(!(d.contract instanceof LoopInvariant)) {
-        final Term[] declassifiesRelations =
-                buildDeclassifiesRelations(d, referenceLocSet1, declassClause1,
-                                           referenceLocSet2, declassClause2);
+        Term[] declassifiesRelations = null;
+        if (d.get(BasicSnippetData.Key.LOOPINVARIANT) == null) {
+            declassifiesRelations =
+                    buildDeclassifiesRelations(d, referenceLocSet1, declassClause1,
+                                               referenceLocSet2, declassClause2);
+        }            
         // }
         ImmutableList<Term> inputRelations =
                 ImmutableSLList.<Term>nil();
         inputRelations = inputRelations.append(mainInputEqRelation);
-        //if(!(d.contract instanceof LoopInvariant))
+        if (d.get(BasicSnippetData.Key.LOOPINVARIANT) == null)
             inputRelations = inputRelations.append(declassifiesRelations);
         return d.tb.and(inputRelations);
     }
@@ -143,10 +135,10 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
                                               ProofObligationVars vs2,
                                               Term[] respects1,
                                               Term[] respects2) {
-//        BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, vs1);
-//        BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, vs2);
-//        Term framingLocs1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
-//        Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
+//      BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, vs1);
+//      BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, vs2);
+//      Term framingLocs1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
+//      Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
 
         Term[] eqAtLocs = new Term[respects1.length];
         for (int i = 0; i < eqAtLocs.length; i++) {

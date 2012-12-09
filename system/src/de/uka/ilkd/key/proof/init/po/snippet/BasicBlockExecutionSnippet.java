@@ -46,7 +46,6 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
         return prog;
     }
 
-
     private Term buildProgramTerm(BasicSnippetData d,
                                   Term postTerm,
                                   TermBuilder.Serviced tb) {

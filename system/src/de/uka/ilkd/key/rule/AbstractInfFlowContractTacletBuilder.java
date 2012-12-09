@@ -156,7 +156,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                                                 Services services) {
         Name tacletName = generateName();
 
-        // genreate schemaFind and schemaAssumes terms
+        // generate schemaFind and schemaAssumes terms
         ProofObligationVars schemaDataFind = generateApplicationDataSVs(
                 "find_", appData, services);
         Term schemaFind = generateSchemaFind(schemaDataFind, services);
@@ -169,7 +169,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                 buildContractApplications(schemaDataFind,
                                           schemaDataAssumes, services);
 
-        //create sequents
+        //create sequences
         Sequent assumesSeq = Sequent.createAnteSequent(
                 new Semisequent(new SequentFormula(schemaAssumes)));
         Sequent axiomSeq = Sequent.createAnteSequent(

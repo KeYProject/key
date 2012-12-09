@@ -29,14 +29,14 @@ public final class InfFlowLoopInvariantTacletBuilder
     
     private LoopInvariant loopinvariant;
     
+    public InfFlowLoopInvariantTacletBuilder(final Services services) {
+        super(services);
+    }
+    
     public void setInvariant(LoopInvariant invariant) {
         this.loopinvariant = invariant;
     }
     
-    public InfFlowLoopInvariantTacletBuilder(final Services services) {
-        super(services);
-    }
-
     @Override
     Name generateName() {
         return MiscTools.toValidTacletName("Use information flow contract for " +
@@ -77,7 +77,7 @@ public final class InfFlowLoopInvariantTacletBuilder
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(loopinvariant, contAppData,
                         contAppData2, services);
-        return f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL);
+        return f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_LOOP_INVARIANT_APPL);
         // TODO: Think about correctness
     }
 }
