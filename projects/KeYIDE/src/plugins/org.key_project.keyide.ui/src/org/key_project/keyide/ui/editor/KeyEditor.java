@@ -18,6 +18,8 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
+   public static final String EDITOR_ID = "org.key_project.keyide.ui.editor";
+   
    private Outline outline;
 
    /**

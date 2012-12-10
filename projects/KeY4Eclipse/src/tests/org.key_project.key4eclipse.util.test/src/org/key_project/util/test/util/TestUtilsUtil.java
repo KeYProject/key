@@ -42,6 +42,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
+import org.eclipse.swtbot.swt.finder.widgets.AbstractSWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -49,6 +50,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTableItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -70,6 +72,7 @@ import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.Activator;
+import org.key_project.util.test.util.internal.ContextMenuHelper;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofManagementDialog;
@@ -240,12 +243,11 @@ public class TestUtilsUtil {
    }
 
    /**
-    * Selects the project explorer view and the defined path.
-    * @param bot The {@link SWTBotTree} to find the package explorer view.
-    * @param toSelects The path to select.
-    * @return The selected element.
+    * Returns the project explorer view or its JDT version package explorer.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @return The found {@link SWTBotView}.
     */
-   public static SWTBotTreeItem selectInProjectExplorer(SWTWorkbenchBot bot, String... toSelects) {
+   public static SWTBotView getProjectExplorer(SWTWorkbenchBot bot) {
       SWTBotView viewBot = null;
       try {
          viewBot = bot.viewByTitle("Package Explorer");
@@ -255,6 +257,17 @@ public class TestUtilsUtil {
          viewBot = bot.viewByTitle("Project Explorer");
          viewBot.show();
       }
+      return viewBot;
+   }
+   
+   /**
+    * Selects the project explorer view and the defined path.
+    * @param bot The {@link SWTBotTree} to find the package explorer view.
+    * @param toSelects The path to select.
+    * @return The selected element.
+    */
+   public static SWTBotTreeItem selectInProjectExplorer(SWTWorkbenchBot bot, String... toSelects) {
+      SWTBotView viewBot = getProjectExplorer(bot);
       return selectInTree(viewBot.bot().tree(), toSelects);
    }
 
@@ -993,5 +1006,58 @@ public class TestUtilsUtil {
             }
          }
       });
+   }
+
+   /**
+    * Returns the {@link SWTBotView} for the properties view.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @return The {@link SWTBotView}.
+    */
+   public static SWTBotView getPropertiesView(SWTWorkbenchBot bot) {
+      return bot.viewById(IPageLayout.ID_PROP_SHEET);
+   }
+
+   /**
+    * Returns the {@link SWTBotView} for the outline view.
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @return The {@link SWTBotView}.
+    */
+   public static SWTBotView getOutlineView(SWTWorkbenchBot bot) {
+      return bot.viewById(IPageLayout.ID_OUTLINE);
+   }
+
+   /**
+    * Closes the given editor thread save.
+    * @param editor The {@link IEditorPart} to close.
+    * @param save Save changes?
+    */
+   public static void closeEditor(final IEditorPart editor, final boolean save) {
+      if (editor != null) {
+         Shell shell = editor.getEditorSite().getShell();
+         if (!shell.isDisposed()) {
+            shell.getDisplay().syncExec(new Runnable() {
+               @Override
+               public void run() {
+                  WorkbenchUtil.closeEditor(editor, save);
+               }
+            });
+         }
+      }
+   }
+   
+   /**
+    * <p>
+    * Performs a click on a menu item of the context menu of the given {@link AbstractSWTBot}.
+    * </p>
+    * <p>
+    * This utility method solves some SWTBot issues on context menu like missing
+    * support for structured context menus and widget is disposed exceptions o
+    * items provided to context menus via extension points.
+    * </p>
+    * @param bot The {@link AbstractSWTBot} to execute a context menu click on it.
+    * @param texts The path to the context menu item to click on.
+    */
+   public static void clickContextMenu(AbstractSWTBot<?> bot, String... texts) {
+      ContextMenuHelper.clickContextMenu(bot, texts);
    }
 }

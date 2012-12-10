@@ -187,6 +187,8 @@ public class KeYToUIUtil {
       Shell parent = WorkbenchUtil.getActiveShell();
       ImmutableCollectionContentProvider contentProvider = ImmutableCollectionContentProvider.getInstance();
       org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog dialog = new org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog(parent, contentProvider, environment.getServices());
+      dialog.setTitle("Contract Selection");
+      dialog.setMessage("Select contract to prove.");
       dialog.setInput(operationContracts);
 //      ContractSelectionDialog dialog = new ContractSelectionDialog(WorkbenchUtil, contentProvider, services)
 //      FunctionalOperationContract selectedContract = KeYToUIUtil.findContract(operationContracts, getContractId());

@@ -44,7 +44,6 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -225,24 +224,6 @@ public final class TestSedCoreUtil {
       if (run.getException() != null) {
          throw run.getException();
       }
-   }
-
-   /**
-    * Returns the {@link SWTBotView} for the properties view.
-    * @param bot The {@link SWTWorkbenchBot} to use.
-    * @return The {@link SWTBotView}.
-    */
-   public static SWTBotView getPropertiesView(SWTWorkbenchBot bot) {
-      return bot.viewById(IPageLayout.ID_PROP_SHEET);
-   }
-
-   /**
-    * Returns the {@link SWTBotView} for the outline view.
-    * @param bot The {@link SWTWorkbenchBot} to use.
-    * @return The {@link SWTBotView}.
-    */
-   public static SWTBotView getOutlineView(SWTWorkbenchBot bot) {
-      return bot.viewById(IPageLayout.ID_OUTLINE);
    }
 
    /**

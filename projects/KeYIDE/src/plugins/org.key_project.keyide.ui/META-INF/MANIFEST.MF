@@ -22,3 +22,6 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
+Export-Package: org.key_project.keyide.ui.editor,
+ org.key_project.keyide.ui.handlers,
+ org.key_project.keyide.ui.visualization

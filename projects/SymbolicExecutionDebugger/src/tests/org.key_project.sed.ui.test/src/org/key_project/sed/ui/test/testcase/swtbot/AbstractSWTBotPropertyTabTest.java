@@ -42,7 +42,7 @@ public class AbstractSWTBotPropertyTabTest extends TestCase {
          debugTree = debugView.bot().tree();
          TestSedCoreUtil.waitUntilDebugTreeHasDebugTarget(bot, debugTree);
          // Get properties view
-         SWTBotView propertiesView = TestSedCoreUtil.getPropertiesView(bot);
+         SWTBotView propertiesView = TestUtilsUtil.getPropertiesView(bot);
          // Select first thread
          selectThread(debugTree);
          SWTBotTabbedPropertyList tabs = SWTBotTabbedPropertyList.tabbedPropertyList(propertiesView.bot());

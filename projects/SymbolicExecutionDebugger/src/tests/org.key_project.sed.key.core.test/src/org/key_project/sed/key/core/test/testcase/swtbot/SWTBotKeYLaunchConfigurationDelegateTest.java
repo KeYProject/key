@@ -44,7 +44,7 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
          IEditorPart part = TestUtilsUtil.openEditor(project.getProject().getFile(new Path("src/MethodPartPOTest.java")));
          editor = bot.editorById(part.getSite().getId());
          // Select method in outline
-         SWTBotView outlineView = TestSedCoreUtil.getOutlineView(bot);
+         SWTBotView outlineView = TestUtilsUtil.getOutlineView(bot);
          TestUtilsUtil.selectInTree(outlineView.bot().tree(), "MethodPartPOTest", "doSomething(int, String, boolean) : int");
          // Start launch
          outlineView.bot().tree().contextMenu("Debug As").menu("&1 Symbolic Execution Debugger (SED)").click();
