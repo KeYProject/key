@@ -814,7 +814,7 @@ public final class MainWindow extends JFrame  {
 	
 	options.add(new TacletOptionsAction(this));
 	options.add(new SMTOptionsAction(this));
-	options.add(setupSpeclangMenu());
+//	options.add(setupSpeclangMenu()); // legacy since only JML supported
 	options.addSeparator();
         options.add(new JCheckBoxMenuItem(new MinimizeInteraction(this)));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
