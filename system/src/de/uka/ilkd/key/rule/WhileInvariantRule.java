@@ -384,6 +384,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                 TB.lt(variant, TB.var(variantPV), services)) 
                 : TB.tt();
 
+        //TODO: falls inf flow, hier getCleanGoal
+
         //split goal into three branches
         ImmutableList<Goal> result = goal.split(3);
         Goal initGoal = result.tail().tail().head();
