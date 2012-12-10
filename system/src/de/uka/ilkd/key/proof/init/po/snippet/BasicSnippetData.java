@@ -136,8 +136,8 @@ class BasicSnippetData {
         this.tb = new TermBuilder.Serviced(services);
         
         contractContents.put(Key.TARGET_METHOD, invariant.getTarget());
-        contractContents.put(Key.FOR_CLASS, invariant.getKJT());
-        contractContents.put(Key.LOOP_INVARIANT, invariant);
+//        contractContents.put(Key.FOR_CLASS, invariant.getKJT()); // not neccessary !?!
+        contractContents.put(Key.LOOP_INVARIANT, invariant.getInvariant(services));
         contractContents.put(Key.MODIFIES, invariant.getModifies());
         contractContents.put(Key.RESPECTS,
                              doubleListToArray(invariant.getRespects(services)));
