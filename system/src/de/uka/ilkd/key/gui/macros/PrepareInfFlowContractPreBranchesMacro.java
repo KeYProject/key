@@ -5,8 +5,8 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.strategy.*;
 
 
@@ -18,17 +18,19 @@ import de.uka.ilkd.key.strategy.*;
  * <p/>
  * @author christoph
  */
-public class RemovePostFromInfFlowContractPreBranchesMacro extends StrategyProofMacro {
+public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
     private static final String INF_FLOW_RULENAME_PREFIX =
             "Use_information_flow_contract";
 
     private static final String IMP_LEFT_RULENAME = "impLeft";
 
+    private static final String DOUBLE_IMP_LEFT_RULENAME = "doubleImpLeft";
+
 
     @Override
     public String getName() {
-        return "Remove original post from pre branches";
+        return "Prepare information flow pre branches";
     }
 
 
@@ -53,7 +55,7 @@ public class RemovePostFromInfFlowContractPreBranchesMacro extends StrategyProof
     protected class RemovePostStrategy implements Strategy {
 
         private final Name NAME =
-                new Name(RemovePostFromInfFlowContractPreBranchesMacro.RemovePostStrategy.class.getSimpleName());
+                new Name(PrepareInfFlowContractPreBranchesMacro.RemovePostStrategy.class.getSimpleName());
 
 
         public RemovePostStrategy() {
@@ -70,8 +72,10 @@ public class RemovePostFromInfFlowContractPreBranchesMacro extends StrategyProof
         public RuleAppCost computeCost(RuleApp ruleApp,
                                        PosInOccurrence pio,
                                        Goal goal) {
-            Name name = ruleApp.rule().name();
-            if (name.equals(InfFlowContractPO.REMOVE_POST_RULENAME)) {
+            String name = ruleApp.rule().name().toString();
+            String removePostName =
+                    RemovePostTacletBuilder.REMOVE_POST_RULENAME.toString();
+            if (name.startsWith(removePostName)) {
                 return LongRuleAppCost.ZERO_COST;
             } else {
                 return TopRuleAppCost.INSTANCE;
@@ -83,7 +87,7 @@ public class RemovePostFromInfFlowContractPreBranchesMacro extends StrategyProof
         public boolean isApprovedApp(RuleApp app,
                                      PosInOccurrence pio,
                                      Goal goal) {
-            // abort not if
+            // abort if
             //  - the parent.parent rule application is an information
             //    flow contract rule application,
             //  - the parent rule application is an impLeft rule applicatoin
@@ -94,11 +98,11 @@ public class RemovePostFromInfFlowContractPreBranchesMacro extends StrategyProof
                 goal.node().parent().parent() != null) {
                 Node parent = goal.node().parent();
                 return getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
-                    getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX) ||
-                    getAppRuleName(parent).equals(IMP_LEFT_RULENAME) &&
-                    getAppRuleName(parent.parent()).equals(IMP_LEFT_RULENAME) &&
-                    parent.parent().parent() != null &&
-                    getAppRuleName(parent.parent().parent()).startsWith(INF_FLOW_RULENAME_PREFIX);
+                       getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX) &&
+                       parent.child(0) == goal.node() ||
+                       getAppRuleName(parent).equals(DOUBLE_IMP_LEFT_RULENAME) &&
+                       getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX) &&
+                       parent.child(2) != goal.node();
             }
             return false;
         }

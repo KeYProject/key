@@ -30,6 +30,7 @@ import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -259,9 +260,14 @@ public class BlockContractRule implements BuiltInRule {
             infFlowGoal = goal.getCleanGoal(seq);
             infFlowGoal.setBranchLabel("Information Flow Validity");
 
-            Taclet removePostTaclet =
-                    generateInfFlowPostRemoveTaclet(infFlowFactory);
-            infFlowGoal.addTaclet(removePostTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            // create and add post-remove-taclets
+            final Term post =
+                    infFlowFactory.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+            final RemovePostTacletBuilder tb = new RemovePostTacletBuilder();
+            final ArrayList<Taclet> removePostTaclets = tb.generateTaclets(post);
+            for (final Taclet t : removePostTaclets) {
+                infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            }
         }
 
         ImmutableList<Goal> result = goal.split(3);
@@ -339,19 +345,6 @@ public class BlockContractRule implements BuiltInRule {
                 new Semisequent(new SequentFormula(finalTerm)));
     }
 
-    private Taclet generateInfFlowPostRemoveTaclet(InfFlowPOSnippetFactory infFlowFactory)
-            throws UnsupportedOperationException {
-        // create post-remove-taclet
-        RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
-        tacletBuilder.setName(InfFlowContractPO.REMOVE_POST_RULENAME);
-        tacletBuilder.setFind(infFlowFactory.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION));
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.SUCCEDENT_POLARITY);
-        tacletBuilder.setSurviveSmbExec(false);
-        RewriteTacletGoalTemplate goal = new RewriteTacletGoalTemplate(TB.ff());
-        tacletBuilder.addTacletGoalTemplate(goal);
-        Taclet removePostTaclet = tacletBuilder.getTaclet();
-        return removePostTaclet;
-    }
 
     public static final class Instantiation {
 

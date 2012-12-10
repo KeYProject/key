@@ -21,11 +21,13 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.InfFlowTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -39,10 +41,10 @@ import java.util.Properties;
  */
 public class InfFlowContractPO extends AbstractOperationPO implements ContractPO {
 
-    public static final Name REMOVE_POST_RULENAME = new Name("Remove_post");
-
     private final InformationFlowContract contract;
+
     private final ProofObligationVars symbExecVars;
+
     private final IFProofObligationVars ifVars;
 
 
@@ -69,24 +71,20 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
                                                    ifVars.c2, services);
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
-        Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+        Term post =
+                f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
-        // create post-remove-taclet
-        RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
-        tacletBuilder.setName(REMOVE_POST_RULENAME);
-        tacletBuilder.setFind(post);
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.SUCCEDENT_POLARITY);
-        tacletBuilder.setSurviveSmbExec(false);
-        RewriteTacletGoalTemplate goal = new RewriteTacletGoalTemplate(TB.ff());
-        tacletBuilder.addTacletGoalTemplate(goal);
-        Taclet removePostTaclet = tacletBuilder.getTaclet();
-
-        // register final term, taclet and collect class axioms
+        // register final term, taclets and collect class axioms
         assignPOTerms(TB.imp(selfComposedExec, post));
-        taclets.add(NoPosTacletApp.createFixedNoPosTacletApp(removePostTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, services));
-        initConfig.getProofEnv().registerRule(removePostTaclet,
-                                              AxiomJustification.INSTANCE);
         collectClassAxioms(contract.getKJT());
+
+        // create and add post-remove-taclets
+        final RemovePostTacletBuilder tb = new RemovePostTacletBuilder();
+        final ArrayList<Taclet> removePostTaclets = tb.generateTaclets(post);
+        for (final Taclet t : removePostTaclets) {
+            taclets = taclets.add(NoPosTacletApp.createFixedNoPosTacletApp(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, services));
+            initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
+        }
     }
 
 
@@ -321,6 +319,7 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
     public static class IFProofObligationVars {
 
         public final ProofObligationVars c1, c2, symbExecVars;
+
         public final Map<Term, Term> map1, map2;
 
 
@@ -360,6 +359,7 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
                 }
             }
         }
+
 
         @Override
         public String toString() {
