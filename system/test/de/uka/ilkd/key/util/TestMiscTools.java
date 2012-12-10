@@ -1,12 +1,16 @@
 package de.uka.ilkd.key.util;
 
 
+import java.io.File;
+
 import junit.framework.TestCase;
 import static de.uka.ilkd.key.util.MiscTools.*;
 
 public class TestMiscTools extends TestCase {
 
-    public void testDisectFilename() {
+    public void testDisectFilenameUnix() {
+        // run only on UNIX-like systems
+        if (File.separatorChar != '/') return;
         String s = "/home/daniel//workspace/key";
         Object[] ls = MiscTools.disectFilename(s).toArray();
         assertEquals("",ls[0]);
@@ -22,13 +26,20 @@ public class TestMiscTools extends TestCase {
         ls = MiscTools.disectFilename(s).toArray();
         assertEquals(4,ls.length);
         assertEquals("key",ls[3]);
-        // test windows delimiters
-        s = "C:\\Windows\\Users\\";
-        ls = MiscTools.disectFilename(s).toArray();
+    }
+    
+    public void testDisectFilenameWindows() {
+        // run only on Windows systems
+        if (File.separatorChar != '\\') return;
+        String s = "C:\\Windows\\Users\\";
+        Object[] ls = MiscTools.disectFilename(s).toArray();
         assertEquals("C:",ls[0]);
     }
     
-    public void testMakeFilenameRelative(){
+    public void testMakeFilenameRelativeUnix() {
+        // run only on UNIX-like systems
+        if (File.separatorChar != '/') return;
+        
         String s = "/home/daniel/bla";
         String t = "/home/daniel/blubb";
         String u = MiscTools.makeFilenameRelative(s,t);
@@ -43,11 +54,16 @@ public class TestMiscTools extends TestCase {
         s = "/home/../home/daniel/";
         t = "/home";
         assertEquals("daniel", MiscTools.makeFilenameRelative(s, t));
+    }
+    
+    public void testMakeFilenameRelativeWindows() {
+        // run only on Windows systems
+        if (File.separatorChar != '\\') return;
         
         // test windows delimiters
-        s = "C:\\Windows";
-        t = "c:\\";
-        u = MiscTools.makeFilenameRelative(s, t);
+        String s = "C:\\Windows";
+        String t = "c:\\";
+        String u = MiscTools.makeFilenameRelative(s, t);
         assertEquals("Windows",u);
         // do stupid things
         try {
@@ -57,6 +73,7 @@ public class TestMiscTools extends TestCase {
         } catch (RuntimeException e){
             assertTrue(true);
         }
+        
     }
     
     public void testToValidFileName(){
