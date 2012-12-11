@@ -41,7 +41,6 @@ public final class TermFactory {
 
     private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();
     
-    
 
     //-------------------------------------------------------------------------
     //constructors
@@ -63,13 +62,17 @@ public final class TermFactory {
     public Term createTerm(Operator op, 
 	    		   ImmutableArray<Term> subs, 
 	    		   ImmutableArray<QuantifiableVariable> boundVars,
-	    		   JavaBlock javaBlock) {
+	    		   JavaBlock javaBlock,
+	    		   ImmutableArray<ITermLabel> labels) {
 	if(op == null) {
 	    throw new TermCreationException("null-Operator at TermFactory");
 	}
 	
 	final Term newTerm 
-		= new TermImpl(op, subs, boundVars, javaBlock).checked();
+		= (labels == null || labels.isEmpty() ? 
+				new TermImpl(op, subs, boundVars, javaBlock) : 
+			new LabeledTermImpl(op, subs, boundVars, javaBlock, labels)).checked();
+	
 	Term term = cache.get(newTerm);
 	if(term == null) {
 	    term = newTerm;
@@ -77,6 +80,15 @@ public final class TermFactory {
 	}
 
 	return term;
+    } 
+    
+    
+    public Term createTerm(Operator op, 
+	    		   ImmutableArray<Term> subs, 
+	    		   ImmutableArray<QuantifiableVariable> boundVars,
+	    		   JavaBlock javaBlock) {
+
+    	return createTerm(op, subs, boundVars, javaBlock, null);
     } 
     
     
@@ -105,6 +117,35 @@ public final class TermFactory {
     
     public Term createTerm(Operator op) {
 	return createTerm(op, NO_SUBTERMS, null, null);
+    }
+
+    
+    public Term createTerm(Operator op,
+    		Term[] subs, 
+    		ImmutableArray<QuantifiableVariable> boundVars,
+    		JavaBlock javaBlock,
+    		ImmutableArray<ITermLabel> labels) {
+    	return createTerm(op, new ImmutableArray<Term>(subs), boundVars, javaBlock, labels);
+    }
+
+
+    public Term createTerm(Operator op, Term[] subs, ImmutableArray<ITermLabel> labels) {
+    	return createTerm(op, subs, null, null, labels);
+    }
+
+
+    public Term createTerm(Operator op, Term sub, ImmutableArray<ITermLabel> labels) {
+    	return createTerm(op, new ImmutableArray<Term>(sub), null, null, labels);
+    }    
+
+
+    public Term createTerm(Operator op, Term sub1, Term sub2, ImmutableArray<ITermLabel> labels) {
+    	return createTerm(op, new Term[]{sub1, sub2}, null, null, labels);
+    }    
+
+
+    public Term createTerm(Operator op, ImmutableArray<ITermLabel> labels) {
+    	return createTerm(op, NO_SUBTERMS, null, null, labels);
     }
 
 }

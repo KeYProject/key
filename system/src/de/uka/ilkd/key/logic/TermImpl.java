@@ -20,13 +20,17 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * The currently only class implementing the Term interface. TermFactory should
  * be the only class dealing directly with the TermImpl class.
  */
-final class TermImpl implements Term {
+class TermImpl implements Term {
 
     private static final ImmutableArray<Term> EMPTY_TERM_LIST 
     	= new ImmutableArray<Term>();
+    
     private static final ImmutableArray<QuantifiableVariable> EMPTY_VAR_LIST
     	= new ImmutableArray<QuantifiableVariable>();
-    private static int serialNumberCounter =0;
+	
+    private static final ImmutableArray<ITermLabel> EMPTY_LABEL_LIST = new ImmutableArray<ITermLabel>();
+    
+	private static int serialNumberCounter =0;
 
     //content
     private final Operator op;
@@ -428,7 +432,8 @@ final class TermImpl implements Term {
 	final Term t = (Term) o;
 	
 	return op().equals(t.op())
-	       && subs().equals(t.subs())
+	       && t.hasLabels() == hasLabels()
+		   && subs().equals(t.subs())
 	       && boundVars().equals(t.boundVars())
 	       && javaBlock().equals(t.javaBlock());
     }
@@ -501,5 +506,19 @@ final class TermImpl implements Term {
         return serialNumber;
     }
 
- 
+	@Override
+	public boolean hasLabels() {
+		return false;
+	}
+
+	@Override
+	public boolean containsLabel(ITermLabel label) {
+		return false;
+	}
+
+	@Override
+	public ImmutableArray<ITermLabel> getLabels() {
+		return EMPTY_LABEL_LIST;
+	}
+
 }
