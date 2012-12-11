@@ -148,6 +148,12 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         //key is the term to identify the bprod, value is the name used for that function.
         private final HashMap<Term, StringBuffer> usedBprodTerms = new HashMap<Term, StringBuffer>();
         
+        //key is the term to identify the function binding vars, value is the name used for the function
+        private HashMap<Term, StringBuffer> uninterpretedBindingFunctionNames = new HashMap<Term, StringBuffer>();
+        
+        //key is the term to identify the predicate binding vars, value is the name used for the predicate
+        private HashMap<Term, StringBuffer> uninterpretedBindingPredicateNames = new HashMap<Term, StringBuffer>();
+        
         private HashMap<Operator, ArrayList<Sort>> functionDecls = new HashMap<Operator, ArrayList<Sort>>();
 
         private HashSet<Function> specialFunctions = new HashSet<Function>();
@@ -767,6 +773,20 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     toReturn.add(element);
                 }
                 
+                // add the type definition for uninterpreted binding functions
+                for (Term t: uninterpretedBindingFunctionNames.keySet()) {
+                    ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
+                    element.add(uninterpretedBindingFunctionNames.get(t));
+                    Function f = (Function)t.op();
+                    for (int i = 0; i < f.arity(); i++) {
+                        if (!f.bindVarsAt(i)) {
+                            element.add(usedDisplaySort.get(f.argSort(i)));
+                        }
+                    }
+                    element.add(usedDisplaySort.get(f.sort()));
+                    toReturn.add(element);
+                }
+                
                 /*
                  * if (this.nullUsed) { //add the null constant to the
                  * declarations ArrayList<StringBuffer> a = new
@@ -810,10 +830,22 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         toReturn.add(element);
                 }
 
+                //add the uninterpreted predicates binding vars
+                for (Term t: this.uninterpretedBindingPredicateNames.keySet()) {
+                    ArrayList<StringBuffer> element = new ArrayList<StringBuffer>();
+                    element.add(uninterpretedBindingPredicateNames.get(t));
+                    for (int i = 0; i < t.op().arity(); i++) {
+                        if (!t.op().bindVarsAt(i)) {
+                            element.add(usedDisplaySort.get(t.sub(i).sort()));
+                        }
+                    }
+                    toReturn.add(element);
+                }
+                
                 predicateTypes.add(new ContextualBlock(start,
                                 toReturn.size() - 1,
                                 ContextualBlock.PREDICATE_FORMULA));
-
+                
                 // add the typePredicates
 
                 start = toReturn.size();
@@ -1728,7 +1760,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
          *                modulo terms, but must be looped through until we get
          *                there.
          */
-
         protected StringBuffer translateTerm(Term term,
                         Vector<QuantifiableVariable> quantifiedVars,
                         Services services) throws IllegalFormulaException {
@@ -1970,6 +2001,14 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                 } else {
                                         // op is non rigid, so it can be treated
                                         // as uniterpreted predicate
+                                    //check whether it binds variables
+                                    boolean bindsVars = false;
+                                    for (int i = 0; i < op.arity(); i++) {
+                                        bindsVars = bindsVars || op.bindVarsAt(i);
+                                    }
+                                    if (bindsVars) {
+                                        return translateAsBindingUninterpretedPredicate(term, fun, quantifiedVars, term.subs(), services);
+                                    } else {
                                         ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
                                         for (int i = 0; i < op.arity(); i++) {
                                                 StringBuffer subterm = translateTerm(
@@ -1993,6 +2032,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                         this.addPredicate(fun, sorts);
 
                                         return translatePred(op, subterms);
+                                    }
                                 }
                         } else {                          
                                 // this Function is a function, so translate it
@@ -2143,29 +2183,170 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                                     
                                     return translateBprodFunction(term, subterms);
                                 } else {
-                                
+                                    boolean bindsVars = false;
+                                    for (int i = 0; i < fun.arity(); i++) {
+                                        bindsVars = bindsVars || fun.bindVarsAt(i);
+                                    }
+                                    if (bindsVars) {
+                                        return translateAsBindingUninterpretedFunction(
+                                                        term, fun, quantifiedVars,
+                                                        term.subs(), services);
+                                    } else {
                                         return translateAsUninterpretedFunction(
                                                         fun, quantifiedVars,
                                                         term.subs(), services);
+                                    }
                                 }
                         }
                 } else {
                         // if none of the above works, the symbol can be
                         // translated as uninterpreted function
-                        // or predicate. The idea is, tht if a formula is valid
+                        // or predicate. The idea is, that if a formula is valid
                         // with a interpreted function,
                         // it has to be valid with an uninterpreted.
                         // Caution: Counterexamples might be affected by this.
                         return translateUnknown(term, quantifiedVars, services);
                 }
         }
+        
+        private StringBuffer translateAsBindingUninterpretedPredicate(Term term, Function fun,
+                Vector<QuantifiableVariable> quantifiedVars,
+                ImmutableArray<Term> subs, Services services) throws IllegalFormulaException {
+            
+            ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
+            for (int i = 0; i < term.arity(); i++) {
+                if (!fun.bindVarsAt(i)) {
+                    Term sub = term.sub(i);
+                    // make type casts, if neccessary
+                    StringBuffer subterm = translateTerm(sub,
+                                    quantifiedVars, services);
+                    if (this.isMultiSorted()) {
+                            subterm = this.castIfNeccessary(subterm,
+                                            sub.sort(), fun.argSort(i));
+                    }
+                    subterms.add(subterm);
+                }
+            }
+            
+            //check whether an equal term was already used.
+            Term used = null;
+            for (Term t: uninterpretedBindingPredicateNames.keySet()) {
+                boolean termsMatch = ((t.op() == term.op()) && (t.arity() == term.arity()));
+                for (int i = 0; i < t.arity(); i++) {
+                    //the terms only have to match on those positions where functions are defined
+                    if (fun.bindVarsAt(i)) {
+                        termsMatch = termsMatch && t.sub(i).equalsModRenaming(term.sub(i));
+                    }
+                }
+                
+                //the terms also match, if the entire sequence matches
+                termsMatch = (termsMatch || t.equalsModRenaming(term));
+                
+                if (termsMatch) {
+                    used = t;
+                }
+            }
+            if (used != null) {
+                //The term was aready used. reuse the function name.
+                return translateFunction(uninterpretedBindingPredicateNames.get(used), subterms);
+            } else {
+                // create a new functionname
+                StringBuffer newName = null;
+                int i = 0;
+                boolean alreadyContains = true;
+                while (alreadyContains) {
+                    i++;
+                    newName = new StringBuffer("bindp_" + fun.name().toString() + "_" + i);
+                    alreadyContains = false;
+                    for (StringBuffer s: uninterpretedBindingPredicateNames.values()) {
+                        alreadyContains = alreadyContains || s.toString().equals(newName.toString());
+                    }
+                }
+                // add the function
+                uninterpretedBindingPredicateNames.put(term, newName);
+                //translate the new function
+                return translatePredicate(newName, subterms);
+            }
+        }
+        
+        /**
+         * Translate an uninterpreted function, which binds variables
+         * @param term The term with the binding function on top level
+         * @param fun the function operator
+         * @param quantifiedVars
+         * @param subs the subterms of the function
+         * @param services
+         * @return A stringBuffer representing the translation of the function.
+         * @throws IllegalFormulaException
+         */
+        private StringBuffer translateAsBindingUninterpretedFunction(Term term, Function fun,
+                Vector<QuantifiableVariable> quantifiedVars,
+                ImmutableArray<Term> subs, Services services) throws IllegalFormulaException {
+            
+            ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
+            for (int i = 0; i < term.arity(); i++) {
+                if (!fun.bindVarsAt(i)) {
+                    Term sub = term.sub(i);
+                    // make type casts, if neccessary
+                    StringBuffer subterm = translateTerm(sub,
+                                    quantifiedVars, services);
+                    if (this.isMultiSorted()) {
+                            subterm = this.castIfNeccessary(subterm,
+                                            sub.sort(), fun.argSort(i));
+                    }
+                    subterms.add(subterm);
+                }
+            }
+            
+            //check whether an equal term was already used.
+            Term used = null;
+            for (Term t: uninterpretedBindingFunctionNames.keySet()) {
+                boolean termsMatch = ((t.op() == term.op()) && (t.arity() == term.arity()));
+                for (int i = 0; i < t.arity(); i++) {
+                    //the terms only have to match on those positions where functions are defined
+                    if (fun.bindVarsAt(i)) {
+                        termsMatch = termsMatch && t.sub(i).equalsModRenaming(term.sub(i));
+                    }
+                }
+                
+                //the terms also match, if the entire terms match
+                termsMatch = (termsMatch || t.equalsModRenaming(term));
+                
+                if (termsMatch) {
+                    used = t;
+                }
+            }
+            if (used != null) {
+                //The term was aready used. reuse the function name.
+                return translateFunction(uninterpretedBindingFunctionNames.get(used), subterms);
+            } else {
+                // create a new functionname
+                StringBuffer newName = null;
+                int i = 0;
+                boolean alreadyContains = true;
+                while (alreadyContains) {
+                    i++;
+                    newName = new StringBuffer("bindf_" + fun.name().toString() + "_" + i);
+                    alreadyContains = false;
+                    for (StringBuffer s: uninterpretedBindingFunctionNames.values()) {
+                        alreadyContains = alreadyContains || s.toString().equals(newName.toString());
+                    }
+                }
+                // add the function
+                uninterpretedBindingFunctionNames.put(term, newName);
+                //translate the new function
+                return translateFunction(newName, subterms);
+            }
+        }
 
         private StringBuffer translateAsUninterpretedFunction(Function fun,
                         Vector<QuantifiableVariable> quantifiedVars,
                         ImmutableArray<Term> subs, Services services)
                         throws IllegalFormulaException {
-                // an uninterpreted function. just
-                // translate it as such
+            // an uninterpreted function. just
+            // translate it as such
+            // it has to be made a difference between binding functions and those not binding
+            
                 ArrayList<StringBuffer> subterms = new ArrayList<StringBuffer>();
                 int i = 0;
                 for (Term sub : subs) {
