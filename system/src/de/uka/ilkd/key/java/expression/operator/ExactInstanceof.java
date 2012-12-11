@@ -78,7 +78,6 @@ public class ExactInstanceof extends TypeOperator {
         }
         if (typeReference != null) {
             if (index == 0) return typeReference;
-            index--;
         }
         throw new ArrayIndexOutOfBoundsException();
     }

@@ -170,7 +170,7 @@ public class TacletIfSelectionDialog extends JPanel{
 	    parent.add(inp);
 	    inp.setEnabled(true);
 	}
-	if (cb.getSelectedItem() != icm.manualText() && (nr==3)) {
+	if (cb.getSelectedItem() != icm.manualText() && nr == 3) {
 	    parent.remove(parent.getComponent(2));
 	}
 	parent.revalidate();
