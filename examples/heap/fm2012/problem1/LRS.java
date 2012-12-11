@@ -27,6 +27,7 @@ public class LRS {
 
     /*@ normal_behavior
       @ requires a.length >= 2;
+      @ requires (\exists int i,j; 0 <= i && i < j && j < a.length; a[i] == a[j]);
       @ requires solStart == 0 && solLength == 0;
       @ ensures (\exists int i; 0 <= i && i < a.length && i != solStart;
       @         (\forall int j; 0 <= j && j < solLength; 
@@ -58,7 +59,7 @@ public class LRS {
         for (int l=1; l < a.length; l++) {
             int length = sa.lcp(l);
             if (length > solLength) {
-                solStart = sa.select(l);
+                solStart = sa.suffixes[l];
                 solLength = length;
             }
         }

@@ -143,18 +143,20 @@ class TacletMenu extends JMenu {
 				  ImmutableList<BuiltInRule> builtInList,
 				  MenuControl control) {	 
 	addActionListener(control);
-	boolean rulesAvailable=(addSection("Find", sort(find), control));
+	
+	boolean rulesAvailable=addSection("Find", sort(find), control);
+	
 	if (pos != null && pos.isSequent()) {
-	    rulesAvailable=addSection("NoFind", noFind, control)
-		| rulesAvailable;
+	    rulesAvailable = addSection("NoFind", noFind, control) | rulesAvailable;
 	}
+
 	if (!rulesAvailable) {
 	    createSection("No rules applicable.");
 	}
 
 	createBuiltInRuleMenu(builtInList, control);
 
-	if(pos.isSequent()){
+	if(pos!= null && pos.isSequent()){
 	    createSMTMenu(control);
 	}
 	createFocussedAutoModeMenu ( control );

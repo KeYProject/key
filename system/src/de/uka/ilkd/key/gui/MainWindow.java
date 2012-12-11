@@ -139,7 +139,7 @@ public final class MainWindow extends JFrame  {
     private static final int MAX_RECENT_FILES = 8;
     
     /** size of the tool bar icons */
-    public static final int TOOLBAR_ICON_SIZE = 15;
+    public static final int TOOLBAR_ICON_SIZE = 16;
     
     /** the tab bar at the left */
     private JTabbedPane tabbedPane;
@@ -817,7 +817,7 @@ public final class MainWindow extends JFrame  {
 	
 	options.add(new TacletOptionsAction(this));
 	options.add(new SMTOptionsAction(this));
-	options.add(setupSpeclangMenu());
+//	options.add(setupSpeclangMenu()); // legacy since only JML supported
 	options.addSeparator();
         options.add(new JCheckBoxMenuItem(new MinimizeInteraction(this)));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
