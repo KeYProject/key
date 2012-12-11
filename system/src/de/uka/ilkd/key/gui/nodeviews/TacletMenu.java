@@ -683,7 +683,7 @@ class TacletMenu extends JMenu {
             LinkedHashMap<String,Integer> map2 = score(o2);
             Iterator<Map.Entry<String,Integer> > it1 = map1.entrySet().iterator();
             Iterator<Map.Entry<String,Integer> > it2 = map2.entrySet().iterator();
-            while (it1.hasNext() & it2.hasNext()) {
+            while (it1.hasNext() && it2.hasNext()) {
                 String s1 = it1.next().getKey();
                 String s2 = it2.next().getKey();
                 if (!s1.equals(s2)) throw new IllegalStateException(
