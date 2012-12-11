@@ -416,9 +416,12 @@ public class SolverLauncher implements SolverListener {
      */
     private void notifySolverHasFinished(SMTSolver solver) {
 	lock.lock();
-	session.removeCurrentlyRunning(solver);
-	wait.signal();
-	lock.unlock();
+	try {
+		session.removeCurrentlyRunning(solver);
+		wait.signal();
+	} finally {
+		lock.unlock();
+	}
     }
 
     /**
