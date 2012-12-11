@@ -100,7 +100,7 @@ public class KeYMediator {
 
 	
 	// moved from layout main here; but does not actually belong here at all;
-	// we should get that rule to behave like a noral built-in rule
+	// we should get that rule to behave like a normal built-in rule
 	addKeYSelectionListener(OneStepSimplifier.INSTANCE);
 
     }
