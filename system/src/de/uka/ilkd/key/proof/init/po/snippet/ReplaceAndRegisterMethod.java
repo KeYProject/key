@@ -46,7 +46,12 @@ abstract class ReplaceAndRegisterMethod {
             Term origTerm = origVarsIt.next();
             Term poTerm = poVarsIt.next();
             if (origTerm != null && poTerm != null) {
-                assert origTerm.sort().equals(poTerm.sort());
+                assert poTerm.sort().equals(origTerm.sort()) ||
+                       poTerm.sort().extendsSorts().contains(origTerm.sort()) :
+                        "mismatch of sorts: orignal term " + origTerm +
+                        ", sort " + origTerm.sort() +
+                        "; replacement term" + poTerm + ", sort " +
+                        poTerm.sort();
                 map.put(origTerm, poTerm);
             }
         }
