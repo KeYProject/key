@@ -327,7 +327,7 @@ public class ProofObligationVars {
                                      IProgramMethod pm,
                                      KeYJavaType kjt,
                                      String postfix) {
-        if (pm.isStatic() || pm.isConstructor()) {
+        if (pm.isStatic()) {
             return null;
         }
         Term selfVar = TB.var(TB.selfVar(services, pm, kjt, true, postfix));
