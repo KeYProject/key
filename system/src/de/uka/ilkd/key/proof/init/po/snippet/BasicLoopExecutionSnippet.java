@@ -42,7 +42,12 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
                                   ProofObligationVars vs,
                                   Term postTerm,
                                   TermBuilder.Serviced tb) {
-        // FIXME: THe following still seems kind of wrong
+        if (d.get(BasicSnippetData.Key.MODALITY) == null) {
+            throw new UnsupportedOperationException("Tried to produce a " +
+                                                    "program-term for a contract without modality.");
+        }
+        
+        // FIXME: The following still seems kind of wrong
         //create formal parameters
         ImmutableList<LocationVariable> formalParamVars =
                 ImmutableSLList.<LocationVariable>nil();
@@ -57,13 +62,20 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         }
         
         //create java block
+        Modality modality =
+                (Modality) d.get(BasicSnippetData.Key.MODALITY);
         final JavaBlock jb = buildJavaBlock(d, formalParamVars,
                 vs.self != null
                 ? vs.self.op(ProgramVariable.class)
                         : null);
 
         //create program term
-        final Modality symbExecMod = Modality.DIA;
+        final Modality symbExecMod;
+        if (modality == Modality.BOX) {
+            symbExecMod = Modality.DIA;
+        } else {
+            symbExecMod = Modality.BOX;
+        }
         final Term programTerm = tb.prog(symbExecMod, jb, postTerm);
         
         //create update

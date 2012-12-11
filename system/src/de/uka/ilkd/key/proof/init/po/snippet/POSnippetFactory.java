@@ -33,14 +33,7 @@ public class POSnippetFactory {
         return new BasicPOSnippetFactoryImpl(invariant, vars, services);
     }
 
-    public static BasicPOSnippetFactory getBasicFactory(
-            LoopInvariant invariant,
-            ProofObligationVars vars,
-            ExecutionContext context,
-            Services services) {
-        return new BasicPOSnippetFactoryImpl(invariant, vars, context, services);
-    }
-
+    
     public static BasicPOSnippetFactory getBasicFactory(
             InformationFlowContract contract,
             ProofObligationVars vars,

@@ -383,25 +383,13 @@ public final class WhileInvariantRule implements BuiltInRule {
         = dia ? TB.and(variantNonNeg, 
                 TB.lt(variant, TB.var(variantPV), services)) 
                 : TB.tt();
-
-        //TODO: falls inf flow, hier getCleanGoal
-
-        //split goal into three branches
-        ImmutableList<Goal> result = goal.split(3);
-        Goal initGoal = result.tail().tail().head();
-        Goal bodyGoal = result.tail().head();
-        Goal useGoal = result.head();
-        initGoal.setBranchLabel("Invariant Initially Valid");
-        bodyGoal.setBranchLabel("Body Preserves Invariant");
-        useGoal.setBranchLabel("Use Case");        
         
-
         //prepare guard
         final ProgramElementName guardVarName 
         = new ProgramElementName(TB.newName(services, "b"));
         final LocationVariable guardVar = new LocationVariable(guardVarName, 
                 booleanKJT);
-        services.getNamespaces().programVariables().addSafely(guardVar);	
+        services.getNamespaces().programVariables().addSafely(guardVar);        
         final VariableSpecification guardVarSpec 
         = new VariableSpecification(guardVar, 
                 inst.loop.getGuardExpression(), 
@@ -441,7 +429,87 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term postAssumption 
         = TB.applySequential(new Term[]{inst.u, beforeLoopUpdate}, 
                 TB.and(anonAssumption,TB.apply(anonUpdate,uAnonInv)));
-        
+
+        final ContractPO po 
+        = services.getSpecificationRepository()
+                  .getPOForProof(goal.proof());
+
+        Goal infFlowGoal = null;
+        Term loopInvApplPredTerm = null;
+        Taclet informationFlowInvariantApp = null;
+
+        if (po instanceof InfFlowContractPO ||
+                po instanceof SymbolicExecutionPO ||
+                po instanceof BlockExecutionPO) {
+            assert anonUpdateDatas.size() == 1; // information flow extension is at
+            // the moment not compatible with
+            // the non-base-heap setting
+            final AnonUpdateData anonUpdateData = anonUpdateDatas.head();
+            
+            InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
+                    new InfFlowLoopInvariantTacletBuilder(services);
+            ifInvariantBuilder.setInvariant(inst.inv);
+            ifInvariantBuilder.setContextUpdate(inst.u);
+            ifInvariantBuilder.setHeapAtPre(anonUpdateData.loopHeapAtPre);
+            ifInvariantBuilder.setHeapAtPost(anonUpdateData.loopHeap);
+            ifInvariantBuilder.setSelf(inst.selfTerm);
+            ifInvariantBuilder.setLocalIns(TB.var(localIns));
+            ifInvariantBuilder.setLocalOuts(TB.var(localOuts));
+            
+            // generate information flow invariant application predicate
+            // and associated taclet
+            loopInvApplPredTerm =
+                    ifInvariantBuilder.buildContractApplPredTerm();
+            informationFlowInvariantApp =
+                    ifInvariantBuilder.buildContractApplTaclet();
+
+            // create information flow validity goal
+
+            // generate proof obligation variables
+            final ProofObligationVars instantiationVars =
+                    new ProofObligationVars(inst.selfTerm,
+                            TB.var(localIns),
+                            anonUpdateData.loopHeapAtPre,
+                            TB.var(localOuts),
+                            anonUpdateData.loopHeap, services);
+            final IFProofObligationVars ifVars =
+                    new IFProofObligationVars(instantiationVars, services);
+
+            // create proof obligation
+            InfFlowPOSnippetFactory infFlowFactory =
+                    POSnippetFactory.getInfFlowFactory(inst.inv, ifVars.c1,
+                            ifVars.c2, services);
+            
+            Sequent seq = buildBodyPreservesSequent(ifVars, inst.inv, guardTrueTerm, services);
+            infFlowGoal = goal.getCleanGoal(seq);
+            infFlowGoal.setBranchLabel("Information Flow Validity");
+            
+            Taclet removePostTaclet =
+                    generateInfFlowPostRemoveTaclet(infFlowFactory);
+            infFlowGoal.addTaclet(removePostTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        }
+
+        //split goal into three branches
+        ImmutableList<Goal> result = goal.split(3);
+        Goal initGoal = result.tail().tail().head();
+        Goal bodyGoal = result.tail().head();
+        Goal useGoal = result.head();
+        initGoal.setBranchLabel("Invariant Initially Valid");
+        bodyGoal.setBranchLabel("Body Preserves Invariant");
+        useGoal.setBranchLabel("Use Case");
+
+        if(infFlowGoal != null) {
+            assert loopInvApplPredTerm != null && informationFlowInvariantApp != null;            
+            result = result.append(infFlowGoal);
+            
+            // add term and taclet to post goal
+            useGoal.addFormula(new SequentFormula(loopInvApplPredTerm),
+                    true,
+                    false);
+            useGoal.addTaclet(informationFlowInvariantApp,
+                    SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        }
+
         //"Invariant Initially Valid":
         // \replacewith (==> inv );
         initGoal.changeFormula(new SequentFormula(
@@ -512,74 +580,9 @@ public final class WhileInvariantRule implements BuiltInRule {
                 true, 
                 false);		
         useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
-        useGoal.addFormula(new SequentFormula(postAssumption), // TODO: Is this correct? 
+        useGoal.addFormula(new SequentFormula(postAssumption), 
                 true, 
                 false);
-        
-        final ContractPO po 
-        = services.getSpecificationRepository()
-                  .getPOForProof(goal.proof());
-
-        if (po instanceof InfFlowContractPO ||
-            po instanceof SymbolicExecutionPO ||
-            po instanceof BlockExecutionPO) {
-        assert anonUpdateDatas.size() == 1; // information flow extension is at
-                                            // the moment not compatible with
-                                            // the non-base-heap setting
-        final AnonUpdateData anonUpdateData = anonUpdateDatas.head();
-
-        InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
-                new InfFlowLoopInvariantTacletBuilder(services);
-        ifInvariantBuilder.setInvariant(inst.inv);
-        ifInvariantBuilder.setContextUpdate(inst.u);
-        ifInvariantBuilder.setHeapAtPre(anonUpdateData.loopHeapAtPre);
-        ifInvariantBuilder.setHeapAtPost(anonUpdateData.loopHeap);
-        ifInvariantBuilder.setSelf(inst.selfTerm);
-        ifInvariantBuilder.setLocalIns(TB.var(localIns));
-        ifInvariantBuilder.setLocalOuts(TB.var(localOuts));
-
-
-        // generate information flow invariant application predicate
-        // and associated taclet
-        Term loopInvApplPredTerm =
-                ifInvariantBuilder.buildContractApplPredTerm();
-        Taclet informationFlowInvariantApp =
-                ifInvariantBuilder.buildContractApplTaclet();
-        
-        // create information flow validity goal
-
-        // generate proof obligation variables
-        final ProofObligationVars instantiationVars =
-                new ProofObligationVars(inst.selfTerm,
-                                        TB.var(localIns),
-                                        anonUpdateData.loopHeapAtPre,
-                                        TB.var(localOuts),
-                                        anonUpdateData.loopHeap, services);
-        final IFProofObligationVars ifVars =
-                new IFProofObligationVars(instantiationVars, services);
-
-        // create proof obligation
-        InfFlowPOSnippetFactory infFlowFactory =
-            POSnippetFactory.getInfFlowFactory(inst.inv, ifVars.c1,
-                                               ifVars.c2, services);
-        
-        Sequent seq = buildBodyPreservesSequent(infFlowFactory, guardTrueTerm);
-        Goal infFlowGoal = goal.getCleanGoal(seq);
-        infFlowGoal.setBranchLabel("Information Flow Validity");
-
-        Taclet removePostTaclet =
-                generateInfFlowPostRemoveTaclet(infFlowFactory);
-        infFlowGoal.addTaclet(removePostTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-        
-        result = result.append(infFlowGoal);
-        
-        // add term and taclet to post goal
-        useGoal.addFormula(new SequentFormula(loopInvApplPredTerm),
-                true,
-                false);
-        useGoal.addTaclet(informationFlowInvariantApp,
-                SVInstantiations.EMPTY_SVINSTANTIATIONS, true);        
-        }
 
         Term restPsi = TB.prog((Modality)inst.progPost.op(),
                 JavaTools.removeActiveStatement(
@@ -596,8 +599,13 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    Sequent buildBodyPreservesSequent(InfFlowPOSnippetFactory f, Term guardTrueTerm) {
-        // TODO: How can we "nicely" put the guard term in the two parts of selfComposedExec?
+    Sequent buildBodyPreservesSequent(IFProofObligationVars ifVars,
+                                      LoopInvariant inv,
+                                      Term guardTrueTerm,
+                                      Services services) {
+        inv.appendTermToAllRespects(guardTrueTerm);
+        InfFlowPOSnippetFactory f =
+                POSnippetFactory.getInfFlowFactory(inv, ifVars.c1, ifVars.c2, services);
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);

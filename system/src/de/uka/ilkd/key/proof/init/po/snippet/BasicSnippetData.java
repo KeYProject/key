@@ -131,14 +131,16 @@ class BasicSnippetData {
 
     }
     
-    BasicSnippetData(LoopInvariant invariant, Services services) {
+    BasicSnippetData(LoopInvariant invariant,
+                     Services services) {
         this.hasMby = false;
         this.tb = new TermBuilder.Serviced(services);
         
         contractContents.put(Key.TARGET_METHOD, invariant.getTarget());
-//        contractContents.put(Key.FOR_CLASS, invariant.getKJT()); // not neccessary !?!
+        contractContents.put(Key.CONTEXT, invariant.getExecutionContext());
         contractContents.put(Key.LOOP_INVARIANT, invariant.getInvariant(services));
         contractContents.put(Key.MODIFIES, invariant.getModifies());
+        contractContents.put(Key.MODALITY, Modality.BOX);
         contractContents.put(Key.RESPECTS,
                              doubleListToArray(invariant.getRespects(services)));
         
@@ -208,14 +210,6 @@ class BasicSnippetData {
                 new ProofObligationVars(vars.self, localInTerms, localOutTerms,
                                         vars.result, vars.exception, heapTerm,
                                         services);
-    }
-
-
-    BasicSnippetData(LoopInvariant invariant,
-                     ExecutionContext context,
-                     Services services) {
-        this(invariant, services);
-        contractContents.put(Key.CONTEXT, context);
     }
 
 

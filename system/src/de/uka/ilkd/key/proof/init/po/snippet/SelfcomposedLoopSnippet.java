@@ -13,7 +13,6 @@ public class SelfcomposedLoopSnippet extends ReplaceAndRegisterMethod implements
                 POSnippetFactory.getBasicFactory(d, poVars1);
         BasicPOSnippetFactory f2 =
                 POSnippetFactory.getBasicFactory(d, poVars2);
-        // TODO: Here (or earlier) we should (really?) somehow add guard=true, but how?
         final Term exec1 =
                 f1.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_WITH_INV_RELATION);
         final Term exec2 =

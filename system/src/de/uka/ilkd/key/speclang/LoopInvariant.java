@@ -13,12 +13,12 @@ package de.uka.ilkd.key.speclang;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
@@ -45,6 +45,8 @@ public interface LoopInvariant extends SpecificationElement {
     public Term getInvariant(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
     
     public Term getInvariant(Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
+    
+    public Term getInvariant(Services services);
 
     /**
      * Returns the modifies clause.
@@ -109,6 +111,8 @@ public interface LoopInvariant extends SpecificationElement {
     public void setTarget(IProgramMethod newPM);
     
     public void setExecutionContext(ExecutionContext execCont);
+    
+    public void appendTermToAllRespects(Term t);
     
     /**
      * Returns a new loop invariant where the invariant formula has been

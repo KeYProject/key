@@ -40,7 +40,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     private ExecutionContext innermostExecCont;
     private final Map<LocationVariable,Term> originalInvariants;
     private final Map<LocationVariable,Term> originalModifies;
-    private final Map<LocationVariable,ImmutableList<ImmutableList<Term>>> originalRespects;
+    private Map<LocationVariable,ImmutableList<ImmutableList<Term>>> originalRespects;
     private final Term originalVariant;
     private final Term originalSelfTerm;
     private final ImmutableList<Term> localIns;
@@ -217,6 +217,11 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     @Override
+    public Term getInvariant(Services services) {
+        return originalInvariants.get(services.getTypeConverter().getHeapLDT().getHeap());
+    }
+    
+    @Override
     public Term getModifies(LocationVariable heap, Term selfTerm,
             		    Map<LocationVariable,Term> atPres,
             		    Services services) {
@@ -239,13 +244,15 @@ public final class LoopInvariantImpl implements LoopInvariant {
     
     @Override
     public ImmutableList<ImmutableList<Term>> getRespects(LocationVariable heap) {
-        return originalRespects.get(heap);
+        ImmutableList<ImmutableList<Term>> respects = ImmutableSLList.<ImmutableList<Term>>nil();
+        respects.append(originalRespects.get(heap)); // apparently respects can be null
+        return respects;
     }
     
     @Override
     public ImmutableList<ImmutableList<Term>> getRespects(Services services) {
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-        return originalRespects.get(baseHeap);
+        return getRespects(baseHeap);
     }
 
     @Override
@@ -330,6 +337,21 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public void setExecutionContext(ExecutionContext execCont) {
         this.innermostExecCont = execCont;
+    }
+
+    @Override
+    public void appendTermToAllRespects(Term t) {
+        for(LocationVariable h: originalRespects.keySet()) {
+            ImmutableList<ImmutableList<Term>> respects
+            = ImmutableSLList.<ImmutableList<Term>>nil();
+            if(originalRespects.get(h)!= null) {
+                for(ImmutableList<Term> tList: originalRespects.get(h)) {
+                    respects.append(tList.append(t));
+                }
+                originalRespects.remove(h);
+                originalRespects.put(h, respects);
+            }            
+        }
     }
     
     @Override
