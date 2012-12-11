@@ -507,7 +507,7 @@ class Session {
 	    Iterator<SMTSolver> it = currentlyRunning.iterator();
 	    while (it.hasNext()) {
 		SMTSolver next = it.next();
-		if (next.equals(next)) {
+		if (next.equals(solver)) {
 		    next.interrupt(reason);
 		    it.remove();
 		    break;
