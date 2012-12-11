@@ -439,7 +439,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         final PosInOccurrence step = 
                 ((UseDependencyContractApp)ruleApp).step(goal.sequent(), services); 
 
-        assert !step.posInTerm().equals(focus);
+        assert !step.subTerm().equals(focus);
         
         //get changed locs and used equalities
         final Term subStep = step.subTerm().sub(0);
