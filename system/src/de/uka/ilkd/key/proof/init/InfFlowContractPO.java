@@ -24,6 +24,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.InfFlowTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import java.io.IOException;
@@ -78,7 +79,13 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
         assignPOTerms(TB.imp(selfComposedExec, post));
         collectClassAxioms(contract.getKJT());
 
-        // create and add post-remove-taclets
+        // create and add split-post and remove-post taclets
+        final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
+        final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
+        for (final Taclet t : splitPostTaclets) {
+            taclets = taclets.add(NoPosTacletApp.createFixedNoPosTacletApp(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, services));
+            initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
+        }
         final RemovePostTacletBuilder tb = new RemovePostTacletBuilder();
         final ArrayList<Taclet> removePostTaclets = tb.generateTaclets(post);
         for (final Taclet t : removePostTaclets) {

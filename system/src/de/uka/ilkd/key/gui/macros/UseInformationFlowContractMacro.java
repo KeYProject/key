@@ -189,10 +189,11 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
             } else if (name.equals(DOUBLE_IMP_LEFT_RULENAME)) {
                 RuleAppCost impLeftCost =
                         InfFlowImpFeature.INSTANCE.compute(ruleApp, pio, goal);
-                return impLeftCost.add(LongRuleAppCost.create(-10));
-
+                return impLeftCost.add(LongRuleAppCost.create(-10010));
             } else if (name.equals(IMP_LEFT_RULENAME)) {
-                return InfFlowImpFeature.INSTANCE.compute(ruleApp, pio, goal);
+                RuleAppCost impLeftCost =
+                        InfFlowImpFeature.INSTANCE.compute(ruleApp, pio, goal);
+                return impLeftCost.add(LongRuleAppCost.create(-10000));
             } else if (admittedRuleNames.contains(name) &&
                        ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
                 return LongRuleAppCost.ZERO_COST;

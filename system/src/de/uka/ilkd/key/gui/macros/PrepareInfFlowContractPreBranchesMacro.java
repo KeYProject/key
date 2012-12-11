@@ -7,7 +7,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.strategy.*;
+import de.uka.ilkd.key.strategy.feature.InfFlowImpFeature;
 
 
 /**
@@ -26,6 +28,8 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
     private static final String IMP_LEFT_RULENAME = "impLeft";
 
     private static final String DOUBLE_IMP_LEFT_RULENAME = "doubleImpLeft";
+
+    private static final String AND_RIGHT_RULENAME = "andRight";
 
 
     @Override
@@ -75,8 +79,16 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
             String name = ruleApp.rule().name().toString();
             String removePostName =
                     RemovePostTacletBuilder.REMOVE_POST_RULENAME.toString();
+            String splitPostName =
+                    SplitPostTacletBuilder.SPLIT_POST_RULENAME.toString();
             if (name.startsWith(removePostName)) {
                 return LongRuleAppCost.ZERO_COST;
+            } else if (name.startsWith(splitPostName)) {
+                return LongRuleAppCost.create(1);
+            } else if (name.equals(AND_RIGHT_RULENAME)) {
+                RuleAppCost impLeftCost =
+                        InfFlowImpFeature.INSTANCE.compute(ruleApp, pio, goal);
+                return impLeftCost.add(LongRuleAppCost.create(1));
             } else {
                 return TopRuleAppCost.INSTANCE;
             }
@@ -87,6 +99,13 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
         public boolean isApprovedApp(RuleApp app,
                                      PosInOccurrence pio,
                                      Goal goal) {
+            String name = app.rule().name().toString();
+            String removePostName =
+                    RemovePostTacletBuilder.REMOVE_POST_RULENAME.toString();
+            if (!name.startsWith(removePostName)) {
+                return true;
+            }
+
             // abort if
             //  - the parent.parent rule application is an information
             //    flow contract rule application,
