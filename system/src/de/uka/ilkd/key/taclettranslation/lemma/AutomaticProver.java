@@ -35,9 +35,8 @@ public class AutomaticProver {
         public void start(Proof proof, int maxNumberOfRules, long timeout)
                         throws InterruptedException {
                 Worker worker = new Worker(proof, maxNumberOfRules);
+                lock.lock();
                 try {  // start the prover and wait until the prover has finished its job.
-                        lock.lock();
-
                         Thread thread = new Thread(worker);
                         thread.start();
                         if (timeout < 0) {
@@ -96,8 +95,8 @@ public class AutomaticProver {
                 }
 
                 public void run() {
-                        try {
-                                awaitShutdown.lock();
+                    awaitShutdown.lock();
+                    try {
                                 LinkedList<Goal> openGoals = copyGoals(proof
                                                 .openGoals());
                                 int ruleCounter = 0;
@@ -125,9 +124,12 @@ public class AutomaticProver {
                                 exception = e;
                         } finally {
                                 lock.lock();
-                                sleepCondition.signalAll();
-                                lock.unlock();
-                                awaitShutdown.unlock();
+                                try {
+                                	sleepCondition.signalAll();
+                                } finally {
+                                	lock.unlock();
+                                	awaitShutdown.unlock();
+                                }
                         }
                 }
 
