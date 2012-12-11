@@ -59,8 +59,7 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
         IProgramMethod pm = contract.getTarget();
         symbExecVars =
                 new ProofObligationVars(pm, contract.getKJT(), services, false);
-        assert (symbExecVars.self == null) == (pm.isStatic() ||
-                                               pm.isConstructor());
+        assert (symbExecVars.self == null) == (pm.isStatic());
         ifVars = new IFProofObligationVars(symbExecVars, services);
     }
 
