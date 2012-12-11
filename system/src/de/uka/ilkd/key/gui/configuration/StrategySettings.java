@@ -26,7 +26,7 @@ import de.uka.ilkd.key.util.Debug;
 
 
 
-public class StrategySettings implements Settings {
+public class StrategySettings implements Settings, Cloneable {
 
     private static final String STRATEGY_KEY = "[Strategy]ActiveStrategy";
     private static final String STEPS_KEY = "[Strategy]MaximumNumberOfAutomaticApplications";
