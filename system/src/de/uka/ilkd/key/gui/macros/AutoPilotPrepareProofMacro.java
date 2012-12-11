@@ -104,13 +104,13 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
     /*
      * Checks if a rule is marked as not suited for interaction.
      */
-    private static boolean isNonHumanInteractionTagged(Rule rule, Services services) {
+    private static boolean isNonHumanInteractionTagged(Rule rule) {
         if (rule instanceof Taclet) {
             Taclet taclet = (Taclet) rule;
-            ImmutableList<RuleSet> ruleSets = taclet.getRuleSets();
-            RuleSet interactionRuleSet = (RuleSet)services.getNamespaces().ruleSets().
-                    lookup(NON_HUMAN_INTERACTION_RULESET);
-            return ruleSets.contains(interactionRuleSet);
+            for (RuleSet rs : taclet.getRuleSets()) {
+                if (NON_HUMAN_INTERACTION_RULESET.equals(rs.name())) 
+                    return true;
+            }
         }
         return false;
     }
@@ -142,7 +142,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
 
             Rule rule = app.rule();
-            if(isNonHumanInteractionTagged(rule, goal.proof().getServices())) {
+            if(isNonHumanInteractionTagged(rule)) {
                 return TopRuleAppCost.INSTANCE;
             }
 

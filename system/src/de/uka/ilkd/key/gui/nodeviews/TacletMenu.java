@@ -62,7 +62,20 @@ class TacletMenu extends JMenu {
     private PosInSequent pos;
     private SequentView sequentView;
     private KeYMediator mediator;
+    private static final Name CLUTTER_RULESET = new Name("notHumanReadable");
+    private static final Set<Name> CLUTTER_RULES = new HashSet<Name>();
 
+    static {
+        CLUTTER_RULES.add(new Name("cut_direct"));
+        CLUTTER_RULES.add(new Name("cut_direct_r"));
+        CLUTTER_RULES.add(new Name("cut_direct_l"));
+        CLUTTER_RULES.add(new Name("case_distinction_r"));
+        CLUTTER_RULES.add(new Name("case_distinction_l"));
+        CLUTTER_RULES.add(new Name("local_cut"));
+        CLUTTER_RULES.add(new Name("commute_and_2"));
+        CLUTTER_RULES.add(new Name("commute_or_2"));
+        CLUTTER_RULES.add(new Name("boxToDiamond"));
+    }
 
     private TacletAppComparator comp = new TacletAppComparator();
         
@@ -144,13 +157,22 @@ class TacletMenu extends JMenu {
 				  MenuControl control) {	 
 	addActionListener(control);
 	
-	boolean rulesAvailable=addSection("Find", sort(find), control);
-	
-	if (pos != null && pos.isSequent()) {
-	    rulesAvailable = addSection("NoFind", noFind, control) | rulesAvailable;
-	}
+        ImmutableList<TacletApp> toAdd = sort(find);
+        boolean rulesAvailable =  find.size() > 0;
 
-	if (!rulesAvailable) {
+        if (pos != null && pos.isSequent()) {
+            rulesAvailable |= noFind.size() > 0;
+            toAdd = toAdd.prepend(noFind);
+        }
+
+//         for (TacletApp a : find) {
+//             System.out.print(a.taclet().name()+":");
+// 	    System.out.println(comp.score(a));
+//         }
+
+	if (rulesAvailable) {
+            createMenuItems(toAdd, control);
+        } else {
 	    createSection("No rules applicable.");
 	}
 
@@ -318,25 +340,6 @@ class TacletMenu extends JMenu {
     }
 
 
-
-    /** creates a non selectable label with the specified name and adds it to
-     * the component followed by the entries of this section 
-     * @param title a String the title of the section
-     * @param taclet IList<Taclet> that contains the Taclets belonging to this section
-     * @return true if section has been added (empty sections are not added)
-     */ 
-    private boolean addSection(String title, ImmutableList<TacletApp> taclet, 
-			       MenuControl control) {
-	if (taclet.size() > 0) {
-	    //uncomment if you want submenus with subtitles
-	    //	    insert(createSubMenu(taclet, title, control), 1);
-	    //	    createSection(title);
-	    add(createMenuItems(taclet, control));
-	    return true;
-	}
-	return false;
-    }
-
     /** inserts separator followed from the section's title 
      * @param title a String that contains the title of the section
      */
@@ -361,23 +364,13 @@ class TacletMenu extends JMenu {
     }
     
 
-
-    /** adds array of TacletMenuItem to itself*/
-    private void add(TacletMenuItem[] items) {
-	for (int i = 0; i < items.length; i++) {
-	    add((Component) items[i]);
-	}
-    }
-
-    /** creates new TacletMenuItems for each taclet in the list and set
-     * the given MenuControl as their ActionListener
+    /** adds a TacletMenuItem for each taclet in the list and sets
+     * the given MenuControl as the ActionListener
      * @param taclets IList<Taclet> with the Taclets the items represent
      * @param control the ActionListener
-     * @return the new MenuItems
      */
-    private TacletMenuItem[] createMenuItems(ImmutableList<TacletApp> taclets, 
-					     MenuControl  control) {
-	List<TacletMenuItem> items = new LinkedList<TacletMenuItem>();
+    private void createMenuItems(ImmutableList<TacletApp> taclets,
+				 MenuControl  control) {
 	
         final InsertHiddenTacletMenuItem insHiddenItem = 
             new InsertHiddenTacletMenuItem(MainWindow.getInstance(), 
@@ -389,36 +382,52 @@ class TacletMenu extends JMenu {
        
         
         for (final TacletApp app : taclets) {
-            
             final Taclet taclet = app.taclet();
-            if(!mediator.getFilterForInteractiveProving().filter(taclet)){
-            	continue;
-            }
-            
+
             if (insHiddenItem.isResponsible(taclet)) {
                 insHiddenItem.add(app);
-            } else if (insSystemInvItem.isResponsible(taclet)) { 
+            } else if (insSystemInvItem.isResponsible(taclet)) {
                 insSystemInvItem.add(app);
-            } else {
-                final TacletMenuItem item = 
-                    new DefaultTacletMenuItem(this, app, 
-                        mediator.getNotationInfo()); 
-                item.addActionListener(control);
-                items.add(item);                
             }        
 	}
         
         if (insHiddenItem.getAppSize() > 0) {
-            items.add(0, insHiddenItem);
+            add(insHiddenItem);
             insHiddenItem.addActionListener(control);
         }
         
         if (insSystemInvItem.getAppSize() > 0) {
-            items.add(0, insSystemInvItem);
+            add(insSystemInvItem);
             insSystemInvItem.addActionListener(control);
         }
         
-	return items.toArray(new TacletMenuItem[items.size()]);
+        JMenu more = new JMenu("More rules");
+
+        for (final TacletApp app : taclets) {
+            final Taclet taclet = app.taclet();
+            if(!mediator.getFilterForInteractiveProving().filter(taclet)){
+                continue;
+            }
+
+            if (! insHiddenItem.isResponsible(taclet) &&
+                !insSystemInvItem.isResponsible(taclet)) {
+                final DefaultTacletMenuItem item =
+                    new DefaultTacletMenuItem(this, app,
+                        mediator.getNotationInfo());
+                item.addActionListener(control);
+                boolean rareRule = false;
+                for (RuleSet rs : taclet.getRuleSets()) {
+                    if (CLUTTER_RULESET.equals(rs.name())) rareRule = true;
+                }
+                if (CLUTTER_RULES.contains(taclet.name())) rareRule = true;
+
+                if (rareRule)
+                    more.add(item);
+                else add(item);
+            }
+	}
+
+        if (more.getItemCount() > 0) add(more);
     }
         
     /** makes submenus invisible */
@@ -732,10 +741,8 @@ class TacletMenu extends JMenu {
 		    
             map.put("goals", -taclet1.goalTemplates().size());
 	
-            map.put("goal_compl", -measureGoalComplexity(taclet1.goalTemplates()));
+            map.put("goal_compl", measureGoalComplexity(taclet1.goalTemplates()));
 
-//          System.out.print(taclet1.name()+":");
-//	    System.out.println(map);
             return map;
 	}
 
