@@ -53,7 +53,7 @@ public class InfFlowImpFeature implements Feature {
 
         for (Term appl : contractAppls) {
             if (isSubFormula(focusFor, appl)) {
-                return LongRuleAppCost.create(-10000);
+                return LongRuleAppCost.ZERO_COST;
             }
         }
 
