@@ -338,7 +338,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
                 && (! (visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {                
             pushNew(toTerm(svInst.getInstantiation((SchemaVariable) visitedOp)));
         } else if((visitedOp instanceof Metavariable)
-                 && metavariableInst.getInstantiation((Metavariable) visitedOp) != visitedOp) {
+                 && metavariableInst.getInstantiation((Metavariable) visitedOp).op() != visitedOp) {
             pushNew(metavariableInst.getInstantiation((Metavariable) visitedOp));
         } else {
             Operator newOp = instantiateOperator(visitedOp);
