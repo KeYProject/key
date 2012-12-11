@@ -6,7 +6,14 @@ final class PrefixSumRec {
     //@ invariant isPow2(a.length);
     //@ accessible \inv: \singleton(a);
     
-    //@ axiom (\forall int x, y; even(x); even(x+y) == even(y));
+    //@ axiom lemma();
+    
+    /*@ normal_behavior
+      @ ensures (\forall int x, y; even(x); even(x+y) == even(y));
+      @ accessible \nothing;
+      @ strictly_pure helper
+      @*/
+    private void lemma() {}
 
     PrefixSumRec(int [] a) {
 	this.a = a;
