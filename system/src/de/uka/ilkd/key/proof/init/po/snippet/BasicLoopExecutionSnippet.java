@@ -5,12 +5,22 @@ import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.Modifier;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.Branch;
+import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -46,8 +56,6 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
             throw new UnsupportedOperationException("Tried to produce a " +
                                                     "program-term for a contract without modality.");
         }
-        
-        // FIXME: The following still seems kind of wrong
         //create formal parameters
         ImmutableList<LocationVariable> formalParamVars =
                 ImmutableSLList.<LocationVariable>nil();
@@ -101,6 +109,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
             throw new UnsupportedOperationException("Tried to produce a "
                     + "java-block for an observer which is no program method.");
         }
+        //JavaInfo javaInfo = d.tb.getServices().getJavaInfo();
         IProgramMethod pm = (IProgramMethod) targetMethod;
 
         //create method call

@@ -82,7 +82,8 @@ class BasicSnippetData {
         TARGET_BLOCK(StatementBlock.class),
         PRECONDITION(Term.class),
         POSTCONDITION(Term.class),
-        LOOP_INVARIANT(Term.class),
+        LOOP_INVARIANT(LoopInvariant.class),
+        LOOP_INVARIANT_TERM(Term.class),
         MODIFIES(Term.class),
         DEPENDENS(Term.class),
         MEASURED_BY(Term.class),
@@ -138,7 +139,8 @@ class BasicSnippetData {
         
         contractContents.put(Key.TARGET_METHOD, invariant.getTarget());
         contractContents.put(Key.CONTEXT, invariant.getExecutionContext());
-        contractContents.put(Key.LOOP_INVARIANT, invariant.getInvariant(services));
+        contractContents.put(Key.LOOP_INVARIANT, invariant);
+        contractContents.put(Key.LOOP_INVARIANT_TERM, invariant.getInvariant(services));
         contractContents.put(Key.MODIFIES, invariant.getModifies());
         contractContents.put(Key.MODALITY, Modality.BOX);
         contractContents.put(Key.RESPECTS,

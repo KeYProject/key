@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
@@ -45,8 +46,10 @@ import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
+import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
@@ -484,9 +487,19 @@ public final class WhileInvariantRule implements BuiltInRule {
             infFlowGoal = goal.getCleanGoal(seq);
             infFlowGoal.setBranchLabel("Information Flow Validity");
             
-            Taclet removePostTaclet =
-                    generateInfFlowPostRemoveTaclet(infFlowFactory);
-            infFlowGoal.addTaclet(removePostTaclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            // create and add split-post and remove-post taclets
+            /*final Term post =
+                    infFlowFactory.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+            final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
+            final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
+            for (final Taclet t : splitPostTaclets) {
+                infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            }
+            final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
+            final ArrayList<Taclet> removePostTaclets = removePostTB.generateTaclets(post);
+            for (final Taclet t : removePostTaclets) {
+                infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            }*/
         }
 
         //split goal into three branches
@@ -613,23 +626,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term finalTerm = TB.imp(selfComposedExec, post);
         return Sequent.createSuccSequent(
                 new Semisequent(new SequentFormula(finalTerm)));
-    }
-
-
-    private Taclet generateInfFlowPostRemoveTaclet(InfFlowPOSnippetFactory infFlowFactory)
-            throws UnsupportedOperationException {
-        // create post-remove-taclet
-        RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
-        tacletBuilder.setName(InfFlowContractPO.REMOVE_POST_RULENAME);
-        tacletBuilder.setFind(
-                infFlowFactory.create(
-                        InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION));
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.SUCCEDENT_POLARITY);
-        tacletBuilder.setSurviveSmbExec(false);
-        RewriteTacletGoalTemplate goal = new RewriteTacletGoalTemplate(TB.ff());
-        tacletBuilder.addTacletGoalTemplate(goal);
-        Taclet removePostTaclet = tacletBuilder.getTaclet();
-        return removePostTaclet;
     }
 
 

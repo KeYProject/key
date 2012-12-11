@@ -107,22 +107,19 @@ public class InfFlowContractPO extends AbstractOperationPO implements ContractPO
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
         
-        // create post-remove-taclet
-        RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
-        tacletBuilder.setName(REMOVE_POST_RULENAME);
-        tacletBuilder.setFind(post);
-        tacletBuilder.setApplicationRestriction(RewriteTaclet.SUCCEDENT_POLARITY);
-        tacletBuilder.setSurviveSmbExec(false);
-        RewriteTacletGoalTemplate goal = new RewriteTacletGoalTemplate(TB.ff());
-        tacletBuilder.addTacletGoalTemplate(goal);
-        Taclet removePostTaclet = tacletBuilder.getTaclet();
-
-        // register final term, taclet and collect class axioms
-        taclets.add(NoPosTacletApp.
-                createFixedNoPosTacletApp(removePostTaclet,
-                                          SVInstantiations.EMPTY_SVINSTANTIATIONS, services));
-        initConfig.getProofEnv().registerRule(removePostTaclet,
-                                              AxiomJustification.INSTANCE);
+        // create and add split-post and remove-post taclets
+        final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
+        final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
+        for (final Taclet t : splitPostTaclets) {
+            taclets = taclets.add(NoPosTacletApp.createFixedNoPosTacletApp(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, services));
+            initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
+        }
+        final RemovePostTacletBuilder tb = new RemovePostTacletBuilder();
+        final ArrayList<Taclet> removePostTaclets = tb.generateTaclets(post);
+        for (final Taclet t : removePostTaclets) {
+            taclets = taclets.add(NoPosTacletApp.createFixedNoPosTacletApp(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, services));
+            initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
+        }
         
         Term poTerms = TB.imp(selfComposedExec, post);
         return poTerms;

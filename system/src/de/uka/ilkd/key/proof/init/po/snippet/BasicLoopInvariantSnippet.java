@@ -13,9 +13,9 @@ public class BasicLoopInvariantSnippet extends ReplaceAndRegisterMethod
             throw new UnsupportedOperationException("Tried to produce a "
                     + "loop invariant for a loop without invariant.");
         }
-        assert Term.class.equals(BasicSnippetData.Key.LOOP_INVARIANT.getType());
+        assert Term.class.equals(BasicSnippetData.Key.LOOP_INVARIANT_TERM.getType());
         Term origLoopInv = (Term) d.get(
-                BasicSnippetData.Key.LOOP_INVARIANT);
+                BasicSnippetData.Key.LOOP_INVARIANT_TERM);
         return replace(origLoopInv, d.origVars, poVars);
     }
 
