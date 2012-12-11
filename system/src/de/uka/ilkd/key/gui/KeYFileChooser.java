@@ -49,7 +49,7 @@ public class KeYFileChooser {
 		}
 		
 		public String getDescription() {
-		    return "KeY files and Directories";
+		    return "KeY files and Source Directories";
 		}
 	    });
     }

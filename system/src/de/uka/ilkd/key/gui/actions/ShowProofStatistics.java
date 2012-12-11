@@ -20,6 +20,9 @@ public class ShowProofStatistics extends MainWindowAction {
     public ShowProofStatistics(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Show Proof Statistics...");
+	
+	getMediator().enableWhenProof(this);
+
     }
 
     @Override

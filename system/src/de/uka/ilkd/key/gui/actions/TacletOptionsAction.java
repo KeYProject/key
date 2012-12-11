@@ -19,6 +19,9 @@ public class TacletOptionsAction extends MainWindowAction {
 	super(mainWindow);
 	setName("Taclet Options...");
 	setAcceleratorLetter(KeyEvent.VK_T);
+	
+	getMediator().enableWhenProof(this);
+
     }
 
     @Override
