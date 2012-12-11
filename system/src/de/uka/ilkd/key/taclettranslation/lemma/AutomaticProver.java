@@ -52,7 +52,8 @@ public class AutomaticProver {
                 } finally {
                         lock.unlock();
                         awaitShutdown.lock();
-                        if (worker.getException() != null) {
+                        try {
+                        	if (worker.getException() != null) {                       
                                 if (worker.getException() 
                                                 instanceof InterruptedException) {
                                         throw (InterruptedException) worker
@@ -61,6 +62,9 @@ public class AutomaticProver {
                                 throw new RuntimeException(
                                                 worker.getException());
                         }
+                       } finally {
+                    	   awaitShutdown.unlock();
+                       }
                 }
         }
 
