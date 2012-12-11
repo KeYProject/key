@@ -1398,7 +1398,7 @@ final class JMLTranslator {
                         Term t = expr.getTerm();
                         LocSetLDT locSetLDT =
                                 services.getTypeConverter().getLocSetLDT();
-                        if (!t.equals(locSetLDT.getSingleton())) {
+                        if (!t.op().equals(locSetLDT.getSingleton())) {
                             HeapLDT heapLDT =
                                     services.getTypeConverter().getHeapLDT();
                             if (heapLDT.getSortOfSelect(t.op()) != null) {
