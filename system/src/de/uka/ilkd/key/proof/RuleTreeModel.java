@@ -25,6 +25,7 @@ import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 
 public class RuleTreeModel extends DefaultTreeModel {
@@ -92,9 +93,10 @@ public class RuleTreeModel extends DefaultTreeModel {
         for (final BuiltInRule br : getBuiltInIndex().rules()) {
             insertAsLast(new DefaultMutableTreeNode(br), builtInRoot);
         }
-        final List<NoPosTacletApp> apps = 
-            sort(getTacletIndex().allNoPosTacletApps());
-        for (final NoPosTacletApp app : apps) {
+        ImmutableSet<NoPosTacletApp> set = getTacletIndex().allNoPosTacletApps();
+        set = set.union(OneStepSimplifier.INSTANCE.getCapturedTaclets());
+
+        for (final NoPosTacletApp app : sort(set)) {
             RuleJustification just = mgt().getJustification(app);
             if (just==null) continue; // do not break system because of this
             if (just.isAxiomJustification()) {

@@ -63,8 +63,6 @@ public final class OneStepSimplifier implements BuiltInRule,
     private Map<Term,Term> notSimplifiableCaches[];
     private boolean active;
     
-    
-
     //-------------------------------------------------------------------------
     //constructors
     //------------------------------------------------------------------------- 
@@ -532,8 +530,21 @@ public final class OneStepSimplifier implements BuiltInRule,
 	refresh(e.getSource().getSelectedProof());
     }
     
-    
-    
+    /**
+     * Gets an immutable set containing all the taclets captured by the OSS.
+     * 
+     * @return the captured taclets (as NoPosTacletApps)
+     */
+    public ImmutableSet<NoPosTacletApp> getCapturedTaclets() {
+        ImmutableSet<NoPosTacletApp> result = DefaultImmutableSet.nil();
+        if(indices != null) {
+            for (int i = 0; i < indices.length; i++) {
+                result = result.union(indices[i].allNoPosTacletApps());
+            }
+        }
+        return result;
+    }
+
 
     //-------------------------------------------------------------------------
     //inner classes
