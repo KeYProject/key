@@ -670,81 +670,76 @@ class TacletMenu extends JMenu {
 	}
 	
 	public int compare(TacletApp o1, TacletApp o2) {
+            LinkedHashMap<String,Integer> map1 = score(o1);
+            LinkedHashMap<String,Integer> map2 = score(o2);
+            Iterator<Map.Entry<String,Integer> > it1 = map1.entrySet().iterator();
+            Iterator<Map.Entry<String,Integer> > it2 = map2.entrySet().iterator();
+            while (it1.hasNext() & it2.hasNext()) {
+                String s1 = it1.next().getKey();
+                String s2 = it2.next().getKey();
+                if (!s1.equals(s2)) throw new IllegalStateException(
+                    "A decision should have been made on a higher level ( "+
+                    s1+"<->"+s2+")");
+                int v1 = map1.get(s1);
+                int v2 = map2.get(s2);
+                // the order will be reversed when the list is sorted
+                if (v1<v2) return 1;
+                if (v1>v2) return -1;
+            }
+            return 0;
+	}
+
+
+        /* A score is a list of named values (comparable lexicographically).
+           Smaller value means the taclet should be higher on the list
+           offered to the user. Two scores need not contain the same
+           named criteria, but the scoring scheme must force a decision
+           before the first divergence point.
+        */
+	public LinkedHashMap<String,Integer> score(TacletApp o1) {
+            LinkedHashMap<String,Integer> map = new LinkedHashMap<String,Integer>();
+
 	    final Taclet taclet1 = o1.taclet();
-	    final Taclet taclet2 = o2.taclet();
-		
+
+            map.put("closing", taclet1.goalTemplates().size()==0 ? -1:1);
+
             int formulaSV1 = 0;
-            int formulaSV2 = 0;
 
             int cmpVar1 = taclet1.getRuleSets().size();
-            int cmpVar2 = taclet2.getRuleSets().size();
 
-	    if (taclet1 instanceof FindTaclet && taclet2 instanceof FindTaclet) {
+	    if (taclet1 instanceof FindTaclet) {
+                map.put("has_find", -1);
 	        final Term find1 = ((FindTaclet) taclet1).find();
 	        int findComplexity1 = find1.depth();
-	        final Term find2 = ((FindTaclet) taclet2).find();
-	        int findComplexity2 = find2.depth();
 	        findComplexity1 += programComplexity(find1.javaBlock());
-	        findComplexity2 += programComplexity(find2.javaBlock());
 
-	        if ( findComplexity1 < findComplexity2 ) {
-	            return -1;
-	        } else if (findComplexity1 > findComplexity2) {
-	            return 1;
-	        }		    		    		    
+                map.put("find_complexity", -findComplexity1);
 	        // depth are equal. Number of schemavariables decides
 	        TacletSchemaVariableCollector coll1 = new TacletSchemaVariableCollector();
 	        find1.execPostOrder(coll1);
 	        formulaSV1 = countFormulaSV(coll1);
-
-	        TacletSchemaVariableCollector coll2  = new TacletSchemaVariableCollector();
-	        find2.execPostOrder(coll2);
-	        formulaSV2 = countFormulaSV(coll2);
 	        cmpVar1 += -coll1.size();
-	        cmpVar2 += -coll2.size();
+                map.put("num_sv", cmpVar1);
 
-	    } else if (taclet1 instanceof FindTaclet != taclet2 instanceof FindTaclet) {
-	        if (taclet1 instanceof FindTaclet) {
-	            return -1;
-	        } else {
-	            return 1;
-	        }
+	    } else {
+                map.put("has_find", 1);
 	    }
 
-	    if (cmpVar1 == cmpVar2) {
-		cmpVar1 = cmpVar1-formulaSV1;
-		cmpVar2 = cmpVar2-formulaSV2;
-	    }
+            cmpVar1 = cmpVar1-formulaSV1;
+            map.put("sans_formula_sv", cmpVar1);
 		    
-	    if ( cmpVar1 < cmpVar2 ) {
-		return -1;
-	    } else if (cmpVar1 > cmpVar2) {
-		return 1;
-	    }
-	
-	    if (taclet1.ifSequent().isEmpty() && 
-		!taclet2.ifSequent().isEmpty()) {
-		return 1;
-	    } else if (!taclet1.ifSequent().isEmpty() && 
-		       taclet2.ifSequent().isEmpty()) {
-		return -1;
-	    }
+            map.put("if_seq", taclet1.ifSequent().isEmpty() ? 1 : -1);
 		    
-	    int goals1 = -taclet1.goalTemplates().size();
-	    int goals2 = -taclet2.goalTemplates().size();
+            map.put("goals", -taclet1.goalTemplates().size());
 	
-	    if (goals1 == goals2) {
-		goals1 = -measureGoalComplexity(taclet1.goalTemplates());
-		goals2 = -measureGoalComplexity(taclet2.goalTemplates());		
-	    } 
-	
-	    if (goals1 < goals2) {
-		return -1;
-	    } else if (goals1 > goals2) {
-		return 1;
-	    }
-	
-	    return 0;
+            map.put("goal_compl", -measureGoalComplexity(taclet1.goalTemplates()));
+
+//          System.out.print(taclet1.name()+":");
+//	    System.out.println(map);
+            return map;
 	}
+
+
+
     }
 }
