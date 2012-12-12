@@ -1349,7 +1349,15 @@ public class TermBuilder {
     public Term arr(Services services, Term idx) {
     return func(services.getTypeConverter().getHeapLDT().getArr(), idx);
     }
+    
+    public Term label(Term term, ImmutableArray<ITermLabel> labels) {
+        return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(), 
+                term.javaBlock(), labels);
+    }
 
+    public Term label(Term term, ITermLabel label) {
+        return label(term, new ImmutableArray<ITermLabel>(label));
+    }
 
     public Term dotArr(Services services, Term ref, Term idx) {
         if(ref == null || idx == null) {
