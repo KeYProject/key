@@ -12,7 +12,7 @@ public class BranchFolder {
    
    private boolean isProved = false;
    
-   
+   // TODO: Why is the parent a branch folder? If I guess I expect that the parent is a Node. 
    public BranchFolder(BranchFolder parent, Node child, String label){
       this.parent = parent;
       this.child = child;
@@ -22,12 +22,14 @@ public class BranchFolder {
    public Node getChild() {
       return child;
    }
+   // TODO: I think this will never change? So remove setter.
    public void setChild(Node child) {
       this.child = child;
    }
    public BranchFolder getParent() {
       return parent;
    }
+   // TODO: I think this will never change? So remove setter.
    public void setParent(BranchFolder parent) {
       this.parent = parent;
    }
@@ -36,6 +38,7 @@ public class BranchFolder {
       return label;
    }
 
+   // TODO: I think this will never change? So remove setter.
    public void setLabel(String label) {
       this.label = label;
    }

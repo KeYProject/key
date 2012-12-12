@@ -3,8 +3,6 @@ package org.key_project.keyide.ui.providers;
 
 import java.util.Vector;
 
-import javax.lang.model.element.Element;
-
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -12,11 +10,11 @@ import org.eclipse.swt.widgets.Display;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
-//import de.uka.ilkd.key.gui.prooftree.GUIProofTreeModel;
 
+// TODO: This class is really nice and reusable, rename it into something like ProofTreeLazyTreeContentProvider
+// TODO: Refactor source code: first constants (not availbale in this class), than attributes, than constructors, than methods
 public class OutlineContentProvider implements ILazyTreeContentProvider{
 
 //   private GUIProofTreeModel model;
@@ -225,7 +223,9 @@ public class OutlineContentProvider implements ILazyTreeContentProvider{
    }
    
    //A vector that saves all branchFolders
-   private Vector<BranchFolder> BranchFolders = new Vector<BranchFolder>();
+   // TODO: Use java naming conventions, rename it into "branchFolders"
+   // TODO: If you just needs the BranchFolder for a Node, use a Map: private Map<Node, BranchFolder> branchFolders = new HashMap<Node, BranchFolder>();
+   private Vector<BranchFolder> BranchFolders = new Vector<BranchFolder>(); // Vector is a bad class because it is based on an array. To store all references of instances a Set is more efficient: private Set<BranchFolder> branchFolders = new HashSet<BranchFolder>();
    
    //manages the whole treeexpandency by calling the specified method for the given node
    private void expanded(Node node){
@@ -326,7 +326,8 @@ public class OutlineContentProvider implements ILazyTreeContentProvider{
          }
          if(setProved){
             Node parentBranchNode = getBranchNode(parentNode);
-            for(int i = 0; i < BranchFolders.size(); i++){
+            
+            for(int i = 0; i < BranchFolders.size(); i++){ // Never iterate over a Collection like this, because not every implementation has a direct access to children via an index. Use always the iterator concept: for (BranchFolders folder : BranchFolders) {...} 
                if(BranchFolders.get(i).getChild().equals(parentBranchNode)){
                   BranchFolders.get(i).setProved(true);
                   if(BranchFolders.get(i).getParent() == null)

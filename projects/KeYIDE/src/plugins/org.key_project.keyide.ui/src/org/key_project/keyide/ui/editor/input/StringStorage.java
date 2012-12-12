@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IPath;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
+//TODO: Rename class, maybe into ProofStorage
 public class StringStorage implements IStorage {
    
    private String proofString;

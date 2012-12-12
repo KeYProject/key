@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.Proof;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
+// TODO: Name is to general, rename into ProofTreeContentOutlinePage
 public class Outline extends ContentOutlinePage {
    private Proof proof;
    

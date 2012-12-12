@@ -7,6 +7,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.key_project.keyide.ui.visualization.VisualizationPreferences;
 
+// TODO: Rename class, maybe into KeYIDEPreferencePage
 public class VisualizationPreferencePage extends FieldEditorPreferencePage implements
       IWorkbenchPreferencePage {
 

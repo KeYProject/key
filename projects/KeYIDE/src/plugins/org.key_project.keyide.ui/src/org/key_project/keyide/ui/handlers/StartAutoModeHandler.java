@@ -8,6 +8,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.services.IEvaluationService;
+import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
 import org.key_project.keyide.ui.editor.IProofEnvironmentProvider;
 import org.key_project.keyide.ui.job.AbstractKeYEnvironmentJob;
 import org.key_project.keyide.ui.util.KeYToUIUtil;
@@ -21,7 +22,7 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
    protected Object doExecute(ExecutionEvent event) throws Exception {
       //initialize values for execution
       IEditorPart editorPart = HandlerUtil.getActiveEditor(event);
-      final IEvaluationService evaluationService = (IEvaluationService) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEvaluationService.class);
+      final IEvaluationService evaluationService = (IEvaluationService)PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEvaluationService.class);
       final IProofEnvironmentProvider proofProvider = (IProofEnvironmentProvider)editorPart.getAdapter(IProofEnvironmentProvider.class);
       if (proofProvider != null && 
           proofProvider.getKeYEnvironment().getUi().isAutoModeSupported(proofProvider.getProof()) && 
@@ -44,7 +45,7 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
                monitor.done();
                return Status.OK_STATUS;
             }
-            }.schedule();
+         }.schedule();
       }
       return null;
    }

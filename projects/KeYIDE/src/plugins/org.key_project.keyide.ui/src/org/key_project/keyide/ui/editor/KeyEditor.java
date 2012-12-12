@@ -61,7 +61,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
          }
          return outline;
       }
-//      if(IPropertySheetPage.class.equals(adapter)){
+//      if(IPropertySheetPage.class.equals(adapter)){ // TODO: Remove uncommented code if no longer required, because otherwise it is hard to say in the future why this code was uncommented.
 //         synchronized (this) {
 //            if (property == null) {
 //               property = new StrategyProperties();
@@ -73,7 +73,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       else if (IProofEnvironmentProvider.class.equals(adapter)) {
          return this;
       }
-//      if (IProofAutomation.class.equals(adapter)) {
+//      if (IProofAutomation.class.equals(adapter)) { // TODO: Remove uncommented code if no longer required, because otherwise it is hard to say in the future why this code was uncommented.
 //         return this;
 //      }
 //      else if (Contento)

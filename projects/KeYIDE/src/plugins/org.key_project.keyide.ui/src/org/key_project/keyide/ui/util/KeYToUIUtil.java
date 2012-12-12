@@ -17,6 +17,7 @@ import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.IEvaluationService;
+import org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
@@ -45,7 +46,7 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
-
+// TODO: Why is this second utility class required? I think all these method can be moved into KeYIDEUtil and this class can be deleted?
 public class KeYToUIUtil {
    
    private KeYToUIUtil(){
@@ -56,6 +57,7 @@ public class KeYToUIUtil {
     * Opens a dialog to select a contract for the specified method, furthermore creates the proof for that method
     * @param method The method to create the proof for.
     */
+   // TODO: This method does more as creating a proof. Rename it into openProofEditor() Maybe create internal methods to make this method easier understandable 
    public static void createProof(final IMethod method) {
          try {
            if (method != null && method.exists()) {
@@ -154,10 +156,11 @@ public class KeYToUIUtil {
       IStorage storage = new StringStorage(inputSequent, inputText);
       IStorageEditorInput input = new StringInput(storage, proof, environment);
       try {
-         PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, "org.key_project.keyide.ui.editor");
+         // TODO: Use WorkbenchUtil.getActivePage() instead of PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+         PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, "org.key_project.keyide.ui.editor"); // TODO: Replace "org.key_project.keyide.ui.editor" with KeYEditor.EDITOR_ID  
       }
       catch (PartInitException e) {
-         e.printStackTrace();
+         e.printStackTrace(); // TODO: Never to this, use LogUtil.getLogger().logError(e); or bedder throw the exception to the caller that can handle it on a bedder way, maybe by logging and showing it to the user
       }
    }
    
@@ -168,7 +171,7 @@ public class KeYToUIUtil {
     */
    public static void switchPerspective() {
       if(KeYIDEUtil.shouldSwitchToKeyPerspective(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage())){
-         WorkbenchUtil.openPerspective("org.key_project.keyide.ui.perspectives");
+         WorkbenchUtil.openPerspective("org.key_project.keyide.ui.perspectives"); // TODO: Replace "org.key_project.keyide.ui.perspectives" with KeYPerspective.PERSPECTIVE_ID
       }
       
    }
@@ -180,17 +183,18 @@ public class KeYToUIUtil {
    {
       Shell parent = WorkbenchUtil.getActiveShell();
       ImmutableCollectionContentProvider contentProvider = ImmutableCollectionContentProvider.getInstance();
-      FunctionalOperationContract[] initialSelection = new FunctionalOperationContract[1];
-      org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog dialog = new org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog(parent, contentProvider, environment.getServices());
-      dialog.setTitle("Contract Selection");
+      ContractSelectionDialog dialog = new ContractSelectionDialog(parent, contentProvider, environment.getServices());
+      dialog.setTitle("Select Contract for Proof in KeY");
       dialog.setMessage("Select contract to prove.");
       dialog.setInput(operationContracts);
-      dialog.setTitle("Select Contract for Proof in KeY");
-      if(!operationContracts.isEmpty()){
-         initialSelection[0]=operationContracts.toArray(initialSelection)[0];
-         dialog.setInitialSelections(initialSelection);
+      
+      if(!operationContracts.isEmpty()){ // TODO: Replace operationContracts.isEmpty() with CollectionUtil.isEmpty(operationContracts) because it is null pointer save
+         // TODO: Replace content in if block with, because it is more efficient: dialog.setInitialSelections(new FunctionalOperationContract[] {CollectionUtil.getFirst(operationContracts)});
+//         FunctionalOperationContract[] initialSelection = new FunctionalOperationContract[1];
+//         initialSelection[0]=operationContracts.toArray(initialSelection)[0];
+//         dialog.setInitialSelections(initialSelection);
       }
-      if (dialog.open() == org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog.OK) {
+      if (dialog.open() == ContractSelectionDialog.OK) {
           Object result = dialog.getFirstResult();
           if (result instanceof FunctionalOperationContract) {
               FunctionalOperationContract foc = (FunctionalOperationContract)result;

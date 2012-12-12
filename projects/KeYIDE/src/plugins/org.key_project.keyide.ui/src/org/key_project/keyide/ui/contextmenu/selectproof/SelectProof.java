@@ -28,7 +28,7 @@ import org.key_project.util.eclipse.swt.SWTUtil;
 
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
-
+// TODO: What is this class? Why is it required? If not required, delete it!
 public class SelectProof implements IViewActionDelegate{
 
    

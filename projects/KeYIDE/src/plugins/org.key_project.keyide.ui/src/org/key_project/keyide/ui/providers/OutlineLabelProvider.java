@@ -44,7 +44,7 @@ public class OutlineLabelProvider extends LabelProvider {
  */
 @Override
 public Image getImage(Object element) {
-   
+   //TODO: Images in SWT are C-Code. For this reason they should exist only once at runtime and they have to be disposed. They are also reusable. Implement a uitlity class like SEDImages (renamed into KeYIDEImages) which manages all images you need. Use its methods here.
    final Image FOLDER_IMAGE = getImageFromFile("icons/folder.png");
 
    final Image FOLDERPROVEN_IMAGE = getImageFromFile("icons/folderproved.png");

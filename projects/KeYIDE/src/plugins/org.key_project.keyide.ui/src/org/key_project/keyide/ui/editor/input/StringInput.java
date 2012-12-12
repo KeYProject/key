@@ -14,6 +14,7 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
+//TODO: Rename class, maybe into ProofEditorInput
 public class StringInput implements IStorageEditorInput{
    
    /**

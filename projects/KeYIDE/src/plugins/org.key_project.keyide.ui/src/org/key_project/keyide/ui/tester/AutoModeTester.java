@@ -27,12 +27,13 @@ public class AutoModeTester extends PropertyTester {
       if(receiver instanceof KeYEditor){
          //initialize values
          KeYEditor editor = (KeYEditor) receiver;
+         // Cast is not required, refactor IProofEnvironmentProvider.getKeYEnvironment() from public KeYEnvironment<?> getKeYEnvironment() into public KeYEnvironment<ConsoleUserInterface> getKeYEnvironment()
          ConsoleUserInterface userInterface = (ConsoleUserInterface)editor.getKeYEnvironment().getUi();
          //Set button states
-         if("start".equals(property)){
+         if("start".equals(property)) { // TODO: Replace "start" with PROPERTY_START, if you define a property, use it!
             return  !userInterface.isAutoMode();
          }
-         if("stop".equals(property)){
+         if("stop".equals(property)) { // TODO: Replace "stop" with PROPERTY_STOP, if you define a property, use it!
             return userInterface.isAutoMode();
          }
       }

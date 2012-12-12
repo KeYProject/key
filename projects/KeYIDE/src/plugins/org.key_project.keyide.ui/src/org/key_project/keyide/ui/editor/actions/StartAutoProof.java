@@ -5,6 +5,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
+// TODO: Is this class required? If not delete it or implement it ohterwise
 public class StartAutoProof implements IEditorActionDelegate {
    
    /**

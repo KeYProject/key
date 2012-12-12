@@ -6,6 +6,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.services.IEvaluationService;
+import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
 import org.key_project.keyide.ui.editor.IProofEnvironmentProvider;
 import org.key_project.keyide.ui.tester.AutoModeTester;
 
@@ -28,7 +29,7 @@ public class StopAutoModeHandler extends AbstractSaveExecutionHandler {
          //refresh GUI properly
          proofProvider.getKeYEnvironment().getUi().notifyAutomodeStopped();
          if (evaluationService != null) {
-            evaluationService.requestEvaluation(AutoModeTester.PROPERTY_NAMESPACE + "." + AutoModeTester.PROPERTY_START);
+            evaluationService.requestEvaluation(AutoModeTester.PROPERTY_NAMESPACE + "." + AutoModeTester.PROPERTY_START); // TODO: Replace with KeYToUIUtil.refreshUI(evaluationService);
             evaluationService.requestEvaluation(AutoModeTester.PROPERTY_NAMESPACE + "." + AutoModeTester.PROPERTY_STOP);
          }
          proofProvider.getKeYEnvironment().getUi().stopAutoMode();

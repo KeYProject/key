@@ -12,6 +12,7 @@ import org.key_project.keyide.ui.Activator;
  * </p>
  * @author Marco Drebing, Niklas Bunzel, Christoph Schneider, Stefan Käsdorf
  */
+// TODO: Rename into KeYIDEPreferences
 public class VisualizationPreferences {
    /**
     * Preference key for the maximal number of set nodes per branch on run.

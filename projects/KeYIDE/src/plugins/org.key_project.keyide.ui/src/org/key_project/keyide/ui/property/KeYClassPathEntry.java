@@ -13,6 +13,7 @@ import org.key_project.util.java.StringUtil;
  * Represents a class path entry for KeY.
  * @author Martin Hentschel
  */
+// TODO: Delete class and reuse original one from starter.core plug-in
 public class KeYClassPathEntry {
     /**
      * The possible kinds.

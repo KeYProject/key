@@ -26,6 +26,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * Provides static methods to read and set KeY specific project settings.
  * @author Martin Hentschel
  */
+//TODO: Delete class and reuse original one from starter.core plug-in
 public final class KeYResourceProperties {
     /**
      * Property for the use custom boot class path.

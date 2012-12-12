@@ -37,6 +37,8 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * </p>
  * @author Martin Hentschel
  */
+// TODO: Implement test in which the perspective is never changed
+// TODO: Implement test in which the perspective is always changed
 public class SWTBotStartProofHandlerTest extends TestCase {
    /**
     * Tests starting of a proof via the context menu of a selected method in a JDT editor.
@@ -135,7 +137,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
          SWTBotShell switchShell = bot.shell("Confirm Perspective Switch");
          switchShell.bot().button("Yes").click();
          // Select first operation contract and start proof
-         SWTBotShell contractShell = bot.shell("Contract Selection");
+         SWTBotShell contractShell = bot.shell("Select Contract for Proof in KeY");
          contractShell.bot().table().select(0);
          contractShell.bot().button("OK").click();
          // Make sure that the KeY proof editor is opened
