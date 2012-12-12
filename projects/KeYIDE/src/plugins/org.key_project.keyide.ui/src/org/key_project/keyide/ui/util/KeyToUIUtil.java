@@ -16,11 +16,13 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.services.IEvaluationService;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.keyide.ui.editor.input.StringInput;
 import org.key_project.keyide.ui.editor.input.StringStorage;
+import org.key_project.keyide.ui.tester.AutoModeTester;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
@@ -172,31 +174,26 @@ public class KeYToUIUtil {
    }
    
    
-//   private static ContractSelectionDialog initializeDialog(ImmutableSet<FunctionalOperationContract> operationContracts, Shell shell, Services services) {
-//      Shell dialogShell = new Shell(shell, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-//      ContractSelectionDialog dialog = new ContractSelectionDialog(dialogShell, ImmutableCollectionContentProvider.getInstance(), services);
-//      dialog.setTitle("Contract selection");
-//      dialog.setMessage("Select a contract to debug.");
-//      dialog.setInput(operationContracts);
-////      existingContractText=new Text(dialogShell, SWT.TOP);
-//      return dialog;
-//   } 
+
    
    private static Proof openDialog(ImmutableSet<FunctionalOperationContract> operationContracts, KeYEnvironment<?> environment) throws ProofInputException 
    {
       Shell parent = WorkbenchUtil.getActiveShell();
       ImmutableCollectionContentProvider contentProvider = ImmutableCollectionContentProvider.getInstance();
+      FunctionalOperationContract[] initialSelection = new FunctionalOperationContract[1];
       org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog dialog = new org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog(parent, contentProvider, environment.getServices());
       dialog.setTitle("Contract Selection");
       dialog.setMessage("Select contract to prove.");
       dialog.setInput(operationContracts);
-//      ContractSelectionDialog dialog = new ContractSelectionDialog(WorkbenchUtil, contentProvider, services)
-//      FunctionalOperationContract selectedContract = KeYToUIUtil.findContract(operationContracts, getContractId());
+      dialog.setTitle("Select Contract for Proof in KeY");
+      if(!operationContracts.isEmpty()){
+         initialSelection[0]=operationContracts.toArray(initialSelection)[0];
+         dialog.setInitialSelections(initialSelection);
+      }
       if (dialog.open() == org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog.OK) {
           Object result = dialog.getFirstResult();
           if (result instanceof FunctionalOperationContract) {
               FunctionalOperationContract foc = (FunctionalOperationContract)result;
-//              existingContractText.setText(foc.getName());
               return environment.createProof(foc.createProofObl(environment.getInitConfig(), foc));
          }
           else {
@@ -206,5 +203,12 @@ public class KeYToUIUtil {
       else {
          return null;
       }
+   }
+
+   public static void refreshUI(IEvaluationService evaluationService) {
+      if (evaluationService != null) {
+         evaluationService.requestEvaluation(AutoModeTester.PROPERTY_NAMESPACE + "." + AutoModeTester.PROPERTY_START);
+         evaluationService.requestEvaluation(AutoModeTester.PROPERTY_NAMESPACE + "." + AutoModeTester.PROPERTY_STOP);
+      }      
    }     
 }

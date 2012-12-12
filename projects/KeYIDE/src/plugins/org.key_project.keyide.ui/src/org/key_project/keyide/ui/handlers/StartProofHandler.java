@@ -50,17 +50,6 @@ public class StartProofHandler extends AbstractSaveExecutionHandler {
            }
        }
        return null;
-   }
-   
-
-   
-   
-   
-   
-   
-   
-   
-  
-   
+   }   
 }
  
