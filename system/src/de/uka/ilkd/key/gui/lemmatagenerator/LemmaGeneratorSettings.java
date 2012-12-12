@@ -7,7 +7,7 @@ import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.configuration.SettingsConverter;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 
-public class LemmaGeneratorSettings implements de.uka.ilkd.key.gui.configuration.Settings{
+public class LemmaGeneratorSettings implements de.uka.ilkd.key.gui.configuration.Settings, Cloneable {
         private LinkedList<SettingsListener> listeners = new LinkedList<SettingsListener>();
         private boolean showDialogAddingAxioms = true;
         private boolean showDialogUsingAxioms = true;

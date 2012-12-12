@@ -930,12 +930,14 @@ public final class JavaInfo {
      * @return the attribute program variable of the given name 
      * @throws IllegalArgumentException if the qualified class name is empty or
      * null
+     * @throws UnknownJavaTypeException if the qualified name refers to an unknown type
      */
     public ProgramVariable getAttribute(String programName, 
             String qualifiedClassName) {
     	if (qualifiedClassName == null || qualifiedClassName.length() == 0) {
     		throw new IllegalArgumentException("Missing qualified classname");
     	}
+    	
     	KeYJavaType kjt = null;
     	try {
     		kjt = getKeYJavaTypeByClassName(qualifiedClassName);
@@ -945,6 +947,11 @@ public final class JavaInfo {
     			kjt = getKeYJavaType(qualifiedClassName);
     		}
     	}
+    	
+    	if (kjt == null) {
+    		throw new UnknownJavaTypeException("Java type '" + qualifiedClassName + "' not known.");
+    	}
+    	
     	return getAttribute(programName, kjt);
     }
 

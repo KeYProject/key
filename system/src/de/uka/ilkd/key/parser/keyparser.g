@@ -4244,7 +4244,6 @@ problem returns [ Term a = null ]
     Choice c = null;
     ImmutableList<String> stlist = null;
     String string = null;
-    Namespace funcNSForSelectedChoices = new Namespace();
     String pref = null;
 }
     :

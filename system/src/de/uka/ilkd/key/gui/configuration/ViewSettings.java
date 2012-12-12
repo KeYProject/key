@@ -22,7 +22,7 @@ import de.uka.ilkd.key.gui.GUIEvent;
  *    instantiated in the displayed tooltip.
  * 3) wether intermediate proofsteps should be hidden in the proof tree view
  */
-public class ViewSettings implements Settings {
+public class ViewSettings implements Settings, Cloneable {
     private static final String MAX_TOOLTIP_LINES_KEY = "[View]MaxTooltipLines";
     private static final String SHOW_WHOLE_TACLET = "[View]ShowWholeTaclet";
     private static final String FONT_INDEX = "[View]FontIndex";

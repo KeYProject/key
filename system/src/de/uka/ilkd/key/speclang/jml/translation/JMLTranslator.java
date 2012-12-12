@@ -167,8 +167,7 @@ final class JMLTranslator {
 
                     private static final long serialVersionUID = 1L;
 
-                    @SuppressWarnings("unused")
-                    public JMLTranslationMethod get(JMLKeyWord key) {
+                    public JMLTranslationMethod get(Object key) {
                         JMLTranslationMethod m = super.get(key);
                         if (m != null) {
                             return m;
@@ -1398,7 +1397,7 @@ final class JMLTranslator {
                         Term t = expr.getTerm();
                         LocSetLDT locSetLDT =
                                 services.getTypeConverter().getLocSetLDT();
-                        if (!t.equals(locSetLDT.getSingleton())) {
+                        if (!t.op().equals(locSetLDT.getSingleton())) {
                             HeapLDT heapLDT =
                                     services.getTypeConverter().getHeapLDT();
                             if (heapLDT.getSortOfSelect(t.op()) != null) {
