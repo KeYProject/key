@@ -208,18 +208,25 @@ public class BlockContractRule implements BuiltInRule {
             po instanceof SymbolicExecutionPO ||
             po instanceof BlockExecutionPO) {
             // prepare information flow analysis
-            assert anonymisationHeaps.size() == 1; // information flow extension is at
-                                                   // the moment not compatible with
-                                                   // the non-base-heap setting
-            final Term preHeap = TB.var(anonymisationHeaps.keySet().iterator().next());
-            final Term postHeap = TB.func(anonymisationHeaps.values().iterator().next());
+            assert anonymisationHeaps.size() <= 1 : "information flow " +
+                                                    "extension is at the " +
+                                                    "moment not compatible " +
+                                                    "with the non-base-heap " +
+                                                    "setting";
+            Term heapAtPre, heapAtPost;
+            if (anonymisationHeaps.keySet().isEmpty()) {
+                heapAtPre = heapAtPost = TB.getBaseHeap(services);
+            } else {
+                heapAtPre = TB.var(anonymisationHeaps.keySet().iterator().next());
+                heapAtPost = TB.func(anonymisationHeaps.values().iterator().next());
+            }
 
             final InfFlowBlockContractTacletBuilder ifContractBuilder =
                     new InfFlowBlockContractTacletBuilder(services);
             ifContractBuilder.setContract(contract);
             ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
-            ifContractBuilder.setHeapAtPre(preHeap);
-            ifContractBuilder.setHeapAtPost(postHeap);
+            ifContractBuilder.setHeapAtPre(heapAtPre);
+            ifContractBuilder.setHeapAtPost(heapAtPost);
             final Terms vars = contract.getVariablesAsTerms();
             ifContractBuilder.setSelf(vars.self);
             ifContractBuilder.setLocalIns(MiscTools.toTermList(localInVariables));
@@ -240,10 +247,10 @@ public class BlockContractRule implements BuiltInRule {
             final ProofObligationVars instantiationVars =
                     new ProofObligationVars(vars.self,
                                             MiscTools.toTermList(localInVariables),
-                                            preHeap,
+                                            heapAtPre,
                                             MiscTools.toTermList(localOutVariables),
                                             vars.result, vars.exception,
-                                            postHeap, services);
+                                            heapAtPost, services);
             final IFProofObligationVars ifVars =
                     new IFProofObligationVars(instantiationVars, services);
             application.update(ifVars, instantiation.context);

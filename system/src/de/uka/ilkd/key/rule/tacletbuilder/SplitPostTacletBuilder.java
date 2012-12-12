@@ -57,7 +57,8 @@ public class SplitPostTacletBuilder {
             postParts.addAll(extractPostParts(post.sub(1)));
         } else {
             throw new IllegalArgumentException("error while extracting post " +
-                                               "parts: information flowpost term malformed.");
+                                               "parts: information flowpost " +
+                                               "term malformed: " + post);
         }
         return postParts;
     }
