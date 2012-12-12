@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Vector;
@@ -478,7 +479,8 @@ public class QueryExpand implements BuiltInRule {
 
     	
     	public boolean subsumes(QueryEvalPos other){
-    		if(!query.equals(other.query) || pathInTerm.size()>other.pathInTerm.size() || !instVars.equals(other.instVars)){
+    		if(!query.equals(other.query) || pathInTerm.size()>other.pathInTerm.size() || 
+    				!Arrays.deepEquals(instVars, other.instVars)) {
     			return false;
     		}
     		//query.equals(other.query) && pathInTerm.size()<=other.pathInTerm.size()

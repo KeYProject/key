@@ -14,7 +14,7 @@ import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 
-public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configuration.Settings{
+public class ProofIndependentSMTSettings implements de.uka.ilkd.key.gui.configuration.Settings, Cloneable {
 	
         private static final String ACTIVE_SOLVER  = "[SMTSettings]ActiveSolver";
 

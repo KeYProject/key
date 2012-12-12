@@ -167,8 +167,7 @@ final class JMLTranslator {
 
                     private static final long serialVersionUID = 1L;
 
-                    @SuppressWarnings("unused")
-                    public JMLTranslationMethod get(JMLKeyWord key) {
+                    public JMLTranslationMethod get(Object key) {
                         JMLTranslationMethod m = super.get(key);
                         if (m != null) {
                             return m;

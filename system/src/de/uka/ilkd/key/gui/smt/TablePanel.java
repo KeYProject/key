@@ -72,7 +72,7 @@ public abstract class TablePanel extends JPanel{
                 }
                 box.add(Box.createHorizontalStrut(STRUT));
                 JButton infoButton = null;
-                if(info != null && info != "" ){
+                if(info != null && !info.isEmpty()){
                     infoButton = new JButton("?");
                     box.add(Box.createHorizontalGlue());
                     box.add(infoButton);
