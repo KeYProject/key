@@ -18,8 +18,7 @@
          </property>
          <property
                name="aboutText"
-               value="KeYIDE
-Integrates KeY in the Eclipse-Environment">
+               value="KeYIDE&#x0A;Integrates KeY in the Eclipse-Environment">
          </property>
          <property
                name="windowImages"

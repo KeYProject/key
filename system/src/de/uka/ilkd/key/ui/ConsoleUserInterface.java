@@ -24,8 +24,13 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     private final boolean verbose;
 	private ProofStarter ps;
 	private KeYMediator mediator;
+	private boolean autoMode;
+	
+    public boolean isAutoMode() {
+      return autoMode;
+   }
 
-    public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
+   public ConsoleUserInterface(BatchMode batchMode, boolean verbose) {
     	this.batchMode = batchMode;
         this.verbose = verbose;
         this.mediator  = new KeYMediator(this);
@@ -152,12 +157,12 @@ public class ConsoleUserInterface extends AbstractUserInterface {
 
     @Override
     public void notifyAutoModeBeingStarted() {
-    	// nothing to do
+    	autoMode = true;
     }
 
     @Override
     public void notifyAutomodeStopped() {
-    	// nothing to do
+       autoMode = false;
     }
 
     @Override

@@ -27,18 +27,27 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
      
    }
    
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public KeYEnvironment<?> getKeYEnvironment() {
       Assert.isTrue(getEditorInput() instanceof StringInput);
       return ((StringInput)getEditorInput()).getEnvironment();
    }
-
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public Proof getProof() {
       Assert.isTrue(getEditorInput() instanceof StringInput);
       return ((StringInput)getEditorInput()).getProof();
    }
-
+   
+   /**
+    * {@inheritDoc}
+    */
    @Override
    public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
       if (IContentOutlinePage.class.equals(adapter)) {
@@ -46,9 +55,19 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
             if (outline == null) {
                outline = new Outline(getProof());
             }
+          
          }
          return outline;
       }
+//      if(IPropertySheetPage.class.equals(adapter)){
+//         synchronized (this) {
+//            if (property == null) {
+//               property = new StrategyProperties();
+//            }
+//          
+//         }
+//         return property;
+//      }
       else if (IProofEnvironmentProvider.class.equals(adapter)) {
          return this;
       }

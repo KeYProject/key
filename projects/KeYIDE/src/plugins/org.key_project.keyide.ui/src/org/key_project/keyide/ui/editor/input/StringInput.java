@@ -16,10 +16,18 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
  */
 public class StringInput implements IStorageEditorInput{
    
+   /**
+    * Gives the {@link Proof} of this {@link StringInput}.
+    * @return The {@link Proof} of this {@link StringInput}.
+    */
    public Proof getProof() {
       return proof;
    }
 
+   /**
+    * Gives the {@link KeYEnvironment} of this {@link StringInput}.
+    * @return The {@link KeYEnvironment} of this {@link StringInput}.
+    */
    public KeYEnvironment<?> getEnvironment() {
       return environment;
    }

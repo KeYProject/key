@@ -76,10 +76,11 @@
             commandId="org.key_project.keyide.ui.commands.startAutoModeCommand">
          <enabledWhen>
             <with
-                  variable="activeEditorId">
-               <equals
-                     value="org.key_project.keyide.ui.editor">
-               </equals>
+                  variable="activeEditor">
+               <test
+                     property="org.key_project.keyide.ui.AutoModeTester.start"
+                     value="true">
+               </test>
             </with>
          </enabledWhen>
       </handler>
@@ -88,10 +89,11 @@
             commandId="org.key_project.keyide.ui.commands.stopAutoModeCommand">
          <enabledWhen>
             <with
-                  variable="activeEditorId">
-               <equals
-                     value="org.key_project.keyide.ui.editor">
-               </equals>
+                  variable="activeEditor">
+               <test
+                     property="org.key_project.keyide.ui.AutoModeTester.stop"
+                     value="true">
+               </test>
             </with>
          </enabledWhen>
       </handler>
@@ -310,13 +312,6 @@
             name="Proof"
             restorable="true">
       </view>
-      <view
-            category="org.key_project.keyide.ui.view.category"
-            class="org.key_project.keyide.ui.views.StrategyProperties"
-            id="org.key_project.keyide.ui.StrategyProperties"
-            name="StrategyProperties"
-            restorable="true">
-      </view>
    </extension>
    <extension
          point="org.eclipse.ui.editorActions">
@@ -331,6 +326,29 @@
                tooltip="Start the automated proof.">
          </action>
       </editorContribution>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml">
+      </contexts>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+      <propertyContributor
+            contributorId="org.key_project.keyide.ui.keyPropertyContributor">
+         <propertyCategory></propertyCategory>
+      </propertyContributor>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.key_project.keyide.ui.tester.AutoModeTester"
+            id="org.key_project.keyide.ui.AutoModeTester"
+            namespace="org.key_project.keyide.ui.AutoModeTester"
+            properties="start, stop"
+            type="org.eclipse.ui.IEditorPart">
+      </propertyTester>
    </extension>
 
 </plugin>
