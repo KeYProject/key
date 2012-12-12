@@ -39,16 +39,20 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
         Term[][] respectsAtPost1 = replace(respectsAtPre1,
                                            new Term[]{poVars1.heap,
                                                       poVars1.self,
+                                                      poVars1.result,
                                                       poVars1.exception},
                                            new Term[]{poVars1.heapAtPost,
                                                       poVars1.selfAtPost,
+                                                      poVars1.resultAtPost,
                                                       poVars1.exceptionAtPost});
         Term[][] respectsAtPost2 = replace(respectsAtPre2,
                                            new Term[]{poVars2.heap,
                                                       poVars2.self,
+                                                      poVars2.result,
                                                       poVars2.exception},
                                            new Term[]{poVars2.heapAtPost,
                                                       poVars2.selfAtPost,
+                                                      poVars2.resultAtPost,
                                                       poVars2.exceptionAtPost});
 
         // get declassifies terms

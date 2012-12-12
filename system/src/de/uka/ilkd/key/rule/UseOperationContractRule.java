@@ -59,6 +59,7 @@ import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -769,21 +770,27 @@ public final class UseOperationContractRule implements BuiltInRule {
         postGoal.addFormula(new SequentFormula(postAssumption), 
         	            true, 
         	            false);
-        if (po instanceof InfFlowContractPO ||
-            po instanceof SymbolicExecutionPO ||
-            po instanceof BlockExecutionPO) {
+        if (contract.hasModifiesClause() &&
+            ((po instanceof InfFlowContractPO &&
+              ((InfFlowContractPO) po).getContract().getRespects() != null) ||
+             (po instanceof SymbolicExecutionPO &&
+              ((SymbolicExecutionPO) po).getContract().getRespects() != null) ||
+             (po instanceof BlockExecutionPO &&
+              ((BlockExecutionPO) po).getContract().getRespects() != null)))  {
             // prepare information flow analysis
-            assert anonUpdateDatas.size() == 1; // information flow extension is at
-                                                // the moment not compatible with
-                                                // the non-base-heap setting
-            AnonUpdateData anonUpdateData = anonUpdateDatas.head();
+            assert anonUpdateDatas.size() == 1 : "information flow extension " +
+                                                 "is at the moment not " +
+                                                 "compatible with the " +
+                                                 "non-base-heap setting";
+            final Term heapAtPre = anonUpdateDatas.head().methodHeapAtPre;
+            final Term heapAtPost = anonUpdateDatas.head().methodHeap;
 
             InfFlowMethodContractTacletBuilder ifContractBuilder =
                     new InfFlowMethodContractTacletBuilder(services);
             ifContractBuilder.setContract(contract);
             ifContractBuilder.setContextUpdate(atPreUpdates, inst.u);
-            ifContractBuilder.setHeapAtPre(anonUpdateData.methodHeapAtPre);
-            ifContractBuilder.setHeapAtPost(anonUpdateData.methodHeap);
+            ifContractBuilder.setHeapAtPre(heapAtPre);
+            ifContractBuilder.setHeapAtPost(heapAtPost);
             ifContractBuilder.setSelf(contractSelf);
             ifContractBuilder.setLocalIns(contractParams);
             ifContractBuilder.setResult(contractResult);
