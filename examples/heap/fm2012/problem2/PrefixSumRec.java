@@ -13,7 +13,7 @@ final class PrefixSumRec {
       @ accessible \nothing;
       @ strictly_pure helper
       @*/
-    private void lemma() {}
+    private static boolean lemma() { return true; }
 
     PrefixSumRec(int [] a) {
 	this.a = a;
@@ -68,10 +68,10 @@ final class PrefixSumRec {
       @   requires !even(left) || right-left==1;
       @   ensures (\forall int k; 2*left-right+1 <= k && k <= right && !even(k); 
       @            a[k] == (\sum int i; 2*left-right+1 <= i && i < k+1; \old(a[i])));
-      @   ensures !(\exists int k; 2*left-right+1 <= k && k <= right && even(k);
-      @             a[k] != \old(a[k]));
       @   measured_by right - left + 1;
-      @   assignable a[*];
+      @   assignable \infinite_union(int k; 
+      @                  (2*left-right+1 <= k && k <= right && !even(k)) ?
+      @                      \singleton(a[k]): \empty);
       @*/
     public void upsweep(int left, int right) {
         int space = right - left;
