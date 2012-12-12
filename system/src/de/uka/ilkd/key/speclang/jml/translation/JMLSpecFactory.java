@@ -86,65 +86,67 @@ public class JMLSpecFactory {
         // create contracts
         ImmutableSet<Contract> symbDatas =
                 DefaultImmutableSet.<Contract>nil();
-        if (clauses.diverges.equals(TB.ff())) {
-            InformationFlowContract symbData =
-                    cf.createInformationFlowContract(pm.getContainerType(), pm,
-                                                     pm.getContainerType(),
-                                                     Modality.DIA,
-                                                     clauses.requires.get(heap),
-                                                     clauses.measuredBy,
-                                                     clauses.assignables.get(heap),
-                                                     !clauses.strictlyPure,
-                                                     progVars,
-                                                     clauses.accessible,
-                                                     clauses.respects,
-                                                     clauses.declassifies,
-                                                     false);
-            symbDatas = symbDatas.add(symbData);
-        } else if (clauses.diverges.equals(TB.tt())) {
-            InformationFlowContract symbData =
-                    cf.createInformationFlowContract(pm.getContainerType(), pm,
-                                                     pm.getContainerType(),
-                                                     Modality.BOX,
-                                                     clauses.requires.get(heap),
-                                                     clauses.measuredBy,
-                                                     clauses.assignables.get(heap),
-                                                     !clauses.strictlyPure,
-                                                     progVars,
-                                                     clauses.accessible,
-                                                     clauses.respects,
-                                                     clauses.declassifies,
-                                                     false);
-            symbDatas = symbDatas.add(symbData);
-        } else {
-            InformationFlowContract symbData1 =
-                    cf.createInformationFlowContract(pm.getContainerType(), pm,
-                                                     pm.getContainerType(),
-                                                     Modality.DIA,
-                                                     TB.and(clauses.requires.get(heap),
-                                                            TB.not(clauses.diverges)),
-                                                     clauses.measuredBy,
-                                                     clauses.assignables.get(heap),
-                                                     !clauses.strictlyPure,
-                                                     progVars,
-                                                     clauses.accessible,
-                                                     clauses.respects,
-                                                     clauses.declassifies,
-                                                     false);
-            InformationFlowContract symbData2 =
-                    cf.createInformationFlowContract(pm.getContainerType(), pm,
-                                                     pm.getContainerType(),
-                                                     Modality.BOX,
-                                                     clauses.requires.get(heap),
-                                                     clauses.measuredBy,
-                                                     clauses.assignables.get(heap),
-                                                     !clauses.strictlyPure,
-                                                     progVars,
-                                                     clauses.accessible,
-                                                     clauses.respects,
-                                                     clauses.declassifies,
-                                                     false);
-            symbDatas = symbDatas.add(symbData1).add(symbData2);
+        if (clauses.respects != null && !clauses.respects.isEmpty()) {
+            if (clauses.diverges.equals(TB.ff())) {
+                InformationFlowContract symbData =
+                        cf.createInformationFlowContract(pm.getContainerType(), pm,
+                                                         pm.getContainerType(),
+                                                         Modality.DIA,
+                                                         clauses.requires.get(heap),
+                                                         clauses.measuredBy,
+                                                         clauses.assignables.get(heap),
+                                                         !clauses.strictlyPure,
+                                                         progVars,
+                                                         clauses.accessible,
+                                                         clauses.respects,
+                                                         clauses.declassifies,
+                                                         false);
+                symbDatas = symbDatas.add(symbData);
+            } else if (clauses.diverges.equals(TB.tt())) {
+                InformationFlowContract symbData =
+                        cf.createInformationFlowContract(pm.getContainerType(), pm,
+                                                         pm.getContainerType(),
+                                                         Modality.BOX,
+                                                         clauses.requires.get(heap),
+                                                         clauses.measuredBy,
+                                                         clauses.assignables.get(heap),
+                                                         !clauses.strictlyPure,
+                                                         progVars,
+                                                         clauses.accessible,
+                                                         clauses.respects,
+                                                         clauses.declassifies,
+                                                         false);
+                symbDatas = symbDatas.add(symbData);
+            } else {
+                InformationFlowContract symbData1 =
+                        cf.createInformationFlowContract(pm.getContainerType(), pm,
+                                                         pm.getContainerType(),
+                                                         Modality.DIA,
+                                                         TB.and(clauses.requires.get(heap),
+                                                                TB.not(clauses.diverges)),
+                                                         clauses.measuredBy,
+                                                         clauses.assignables.get(heap),
+                                                         !clauses.strictlyPure,
+                                                         progVars,
+                                                         clauses.accessible,
+                                                         clauses.respects,
+                                                         clauses.declassifies,
+                                                         false);
+                InformationFlowContract symbData2 =
+                        cf.createInformationFlowContract(pm.getContainerType(), pm,
+                                                         pm.getContainerType(),
+                                                         Modality.BOX,
+                                                         clauses.requires.get(heap),
+                                                         clauses.measuredBy,
+                                                         clauses.assignables.get(heap),
+                                                         !clauses.strictlyPure,
+                                                         progVars,
+                                                         clauses.accessible,
+                                                         clauses.respects,
+                                                         clauses.declassifies,
+                                                         false);
+                symbDatas = symbDatas.add(symbData1).add(symbData2);
+            }
         }
         return symbDatas;
     }
