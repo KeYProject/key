@@ -59,6 +59,7 @@ import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -767,21 +768,20 @@ public final class UseOperationContractRule implements BuiltInRule {
         postGoal.addFormula(new SequentFormula(postAssumption), 
         	            true, 
         	            false);
-        if (po instanceof InfFlowContractPO ||
-            po instanceof SymbolicExecutionPO ||
-            po instanceof BlockExecutionPO) {
+        if (contract.hasModifiesClause() &&
+            ((po instanceof InfFlowContractPO &&
+              ((InfFlowContractPO) po).getContract().getRespects() != null) ||
+             (po instanceof SymbolicExecutionPO &&
+              ((SymbolicExecutionPO) po).getContract().getRespects() != null) ||
+             (po instanceof BlockExecutionPO &&
+              ((BlockExecutionPO) po).getContract().getRespects() != null)))  {
             // prepare information flow analysis
-            assert anonUpdateDatas.size() <= 1 : "information flow extension " +
+            assert anonUpdateDatas.size() == 1 : "information flow extension " +
                                                  "is at the moment not " +
                                                  "compatible with the " +
                                                  "non-base-heap setting";
-            Term heapAtPre, heapAtPost;
-            if (anonUpdateDatas.isEmpty()) {
-                heapAtPre = heapAtPost = TB.getBaseHeap(services);
-            } else {
-                heapAtPre = anonUpdateDatas.head().methodHeapAtPre;
-                heapAtPost = anonUpdateDatas.head().methodHeap;
-            }
+            final Term heapAtPre = anonUpdateDatas.head().methodHeapAtPre;
+            final Term heapAtPost = anonUpdateDatas.head().methodHeap;
 
             InfFlowMethodContractTacletBuilder ifContractBuilder =
                     new InfFlowMethodContractTacletBuilder(services);

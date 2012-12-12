@@ -204,22 +204,20 @@ public class BlockContractRule implements BuiltInRule {
         Term contractApplPredTerm = TB.tt();
         Taclet informationFlowContractApp = null;
         Goal infFlowGoal = null;
-        if (po instanceof InfFlowContractPO ||
-            po instanceof SymbolicExecutionPO ||
-            po instanceof BlockExecutionPO) {
+        if ((po instanceof InfFlowContractPO ||
+             po instanceof SymbolicExecutionPO ||
+             po instanceof BlockExecutionPO) &&
+            contract.hasModifiesClause() &&
+            contract.getRespects() != null) {
             // prepare information flow analysis
-            assert anonymisationHeaps.size() <= 1 : "information flow " +
+            assert anonymisationHeaps.size() == 1 : "information flow " +
                                                     "extension is at the " +
                                                     "moment not compatible " +
                                                     "with the non-base-heap " +
                                                     "setting";
-            Term heapAtPre, heapAtPost;
-            if (anonymisationHeaps.keySet().isEmpty()) {
-                heapAtPre = heapAtPost = TB.getBaseHeap(services);
-            } else {
-                heapAtPre = TB.var(anonymisationHeaps.keySet().iterator().next());
-                heapAtPost = TB.func(anonymisationHeaps.values().iterator().next());
-            }
+            
+            final Term heapAtPre = TB.var(anonymisationHeaps.keySet().iterator().next());
+            final Term heapAtPost = TB.func(anonymisationHeaps.values().iterator().next());
 
             final InfFlowBlockContractTacletBuilder ifContractBuilder =
                     new InfFlowBlockContractTacletBuilder(services);
