@@ -99,7 +99,6 @@ public class JMLSpecFactory {
                                                          progVars,
                                                          clauses.accessible,
                                                          clauses.respects,
-                                                         clauses.declassifies,
                                                          false);
                 symbDatas = symbDatas.add(symbData);
             } else if (clauses.diverges.equals(TB.tt())) {
@@ -114,7 +113,6 @@ public class JMLSpecFactory {
                                                          progVars,
                                                          clauses.accessible,
                                                          clauses.respects,
-                                                         clauses.declassifies,
                                                          false);
                 symbDatas = symbDatas.add(symbData);
             } else {
@@ -130,7 +128,6 @@ public class JMLSpecFactory {
                                                          progVars,
                                                          clauses.accessible,
                                                          clauses.respects,
-                                                         clauses.declassifies,
                                                          false);
                 InformationFlowContract symbData2 =
                         cf.createInformationFlowContract(pm.getContainerType(), pm,
@@ -143,7 +140,6 @@ public class JMLSpecFactory {
                                                          progVars,
                                                          clauses.accessible,
                                                          clauses.respects,
-                                                         clauses.declassifies,
                                                          false);
                 symbDatas = symbDatas.add(symbData1).add(symbData2);
             }
@@ -169,8 +165,7 @@ public class JMLSpecFactory {
         public Map<Label, Term> continues;
         public Term returns;
         public boolean strictlyPure;
-        public ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> respects;
-        public ImmutableList<ImmutableList<Term>> declassifies;
+        public ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> respects;
     }
 
     //-------------------------------------------------------------------------
@@ -372,15 +367,11 @@ public class JMLSpecFactory {
                 translateRespectsClauses(pm, progVars.selfVar,
                                           progVars.paramVars, progVars.resultVar,
                                           textualSpecCase.getRespects());
-        clauses.declassifies =
-                translateDeclassifiesClauses(pm, progVars.selfVar,
-                                           progVars.paramVars, progVars.resultVar,
-                                           textualSpecCase.getDeclassifies());
         return clauses;
     }
 
 
-    private ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> translateRespectsClauses(
+    private ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> translateRespectsClauses(
             IProgramMethod pm,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
@@ -388,39 +379,15 @@ public class JMLSpecFactory {
             ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
         if (originalClauses.isEmpty()) {
-            return ImmutableSLList.<Pair<ImmutableList<Term>,ImmutableList<Term>>>nil();
+            return ImmutableSLList.<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>>nil();
         } else {
-            ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> result =
-                    ImmutableSLList.<Pair<ImmutableList<Term>,ImmutableList<Term>>>nil();
+            ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> result =
+                    ImmutableSLList.<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>>nil();
             for (PositionedString expr : originalClauses) {
-                Pair<ImmutableList<Term>,ImmutableList<Term>> translated =
+                Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>> translated =
                         JMLTranslator.translate(
                         expr, pm.getContainerType(), selfVar, paramVars, resultVar,
-                        null, null, Pair.class, services);
-                result = result.append(translated);
-            }
-            return result;
-        }
-    }
-
-
-    private ImmutableList<ImmutableList<Term>> translateDeclassifiesClauses(
-            IProgramMethod pm,
-            ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable resultVar,
-            ImmutableList<PositionedString> originalClauses)
-            throws SLTranslationException {
-        if (originalClauses.isEmpty()) {
-            return ImmutableSLList.<ImmutableList<Term>>nil();
-        } else {
-            ImmutableList<ImmutableList<Term>> result =
-                    ImmutableSLList.<ImmutableList<Term>>nil();
-            for (PositionedString expr : originalClauses) {
-                ImmutableList<Term> translated =
-                        JMLTranslator.translate(
-                        expr, pm.getContainerType(), selfVar, paramVars, resultVar,
-                        null, null, ImmutableList.class, services);
+                        null, null, Triple.class, services);
                 result = result.append(translated);
             }
             return result;
@@ -1120,7 +1087,7 @@ public class JMLSpecFactory {
         final ContractClauses clauses = translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new SimpleBlockContract.Creator(
             block, labels, method, behavior, variables, clauses.requires,
-            clauses.ensures, clauses.respects, clauses.declassifies,
+            clauses.ensures, clauses.respects,
             clauses.breaks, clauses.continues, clauses.returns, clauses.signals,
             clauses.signalsOnly, clauses.diverges, clauses.assignables,
             !clauses.strictlyPure, services

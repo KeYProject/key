@@ -23,6 +23,7 @@ import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * Walks through a java AST in depth-left-fist-order.
@@ -135,18 +136,15 @@ public class ProgramVariableCollector extends JavaASTVisitor {
                 modifiesClause.execPostOrder(collector);
             }
         }
-        ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> respects = x.getRespects();
-        for (Pair<ImmutableList<Term>,ImmutableList<Term>> ts : respects) {
+        ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> respects = x.getRespects();
+        for (Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>> ts : respects) {
             for (Term t : ts.first) {
                 t.execPostOrder(collector);
             }
             for (Term t : ts.second) {
                 t.execPostOrder(collector);
             }
-        }
-        ImmutableList<ImmutableList<Term>> declassifies = x.getDeclassifies();
-        for (ImmutableList<Term> ts : declassifies) {
-            for (Term t : ts) {
+            for (Term t : ts.third) {
                 t.execPostOrder(collector);
             }
         }

@@ -46,8 +46,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private ImmutableList<PositionedString> respects =
             ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> declassifies =
-            ImmutableSLList.<PositionedString>nil();
     
     private Map<String, ImmutableList<PositionedString>>
       assignables = new LinkedHashMap<String, ImmutableList<PositionedString>>();
@@ -197,16 +195,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public void addDeclassifies(PositionedString ps) {
-        declassifies = declassifies.append(ps);
-    }
-
-
-    public void addDeclassifies(ImmutableList<PositionedString> l) {
-        declassifies = declassifies.append(l);
-    }
-    
-    
     public Behavior getBehavior() {
         return behavior;
     }
@@ -297,11 +285,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
 
-    public ImmutableList<PositionedString> getDeclassifies() {
-        return declassifies;
-    }
-
-
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
@@ -362,10 +345,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("respects: ").append(it.next()).append("\n");
         }
-        it = declassifies.iterator();
-        while (it.hasNext()) {
-            sb.append("declassifies: ").append(it.next()).append("\n");
-        }
         return sb.toString();
     }
 
@@ -389,8 +368,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && breaks.equals(sc.breaks)
                && continues.equals(sc.continues)
                && returns.equals(sc.returns)
-               && respects.equals(sc.respects)
-               && declassifies.equals(sc.declassifies);
+               && respects.equals(sc.respects);
     }
 
 
@@ -409,7 +387,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + breaks.hashCode()
                + continues.hashCode()
                + returns.hashCode()
-               + respects.hashCode()
-               + declassifies.hashCode();
+               + respects.hashCode();
     }
 }

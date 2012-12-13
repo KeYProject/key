@@ -22,7 +22,8 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -50,8 +51,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private final Term origExc;
     private final boolean toBeSaved;
     private final Term origDep;
-    private final ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> origRespects;
-    private final ImmutableList<ImmutableList<Term>> origDeclassifies;
+    private final ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> origRespects;
 
     /**
      * If a method is strictly pure, it has no modifies clause which could
@@ -80,8 +80,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                           Term result,
                                           Term exc,
                                           Term dep,
-                                          ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> respects,
-                                          ImmutableList<ImmutableList<Term>> declassifies,
+                                          ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> respects,
                                           boolean toBeSaved,
                                           int id) {
         assert baseName != null;
@@ -101,7 +100,6 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         assert exc != null;
 //        assert dep != null;
         assert respects != null;
-        assert declassifies != null;
 
         this.baseName = baseName;
         this.name = name != null
@@ -123,7 +121,6 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         this.toBeSaved = toBeSaved;
         this.origDep = dep;
         this.origRespects = respects;
-        this.origDeclassifies = declassifies;
     }
 
 
@@ -141,12 +138,11 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                        Term result,
                                        Term exc,
                                        Term dep,
-                                       ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> respects,
-                                       ImmutableList<ImmutableList<Term>> declassifies,
+                                       ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> respects,
                                        boolean toBeSaved) {
 
         this(baseName, null, forClass, pm, specifiedIn, modality, pre, mby, mod,
-             hasRealMod, self, params, result, exc, dep, respects, declassifies,
+             hasRealMod, self, params, result, exc, dep, respects,
              toBeSaved, INVALID_ID);
     }
 
@@ -158,7 +154,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
              bc.hasModifiesClause(), bc.getVariablesAsTerms().self,
              ImmutableSLList.<Term>nil(), bc.getVariablesAsTerms().result,
              bc.getVariablesAsTerms().exception, null, bc.getRespects(),
-             bc.getDeclassifies(), false, INVALID_ID);
+             false, INVALID_ID);
     }
 
 
@@ -281,12 +277,6 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public boolean hasDeclassifies() {
-        return !origDeclassifies.isEmpty();
-    }
-
-
-    @Override
     public String getHTMLText(Services services) {
         return "<html>"
                + getHTMLBody(services)
@@ -303,7 +293,6 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                + getHTMLFor(origMby, "measured-by", services)
                + "<br><b>termination</b> " + modality
                + getHTMLFor(origRespects, "segregates", services)
-               + getHTMLForDeclassifies(services)
                + "</html>";
     }
 
@@ -359,53 +348,41 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     private String getHTMLFor(Iterable<Term> originalTerms,
-                              String htmlName,
                               Services services) {
-        String respects = "";
-        if (hasRespects()) {
-            respects = "<br><b>" + htmlName + "</b> ";
-            for (Term term : originalTerms) {
-                final String quickPrint =
-                        LogicPrinter.quickPrintTerm(term, services);
-                respects += LogicPrinter.escapeHTML(quickPrint, false);
+        String result = "";
+        Iterator<Term> it = originalTerms.iterator();
+        while (it.hasNext()) {
+            Term term = it.next();
+            final String quickPrint =
+                    LogicPrinter.quickPrintTerm(term, services);
+            result += " " + LogicPrinter.escapeHTML(quickPrint, false);
+            if (it.hasNext()) {
+                result += ", ";
             }
         }
-        return respects;
+        return result;
     }
 
     
-    private String getHTMLFor(ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> originalTerms,
+    private String getHTMLFor(ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> originalTerms,
                               String htmlName,
                               Services services) {
         String respects = "";
         if (hasRespects()) {
             respects = "<br><b>" + htmlName + "</b> ";
-            for (Pair<ImmutableList<Term>,ImmutableList<Term>> pair : originalTerms) {
-                if (pair.second.isEmpty()) {
-                    respects += "(" + getHTMLFor(pair.first, htmlName, services) + ") ";
-                } else {
-                    respects += "(" + getHTMLFor(pair.first, htmlName, services) + ") " +
-                                " depending on (" + getHTMLFor(pair.second, htmlName, services) + ") ";
+            for (Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>> pair : originalTerms) {
+                respects += "(" + getHTMLFor(pair.first, services) + ")";
+                if (!pair.second.isEmpty()) {
+                    respects += ", declassifies (" + getHTMLFor(pair.second, services) + ")";
+                }
+                if (!pair.third.isEmpty()) {
+                    respects += ", erases (" + getHTMLFor(pair.third, services) + ")";
                 }
             }
         }
         return respects;
     }
     
-
-    private String getHTMLForDeclassifies(Services services) {
-        String declassifies = "";
-        if (hasDeclassifies()) {
-            final String quickPrint =
-                    LogicPrinter.quickPrintTerm(
-                    origDeclassifies.head().head(),
-                    services);
-            declassifies = "<br><b>declassifies</b> ";
-            declassifies += LogicPrinter.escapeHTML(quickPrint, false);
-        }
-        return declassifies;
-    }
-
 
     @Override
     public String toString() {
@@ -463,8 +440,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
                                                origDep, origRespects,
-                                               origDeclassifies, toBeSaved,
-                                               newId);
+                                               toBeSaved, newId);
     }
 
 
@@ -479,8 +455,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
                                                origDep, origRespects,
-                                               origDeclassifies, toBeSaved,
-                                               id);
+                                               toBeSaved, id);
     }
 
 
@@ -492,8 +467,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
                                                origDep, origRespects,
-                                               origDeclassifies, toBeSaved,
-                                               id);
+                                               toBeSaved, id);
     }
 
 
@@ -505,8 +479,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
                                                origDep, origRespects,
-                                               origDeclassifies, toBeSaved,
-                                               id);
+                                               toBeSaved, id);
     }
 
 
@@ -518,8 +491,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                hasRealModifiesClause, origSelf,
                                                origParams, origResult, origExc,
                                                origDep, origRespects,
-                                               origDeclassifies, toBeSaved,
-                                               id);
+                                               toBeSaved, id);
     }
 
 
@@ -530,14 +502,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> getRespects() {
+    public ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> getRespects() {
         return origRespects;
-    }
-
-
-    @Override
-    public ImmutableList<ImmutableList<Term>> getDeclassifies() {
-        return origDeclassifies;
     }
 
 
@@ -555,7 +521,6 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         assert origParams != null;
         assert origDep != null;
         assert origRespects != null;
-        assert origDeclassifies != null;
         InformationFlowContract ifc = (InformationFlowContract) c;
         return name.equals(ifc.getName())
                && forClass.equals(ifc.getKJT())
@@ -577,8 +542,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                && id == ifc.id()
                && toBeSaved == ifc.toBeSaved()
                && origDep.equals(ifc.getDep())
-               && origRespects.equals(ifc.getRespects())
-               && origDeclassifies.equals(ifc.getDeclassifies());
+               && origRespects.equals(ifc.getRespects());
     }
     
     

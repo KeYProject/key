@@ -40,7 +40,6 @@ tokens {
     ACCESSIBLE      = "accessible";
     ASSIGNABLE      = "assignable";
     ENSURES         = "ensures";
-    DECLASSIFIES    = "declassifies";
     DEPENDS         = "depends";
     REPRESENTS      = "represents";
     REQUIRES        = "requires";
@@ -163,10 +162,9 @@ SEQDEF : "\\seq_def";
 
 MEASURED_BY : "\\measured_by";
 
-FROM : "\\from";
-TO : "\\to";
-IF : "\\if";
-DEPENDING_ON : "\\depending_on";
+DECLASSIFIES : "\\declassifies";
+ERASES : "\\erases";
+
 
 DL_ESCAPE : "\\dl_"  LETTER  ( LETTERORDIGIT )*  ;
 

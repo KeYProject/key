@@ -13,7 +13,6 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -35,6 +34,7 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * Walks through a java AST in depth-left-first-order. This visitor
@@ -211,28 +211,17 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
 
-    private ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> replaceVariablesInTermListPairs(ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> terms) {
-        ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> res =
-                ImmutableSLList.<Pair<ImmutableList<Term>,ImmutableList<Term>>>nil();
-        for (final Pair<ImmutableList<Term>,ImmutableList<Term>> innerTerms : terms) {
+    private ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> replaceVariablesInTermListTiples(ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> terms) {
+        ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> res =
+                ImmutableSLList.<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>>nil();
+        for (final Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>> innerTerms : terms) {
             final ImmutableList<Term> renamed1 =
                     replaceVariablesInTerms(innerTerms.first);
             final ImmutableList<Term> renamed2 =
-                    replaceVariablesInTerms(innerTerms.first);
-            res = res.append(new Pair(renamed1, renamed2));
-        }
-        return res;
-    }
-
-
-    private ImmutableList<ImmutableList<Term>> replaceVariablesInTermLists(ImmutableList<ImmutableList<Term>> terms) {
-        ImmutableList<ImmutableList<Term>> res = ImmutableSLList.<ImmutableList<Term>>nil();
-        for (final ImmutableList<Term> innerTerms : terms) {
-            ImmutableList<Term> tmp = ImmutableSLList.<Term>nil();
-            for (final Term term : innerTerms) {
-                tmp = tmp.append(replaceVariablesInTerm(term));
-            }
-            res = res.append(tmp);
+                    replaceVariablesInTerms(innerTerms.second);
+            final ImmutableList<Term> renamed3 =
+                    replaceVariablesInTerms(innerTerms.third);
+            res = res.append(new Triple(renamed1, renamed2, renamed3));
         }
         return res;
     }
@@ -265,13 +254,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             newPostconditions.put(heap, replaceVariablesInTerm(oldContract.getPostcondition(heap, services)));
             newModifiesClauses.put(heap, replaceVariablesInTerm(oldContract.getModifiesClause(heap, services)));
         }
-        final ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> newRespects =
-                replaceVariablesInTermListPairs(oldContract.getRespects());
-        final ImmutableList<ImmutableList<Term>> newDeclassifies =
-                replaceVariablesInTermLists(oldContract.getDeclassifies());
+        final ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> newRespects =
+                replaceVariablesInTermListTiples(oldContract.getRespects());
         return oldContract.update(newBlock, newPreconditions, newPostconditions,
-                                  newModifiesClauses, newRespects,
-                                  newDeclassifies, newVariables);
+                                  newModifiesClauses, newRespects, newVariables);
     }
 
     private BlockContract.Variables replaceBlockContractVariables(final BlockContract.Variables variables)

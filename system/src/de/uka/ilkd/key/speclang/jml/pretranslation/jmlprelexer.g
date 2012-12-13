@@ -53,7 +53,6 @@ tokens {
 	CONTINUES			= "continues";
 	CONTINUE_BEHAVIOR 	= "continue_behavior";
     CONTINUE_BEHAVIOUR 	= "continue_behaviour";
-    DECLASSIFIES                = "declassifies";
     DECREASES  			= "decreases";
     DECREASES_REDUNDANTLY  	= "decreases_redundantly";
     DECREASING  		= "decreasing";

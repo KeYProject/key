@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 public interface BlockContract extends SpecificationElement {
 
@@ -69,8 +70,7 @@ public interface BlockContract extends SpecificationElement {
                                 Map<LocationVariable,Term> newPreconditions,
                                 Map<LocationVariable,Term> newPostconditions,
                                 Map<LocationVariable,Term> newModifiesClauses,
-                                final ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> respects,
-                                final ImmutableList<ImmutableList<Term>> declassifies,
+                                final ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> respects,
                                 Variables newVariables);
 
     /**
@@ -100,13 +100,7 @@ public interface BlockContract extends SpecificationElement {
     /**
      * Returns the original respects clause of the contract.
      */
-    public ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> getRespects();
-
-
-    /**
-     * Returns the original declassifies clause of the contract.
-     */
-    public ImmutableList<ImmutableList<Term>> getDeclassifies();
+    public ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> getRespects();
 
 
     /**

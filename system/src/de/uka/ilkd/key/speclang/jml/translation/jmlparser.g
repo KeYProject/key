@@ -339,7 +339,6 @@ top returns [Object result = null] throws  SLTranslationException
     |   result = breaksclause
     |   result = continuesclause
     |   result = dependsclause
-    |   result = declassifiesclause
     |   result = ensuresclause
     |   result = representsclause
     |   result = requiresclause
@@ -368,22 +367,6 @@ assignableclause returns [Term result = null] throws SLTranslationException
     | LESS_THAN_NOTHING
         { result = TB.lessThanNothing(); }
     )
-    ;
-
-
-declassifiesclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
-{
-    Term declass = null;
-    SLExpression frompart = null;
-    SLExpression topart = null;
-    Term ifpart = null;
-}
-:
-    del:DECLASSIFIES declass = termexpression
-    (FROM frompart = sequence)?
-    (TO topart = sequence)?
-    (IF ifpart = predicate)?
-    { result = translator.translate(del.getText(), ImmutableList.class, declass, frompart, topart, ifpart, services); }
     ;
 
 
@@ -467,13 +450,18 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
     ;
 
 
-respectsclause returns  [Pair<ImmutableList<Term>,ImmutableList<Term>> result = null] throws SLTranslationException {
+respectsclause returns  [Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>> result = null] throws SLTranslationException {
     ImmutableList<Term> seg = ImmutableSLList.<Term>nil();
-    ImmutableList<Term> depOn = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> decl = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> erases = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> tmp;
 }
 :
-    (RESPECTS | SEGREGATES) seg = respectslist (DEPENDING_ON (NOTHING {depOn = depOn.append(TB.tt());} | depOn = respectslist))?
-    {result = new Pair(seg, depOn);}
+    (RESPECTS | SEGREGATES) (NOTHING | seg = respectslist)
+    (   (DECLASSIFIES (NOTHING | tmp = respectslist {decl = decl.append(tmp);})) |
+        (ERASES (NOTHING | tmp = respectslist {erases = erases.append(tmp);}))
+    )*
+    {result = new Triple(seg, decl, erases);}
     ;
 
 

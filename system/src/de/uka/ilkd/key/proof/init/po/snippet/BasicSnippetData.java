@@ -20,7 +20,6 @@ import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 import java.util.EnumMap;
 import java.util.List;
 
@@ -87,7 +86,6 @@ class BasicSnippetData {
         MEASURED_BY(Term.class),
         MODALITY(Modality.class),
         RESPECTS(ImmutableList.class),
-        DECLASSIFIES(Term[][].class),
         /**
          * Variables originally used during parsing.
          */
@@ -144,8 +142,6 @@ class BasicSnippetData {
         contractContents.put(Key.MEASURED_BY, contract.getMby());
         contractContents.put(Key.MODALITY, contract.getModality());
         contractContents.put(Key.RESPECTS, contract.getRespects());
-        contractContents.put(Key.DECLASSIFIES,
-                             doubleListToArray(contract.getDeclassifies()));
 
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         origVars =
@@ -169,8 +165,6 @@ class BasicSnippetData {
         contractContents.put(Key.MODIFIES, contract.getMod(services));
         contractContents.put(Key.MODALITY, contract.getModality());
         contractContents.put(Key.RESPECTS, contract.getRespects());
-        contractContents.put(Key.DECLASSIFIES,
-                             doubleListToArray(contract.getDeclassifies()));
         List<Label> labels = contract.getLabels();
         contractContents.put(Key.LABELS,
                              labels.toArray(new Label[labels.size()]));
