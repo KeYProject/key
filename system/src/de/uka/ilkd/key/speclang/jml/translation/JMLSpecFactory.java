@@ -169,7 +169,7 @@ public class JMLSpecFactory {
         public Map<Label, Term> continues;
         public Term returns;
         public boolean strictlyPure;
-        public ImmutableList<ImmutableList<Term>> respects;
+        public ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> respects;
         public ImmutableList<ImmutableList<Term>> declassifies;
     }
 
@@ -369,18 +369,42 @@ public class JMLSpecFactory {
                 originalBehavior,
                 textualSpecCase.getReturns());
         clauses.respects =
-                translateIndependetClauses(pm, progVars.selfVar,
+                translateRespectsClauses(pm, progVars.selfVar,
                                           progVars.paramVars, progVars.resultVar,
                                           textualSpecCase.getRespects());
         clauses.declassifies =
-                translateIndependetClauses(pm, progVars.selfVar,
+                translateDeclassifiesClauses(pm, progVars.selfVar,
                                            progVars.paramVars, progVars.resultVar,
                                            textualSpecCase.getDeclassifies());
         return clauses;
     }
 
 
-    private ImmutableList<ImmutableList<Term>> translateIndependetClauses(
+    private ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> translateRespectsClauses(
+            IProgramMethod pm,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar,
+            ImmutableList<PositionedString> originalClauses)
+            throws SLTranslationException {
+        if (originalClauses.isEmpty()) {
+            return ImmutableSLList.<Pair<ImmutableList<Term>,ImmutableList<Term>>>nil();
+        } else {
+            ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> result =
+                    ImmutableSLList.<Pair<ImmutableList<Term>,ImmutableList<Term>>>nil();
+            for (PositionedString expr : originalClauses) {
+                Pair<ImmutableList<Term>,ImmutableList<Term>> translated =
+                        JMLTranslator.translate(
+                        expr, pm.getContainerType(), selfVar, paramVars, resultVar,
+                        null, null, Pair.class, services);
+                result = result.append(translated);
+            }
+            return result;
+        }
+    }
+
+
+    private ImmutableList<ImmutableList<Term>> translateDeclassifiesClauses(
             IProgramMethod pm,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,

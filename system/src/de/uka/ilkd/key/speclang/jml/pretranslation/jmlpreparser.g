@@ -648,7 +648,7 @@ respects_clause
 	returns [PositionedString result = null]
 	throws SLTranslationException
 :
-    r:RESPECTS result=expression { result = result.prepend(r.getText() + " "); }
+    (RESPECTS | SEGREGATES) result=expression { result = result.prepend("respects "); }
 ;
 
 

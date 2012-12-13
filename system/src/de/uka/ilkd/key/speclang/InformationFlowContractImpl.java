@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.util.Pair;
 import java.util.List;
 import java.util.Map;
 
@@ -49,7 +50,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private final Term origExc;
     private final boolean toBeSaved;
     private final Term origDep;
-    private final ImmutableList<ImmutableList<Term>> origRespects;
+    private final ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> origRespects;
     private final ImmutableList<ImmutableList<Term>> origDeclassifies;
 
     /**
@@ -79,7 +80,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                           Term result,
                                           Term exc,
                                           Term dep,
-                                          ImmutableList<ImmutableList<Term>> respects,
+                                          ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> respects,
                                           ImmutableList<ImmutableList<Term>> declassifies,
                                           boolean toBeSaved,
                                           int id) {
@@ -140,7 +141,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                        Term result,
                                        Term exc,
                                        Term dep,
-                                       ImmutableList<ImmutableList<Term>> respects,
+                                       ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> respects,
                                        ImmutableList<ImmutableList<Term>> declassifies,
                                        boolean toBeSaved) {
 
@@ -301,7 +302,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                + (hasRealModifiesClause ? "" : "<b>, creates no new objects</b>")
                + getHTMLFor(origMby, "measured-by", services)
                + "<br><b>termination</b> " + modality
-               + getHTMLFor2(origRespects, "respects", services)
+               + getHTMLFor(origRespects, "segregates", services)
                + getHTMLForDeclassifies(services)
                + "</html>";
     }
@@ -373,14 +374,19 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
     
-    private String getHTMLFor2(Iterable<ImmutableList<Term>> originalTerms,
+    private String getHTMLFor(ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> originalTerms,
                               String htmlName,
                               Services services) {
         String respects = "";
         if (hasRespects()) {
             respects = "<br><b>" + htmlName + "</b> ";
-            for (Iterable<Term> list : originalTerms) {
-                respects += "(" + getHTMLFor(list, htmlName, services) + ") ";
+            for (Pair<ImmutableList<Term>,ImmutableList<Term>> pair : originalTerms) {
+                if (pair.second.isEmpty()) {
+                    respects += "(" + getHTMLFor(pair.first, htmlName, services) + ") ";
+                } else {
+                    respects += "(" + getHTMLFor(pair.first, htmlName, services) + ") " +
+                                " depending on (" + getHTMLFor(pair.second, htmlName, services) + ") ";
+                }
             }
         }
         return respects;
@@ -524,7 +530,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public ImmutableList<ImmutableList<Term>> getRespects() {
+    public ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> getRespects() {
         return origRespects;
     }
 

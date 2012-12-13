@@ -20,6 +20,7 @@ import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 import java.util.EnumMap;
 import java.util.List;
 
@@ -85,7 +86,7 @@ class BasicSnippetData {
         DEPENDENS(Term.class),
         MEASURED_BY(Term.class),
         MODALITY(Modality.class),
-        RESPECTS(Term[][].class),
+        RESPECTS(ImmutableList.class),
         DECLASSIFIES(Term[][].class),
         /**
          * Variables originally used during parsing.
@@ -142,8 +143,7 @@ class BasicSnippetData {
         contractContents.put(Key.DEPENDENS, contract.getDep());
         contractContents.put(Key.MEASURED_BY, contract.getMby());
         contractContents.put(Key.MODALITY, contract.getModality());
-        contractContents.put(Key.RESPECTS,
-                             doubleListToArray(contract.getRespects()));
+        contractContents.put(Key.RESPECTS, contract.getRespects());
         contractContents.put(Key.DECLASSIFIES,
                              doubleListToArray(contract.getDeclassifies()));
 
@@ -168,8 +168,7 @@ class BasicSnippetData {
         contractContents.put(Key.PRECONDITION, contract.getPre(services));
         contractContents.put(Key.MODIFIES, contract.getMod(services));
         contractContents.put(Key.MODALITY, contract.getModality());
-        contractContents.put(Key.RESPECTS,
-                             doubleListToArray(contract.getRespects()));
+        contractContents.put(Key.RESPECTS, contract.getRespects());
         contractContents.put(Key.DECLASSIFIES,
                              doubleListToArray(contract.getDeclassifies()));
         List<Label> labels = contract.getLabels();

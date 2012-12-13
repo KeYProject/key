@@ -9,6 +9,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Generate term "self != null".
@@ -28,15 +29,15 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
             throw new UnsupportedOperationException("Tried to produce "
                     + "respects for a contract without respects.");
         }
-        assert Term[][].class.equals(BasicSnippetData.Key.RESPECTS.getType());
-        Term[][] origRespects = (Term[][]) d.get(
-                BasicSnippetData.Key.RESPECTS);
+        assert ImmutableList.class.equals(BasicSnippetData.Key.RESPECTS.getType());
+        ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> origRespects =
+                (ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>>) d.get(BasicSnippetData.Key.RESPECTS);
 
         // the respects-sequents evaluated in the pre-state
-        Term[][] respectsAtPre1 = replace(origRespects, d.origVars, poVars1);
-        Term[][] respectsAtPre2 = replace(origRespects, d.origVars, poVars2);
+        Pair<Term[],Term[]>[] respectsAtPre1 = replace(origRespects, d.origVars, poVars1);
+        Pair<Term[],Term[]>[] respectsAtPre2 = replace(origRespects, d.origVars, poVars2);
         // the respects-sequents evaluated in the post-state
-        Term[][] respectsAtPost1 = replace(respectsAtPre1,
+        Pair<Term[],Term[]>[] respectsAtPost1 = replace(respectsAtPre1,
                                            new Term[]{poVars1.heap,
                                                       poVars1.self,
                                                       poVars1.result,
@@ -45,7 +46,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
                                                       poVars1.selfAtPost,
                                                       poVars1.resultAtPost,
                                                       poVars1.exceptionAtPost});
-        Term[][] respectsAtPost2 = replace(respectsAtPre2,
+        Pair<Term[],Term[]>[] respectsAtPost2 = replace(respectsAtPre2,
                                            new Term[]{poVars2.heap,
                                                       poVars2.self,
                                                       poVars2.result,
@@ -86,36 +87,47 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
     private Term buildInputOutputRelation(BasicSnippetData d,
                                           ProofObligationVars vs1,
                                           ProofObligationVars vs2,
-                                          Term[] respectsAtPre1,
-                                          Term[] respectsAtPre2,
-                                          Term[] respectsAtPost1,
-                                          Term[] respectsAtPost2,
+                                          Pair<Term[],Term[]> respectsAtPre1,
+                                          Pair<Term[],Term[]> respectsAtPre2,
+                                          Pair<Term[],Term[]> respectsAtPost1,
+                                          Pair<Term[],Term[]> respectsAtPost2,
                                           Term[][] declassClause1,
                                           Term[][] declassClause2) {
+        Term[] respectsAtPreTerms1 = (hasDependsOn(respectsAtPre1)) ?
+                                     respectsAtPre1.second :
+                                     respectsAtPre1.first;
+        Term[] respectsAtPreTerms2 = (hasDependsOn(respectsAtPre2)) ?
+                                     respectsAtPre2.second :
+                                     respectsAtPre2.first;
         Term inputRelation =
-                buildInputRelation(d, vs1, vs2, respectsAtPre1,
-                                   respectsAtPre2, declassClause1,
+                buildInputRelation(d, vs1, vs2, respectsAtPreTerms1,
+                                   respectsAtPreTerms2, declassClause1,
                                    declassClause2);
         Term outputRelation =
-                buildOutputRelation(d, vs1, vs2, respectsAtPost1,
-                                    respectsAtPost2);
+                buildOutputRelation(d, vs1, vs2, respectsAtPost1.first,
+                                    respectsAtPost2.first);
 
         return d.tb.imp(inputRelation, outputRelation);
+    }
+
+
+    private boolean hasDependsOn(Pair<Term[], Term[]> respectsAtPre1) {
+        return respectsAtPre1.second.length > 0;
     }
 
     private Term buildInputRelation(BasicSnippetData d,
                                     ProofObligationVars vs1,
                                     ProofObligationVars vs2,
-                                    Term[] referenceLocSet1,
-                                    Term[] referenceLocSet2,
+                                    Term[] respects1,
+                                    Term[] respects2,
                                     Term[][] declassClause1,
                                     Term[][] declassClause2) {
         final Term mainInputEqRelation =
-                buildMainInputEqualsRelation(d, vs1, vs2, referenceLocSet1,
-                                             referenceLocSet2);
+                buildMainInputEqualsRelation(d, vs1, vs2, respects1,
+                                             respects2);
         final Term[] declassifiesRelations =
-                buildDeclassifiesRelations(d, referenceLocSet1, declassClause1,
-                                           referenceLocSet2, declassClause2);
+                buildDeclassifiesRelations(d, respects1, declassClause1,
+                                           respects2, declassClause2);
 
         ImmutableList<Term> inputRelations =
                 ImmutableSLList.<Term>nil();
@@ -152,16 +164,16 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
 
     private Term[] buildDeclassifiesRelations(
             BasicSnippetData d,
-            Term[] referenceLocSet1,
+            Term[] respects1,
             Term[][] declassClause1,
-            Term[] referenceLocSet2,
+            Term[] respects2,
             Term[][] declassClause2) {
         final Term[] declassifications = new Term[declassClause1.length];
         for (int i = 0; i < declassifications.length; i++) {
             declassifications[i] =
-                    buildDeclassifiesRelation(d, referenceLocSet1,
+                    buildDeclassifiesRelation(d, respects1,
                                               declassClause1[i],
-                                              referenceLocSet2,
+                                              respects2,
                                               declassClause2[i]);
         }
         return declassifications;
@@ -169,9 +181,9 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
 
     private Term buildDeclassifiesRelation(
             BasicSnippetData d,
-            Term[] referenceLocSet1,
+            Term[] respects1,
             Term[] declassClause1,
-            Term[] referenceLocSet2,
+            Term[] respects2,
             Term[] declassClause2) {
         final Term declassification1 = declassClause1[0];
         final Term from1 = declassClause1[1];
@@ -191,8 +203,8 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
         }
         if (to1 != null) {
             condition = d.tb.and(
-                    d.tb.equals(to1, d.tb.seq(referenceLocSet1)),
-                    d.tb.equals(to2, d.tb.seq(referenceLocSet2)),
+                    d.tb.equals(to1, d.tb.seq(respects1)),
+                    d.tb.equals(to2, d.tb.seq(respects2)),
                     condition);
         }
         if (from1 != null) {
@@ -205,11 +217,11 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
     private Term buildOutputRelation(BasicSnippetData d,
                                      ProofObligationVars vs1,
                                      ProofObligationVars vs2,
-                                     Term[] referenceLocSet1,
-                                     Term[] referenceLocSet2) {
+                                     Term[] respects1,
+                                     Term[] respects2) {
         Term mainEqRelation =
-                buildMainOutputEqualsRelation(d, vs1, vs2, referenceLocSet1,
-                                              referenceLocSet2);
+                buildMainOutputEqualsRelation(d, vs1, vs2, respects1,
+                                              respects2);
         ImmutableList<Term> outputRelations = ImmutableSLList.<Term>nil();
         outputRelations = outputRelations.append(mainEqRelation);
         return d.tb.and(outputRelations);
@@ -218,16 +230,16 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
     private static Term buildMainOutputEqualsRelation(BasicSnippetData d,
                                                       ProofObligationVars vs1,
                                                       ProofObligationVars vs2,
-                                                      Term[] referenceLocSet1,
-                                                      Term[] referenceLocSet2) {
+                                                      Term[] respects1,
+                                                      Term[] respects2) {
         BasicPOSnippetFactory f1 = POSnippetFactory.getBasicFactory(d, vs1);
         BasicPOSnippetFactory f2 = POSnippetFactory.getBasicFactory(d, vs2);
         Term framingLocs1 = f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_MOD);
         Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_MOD);
 
-        Term[] eqAtLocs = new Term[referenceLocSet1.length];
+        Term[] eqAtLocs = new Term[respects1.length];
         for (int i = 0; i < eqAtLocs.length; i++) {
-            eqAtLocs[i] = d.tb.equals(referenceLocSet1[i], referenceLocSet2[i]);
+            eqAtLocs[i] = d.tb.equals(respects1[i], respects2[i]);
         }
         return d.tb.and(eqAtLocs);
     }

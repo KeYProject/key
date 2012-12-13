@@ -45,6 +45,7 @@ tokens {
     REPRESENTS      = "represents";
     REQUIRES        = "requires";
     RESPECTS        = "respects";
+    SEGREGATES      = "segregates";
     SECURE_FOR      = "secure_for";
     SIGNALS         = "signals";
     SIGNALS_ONLY    = "signals_only";
@@ -165,6 +166,7 @@ MEASURED_BY : "\\measured_by";
 FROM : "\\from";
 TO : "\\to";
 IF : "\\if";
+DEPENDING_ON : "\\depending_on";
 
 DL_ESCAPE : "\\dl_"  LETTER  ( LETTERORDIGIT )*  ;
 

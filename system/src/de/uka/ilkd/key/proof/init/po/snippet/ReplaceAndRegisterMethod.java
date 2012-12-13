@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.util.Pair;
 import java.util.Iterator;
 
 
@@ -75,12 +76,74 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
+    final Pair<Term[], Term[]> replace(Pair<Term[], Term[]> terms,
+                                       Term[] origVars,
+                                       Term[] poVars) {
+        final Term[] result1 = new Term[terms.first.length];
+        for (int i = 0; i < terms.first.length; i++) {
+            result1[i] = replace(terms.first[i], origVars, poVars);
+
+        }
+        final Term[] result2 = new Term[terms.second.length];
+        for (int i = 0; i < terms.second.length; i++) {
+            result2[i] = replace(terms.second[i], origVars, poVars);
+
+        }
+        return new Pair(result1, result2);
+    }
+
+
+    final Pair<Term[], Term[]> replace(
+            Pair<ImmutableList<Term>, ImmutableList<Term>> terms,
+            ProofObligationVars origVars,
+            ProofObligationVars poVars) {
+        final Term[] result1 = new Term[terms.first.size()];
+        Iterator<Term> termIt1 = terms.first.iterator();
+        for (int i = 0; termIt1.hasNext(); i++) {
+            result1[i] = replace(termIt1.next(), origVars, poVars);
+
+        }
+        final Term[] result2 = new Term[terms.second.size()];
+        Iterator<Term> termIt2 = terms.second.iterator();
+        for (int i = 0; termIt2.hasNext(); i++) {
+            result2[i] = replace(termIt2.next(), origVars, poVars);
+
+        }
+        return new Pair(result1, result2);
+    }
+
+
     final Term[][] replace(Term[][] termss,
                            ProofObligationVars origVars,
                            ProofObligationVars poVars) {
         final Term[][] result = new Term[termss.length][];
         for (int i = 0; i < termss.length; i++) {
             result[i] = replace(termss[i], origVars, poVars);
+        }
+        return result;
+    }
+
+
+    final Pair<Term[], Term[]>[] replace(Pair<Term[], Term[]>[] termss,
+                                         Term[] origVars,
+                                         Term[] poVars) {
+        final Pair<Term[], Term[]>[] result = new Pair[termss.length];
+        for (int i = 0; i < termss.length; i++) {
+            result[i] = replace(termss[i], origVars, poVars);
+        }
+        return result;
+    }
+
+
+    final Pair<Term[], Term[]>[] replace(
+            ImmutableList<Pair<ImmutableList<Term>, ImmutableList<Term>>> termss,
+            ProofObligationVars origVars,
+            ProofObligationVars poVars) {
+        final Pair<Term[], Term[]>[] result = new Pair[termss.size()];
+        Iterator<Pair<ImmutableList<Term>, ImmutableList<Term>>> it =
+                termss.iterator();
+        for (int i = 0; it.hasNext(); i++) {
+            result[i] = replace(it.next(), origVars, poVars);
         }
         return result;
     }

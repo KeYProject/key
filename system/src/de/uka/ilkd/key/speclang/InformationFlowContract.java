@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.util.Pair;
 
 
 
@@ -136,7 +137,7 @@ public interface InformationFlowContract extends Contract {
     /**
      * Returns the set of views.
      */
-    ImmutableList<ImmutableList<Term>> getRespects();
+    ImmutableList<Pair<ImmutableList<Term>,ImmutableList<Term>>> getRespects();
 
 
     /**

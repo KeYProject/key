@@ -467,14 +467,23 @@ representsclause returns [Pair<ObserverFunction,Term> result=null] throws SLTran
     ;
 
 
-respectsclause returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
+respectsclause returns  [Pair<ImmutableList<Term>,ImmutableList<Term>> result = null] throws SLTranslationException {
+    ImmutableList<Term> seg = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> depOn = ImmutableSLList.<Term>nil();
+}
+:
+    (RESPECTS | SEGREGATES) seg = respectslist (DEPENDING_ON (NOTHING {depOn = depOn.append(TB.tt());} | depOn = respectslist))?
+    {result = new Pair(seg, depOn);}
+    ;
+
+
+respectslist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException {
     Term term = null;
 }
 :
-    resp:RESPECTS
     term = termexpression { result = result.append(term); }
     (COMMA term = termexpression { result = result.append(term); })*
-        { result = translator.translate(resp.getText(), ImmutableList.class, result, services); }
+        { result = translator.translate("respects", ImmutableList.class, result, services); }
     ;
 
 
