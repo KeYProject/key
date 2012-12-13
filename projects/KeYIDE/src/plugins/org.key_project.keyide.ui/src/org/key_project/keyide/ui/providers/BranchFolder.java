@@ -8,15 +8,10 @@ public class BranchFolder {
    
    private BranchFolder parent;
    
-   private String label;
-   
-   private boolean isProved = false;
-   
    // TODO: Why is the parent a branch folder? If I guess I expect that the parent is a Node. 
-   public BranchFolder(BranchFolder parent, Node child, String label){
+   public BranchFolder(BranchFolder parent, Node child){
       this.parent = parent;
       this.child = child;
-      this.label = label;
    }
    
    public Node getChild() {
@@ -35,20 +30,11 @@ public class BranchFolder {
    }
 
    public String getLabel() {
-      return label;
+      return child.getNodeInfo().getBranchLabel();
    }
 
-   // TODO: I think this will never change? So remove setter.
-   public void setLabel(String label) {
-      this.label = label;
-   }
-
-   public boolean isProved() {
-      return isProved;
-   }
-
-   public void setProved(boolean isProved) {
-      this.isProved = isProved;
+   public boolean isClosed() {
+      return child.isClosed();
    }
       
 }

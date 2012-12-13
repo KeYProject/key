@@ -6,6 +6,7 @@ import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.key_project.keyide.ui.editor.input.StringInput;
 import org.key_project.keyide.ui.views.Outline;
+import org.key_project.keyide.ui.views.StrategyPropertiesView;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -55,11 +56,14 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       if (IContentOutlinePage.class.equals(adapter)) {
          synchronized (this) {
             if (outline == null) {
-               outline = new Outline(getProof());
+               outline = new Outline(getProof(), getKeYEnvironment());
             }
           
          }
          return outline;
+      }
+      if(StrategyPropertiesView.class.equals(adapter)){
+         return getProof();
       }
 //      if(IPropertySheetPage.class.equals(adapter)){ // TODO: Remove uncommented code if no longer required, because otherwise it is hard to say in the future why this code was uncommented.
 //         synchronized (this) {

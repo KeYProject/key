@@ -28,7 +28,6 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
           proofProvider.getKeYEnvironment().getUi().isAutoModeSupported(proofProvider.getProof()) && 
           !proofProvider.getKeYEnvironment().getMediator().autoMode()) {
          //refresh GUI properly
-         proofProvider.getKeYEnvironment().getMediator().setMaxAutomaticSteps(2);
          proofProvider.getKeYEnvironment().getUi().notifyAutoModeBeingStarted();
          KeYToUIUtil.refreshUI(evaluationService);
          new AbstractKeYEnvironmentJob("Auto Mode", proofProvider.getKeYEnvironment()) {
@@ -36,7 +35,7 @@ public class StartAutoModeHandler extends AbstractSaveExecutionHandler {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
                monitor.beginTask("Proving with KeY", IProgressMonitor.UNKNOWN);
-               proofProvider.getKeYEnvironment().getMediator().setMaxAutomaticSteps(Integer.MAX_VALUE);
+               
                proofProvider.getKeYEnvironment().getUi().startAndWaitForAutoMode(proofProvider.getProof());
                //refresh GUI properly
                proofProvider.getKeYEnvironment().getUi().notifyAutomodeStopped();

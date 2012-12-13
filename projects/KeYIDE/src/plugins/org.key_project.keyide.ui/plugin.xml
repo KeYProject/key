@@ -312,6 +312,14 @@
             name="Proof"
             restorable="true">
       </view>
+      <view
+            category="org.key_project.keyide.ui.view.category"
+            class="org.key_project.keyide.ui.views.StrategyPropertiesView"
+            icon="icons/releng_gears.gif"
+            id="org.key_project.keyide.ui.view.StrategyProperties"
+            name="Strategy Properties"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.editorActions">

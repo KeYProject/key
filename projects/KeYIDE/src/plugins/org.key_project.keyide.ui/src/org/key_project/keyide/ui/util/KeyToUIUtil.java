@@ -152,8 +152,7 @@ public class KeYToUIUtil {
     */
    public static void openEditor(Proof proof, KeYEnvironment<?> environment){
       String inputText = NonGoalInfoView.computeText(environment.getMediator(), proof.root());
-      String inputSequent=(String) inputText.subSequence(0, inputText.length()-12);
-      IStorage storage = new StringStorage(inputSequent, inputText);
+      IStorage storage = new StringStorage(inputText, proof.name().toString());
       IStorageEditorInput input = new StringInput(storage, proof, environment);
       try {
          // TODO: Use WorkbenchUtil.getActivePage() instead of PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
@@ -193,6 +192,7 @@ public class KeYToUIUtil {
 //         FunctionalOperationContract[] initialSelection = new FunctionalOperationContract[1];
 //         initialSelection[0]=operationContracts.toArray(initialSelection)[0];
 //         dialog.setInitialSelections(initialSelection);
+         dialog.setInitialSelections(new FunctionalOperationContract[] {CollectionUtil.getFirst(operationContracts)});
       }
       if (dialog.open() == ContractSelectionDialog.OK) {
           Object result = dialog.getFirstResult();

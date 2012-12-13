@@ -1,12 +1,14 @@
 package org.key_project.keyide.ui.providers;
 
 
+import java.util.HashMap;
 import java.util.Vector;
 
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.TreeItem;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -120,7 +122,7 @@ public class OutlineContentProvider implements ILazyTreeContentProvider{
             public void run() {
                // TODO Auto-generated method stub
 //               System.out.println("ADDED----------------------------------------------------------------------------------------------------");
-               //System.out.println(e.getGoal());
+//               System.out.println("Added: " + e.getNode());
                
             }
          });
@@ -138,7 +140,7 @@ public class OutlineContentProvider implements ILazyTreeContentProvider{
             @Override
             public void run() {
                // TODO Auto-generated method stub
-               //viewer.remove(e.getNode());
+//               System.out.println("Removed: " + e.getGoal().node().serialNr() + ":" + e.getGoal().node().name());
 //               System.out.println("REMOVED----------------------------------------------------------------------------------------------------");
             }
          });
@@ -159,6 +161,7 @@ public class OutlineContentProvider implements ILazyTreeContentProvider{
             public void run() {
                // TODO Auto-generated method stub
                //System.out.println("EXPANDED----------------------------------------------------------------------------------------------------");
+//               System.out.println("Expanded: " + e.getNode().serialNr() + ":" + e.getNode().name());
                expanded(e.getNode());
             }
             
@@ -219,16 +222,30 @@ public class OutlineContentProvider implements ILazyTreeContentProvider{
    }
    
    @Override
-   public void updateElement(Object branch, int index) {
-   }
+   public void updateElement(Object parent, int index) {
+  }
    
    //A vector that saves all branchFolders
    // TODO: Use java naming conventions, rename it into "branchFolders"
    // TODO: If you just needs the BranchFolder for a Node, use a Map: private Map<Node, BranchFolder> branchFolders = new HashMap<Node, BranchFolder>();
-   private Vector<BranchFolder> BranchFolders = new Vector<BranchFolder>(); // Vector is a bad class because it is based on an array. To store all references of instances a Set is more efficient: private Set<BranchFolder> branchFolders = new HashSet<BranchFolder>();
-   
+   //private Vector<BranchFolder> branchFolders = new Vector<BranchFolder>(); // Vector is a bad class because it is based on an array. To store all references of instances a Set is more efficient: private Set<BranchFolder> branchFolders = new HashSet<BranchFolder>();
+   private HashMap<Node, BranchFolder> branchFolders = new HashMap<Node, BranchFolder>();
    //manages the whole treeexpandency by calling the specified method for the given node
    private void expanded(Node node){
+
+// Shell muss sichtbar sein
+//TreeViewer x = new TreeViewer();
+//x.setUseHashlookup(true);
+//x.setInput(input); //;
+//x.expandAll();
+//TreeItem[] items = x.getTree().getItems()
+//for (TreeItem item : items) {
+// x.getTree().showItem(item);
+// x.expandAll();
+//   item.getItems()
+//   item.getData() == node, or folder
+//}
+
 
       if(isBranchNodeRoot(node)){
          expandedRoot(node);
@@ -248,15 +265,16 @@ public class OutlineContentProvider implements ILazyTreeContentProvider{
       }
       else if(index == size-1 && node.childrenCount() > 1){
          viewer.setChildCount(node.proof(), size+node.childrenCount());
-         for(int i = 0; i < node.childrenCount(); i++, size++, index++){
-            viewer.replace(node.proof(), size, node.child(i));
-         }
+//         for(int i = 0; i < node.childrenCount(); i++, size++, index++){
+//            viewer.replace(node.proof(), size, node.child(i));
+//         }
+         createFolder(node);
       }
    }
    
    //manages the expandency of the nodes when the branchnode of the given node is NOT the rootNode 
    private void expandedFolder(Node node){
-      createFolder(node);
+      //createFolder(node);
       
       BranchFolder branchFolder = getBranchFolder(node);
       int index = getNodeIndexInBranch(node);
@@ -264,82 +282,50 @@ public class OutlineContentProvider implements ILazyTreeContentProvider{
       viewer.setChildCount(branchFolder, size);
       viewer.replace(branchFolder, index, node);
       if(index == size-2 && node.childrenCount() == 1){
-         //Updates the "isProved" Status of the Folders to refresh the Images
-         updateFolderIsProved(node, branchFolder);
-         
+         //Updates the "isProved" Status of the Folders to refresh the Images         
          viewer.replace(branchFolder, index+1, node.child(0));
       }
       else if(index == size-1 && node.childrenCount() > 1){
          viewer.setChildCount(branchFolder, size+node.childrenCount());
-         for(int i = 0; i < node.childrenCount(); i++, size++, index++){
-            viewer.replace(branchFolder, size, node.child(i));
-         }
+//         for(int i = 0; i < node.childrenCount(); i++, size++, index++){
+//            viewer.replace(branchFolder, size, node.child(i));
+//         }
+         createFolder(node);
       }
    }
    
    
    //Creates the folder for the branchnode of the given node
    private void createFolder(Node node){
-      if(node.parent().childrenCount() > 1){
-         Node parentBranchNode = getBranchNode(node.parent());
-         BranchFolder parentBranchFolder = getBranchFolder(parentBranchNode);
-         int parentIndex = getNodeIndexInBranch(node.parent());
-         for(int i = 0; i < node.parent().childrenCount(); i++, parentIndex++){
-            if(node.equals(node.parent().child(i))){
-               BranchFolder branchFolder = new BranchFolder(parentBranchFolder, node, node.getNodeInfo().getBranchLabel());
-               BranchFolders.add(branchFolder);
-               if(parentBranchFolder == null)
-                  viewer.replace(node.proof(), parentIndex+1, branchFolder);
-               else viewer.replace(parentBranchFolder, parentIndex+1, branchFolder);
-            }
-         }   
-      }
-   }
-   
-   //Updates the first Folder above a "closed goal" term and calls the setUpperFoldersProved(Node node) method to check the upper folders for provedheit
-   private void updateFolderIsProved(Node node, BranchFolder branchFolder){
-      if(node.child(0).name().equals("Closed goal")){
-         branchFolder.setProved(true);
-         if(branchFolder.getParent() == null)
-            viewer.replace(node.proof(), getBranchFolderIndex(branchFolder), branchFolder);
+      for(int i = 0; i < node.childrenCount(); i++){
+         BranchFolder parentBranchFolder = getBranchFolder(node);
+         BranchFolder branchFolder = new BranchFolder(parentBranchFolder, node.child(i));
+         branchFolders.put(node.child(i), branchFolder);
+//         System.out.println(node.child(i).serialNr() + ":" + node.child(i).name() + " | " + node.child(i).getNodeInfo().getBranchLabel());
+         int nodeIndex = getNodeIndexInBranch(node);
+         if(parentBranchFolder == null)
+            viewer.replace(node.proof(), nodeIndex+i+1, branchFolder);
          else
-            viewer.replace(branchFolder.getParent(), getBranchFolderIndex(branchFolder), branchFolder);
-         setUpperFoldersProved(node.child(0));
+            viewer.replace(parentBranchFolder, nodeIndex+i+1, branchFolder);
+         viewer.setChildCount(branchFolder, 1);
+         viewer.replace(branchFolder,0 , node.child(i));
       }
+//      if(node.parent().childrenCount() > 1){
+//         Node parentBranchNode = getBranchNode(node.parent());
+//         BranchFolder parentBranchFolder = getBranchFolder(parentBranchNode);
+//         int parentIndex = getNodeIndexInBranch(node.parent());
+//         for(int i = 0; i < node.parent().childrenCount(); i++, parentIndex++){
+//            if(node.equals(node.parent().child(i))){
+//               BranchFolder branchFolder = new BranchFolder(parentBranchFolder, node, node.getNodeInfo().getBranchLabel());
+//               branchFolders.put(node, branchFolder);
+//               if(parentBranchFolder == null)
+//                  viewer.replace(node.proof(), parentIndex+1, branchFolder);
+//               else viewer.replace(parentBranchFolder, parentIndex+1, branchFolder);
+//            }
+//         }   
+//      }
    }
-
    
-   //checks if the upper folders are proved and sets their status
-   //TODO call with parent of checked folders
-   private void setUpperFoldersProved(Node node){
-      
-      if(!getBranchNode(node).equals(node.proof().root())){
-         boolean setProved = false;
-         Node branchNode = getBranchNode(node);
-         Node parentNode = branchNode.parent();
-         for(int i = 0; i < parentNode.childrenCount(); i++){
-            if(getBranchFolder(parentNode.child(i)) != null){
-               if(getBranchFolder(parentNode.child(i)).isProved())
-                  setProved = true;
-               else setProved = false;
-            }
-         }
-         if(setProved){
-            Node parentBranchNode = getBranchNode(parentNode);
-            
-            for(int i = 0; i < BranchFolders.size(); i++){ // Never iterate over a Collection like this, because not every implementation has a direct access to children via an index. Use always the iterator concept: for (BranchFolders folder : BranchFolders) {...} 
-               if(BranchFolders.get(i).getChild().equals(parentBranchNode)){
-                  BranchFolders.get(i).setProved(true);
-                  if(BranchFolders.get(i).getParent() == null)
-                     viewer.replace(node.proof(), getBranchFolderIndex(BranchFolders.get(i)), BranchFolders.get(i));
-                  else
-                     viewer.replace(BranchFolders.get(i).getParent(), getBranchFolderIndex(BranchFolders.get(i)), BranchFolders.get(i));
-               }
-            }
-            setUpperFoldersProved(parentNode);
-         }
-      } 
-   }
    
    //returns the index of a given branchfolder in its branchfolder parent
    private int getBranchFolderIndex(BranchFolder branchFolder){
@@ -374,12 +360,10 @@ public class OutlineContentProvider implements ILazyTreeContentProvider{
    //returns the branchfolder of a given node
    private BranchFolder getBranchFolder(Node node){
       Node branchNode = getBranchNode(node);
-      for(int i = 0; i < BranchFolders.size(); i++){
-         if(BranchFolders.get(i).getChild().equals(branchNode)){
-            return BranchFolders.get(i);
-         }
-      }
-      return null;
+      if(branchNode.equals(node.proof().root()))
+         return null;
+      else
+         return branchFolders.get(branchNode);
    }
    
    //returns the index in the given node in its branch
@@ -398,18 +382,5 @@ public class OutlineContentProvider implements ILazyTreeContentProvider{
       node = getBranchNode(node);
       return node.equals(node.proof().root());
    }
-   
-   //returns if the folder for the given branchnode already exists
-   //not needed atm. can be deleted
-   private boolean hasFolder(Node branchNode){
-      for(int i = 0; i < BranchFolders.size(); i++){
-         if(BranchFolders.get(i).getChild().equals(branchNode)){
-            return true;
-         }
-      }
-      return false;
-   }
-   
-   
    
 }

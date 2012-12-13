@@ -7,6 +7,7 @@ import org.key_project.keyide.ui.providers.OutlineContentProvider;
 import org.key_project.keyide.ui.providers.OutlineLabelProvider;
 
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 
 /**
  * A class to display the correct Outline for the current {@link Proof}
@@ -17,12 +18,15 @@ import de.uka.ilkd.key.proof.Proof;
 public class Outline extends ContentOutlinePage {
    private Proof proof;
    
+   private KeYEnvironment<?> environment;
+   
    /**
     * Constructor.
     * @param proof The {@link Proof} for this Outline.
     */
-   public Outline(Proof proof) {
+   public Outline(Proof proof, KeYEnvironment<?> environment) {
       this.proof = proof;
+      this.environment = environment;
    }
    
    /**
@@ -41,7 +45,7 @@ public class Outline extends ContentOutlinePage {
       super.createControl(parent);
       getTreeViewer().setUseHashlookup(true);
       getTreeViewer().setContentProvider(new OutlineContentProvider(getTreeViewer()));
-      getTreeViewer().setLabelProvider(new OutlineLabelProvider());
+      getTreeViewer().setLabelProvider(new OutlineLabelProvider(getTreeViewer(), environment, proof));
       getTreeViewer().setInput(proof);
    }
 }

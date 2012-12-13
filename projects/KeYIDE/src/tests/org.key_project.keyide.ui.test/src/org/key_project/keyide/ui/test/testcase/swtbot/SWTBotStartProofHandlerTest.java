@@ -19,6 +19,7 @@ import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
 import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.handlers.StartProofHandler;
+import org.key_project.keyide.ui.perspectives.KeYPerspective;
 import org.key_project.keyide.ui.test.Activator;
 import org.key_project.keyide.ui.visualization.VisualizationPreferences;
 import org.key_project.util.eclipse.BundleUtil;
@@ -136,6 +137,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
          // Switch to KeY perspective
          SWTBotShell switchShell = bot.shell("Confirm Perspective Switch");
          switchShell.bot().button("Yes").click();
+         assertEquals(KeYPerspective.PERSPECTIVE_ID, TestUtilsUtil.getActivePerspective().getId());
          // Select first operation contract and start proof
          SWTBotShell contractShell = bot.shell("Select Contract for Proof in KeY");
          contractShell.bot().table().select(0);

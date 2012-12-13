@@ -33,6 +33,7 @@ public class KeYPerspective implements IPerspectiveFactory {
       // Put the properties view on bottom left.
       IFolderLayout bottomLeftFolder = layout.createFolder("bottomLeft", IPageLayout.BOTTOM, 0.7f, "left");
       bottomLeftFolder.addView(IPageLayout.ID_PROP_SHEET);
+      bottomLeftFolder.addView("org.key_project.keyide.ui.view.StrategyProperties");
       // Put the out line on the right.
       IFolderLayout rightFolder = layout.createFolder("right", IPageLayout.RIGHT, 0.8f, editorArea);
       rightFolder.addView(IPageLayout.ID_OUTLINE);
