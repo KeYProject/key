@@ -93,4 +93,10 @@ public class TermLabelWildcard extends TermLabelOperation implements SchemaVaria
         return (ImmutableArray<ITermLabel>) svInst.getInstantiation(this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String toString() {
+        return "*";
+    }
 }

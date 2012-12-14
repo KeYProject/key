@@ -56,6 +56,7 @@ import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.label.TermLabelOperation;
+import de.uka.ilkd.key.rule.label.TermLabelWildcard;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
@@ -340,7 +341,8 @@ public final class SyntacticalReplaceVisitor extends Visitor {
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
                 && (!(visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp)
                         .isListSV()))) {
-            pushNew(toTerm(svInst.getInstantiation((SchemaVariable) visitedOp)));
+            Term newTerm = toTerm(svInst.getInstantiation((SchemaVariable) visitedOp));            
+            pushNew(TermBuilder.DF.label(newTerm, instantiateAnnotations(visited)));
         } else if ((visitedOp instanceof Metavariable)
                 && metavariableInst.getInstantiation((Metavariable) visitedOp)
                         .op() != visitedOp) {
@@ -371,23 +373,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
             final ImmutableArray<QuantifiableVariable> boundVars = instantiateBoundVariables(visited);
 
             // instantiate annotations
-            ImmutableArray<ITermLabel> labels;
-            if (visited.hasLabels()) {
-                ArrayList<ITermLabel> instantiatedLabels = new ArrayList<ITermLabel>(10);
-                ImmutableArray<ITermLabel> visitedLabels = visited.getLabels();
-                for (ITermLabel l : visitedLabels) {
-                    if (l instanceof TermLabelOperation) {
-                        for (final ITermLabel result : ((TermLabelOperation) l).evaluate(svInst, services)) {
-                            instantiatedLabels.add(result);
-                        }
-                    } else {
-                        instantiatedLabels.add(l);
-                    }
-                }
-                labels = new ImmutableArray<ITermLabel>(instantiatedLabels);
-            } else {
-                labels = new ImmutableArray<ITermLabel>();
-            }
+            ImmutableArray<ITermLabel> labels = instantiateAnnotations(visited);
             
             // instantiate sub terms
             Term[] neededsubs = neededSubs(newOp.arity());
@@ -416,6 +402,27 @@ public final class SyntacticalReplaceVisitor extends Visitor {
                     pushNew(t);
             }
         }
+    }
+
+    private ImmutableArray<ITermLabel> instantiateAnnotations(Term visited) {
+        ImmutableArray<ITermLabel> labels;
+        if (visited.hasLabels()) {
+            ArrayList<ITermLabel> instantiatedLabels = new ArrayList<ITermLabel>(10);
+            ImmutableArray<ITermLabel> visitedLabels = visited.getLabels();
+            for (ITermLabel l : visitedLabels) {
+                if (l instanceof TermLabelOperation) {
+                    for (final ITermLabel result : ((TermLabelOperation) l).evaluate(svInst, services)) {
+                        instantiatedLabels.add(result);
+                    }
+                } else {
+                    instantiatedLabels.add(l);
+                }
+            }
+            labels = new ImmutableArray<ITermLabel>(instantiatedLabels);
+        } else {
+            labels = new ImmutableArray<ITermLabel>();
+        }
+        return labels;
     }
     
     private Operator handleSortDependingSymbol (SortDependingFunction depOp) {
