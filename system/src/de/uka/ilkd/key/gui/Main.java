@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 
+import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
