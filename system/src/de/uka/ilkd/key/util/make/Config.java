@@ -41,14 +41,14 @@ public class Config {
     public static final String SIMPLIFY_PATH_KEY = "[SimplifyPath]";
 
     
-    static HashMap map = new HashMap();
+    static HashMap<String,StringBuffer> map = new HashMap<String,StringBuffer>();
 
     /** loads a resource and returns its URL 
      * @param cl the Class used to determine the resource 
      * @param resourcename the String that contains the name of the resource
      * @return the URL of the resource
      */
-    public static URL getResourceFile(Class cl, String resourcename) {
+    public static URL getResourceFile(Class<?> cl, String resourcename) {
 	URL resourceURL = cl.getResource(resourcename);
 	if (resourceURL == null && cl.getSuperclass() != null) {
 	    return getResourceFile(cl.getSuperclass(), resourcename);
@@ -163,7 +163,7 @@ public class Config {
 	FileReader fr = null;
 	try {
 	    fr = new FileReader(args[0]);       	
-	    map = new HashMap();
+	    map = new HashMap<String, StringBuffer>();
 	    while (readIdentifier(fr)!=-1) {	    
 	    }
 	    fr.close();

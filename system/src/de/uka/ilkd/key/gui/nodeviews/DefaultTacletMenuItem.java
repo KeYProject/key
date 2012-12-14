@@ -15,6 +15,7 @@ import java.io.Writer;
 
 import javax.swing.JMenuItem;
 
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -54,7 +55,8 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     				       true);
         tp.printTaclet(connectedTo.taclet(), 
         	       connectedTo.instantiations(),
-        	       ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(),
+        	       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
+//        	       ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(),
         	       false);
         
         int nlcount = 0;
@@ -65,11 +67,13 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         	nlcount += 1;
             }
         }
-        if (nlcount > ProofSettings.DEFAULT_SETTINGS.getViewSettings().getMaxTooltipLines()) { 
+        if(nlcount > ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines()){
+  //      if (nlcount > ProofSettings.DEFAULT_SETTINGS.getViewSettings().getMaxTooltipLines()) { 
     	    Debug.log4jDebug("No SchemaVariable instantiation printed, linecount is " 
     			 + nlcount + " > " 
-    			 + ProofSettings.DEFAULT_SETTINGS.
-    			 getViewSettings().getMaxTooltipLines(),
+    			 + ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines(),
+//    			 + ProofSettings.DEFAULT_SETTINGS.
+//    			 getViewSettings().getMaxTooltipLines(),
     			 TacletMenu.class.getName());
     	    taclet_sb = new StringBuffer();
     	    w = new StringWriter();

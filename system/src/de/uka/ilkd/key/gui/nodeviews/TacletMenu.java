@@ -62,7 +62,13 @@ class TacletMenu extends JMenu {
     private PosInSequent pos;
     private SequentView sequentView;
     private KeYMediator mediator;
-    private static final Name CLUTTER_RULESET = new Name("notHumanReadable");
+    private static final Set<Name> CLUTTER_RULESETS = new HashSet<Name>();
+
+    static {
+        CLUTTER_RULESETS.add(new Name("notHumanReadable"));
+        CLUTTER_RULESETS.add(new Name("pullOutQuantifierAll"));
+        CLUTTER_RULESETS.add(new Name("pullOutQuantifierEx"));
+    }
     private static final Set<Name> CLUTTER_RULES = new HashSet<Name>();
 
     static {
@@ -75,6 +81,10 @@ class TacletMenu extends JMenu {
         CLUTTER_RULES.add(new Name("commute_and_2"));
         CLUTTER_RULES.add(new Name("commute_or_2"));
         CLUTTER_RULES.add(new Name("boxToDiamond"));
+        CLUTTER_RULES.add(new Name("pullOut"));
+        CLUTTER_RULES.add(new Name("typeStatic"));
+        CLUTTER_RULES.add(new Name("less_is_total"));
+        CLUTTER_RULES.add(new Name("less_zero_is_total"));
     }
 
     private TacletAppComparator comp = new TacletAppComparator();
@@ -417,7 +427,7 @@ class TacletMenu extends JMenu {
                 item.addActionListener(control);
                 boolean rareRule = false;
                 for (RuleSet rs : taclet.getRuleSets()) {
-                    if (CLUTTER_RULESET.equals(rs.name())) rareRule = true;
+                    if (CLUTTER_RULESETS.contains(rs.name())) rareRule = true;
                 }
                 if (CLUTTER_RULES.contains(taclet.name())) rareRule = true;
 
@@ -712,34 +722,45 @@ class TacletMenu extends JMenu {
 
             map.put("closing", taclet1.goalTemplates().size()==0 ? -1:1);
 
-            int formulaSV1 = 0;
+            boolean calc = false;
+            for (RuleSet rs : taclet1.getRuleSets()) {
+                String s = rs.name().toString();
+                if (s.equals("simplify_literals") ||
+                    s.equals("concrete") ||
+                    s.equals("update_elim") ||
+                    s.equals("replace_known_left") ||
+                    s.equals("replace_known_right")) calc = true;
+            }
+            map.put("calc", calc ? -1 : 1);
 
-            int cmpVar1 = taclet1.getRuleSets().size();
+            int formulaSV1 = 0;
+            int cmpVar1 = 0;
 
 	    if (taclet1 instanceof FindTaclet) {
                 map.put("has_find", -1);
+
 	        final Term find1 = ((FindTaclet) taclet1).find();
 	        int findComplexity1 = find1.depth();
 	        findComplexity1 += programComplexity(find1.javaBlock());
-
                 map.put("find_complexity", -findComplexity1);
+
 	        // depth are equal. Number of schemavariables decides
 	        TacletSchemaVariableCollector coll1 = new TacletSchemaVariableCollector();
 	        find1.execPostOrder(coll1);
 	        formulaSV1 = countFormulaSV(coll1);
 	        cmpVar1 += -coll1.size();
-                map.put("num_sv", cmpVar1);
+                map.put("num_sv", -cmpVar1);
 
 	    } else {
                 map.put("has_find", 1);
 	    }
 
             cmpVar1 = cmpVar1-formulaSV1;
-            map.put("sans_formula_sv", cmpVar1);
+            map.put("sans_formula_sv", -cmpVar1);
 		    
             map.put("if_seq", taclet1.ifSequent().isEmpty() ? 1 : -1);
 		    
-            map.put("goals", -taclet1.goalTemplates().size());
+            map.put("num_goals", taclet1.goalTemplates().size());
 	
             map.put("goal_compl", measureGoalComplexity(taclet1.goalTemplates()));
 

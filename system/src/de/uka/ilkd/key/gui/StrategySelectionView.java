@@ -23,6 +23,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.swing.BorderFactory;
@@ -50,10 +51,7 @@ import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
 
 public final class StrategySelectionView extends JPanel {
     
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 4543901758512289107L;
+    private static final long serialVersionUID = -2808575255579411116L;
 
     private static final String JAVACARDDL_STRATEGY_NAME 
     	= "JavaCardDLStrategy";
@@ -1251,4 +1249,25 @@ public final class StrategySelectionView extends JPanel {
                     props);
         }
     }
+    
+
+    private static class JRadioButtonHashMap extends JRadioButton {
+        
+        private static final long serialVersionUID = 7686260531440322733L;
+
+        JRadioButtonHashMap(String text, String command, boolean selected, 
+                boolean enabled) {
+            super(text, selected);
+            this.setEnabled(enabled);        
+            this.setActionCommand(command);        
+            hashmap.put(command, this);        
+        }
+
+        static HashMap<String, JRadioButtonHashMap> hashmap = new HashMap<String, JRadioButtonHashMap>();
+
+        public static JRadioButton getButton(String command) {
+            return hashmap.get(command);       
+        }
+    }
+
 }

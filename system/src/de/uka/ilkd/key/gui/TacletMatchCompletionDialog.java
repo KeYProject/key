@@ -31,6 +31,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 
 import de.uka.ilkd.key.gui.configuration.PathConfig;
+import de.uka.ilkd.key.gui.utilities.BracketMatchingTextArea;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.rule.Taclet;

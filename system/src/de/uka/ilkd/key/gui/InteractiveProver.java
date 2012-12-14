@@ -480,7 +480,7 @@ public class InteractiveProver {
                         ifs.head() instanceof IfFormulaInstSeq) {
                         IfFormulaInstSeq ifis = (IfFormulaInstSeq) ifs.head();
                         if (ifis.toPosInOccurrence().equals(
-                            pos.getPosInOccurrence())) {
+                            pos.getPosInOccurrence().topLevel())) {
                             continue; // skipp app if find and if same formula
                         }
                     }
