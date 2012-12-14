@@ -325,20 +325,22 @@ public final class SyntacticalReplaceVisitor extends Visitor {
                 : vBoundVars;                
     }
     
-
     /**
-     * performs the syntactic replacement of schemavariables with their instantiations	
+     * performs the syntactic replacement of schemavariables with their
+     * instantiations
      */
     public void visit(Term visited) {
-	// Sort equality has to be ensured before calling this method
+        // Sort equality has to be ensured before calling this method
         final Operator visitedOp = visited.op();
         if (visitedOp instanceof SchemaVariable
-        	&& visitedOp.arity() == 0
+                && visitedOp.arity() == 0
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
-                && (! (visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {                
+                && (!(visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp)
+                        .isListSV()))) {
             pushNew(toTerm(svInst.getInstantiation((SchemaVariable) visitedOp)));
-        } else if((visitedOp instanceof Metavariable)
-                 && metavariableInst.getInstantiation((Metavariable) visitedOp).op() != visitedOp) {
+        } else if ((visitedOp instanceof Metavariable)
+                && metavariableInst.getInstantiation((Metavariable) visitedOp)
+                        .op() != visitedOp) {
             pushNew(metavariableInst.getInstantiation((Metavariable) visitedOp));
         } else {
             Operator newOp = instantiateOperator(visitedOp);
@@ -350,7 +352,6 @@ public final class SyntacticalReplaceVisitor extends Visitor {
             }
 
             boolean operatorInst = (newOp != visitedOp);
-            
 
             // instantiation of java block
             boolean jblockChanged = false;
@@ -362,24 +363,21 @@ public final class SyntacticalReplaceVisitor extends Visitor {
                     jblockChanged = true;
                 }
             }
-            
-           // instantiate bound variables            
-           final ImmutableArray<QuantifiableVariable> boundVars = 
-               instantiateBoundVariables(visited);
-            
+
+            // instantiate bound variables
+            final ImmutableArray<QuantifiableVariable> boundVars = instantiateBoundVariables(visited);
+
             Term[] neededsubs = neededSubs(newOp.arity());
-            if(visitedOp instanceof ElementaryUpdate 
-        	&& elementaryUpdateLhs != null) {
-        	assert neededsubs.length == 1;
-        	Term newTerm = TermBuilder.DF.elementary(services, 
-        						 elementaryUpdateLhs, 
-        						 neededsubs[0]);
-        	pushNew(newTerm);
-            } else if(boundVars != visited.boundVars() 
-        	 || jblockChanged 
-        	 || operatorInst
-                 || (!subStack.empty() && subStack.peek() == newMarker)) {
-        	Term newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb);
+            if (visitedOp instanceof ElementaryUpdate
+                    && elementaryUpdateLhs != null) {
+                assert neededsubs.length == 1;
+                Term newTerm = TermBuilder.DF.elementary(services,
+                        elementaryUpdateLhs, neededsubs[0]);
+                pushNew(newTerm);
+            } else if (boundVars != visited.boundVars() || jblockChanged
+                    || operatorInst
+                    || (!subStack.empty() && subStack.peek() == newMarker)) {
+                Term newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb);
                 pushNew(resolveSubst(newTerm));
             } else {
                 final Term t = resolveSubst(visited);
