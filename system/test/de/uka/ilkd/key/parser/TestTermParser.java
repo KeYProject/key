@@ -585,10 +585,10 @@ public class TestTermParser extends TestCase {
     
     public void testParseTermsWithLabels() {
         Term t = parseTerm("(3 + 2)<<SE>>");
-        //assertTrue(t.hasLabels());
+        assertTrue(t.hasLabels());
         t = parseTerm("3 + 2<<SE>>");
-        //assertFalse(t.hasLabels());
-        //assertTrue(t.sub(1).hasLabels());
+        assertFalse(t.hasLabels());
+        assertTrue(t.sub(1).hasLabels());
     }
     
 }

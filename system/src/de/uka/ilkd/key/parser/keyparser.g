@@ -2928,14 +2928,23 @@ label returns [ImmutableArray<ITermLabel> labels = new ImmutableArray<ITermLabel
 :
    label=single_label {labelList.add(label);} (COMMA label=single_label {labelList.add(label);})*
    {
-   	//labels = new ImmutableArray<ITermLabel>((ITermLabel[])labelList.toArray(new ITermLabel[labelList.size()]));
+   	labels = new ImmutableArray<ITermLabel>((ITermLabel[])labelList.toArray(new ITermLabel[labelList.size()]));
    }
 ;
 
 single_label returns [ITermLabel label=null]
 :
-  id:IDENT (LPAREN param1:IDENT (COMMA param2:IDENT)* RPAREN)?
-;
+  name:IDENT (LPAREN param1:IDENT (COMMA param2:IDENT)* RPAREN)? 
+  {
+  	label = LabelFactory.createLabel(name.getText());
+  }
+;  exception
+        catch [UnknownLabelException ex] {
+              keh.reportException
+		(new KeYSemanticException
+			(ex.getMessage(), getFilename(), getLine(), getColumn()));
+        }
+
 
 abbreviation returns [Term a=null]
 { 
