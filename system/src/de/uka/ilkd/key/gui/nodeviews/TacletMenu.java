@@ -62,7 +62,30 @@ class TacletMenu extends JMenu {
     private PosInSequent pos;
     private SequentView sequentView;
     private KeYMediator mediator;
+    private static final Set<Name> CLUTTER_RULESETS = new HashSet<Name>();
 
+    static {
+        CLUTTER_RULESETS.add(new Name("notHumanReadable"));
+        CLUTTER_RULESETS.add(new Name("pullOutQuantifierAll"));
+        CLUTTER_RULESETS.add(new Name("pullOutQuantifierEx"));
+    }
+    private static final Set<Name> CLUTTER_RULES = new HashSet<Name>();
+
+    static {
+        CLUTTER_RULES.add(new Name("cut_direct"));
+        CLUTTER_RULES.add(new Name("cut_direct_r"));
+        CLUTTER_RULES.add(new Name("cut_direct_l"));
+        CLUTTER_RULES.add(new Name("case_distinction_r"));
+        CLUTTER_RULES.add(new Name("case_distinction_l"));
+        CLUTTER_RULES.add(new Name("local_cut"));
+        CLUTTER_RULES.add(new Name("commute_and_2"));
+        CLUTTER_RULES.add(new Name("commute_or_2"));
+        CLUTTER_RULES.add(new Name("boxToDiamond"));
+        CLUTTER_RULES.add(new Name("pullOut"));
+        CLUTTER_RULES.add(new Name("typeStatic"));
+        CLUTTER_RULES.add(new Name("less_is_total"));
+        CLUTTER_RULES.add(new Name("less_zero_is_total"));
+    }
 
     private TacletAppComparator comp = new TacletAppComparator();
         
@@ -144,13 +167,22 @@ class TacletMenu extends JMenu {
 				  MenuControl control) {	 
 	addActionListener(control);
 	
-	boolean rulesAvailable=addSection("Find", sort(find), control);
-	
-	if (pos != null && pos.isSequent()) {
-	    rulesAvailable = addSection("NoFind", noFind, control) | rulesAvailable;
-	}
+        ImmutableList<TacletApp> toAdd = sort(find);
+        boolean rulesAvailable =  find.size() > 0;
 
-	if (!rulesAvailable) {
+        if (pos != null && pos.isSequent()) {
+            rulesAvailable |= noFind.size() > 0;
+            toAdd = toAdd.prepend(noFind);
+        }
+
+//         for (TacletApp a : find) {
+//             System.out.print(a.taclet().name()+":");
+// 	    System.out.println(comp.score(a));
+//         }
+
+	if (rulesAvailable) {
+            createMenuItems(toAdd, control);
+        } else {
 	    createSection("No rules applicable.");
 	}
 
@@ -318,25 +350,6 @@ class TacletMenu extends JMenu {
     }
 
 
-
-    /** creates a non selectable label with the specified name and adds it to
-     * the component followed by the entries of this section 
-     * @param title a String the title of the section
-     * @param taclet IList<Taclet> that contains the Taclets belonging to this section
-     * @return true if section has been added (empty sections are not added)
-     */ 
-    private boolean addSection(String title, ImmutableList<TacletApp> taclet, 
-			       MenuControl control) {
-	if (taclet.size() > 0) {
-	    //uncomment if you want submenus with subtitles
-	    //	    insert(createSubMenu(taclet, title, control), 1);
-	    //	    createSection(title);
-	    add(createMenuItems(taclet, control));
-	    return true;
-	}
-	return false;
-    }
-
     /** inserts separator followed from the section's title 
      * @param title a String that contains the title of the section
      */
@@ -361,23 +374,13 @@ class TacletMenu extends JMenu {
     }
     
 
-
-    /** adds array of TacletMenuItem to itself*/
-    private void add(TacletMenuItem[] items) {
-	for (int i = 0; i < items.length; i++) {
-	    add((Component) items[i]);
-	}
-    }
-
-    /** creates new TacletMenuItems for each taclet in the list and set
-     * the given MenuControl as their ActionListener
+    /** adds a TacletMenuItem for each taclet in the list and sets
+     * the given MenuControl as the ActionListener
      * @param taclets IList<Taclet> with the Taclets the items represent
      * @param control the ActionListener
-     * @return the new MenuItems
      */
-    private TacletMenuItem[] createMenuItems(ImmutableList<TacletApp> taclets, 
-					     MenuControl  control) {
-	List<TacletMenuItem> items = new LinkedList<TacletMenuItem>();
+    private void createMenuItems(ImmutableList<TacletApp> taclets,
+				 MenuControl  control) {
 	
         final InsertHiddenTacletMenuItem insHiddenItem = 
             new InsertHiddenTacletMenuItem(MainWindow.getInstance(), 
@@ -389,36 +392,52 @@ class TacletMenu extends JMenu {
        
         
         for (final TacletApp app : taclets) {
-            
             final Taclet taclet = app.taclet();
-            if(!mediator.getFilterForInteractiveProving().filter(taclet)){
-            	continue;
-            }
-            
+
             if (insHiddenItem.isResponsible(taclet)) {
                 insHiddenItem.add(app);
-            } else if (insSystemInvItem.isResponsible(taclet)) { 
+            } else if (insSystemInvItem.isResponsible(taclet)) {
                 insSystemInvItem.add(app);
-            } else {
-                final TacletMenuItem item = 
-                    new DefaultTacletMenuItem(this, app, 
-                        mediator.getNotationInfo()); 
-                item.addActionListener(control);
-                items.add(item);                
             }        
 	}
         
         if (insHiddenItem.getAppSize() > 0) {
-            items.add(0, insHiddenItem);
+            add(insHiddenItem);
             insHiddenItem.addActionListener(control);
         }
         
         if (insSystemInvItem.getAppSize() > 0) {
-            items.add(0, insSystemInvItem);
+            add(insSystemInvItem);
             insSystemInvItem.addActionListener(control);
         }
         
-	return items.toArray(new TacletMenuItem[items.size()]);
+        JMenu more = new JMenu("More rules");
+
+        for (final TacletApp app : taclets) {
+            final Taclet taclet = app.taclet();
+            if(!mediator.getFilterForInteractiveProving().filter(taclet)){
+                continue;
+            }
+
+            if (! insHiddenItem.isResponsible(taclet) &&
+                !insSystemInvItem.isResponsible(taclet)) {
+                final DefaultTacletMenuItem item =
+                    new DefaultTacletMenuItem(this, app,
+                        mediator.getNotationInfo());
+                item.addActionListener(control);
+                boolean rareRule = false;
+                for (RuleSet rs : taclet.getRuleSets()) {
+                    if (CLUTTER_RULESETS.contains(rs.name())) rareRule = true;
+                }
+                if (CLUTTER_RULES.contains(taclet.name())) rareRule = true;
+
+                if (rareRule)
+                    more.add(item);
+                else add(item);
+            }
+	}
+
+        if (more.getItemCount() > 0) add(more);
     }
         
     /** makes submenus invisible */
@@ -670,81 +689,85 @@ class TacletMenu extends JMenu {
 	}
 	
 	public int compare(TacletApp o1, TacletApp o2) {
+            LinkedHashMap<String,Integer> map1 = score(o1);
+            LinkedHashMap<String,Integer> map2 = score(o2);
+            Iterator<Map.Entry<String,Integer> > it1 = map1.entrySet().iterator();
+            Iterator<Map.Entry<String,Integer> > it2 = map2.entrySet().iterator();
+            while (it1.hasNext() && it2.hasNext()) {
+                String s1 = it1.next().getKey();
+                String s2 = it2.next().getKey();
+                if (!s1.equals(s2)) throw new IllegalStateException(
+                    "A decision should have been made on a higher level ( "+
+                    s1+"<->"+s2+")");
+                int v1 = map1.get(s1);
+                int v2 = map2.get(s2);
+                // the order will be reversed when the list is sorted
+                if (v1<v2) return 1;
+                if (v1>v2) return -1;
+            }
+            return 0;
+	}
+
+
+        /* A score is a list of named values (comparable lexicographically).
+           Smaller value means the taclet should be higher on the list
+           offered to the user. Two scores need not contain the same
+           named criteria, but the scoring scheme must force a decision
+           before the first divergence point.
+        */
+	public LinkedHashMap<String,Integer> score(TacletApp o1) {
+            LinkedHashMap<String,Integer> map = new LinkedHashMap<String,Integer>();
+
 	    final Taclet taclet1 = o1.taclet();
-	    final Taclet taclet2 = o2.taclet();
-		
+
+            map.put("closing", taclet1.goalTemplates().size()==0 ? -1:1);
+
+            boolean calc = false;
+            for (RuleSet rs : taclet1.getRuleSets()) {
+                String s = rs.name().toString();
+                if (s.equals("simplify_literals") ||
+                    s.equals("concrete") ||
+                    s.equals("update_elim") ||
+                    s.equals("replace_known_left") ||
+                    s.equals("replace_known_right")) calc = true;
+            }
+            map.put("calc", calc ? -1 : 1);
+
             int formulaSV1 = 0;
-            int formulaSV2 = 0;
+            int cmpVar1 = 0;
 
-            int cmpVar1 = taclet1.getRuleSets().size();
-            int cmpVar2 = taclet2.getRuleSets().size();
+	    if (taclet1 instanceof FindTaclet) {
+                map.put("has_find", -1);
 
-	    if (taclet1 instanceof FindTaclet && taclet2 instanceof FindTaclet) {
 	        final Term find1 = ((FindTaclet) taclet1).find();
 	        int findComplexity1 = find1.depth();
-	        final Term find2 = ((FindTaclet) taclet2).find();
-	        int findComplexity2 = find2.depth();
 	        findComplexity1 += programComplexity(find1.javaBlock());
-	        findComplexity2 += programComplexity(find2.javaBlock());
+                map.put("find_complexity", -findComplexity1);
 
-	        if ( findComplexity1 < findComplexity2 ) {
-	            return -1;
-	        } else if (findComplexity1 > findComplexity2) {
-	            return 1;
-	        }		    		    		    
 	        // depth are equal. Number of schemavariables decides
 	        TacletSchemaVariableCollector coll1 = new TacletSchemaVariableCollector();
 	        find1.execPostOrder(coll1);
 	        formulaSV1 = countFormulaSV(coll1);
-
-	        TacletSchemaVariableCollector coll2  = new TacletSchemaVariableCollector();
-	        find2.execPostOrder(coll2);
-	        formulaSV2 = countFormulaSV(coll2);
 	        cmpVar1 += -coll1.size();
-	        cmpVar2 += -coll2.size();
+                map.put("num_sv", -cmpVar1);
 
-	    } else if (taclet1 instanceof FindTaclet != taclet2 instanceof FindTaclet) {
-	        if (taclet1 instanceof FindTaclet) {
-	            return -1;
-	        } else {
-	            return 1;
-	        }
+	    } else {
+                map.put("has_find", 1);
 	    }
 
-	    if (cmpVar1 == cmpVar2) {
-		cmpVar1 = cmpVar1-formulaSV1;
-		cmpVar2 = cmpVar2-formulaSV2;
-	    }
+            cmpVar1 = cmpVar1-formulaSV1;
+            map.put("sans_formula_sv", -cmpVar1);
 		    
-	    if ( cmpVar1 < cmpVar2 ) {
-		return -1;
-	    } else if (cmpVar1 > cmpVar2) {
-		return 1;
-	    }
-	
-	    if (taclet1.ifSequent().isEmpty() && 
-		!taclet2.ifSequent().isEmpty()) {
-		return 1;
-	    } else if (!taclet1.ifSequent().isEmpty() && 
-		       taclet2.ifSequent().isEmpty()) {
-		return -1;
-	    }
+            map.put("if_seq", taclet1.ifSequent().isEmpty() ? 1 : -1);
 		    
-	    int goals1 = -taclet1.goalTemplates().size();
-	    int goals2 = -taclet2.goalTemplates().size();
+            map.put("num_goals", taclet1.goalTemplates().size());
 	
-	    if (goals1 == goals2) {
-		goals1 = -measureGoalComplexity(taclet1.goalTemplates());
-		goals2 = -measureGoalComplexity(taclet2.goalTemplates());		
-	    } 
-	
-	    if (goals1 < goals2) {
-		return -1;
-	    } else if (goals1 > goals2) {
-		return 1;
-	    }
-	
-	    return 0;
+            map.put("goal_compl", measureGoalComplexity(taclet1.goalTemplates()));
+
+            return map;
 	}
+
+
+
     }
 }

@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 
-public class ChoiceSettings implements Settings {
+public class ChoiceSettings implements Settings, Cloneable {
 
     private static final String DEFAULTCHOICES_KEY = "[Choice]DefaultChoices";
     private LinkedList<SettingsListener> listenerList 

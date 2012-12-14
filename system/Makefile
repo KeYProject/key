@@ -98,7 +98,7 @@ JAVACC_MAIN=javacc
 
 ## nice source links
 JAVADOC=javadoc
-JAVADOC_OPTIONS=-use -quiet -breakiterator -linksource -J-Xmx512m
+JAVADOC_OPTIONS=-use -quiet -breakiterator -linksource -J-Xmx1024m
 
 
 ANTLR_PARSER= \
@@ -154,7 +154,7 @@ doc: argfile
 	-windowtitle "KeY API Documentation" \
 	-doctitle "KeY API Documentation ($(KEY_VERSION_LONG))" \
 	-header "KeY $(KEY_VERSION_LONG)" \
-	-private -author -version -J-Xmx256m
+	-private -author -version -J-Xmx512m
 
 
 

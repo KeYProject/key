@@ -143,7 +143,7 @@ public class PackageReference extends JavaNonTerminalProgramElement
     }
     
     public boolean equals(Object o) {
-	if(o.getClass() != PackageReference.class) {
+	if (!(o instanceof PackageReference)) {
 	    return false;
 	}
 	final PackageReference pr = (PackageReference) o;

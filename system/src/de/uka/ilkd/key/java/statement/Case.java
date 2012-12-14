@@ -106,7 +106,6 @@ public class Case extends BranchImp implements ExpressionContainer {
             if (len > index) {
                 return body.get(index);
             }
-            index -= len;
         }
         throw new ArrayIndexOutOfBoundsException();
     }

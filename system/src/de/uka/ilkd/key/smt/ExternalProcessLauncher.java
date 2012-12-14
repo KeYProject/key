@@ -10,9 +10,6 @@
 
 package de.uka.ilkd.key.smt;
 
-
-import java.io.IOException;
-import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 

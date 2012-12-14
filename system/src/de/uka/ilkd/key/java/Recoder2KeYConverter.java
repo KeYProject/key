@@ -968,6 +968,8 @@ public class Recoder2KeYConverter {
         StatementBlock block = null;
         if (rmcs.getBody() != null) {
             block = (StatementBlock) callConvert(rmcs.getBody());
+        } else {
+        	throw new ConvertException("Methodframe statement has no body " + rmcs);
         }
 
         return new MethodFrame(resVar, convert(rmcs
