@@ -2897,8 +2897,11 @@ accesstermlist returns [HashSet accessTerms = new HashSet()] {Term t = null;}:
 
 
 atom returns [Term a = null]
+{
+  ImmutableArray<ITermLabel> labels;
+}
     :
-        {isTermTransformer()}? a = specialTerm
+(        {isTermTransformer()}? a = specialTerm
     |   a = funcpredvarterm
     |   LPAREN a = term RPAREN 
     |   TRUE  { a = tf.createTerm(Junctor.TRUE); }
@@ -2909,6 +2912,7 @@ atom returns [Term a = null]
         {
             a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(literal.getText()));
         }   
+    ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = TermBuilder.DF.label(a, labels);} } GREATER GREATER)?
     ; exception
         catch [TermCreationException ex] {
               keh.reportException
@@ -2916,6 +2920,22 @@ atom returns [Term a = null]
 			(ex.getMessage(), getFilename(), getLine(), getColumn()));
         }
 
+label returns [ImmutableArray<ITermLabel> labels = new ImmutableArray<ITermLabel>()] 
+{
+  ArrayList<ITermLabel> labelList = new ArrayList<ITermLabel>();
+  ITermLabel label;
+}
+:
+   label=single_label {labelList.add(label);} (COMMA label=single_label {labelList.add(label);})*
+   {
+   	labels = new ImmutableArray<ITermLabel>((ITermLabel[])labelList.toArray(new ITermLabel[labelList.size()]));
+   }
+;
+
+single_label returns [ITermLabel label=null]
+:
+  id:IDENT (LPAREN param1:IDENT (COMMA param2:IDENT)* RPAREN)?
+;
 
 abbreviation returns [Term a=null]
 { 
