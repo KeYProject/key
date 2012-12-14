@@ -8,6 +8,7 @@ import org.key_project.keyide.ui.providers.OutlineLabelProvider;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * A class to display the correct Outline for the current {@link Proof}
@@ -18,13 +19,13 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 public class Outline extends ContentOutlinePage {
    private Proof proof;
    
-   private KeYEnvironment<?> environment;
+   private KeYEnvironment<CustomConsoleUserInterface> environment;
    
    /**
     * Constructor.
     * @param proof The {@link Proof} for this Outline.
     */
-   public Outline(Proof proof, KeYEnvironment<?> environment) {
+   public Outline(Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment) {
       this.proof = proof;
       this.environment = environment;
    }
@@ -44,7 +45,7 @@ public class Outline extends ContentOutlinePage {
    public void createControl(Composite parent) {
       super.createControl(parent);
       getTreeViewer().setUseHashlookup(true);
-      getTreeViewer().setContentProvider(new OutlineContentProvider(getTreeViewer()));
+      getTreeViewer().setContentProvider(new OutlineContentProvider(getTreeViewer(), environment, proof));
       getTreeViewer().setLabelProvider(new OutlineLabelProvider(getTreeViewer(), environment, proof));
       getTreeViewer().setInput(proof);
    }

@@ -2,26 +2,59 @@ package org.key_project.keyide.ui.providers;
 
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.internal.ole.win32.COSERVERINFO;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeItem;
 
+import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 // TODO: This class is really nice and reusable, rename it into something like ProofTreeLazyTreeContentProvider
 // TODO: Refactor source code: first constants (not availbale in this class), than attributes, than constructors, than methods
 public class OutlineContentProvider implements ILazyTreeContentProvider{
 
+   private KeYEnvironment<CustomConsoleUserInterface> environment;
+   private Proof proof;
+   private Map<Node, BranchFolder> branchFolders = new HashMap<Node, BranchFolder>();
+   private boolean isAutoModeRunning = false;
 //   private GUIProofTreeModel model;
    private TreeViewer viewer;
 //   private GUIProofTreeModel model;
+   
+   private AutoModeListener autoModeListener = new AutoModeListener() {
+      @Override
+      public void autoModeStopped(ProofEvent e) {
+         isAutoModeRunning = false;
+         // TODO Refresh the tree
+         viewer.getControl().getDisplay().asyncExec(new Runnable() {
+            
+            @Override
+            public void run() {
+               // TODO Auto-generated method stub
+               viewer.refresh();
+            }
+         });
+         
+      }
+      
+      @Override
+      public void autoModeStarted(ProofEvent e) {
+         isAutoModeRunning = true;
+      }
+   };
+   
    private ProofTreeListener listener = new ProofTreeListener() {
       
       /**
@@ -162,7 +195,9 @@ public class OutlineContentProvider implements ILazyTreeContentProvider{
                // TODO Auto-generated method stub
                //System.out.println("EXPANDED----------------------------------------------------------------------------------------------------");
 //               System.out.println("Expanded: " + e.getNode().serialNr() + ":" + e.getNode().name());
-               expanded(e.getNode());
+               if(!isAutoModeRunning){
+                  expanded(e.getNode());
+               }
             }
             
          });
@@ -183,24 +218,39 @@ public class OutlineContentProvider implements ILazyTreeContentProvider{
    };
    
    
-   public  OutlineContentProvider(TreeViewer viewer){
+   public  OutlineContentProvider(TreeViewer viewer, KeYEnvironment<CustomConsoleUserInterface> environment, Proof proof){
       this.viewer=viewer;
+      this.proof = proof;
+      this.environment = environment;
    }
+   
+   
    
    @Override
    public void dispose() {
-      // abmelden, sicherstellen das aufgerufen wird
+      // TODO abmelden, sicherstellen das aufgerufen wird
+//      proof.removeProofTreeListener(listener);
+//      if (environment != null){
+//      environment.getMediator().removeAutoModeListener(autoModeListener);
+//      }
    }
+      
 
    @Override
    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
       if(newInput instanceof Proof){
-         Proof proof = (Proof) newInput;
+         this.proof = (Proof) newInput;
          if(oldInput != null){
             proof.removeProofTreeListener(listener);
+            if (environment != null) {
+               environment.getMediator().removeAutoModeListener(autoModeListener);
+            }
          }
           if(newInput != null){
              proof.addProofTreeListener(listener);
+             if (environment != null) {
+                environment.getMediator().addAutoModeListener(autoModeListener);
+             }
           }
           
        }
@@ -216,20 +266,34 @@ public class OutlineContentProvider implements ILazyTreeContentProvider{
    @Override
    public void updateChildCount(Object element, int currentChildCount) {
       if(element instanceof Proof){
-         viewer.setChildCount(element, 1);
-         viewer.replace(element, 0, ((Proof)element).root());
+         System.out.println("UpdateChildCount: Proof");
+         Node node = ((Proof)element).root();
+         System.out.println(getBranchFolderChildCount(node));
+         viewer.setChildCount(element, getBranchFolderChildCount(node));
+         
+      }
+      else if(element instanceof Node){
+         Node node = (Node) element;
+         System.out.println("UpdateChildCount: " + node.serialNr() + ":" + node.name());
+         
+         
       }
    }
    
    @Override
    public void updateElement(Object parent, int index) {
-  }
+      if(parent instanceof Proof){
+         System.out.println("UpdateElement: Proof");
+      }
+      else if(parent instanceof Node){
+         Node node = (Node) parent;
+         System.out.println("UpdateElement: " + node.serialNr() + ":" + node.name());
+      }
+   }
    
-   //A vector that saves all branchFolders
-   // TODO: Use java naming conventions, rename it into "branchFolders"
    // TODO: If you just needs the BranchFolder for a Node, use a Map: private Map<Node, BranchFolder> branchFolders = new HashMap<Node, BranchFolder>();
    //private Vector<BranchFolder> branchFolders = new Vector<BranchFolder>(); // Vector is a bad class because it is based on an array. To store all references of instances a Set is more efficient: private Set<BranchFolder> branchFolders = new HashSet<BranchFolder>();
-   private HashMap<Node, BranchFolder> branchFolders = new HashMap<Node, BranchFolder>();
+   
    //manages the whole treeexpandency by calling the specified method for the given node
    private void expanded(Node node){
 

@@ -26,6 +26,7 @@ import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
 import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * A class to provide the correct labels for the KeY-Outline.
@@ -35,7 +36,7 @@ import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 public class OutlineLabelProvider extends LabelProvider {
    private Viewer viewer;
    
-   private KeYEnvironment<?> environment;
+   private KeYEnvironment<CustomConsoleUserInterface> environment;
    
    private Proof proof;
    
