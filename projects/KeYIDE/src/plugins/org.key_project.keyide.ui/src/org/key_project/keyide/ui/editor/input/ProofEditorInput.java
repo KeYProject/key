@@ -15,20 +15,19 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
-//TODO: Rename class, maybe into ProofEditorInput
-public class StringInput implements IStorageEditorInput{
+public class ProofEditorInput implements IStorageEditorInput{
    
    /**
-    * Gives the {@link Proof} of this {@link StringInput}.
-    * @return The {@link Proof} of this {@link StringInput}.
+    * Gives the {@link Proof} of this {@link ProofEditorInput}.
+    * @return The {@link Proof} of this {@link ProofEditorInput}.
     */
    public Proof getProof() {
       return proof;
    }
 
    /**
-    * Gives the {@link KeYEnvironment} of this {@link StringInput}.
-    * @return The {@link KeYEnvironment} of this {@link StringInput}.
+    * Gives the {@link KeYEnvironment} of this {@link ProofEditorInput}.
+    * @return The {@link KeYEnvironment} of this {@link ProofEditorInput}.
     */
    public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
       return environment;
@@ -44,7 +43,7 @@ public class StringInput implements IStorageEditorInput{
     * Constructor
     * @param storage The storage for this {@link IStorageEditorInput}
     */
-   public StringInput(IStorage storage, Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment){
+   public ProofEditorInput(IStorage storage, Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment){
       this.storage=storage;
       this.proof = proof;
       this.environment = environment;

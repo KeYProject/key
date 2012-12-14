@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="org.key_project.keyide.ui.editor.KeYEditor"
+            class="org.key_project.keyide.ui.editor.KeYEditor2"
             contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
             default="false"
             extensions="proof"
@@ -287,7 +287,7 @@
          point="org.eclipse.ui.preferencePages">
       <page
             category="org.eclipse.ui.preferencePages.Perspectives"
-            class="org.key_project.keyide.ui.preference.page.VisualizationPreferencePage"
+            class="org.key_project.keyide.ui.preference.page.KeYIDEPreferencePage"
             id="org.key_project.keyide.ui.preference.page.VisualizationPreferencePage"
             name="KeY preferences">
       </page>
@@ -295,7 +295,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="org.key_project.keyide.ui.visualization.VisualizationPreferencesInitializer">
+            class="org.key_project.keyide.ui.visualization.KeYIDEPreferencesInitializer">
       </initializer>
    </extension>
    <extension

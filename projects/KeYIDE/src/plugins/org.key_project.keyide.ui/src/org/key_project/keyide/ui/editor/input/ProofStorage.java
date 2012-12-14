@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.IPath;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 //TODO: Rename class, maybe into ProofStorage
-public class StringStorage implements IStorage {
+public class ProofStorage implements IStorage {
    
    private String proofString;
    private String name;
@@ -24,7 +24,7 @@ public class StringStorage implements IStorage {
     * @param input The textbody of this storage
     * @param name The name of this {@link IStorage}.
     */
-   public StringStorage(String input, String name){
+   public ProofStorage(String input, String name){
       this.proofString=input;
       this.name=name;
    }

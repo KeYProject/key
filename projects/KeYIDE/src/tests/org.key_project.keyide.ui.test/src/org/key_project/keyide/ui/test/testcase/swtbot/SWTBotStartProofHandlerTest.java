@@ -17,11 +17,11 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
-import org.key_project.keyide.ui.editor.KeYEditor;
+import org.key_project.keyide.ui.editor.KeYEditor2;
 import org.key_project.keyide.ui.handlers.StartProofHandler;
 import org.key_project.keyide.ui.perspectives.KeYPerspective;
 import org.key_project.keyide.ui.test.Activator;
-import org.key_project.keyide.ui.visualization.VisualizationPreferences;
+import org.key_project.keyide.ui.visualization.KeYIDEPreferences;
 import org.key_project.util.eclipse.BundleUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
@@ -118,8 +118,8 @@ public class SWTBotStartProofHandlerTest extends TestCase {
       long originalTimeout = SWTBotPreferences.TIMEOUT;
       SWTBotPreferences.TIMEOUT = originalTimeout * 4;
       // Backup original switch perspective preference and set preference to test.
-      String originalSwitchPerspectivePreference = VisualizationPreferences.getSwitchToKeyPerspective();
-      VisualizationPreferences.setSwitchToKeyPerspective(MessageDialogWithToggle.PROMPT);
+      String originalSwitchPerspectivePreference = KeYIDEPreferences.getSwitchToKeyPerspective();
+      KeYIDEPreferences.setSwitchToKeyPerspective(MessageDialogWithToggle.PROMPT);
       // Backup current perspective
       IPerspectiveDescriptor originalPerspective = TestUtilsUtil.getActivePerspective();
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
@@ -144,13 +144,13 @@ public class SWTBotStartProofHandlerTest extends TestCase {
          contractShell.bot().button("OK").click();
          // Make sure that the KeY proof editor is opened
          SWTBotEditor editor = bot.activeEditor();
-         assertEquals(KeYEditor.EDITOR_ID, editor.getReference().getId());
+         assertEquals(KeYEditor2.EDITOR_ID, editor.getReference().getId());
       }
       finally {
          // Restore original timeout
          SWTBotPreferences.TIMEOUT = originalTimeout;
          // Restore original switch perspective preference.
-         VisualizationPreferences.setSwitchToKeyPerspective(originalSwitchPerspectivePreference);
+         KeYIDEPreferences.setSwitchToKeyPerspective(originalSwitchPerspectivePreference);
          // Restore original perspective
          TestUtilsUtil.openPerspective(originalPerspective);
          // Close all editors

@@ -8,12 +8,11 @@ import org.key_project.keyide.ui.Activator;
  * Provides access to the preferences of the KeY visualization.
  * </p>
  * <p>
- * Default values are defined via {@link VisualizationPreferencesInitializer}.
+ * Default values are defined via {@link KeYIDEPreferencesInitializer}.
  * </p>
  * @author Marco Drebing, Niklas Bunzel, Christoph Schneider, Stefan Käsdorf
  */
-// TODO: Rename into KeYIDEPreferences
-public class VisualizationPreferences {
+public class KeYIDEPreferences {
    /**
     * Preference key for the maximal number of set nodes per branch on run.
     */
