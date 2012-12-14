@@ -42,7 +42,6 @@ import javax.swing.event.ChangeListener;
 
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -112,7 +111,6 @@ public final class StrategySelectionView extends JPanel {
     private JRadioButtonHashMap quantifierInstantiate;
     private JRadioButtonHashMap autoInductionOff; 
     private JRadioButtonHashMap autoInductionRestricted; 
-    private JRadioButtonHashMap autoInductionOn; 
     private JRadioButtonHashMap autoInductionLemmaOn; 
     
     private KeYMediator mediator;
@@ -1138,7 +1136,8 @@ public final class StrategySelectionView extends JPanel {
             System.err.println("Selected Strategy '" + strategyName + "' not found falling back to "+ 
                 mediator.getProfile().getDefaultStrategyFactory().name());
         }
-        return mediator.getProfile().getDefaultStrategyFactory().create(proof, properties);
+        return mediator != null ? mediator.getProfile().getDefaultStrategyFactory().create(proof, properties) :
+        	proof.getSettings().getProfile().getDefaultStrategyFactory().create(proof, properties);
     }
   
     private String removeLast(String str, int num) {

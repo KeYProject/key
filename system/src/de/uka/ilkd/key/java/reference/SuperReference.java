@@ -90,7 +90,6 @@ public class SuperReference extends JavaNonTerminalProgramElement
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
             if (index == 0) return prefix;
-	    index--;
         } 
         throw new ArrayIndexOutOfBoundsException();
     }

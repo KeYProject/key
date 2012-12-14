@@ -19,7 +19,7 @@ import de.uka.ilkd.key.gui.GUIEvent;
  * Heuristics and the maximum amount of heuristics steps before an
  * interactive step is required.
  */
-public class GeneralSettings implements Settings {
+public class GeneralSettings implements Settings, Cloneable {
 
 
     private static final String TACLET_FILTER = "[General]StupidMode";
