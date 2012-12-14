@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="org.key_project.keyide.ui.editor.KeYEditor2"
+            class="org.key_project.keyide.ui.editor.KeYEditor"
             contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
             default="false"
             extensions="proof"

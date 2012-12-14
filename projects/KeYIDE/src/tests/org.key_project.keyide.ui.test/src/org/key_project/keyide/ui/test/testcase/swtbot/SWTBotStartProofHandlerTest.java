@@ -17,7 +17,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
-import org.key_project.keyide.ui.editor.KeYEditor2;
+import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.handlers.StartProofHandler;
 import org.key_project.keyide.ui.perspectives.KeYPerspective;
 import org.key_project.keyide.ui.test.Activator;
@@ -144,7 +144,7 @@ public class SWTBotStartProofHandlerTest extends TestCase {
          contractShell.bot().button("OK").click();
          // Make sure that the KeY proof editor is opened
          SWTBotEditor editor = bot.activeEditor();
-         assertEquals(KeYEditor2.EDITOR_ID, editor.getReference().getId());
+         assertEquals(KeYEditor.EDITOR_ID, editor.getReference().getId());
       }
       finally {
          // Restore original timeout

@@ -27,7 +27,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
-public class KeYEditor2 extends TextEditor implements IProofEnvironmentProvider {
+public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    public static final String EDITOR_ID = "org.key_project.keyide.ui.editor";
    
    private Outline outline;

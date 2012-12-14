@@ -25,7 +25,7 @@ import org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
-import org.key_project.keyide.ui.editor.KeYEditor2;
+import org.key_project.keyide.ui.editor.KeYEditor;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
 import org.key_project.keyide.ui.editor.input.ProofStorage;
 import org.key_project.keyide.ui.perspectives.KeYPerspective;
@@ -137,7 +137,7 @@ public class KeYIDEUtil {
       String inputText = NonGoalInfoView.computeText(environment.getMediator(), proof.root());
       IStorage storage = new ProofStorage(inputText, proof.name().toString());
       IStorageEditorInput input = new ProofEditorInput(storage, proof, environment);
-         WorkbenchUtil.getActivePage().openEditor(input, KeYEditor2.EDITOR_ID);  
+         WorkbenchUtil.getActivePage().openEditor(input, KeYEditor.EDITOR_ID);  
    }
    
    

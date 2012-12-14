@@ -11,14 +11,14 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 public interface IProofEnvironmentProvider {
    
    /**
-    * The {@link KeYEnvironment} for this {@link KeYEditor2}.
-    * @return The {@link KeYEnvironment} for this {@link KeYEditor2}.
+    * The {@link KeYEnvironment} for this {@link KeYEditor}.
+    * @return The {@link KeYEnvironment} for this {@link KeYEditor}.
     */
    public KeYEnvironment<CustomConsoleUserInterface> getKeYEnvironment();
 
    /**
-    * The {@link Proof} for this {@link KeYEditor2}.
-    * @return The {@link Proof} for this {@link KeYEditor2}.
+    * The {@link Proof} for this {@link KeYEditor}.
+    * @return The {@link Proof} for this {@link KeYEditor}.
     */
    public Proof getProof();
 }
