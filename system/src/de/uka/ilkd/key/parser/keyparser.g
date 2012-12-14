@@ -37,6 +37,7 @@ header {
   import de.uka.ilkd.key.proof.io.*;
 
   import de.uka.ilkd.key.rule.*;
+  import de.uka.ilkd.key.rule.label.*;
   import de.uka.ilkd.key.rule.tacletbuilder.*;
   import de.uka.ilkd.key.rule.conditions.*;
  
@@ -2933,10 +2934,13 @@ label returns [ImmutableArray<ITermLabel> labels = new ImmutableArray<ITermLabel
 ;
 
 single_label returns [ITermLabel label=null]
+{
+  String labelName = "";
+}
 :
-  name:IDENT (LPAREN param1:IDENT (COMMA param2:IDENT)* RPAREN)? 
+  (name:IDENT {labelName=name.getText();} | star:STAR {labelName=star.getText();} ) (LPAREN param1:IDENT (COMMA param2:IDENT)* RPAREN)? 
   {
-  	label = LabelFactory.createLabel(name.getText());
+  	label = inSchemaMode() ? RuleLabelFactory.createLabel(labelName) : LabelFactory.createLabel(labelName);
   }
 ;  exception
         catch [UnknownLabelException ex] {
@@ -3424,8 +3428,8 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
 	  namespaces().setVariables(new Namespace(variables()));
         } 
 	( SCHEMAVAR one_schema_var_decl ) *
-        ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
-        ( FIND LPAREN find = termorseq RPAREN
+        ( ASSUMES LPAREN ifSeq=seq[false] RPAREN ) ?
+        ( FIND LPAREN find = termorseq[true] RPAREN 
             (   SAMEUPDATELEVEL { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
               | INSEQUENTSTATE { applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE; }
               | ANTECEDENTPOLARITY { applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY; }
@@ -3438,7 +3442,7 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
             b.setIfSequent(ifSeq);
         }
         ( VARCOND LPAREN varexplist[b] RPAREN ) ?
-        goalspecs[b]
+        goalspecs[b, find != null]
         modifiers[b]
         RBRACE
         { 
@@ -3470,8 +3474,8 @@ modifiers[TacletBuilder b]
         ) *
     ;
 
-seq returns [Sequent s] {Semisequent ant,suc; s = null; } : 
-        ant=semisequent SEQARROW suc=semisequent 
+seq[boolean addWildcard] returns [Sequent s] {Semisequent ant,suc; s = null; } : 
+        ant=semisequent[addWildcard] SEQARROW suc=semisequent[addWildcard] 
         { s = Sequent.createSequent(ant, suc); }
     ;
 exception
@@ -3483,7 +3487,7 @@ exception
 	 keh.reportException(betterEx);			
      }
      
-termorseq returns [Object o]
+termorseq[boolean addWildcard] returns [Object o]
 {
     Term head = null;
     Sequent s = null;
@@ -3491,8 +3495,11 @@ termorseq returns [Object o]
     o = null; 
 }
     :
-        head=term ( COMMA s=seq | SEQARROW ss=semisequent ) ?
+        head=term ( COMMA s=seq[addWildcard] | SEQARROW ss=semisequent[addWildcard] ) ?
         {
+            if (addWildcard && !head.hasLabels()) { 
+                head = TermBuilder.DF.label(head, TermLabelWildcard.WILDCARD); 
+            } 
             if ( s == null ) {
                 if ( ss == null ) {
                     // Just a term
@@ -3513,21 +3520,26 @@ termorseq returns [Object o]
             }
         }
     |
-        SEQARROW ss=semisequent
+        SEQARROW ss=semisequent[true]
         {
             o = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,ss);
         }
     ;
 
-semisequent returns [Semisequent ss]
+semisequent[boolean addWildcard] returns [Semisequent ss]
 { 
     Term head = null;
     ss = Semisequent.EMPTY_SEMISEQUENT; 
 }
     :
         /* empty */ | 
-        head=term ( COMMA ss=semisequent ) ? 
-        { ss = ss.insertFirst(new SequentFormula(head)).semisequent(); }
+        head=term ( COMMA ss=semisequent[addWildcard] ) ? 
+        { 
+          if (addWildcard && !head.hasLabels()) {
+                head = TermBuilder.DF.label(head, TermLabelWildcard.WILDCARD); 
+          }
+          ss = ss.insertFirst(new SequentFormula(head)).semisequent(); 
+        }
     ;
 
 varexplist[TacletBuilder b] : varexp[b] ( COMMA varexp[b] ) * ;
@@ -4028,20 +4040,20 @@ varcond_induction_variable [TacletBuilder b, boolean negated]
 ;
 
 
-goalspecs[TacletBuilder b] :
+goalspecs[TacletBuilder b, boolean ruleWithFind] :
         CLOSEGOAL
-    | goalspecwithoption[b] ( SEMI goalspecwithoption[b] )* ;
+    | goalspecwithoption[b, ruleWithFind] ( SEMI goalspecwithoption[b, ruleWithFind] )* ;
 
-goalspecwithoption[TacletBuilder b]
+goalspecwithoption[TacletBuilder b, boolean ruleWithFind]
 {
     ImmutableSet<Choice> soc = DefaultImmutableSet.<Choice>nil();
 } :
         (( soc = option_list[soc]
                 LBRACE
-                goalspec[b,soc] 
+                goalspec[b,soc,ruleWithFind] 
                 RBRACE)
         |  
-            goalspec[b,null] 
+            goalspec[b,null,ruleWithFind] 
         )
     ;
 
@@ -4068,7 +4080,7 @@ LPAREN {result = soc; }
 RPAREN
 ;
 
-goalspec[TacletBuilder b, ImmutableSet<Choice> soc] 
+goalspec[TacletBuilder b, ImmutableSet<Choice> soc, boolean ruleWithFind] 
 {
     Object rwObj = null;
     Sequent addSeq = Sequent.EMPTY_SEQUENT;
@@ -4079,11 +4091,11 @@ goalspec[TacletBuilder b, ImmutableSet<Choice> soc]
     :
         (name = string_literal COLON)?
         (   ( rwObj = replacewith
-                (addSeq=add)? 
+                (addSeq=add[ruleWithFind])? 
                 (addRList=addrules)? 
                 (addpv=addprogvar)?
             )
-        | ( addSeq=add (addRList=addrules)? )
+        | ( addSeq=add[ruleWithFind] (addRList=addrules)? )
         | ( addRList=addrules )
         )
         {
@@ -4093,10 +4105,10 @@ goalspec[TacletBuilder b, ImmutableSet<Choice> soc]
     ;
 
 replacewith returns [Object o] { o = null; } :
-        REPLACEWITH LPAREN o=termorseq RPAREN;
+        REPLACEWITH LPAREN o=termorseq[true] RPAREN;
 
-add returns [Sequent s] { s = null;} :
-        ADD LPAREN s=seq RPAREN;
+add[boolean ruleWithFind] returns [Sequent s] { s = null;} :
+        ADD LPAREN s=seq[ruleWithFind] RPAREN;
 
 addrules returns [ImmutableList<Taclet> lor] { lor = null; } :
         ADDRULES LPAREN lor=tacletlist RPAREN;

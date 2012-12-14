@@ -107,7 +107,7 @@ class LabeledTermImpl extends TermImpl {
 		result.append("@[[");
 		// as labels must not be empty at least one element exists
 		result.append(labels.get(0).toString()); 
-		for (int i = 1; i<result.length();i++) {
+		for (int i = 1; i<labels.size();i++) {
 			result.append(", ");
 			result.append(labels.get(i).toString());			
 		}		

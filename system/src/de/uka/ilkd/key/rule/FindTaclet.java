@@ -144,7 +144,8 @@ public abstract class FindTaclet extends Taclet {
         // at the moment we do not support complex match patterns for term labels
         // The current implementation assumes an implicit wild card at the the top level term
         // which is matched
-        assert !find.hasLabels() : "Find terms with labels not yet supported";
+        assert find.getLabels().size() == 1 && 
+                find.getLabels().get(0) == TermLabelWildcard.WILDCARD : "Find terms with labels not yet supported" + name() + ":" + find;
         matchCond = matchCond.setInstantiations(matchCond.getInstantiations().add(TermLabelWildcard.WILDCARD, 
                 term.getLabels(), services));
         
