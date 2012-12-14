@@ -48,8 +48,8 @@ public class GeneralSettings implements Settings {
     /** is one-step simplification enabled */
     private boolean oneStepSimplification = true;
     
-    /** launches the rightclick the macro menu */
-    private boolean rightClickMacros;
+    /** launches the rightclick the macro menu. on by default. */
+    private boolean rightClickMacros = true;
 
     /** JML is active by default */
     private boolean useJML = true;
