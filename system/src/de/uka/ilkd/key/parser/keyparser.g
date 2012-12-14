@@ -3301,8 +3301,8 @@ funcpredvarterm returns [Term a = null]
 	                        if(i < op.arity() && !op.bindVarsAt(i)) {
 	                            for(QuantifiableVariable qv : args[i].freeVars()) {
 	                                if(boundVars.contains(qv)) {
-	                                    semanticError("Building a function term with bound variables failed: "
-	                                                   + "Variable " + qv + " must not occur free in subterm " + i);
+	                                    semanticError("Building function term "+op+" with bound variables failed: "
+	                                                   + "Variable " + qv + " must not occur free in subterm " + args[i]);
 	                                } 
 	                            }	                            
 	                        }

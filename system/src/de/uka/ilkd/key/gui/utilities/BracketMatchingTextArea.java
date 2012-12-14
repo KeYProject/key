@@ -8,7 +8,7 @@
 //
 //
 
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.Color;
 import java.awt.Graphics;
