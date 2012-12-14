@@ -27,7 +27,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.rule.label.TermLabelWildcard;
 import de.uka.ilkd.key.util.Debug;
 
 /** 
@@ -168,7 +168,8 @@ public class NoPosTacletApp extends TacletApp {
 	    if ( sv instanceof ModalOperatorSV
 	         || sv instanceof ProgramSV
                  || sv instanceof VariableSV
-                 || sv instanceof SkolemTermSV)
+                 || sv instanceof SkolemTermSV
+                 || sv instanceof TermLabelWildcard)
                 continue;
 
 	    final TacletPrefix prefix = taclet.getPrefix ( sv );

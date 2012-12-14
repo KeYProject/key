@@ -379,7 +379,7 @@ public class TestMatchTaclet extends TestCase {
 	PosTacletApp app = PosTacletApp.createPosTacletApp
 	(find_addrule_conflict,
 	        find_addrule_conflict.match(match.sub(0), 
-	                find_addrule_conflict.find(), false,
+	                find_addrule_conflict.find(), 
 	                MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
                     new PosInOccurrence(new SequentFormula(match),
                             PosInTerm.TOP_LEVEL.down(0), true), services);
@@ -394,7 +394,7 @@ public class TestMatchTaclet extends TestCase {
 	app = PosTacletApp.createPosTacletApp
 	(find_addrule_conflict,
             find_addrule_conflict.match(match, 
-                    find_addrule_conflict.find(), false,
+                    find_addrule_conflict.find(), 
                     MatchConditions.EMPTY_MATCHCONDITIONS, services).getInstantiations(),
                     new PosInOccurrence(new SequentFormula(match),
                             PosInTerm.TOP_LEVEL, true), services);
@@ -414,7 +414,7 @@ public class TestMatchTaclet extends TestCase {
 	Term match = TacletForTests.parseTerm("\\forall testSort z; (p(z) -> A)");
 	TacletApp app = PosTacletApp.createPosTacletApp
 	(if_find_clash,
-            if_find_clash.match(match.sub(0), if_find_clash.find(), false, 
+            if_find_clash.match(match.sub(0), if_find_clash.find(),  
                MatchConditions.EMPTY_MATCHCONDITIONS, 
                services).getInstantiations(),
                new PosInOccurrence(new SequentFormula(match.sub(0)),
@@ -426,7 +426,7 @@ public class TestMatchTaclet extends TestCase {
 
 
 	assertTrue("Match not found", 
-		   if_find_clash.match(match, if_find_clash.find(), false,
+		   if_find_clash.match(match, if_find_clash.find(), 
 				       MatchConditions.EMPTY_MATCHCONDITIONS, services) != null);	           
     }
 
@@ -437,7 +437,7 @@ public class TestMatchTaclet extends TestCase {
 
 	assertTrue("Match not found but should exist"+
 		   " because add and if are same area",
-                   if_add_no_clash.match(match.sub(0), if_add_no_clash.find(), false,
+                   if_add_no_clash.match(match.sub(0), if_add_no_clash.find(),
 					 MatchConditions.EMPTY_MATCHCONDITIONS, services) != null); 
     }
     
@@ -452,7 +452,7 @@ public class TestMatchTaclet extends TestCase {
 		   "..not free in..", NoPosTacletApp.createNoPosTacletApp
 		   (not_free_conflict,
 		    not_free_conflict.match
-		    (free_in, not_free_conflict.find(), false,
+		    (free_in, not_free_conflict.find(),
 		     MatchConditions.EMPTY_MATCHCONDITIONS, services), services) == null);
 
 	Term not_free_in = TacletForTests.parseTerm("\\forall testSort z; (p(z) & p(c))");
@@ -460,7 +460,7 @@ public class TestMatchTaclet extends TestCase {
 		   "is not relevant", NoPosTacletApp.createNoPosTacletApp
 		   (not_free_conflict,
 		    not_free_conflict.match
-		    (not_free_in, not_free_conflict.find(), false,
+		    (not_free_in, not_free_conflict.find(),
 		     MatchConditions.EMPTY_MATCHCONDITIONS, services), services) != null);
     }
 
@@ -507,14 +507,12 @@ public class TestMatchTaclet extends TestCase {
 	assertTrue("Instantiations should be found as updates can be ignored if "+
 		   "only the term that is matched has an update and the "+
 		   "template it is matched to has none.",
-		   all_left.match(match, all_left.find(), 
-				  true, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
+		   all_left.matchFind(match, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
 		
 	Term match2 = TacletForTests.parseTerm("\\<{int i;}\\>{i:=Z(2(#))} true");
 	match2 = match2.sub(0);
 	assertTrue("Instantiations should be found.",
-		   assign_n.match(match2, assign_n.find(), 
-				  true, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
+		   assign_n.matchFind(match2, MatchConditions.EMPTY_MATCHCONDITIONS, services)!=null);
     }
 
 

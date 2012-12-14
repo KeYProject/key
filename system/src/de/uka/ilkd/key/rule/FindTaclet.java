@@ -22,8 +22,10 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.label.TermLabelWildcard;
 import de.uka.ilkd.key.rule.tacletbuilder.FindTacletBuilder;
@@ -85,6 +87,35 @@ public abstract class FindTaclet extends Taclet {
     public Term find() {
 	return find;
     }
+    
+    /**
+     * ignores a possible update prefix
+     * @param term the term to be matched
+     * @param template the pattern term
+     * @param matchCond the accumulated match conditions for a successful match
+     * @param services the Services
+     * @return a pair of updated match conditions and the unwrapped term without the ignored updates (Which have been added to the update context in the match conditions)
+     */
+    private IgnoreUpdateMatchResult matchAndIgnoreUpdatePrefix(final Term term,
+            final Term template, MatchConditions matchCond, final Services services) {
+
+        final Operator sourceOp   = term.op ();
+        final Operator templateOp = template.op ();
+
+        if ( sourceOp instanceof UpdateApplication
+                && !(templateOp instanceof UpdateApplication) ) {
+            // updates can be ignored
+            Term update = UpdateApplication.getUpdate(term);
+            matchCond = matchCond
+                    .setInstantiations ( matchCond.getInstantiations ().
+                            addUpdate (update) );
+            return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(term), 
+                    template, matchCond, services);       
+        } else {
+            return new IgnoreUpdateMatchResult(term, matchCond);
+        }
+    }
+
 
     /** 
      * matches the given term against the taclet's find term and
@@ -104,6 +135,12 @@ public abstract class FindTaclet extends Taclet {
             MatchConditions matchCond,
             Services services) {
         
+        if (ignoreTopLevelUpdates()) {
+            IgnoreUpdateMatchResult resultUpdateMatch = matchAndIgnoreUpdatePrefix(term, find(), matchCond, services);
+            term = resultUpdateMatch.termWithoutMatchedUpdates;
+            matchCond = resultUpdateMatch.matchCond;
+        }
+        
         // at the moment we do not support complex match patterns for term labels
         // The current implementation assumes an implicit wild card at the the top level term
         // which is matched
@@ -111,9 +148,7 @@ public abstract class FindTaclet extends Taclet {
         matchCond = matchCond.setInstantiations(matchCond.getInstantiations().add(TermLabelWildcard.WILDCARD, 
                 term.getLabels(), services));
         
-        return match(term, find(), 
-                ignoreTopLevelUpdates(),
-                matchCond, services);
+        return match(term, find(), matchCond, services);
     }
 
     /** CONSTRAINT NOT USED 
@@ -264,6 +299,16 @@ public abstract class FindTaclet extends Taclet {
         final BoundVarsVisitor bvv = new BoundVarsVisitor();
         bvv.visit(find());
         return bvv.getBoundVariables();
+    }
+    
+    private static final class IgnoreUpdateMatchResult {
+        public Term termWithoutMatchedUpdates;
+        public MatchConditions matchCond;
+
+        public IgnoreUpdateMatchResult(Term term, MatchConditions matchCond) {
+            this.termWithoutMatchedUpdates = term;
+            this.matchCond = matchCond;
+        }
     }
     
 } 

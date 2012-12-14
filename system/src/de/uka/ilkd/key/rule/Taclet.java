@@ -322,8 +322,6 @@ public abstract class Taclet implements Rule, Named {
      * resolved there as well, if necessary.
      * @param term the Term that has to be matched
      * @param template the Term that is checked if it can match term
-     * @param ignoreUpdates a boolean if set to true updates will be ignored as 
-     * e.g. wanted if an if-sequent is matched
      * @param matchCond the SVInstantiations/Constraint that are
      * required because of formerly matchings
      * @param services the Services object encapsulating information
@@ -333,36 +331,13 @@ public abstract class Taclet implements Rule, Named {
      */
     protected MatchConditions match(Term            term,
 				    Term            template,
-				    boolean         ignoreUpdates,
 				    MatchConditions matchCond,
 				    Services        services) {
 	Debug.out("Start Matching rule: ", name);
-	matchCond = matchHelp(term, template, ignoreUpdates, matchCond, 
-		 services);	
+	matchCond = matchHelp(term, template, matchCond, services);	
 	Debug.out(matchCond == null ? "Failed: " : "Succeeded: ", name);
 	return matchCond == null ? null : checkConditions(matchCond, services);
     }
-
-
-
-    /**
-     * same as the method above but with ignoreUpdates always false
-     * @param term the Term that has to be matched
-     * @param template the Term that is checked if it can match term
-     * @param matchCond the SVInstantiations/Constraint that are
-     * required because of formerly matchings
-     * @param services the Services object encapsulating information
-     * about the java datastructures like (static)types etc.
-     * @return the new MatchConditions needed to match template with
-     * term , if possible, null otherwise
-     */
-    protected MatchConditions match(Term            term,
-				    Term            template,
-				    MatchConditions matchCond,
-				    Services        services) {
-	return match(term, template, false, matchCond, services);
-    }
-
 
     /**
      * checks if the conditions for a correct instantiation are satisfied
@@ -526,8 +501,6 @@ public abstract class Taclet implements Rule, Named {
      * (marked as final to help the compiler inlining methods)
      * @param term the Term the Template should match
      * @param template the Term tried to be instantiated so that it matches term
-     * @param ignoreUpdates a boolean if set to true updates will be ignored as 
-     * e.g. wanted if an if-sequent is matched
      * @param matchCond the MatchConditions to be obeyed by a
      * successfull match
      * @return the new MatchConditions needed to match template with
@@ -538,29 +511,14 @@ public abstract class Taclet implements Rule, Named {
 
     private MatchConditions matchHelp(final Term             term,
 				      final Term             template, 
-				      final boolean          ignoreUpdates,
 				      MatchConditions  	     matchCond,
 				      final Services         services) {
 	Debug.out("Match: ", template);
 	Debug.out("With: ",  term);
         
 	final Operator sourceOp   = term.op ();
-        final Operator templateOp = template.op ();
+    final Operator templateOp = template.op ();
                 
-        if ( ignoreUpdates
-             && sourceOp instanceof UpdateApplication
-             && !(templateOp instanceof UpdateApplication) ) {
-	    // updates can be ignored
-            Term update = UpdateApplication.getUpdate(term);
-	    matchCond = matchCond
-		.setInstantiations ( matchCond.getInstantiations ().
-				     addUpdate (update) );
-	    return matchHelp(UpdateApplication.getTarget(term), 
-		    	     template,
-			     true, 
-			     matchCond, 
-			     services);
-	}
     
 	if(templateOp instanceof SchemaVariable && templateOp.arity() == 0) {
 	    return templateOp.match(term, matchCond, services);
@@ -591,7 +549,6 @@ public abstract class Taclet implements Rule, Named {
 	for (int i = 0, arity = term.arity(); i < arity; i++) {
 	    matchCond = matchHelp(term.sub(i), 
 		    		  template.sub(i), 
-		    		  false,
 				  matchCond, 
 				  services);
 	    if (matchCond == null) {		      
@@ -601,7 +558,6 @@ public abstract class Taclet implements Rule, Named {
                 
         return matchCond.shrinkRenameTable();
     }
-    
 
 
     /**
@@ -640,8 +596,7 @@ public abstract class Taclet implements Rule, Named {
 	while (p_toMatch.hasNext()) {
 	    cf = p_toMatch.next();
 
-	    newMC = match(cf.getConstrainedFormula().formula(), updateFormula,
-		    false, p_matchCond, p_services);
+	    newMC = match(cf.getConstrainedFormula().formula(), updateFormula, p_matchCond, p_services);
 	    if (newMC != null) {
 		resFormulas = resFormulas.prepend(cf);
 		resMC = resMC.prepend(newMC);
