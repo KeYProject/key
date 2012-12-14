@@ -37,7 +37,7 @@ import de.uka.ilkd.key.util.GuiUtilities;
 
 public class RuleView extends JSplitPane implements TreeSelectionListener, java.io.Serializable {
 
-    private static final String DESC_RESOURCE = "de/uka/ilkd/key/gui/help/ruledesc.xml";
+    private static final String DESC_RESOURCE = "de/uka/ilkd/key/gui/help/ruleExplanations.xml";
     private static final long serialVersionUID = 911181673407907024L;
     private RuleTreeModel ruleViewModel;
     private JTree ruleTree;
