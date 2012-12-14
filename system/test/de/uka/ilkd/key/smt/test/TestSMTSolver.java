@@ -236,6 +236,42 @@ public abstract class TestSMTSolver extends TestCommons {
 	Assert.assertTrue(correctResult(testFile + "add1.key", true));
     }
     
+    public void testBSum1() {
+        Assert.assertTrue(correctResult(testFile + "bsum1.key", true));
+    }
+    
+    public void testBSum2() {
+        Assert.assertTrue(correctResult(testFile + "bsum2.key", true));
+    }
+    
+    public void testBSum3() {
+        Assert.assertTrue(correctResult(testFile + "bsum3.key", false));
+    }
+    
+    public void testBProd1() {
+        Assert.assertTrue(correctResult(testFile + "bprod1.key", true));
+    }
+    
+    public void testBProd2() {
+        Assert.assertTrue(correctResult(testFile + "bprod2.key", true));
+    }
+    
+    public void testBProd3() {
+        Assert.assertTrue(correctResult(testFile + "bprod3.key", false));
+    }
+    
+//    public void testBinderPred1() {
+//        Assert.assertTrue(correctResult(testFile + "binder2.key", true));
+//    }
+    
+    public void testBinderPred2() {
+        Assert.assertTrue(correctResult(testFile + "binder4.key", true));
+    }
+    
+    public void testBinderPred3() {
+        Assert.assertTrue(correctResult(testFile + "binder5.key", true));
+    }
+    
     /*public void testAdd2() {
 	Assert.assertTrue(correctResult(testFile + "add2.key", false));
     }*/
@@ -245,7 +281,7 @@ public abstract class TestSMTSolver extends TestCommons {
 	Assert.assertTrue(correctResult(testFile + "mult1.key", true));
     }*/
     
-    private boolean correctResult(String filepath, boolean isValid) {
+    protected boolean correctResult(String filepath, boolean isValid) {
 	if (toolNotInstalled()) {
 	    return true;
 	}

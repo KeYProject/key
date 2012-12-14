@@ -13,7 +13,6 @@ package de.uka.ilkd.key.gui;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Iterator;
 import java.util.List;
 
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
@@ -26,12 +25,12 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.ui.BatchMode;
 import de.uka.ilkd.key.ui.ConsoleUserInterface;
 import de.uka.ilkd.key.ui.UserInterface;
+import de.uka.ilkd.key.util.CommandLine;
 import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExperimentalFeature;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
-import de.uka.ilkd.key.util.CommandLine;
 
 /**
  * The main entry point for KeY
@@ -266,7 +265,7 @@ public class Main {
 
         if(cl.isSet(PRINT_STATISTICS)){
         	statisticsFile = cl.getString(PRINT_STATISTICS, null);
-        	if(statisticsFile.equals(null)){
+        	if(statisticsFile == null){
         		printUsageAndExit(true,null);
         	}
         }
@@ -290,7 +289,7 @@ public class Main {
         }
         if(cl.isSet(EXAMPLES)){
         	examplesDir = cl.getString(EXAMPLES, null);
-        	if (examplesDir.equals(null)){
+        	if (examplesDir == null) {
         		printUsageAndExit(true, null);
         	}
         }
@@ -314,7 +313,6 @@ public class Main {
             deactivateExperimentalFeatures();
         }
      	List<String> fileArguments = cl.getArguments();
-     	Iterator iter = fileArguments.iterator();
 
         if(cl.isSet(JUSTIFY_RULES))
         {evaluateLemmataOptions(cl);}

@@ -123,7 +123,7 @@ class SequentViewListener extends MouseInputAdapter
             String tOpClassString = t.op().getClass().toString();
             String operator = tOpClassString.substring(
                 tOpClassString.lastIndexOf('.')+1);
-            return  operator + ", Sort: " + t.sort();
+            return  operator + ", Sort: " + t.sort() + ", Hash:"+t.hashCode();
         }
         return null;
     }

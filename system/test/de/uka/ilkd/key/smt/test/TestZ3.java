@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.smt.test;
 
 import de.uka.ilkd.key.smt.SolverType;
+import junit.framework.Assert;
 
 
 public class TestZ3 extends TestSMTSolver {
@@ -52,4 +53,22 @@ public class TestZ3 extends TestSMTSolver {
        }
        return type;
     }
+    
+    //These testcases are z3 specific, because other solver don't support integer division.
+    public void testDiv1() {
+        Assert.assertTrue(correctResult(testFile + "div1.key", true));
+    }
+    
+    public void testDiv3() {
+        Assert.assertTrue(correctResult(testFile + "div3.key", true));
+    }
+    
+    public void testDiv5() {
+        Assert.assertTrue(correctResult(testFile + "div5.key", false));
+    }
+    
+    public void testDiv6() {
+        Assert.assertTrue(correctResult(testFile + "div6.key", false));
+    }
+    
 }

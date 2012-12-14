@@ -325,7 +325,7 @@ class ProgressTable extends JTable{
                 
                 public void setText(String text){
                         getProgressBar().setString(text);
-                        getProgressBar().setStringPainted(text != null && text != "" );
+                        getProgressBar().setStringPainted(text != null && !text.isEmpty() );
                 }
         }
         

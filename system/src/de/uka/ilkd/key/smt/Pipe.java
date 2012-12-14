@@ -32,11 +32,6 @@ class Pipe<T>{
 	private final ReentrantLock listenerLock = new ReentrantLock(true);
 	private final LinkedList<PipeListener<T>> listeners = new LinkedList<PipeListener<T>>();
 	
-	/** there are three worker threads, thus three permits are acquired in advance. After a worker thread
-	 * has done its work it releases one permit. Thus, the semaphore has exactly one permit when all worker
-	 * have finished their work.*/
-	private final Semaphore     stopWaiting = new Semaphore(-2);
-
 	/**
 	 * The workers of the pipe. One worker is responsible for sending messages, while the other two workers
 	 * handle messages which are received. 
@@ -52,13 +47,6 @@ class Pipe<T>{
 	/**The sender goes to sleep when there are no messages to be sent. If you want to wake him up, use this
 	 * condition. */
 	private final Condition     postMessages = queueLock.newCondition();
-	
-	/**
-	 * External threads can wait until the pipe is closed. The condition <code>await</code> is used for that purpose,
-	 * see <code>waitForPipe</code>.
-	 */
-	private final ReentrantLock awaitLock    = new ReentrantLock(true);
-	private final Condition     awaitCond    = awaitLock.newCondition();
 	
 	/**
 	 * The delimiters of the messages, i.e. strings that indicate the end of a message. If you specify several
@@ -102,24 +90,14 @@ class Pipe<T>{
 			try{
 				doWork();
 			}catch(Throwable e){
+				listenerLock.lock();
 				try{
-					listenerLock.lock();
 					e.printStackTrace();
-					close();
 					for(PipeListener<T> listener : listeners){
 						listener.exceptionOccurred(Pipe.this,e);
 					}
 				}finally{
 					listenerLock.unlock();
-				}
-			}finally{
-				// the work is done, unregister from the system. 
-				stopWaiting.release();
-				try{
-					awaitLock.lock();
-					awaitCond.signalAll();
-				}finally{
-					awaitLock.unlock();
 				}
 			}
 		}
@@ -147,6 +125,10 @@ class Pipe<T>{
 				try {					
 					while(!queue.isEmpty()){
 						String message = queue.pop();
+						if (message == null) {
+							output.close();
+							return;
+						}
 						writer.write(message+"\n");
 						writer.flush();
 					}
@@ -203,10 +185,10 @@ class Pipe<T>{
 					//the next call blocks the thread and waits until there is a message. 
  					message = reader.readMessage();
 				} catch (Throwable e) {
-					close();
 					// only throw an exception if the thread has not been interrupted. It can be that
 					// the exception comes from the interruption.
 					if(!Thread.currentThread().isInterrupted()){
+						close();
 						throw new RuntimeException(e);
 					}
 				}					 
@@ -224,8 +206,8 @@ class Pipe<T>{
 		
 		
 		private void deliverMessage(String message){
+			listenerLock.lock();
 			try{
-				listenerLock.lock();
 				for(PipeListener<T> listener : listeners){
 					listener.messageIncoming(Pipe.this,message, type);
 				}
@@ -248,8 +230,8 @@ class Pipe<T>{
 		addListener(listener);
 		try{
 			workerLock.lock();
-			workers.add(new Receiver(input,NORMAL_MESSAGE,"receiver for normal messages"));
 			workers.add(new Sender(output,"sender"));
+			workers.add(new Receiver(input,NORMAL_MESSAGE,"receiver for normal messages"));
 			workers.add(new Receiver(error,ERROR_MESSAGE,"receiver for error messages"));
 			
 	
@@ -299,6 +281,11 @@ class Pipe<T>{
 		}
 	}
 	
+	/** Closes the pipe for sending, signalling the end of the input to the target process. */
+	void closeSendingPipe() {
+		sendMessage(null);
+	}
+	
 	void addListener(PipeListener<T> listener){
 		try{
 			listenerLock.lock();
@@ -312,16 +299,17 @@ class Pipe<T>{
 		return session;
 	}
 	
-	public void waitForPipe(){
-		awaitLock.lock();
-		while(!stopWaiting.tryAcquire()){ // loop protects for spurious wakeup
-			try {
-			  awaitCond.await();
-			} catch (InterruptedException e) {
-				close(); // stop pipe and wait until all worker have stopped.				
-			}
+	/** Wait until the output of the target process has been read completely. */
+	public void waitForPipe() throws InterruptedException {
+		Thread[] threads;
+		try{
+			workerLock.lock();
+			threads = workers.toArray(new Thread[0]);
+		}finally{
+			workerLock.unlock();
+		}
+		for (Thread worker : workers) {
+			worker.join();
 		}
 	}
-
-
 }

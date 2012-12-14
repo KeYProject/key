@@ -146,7 +146,7 @@ public class WindowUserInterface extends AbstractUserInterface {
 			}
 		} else {
 			resetStatus(this);
-			if (info.toString() != "") {
+			if (!info.toString().isEmpty()) {
 				mainWindow.displayResults(info.toString());
 			}
 		}

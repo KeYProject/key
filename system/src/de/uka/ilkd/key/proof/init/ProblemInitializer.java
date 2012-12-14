@@ -463,19 +463,19 @@ public final class ProblemInitializer {
 	alreadyParsed.clear();
 
         //the first time, read in standard rules
-        if(baseConfig == null || profile != baseConfig.getProfile()) {
-            baseConfig = new InitConfig(services, profile);
-
-	    RuleSource tacletBase = profile.getStandardRules().getTacletBase();
-	    if(tacletBase != null) {
-    	    	KeYFile tacletBaseFile
-    	    	    = new KeYFile("taclet base", 
-    	    		          profile.getStandardRules().getTacletBase(),
-			          progMon);
-    	    	readEnvInput(tacletBaseFile, baseConfig);
-	    }	    
+	if(baseConfig == null || profile != baseConfig.getProfile()) {            
+		InitConfig newBaseConfig = new InitConfig(services, profile);
+			RuleSource tacletBase = profile.getStandardRules().getTacletBase();
+			if(tacletBase != null) {
+				KeYFile tacletBaseFile
+				= new KeYFile("taclet base", 
+						profile.getStandardRules().getTacletBase(),
+						progMon);
+				readEnvInput(tacletBaseFile, newBaseConfig);			
+			}
+			baseConfig = newBaseConfig;
 	}
-	  return prepare(envInput, baseConfig);
+	return prepare(envInput, baseConfig);
 	
 	}
     
