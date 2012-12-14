@@ -1,15 +1,24 @@
 package org.key_project.keyide.ui.editor;
 
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.key_project.keyide.ui.editor.input.StringInput;
+import org.key_project.keyide.ui.tester.AutoModeTester;
 import org.key_project.keyide.ui.views.Outline;
 import org.key_project.keyide.ui.views.StrategyPropertiesView;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.ConsoleUserInterface;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 
 
@@ -24,17 +33,39 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    private Outline outline;
 
    /**
-    * Constructor.
+    * Listens for changes on {@link ConsoleUserInterface#isAutoMode()} 
+    * of the {@link ConsoleUserInterface} provided via {@link #getKeYEnvironment()}.
     */
-   public KeYEditor(){
-     
-   }
-   
+   private PropertyChangeListener autoModeActiveListener = new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+         AutoModeTester.updateProperties();
+      }
+   };
+
    /**
     * {@inheritDoc}
     */
    @Override
-   public KeYEnvironment<?> getKeYEnvironment() {
+   public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+      super.init(site, input);
+      getKeYEnvironment().getUi().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void dispose() {
+      getKeYEnvironment().getUi().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
+      super.dispose();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYEnvironment<CustomConsoleUserInterface> getKeYEnvironment() {
       Assert.isTrue(getEditorInput() instanceof StringInput);
       return ((StringInput)getEditorInput()).getEnvironment();
    }

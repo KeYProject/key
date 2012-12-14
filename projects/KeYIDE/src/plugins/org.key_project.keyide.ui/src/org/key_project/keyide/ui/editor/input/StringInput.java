@@ -8,6 +8,7 @@ import org.eclipse.ui.IStorageEditorInput;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * This class is used to define an input to display in the editor
@@ -29,7 +30,7 @@ public class StringInput implements IStorageEditorInput{
     * Gives the {@link KeYEnvironment} of this {@link StringInput}.
     * @return The {@link KeYEnvironment} of this {@link StringInput}.
     */
-   public KeYEnvironment<?> getEnvironment() {
+   public KeYEnvironment<CustomConsoleUserInterface> getEnvironment() {
       return environment;
    }
 
@@ -37,13 +38,13 @@ public class StringInput implements IStorageEditorInput{
    
    private Proof proof;
    
-   private KeYEnvironment<?> environment;
+   private KeYEnvironment<CustomConsoleUserInterface> environment;
    
    /**
     * Constructor
     * @param storage The storage for this {@link IStorageEditorInput}
     */
-   public StringInput(IStorage storage, Proof proof, KeYEnvironment<?> environment){
+   public StringInput(IStorage storage, Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment){
       this.storage=storage;
       this.proof = proof;
       this.environment = environment;

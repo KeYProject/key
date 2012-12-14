@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IStorage;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
@@ -40,6 +41,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
  * This class provides static methods for the communication between KeY and the Eclipse UI.
@@ -72,7 +74,7 @@ public class KeYToUIUtil {
                     protected IStatus run(IProgressMonitor monitor) {
                        try {
                           monitor.beginTask("Loading Proof", 1);
-                          final KeYEnvironment<?> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
+                          final KeYEnvironment<CustomConsoleUserInterface> environment = KeYEnvironment.load(location, classPaths, bootClassPath);
 
                           if (environment.getInitConfig() != null) {
                              // Get method to proof in KeY
@@ -150,7 +152,7 @@ public class KeYToUIUtil {
     * @param name The  name to display at the editor-tab
     * @param ui The UserInterface that holds the KeYMediator
     */
-   public static void openEditor(Proof proof, KeYEnvironment<?> environment){
+   public static void openEditor(Proof proof, KeYEnvironment<CustomConsoleUserInterface> environment){
       String inputText = NonGoalInfoView.computeText(environment.getMediator(), proof.root());
       IStorage storage = new StringStorage(inputText, proof.name().toString());
       IStorageEditorInput input = new StringInput(storage, proof, environment);
@@ -180,6 +182,8 @@ public class KeYToUIUtil {
    
    private static Proof openDialog(ImmutableSet<FunctionalOperationContract> operationContracts, KeYEnvironment<?> environment) throws ProofInputException 
    {
+      Assert.isNotNull(operationContracts);
+      Assert.isNotNull(environment);
       Shell parent = WorkbenchUtil.getActiveShell();
       ImmutableCollectionContentProvider contentProvider = ImmutableCollectionContentProvider.getInstance();
       ContractSelectionDialog dialog = new ContractSelectionDialog(parent, contentProvider, environment.getServices());
@@ -187,7 +191,7 @@ public class KeYToUIUtil {
       dialog.setMessage("Select contract to prove.");
       dialog.setInput(operationContracts);
       
-      if(!operationContracts.isEmpty()){ // TODO: Replace operationContracts.isEmpty() with CollectionUtil.isEmpty(operationContracts) because it is null pointer save
+      if(!operationContracts.isEmpty()){
          // TODO: Replace content in if block with, because it is more efficient: dialog.setInitialSelections(new FunctionalOperationContract[] {CollectionUtil.getFirst(operationContracts)});
 //         FunctionalOperationContract[] initialSelection = new FunctionalOperationContract[1];
 //         initialSelection[0]=operationContracts.toArray(initialSelection)[0];
