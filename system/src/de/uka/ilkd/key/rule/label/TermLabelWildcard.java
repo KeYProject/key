@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class TermLabelWildcard extends TermLabelOperation implements SchemaVariable, ITermLabel {
     
@@ -87,9 +88,9 @@ public class TermLabelWildcard extends TermLabelOperation implements SchemaVaria
 
     @SuppressWarnings("unchecked")
     @Override
-    public ImmutableArray<ITermLabel> evaluate(MatchConditions cond,
+    public ImmutableArray<ITermLabel> evaluate(SVInstantiations svInst,
             Services services) {
-        return (ImmutableArray<ITermLabel>) cond.getInstantiations().getInstantiation(this);
+        return (ImmutableArray<ITermLabel>) svInst.getInstantiation(this);
     }
 
 }

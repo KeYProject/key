@@ -3,7 +3,7 @@ package de.uka.ilkd.key.rule.label;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ITermLabel;
-import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
  * A term label which represents the set difference of term labels of its parameters.
@@ -19,7 +19,7 @@ public class TermLabelSubstraction extends TermLabelOperation {
     }
 
     @Override
-    public ImmutableArray<ITermLabel> evaluate(MatchConditions cond,
+    public ImmutableArray<ITermLabel> evaluate(SVInstantiations svInst,
             Services services) {
         // TODO Auto-generated method stub
         return null;

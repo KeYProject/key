@@ -17,6 +17,7 @@
  */
 package de.uka.ilkd.key.rule;
 
+import java.util.ArrayList;
 import java.util.Stack;
 
 import de.uka.ilkd.key.collection.DefaultImmutableMap;
@@ -33,6 +34,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -53,6 +55,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.label.TermLabelOperation;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
@@ -367,20 +370,46 @@ public final class SyntacticalReplaceVisitor extends Visitor {
             // instantiate bound variables
             final ImmutableArray<QuantifiableVariable> boundVars = instantiateBoundVariables(visited);
 
+            // instantiate annotations
+            ImmutableArray<ITermLabel> labels;
+            if (visited.hasLabels()) {
+                ArrayList<ITermLabel> instantiatedLabels = new ArrayList<ITermLabel>(10);
+                ImmutableArray<ITermLabel> visitedLabels = visited.getLabels();
+                for (ITermLabel l : visitedLabels) {
+                    if (l instanceof TermLabelOperation) {
+                        for (final ITermLabel result : ((TermLabelOperation) l).evaluate(svInst, services)) {
+                            instantiatedLabels.add(result);
+                        }
+                    } else {
+                        instantiatedLabels.add(l);
+                    }
+                }
+                labels = new ImmutableArray<ITermLabel>(instantiatedLabels);
+            } else {
+                labels = new ImmutableArray<ITermLabel>();
+            }
+            
+            // instantiate sub terms
             Term[] neededsubs = neededSubs(newOp.arity());
             if (visitedOp instanceof ElementaryUpdate
                     && elementaryUpdateLhs != null) {
                 assert neededsubs.length == 1;
                 Term newTerm = TermBuilder.DF.elementary(services,
                         elementaryUpdateLhs, neededsubs[0]);
+                if (labels.size() != 0) {
+                    newTerm = TermBuilder.DF.label(newTerm, labels);
+                }
                 pushNew(newTerm);
             } else if (boundVars != visited.boundVars() || jblockChanged
                     || operatorInst
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
-                Term newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb);
+                Term newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb, labels);
                 pushNew(resolveSubst(newTerm));
             } else {
-                final Term t = resolveSubst(visited);
+                Term t = resolveSubst(visited);
+                if (labels.size() != 0) {
+                    t = TermBuilder.DF.label(t, labels);
+                }
                 if (t == visited)
                     subStack.push(t);
                 else

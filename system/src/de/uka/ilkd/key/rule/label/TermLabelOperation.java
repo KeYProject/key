@@ -6,6 +6,7 @@ import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
  * TermLabelOperations are used in goal templates of taclets to describe unions, set difference etc. operations
@@ -63,7 +64,7 @@ public abstract class TermLabelOperation implements ITermLabel, Named {
         return children.get(i);
     }
 
-    public abstract ImmutableArray<ITermLabel> evaluate(MatchConditions cond, Services services);
+    public abstract ImmutableArray<ITermLabel> evaluate(SVInstantiations svInst, Services services);
     
     public String toString() {
         StringBuilder result = new StringBuilder();
