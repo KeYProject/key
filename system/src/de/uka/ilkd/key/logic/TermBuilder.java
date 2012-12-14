@@ -1351,12 +1351,20 @@ public class TermBuilder {
     }
     
     public Term label(Term term, ImmutableArray<ITermLabel> labels) {
-        return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(), 
-                term.javaBlock(), labels);
+        if (labels.size() == 0) {
+            return term;
+        } else {
+            return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(), 
+                    term.javaBlock(), labels);
+        }
     }
 
     public Term label(Term term, ITermLabel label) {
-        return label(term, new ImmutableArray<ITermLabel>(label));
+        if (label == null) {
+            return term;
+        } else {
+            return label(term, new ImmutableArray<ITermLabel>(label));
+        }
     }
 
     public Term dotArr(Services services, Term ref, Term idx) {
