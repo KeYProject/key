@@ -51,10 +51,7 @@ import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
 
 public final class StrategySelectionView extends JPanel {
     
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 4543901758512289107L;
+    private static final long serialVersionUID = -2808575255579411116L;
 
     private static final String JAVACARDDL_STRATEGY_NAME 
     	= "JavaCardDLStrategy";
@@ -1255,10 +1252,8 @@ public final class StrategySelectionView extends JPanel {
     
 
     private static class JRadioButtonHashMap extends JRadioButton {
-        /**
-         * 
-         */
-        private static final long serialVersionUID = 785796009937827348L;
+        
+        private static final long serialVersionUID = 7686260531440322733L;
 
         JRadioButtonHashMap(String text, String command, boolean selected, 
                 boolean enabled) {
