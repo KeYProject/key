@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 
-import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -255,7 +254,14 @@ public class Main {
         }
 
         if(cl.isSet(PRINT_STATISTICS)){
+<<<<<<< HEAD
             statisticsFile = cl.getString(PRINT_STATISTICS, null);
+=======
+        	statisticsFile = cl.getString(PRINT_STATISTICS, null);
+        	if(statisticsFile == null){
+        		printUsageAndExit(true,null);
+        	}
+>>>>>>> master
         }
 
         if(cl.isSet(TIMEOUT)){
@@ -279,7 +285,14 @@ public class Main {
         }
 
         if(cl.isSet(EXAMPLES)){
+<<<<<<< HEAD
             examplesDir = cl.getString(EXAMPLES, null);
+=======
+        	examplesDir = cl.getString(EXAMPLES, null);
+        	if (examplesDir == null) {
+        		printUsageAndExit(true, null);
+        	}
+>>>>>>> master
         }
 
         if (Debug.ENABLE_DEBUG) {
@@ -299,6 +312,10 @@ public class Main {
         } else {
             deactivateExperimentalFeatures();
         }
+<<<<<<< HEAD
+=======
+     	List<String> fileArguments = cl.getArguments();
+>>>>>>> master
 
         if(cl.isSet(LAST)){
             loadRecentFile=true;

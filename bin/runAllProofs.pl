@@ -326,6 +326,7 @@ sub system_timeout {
 	# parent process, waiting for child
 	waitpid $child, 0;
 	my $result = ${^CHILD_ERROR_NATIVE};
+        # this waitpid call makes the result value (of KeY) shift by 8 to the left
 	# in case of a time out - wait a little for the process to finish
 	sleep 10 if $result & 0xff;
 	return $result;
