@@ -582,4 +582,13 @@ public class TestTermParser extends TestCase {
         assertEquals("cast stronger than plus", parseTerm("(int)3+2"), 
                 parseTerm("((int)3)+2"));
      }
+    
+    public void testParseTermsWithLabels() {
+        Term t = parseTerm("(3 + 2)<<SE>>");
+        //assertTrue(t.hasLabels());
+        t = parseTerm("3 + 2<<SE>>");
+        //assertFalse(t.hasLabels());
+        //assertTrue(t.sub(1).hasLabels());
+    }
+    
 }

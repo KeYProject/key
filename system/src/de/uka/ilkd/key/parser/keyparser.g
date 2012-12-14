@@ -2928,7 +2928,7 @@ label returns [ImmutableArray<ITermLabel> labels = new ImmutableArray<ITermLabel
 :
    label=single_label {labelList.add(label);} (COMMA label=single_label {labelList.add(label);})*
    {
-   	labels = new ImmutableArray<ITermLabel>((ITermLabel[])labelList.toArray(new ITermLabel[labelList.size()]));
+   	//labels = new ImmutableArray<ITermLabel>((ITermLabel[])labelList.toArray(new ITermLabel[labelList.size()]));
    }
 ;
 
