@@ -10,8 +10,6 @@
 
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.logic.TestClashFreeSubst;
-
 /**
  * The mode in which the parser is currently running.
  * 
@@ -35,7 +33,7 @@ public enum ParserMode {
      * Parse global declarations.
      * 
      * Apparently, this mode is only used in test case
-     * {@link TestClashFreeSubst}.
+     * {@link de.uka.ilkd.key.logic.TestClashFreeSubst}.
      */
     GLOBALDECL,
 
