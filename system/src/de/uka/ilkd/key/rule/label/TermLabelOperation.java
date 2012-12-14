@@ -1,13 +1,18 @@
-package de.uka.ilkd.key.logic;
+package de.uka.ilkd.key.rule.label;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.rule.MatchConditions;
 
 /**
  * TermLabelOperations are used in goal templates of taclets to describe unions, set difference etc. operations
  * on labels.
  * 
  */
-public class TermLabelOperation implements ITermLabel, Named {
+public abstract class TermLabelOperation implements ITermLabel, Named {
 
     private final Name name;
     private final ImmutableArray<ITermLabel> children;
@@ -17,6 +22,7 @@ public class TermLabelOperation implements ITermLabel, Named {
         this.children = new ImmutableArray<ITermLabel>(children);
     }
 
+    @Override
     public int getChildCount() {
         return children.size();
     }
@@ -24,7 +30,7 @@ public class TermLabelOperation implements ITermLabel, Named {
     @Override
     public int hashCode() {
         int hash = 0;
-        for (ITermLabel child : children) {
+        for (final ITermLabel child : children) {
             hash += 17*child.hashCode();
         }
         return 23*name.hashCode() + hash;
@@ -52,10 +58,13 @@ public class TermLabelOperation implements ITermLabel, Named {
         return children;
     }
     
+    @Override
     public ITermLabel getChild(int i) {
         return children.get(i);
     }
 
+    public abstract ImmutableArray<ITermLabel> evaluate(MatchConditions cond, Services services);
+    
     public String toString() {
         StringBuilder result = new StringBuilder();
         result.append(name);
