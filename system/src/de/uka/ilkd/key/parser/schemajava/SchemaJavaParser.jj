@@ -3527,7 +3527,7 @@ Statement Statement() :
 	    }
 	    catch (ClassCastException cce) {
 		// this is a semantical error!!!
-		ParseException e =  new ParseException("ExpressionStatement expected");
+		throw new ParseException("ExpressionStatement expected");
 	    }
 	}
      | result = SwitchStatement()

@@ -90,9 +90,9 @@ class Pipe<T>{
 			try{
 				doWork();
 			}catch(Throwable e){
+				listenerLock.lock();
 				try{
 					e.printStackTrace();
-					listenerLock.lock();
 					for(PipeListener<T> listener : listeners){
 						listener.exceptionOccurred(Pipe.this,e);
 					}
@@ -206,8 +206,8 @@ class Pipe<T>{
 		
 		
 		private void deliverMessage(String message){
+			listenerLock.lock();
 			try{
-				listenerLock.lock();
 				for(PipeListener<T> listener : listeners){
 					listener.messageIncoming(Pipe.this,message, type);
 				}
