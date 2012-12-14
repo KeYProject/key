@@ -25,6 +25,16 @@ public class SymbolicExecutionLabel implements ITermLabel {
 	public String toString() {
 		return "SE";
 	}
+
+	@Override
+    public ITermLabel getChild(int i) {
+        return null;
+    }
+
+	@Override
+    public int getChildCount() {
+        return 0;
+    }
 	
 	
 }

@@ -10,18 +10,24 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.FindTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.BoundVarsVisitor;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.label.TermLabelWildcard;
+import de.uka.ilkd.key.rule.tacletbuilder.FindTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 
 /** 
@@ -97,6 +103,14 @@ public abstract class FindTaclet extends Taclet {
     public MatchConditions matchFind(Term term,
             MatchConditions matchCond,
             Services services) {
+        
+        // at the moment we do not support complex match patterns for term labels
+        // The current implementation assumes an implicit wild card at the the top level term
+        // which is matched
+        assert !find.hasLabels() : "Find terms with labels not yet supported";
+        matchCond = matchCond.setInstantiations(matchCond.getInstantiations().add(TermLabelWildcard.WILDCARD, 
+                term.getLabels(), services));
+        
         return match(term, find(), 
                 ignoreTopLevelUpdates(),
                 matchCond, services);

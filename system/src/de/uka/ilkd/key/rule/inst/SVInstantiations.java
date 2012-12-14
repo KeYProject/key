@@ -163,6 +163,13 @@ public class SVInstantiations {
         	   services);
     }
 
+    public SVInstantiations add(SchemaVariable sv, 
+            ImmutableArray<ITermLabel> labels, 
+            Services services) {
+        return add(sv, 
+                new TermLabelInstantiationEntry(sv, labels), 
+                services);
+    }
 
 
     public SVInstantiations addList(SchemaVariable sv,  
