@@ -615,4 +615,5 @@ public abstract class Notation {
 	    sp.printConstant(printStringTerm(t));
 	}
     }
+
 }

@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -880,8 +881,25 @@ public final class LogicPrinter {
             startTerm(0);
             layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
         } else {
+            if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+                layouter.print("(");
+            }
             notationInfo.getNotation(t.op(), services).print(t,this);
+            if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+                layouter.print(")");
+            }
         }
+        if (t.hasLabels()) {
+            printLabels(t);
+        }
+    }
+
+    public void printLabels(Term t) throws IOException {
+        layouter.beginC().print("<<");
+        for (ITermLabel l : t.getLabels()) {
+            layouter.print(l.toString());
+        }
+        layouter.end().print(">>");
     }
 
     /**
