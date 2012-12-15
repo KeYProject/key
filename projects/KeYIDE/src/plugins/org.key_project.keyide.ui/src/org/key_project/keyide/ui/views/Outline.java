@@ -3,8 +3,8 @@ package org.key_project.keyide.ui.views;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
-import org.key_project.keyide.ui.providers.OutlineContentProvider;
-import org.key_project.keyide.ui.providers.OutlineLabelProvider;
+import org.key_project.keyide.ui.providers.ProofTreeLazyTreeContentProvider;
+import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -45,8 +45,8 @@ public class Outline extends ContentOutlinePage {
    public void createControl(Composite parent) {
       super.createControl(parent);
       getTreeViewer().setUseHashlookup(true);
-      getTreeViewer().setContentProvider(new OutlineContentProvider(getTreeViewer(), environment, proof));
-      getTreeViewer().setLabelProvider(new OutlineLabelProvider(getTreeViewer(), environment, proof));
+      getTreeViewer().setContentProvider(new ProofTreeLazyTreeContentProvider(getTreeViewer(), environment, proof));
+      getTreeViewer().setLabelProvider(new ProofTreeLabelProvider(getTreeViewer(), environment, proof));
       getTreeViewer().setInput(proof);
    }
 }

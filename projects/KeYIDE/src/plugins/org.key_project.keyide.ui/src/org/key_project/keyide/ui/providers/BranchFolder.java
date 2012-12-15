@@ -2,37 +2,46 @@ package org.key_project.keyide.ui.providers;
 
 import de.uka.ilkd.key.proof.Node;
 
+/**
+ * A Class for the BranchFolers which are required for the correct tree visualization.
+ * 
+ * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
+ */
 public class BranchFolder {
    
+   /**
+    * The first child {@link Node} of this {@link BranchFolder}.
+    */
    private Node child;
    
-   private BranchFolder parent;
-   
-   // TODO: Why is the parent a branch folder? If I guess I expect that the parent is a Node. 
-   public BranchFolder(BranchFolder parent, Node child){
-      this.parent = parent;
+   /**
+    * The Constructor
+    * @param child - The first child {@link Node} of this {@link BranchFolder}.
+    */
+   public BranchFolder(Node child){
       this.child = child;
    }
    
+   /**
+    * Returns the first child {@link Node} of this {@link BranchFolder}.
+    * @return The first child {@link Node} of this {@link BranchFolder}.
+    */
    public Node getChild() {
       return child;
    }
-   // TODO: I think this will never change? So remove setter.
-   public void setChild(Node child) {
-      this.child = child;
-   }
-   public BranchFolder getParent() {
-      return parent;
-   }
-   // TODO: I think this will never change? So remove setter.
-   public void setParent(BranchFolder parent) {
-      this.parent = parent;
-   }
 
+   /**
+    * Returns the label {@link String} of this {@link BranchFolder}. The label is the branchLabel of the child {@link Node}.
+    * @return the label {@link String} of this {@link BranchFolder}.
+    */
    public String getLabel() {
       return child.getNodeInfo().getBranchLabel();
    }
 
+   /**
+    * Returns true iff the first child {@link Node} is Closed. From this follows that this {@link BranchFolder} is closed. Otherwise false.
+    * @return true iff the first child {@link Node} is Closed. From this follows that this {@link BranchFolder} is closed. Otherwise false.
+    */
    public boolean isClosed() {
       return child.isClosed();
    }
