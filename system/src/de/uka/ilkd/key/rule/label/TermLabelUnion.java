@@ -15,7 +15,7 @@ public class TermLabelUnion extends TermLabelOperation {
      * creates an instance which represents the union of the termlabels of its parameters
      */
     TermLabelUnion(ITermLabel left,ITermLabel right) {
-        super("union", new ITermLabel[]{left, right});
+        super("\\cup", new ITermLabel[]{left, right});
     }
 
     @Override

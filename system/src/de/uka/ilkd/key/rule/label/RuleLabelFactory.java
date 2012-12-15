@@ -14,5 +14,14 @@ public class RuleLabelFactory extends LabelFactory {
                 return LabelFactory.createLabel(name);
         }
     }    
+
     
+    public static ITermLabel createLabelUnion(ITermLabel left, ITermLabel right) throws UnknownLabelException {
+        return new TermLabelUnion(left, right);
+    }    
+
+    public static ITermLabel createLabelSubstraction(ITermLabel left, ITermLabel right) throws UnknownLabelException {
+        return new TermLabelSubstraction(left, right);
+    }    
+
 }

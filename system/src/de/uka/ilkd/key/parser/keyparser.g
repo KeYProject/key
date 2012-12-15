@@ -2936,12 +2936,32 @@ label returns [ImmutableArray<ITermLabel> labels = new ImmutableArray<ITermLabel
 single_label returns [ITermLabel label=null]
 {
   String labelName = "";
+  ITermLabel left = null;
+  ITermLabel right = null;
 }
 :
   (name:IDENT {labelName=name.getText();} | star:STAR {labelName=star.getText();} ) (LPAREN param1:IDENT (COMMA param2:IDENT)* RPAREN)? 
   {
   	label = inSchemaMode() ? RuleLabelFactory.createLabel(labelName) : LabelFactory.createLabel(labelName);
   }
+  | 
+   (UNION LPAREN left = single_label COMMA right=single_label RPAREN)
+    {
+        if (!inSchemaMode()) {
+        	new KeYSemanticException
+			("Term constructors can only be used by rules.", getFilename(), getLine(), getColumn());
+        }
+  	label = RuleLabelFactory.createLabelUnion(left, right);
+    }
+  | 
+   (DIFF LPAREN left = single_label COMMA right=single_label RPAREN)
+    {
+        if (!inSchemaMode()) {
+        	new KeYSemanticException
+			("Term constructors can only be used by rules.", getFilename(), getLine(), getColumn());
+        }
+  	label = RuleLabelFactory.createLabelSubstraction(left, right);
+    }
 ;  exception
         catch [UnknownLabelException ex] {
               keh.reportException
