@@ -604,7 +604,6 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=breaks_clause         { sc.addBreaks(ps); }
 	|   ps=continues_clause      { sc.addContinues(ps); }
 	|   ps=returns_clause        { sc.addReturns(ps); }
-    |   ps=declassifies_clause   { sc.addDeclassifies(ps); }
     |   ps=respects_clause       { sc.addRespects(ps); }
     )
     {
@@ -636,19 +635,12 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 //simple specification body clauses
 //-----------------------------------------------------------------------------
 
-declassifies_clause
-	returns [PositionedString result = null]
-	throws SLTranslationException
-:
-    d:DECLASSIFIES result=expression { result = result.prepend(d.getText() + " "); }
-;
-
 
 respects_clause
 	returns [PositionedString result = null]
 	throws SLTranslationException
 :
-    r:RESPECTS result=expression { result = result.prepend(r.getText() + " "); }
+    (RESPECTS | SEGREGATES) result=expression { result = result.prepend("respects "); }
 ;
 
 

@@ -28,6 +28,7 @@ import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 /**
@@ -207,8 +208,7 @@ public class ContractFactory {
             boolean hasMod,
             ProgramVariableCollection progVars,
             Term accessible,
-            ImmutableList<ImmutableList<Term>> respects,
-            ImmutableList<ImmutableList<Term>> declassifies,
+            ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> respects,
             boolean toBeSaved) {
         final Term self = progVars.selfVar != null ? tb.var(progVars.selfVar) : null;
         final ImmutableList<Term> params = tb.var(progVars.paramVars);
@@ -218,7 +218,7 @@ public class ContractFactory {
         return new InformationFlowContractImpl(
                 INFORMATION_FLOW_CONTRACT_BASENAME, forClass, pm, specifiedIn,
                 modality, requires, measuredBy, modifies, hasMod, self, params,
-                result, exc, accessible, respects, declassifies, toBeSaved);
+                result, exc, accessible, respects, toBeSaved);
     }
     
     @Override

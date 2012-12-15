@@ -100,7 +100,6 @@ public class JMLSpecFactory {
                                                          progVars,
                                                          clauses.accessible,
                                                          clauses.respects,
-                                                         clauses.declassifies,
                                                          false);
                 symbDatas = symbDatas.add(symbData);
             } else if (clauses.diverges.equals(TB.tt())) {
@@ -115,7 +114,6 @@ public class JMLSpecFactory {
                                                          progVars,
                                                          clauses.accessible,
                                                          clauses.respects,
-                                                         clauses.declassifies,
                                                          false);
                 symbDatas = symbDatas.add(symbData);
             } else {
@@ -131,7 +129,6 @@ public class JMLSpecFactory {
                                                          progVars,
                                                          clauses.accessible,
                                                          clauses.respects,
-                                                         clauses.declassifies,
                                                          false);
                 InformationFlowContract symbData2 =
                         cf.createInformationFlowContract(pm.getContainerType(), pm,
@@ -144,7 +141,6 @@ public class JMLSpecFactory {
                                                          progVars,
                                                          clauses.accessible,
                                                          clauses.respects,
-                                                         clauses.declassifies,
                                                          false);
                 symbDatas = symbDatas.add(symbData1).add(symbData2);
             }
@@ -170,8 +166,7 @@ public class JMLSpecFactory {
         public Map<Label, Term> continues;
         public Term returns;
         public boolean strictlyPure;
-        public ImmutableList<ImmutableList<Term>> respects;
-        public ImmutableList<ImmutableList<Term>> declassifies;
+        public ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> respects;
     }
 
     //-------------------------------------------------------------------------
@@ -370,34 +365,32 @@ public class JMLSpecFactory {
                 originalBehavior,
                 textualSpecCase.getReturns());
         clauses.respects =
-                translateIndependentClauses(pm, progVars.selfVar,
+                translateRespectsClauses(pm, progVars.selfVar,
                                           progVars.paramVars, progVars.resultVar,
                                           textualSpecCase.getRespects());
-        clauses.declassifies =
-                translateIndependentClauses(pm, progVars.selfVar,
-                                           progVars.paramVars, progVars.resultVar,
-                                           textualSpecCase.getDeclassifies());
         return clauses;
     }
 
 
-    private ImmutableList<ImmutableList<Term>> translateIndependentClauses(
-            IProgramMethod pm,
-            ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars,
-            ProgramVariable resultVar,
-            ImmutableList<PositionedString> originalClauses)
+    private ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>>
+        translateRespectsClauses(IProgramMethod pm,
+                                 ProgramVariable selfVar,
+                                 ImmutableList<ProgramVariable> paramVars,
+                                 ProgramVariable resultVar,
+                                 ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
         if (originalClauses.isEmpty()) {
-            return ImmutableSLList.<ImmutableList<Term>>nil();
+            return ImmutableSLList.
+                    <Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>>nil();
         } else {
-            ImmutableList<ImmutableList<Term>> result =
-                    ImmutableSLList.<ImmutableList<Term>>nil();
+            ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>>
+                result = ImmutableSLList.
+                <Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>>nil();
             for (PositionedString expr : originalClauses) {
-                ImmutableList<Term> translated =
+                Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>> translated =
                         JMLTranslator.translate(
                         expr, pm.getContainerType(), selfVar, paramVars, resultVar,
-                        null, null, ImmutableList.class, services);
+                        null, null, Triple.class, services);
                 result = result.append(translated);
             }
             return result;
@@ -1097,7 +1090,7 @@ public class JMLSpecFactory {
         final ContractClauses clauses = translateJMLClauses(method, specificationCase, programVariables, behavior);
         return new SimpleBlockContract.Creator(
             block, labels, method, behavior, variables, clauses.requires,
-            clauses.ensures, clauses.respects, clauses.declassifies,
+            clauses.ensures, clauses.respects,
             clauses.breaks, clauses.continues, clauses.returns, clauses.signals,
             clauses.signalsOnly, clauses.diverges, clauses.assignables,
             !clauses.strictlyPure, services
@@ -1266,17 +1259,37 @@ public class JMLSpecFactory {
         }
         
         //translateToListOfTermLists respects
-        Map<LocationVariable,ImmutableList<ImmutableList<Term>>> respects
-            = new LinkedHashMap<LocationVariable,ImmutableList<ImmutableList<Term>>>();
-        ImmutableList<ImmutableList<Term>> respectsTermList;
+        Map<LocationVariable,
+            ImmutableList<Triple<ImmutableList<Term>,
+                                 ImmutableList<Term>,
+                                 ImmutableList<Term>>>>
+                respectsHelper = new LinkedHashMap<LocationVariable,
+                                             ImmutableList<Triple<ImmutableList<Term>,
+                                                                  ImmutableList<Term>,
+                                                                  ImmutableList<Term>>>>();
+        ImmutableList<Triple<ImmutableList<Term>,
+                             ImmutableList<Term>,
+                             ImmutableList<Term>>> respectsTermList;
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         if(originalRespects.isEmpty()) {
             respectsTermList = null;
         } else {
-            respectsTermList = translateIndependentClauses(pm, selfVar, paramVars,
+            respectsTermList = translateRespectsClauses(pm, selfVar, paramVars,
                                                     resultVar, originalRespects);
         }
-        respects.put(baseHeap, respectsTermList);
+        Map<LocationVariable,ImmutableList<ImmutableList<Term>>>
+            respects = new LinkedHashMap<LocationVariable,
+                                         ImmutableList<ImmutableList<Term>>>();
+        
+        ImmutableList<ImmutableList<Term>> helperList =
+                ImmutableSLList.<ImmutableList<Term>>nil();
+                                                  
+        for(Triple<ImmutableList<Term>,
+                             ImmutableList<Term>,
+                             ImmutableList<Term>> trip: respectsTermList) {
+            helperList.append(trip.first);
+        }
+        respects.put(baseHeap, helperList);
 
         //translateToTerm variant
         Term variant;

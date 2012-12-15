@@ -88,8 +88,7 @@ class BasicSnippetData {
         DEPENDENS(Term.class),
         MEASURED_BY(Term.class),
         MODALITY(Modality.class),
-        RESPECTS(Term[][].class),
-        DECLASSIFIES(Term[][].class),
+        RESPECTS(ImmutableList.class),
         /**
          * Variables originally used during parsing.
          */
@@ -166,10 +165,7 @@ class BasicSnippetData {
         contractContents.put(Key.DEPENDENS, contract.getDep());
         contractContents.put(Key.MEASURED_BY, contract.getMby());
         contractContents.put(Key.MODALITY, contract.getModality());
-        contractContents.put(Key.RESPECTS,
-                             doubleListToArray(contract.getRespects()));
-        contractContents.put(Key.DECLASSIFIES,
-                             doubleListToArray(contract.getDeclassifies()));
+        contractContents.put(Key.RESPECTS, contract.getRespects());
 
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         origVars =
@@ -192,10 +188,7 @@ class BasicSnippetData {
         contractContents.put(Key.PRECONDITION, contract.getPre(services));
         contractContents.put(Key.MODIFIES, contract.getMod(services));
         contractContents.put(Key.MODALITY, contract.getModality());
-        contractContents.put(Key.RESPECTS,
-                             doubleListToArray(contract.getRespects()));
-        contractContents.put(Key.DECLASSIFIES,
-                             doubleListToArray(contract.getDeclassifies()));
+        contractContents.put(Key.RESPECTS, contract.getRespects());
         List<Label> labels = contract.getLabels();
         contractContents.put(Key.LABELS,
                              labels.toArray(new Label[labels.size()]));
