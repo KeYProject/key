@@ -136,7 +136,8 @@ public abstract class FindTaclet extends Taclet {
             Services services) {
         
         if (ignoreTopLevelUpdates()) {
-            IgnoreUpdateMatchResult resultUpdateMatch = matchAndIgnoreUpdatePrefix(term, find(), matchCond, services);
+            IgnoreUpdateMatchResult resultUpdateMatch = 
+                    matchAndIgnoreUpdatePrefix(term, find(), matchCond, services);
             term = resultUpdateMatch.termWithoutMatchedUpdates;
             matchCond = resultUpdateMatch.matchCond;
         }

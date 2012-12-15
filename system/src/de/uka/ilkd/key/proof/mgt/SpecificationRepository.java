@@ -51,6 +51,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.label.TermLabelWildcard;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -309,11 +310,11 @@ public final class SpecificationRepository {
 	
 	//create taclet
 	final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
-	tacletBuilder.setFind(limitedTerm);
+	tacletBuilder.setFind(TB.label(limitedTerm, TermLabelWildcard.WILDCARD));
 	tacletBuilder.addTacletGoalTemplate
 	    (new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
 					   ImmutableSLList.<Taclet>nil(),
-					   unlimitedTerm));
+					   TB.label(unlimitedTerm, TermLabelWildcard.WILDCARD)));
 	tacletBuilder.setName(MiscTools.toValidTacletName(
 					"unlimit " + unlimited.name()));
 	
@@ -341,9 +342,9 @@ public final class SpecificationRepository {
 	
 	//create taclet
 	final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
-	tacletBuilder.setFind(TB.func(unlimited, subs));
+	tacletBuilder.setFind(TB.label(TB.func(unlimited, subs), TermLabelWildcard.WILDCARD));
 	final SequentFormula cf 
-		= new SequentFormula(TB.equals(limitedTerm, unlimitedTerm));
+		= new SequentFormula(TB.label(TB.equals(limitedTerm, unlimitedTerm), TermLabelWildcard.WILDCARD));
 	final Sequent addedSeq 
 		= Sequent.createAnteSequent(Semisequent.EMPTY_SEMISEQUENT
 			                               .insertFirst(cf)
@@ -351,7 +352,7 @@ public final class SpecificationRepository {
 	tacletBuilder.addTacletGoalTemplate
 	    (new RewriteTacletGoalTemplate(addedSeq,
 					   ImmutableSLList.<Taclet>nil(),
-					   TB.func(unlimited, subs)));
+					   TB.label(TB.func(unlimited, subs), TermLabelWildcard.WILDCARD)));
 	tacletBuilder.setApplicationRestriction(RewriteTaclet.IN_SEQUENT_STATE);
 	tacletBuilder.setName(MiscTools.toValidTacletName(
 					"limit " + unlimited.name()));
