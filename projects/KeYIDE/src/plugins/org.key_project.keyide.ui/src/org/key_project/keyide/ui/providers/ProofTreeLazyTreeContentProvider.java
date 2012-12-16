@@ -8,6 +8,8 @@ import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.proof.Node;
@@ -216,7 +218,6 @@ public class ProofTreeLazyTreeContentProvider implements ILazyTreeContentProvide
          viewer.setChildCount(element, childCount + folderCount);
       }
       if(element instanceof Node){
-         System.out.println("ChildCount Node");
          viewer.setChildCount(element, 0);
       }
       if(element instanceof BranchFolder) {
@@ -234,7 +235,16 @@ public class ProofTreeLazyTreeContentProvider implements ILazyTreeContentProvide
    @Override
    public void updateElement(Object parent, int index) {
       Object element = getElementByIndex(parent, index);
-      viewer.replace(parent, index, element);
+      // TODO wirklich hier??
+      //selects the initial item of the tree.
+      if(viewer.getTree().getItem(0).getData() == null){
+         viewer.replace(parent, index, element);
+         viewer.getTree().setSelection(viewer.getTree().getItem(0));
+         viewer.setSelection(viewer.getSelection(), true);
+      }
+      else{
+         viewer.replace(parent, index, element);
+      }
       updateChildCount(element, -1);
    }
    
@@ -245,6 +255,15 @@ public class ProofTreeLazyTreeContentProvider implements ILazyTreeContentProvide
    @Override
    public void dispose() {
       // TODO abmelden, sicherstellen das aufgerufen wird
+   }
+   
+   
+   //Just something I'm testing.
+   private void getTreeNodes(){
+      Tree tree = viewer.getTree();
+      System.out.println(tree.getItemCount());
+      System.out.println(tree.getItem(0).getData().getClass());
+      
    }
    
    
