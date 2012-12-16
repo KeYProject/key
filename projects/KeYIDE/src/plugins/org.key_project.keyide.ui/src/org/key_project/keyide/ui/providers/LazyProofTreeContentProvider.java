@@ -4,7 +4,10 @@ package org.key_project.keyide.ui.providers;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.internal.codeassist.impl.Keywords;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
@@ -25,7 +28,7 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * 
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
-public class ProofTreeLazyTreeContentProvider implements ILazyTreeContentProvider{
+public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
 
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    private Proof proof;
@@ -37,12 +40,11 @@ public class ProofTreeLazyTreeContentProvider implements ILazyTreeContentProvide
    
    /**
     * The Constructor
-    * @param viewer
-    * @param environment
-    * @param proof
+    * @param viewer - the {@link TreeViewer}
+    * @param environment - the {@link KeYEnvironment}
+    * @param proof - the {@link Proof}
     */
-   // TODO Comment
-   public  ProofTreeLazyTreeContentProvider(TreeViewer viewer, KeYEnvironment<CustomConsoleUserInterface> environment, Proof proof){
+   public  LazyProofTreeContentProvider(TreeViewer viewer, KeYEnvironment<CustomConsoleUserInterface> environment, Proof proof){
       this.viewer=viewer;
       this.proof = proof;
       this.environment = environment;
@@ -235,17 +237,24 @@ public class ProofTreeLazyTreeContentProvider implements ILazyTreeContentProvide
    @Override
    public void updateElement(Object parent, int index) {
       Object element = getElementByIndex(parent, index);
-      // TODO wirklich hier??
-      //selects the initial item of the tree.
-      if(viewer.getTree().getItem(0).getData() == null){
-         viewer.replace(parent, index, element);
+      viewer.replace(parent, index, element);
+      refreshSelection(element);         
+      updateChildCount(element, -1);
+   }
+   
+   private void refreshSelection(Object element){
+      ISelection selection = viewer.getSelection();
+      if(selection.isEmpty()){
          viewer.getTree().setSelection(viewer.getTree().getItem(0));
          viewer.setSelection(viewer.getSelection(), true);
+         
       }
-      else{
-         viewer.replace(parent, index, element);
+      else if(selection instanceof TreeSelection){
+         TreeSelection treeSelection = (TreeSelection) selection;
+         if(treeSelection.getFirstElement().equals(element)){
+            viewer.setSelection(viewer.getSelection());
+         }
       }
-      updateChildCount(element, -1);
    }
    
    
@@ -254,7 +263,8 @@ public class ProofTreeLazyTreeContentProvider implements ILazyTreeContentProvide
     */
    @Override
    public void dispose() {
-      // TODO abmelden, sicherstellen das aufgerufen wird
+      proof.removeProofTreeListener(proofTreeListener);
+      environment.getMediator().removeAutoModeListener(autoModeListener);
    }
    
    

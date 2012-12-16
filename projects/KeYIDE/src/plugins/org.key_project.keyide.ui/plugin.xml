@@ -194,7 +194,7 @@
                id="org.key_project.keyide.ui.toolbar">
                  <command
                        commandId="org.key_project.keyide.ui.commands.startAutoModeCommand"
-                       icon="icons/autoModeStart.png"
+                       icon="icons/play.png"
                        id="org.key_project.keyide.ui.commands.startAutoModeCommand"
                        label="Start Auto Mode"
                        tooltip="Start Auto Mode">
@@ -210,7 +210,7 @@
                 </command>
                  <command
                        commandId="org.key_project.keyide.ui.commands.stopAutoModeCommand"
-                       icon="icons/autoModeStop.png"
+                       icon="icons/stop.png"
                        id="org.key_project.keyide.ui.commands.stopAutoModeCommand"
                        label="Stop Auto Mode"
                        style="push">
@@ -306,7 +306,7 @@
       </category>
       <view
             category="org.key_project.keyide.ui.view.category"
-            class="org.key_project.keyide.ui.views.Outline"
+            class="org.key_project.keyide.ui.views.ProofTreeContentOutlinePage"
             icon="icons/logo16.gif"
             id="org.key_project.keyide.ui.view.outline"
             name="Proof"
