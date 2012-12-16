@@ -68,5 +68,12 @@ public class ProofStorage implements IStorage {
    public boolean isReadOnly() {
       return true;
    }
+   
+   public void setProofString(String proofString){
+      this.proofString = proofString;      
+   }
 
+   public void setName(String name) {
+      this.name = name;
+   }
 }

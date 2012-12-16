@@ -6,6 +6,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IPersistableElement;
 import org.eclipse.ui.IStorageEditorInput;
 
+import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -55,6 +57,11 @@ public class ProofEditorInput implements IStorageEditorInput{
    @Override
    public boolean exists() {
       return true;
+   }
+   
+   public void setData(Node node){
+       ((ProofStorage)storage).setProofString(NonGoalInfoView.computeText(environment.getMediator(), node));
+       ((ProofStorage)storage).setName(proof.name() + " - " + node.serialNr() + ":" + node.name());
    }
 
    /** 
