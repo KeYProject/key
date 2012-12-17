@@ -97,6 +97,18 @@
             </with>
          </enabledWhen>
       </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.PruneProofHandler"
+            commandId="org.key_project.keyide.ui.commands.pruneProof">
+         <enabledWhen>
+            <with
+                  variable="activeMenuSelection">
+               <test
+                     property="org.key_project.keyide.ui.PruneProofTester.isClosed">
+               </test>
+            </with>
+         </enabledWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -226,6 +238,38 @@
                  </command>
          </toolbar>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.key_project.keyide.ui.view.outline.popup?after=additions">
+         <command
+               commandId="org.key_project.keyide.ui.commands.pruneProof"
+               icon="icons/prune.png"
+               label="Prune Proof"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <or>
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
+                        <adapt
+                              type="de.uka.ilkd.key.proof.Node">
+                        </adapt>
+                     </iterate>
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
+                        <adapt
+                              type="org.key_project.keyide.ui.providers.BranchFolder">
+                        </adapt>
+                     </iterate>
+                  </or>
+               </with>
+            </visibleWhen>
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -251,6 +295,12 @@
             description="Stops the automode."
             id="org.key_project.keyide.ui.commands.stopAutoModeCommand"
             name="Stop Auto Mode">
+      </command>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Prunes the current prove at the selected position."
+            id="org.key_project.keyide.ui.commands.pruneProof"
+            name="Prune Proof">
       </command>
    </extension>
    <extension
@@ -356,6 +406,13 @@
             namespace="org.key_project.keyide.ui.AutoModeTester"
             properties="start, stop"
             type="org.eclipse.ui.IEditorPart">
+      </propertyTester>
+      <propertyTester
+            class="org.key_project.keyide.ui.tester.PruneProofTester"
+            id="org.key_project.keyide.ui.PruneProofTester"
+            namespace="org.key_project.keyide.ui.PruneProofTester"
+            properties="isClosed"
+            type="org.eclipse.jface.viewers.StructuredSelection">
       </propertyTester>
    </extension>
 

@@ -1,7 +1,9 @@
 package org.key_project.keyide.ui.views;
 
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
@@ -47,5 +49,10 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
       getTreeViewer().setContentProvider(new LazyProofTreeContentProvider(getTreeViewer(), environment, proof));
       getTreeViewer().setLabelProvider(new ProofTreeLabelProvider(getTreeViewer(), environment, proof));
       getTreeViewer().setInput(proof);
+      
+      MenuManager menuManager = new MenuManager("Outline popup", "org.key_project.keyide.ui.view.outline.popup");
+      Menu menu = menuManager.createContextMenu(getTreeViewer().getControl());
+      getTreeViewer().getControl().setMenu(menu);
+      getSite().registerContextMenu ("org.key_project.keyide.ui.view.outline.popup", menuManager, getTreeViewer());
    }
 }

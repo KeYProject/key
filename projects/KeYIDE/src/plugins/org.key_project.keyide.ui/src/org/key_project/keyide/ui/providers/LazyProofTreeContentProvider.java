@@ -30,8 +30,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    private Proof proof;
    private Map<Node, BranchFolder> branchFolders = new HashMap<Node, BranchFolder>();
-   @SuppressWarnings("unused")
-   private boolean isAutoModeRunning = false;
+
    private TreeViewer viewer;
    
    
@@ -54,7 +53,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
    private AutoModeListener autoModeListener = new AutoModeListener() {
       @Override
       public void autoModeStopped(ProofEvent e) {
-         isAutoModeRunning = false;
          viewer.getControl().getDisplay().asyncExec(new Runnable() {
             
             /**
@@ -64,6 +62,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
             public void run() {
                viewer.refresh();
                viewer.refresh();
+
             }
          });
       }
@@ -73,7 +72,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void autoModeStarted(ProofEvent e) {
-         isAutoModeRunning = true;
       }
    };
    
@@ -88,6 +86,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void smtDataUpdate(ProofTreeEvent e) {
+         if(!environment.getMediator().autoMode()){
+         }
       }
       
       /**
@@ -95,13 +95,24 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofStructureChanged(ProofTreeEvent e) {
+         if(!environment.getMediator().autoMode()){
+         }
       }
       
       /**
        * {@inheritDoc}
        */
       @Override
-      public void proofPruned(ProofTreeEvent e) {
+      public void proofPruned(final ProofTreeEvent e) {
+         if(!environment.getMediator().autoMode()){
+            viewer.getControl().getDisplay().asyncExec(new Runnable() {
+               
+               @Override
+               public void run() {
+                  prune(e.getNode());
+               }
+            });
+         }
       }
       
       /**
@@ -109,6 +120,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofIsBeingPruned(ProofTreeEvent e) {
+         if(!environment.getMediator().autoMode()){
+         }
       }
       
       /**
@@ -116,6 +129,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofGoalsChanged(ProofTreeEvent e) {
+         if(!environment.getMediator().autoMode()){
+         }
       }
       
       /**
@@ -123,6 +138,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofGoalsAdded(final ProofTreeEvent e) {
+         if(!environment.getMediator().autoMode()){
+         }
       }
       
       /**
@@ -130,6 +147,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofGoalRemoved(final ProofTreeEvent e) {
+         if(!environment.getMediator().autoMode()){
+         }
       }
       
       /**
@@ -137,6 +156,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofExpanded(final ProofTreeEvent e) {
+         if(!environment.getMediator().autoMode()){
+         }
          Display.getDefault().asyncExec(new Runnable() {
             
             /**
@@ -154,6 +175,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofClosed(final ProofTreeEvent e) {
+         if(!environment.getMediator().autoMode()){
+         }
       }
    };
    
@@ -286,6 +309,24 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
             viewer.replace(parentBranchFolder, nodeIndex+i+1, branchFolder);
          viewer.setChildCount(branchFolder, 1);
          viewer.replace(branchFolder,0 , node.child(i));
+      }
+   }
+   
+   
+   private void prune(Node node){
+      ISelection selection = viewer.getSelection();
+      if(selection instanceof TreeSelection){
+         TreeSelection treeSelection = (TreeSelection) selection;
+         Object element = treeSelection.getFirstElement();
+         if(element instanceof BranchFolder){
+            BranchFolder branchFolder = (BranchFolder) element;
+            viewer.refresh(branchFolder);
+         }
+         else if(element instanceof Node){
+            Node branchNode = getBranchNode((Node) element);
+            BranchFolder branchFolder = branchFolders.get(branchNode);
+            viewer.refresh(branchFolder);
+         }
       }
    }
    
