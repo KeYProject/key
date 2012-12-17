@@ -3,7 +3,7 @@ package de.uka.ilkd.key.rule.label;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ITermLabel;
-import de.uka.ilkd.key.logic.label.TermLabelOperations;
+import de.uka.ilkd.key.logic.label.TermLabelOperationsInterpreter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -27,7 +27,7 @@ public class TermLabelUnion extends TermLabelOperation {
         ImmutableArray<ITermLabel> right = getChild(1) instanceof TermLabelOperation ? ((TermLabelOperation) getChild(1))
                 .evaluate(svInst, services) : new ImmutableArray<ITermLabel>(
                 getChild(1));
-        return TermLabelOperations.union(left, right);
+        return TermLabelOperationsInterpreter.union(left, right);
     }
         
 }

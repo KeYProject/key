@@ -2913,7 +2913,7 @@ atom returns [Term a = null]
         {
             a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(literal.getText()));
         }   
-    ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = TermBuilder.DF.label(a, labels);} } GREATER GREATER)?
+    ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = TermBuilder.DF.label(a, labels);} } RGUILLEMETS)?
     ; exception
         catch [TermCreationException ex] {
               keh.reportException

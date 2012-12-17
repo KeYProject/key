@@ -550,6 +550,13 @@ options {
       :   '>' '='
       ;
 
+RGUILLEMETS
+options {
+  paraphrase = "`>>'";
+}
+      :   '>' '>'
+      ;
+
 
 WS
 options {
