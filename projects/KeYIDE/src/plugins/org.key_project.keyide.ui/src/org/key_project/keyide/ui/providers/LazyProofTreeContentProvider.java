@@ -4,15 +4,12 @@ package org.key_project.keyide.ui.providers;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jdt.internal.codeassist.impl.Keywords;
 import org.eclipse.jface.viewers.ILazyTreeContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeItem;
 
 import de.uka.ilkd.key.gui.AutoModeListener;
 import de.uka.ilkd.key.proof.Node;
@@ -242,6 +239,11 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       updateChildCount(element, -1);
    }
    
+   /**
+    * 
+    * @param element - a {@link Node} or a {@link BranchFolder}
+    */
+   
    private void refreshSelection(Object element){
       ISelection selection = viewer.getSelection();
       if(selection.isEmpty()){
@@ -266,29 +268,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       proof.removeProofTreeListener(proofTreeListener);
       environment.getMediator().removeAutoModeListener(autoModeListener);
    }
-   
-   
-   //Just something I'm testing.
-   private void getTreeNodes(){
-      Tree tree = viewer.getTree();
-      System.out.println(tree.getItemCount());
-      System.out.println(tree.getItem(0).getData().getClass());
-      
-   }
-   
-   
-// Shell muss sichtbar sein
-//TreeViewer x = new TreeViewer();
-//x.setUseHashlookup(true);
-//x.setInput(input); //;
-//x.expandAll();
-//TreeItem[] items = x.getTree().getItems()
-//for (TreeItem item : items) {
-// x.getTree().showItem(item);
-// x.expandAll();
-//   item.getItems()
-//   item.getData() == node, or folder
-//}
 
 
    /**
