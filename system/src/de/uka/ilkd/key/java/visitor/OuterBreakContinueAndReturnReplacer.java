@@ -185,6 +185,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             changeList.removeFirst();
             Expression guard = ((Guard) changeList.removeFirst()).getExpression();
             Statement body = (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
+            // TODO reregister loop invariants
             addChild(new While(guard, body, x.getPositionInfo()));
             changed();
         }
@@ -197,6 +198,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
+                // TODO reregister loop invariants
                 return new For(changeList);
             }
         };
@@ -207,6 +209,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
+             // TODO reregister loop invariants
                 return new EnhancedFor(changeList);
             }
         };
@@ -218,8 +221,10 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         final ExtList changeList = stack.peek();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
-            Expression guard = (Expression) changeList.removeFirst();
-            Statement body = (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
+            Statement body = changeList.removeFirstOccurrence(Statement.class);
+            Guard g = changeList.removeFirstOccurrence(Guard.class);
+            Expression guard = g == null ? null : g.getExpression();
+            // TODO reregister loop invariants
             addChild(new Do(guard, body, x.getPositionInfo()));
             changed();
         }
