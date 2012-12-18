@@ -69,6 +69,8 @@ public interface BlockContract extends SpecificationElement {
                                 Map<LocationVariable,Term> newModifiesClauses,
                                 Variables newVariables);
 
+    public BlockContract setBlock(StatementBlock newBlock);
+
     public static class Variables {
 
         public static Variables create(final StatementBlock block, final List<Label> labels, final IProgramMethod method, final Services services)

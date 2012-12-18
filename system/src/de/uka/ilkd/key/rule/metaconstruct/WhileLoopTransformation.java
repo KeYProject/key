@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Stack;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
@@ -27,6 +28,8 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -166,6 +169,17 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	return result;
     }
     
+
+    protected void reregisterLoopInv(LoopStatement x, LoopStatement newLoop) {
+        LoopInvariant li 
+            = services.getSpecificationRepository().getLoopInvariant(x);
+        if (li != null) {
+            li = li.setLoop(newLoop);
+            services.getSpecificationRepository().setLoopInvariant(li);
+        }
+    }
+
+    
     /** walks through the AST. While keeping track of the current node
      * @param node the JavaProgramElement the walker is at 
      */
@@ -255,12 +269,21 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	def.doAction(x);
     }
 
-    public void performActionOnStatementBlock(StatementBlock x) {
-	DefaultAction def=new DefaultAction() {
-		ProgramElement createNewElement(ExtList changeList) {
-		    return new StatementBlock(changeList);
-		}
-	    };
+    public void performActionOnStatementBlock(final StatementBlock x) {
+        DefaultAction def=new DefaultAction() {
+            ProgramElement createNewElement(ExtList changeList) {
+                StatementBlock newBlock = new StatementBlock(changeList);
+                ImmutableSet<BlockContract> bcs
+                    = services.getSpecificationRepository().getBlockContracts(x);
+                if (bcs != null) {
+                    for (BlockContract bc : bcs) {
+                        bc = bc.setBlock(newBlock);
+                        services.getSpecificationRepository().addBlockContract(bc);
+                    }
+                }
+                return newBlock;
+            }
+        };
 	def.doAction(x);
     }
 
@@ -543,7 +566,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
             if (changeList.getFirst() == CHANGED) {
 	    	changeList.removeFirst();
-	    	addChild(new For(changeList));
+	    	For newLoop = new For(changeList);
+	    	reregisterLoopInv(x, newLoop);
+	    	addChild(newLoop);
 	    	changed();
 	    } else {
 	    	doDefaultAction(x);
@@ -572,7 +597,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         } else {
             if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
-                addChild(new For(changeList));
+                EnhancedFor newLoop = new EnhancedFor(changeList);
+                reregisterLoopInv(x, newLoop);
+                addChild(newLoop);
                 changed();
             } else {
                 doDefaultAction(x);
@@ -640,7 +667,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 		Statement body = (Statement) (changeList.isEmpty() ?
 					      null :
 					      changeList.removeFirst());
-		addChild(new While(guard, body, x.getPositionInfo()));
+		While newLoop = new While(guard, body, x.getPositionInfo());
+		reregisterLoopInv(x, newLoop);
+		addChild(newLoop);
 		changed();
 	    } else {
 		doDefaultAction(x);
@@ -692,14 +721,15 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 		Statement body = (Statement) (changeList.isEmpty() ?
 					      null :
 					      changeList.removeFirst());
-		addChild(new Do(guard, body, x.getPositionInfo()));
+		Do newLoop = new Do(guard, body, x.getPositionInfo());
+		reregisterLoopInv(x, newLoop);
+		addChild(newLoop);
 		changed();
 	    } else {
 		doDefaultAction(x);
 	    }
 	}
     }
-
 
     public void performActionOnIf(If x)     {
 	DefaultAction def=new DefaultAction() {		

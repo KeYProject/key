@@ -255,7 +255,9 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 Statement body =
                         (Statement) (changeList.isEmpty() ? null
                                 : changeList.removeFirst());
- 		addChild(new While(guard, body, x.getPositionInfo()));
+                While newLoop = new While(guard, body, x.getPositionInfo());
+                reregisterLoopInv(x, newLoop);
+                addChild(newLoop);
                 changed();
             } else {
                 doDefaultAction(x);

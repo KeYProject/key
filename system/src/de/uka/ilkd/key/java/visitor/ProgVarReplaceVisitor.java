@@ -220,36 +220,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     public void performActionOnBlockContract(final StatementBlock oldBlock, final StatementBlock newBlock) {
         ImmutableSet<BlockContract> oldContracts = services.getSpecificationRepository().getBlockContracts(oldBlock);
         for (BlockContract oldContract : oldContracts) {
-            services.getSpecificationRepository().addBlockContract(createNewBlockContract(oldContract, newBlock));
+            services.getSpecificationRepository().addBlockContract(oldContract.setBlock(newBlock));
         }
-    }
-
-    private BlockContract createNewBlockContract(final BlockContract oldContract, final StatementBlock newBlock)
-    {
-        final BlockContract.Variables newVariables = replaceBlockContractVariables(oldContract.getPlaceholderVariables());
-        final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<LocationVariable, Term>();
-        final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<LocationVariable, Term>();
-        final Map<LocationVariable, Term> newModifiesClauses = new LinkedHashMap<LocationVariable, Term>();
-        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-            newPreconditions.put(heap, replaceVariablesInTerm(oldContract.getPrecondition(heap, services)));
-            newPostconditions.put(heap, replaceVariablesInTerm(oldContract.getPostcondition(heap, services)));
-            newModifiesClauses.put(heap, replaceVariablesInTerm(oldContract.getModifiesClause(heap, services)));
-        }
-        return oldContract.update(newBlock, newPreconditions, newPostconditions, newModifiesClauses, newVariables);
-    }
-
-    private BlockContract.Variables replaceBlockContractVariables(final BlockContract.Variables variables)
-    {
-        return new BlockContract.Variables(
-            replaceVariable(variables.self),
-            replaceFlags(variables.breakFlags),
-            replaceFlags(variables.continueFlags),
-            replaceVariable(variables.returnFlag),
-            replaceVariable(variables.result),
-            replaceVariable(variables.exception),
-            replaceRemembranceHeaps(variables.remembranceHeaps),
-            replaceRemembranceLocalVariables(variables.remembranceLocalVariables)
-        );
     }
 
     private ProgramVariable replaceVariable(final ProgramVariable variable)
