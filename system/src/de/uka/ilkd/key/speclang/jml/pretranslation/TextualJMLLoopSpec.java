@@ -57,11 +57,11 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     }
     
     public void addRespects(PositionedString ps) {
-        respects.append(ps);
+        respects = respects.append(ps);
     }
     
     public void addRespects(ImmutableList<PositionedString> l) {
-        respects.append(l);
+        respects = respects.append(l);
     }
     
     public void setVariant(PositionedString ps) {

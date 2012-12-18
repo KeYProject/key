@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
@@ -46,10 +45,6 @@ import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
-import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;

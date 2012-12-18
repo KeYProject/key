@@ -1259,35 +1259,27 @@ public class JMLSpecFactory {
         }
         
         //translateToListOfTermLists respects
-        Map<LocationVariable,
-            ImmutableList<Triple<ImmutableList<Term>,
-                                 ImmutableList<Term>,
-                                 ImmutableList<Term>>>>
-                respectsHelper = new LinkedHashMap<LocationVariable,
-                                             ImmutableList<Triple<ImmutableList<Term>,
-                                                                  ImmutableList<Term>,
-                                                                  ImmutableList<Term>>>>();
         ImmutableList<Triple<ImmutableList<Term>,
                              ImmutableList<Term>,
-                             ImmutableList<Term>>> respectsTermList;
+                             ImmutableList<Term>>>
+                respectsTermList = ImmutableSLList.<Triple<ImmutableList<Term>,
+                                                            ImmutableList<Term>,
+                                                            ImmutableList<Term>>>nil();
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-        if(originalRespects.isEmpty()) {
-            respectsTermList = null;
-        } else {
+        if(!originalRespects.isEmpty()) {
             respectsTermList = translateRespectsClauses(pm, selfVar, paramVars,
-                                                    resultVar, originalRespects);
+                                                        resultVar, originalRespects);
         }
+        
         Map<LocationVariable,ImmutableList<ImmutableList<Term>>>
             respects = new LinkedHashMap<LocationVariable,
-                                         ImmutableList<ImmutableList<Term>>>();
-        
+                                         ImmutableList<ImmutableList<Term>>>();        
         ImmutableList<ImmutableList<Term>> helperList =
-                ImmutableSLList.<ImmutableList<Term>>nil();
-                                                  
+                ImmutableSLList.<ImmutableList<Term>>nil();                                                  
         for(Triple<ImmutableList<Term>,
-                             ImmutableList<Term>,
-                             ImmutableList<Term>> trip: respectsTermList) {
-            helperList.append(trip.first);
+                   ImmutableList<Term>,
+                   ImmutableList<Term>> trip: respectsTermList) {
+            helperList = helperList.append(trip.first);
         }
         respects.put(baseHeap, helperList);
 

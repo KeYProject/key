@@ -363,18 +363,22 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             = new LinkedHashMap<LocationVariable,ImmutableList<ImmutableList<Term>>>();
         //LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
 
-        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-           final Term m = replaceVariablesInTerm(inv.getModifies(heap, selfTerm,
-                                     atPres,
-                                     services));
-           newMods.put(heap, m);
-           final ImmutableList<ImmutableList<Term>> r
-               = replaceVariablesInTermLists(inv.getRespects(heap));
-           newRespects.put(heap, r);
-           final Term i = replaceVariablesInTerm(inv.getInvariant(heap, selfTerm,
-                                     atPres,
-                                     services));
-           newInvariants.put(heap, i);
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            if (inv.getRespects(heap) != null) {
+                final Term m =
+                        replaceVariablesInTerm(inv.getModifies(heap, selfTerm,
+                                                               atPres,
+                                                               services));
+                newMods.put(heap, m);
+                final ImmutableList<ImmutableList<Term>> r =
+                        replaceVariablesInTermLists(inv.getRespects(heap));
+                newRespects.put(heap, r);
+                final Term i =
+                        replaceVariablesInTerm(inv.getInvariant(heap, selfTerm,
+                                                                atPres,
+                                                                services));
+                newInvariants.put(heap, i);
+            }
         }
 
         //variant
