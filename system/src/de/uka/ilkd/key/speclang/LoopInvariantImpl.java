@@ -245,8 +245,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public ImmutableList<ImmutableList<Term>> getRespects(LocationVariable heap) {
         ImmutableList<ImmutableList<Term>> respects = ImmutableSLList.<ImmutableList<Term>>nil();
-        respects.append(originalRespects.get(heap)); // apparently respects can be null
-        return respects;
+        return respects.append(originalRespects.get(heap)); // apparently respects can be null
     }
     
     @Override
@@ -346,7 +345,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
             = ImmutableSLList.<ImmutableList<Term>>nil();
             if(originalRespects.get(h)!= null) {
                 for(ImmutableList<Term> tList: originalRespects.get(h)) {
-                    respects.append(tList.append(t));
+                    respects = respects.append(tList.append(t));
                 }
                 originalRespects.remove(h);
                 originalRespects.put(h, respects);
