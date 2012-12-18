@@ -142,8 +142,7 @@ class BasicSnippetData {
         contractContents.put(Key.LOOP_INVARIANT_TERM, invariant.getInvariant(services));
         contractContents.put(Key.MODIFIES, invariant.getModifies());
         contractContents.put(Key.MODALITY, Modality.BOX);
-        contractContents.put(Key.RESPECTS,
-                             doubleListToArray(invariant.getRespects(services)));
+        contractContents.put(Key.RESPECTS, invariant.getRespects(services));
         
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         origVars =
@@ -222,6 +221,16 @@ class BasicSnippetData {
         for (ImmutableList<Term> terms : termss) {
             result[i] = terms.toArray(Term.class);
             i++;
+        }
+        return result;
+    }
+    
+    private ImmutableList<Term> doubleListToList(ImmutableList<ImmutableList<Term>> termss) {
+        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+        for (ImmutableList<Term> terms : termss) {
+            for (Term term : terms) {
+                result = result.append(term);
+            }
         }
         return result;
     }

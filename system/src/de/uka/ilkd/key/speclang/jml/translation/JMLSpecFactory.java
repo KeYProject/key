@@ -1271,17 +1271,15 @@ public class JMLSpecFactory {
                                                         resultVar, originalRespects);
         }
         
-        Map<LocationVariable,ImmutableList<ImmutableList<Term>>>
-            respects = new LinkedHashMap<LocationVariable,
-                                         ImmutableList<ImmutableList<Term>>>();        
-        ImmutableList<ImmutableList<Term>> helperList =
-                ImmutableSLList.<ImmutableList<Term>>nil();                                                  
-        for(Triple<ImmutableList<Term>,
-                   ImmutableList<Term>,
-                   ImmutableList<Term>> trip: respectsTermList) {
-            helperList = helperList.append(trip.first);
-        }
-        respects.put(baseHeap, helperList);
+        Map<LocationVariable,
+            ImmutableList<Triple<ImmutableList<Term>,
+                                 ImmutableList<Term>,
+                                 ImmutableList<Term>>>>
+                respects = new LinkedHashMap<LocationVariable,
+                                             ImmutableList<Triple<ImmutableList<Term>,
+                                                                  ImmutableList<Term>,
+                                                                  ImmutableList<Term>>>>();        
+        respects.put(baseHeap, respectsTermList);
 
         //translateToTerm variant
         Term variant;

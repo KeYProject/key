@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * Standard implementation of the LoopInvariant interface.
@@ -40,7 +41,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
     private ExecutionContext innermostExecCont;
     private final Map<LocationVariable,Term> originalInvariants;
     private final Map<LocationVariable,Term> originalModifies;
-    private Map<LocationVariable,ImmutableList<ImmutableList<Term>>> originalRespects;
+    private Map<LocationVariable,
+                ImmutableList<Triple<ImmutableList<Term>,
+                                     ImmutableList<Term>,
+                                     ImmutableList<Term>>>> originalRespects;
     private final Term originalVariant;
     private final Term originalSelfTerm;
     private final ImmutableList<Term> localIns;
@@ -65,7 +69,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public LoopInvariantImpl(LoopStatement loop,
                              Map<LocationVariable,Term> invariants,
                              Map<LocationVariable,Term> modifies,
-                             Map<LocationVariable,ImmutableList<ImmutableList<Term>>> respects,
+                             Map<LocationVariable,
+                             ImmutableList<Triple<ImmutableList<Term>,
+                                                  ImmutableList<Term>,
+                                                  ImmutableList<Term>>>> respects,
                              Term variant, 
                              Term selfTerm,
                              ImmutableList<Term> localIns,
@@ -80,7 +87,12 @@ public final class LoopInvariantImpl implements LoopInvariant {
         this.originalInvariants         = invariants == null ? new LinkedHashMap<LocationVariable,Term>() : invariants;
         this.originalVariant            = variant;
         this.originalModifies           = modifies == null ? new LinkedHashMap<LocationVariable,Term>() : modifies;
-        this.originalRespects           = respects;
+        this.originalRespects           = respects == null ?
+                                          new LinkedHashMap<LocationVariable,
+                                                            ImmutableList<Triple<ImmutableList<Term>,
+                                                                                 ImmutableList<Term>,
+                                                                                 ImmutableList<Term>>>>()
+                                                                                 : respects;
         this.originalSelfTerm           = selfTerm;
         this.localIns                   = localIns;
         this.localOuts                  = localOuts;
@@ -243,13 +255,22 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     @Override
-    public ImmutableList<ImmutableList<Term>> getRespects(LocationVariable heap) {
-        ImmutableList<ImmutableList<Term>> respects = ImmutableSLList.<ImmutableList<Term>>nil();
+    public ImmutableList<Triple<ImmutableList<Term>,
+                                ImmutableList<Term>,
+                                ImmutableList<Term>>> getRespects(LocationVariable heap) {
+        ImmutableList<Triple<ImmutableList<Term>,
+                             ImmutableList<Term>,
+                             ImmutableList<Term>>>
+            respects = ImmutableSLList.<Triple<ImmutableList<Term>,
+                                               ImmutableList<Term>,
+                                               ImmutableList<Term>>>nil();
         return respects.append(originalRespects.get(heap)); // apparently respects can be null
     }
     
     @Override
-    public ImmutableList<ImmutableList<Term>> getRespects(Services services) {
+    public ImmutableList<Triple<ImmutableList<Term>,
+                                ImmutableList<Term>,
+                                ImmutableList<Term>>> getRespects(Services services) {
         LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         return getRespects(baseHeap);
     }
@@ -281,7 +302,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     @Override
-    public Map<LocationVariable,ImmutableList<ImmutableList<Term>>> getInternalRespects(){
+    public Map<LocationVariable,
+               ImmutableList<Triple<ImmutableList<Term>,
+                                    ImmutableList<Term>,
+                                    ImmutableList<Term>>>> getInternalRespects(){
         return originalRespects;
     }
     
@@ -341,11 +365,24 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public void appendTermToAllRespects(Term t) {
         for(LocationVariable h: originalRespects.keySet()) {
-            ImmutableList<ImmutableList<Term>> respects
-            = ImmutableSLList.<ImmutableList<Term>>nil();
+            ImmutableList<Triple<ImmutableList<Term>,
+                                 ImmutableList<Term>,
+                                 ImmutableList<Term>>>
+                respects = ImmutableSLList.<Triple<ImmutableList<Term>,
+                                                   ImmutableList<Term>,
+                                                   ImmutableList<Term>>>nil();
             if(originalRespects.get(h)!= null) {
-                for(ImmutableList<Term> tList: originalRespects.get(h)) {
-                    respects = respects.append(tList.append(t));
+                for(Triple<ImmutableList<Term>,
+                           ImmutableList<Term>,
+                           ImmutableList<Term>> trip: originalRespects.get(h)) {
+                    Triple<ImmutableList<Term>,
+                           ImmutableList<Term>,
+                           ImmutableList<Term>> newTrip
+                           = new Triple<ImmutableList<Term>,
+                                        ImmutableList<Term>,
+                                        ImmutableList<Term>>
+                                ((trip.first).append(t),trip.second,trip.third);
+                    respects = respects.append(newTrip);
                 }
                 originalRespects.remove(h);
                 originalRespects.put(h, respects);

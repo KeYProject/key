@@ -220,7 +220,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return res;
     }
 
-    private ImmutableList<ImmutableList<Term>> replaceVariablesInTermLists(ImmutableList<ImmutableList<Term>> termlists) {
+    private ImmutableList<ImmutableList<Term>>
+    replaceVariablesInTermLists(ImmutableList<ImmutableList<Term>> termlists) {
         ImmutableList<ImmutableList<Term>> res = ImmutableSLList.<ImmutableList<Term>>nil();
         for (final ImmutableList<Term> terms : termlists) {
             res = res.append(replaceVariablesInTermList(terms));
@@ -229,17 +230,26 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
 
-    private ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> replaceVariablesInTermListTiples(ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> terms) {
+    private ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>>
+    replaceVariablesInTermListTriples(ImmutableList<Triple<ImmutableList<Term>,
+                                                           ImmutableList<Term>,
+                                                           ImmutableList<Term>>> terms) {
         ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> res =
-                ImmutableSLList.<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>>nil();
-        for (final Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>> innerTerms : terms) {
+                ImmutableSLList.<Triple<ImmutableList<Term>,
+                                        ImmutableList<Term>,
+                                        ImmutableList<Term>>>nil();
+        for (final Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>
+                            innerTerms : terms) {
             final ImmutableList<Term> renamed1 =
                     replaceVariablesInTerms(innerTerms.first);
             final ImmutableList<Term> renamed2 =
                     replaceVariablesInTerms(innerTerms.second);
             final ImmutableList<Term> renamed3 =
                     replaceVariablesInTerms(innerTerms.third);
-            res = res.append(new Triple(renamed1, renamed2, renamed3));
+            res = res.append(new Triple<ImmutableList<Term>,
+                                        ImmutableList<Term>,
+                                        ImmutableList<Term>>
+                    (renamed1, renamed2, renamed3));
         }
         return res;
     }
@@ -273,7 +283,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             newModifiesClauses.put(heap, replaceVariablesInTerm(oldContract.getModifiesClause(heap, services)));
         }
         final ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> newRespects =
-                replaceVariablesInTermListTiples(oldContract.getRespects());
+                replaceVariablesInTermListTriples(oldContract.getRespects());
         return oldContract.update(newBlock, newPreconditions, newPostconditions,
                                   newModifiesClauses, newRespects, newVariables);
     }
@@ -359,8 +369,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
         Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
-        Map<LocationVariable,ImmutableList<ImmutableList<Term>>> newRespects
-            = new LinkedHashMap<LocationVariable,ImmutableList<ImmutableList<Term>>>();
+        Map<LocationVariable,
+            ImmutableList<Triple<ImmutableList<Term>,
+                                 ImmutableList<Term>,
+                                 ImmutableList<Term>>>> newRespects
+            = new LinkedHashMap<LocationVariable,
+                                ImmutableList<Triple<ImmutableList<Term>,
+                                                     ImmutableList<Term>,
+                                                     ImmutableList<Term>>>>();
         //LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
 
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -370,8 +386,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                                                atPres,
                                                                services));
                 newMods.put(heap, m);
-                final ImmutableList<ImmutableList<Term>> r =
-                        replaceVariablesInTermLists(inv.getRespects(heap));
+                final ImmutableList<Triple<ImmutableList<Term>,
+                                           ImmutableList<Term>,
+                                           ImmutableList<Term>>> r =
+                        replaceVariablesInTermListTriples(inv.getRespects(heap));
                 newRespects.put(heap, r);
                 final Term i =
                         replaceVariablesInTerm(inv.getInvariant(heap, selfTerm,

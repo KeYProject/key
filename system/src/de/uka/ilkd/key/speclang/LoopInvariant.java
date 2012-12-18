@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.util.Triple;
 
 
 /**
@@ -58,9 +59,13 @@ public interface LoopInvariant extends SpecificationElement {
     /**
      * Returns the respects clause.
      */
-    public ImmutableList<ImmutableList<Term>> getRespects(LocationVariable heap);
+    public ImmutableList<Triple<ImmutableList<Term>,
+                                ImmutableList<Term>,
+                                ImmutableList<Term>>> getRespects(LocationVariable heap);
     
-    public ImmutableList<ImmutableList<Term>> getRespects(Services services);
+    public ImmutableList<Triple<ImmutableList<Term>,
+                                ImmutableList<Term>,
+                                ImmutableList<Term>>> getRespects(Services services);
     
     /**
      * Returns the variant term. 
@@ -100,7 +105,10 @@ public interface LoopInvariant extends SpecificationElement {
     
     public Map<LocationVariable,Term> getInternalModifies();
     
-    public Map<LocationVariable, ImmutableList<ImmutableList<Term>>> getInternalRespects();
+    public Map<LocationVariable,
+               ImmutableList<Triple<ImmutableList<Term>,
+                                    ImmutableList<Term>,
+                                    ImmutableList<Term>>>> getInternalRespects();
 
     /**
      * Returns a new loop invariant where the loop reference has been
