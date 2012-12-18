@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -88,10 +89,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      */
     protected ProgramElement result=null;
 
-    protected Stack labelStack = new Stack();
+    protected Stack<Label> labelStack = new Stack<Label>();
 
-
-    protected Stack methodStack = new Stack();
+    protected Stack<MethodFrame> methodStack = new Stack<MethodFrame>();
 
     /** creates the WhileLoopTransformation for the transformation mode
      * @param root the ProgramElement where to begin
@@ -193,7 +193,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    labelStack.push(((LabeledStatement)node).getLabel());
 	}
 	if (node instanceof MethodFrame) {
-	    methodStack.push(node);
+	    methodStack.push((MethodFrame)node);
 	}
 
 	super.walk(node);
@@ -635,7 +635,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	     * rename all occ. variables in the body (same name but different object)
 	     */
 	    ProgVarReplaceVisitor replacer = new ProgVarReplaceVisitor(body, 
-	            new HashMap(), true, services);
+	            new HashMap<ProgramVariable, ProgramVariable>(), true, services);
 	    replacer.start();
 	    body = (Statement) replacer.result();
 	    

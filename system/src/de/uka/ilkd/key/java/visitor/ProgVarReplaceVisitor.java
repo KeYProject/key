@@ -50,7 +50,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * stores the program variables to be replaced as keys and the new
      * program variables as values
      */
-    protected Map replaceMap;
+    protected Map<ProgramVariable, ProgramVariable> replaceMap;
 
 
     /**
@@ -59,7 +59,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * @param st the statement where the prog vars are replaced
      * @param map the HashMap with the replacements
      */
-    public ProgVarReplaceVisitor(ProgramElement st, Map map, Services services) {
+    public ProgVarReplaceVisitor(ProgramElement st, Map<ProgramVariable, ProgramVariable> map, Services services) {
     super(st, true, services);
     this.replaceMap = map;
         assert services != null;
@@ -74,7 +74,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * @param replaceall decides if all variables are to be replaced
      */
     public ProgVarReplaceVisitor(ProgramElement st,
-                                 Map map,
+                                 Map<ProgramVariable, ProgramVariable> map,
                                  boolean replaceall,
                                  Services services) {
         this(st, map, services);
@@ -166,16 +166,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
     if(t.op() instanceof ProgramVariable) {
         if(replaceMap.containsKey(t.op())) {
-        Object o = replaceMap.get(t.op());
-        if(o instanceof ProgramVariable){
-            return TermFactory.DEFAULT.createTerm
-            ((ProgramVariable) replaceMap.get(t.op()));
-        }else{
-            return TermFactory.DEFAULT.createTerm
-            ((SchemaVariable) replaceMap.get(t.op()));
-        }
+            ProgramVariable replacement = replaceMap.get(t.op());
+            return TermFactory.DEFAULT.createTerm(replacement);
         } else {
-        return t;
+            return t;
         }
     } else {
         Term subTerms[] = new Term[t.arity()];
