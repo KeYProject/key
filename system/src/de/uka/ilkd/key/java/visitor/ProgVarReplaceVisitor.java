@@ -323,6 +323,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                     newVariant,
                                     newSelfTerm,
                                     atPres);
-        services.getSpecificationRepository().setLoopInvariant(newInv);
+        services.getSpecificationRepository().addLoopInvariant(newInv);
     }
 }

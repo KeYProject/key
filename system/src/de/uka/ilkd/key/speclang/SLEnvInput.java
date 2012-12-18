@@ -298,7 +298,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 	    			pm, 
                         			(LoopStatement) loop);
                     if(inv != null) {
-                        specRepos.setLoopInvariant(inv);
+                        specRepos.addLoopInvariant(inv);
                     }
                 }
                 

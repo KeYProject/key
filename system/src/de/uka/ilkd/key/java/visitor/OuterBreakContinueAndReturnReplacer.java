@@ -185,8 +185,9 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             changeList.removeFirst();
             Expression guard = ((Guard) changeList.removeFirst()).getExpression();
             Statement body = (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
-            // TODO reregister loop invariants
-            addChild(new While(guard, body, x.getPositionInfo()));
+            While newLoop = new While(guard, body, x.getPositionInfo());
+            services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+            addChild(newLoop);
             changed();
         }
         else {
@@ -198,8 +199,9 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
-                // TODO reregister loop invariants
-                return new For(changeList);
+                For newLoop = new For(changeList);
+                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                return newLoop;
             }
         };
         def.doAction(x);
@@ -209,8 +211,9 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
-             // TODO reregister loop invariants
-                return new EnhancedFor(changeList);
+                EnhancedFor newLoop = new EnhancedFor(changeList);
+                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                return newLoop;
             }
         };
         def.doAction(x);
@@ -224,8 +227,9 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             Statement body = changeList.removeFirstOccurrence(Statement.class);
             Guard g = changeList.removeFirstOccurrence(Guard.class);
             Expression guard = g == null ? null : g.getExpression();
-            // TODO reregister loop invariants
-            addChild(new Do(guard, body, x.getPositionInfo()));
+            Do newLoop = new Do(guard, body, x.getPositionInfo());
+            services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+            addChild(newLoop);
             changed();
         }
         else {

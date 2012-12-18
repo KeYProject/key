@@ -170,12 +170,12 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
     
 
-    protected void reregisterLoopInv(LoopStatement x, LoopStatement newLoop) {
+    protected void reregisterLoopInvS(LoopStatement x, LoopStatement newLoop) {
         LoopInvariant li 
             = services.getSpecificationRepository().getLoopInvariant(x);
         if (li != null) {
             li = li.setLoop(newLoop);
-            services.getSpecificationRepository().setLoopInvariant(li);
+            services.getSpecificationRepository().addLoopInvariant(li);
         }
     }
 
@@ -567,7 +567,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             if (changeList.getFirst() == CHANGED) {
 	    	changeList.removeFirst();
 	    	For newLoop = new For(changeList);
-	    	reregisterLoopInv(x, newLoop);
+	    	services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
 	    	addChild(newLoop);
 	    	changed();
 	    } else {
@@ -598,7 +598,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
                 EnhancedFor newLoop = new EnhancedFor(changeList);
-                reregisterLoopInv(x, newLoop);
+                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
                 addChild(newLoop);
                 changed();
             } else {
@@ -668,7 +668,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 					      null :
 					      changeList.removeFirst());
 		While newLoop = new While(guard, body, x.getPositionInfo());
-		reregisterLoopInv(x, newLoop);
+		services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
 		addChild(newLoop);
 		changed();
 	    } else {
@@ -721,7 +721,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 		Guard g = changeList.removeFirstOccurrence(Guard.class);
 		Expression guard = g == null ? null : g.getExpression();
 		Do newLoop = new Do(guard, body, x.getPositionInfo());
-		reregisterLoopInv(x, newLoop);
+		services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
 		addChild(newLoop);
 		changed();
 	    } else {
