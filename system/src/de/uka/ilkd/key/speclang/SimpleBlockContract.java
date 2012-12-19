@@ -27,7 +27,7 @@ public final class SimpleBlockContract implements BlockContract {
         return new Combinator(contracts, services).combine();
     }
 
-	private final StatementBlock block;
+    private final StatementBlock block;
     private final List<Label> labels;
     private final IProgramMethod method;
     private final Modality modality;
