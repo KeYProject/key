@@ -396,7 +396,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
         };
         
         /**
-         * Class for the CVC3 solver. It makes use of its own format.
+         * Class for the Simplify solver. It makes use of its own format.
          */
         static public final SolverType SIMPLIFY_SOLVER = new AbstractSolverType() {
 
