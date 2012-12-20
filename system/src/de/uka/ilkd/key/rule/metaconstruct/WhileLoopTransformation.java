@@ -170,16 +170,6 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
     
 
-    protected void reregisterLoopInvS(LoopStatement x, LoopStatement newLoop) {
-        LoopInvariant li 
-            = services.getSpecificationRepository().getLoopInvariant(x);
-        if (li != null) {
-            li = li.setLoop(newLoop);
-            services.getSpecificationRepository().addLoopInvariant(li);
-        }
-    }
-
-    
     /** walks through the AST. While keeping track of the current node
      * @param node the JavaProgramElement the walker is at 
      */
@@ -697,12 +687,12 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 unwindedBody = body;
             }
 	    Statement resultStatement = null;
+	    While newLoop = new While(guard, x.getBody(), x.getPositionInfo());
+	    services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
 	    StatementBlock block = new StatementBlock
 		(new ImmutableArray<Statement>(new Statement[]
 		    {unwindedBody, 
-		        new While(guard, 
-		                  x.getBody(), 
-                                  x.getPositionInfo())}));
+		        newLoop}));
 
  	    if (outerLabelNeeded() && breakOuterLabel != null) {
 		// an unlabeled break occurs in the
