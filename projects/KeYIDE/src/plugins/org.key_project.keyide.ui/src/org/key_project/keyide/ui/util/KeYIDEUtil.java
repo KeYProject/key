@@ -85,6 +85,7 @@ public class KeYIDEUtil {
                                        try {
                                           // Open selection dialog
                                           Proof proof = openDialog(operationContracts, environment);
+                                          environment.getMediator().setProof(proof);
                                           //Open proof in Editor if correctly selected
                                           if(proof != null){
                                              KeYIDEUtil.openEditor(proof, environment);

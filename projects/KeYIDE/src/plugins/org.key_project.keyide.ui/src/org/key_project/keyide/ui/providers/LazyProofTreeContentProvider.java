@@ -60,9 +60,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
              */
             @Override
             public void run() {
-               viewer.refresh();
-               viewer.refresh();
-
+               viewer.refresh(); // Refresh structure
+               viewer.refresh(); // Referesh labels and icons
             }
          });
       }
@@ -258,30 +257,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
    public void updateElement(Object parent, int index) {
       Object element = getElementByIndex(parent, index);
       viewer.replace(parent, index, element);
-      refreshSelection(element);         
       updateChildCount(element, -1);
    }
-   
-   /**
-    * 
-    * @param element - a {@link Node} or a {@link BranchFolder}
-    */
-   
-   private void refreshSelection(Object element){
-      ISelection selection = viewer.getSelection();
-      if(selection.isEmpty()){
-         viewer.getTree().setSelection(viewer.getTree().getItem(0));
-         viewer.setSelection(viewer.getSelection(), true);
-         
-      }
-      else if(selection instanceof TreeSelection){
-         TreeSelection treeSelection = (TreeSelection) selection;
-         if(treeSelection.getFirstElement().equals(element)){
-            viewer.setSelection(viewer.getSelection());
-         }
-      }
-   }
-   
    
    /**
     * Removes the added listeners.

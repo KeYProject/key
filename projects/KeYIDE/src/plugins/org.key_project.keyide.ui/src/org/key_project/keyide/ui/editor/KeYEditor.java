@@ -40,58 +40,78 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    
    private ProofTreeContentOutlinePage outline;
    
+   private Node showNode;
    
-   /**
-    * Listener that changes the current EditorInput if the selection in the outline has changed.
-    */
-   private ISelectionChangedListener outlineSelectionListener = new ISelectionChangedListener() {
+   // TODO: Remove uncommented code
+   // TODO: Observe seletion in getKeYEvenrionment().getMediator() and change shown sequent if it changes
+   // TODO: Observe structure of selected node and update content if it is pruned.
+   
+//   /**
+//    * Listener that changes the current EditorInput if the selection in the outline has changed.
+//    */
+//   private ISelectionChangedListener outlineSelectionListener = new ISelectionChangedListener() {
+//
+//      /**
+//       * {@inheritDoc}
+//       */
+//      @Override
+//      public void selectionChanged(SelectionChangedEvent event) {
+//         updateInput(event);
+//      }
+//   };
+   
+   
+   
+   
+   public Node getShowNode() {
+      return showNode;
+   }
 
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public void selectionChanged(SelectionChangedEvent event) {
-         updateInput(event);
-      }
-   };
-   
-   
+   public void setShowNode(Node showNode) {
+      this.showNode = showNode;
+      // TODO: Update shown text
+      // TODO: Thorw event to update outline
+   }
+
    /**
     * Updates the {@link ProofEditorInput} and shows the new {@link ProofEditorInput} in the {@link KeYEditor}.
     * @param event - the {@link SelectionChangedEvent} with the Information for the new Input.
     */
-   private void updateInput(SelectionChangedEvent event){
-      Node node = null;
-      IEditorInput input = getEditorInput();
-      if(input instanceof ProofEditorInput){
-         //get the selected item
-         ISelection selection = event.getSelection();
-         if(!selection.isEmpty()){
-            if(selection instanceof TreeSelection){
-               TreeSelection treeSelection = (TreeSelection) selection;
-               if(!treeSelection.isEmpty()){
-                  if(treeSelection.getFirstElement() instanceof Node){
-                     //get the Node
-                     node = (Node) treeSelection.getFirstElement();
-                  }
-                  else if(treeSelection.getFirstElement() instanceof BranchFolder){
-                     //get the BranchFolders ChildNode
-                     BranchFolder branchFolder = (BranchFolder) treeSelection.getFirstElement();
-                     node = branchFolder.getChild();
-                  }
-               }
-            }
-            //SetUp the new EditorInput
-            ((ProofEditorInput)input).setData(node);
-            try {
-               doSetInput(input);
-            }
-            catch (CoreException e) {
-               LogUtil.getLogger().logError(e);
-            }
-         }
-      }
-   }
+   
+   
+//   private void updateInput(SelectionChangedEvent event){
+//      getKeYEnvironment().getMediator().getSelectionModel().setSelectedNode(n)
+//      Node node = null;
+//      IEditorInput input = getEditorInput();
+//      if(input instanceof ProofEditorInput){
+//         //get the selected item
+//         ISelection selection = event.getSelection();
+//         if(!selection.isEmpty()){
+//            if(selection instanceof TreeSelection){
+//               TreeSelection treeSelection = (TreeSelection) selection;
+//               if(!treeSelection.isEmpty()){
+//                  if(treeSelection.getFirstElement() instanceof Node){
+//                     //get the Node
+//                     node = (Node) treeSelection.getFirstElement();
+//                  }
+//                  else if(treeSelection.getFirstElement() instanceof BranchFolder){
+//                     //get the BranchFolders ChildNode
+//                     BranchFolder branchFolder = (BranchFolder) treeSelection.getFirstElement();
+//                     node = branchFolder.getChild();
+//                  }
+//               }
+//            }
+//            //SetUp the new EditorInput
+//            ((ProofEditorInput)input).setData(node);
+//            try {
+//               doSetInput(input);
+//            }
+//            catch (CoreException e) {
+//               LogUtil.getLogger().logError(e);
+//            }
+//         }
+//      }
+//   }
    
    /**
     * Listens for changes on {@link ConsoleUserInterface#isAutoMode()} 
@@ -119,7 +139,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    @Override
    public void dispose() {
       getKeYEnvironment().getUi().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
-      outline.removeSelectionChangedListener(outlineSelectionListener);
+//      outline.removeSelectionChangedListener(outlineSelectionListener);
       outline.dispose();
       super.dispose();
    }
@@ -151,11 +171,11 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
          synchronized (this) {
             if (outline == null) {
                outline = new ProofTreeContentOutlinePage(getProof(), getKeYEnvironment());
+               //adds a ISelectionChangedListener to the Outline
+//               outline.addSelectionChangedListener(outlineSelectionListener);
             }
           
          }
-         //adds a ISelectionChangedListener to the Outline
-         outline.addSelectionChangedListener(outlineSelectionListener);
          return outline;
       }
       if(StrategyPropertiesView.class.equals(adapter)){

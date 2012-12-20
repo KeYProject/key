@@ -6,6 +6,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
@@ -70,7 +71,7 @@ public class StrategyContentProvider extends ScrolledForm{
 
    
    public StrategyContentProvider(Composite parent) {
-      super(parent);
+      super(parent, SWT.V_SCROLL);
       initializeContent(parent);
       
    }
@@ -79,12 +80,13 @@ public class StrategyContentProvider extends ScrolledForm{
    
    private void initializeContent(Composite parent) {
       FormToolkit toolkit = new FormToolkit(parent.getDisplay());
-      getBody().setLayout(new RowLayout(SWT.VERTICAL));
+      getBody().setLayout(new GridLayout(1, false));
       
       
-      Label maxStepLabel = new Label(getBody(), 20);
-      maxStepLabel.setText("Number of steps to execute in a row.(Must be between 1 and 1.000.000.)");
-      maxStepText = new Text(getBody(), 20);
+      Label maxStepLabel = new Label(getBody(), SWT.NONE);
+      maxStepLabel.setText("Number of steps to execute in a row.(Must be between 1 and 1.000.000.)"); // TODO: Short the text
+      maxStepText = new Text(getBody(), SWT.BORDER);
+      maxStepText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL)); // TODO: Set layout in all components
       maxStepText.addModifyListener(maxStepListener);
       maxStepText.setTextLimit(7);
       
