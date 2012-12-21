@@ -41,7 +41,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
             posts = posts.append(d.tb.equals(poVars.exceptionAtPost,
                                              poVars.exception));
         }
-        posts = posts.append(d.tb.equals(poVars.heapAtPost, poVars.heap));
+        posts = posts.append(d.tb.equals(poVars.heapAtPost, d.tb.getBaseHeap()));
         final Term prog = buildProgramTerm(d, d.tb.and(posts), d.tb);
         return prog;
     }

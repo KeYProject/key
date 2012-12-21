@@ -1935,6 +1935,12 @@ public class TermBuilder {
             return reachableValue(services, variable);
         }
 
+        public Term reachableValue(Term h,
+                                   Term t,
+                                   KeYJavaType kjt) {
+            return reachableValue(services, h, t, kjt);
+        }
+
         public Term frame(final Term heapTerm, final Map<Term, Term> normalToAtPre, final Term modifiesClause)
         {
             return frame(services, heapTerm, normalToAtPre, modifiesClause);

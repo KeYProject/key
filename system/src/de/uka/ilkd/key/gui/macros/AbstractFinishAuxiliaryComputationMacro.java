@@ -59,10 +59,10 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
                                           IFProofObligationVars ifVars,
                                           Services services) {
         Term[] goalFormulas1 =
-                buildExecution(ifVars.c1, ifVars.map1, ifVars.symbExecVars.heap,
+                buildExecution(ifVars.c1, ifVars.map1,
                                proof.openGoals(), services);
         Term[] goalFormulas2 =
-                buildExecution(ifVars.c2, ifVars.map2, ifVars.symbExecVars.heap,
+                buildExecution(ifVars.c2, ifVars.map2,
                                proof.openGoals(), services);
 
         Term composedStates = TB.ff();
@@ -79,14 +79,13 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
 
     private Term[] buildExecution(ProofObligationVars c,
                                   Map<Term, Term> vsMap,
-                                  Term symbExecHeap,
                                   ImmutableList<de.uka.ilkd.key.proof.Goal> symbExecGoals,
                                   Services services) {
         final Term[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
         // the build in heap symbol has to be handled with care
         final HashMap<Operator, Boolean> doNotReplace =
                 new HashMap<Operator, Boolean>();
-        doNotReplace.put(symbExecHeap.op(), Boolean.TRUE);
+        doNotReplace.put(TB.getBaseHeap(services).op(), Boolean.TRUE);
         final Term[] renamedGoalFormulas =
                 renameVariablesAndSkolemConstants(goalFormulas, vsMap, doNotReplace,
                                                   c.postfix, services);
