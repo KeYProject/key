@@ -201,7 +201,7 @@ public class BlockContractRule implements BuiltInRule {
         final ContractPO po =
                 services.getSpecificationRepository().getPOForProof(goal.proof());
         
-        Term contractApplPredTerm = TB.tt();
+        Term infFlowAssumptions = TB.tt();
         Taclet informationFlowContractApp = null;
         Goal infFlowGoal = null;
         if ((po instanceof InfFlowContractPO ||
@@ -215,9 +215,18 @@ public class BlockContractRule implements BuiltInRule {
                                                     "moment not compatible " +
                                                     "with the non-base-heap " +
                                                     "setting";
-            
-            final Term heapAtPre = TB.var(anonymisationHeaps.keySet().iterator().next());
-            final Term heapAtPost = TB.func(anonymisationHeaps.values().iterator().next());
+
+            final LocationVariable baseheap = services.getTypeConverter().getHeapLDT().getHeap();
+            final Term heapAtPre = TB.var(variables.remembranceHeaps.get(baseheap));
+//            final Map.Entry<LocationVariable, Function> anonHeap =
+//                    anonymisationHeaps.entrySet().iterator().next();
+            final Name heapAtPostName =
+                    new Name(TB.newName(services, "heapAfterBlock"));
+            final Term heapAtPost =
+                    TB.func(new Function(heapAtPostName, heapAtPre.sort(), true));
+
+            final Term heapAtPostEq =
+                    TB.equals(heapAtPost, TB.var(heaps.get(0))); // TB.var(heaps.get(0)) will be made anonymous by setUpUsageGoal
 
             final InfFlowBlockContractTacletBuilder ifContractBuilder =
                     new InfFlowBlockContractTacletBuilder(services);
@@ -234,10 +243,13 @@ public class BlockContractRule implements BuiltInRule {
 
             // generate information flow contract application predicate
             // and associated taclet
-            contractApplPredTerm =
+            final Term contractApplTerm =
                     ifContractBuilder.buildContractApplPredTerm();
             informationFlowContractApp =
                     ifContractBuilder.buildContractApplTaclet();
+
+            // set infFlowAssumptions
+            infFlowAssumptions = TB.and(heapAtPostEq, contractApplTerm);
 
             // create information flow validity goal
 
@@ -298,7 +310,7 @@ public class BlockContractRule implements BuiltInRule {
         configurator.setUpUsageGoal(
             result.head(),
             new Term[] {contextUpdate, remembranceUpdate, anonymisationUpdate},
-            new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition, contractApplPredTerm},
+            new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition, infFlowAssumptions},
             informationFlowContractApp
         );
         return result;
@@ -310,7 +322,7 @@ public class BlockContractRule implements BuiltInRule {
         if (!isStrictlyPure) {
             for (LocationVariable variable : variables) {
                 final String anonymisationName = TB.newName(services, ANONYMISATION_PREFIX + variable.name());
-                final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort());
+                final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 result.put(variable, anonymisationFunction);
             }
@@ -591,7 +603,7 @@ public class BlockContractRule implements BuiltInRule {
             final Collection<LocationVariable> localOutVariables = variables.remembranceLocalVariables.keySet();
             for (LocationVariable variable : localOutVariables) {
                 final String anonymisationName = newName(ANONYMISATION_PREFIX + variable.name());
-                final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort());
+                final Function anonymisationFunction = new Function(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
                 final Term elementaryUpdate = elementary(variable, func(anonymisationFunction));
                 result = parallel(result, elementaryUpdate);

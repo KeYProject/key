@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -17,7 +16,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -75,7 +73,8 @@ public class BlockExecutionPO extends AbstractOperationPO implements ContractPO 
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.BLOCK_EXEC);
 
         // final symbolic execution term
-        Term finalTerm = TB.not(TB.and(pre, symExec));
+        Term finalTerm = TB.applyElementary(services, symbExecVars.heap,
+                                            TB.not(TB.and(pre, symExec)));
 
         // register final term
         assignPOTerms(finalTerm);
