@@ -15,7 +15,7 @@ import de.uka.ilkd.key.speclang.Contract;
 
 
 /**
- * A obligation for some kind of contract. 
+ * An obligation for some kind of contract. 
  */
 public interface ContractPO extends ProofOblInput {
     

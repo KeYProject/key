@@ -161,12 +161,12 @@ public final class WhileInvariantRule implements BuiltInRule {
         assert loop_inv != null;
         
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final Name loopHeapName = new Name(TB.newName(services, heap+"After_"+ loop_inv.getName()));
+	final Name loopHeapName = new Name(TB.newName(services, heap+"_After_LOOP"));
         final Function loopHeapFunc = new Function(loopHeapName,
                                              heapLDT.targetSort(), true);
         services.getNamespaces().functions().addSafely(loopHeapFunc);
         final Term loopHeap = TB.func(loopHeapFunc);
-	final Name anonHeapName = new Name(TB.newName(services, "anon_"+heap+"_" + loop_inv.getName()));
+	final Name anonHeapName = new Name(TB.newName(services, "anon_"+heap+"_LOOP"));
 	final Function anonHeapFunc = new Function(anonHeapName,heap.sort(), true);
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
 	final Term anonHeap = TB.func(anonHeapFunc);	
@@ -294,7 +294,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         for(LocationVariable heap : heapContext) {
             heapToBeforeLoop.put(heap, new LinkedHashMap<Term,Term>());
-            final LocationVariable lv = TB.heapAtPreVar(services, heap+"Before_"+inst.inv.getName(), heap.sort(), true);
+            final LocationVariable lv = TB.heapAtPreVar(services, heap+"Before_LOOP", heap.sort(), true);
             services.getNamespaces().programVariables().addSafely(lv);
             final Term u = TB.elementary(services, lv, TB.var(heap));
             if(beforeLoopUpdate == null) {
@@ -451,8 +451,8 @@ public final class WhileInvariantRule implements BuiltInRule {
             ifInvariantBuilder.setHeapAtPre(anonUpdateData.loopHeapAtPre);
             ifInvariantBuilder.setHeapAtPost(anonUpdateData.loopHeap);
             ifInvariantBuilder.setSelf(inst.selfTerm);
-            ifInvariantBuilder.setLocalIns(TB.var(localIns));
-            ifInvariantBuilder.setLocalOuts(TB.var(localOuts));
+            ifInvariantBuilder.setLocalIns(TB.var(localIns));//.add(guardVar)
+            ifInvariantBuilder.setLocalOuts(TB.var(localOuts));//.add(guardVar)
             
             // generate information flow invariant application predicate
             // and associated taclet
@@ -472,12 +472,9 @@ public final class WhileInvariantRule implements BuiltInRule {
                             anonUpdateData.loopHeap, services);
             final IFProofObligationVars ifVars =
                     new IFProofObligationVars(instantiationVars, services);
+            ((LoopInvariantBuiltInRuleApp) ruleApp).setInformationFlowProofObligationVars(ifVars);
 
             // create proof obligation
-            InfFlowPOSnippetFactory infFlowFactory =
-                    POSnippetFactory.getInfFlowFactory(inst.inv, ifVars.c1,
-                            ifVars.c2, services);
-            
             Sequent seq = buildBodyPreservesSequent(ifVars, inst.inv, guardTrueTerm, services);
             infFlowGoal = goal.getCleanGoal(seq);
             infFlowGoal.setBranchLabel("Information Flow Validity");

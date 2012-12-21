@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -23,6 +24,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
@@ -37,6 +39,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     private final LoopInvariant inv;
 
     private final List<LocationVariable> heapContext;
+    
+    private IFProofObligationVars infFlowVars;
 
     public LoopInvariantBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pos) {
         this(rule, pos, null, null, null);
@@ -258,6 +262,10 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     public LoopInvariantBuiltInRuleApp setLoopInvariant(LoopInvariant inv) {
         return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, heapContext);
     }
+    
+    public void setInformationFlowProofObligationVars(IFProofObligationVars vars) {
+        this.infFlowVars = vars;
+    }
 
     @Override
     public LoopInvariantBuiltInRuleApp tryToInstantiate(Goal goal) {
@@ -281,6 +289,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     @Override
     public List<LocationVariable> getHeapContext() {
       return heapContext;
-    }   
-
+    }
+    
+    public IFProofObligationVars getInformationFlowProofObligationVars() {
+        return infFlowVars;
+    }
 }

@@ -30,7 +30,7 @@ public class StartAuxiliaryComputationMacro implements ProofMacro {
 
     @Override
     public String getName() {
-        return "Start auxiliray computation for self-composition proofs";
+        return "Start auxiliary computation for self-composition proofs";
     }
 
 

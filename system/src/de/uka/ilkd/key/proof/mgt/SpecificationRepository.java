@@ -99,6 +99,8 @@ public final class SpecificationRepository {
                 = new LinkedHashMap<ProofOblInput,ImmutableSet<Proof>>();
     private final Map<LoopStatement,LoopInvariant> loopInvs
                 = new LinkedHashMap<LoopStatement,LoopInvariant>();
+    private final Map<String,LoopInvariant> loopInvariantsByName
+                = new LinkedHashMap<String,LoopInvariant>();
     private final Map<StatementBlock,ImmutableSet<BlockContract>> blockContracts
                 = new LinkedHashMap<StatementBlock, ImmutableSet<BlockContract>>();
     private final Map<IObserverFunction,IObserverFunction> unlimitedToLimited
@@ -1076,6 +1078,32 @@ public final class SpecificationRepository {
     }
 
 
+    public LoopInvariant getLoopInvariantByName(String name) {
+        if(name == null || name.length() == 0) {
+            return null;
+        }
+        String[] baseNames = name.split(CONTRACT_COMBINATION_MARKER);
+        if(baseNames.length == 1) {
+            return loopInvariantsByName.get(baseNames[0]);
+        }
+
+       /* ImmutableSet<LoopInvariant> baseLoopInvariants 
+        = DefaultImmutableSet.<LoopInvariant>nil();
+        for(String baseName : baseNames) {
+            LoopInvariant baseLoopInvariant 
+            = loopInvariantsByName.get(baseName);
+            if(baseLoopInvariant == null) {
+                return null;
+            }
+            baseLoopInvariants = baseLoopInvariants.add(baseLoopInvariant);
+        }
+        
+        return combineLoopInvariants(baseLoopInvariants);*/
+        
+        return loopInvariantsByName.get(name);
+    }
+
+
     /**
      * Registers the passed loop invariant, possibly overwriting an older
      * registration for the same loop.
@@ -1083,6 +1111,7 @@ public final class SpecificationRepository {
     public void setLoopInvariant(LoopInvariant inv) {
         LoopStatement loop = inv.getLoop();
         loopInvs.put(loop, inv);
+        loopInvariantsByName.put(inv.getName(), inv);
     }
     
     

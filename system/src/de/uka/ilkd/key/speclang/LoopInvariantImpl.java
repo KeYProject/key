@@ -28,6 +28,9 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.InfFlowContractPO;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
 
@@ -453,8 +456,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public String getName() {
         assert(getExecutionContext() != null);
-        return getLoop().getBody() + getLoop().getGuardExpression().toString() +
-                getExecutionContext() + this + "::" + getLoop() + "__loop_invariant";
+        return "loop_invariant__"  + "at_line_" + getLoop().getStartPosition().getLine()
+                + "_in_" + pm.getFullName();
     }
 
 

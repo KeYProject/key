@@ -194,7 +194,7 @@ public class BlockExecutionPO extends AbstractOperationPO implements ContractPO 
         if (contract == null) {
             throw new RuntimeException("Contract not found: " + contractName);
         } else {
-            ProofOblInput po = contract.createProofObl(initConfig);
+            ProofOblInput po = new InfFlowContractPO(initConfig, null);
             return new LoadedPOContainer(po, 0);
         }
     }
