@@ -186,13 +186,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 	return new AnonUpdateData(assumption, anonUpdate, loopHeap, TB.getBaseHeap(services), anonHeap);
     }
     
-    /*private Term createTermSV(String svName,
-            Sort predArgSort,
-            Services services) {
-        Name name = services.getVariableNamer().getTemporaryNameProposal(svName);
-        return TB.var(SchemaVariableFactory.createTermSV(name, predArgSort));
-    }*/
-    
     private static boolean checkFocus(final Term progPost) {
         // focus (below update) must be modality term
         return progPost.op() instanceof Modality;
@@ -439,9 +432,11 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (po instanceof InfFlowContractPO ||
                 po instanceof SymbolicExecutionPO ||
                 po instanceof BlockExecutionPO) {
-            assert anonUpdateDatas.size() == 1; // information flow extension is at
-            // the moment not compatible with
-            // the non-base-heap setting
+            assert anonUpdateDatas.size() == 1 : "information flow " +
+                                                 "extension is at the " +
+                                                 "moment not compatible " +
+                                                 "with the non-base-heap " +
+                                                 "setting";
             final AnonUpdateData anonUpdateData = anonUpdateDatas.head();
             
             InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =

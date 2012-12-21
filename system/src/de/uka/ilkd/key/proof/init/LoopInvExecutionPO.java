@@ -17,14 +17,10 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
-import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
-import de.uka.ilkd.key.speclang.InformationFlowContractImpl;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 public class LoopInvExecutionPO extends AbstractOperationPO implements ContractPO {
@@ -63,7 +59,8 @@ public class LoopInvExecutionPO extends AbstractOperationPO implements ContractP
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_EXEC);
 
         // final symbolic execution term
-        Term finalTerm = TB.not(TB.and(loopInv, symExec));
+        Term finalTerm = TB.applyElementary(services, symbExecVars.heap,
+                                            TB.not(TB.and(loopInv, symExec)));
 
         // register final term
         assignPOTerms(finalTerm);
