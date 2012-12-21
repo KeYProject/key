@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.rule;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
@@ -45,6 +46,8 @@ import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.WhileInvRule;
+import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.MiscTools;
@@ -470,13 +473,16 @@ public final class WhileInvariantRule implements BuiltInRule {
             ((LoopInvariantBuiltInRuleApp) ruleApp).setInformationFlowProofObligationVars(ifVars);
 
             // create proof obligation
-            Sequent seq = buildBodyPreservesSequent(ifVars, inst.inv, guardTrueTerm, services);
+            Pair<InfFlowPOSnippetFactory, Sequent> factoryAndSequent
+                = buildBodyPreservesSequent(ifVars, inst.inv, guardTrueTerm, services);
+            Sequent seq = factoryAndSequent.second;
             infFlowGoal = goal.getCleanGoal(seq);
             infFlowGoal.setBranchLabel("Information Flow Validity");
             
             // create and add split-post and remove-post taclets
-            /*final Term post =
-                    infFlowFactory.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+            InfFlowPOSnippetFactory infFlowFactory = factoryAndSequent.first;
+            final Term post = infFlowFactory
+                    .create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
             final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
             final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
             for (final Taclet t : splitPostTaclets) {
@@ -486,7 +492,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             final ArrayList<Taclet> removePostTaclets = removePostTB.generateTaclets(post);
             for (final Taclet t : removePostTaclets) {
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-            }*/
+            }
         }
 
         //split goal into three branches
@@ -599,7 +605,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-    Sequent buildBodyPreservesSequent(IFProofObligationVars ifVars,
+    Pair<InfFlowPOSnippetFactory,Sequent> buildBodyPreservesSequent(IFProofObligationVars ifVars,
                                       LoopInvariant inv,
                                       Term guardTrueTerm,
                                       Services services) {
@@ -611,8 +617,8 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
-        return Sequent.createSuccSequent(
-                new Semisequent(new SequentFormula(finalTerm)));
+        return new Pair<InfFlowPOSnippetFactory,Sequent>
+            (f, Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm))));
     }
 
 

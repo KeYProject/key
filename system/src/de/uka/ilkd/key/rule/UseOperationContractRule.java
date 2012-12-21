@@ -59,7 +59,6 @@ import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.util.Pair;
 
 
