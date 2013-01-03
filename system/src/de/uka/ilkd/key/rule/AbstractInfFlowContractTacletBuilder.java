@@ -169,7 +169,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                 buildContractApplications(schemaDataFind,
                                           schemaDataAssumes, services);
 
-        //create sequences
+        //create sequents
         Sequent assumesSeq = Sequent.createAnteSequent(
                 new Semisequent(new SequentFormula(schemaAssumes)));
         Sequent axiomSeq = Sequent.createAnteSequent(

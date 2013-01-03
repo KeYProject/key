@@ -45,13 +45,13 @@ abstract class AbstractFinishAuxiliaryComputationMacro implements ProofMacro {
 
     @Override
     public String getName() {
-        return "Finish auxiliray computation";
+        return "Finish auxiliary computation";
     }
 
 
     @Override
     public String getDescription() {
-        return "Finish auxiliray computation.";
+        return "Finish auxiliary computation.";
     }
 
 

@@ -455,9 +455,12 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     @Override
     public String getName() {
-        assert(getExecutionContext() != null);
-        return "loop_invariant__"  + "at_line_" + getLoop().getStartPosition().getLine()
-                + "_in_" + pm.getFullName();
+        if(getTarget() != null)
+            return "loop_invariant__"  + "at_line_" + getLoop().getStartPosition().getLine()
+                    + "_in_" + pm.getFullName();
+        else // TODO: We should always know the target, maybe generate earlier?
+            return "loop_invariant__"  + "at_line_" + getLoop().getStartPosition().getLine()
+                    + "_in_" + "unknown_method";
     }
 
 
