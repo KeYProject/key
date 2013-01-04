@@ -42,6 +42,7 @@ import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
+import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -633,8 +634,9 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class);
                 final Services services = (Services)params[0];
+                IObserverFunction inv = services.getJavaInfo().getInv();
                 Term obj = ((SLExpression) params[1]).getTerm();
-                return new SLExpression(TB.inv(services, obj));
+                return new SLExpression(TB.func(inv, TB.getBaseHeap(services), obj));
             }
         });
         
@@ -1387,6 +1389,7 @@ final class JMLTranslator {
                     Object... params)
                     throws SLTranslationException {
                 checkParameters(params, ImmutableList.class, Services.class);
+                @SuppressWarnings("unchecked")
                 ImmutableList<SLExpression> exprList =
                         (ImmutableList<SLExpression>) params[0];
                 Services services = (Services) params[1];
@@ -1405,10 +1408,14 @@ final class JMLTranslator {
                                 final Term fieldTerm = t.sub(2);
                                 t = TB.singleton(services, objTerm, fieldTerm);
                                 singletons = singletons.append(t);
+                            } else if (t.op() instanceof ProgramVariable) {
+                                // this case may happen with local variables
+                                addIgnoreWarning("local variable in assignable clause");
+                                Debug.out("Can't create a locset from local variable "+ t + ".\n" +
+                                        "In this version of KeY, you do not need to put them in assignable clauses.");
                             } else {
-                                throw excManager.createException("Can't create a locset from "
-                                                                 + t + ".");
-    }
+                                throw excManager.createException("Can't create a locset from "+ t + ".");
+                            }
                         } else {
                             throw excManager.createException("Can't create a locset of a singleton: "
                                                              + expr);
@@ -1591,9 +1598,9 @@ final class JMLTranslator {
      * @author bruns
      * @since 1.7.2178
      */
-    @SuppressWarnings("unused")
     private void addIgnoreWarning(String feature) {
         String msg = feature + " is not supported and has been silently ignored.";
+        Debug.out(msg);
         // TODO: wasn't there some collection of non-critical warnings ???
     }
 
@@ -1969,13 +1976,10 @@ final class JMLTranslator {
      */
     private abstract class JMLArithmeticOperationTranslationMethod implements JMLTranslationMethod {
         
-        @SuppressWarnings("unused")
         protected KeYJavaType bigint;
         
-        @SuppressWarnings("unused")
         protected String BIGINT_NOT_ALLOWED = "Operation "+opName()+" may only be used with primitive Java types, not with \\bigint";
 
-        @SuppressWarnings("unused")
         protected boolean isBigint(SLExpression e) {
             assert bigint != null;
             return e.getType().equals(bigint);

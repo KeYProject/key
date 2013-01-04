@@ -31,6 +31,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -259,12 +260,16 @@ public final class ExampleChooser extends JDialog {
 	if(examplesDirString == null) {
 	    examplesDir = lookForExamples();
 	} else {
-	    examplesDir = new File(examplesDirString);
-	}
-	if(examplesDir == null || !examplesDir.isDirectory()) {
-	    return null;
-	}	    
-	
+            examplesDir = new File(examplesDirString);
+        }
+
+        if (examplesDir == null || !examplesDir.isDirectory()) {
+            JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                    "The examples directory cannot be found.", "Error loading examples",
+                    JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
 	//show dialog
 	if(instance == null) {
 	    instance = new ExampleChooser(examplesDir);

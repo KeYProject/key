@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 
+import de.uka.ilkd.key.gui.RecentFileMenu.RecentFileEntry;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
@@ -123,7 +124,7 @@ public class Main {
     /**
      * flag whether recent loaded file should be loaded on startup
      */
-    private static Boolean loadRecentFile=false;
+    private static boolean loadRecentFile=false;
     
     /** Lists all features currently marked as experimental.
      * Unless invoked with command line option --experimental ,
@@ -158,22 +159,24 @@ public class Main {
 
 
         try {
-			cl = createCommandLine();
-			cl.parse(args);
-			evaluateOptions(cl);
-			UserInterface userInterface = createUserInterface();
-			loadCommandLineFile(userInterface);
-		} catch (CommandLineException e) {
-			e.printStackTrace();
-			System.out.println("Exception during parsing of commandline options");
-		}
-        
+            cl = createCommandLine();
+            cl.parse(args);
+            evaluateOptions(cl);
+            UserInterface userInterface = createUserInterface();
+            loadCommandLineFile(userInterface);
+        } catch (CommandLineException e) {
+            if (Debug.ENABLE_DEBUG) {
+                e.printStackTrace();
+            }
+            printUsageAndExit(true, e.getMessage(), -1);
+        }
+
     }
 
     public static void loadCommandLineFile(UserInterface ui) {
         if (Main.getFileNameOnStartUp() != null) {
             ui.loadProblem(new File(Main.getFileNameOnStartUp()));
-            
+
         } else if(Main.getExamplesDir() != null && Main.showExampleChooserIfExamplesDirIsDefined) {
             ui.openExamples();
         }
@@ -188,41 +191,42 @@ public class Main {
     public static String getMainWindowTitle() {
         return "KeY " + KeYResourceManager.getManager().getVersion();
     }
+
     /**
      * Register commandline options with command line object
      * @return commandline object 
      */
     private static CommandLine createCommandLine(){
-    	CommandLine cl= new CommandLine();
-    	cl.setIndentation(3);
-    	cl.addSection("Test Headline");
-    	cl.addText("Usage: ./runProver [options | --justify_rules [justify rule options] filename] [filename(s)]\n\n", false);
-    	cl.addSection("Options for the KeY-Prover");
-    	cl.addOption(HELP, null, "display this text");
-    	cl.addTextPart("--Khelp", "display help for technical/debug parameters\n", true);
-    	cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
-    	cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
-    	cl.addSection("Batchmode options:");
-    	cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
-    	cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
-    	cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
-    	cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");
-    	cl.addOption(PRINT_STATISTICS, "<filename>",  "output nr. of rule applications and time spent on proving");
-    	cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +", i.e., no timeout)");
-    	cl.addSection("Options for justify rules:");
-    	cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument" );
-    	cl.addText("\n", true);
-    	cl.addText("The 'justifyrules' command has a number of options you can set. As default configuration the proofs are not stored to a file.\n", false);
-    	cl.addText("Provide the option name and the value as separate arguments.\n", false);
-    	cl.addText("\n", true);
-    	cl.addOption(JMAX_RULES, "<number>","maximum number of rule application to perform (default: " + LemmataAutoModeOptions.DEFAULT_MAXRULES +")");
-    	cl.addOption(JPATH_OF_RESULT, "<path>", "store proofs to this folder");
-    	cl.addOption(JTIMEOUT, "<timeout>", "the timeout for proof of a taclet in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +")");
-    	cl.addOption(JPRINT, "<terminal/disable>", "send output to terminal or disable output");
-    	cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "save or drop proofs (then stored to path given by "+ JPATH_OF_RESULT + ")");
-    	cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "read axioms from given file");
-    	cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "read definitions from given file");
-    	return cl;
+        CommandLine cl = new CommandLine();
+        cl.setIndentation(3);
+        cl.addSection("Using KeY");
+        cl.addText("Usage: ./runProver [options] [filename]\n\n", false);
+        cl.addSection("Options for the KeY-Prover");
+        cl.addOption(HELP, null, "display this text");
+        cl.addTextPart("--Khelp", "display help for technical/debug parameters\n", true);
+        cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
+        cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
+        cl.addSection("Batchmode options:");
+        cl.addOption(AUTO, null, "start automatic prove procedure after initialisation without GUI");
+        cl.addOption(AUTO_LOADONLY, null, "load files automatically without proving (for testing)");
+        cl.addOption(NO_JMLSPECS, null, "disable parsing JML specifications");
+        cl.addOption(EXAMPLES, "<directory>", "load the directory containing the example files on startup");
+        cl.addOption(PRINT_STATISTICS, "<filename>",  "output nr. of rule applications and time spent on proving");
+        cl.addOption(TIMEOUT, "<timeout>", "timeout for each automatic proof of a problem in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +", i.e., no timeout)");
+        cl.addSection("Options for justify rules:");
+        cl.addOption(JUSTIFY_RULES, "<filename>", "autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument" );
+        cl.addText("\n", true);
+        cl.addText("The '" + JUSTIFY_RULES + "' option has a number of additional parameters you can set.", false);
+        cl.addText("The following options only apply if '" + JUSTIFY_RULES + "' is used.", false);
+        cl.addText("\n", true);
+        cl.addOption(JMAX_RULES, "<number>","maximum number of rule application to perform (default: " + LemmataAutoModeOptions.DEFAULT_MAXRULES +")");
+        cl.addOption(JPATH_OF_RESULT, "<path>", "store proofs to this folder");
+        cl.addOption(JTIMEOUT, "<timeout>", "the timeout for proof of a taclet in ms (default: " + LemmataAutoModeOptions.DEFAULT_TIMEOUT +")");
+        cl.addOption(JPRINT, "<terminal/disable>", "send output to terminal or disable output");
+        cl.addOption(JSAVE_RESULTS_TO_FILE, "<true/false>", "save or drop proofs (then stored to path given by "+ JPATH_OF_RESULT + ")");
+        cl.addOption(JFILE_FOR_AXIOMS, "<filename>", "read axioms from given file");
+        cl.addOption(JFILE_FOR_DEFINITION, "<filename>", "read definitions from given file");
+        return cl;
     }
     /**
      * Evaluate the parsed commandline options
@@ -232,7 +236,7 @@ public class Main {
 
         ProofSettings.DEFAULT_SETTINGS.setProfile(new JavaProfile());
 
-        
+
         if(cl.isSet(AUTO)){
         	uiMode = UiMode.AUTO;
         }
@@ -240,94 +244,83 @@ public class Main {
         	uiMode = UiMode.AUTO;
         	loadOnly = true;
         }
-        
+
         if(cl.isSet(HELP)){
-        	printUsageAndExit(false, null);	
+            // 0 as exit value means: no error
+            printUsageAndExit(true, null, 0);	
         }
-//        if(cl.isSet(DEBUG)){
-//        	 de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = true;
-//        }
-//        if(cl.isSet(NO_DEBUG)){
-//        	de.uka.ilkd.key.util.Debug.ENABLE_DEBUG = false;
-//        }
-//        if(cl.isSet(ASSERTION)){
-//        	de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = true;
-//        }
-//        if(cl.isSet(NO_ASSERTION)){
-//        	de.uka.ilkd.key.util.Debug.ENABLE_ASSERTION = false;
-//        }
+
         if(cl.isSet(NO_JMLSPECS)){
-        	GeneralSettings.disableSpecs = true;
+            GeneralSettings.disableSpecs = true;
         }
-
-
-
 
         if(cl.isSet(PRINT_STATISTICS)){
-        	statisticsFile = cl.getString(PRINT_STATISTICS, null);
-        	if(statisticsFile == null){
-        		printUsageAndExit(true,null);
-        	}
+            statisticsFile = cl.getString(PRINT_STATISTICS, null);
         }
+
         if(cl.isSet(TIMEOUT)){
-           System.out.println("Timeout is set");
-           long timeout = -1;
-           try {
-               timeout = cl.getLong(TIMEOUT, -1);
-               System.out.println("Timeout is: "+ timeout+" ms");
-           } catch (NumberFormatException nfe) {
-               System.out.println("Illegal timeout (must be a number >=-1).");
-               System.exit(-1);
-           } catch (CommandLineException e) {
-        	   System.out.println("Wrong argument for timeout");
-		   }
-           if (timeout < -1) {
-               System.out.println("Illegal timeout (must be a number >=-1).");
-               System.exit(-1);
-           }
-           ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
+            System.out.println("Timeout is set");
+            long timeout = -1;
+            try {
+                timeout = cl.getLong(TIMEOUT, -1);
+                System.out.println("Timeout is: "+ timeout+" ms");
+            } catch (CommandLineException e) {
+                if(Debug.ENABLE_DEBUG) {
+                    e.printStackTrace();
+                }
+                System.out.println(e.getMessage());
+            }
+
+            if (timeout < -1) {
+                printUsageAndExit(false, "Illegal timeout (must be a number >= -1)", -5);
+            }
+
+            ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setTimeout(timeout);
         }
+
         if(cl.isSet(EXAMPLES)){
-        	examplesDir = cl.getString(EXAMPLES, null);
-        	if (examplesDir == null) {
-        		printUsageAndExit(true, null);
-        	}
+            examplesDir = cl.getString(EXAMPLES, null);
         }
-        
+
         if (Debug.ENABLE_DEBUG) {
             System.out.println("Running in debug mode ...");
         } else {
             System.out.println("Running in normal mode ...");
         }
+
         if (Debug.ENABLE_ASSERTION) {
             System.out.println("Using assertions ...");
         } else {
             System.out.println("Not using assertions ...");
         }
-        if(cl.isSet(LAST)){
-        	loadRecentFile=true;
-        }
+
         if(cl.isSet(EXPERIMENTAL)){
-        	System.out.println("Running in experimental mode ...");
+            System.out.println("Running in experimental mode ...");
         } else {
             deactivateExperimentalFeatures();
         }
-     	List<String> fileArguments = cl.getArguments();
 
-        if(cl.isSet(JUSTIFY_RULES))
-        {evaluateLemmataOptions(cl);}
-        
+        if(cl.isSet(LAST)){
+            loadRecentFile=true;
+        }
+
+        List<String> fileArguments = cl.getArguments();
+
+        if (cl.isSet(JUSTIFY_RULES)) {
+            evaluateLemmataOptions(cl);
+        }
+
         //arguments not assigned to a command line option may be files
 
-      	if(!fileArguments.isEmpty()){
-      		if(new File(fileArguments.get(0)).exists()){
-      			//System.out.println("Loading: "+fileArguments.get(0));
-      			fileNameOnStartUp=fileArguments.get(0);    	
-      		}else{
-      			printUsageAndExit(true, null);
-      		}
-      	}
-        	
+        if(!fileArguments.isEmpty()){
+            String fileArg = fileArguments.get(0);
+            if(new File(fileArg).exists()) {
+                fileNameOnStartUp = fileArg;
+            } else {
+                printUsageAndExit(false, "File not found: " + fileArg, -4);
+            }
+        }
+
     }
     
     /** Deactivate experimental features. */
@@ -349,28 +342,33 @@ public class Main {
     private static UserInterface createUserInterface() {
 	UserInterface ui;
 
-	if (uiMode == UiMode.AUTO) {
-	    BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
+        if (uiMode == UiMode.AUTO) {
+            BatchMode batch = new BatchMode(fileNameOnStartUp, loadOnly);
 
-	    ui = new ConsoleUserInterface(batch, VERBOSE_UI);
-	} else {
-	    GuiUtilities.invokeAndWait(new Runnable() {
-		public void run() {
-		    MainWindow key = MainWindow.getInstance();
-		    key.setVisible(true);
-		}
-	    });
-	    if(loadRecentFile){
-	    	fileNameOnStartUp = MainWindow.getInstance().getRecentFiles().getMostRecent().getAbsolutePath(); 
-        	
+            ui = new ConsoleUserInterface(batch, VERBOSE_UI);
+        } else {
+            GuiUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    MainWindow key = MainWindow.getInstance();
+                    key.setVisible(true);
+                }
+            });
 
-	    }    
-	    ui = MainWindow.getInstance().getUserInterface();
+            if (loadRecentFile) {
+                RecentFileEntry mostRecent = 
+                        MainWindow.getInstance().getRecentFiles().getMostRecent();
+
+                if (mostRecent != null) {
+                    fileNameOnStartUp = mostRecent.getAbsolutePath();
+                }
+            }
+
+            ui = MainWindow.getInstance().getUserInterface();
 	    if (fileNameOnStartUp != null)
 	        System.out.println("Loading: "+fileNameOnStartUp);
-	}
+        }
 
-	return ui;
+        return ui;
 
     }
 
@@ -381,38 +379,28 @@ public class Main {
 
             opt = new LemmataAutoModeOptions(options, INTERNAL_VERSION,
                     PathConfig.getKeyConfigDir());
-
-        } catch(Exception e) {
-            System.out.println("An error occured while reading the lemma parameters:");
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-            System.exit(1);
-            return;
-            
-        }
-
-
-        try {
             LemmataHandler handler = new LemmataHandler(opt,
                     ProofSettings.DEFAULT_SETTINGS.getProfile());
             handler.start();
-        }
-        catch(ProofInputException exception){
-            System.out.println("Could not create dummy file: " + exception);
-        }
-        catch(IOException exception){
-            System.out.println("Could not create dummy file: " + exception);
+
+        } catch(Exception e) {
+            if(Debug.ENABLE_DEBUG) {
+                e.printStackTrace();
+            }
+            printUsageAndExit(false, e.getMessage(), -2);
         }
 
     }
 
-    private static void printUsageAndExit(boolean exitWithError, String offending) {
-        final PrintStream ps = System.out;
-        if (exitWithError) 
-            ps.println("File not found or unrecognized option" +
-                    (offending != null? ": "+offending: ".")+"\n");
-          cl.printUsage(ps);
-          System.exit(exitWithError? -1: 0);
+    private static void printUsageAndExit(boolean printUsage, String offending, int exitValue) {
+        final PrintStream ps = System.err;
+        if(offending != null) {
+            ps.println(offending);
+        }
+        if (printUsage) {
+            cl.printUsage(ps);
+        }
+        System.exit(exitValue);
     }
 
     public static String getExamplesDir() {
