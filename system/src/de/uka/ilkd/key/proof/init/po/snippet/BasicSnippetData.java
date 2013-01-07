@@ -162,6 +162,7 @@ class BasicSnippetData {
         contractContents.put(Key.TARGET_BLOCK, contract.getBlock());
         contractContents.put(Key.BLOCK_VARS, contract.getVariables());
         contractContents.put(Key.PRECONDITION, contract.getPre(services));
+        contractContents.put(Key.POSTCONDITION, contract.getPost(services));
         contractContents.put(Key.MODIFIES, contract.getMod(services));
         contractContents.put(Key.MODALITY, contract.getModality());
         contractContents.put(Key.RESPECTS, contract.getRespects());
