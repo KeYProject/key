@@ -30,7 +30,8 @@ import java.util.Properties;
  *
  * @author christoph
  */
-public class BlockExecutionPO extends AbstractOperationPO implements ContractPO {
+public class BlockExecutionPO extends AbstractOperationPO
+        implements ContractPO, InfFlowRelatedPO {
 
     private final BlockContract contract;
     private final InformationFlowContract generatedIFContract;

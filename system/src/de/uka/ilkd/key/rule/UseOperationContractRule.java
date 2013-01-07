@@ -48,6 +48,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
@@ -768,13 +769,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         postGoal.addFormula(new SequentFormula(postAssumption), 
         	            true, 
         	            false);
-        if (contract.hasModifiesClause() &&
-            ((po instanceof InfFlowContractPO &&
-              ((InfFlowContractPO) po).getContract().getRespects() != null) ||
-             (po instanceof SymbolicExecutionPO &&
-              ((SymbolicExecutionPO) po).getContract().getRespects() != null) ||
-             (po instanceof BlockExecutionPO &&
-              ((BlockExecutionPO) po).getContract().getRespects() != null)))  {
+        if (goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY))  {
             // prepare information flow analysis
             assert anonUpdateDatas.size() == 1 : "information flow extension " +
                                                  "is at the moment not " +

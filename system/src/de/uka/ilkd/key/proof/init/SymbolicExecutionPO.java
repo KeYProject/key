@@ -27,7 +27,8 @@ import java.util.Properties;
  *
  * @author christoph
  */
-public class SymbolicExecutionPO extends AbstractOperationPO implements ContractPO {
+public class SymbolicExecutionPO extends AbstractOperationPO
+        implements ContractPO, InfFlowRelatedPO {
 
     private final InformationFlowContract contract;
     private final ProofObligationVars symbExecVars;

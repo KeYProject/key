@@ -16,8 +16,10 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
+import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
@@ -198,15 +200,12 @@ public class BlockContractRule implements BuiltInRule {
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate = updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps, /*anonymisationLocalVariables, */modifiesClauses);
 
-        final ContractPO po =
-                services.getSpecificationRepository().getPOForProof(goal.proof());
-        
+       
         Term infFlowAssumptions = TB.tt();
         Taclet informationFlowContractApp = null;
         Goal infFlowGoal = null;
-        if ((po instanceof InfFlowContractPO ||
-             po instanceof SymbolicExecutionPO ||
-             po instanceof BlockExecutionPO) &&
+        if (goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) &&
             contract.hasModifiesClause() &&
             contract.getRespects() != null) {
             // prepare information flow analysis
@@ -216,10 +215,9 @@ public class BlockContractRule implements BuiltInRule {
                                                     "with the non-base-heap " +
                                                     "setting";
 
+            final Terms vars = contract.getVariablesAsTerms();
             final LocationVariable baseheap = services.getTypeConverter().getHeapLDT().getHeap();
             final Term heapAtPre = TB.var(variables.remembranceHeaps.get(baseheap));
-//            final Map.Entry<LocationVariable, Function> anonHeap =
-//                    anonymisationHeaps.entrySet().iterator().next();
             final Name heapAtPostName =
                     new Name(TB.newName(services, "heapAfterBlock"));
             final Term heapAtPost =
@@ -234,7 +232,6 @@ public class BlockContractRule implements BuiltInRule {
             ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
             ifContractBuilder.setHeapAtPre(heapAtPre);
             ifContractBuilder.setHeapAtPost(heapAtPost);
-            final Terms vars = contract.getVariablesAsTerms();
             ifContractBuilder.setSelf(vars.self);
             ifContractBuilder.setLocalIns(MiscTools.toTermList(localInVariables));
             ifContractBuilder.setLocalOuts(MiscTools.toTermList(localOutVariables));
@@ -821,6 +818,19 @@ public class BlockContractRule implements BuiltInRule {
                 ),
                 occurrence
             );
+            final boolean oldInfFlowCheckInfoValue =
+                    goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
+                    goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
+            StrategyInfoUndoMethod undo =
+                    new StrategyInfoUndoMethod() {
+
+                        @Override
+                        public void undo(
+                                de.uka.ilkd.key.util.properties.Properties strategyInfos) {
+                            strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, oldInfFlowCheckInfoValue);
+                        }
+                    };
+            goal.addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, false, undo);
         }
 
         private Statement wrapInMethodFrameIfContextIsAvailable(final StatementBlock block)
