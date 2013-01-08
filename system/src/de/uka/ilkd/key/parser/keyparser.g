@@ -782,6 +782,11 @@ options {
                 } catch(Throwable e) {
                     semanticError("Getting array length failed");
                 }
+            } else if(attributeName.equals("<inv>")) {
+                // The invariant observer "<inv>" is implicit and 
+                // not part of the class declaration
+                // A special case is needed, hence.
+                result = javaInfo.getInvProgramVar();
             } else {
                 if (inSchemaMode()) {
                     semanticError("Either undeclared schema variable '" + 
@@ -797,13 +802,10 @@ options {
                 if(!isDeclParser()) {			      	
                     final ImmutableList<ProgramVariable> vars = 	
                     javaInfo.getAllAttributes(attributeName, prefixKJT);
-                    
+
                     if (vars.size() == 0) {
                         semanticError("There is no attribute '" + attributeName + 
-                            "' declared in type '" + prefixSort + "'.\n"+
-                            "If you wanted to use observer symbols, "+
-                            "please make sure to use raw (i.e., not pretty-printed) syntax, "+
-                            "e.g., 'java.lang.Object::<inv>(heap,t)'");
+                            "' declared in type '" + prefixSort + "'");
                     }                    
 
                     if (LogicPrinter.printInShortForm(attributeName, 
@@ -1056,7 +1058,6 @@ options {
      */
     private Operator lookupVarfuncId(String varfunc_name, Term[] args) 
         throws NotDeclException, SemanticException {
-        
 
         // case 1: variable
         Operator v = (Operator) variables().lookup(new Name(varfunc_name));
@@ -3354,8 +3355,8 @@ funcpredvarterm returns [Term a = null]
 	                        if(i < op.arity() && !op.bindVarsAt(i)) {
 	                            for(QuantifiableVariable qv : args[i].freeVars()) {
 	                                if(boundVars.contains(qv)) {
-	                                    semanticError("Building a function term with bound variables failed: "
-	                                                   + "Variable " + qv + " must not occur free in subterm " + i);
+	                                    semanticError("Building function term "+op+" with bound variables failed: "
+	                                                   + "Variable " + qv + " must not occur free in subterm " + args[i]);
 	                                } 
 	                            }	                            
 	                        }

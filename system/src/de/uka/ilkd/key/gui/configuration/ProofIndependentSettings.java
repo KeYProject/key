@@ -14,13 +14,20 @@ import de.uka.ilkd.key.gui.smt.ProofIndependentSMTSettings;
 
 
 public class ProofIndependentSettings implements SettingsListener {
-        public static final ProofIndependentSettings DEFAULT_INSTANCE = new ProofIndependentSettings(PathConfig.getProofIndependentSettings());
-        private final ProofIndependentSMTSettings smtSettings = ProofIndependentSMTSettings.getDefaultSettingsData();
-        private final LemmaGeneratorSettings lemmaGeneratorSettings = new LemmaGeneratorSettings();
+        public static final ProofIndependentSettings DEFAULT_INSTANCE = 
+        		new ProofIndependentSettings(PathConfig.getProofIndependentSettings());
+        private final ProofIndependentSMTSettings smtSettings = 
+        		ProofIndependentSMTSettings.getDefaultSettingsData();
+        private final LemmaGeneratorSettings lemmaGeneratorSettings = 
+        		new LemmaGeneratorSettings();
+        private final GeneralSettings generalSettings= new GeneralSettings();
+        private final ViewSettings viewSettings = new ViewSettings();
         private final String filename;
 
         private final Settings[] settingsSet = { smtSettings,
-                        lemmaGeneratorSettings };
+                        lemmaGeneratorSettings,
+                        generalSettings,
+                        viewSettings};
 
         
 
@@ -40,9 +47,7 @@ public class ProofIndependentSettings implements SettingsListener {
         
    
         
-        public LemmaGeneratorSettings getLemmaGeneratorSettings() {
-                return lemmaGeneratorSettings;
-        }
+
         
         public void loadSettings(){
                 try {
@@ -89,10 +94,23 @@ public class ProofIndependentSettings implements SettingsListener {
             
         }
       
+        public GeneralSettings getGeneralSettings() {
+            //ensureInitialized();
+            return generalSettings;
+        }
 
+        public ViewSettings getViewSettings() {
+            //ensureInitialized();
+            return viewSettings;
+        }
+        public LemmaGeneratorSettings getLemmaGeneratorSettings() {
+            return lemmaGeneratorSettings;
+        }
         
         public ProofIndependentSMTSettings getSMTSettings() {
                return smtSettings;
         }
+
+        
 
 }

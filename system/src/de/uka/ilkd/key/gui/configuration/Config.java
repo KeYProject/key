@@ -40,7 +40,8 @@ public class Config {
     private static final int[] sizes=new int[]{10,12,14,17,20,24};
 
     /** The index of the current size */
-    private int sizeIndex = ProofSettings.DEFAULT_SETTINGS.getViewSettings().sizeIndex();
+//    private int sizeIndex = ProofSettings.DEFAULT_SETTINGS.getViewSettings().sizeIndex();
+    private int sizeIndex = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().sizeIndex();
 
     /** cached ConfigChange event */
     private ConfigChangeEvent configChangeEvent = 
@@ -56,7 +57,8 @@ public class Config {
     public void larger() {
 	if (!isMaximumSize()) {
 	    sizeIndex++;
-	    ProofSettings.DEFAULT_SETTINGS.getViewSettings().setFontIndex(sizeIndex);
+	    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setFontIndex(sizeIndex);
+//	    ProofSettings.DEFAULT_SETTINGS.getViewSettings().setFontIndex(sizeIndex);
 	    setDefaultFonts();
 	    fireConfigChange(); 
 	}
@@ -65,7 +67,8 @@ public class Config {
     public void smaller() {
 	if (!isMinimumSize()) {
 	    sizeIndex--;
-	    ProofSettings.DEFAULT_SETTINGS.getViewSettings().setFontIndex(sizeIndex);
+	    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setFontIndex(sizeIndex);
+//	    ProofSettings.DEFAULT_SETTINGS.getViewSettings().setFontIndex(sizeIndex);
 	    setDefaultFonts(); 
 	    fireConfigChange();
 	}

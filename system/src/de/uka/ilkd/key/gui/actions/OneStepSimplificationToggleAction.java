@@ -9,6 +9,7 @@ import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 
@@ -32,15 +33,17 @@ public class OneStepSimplificationToggleAction extends MainWindowAction {
                 MainWindow.TOOLBAR_ICON_SIZE));
 
         final boolean oneStepSimplificationOn = 
-            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().oneStepSimplification();
+        		ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+//            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().oneStepSimplification();
         setSelected(oneStepSimplificationOn);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
 	boolean b = ((AbstractButton) e.getSource()).isSelected();
-	ProofSettings.DEFAULT_SETTINGS.getGeneralSettings()
-	        .setOneStepSimplification(b);
+	ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(b);
+//	ProofSettings.DEFAULT_SETTINGS.getGeneralSettings()
+//	        .setOneStepSimplification(b);
 	OneStepSimplifier.INSTANCE.refresh(getMediator().getSelectedProof());
     }
 

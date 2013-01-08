@@ -479,6 +479,7 @@ public final class Goal  {
      * clones the goal (with copy of tacletindex and ruleAppIndex)
      * @return Object the clone
      */
+    @SuppressWarnings("unchecked")
     public Object clone() {	
 	Goal clone = new Goal ( node,
 	                        ruleAppIndex.copy (),
