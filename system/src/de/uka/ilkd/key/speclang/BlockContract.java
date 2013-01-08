@@ -92,6 +92,12 @@ public interface BlockContract extends SpecificationElement {
 
 
     /**
+     * Returns the original postcondition of the contract.
+     */
+    Term getPost(Services services);
+
+
+    /**
      * Returns the original modifies clause of the contract.
      */
     Term getMod(Services services);

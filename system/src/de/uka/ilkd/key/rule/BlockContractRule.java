@@ -16,8 +16,10 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
+import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.init.BlockExecutionPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO;
@@ -32,6 +34,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Terms;
+import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -151,6 +154,104 @@ public class BlockContractRule implements BuiltInRule {
         return !contracts.isEmpty();
     }
 
+
+    private InfFlowValidityData buildInfFlowValidityGoal(final Goal goal,
+                                                     final BlockContract contract,
+                                                     final Map<LocationVariable, Function> anonymisationHeaps,
+                                                     final Services services,
+                                                     final Variables variables,
+                                                     final List<LocationVariable> heaps,
+                                                     final ImmutableSet<ProgramVariable> localInVariables,
+                                                     final ImmutableSet<ProgramVariable> localOutVariables,
+                                                     final BlockContractBuiltInRuleApp application,
+                                                     final Instantiation instantiation) {
+        if (goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) &&
+            contract.hasModifiesClause() &&
+            contract.getRespects() != null) {
+            // prepare information flow analysis
+            assert anonymisationHeaps.size() == 1 : "information flow " +
+                                                    "extension is at the " +
+                                                    "moment not compatible " +
+                                                    "with the non-base-heap " +
+                                                    "setting";
+
+            final Terms vars = contract.getVariablesAsTerms();
+            final LocationVariable baseheap = services.getTypeConverter().getHeapLDT().getHeap();
+            final Term heapAtPre = TB.var(variables.remembranceHeaps.get(baseheap));
+            final Name heapAtPostName =
+                    new Name(TB.newName(services, "heapAfterBlock"));
+            final Term heapAtPost =
+                    TB.func(new Function(heapAtPostName, heapAtPre.sort(), true));
+
+            final Term heapAtPostEq =
+                    TB.equals(heapAtPost, TB.var(heaps.get(0))); // TB.var(heaps.get(0)) will be made anonymous by setUpUsageGoal
+
+            final InfFlowBlockContractTacletBuilder ifContractBuilder =
+                    new InfFlowBlockContractTacletBuilder(services);
+            ifContractBuilder.setContract(contract);
+            ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
+            ifContractBuilder.setHeapAtPre(heapAtPre);
+            ifContractBuilder.setHeapAtPost(heapAtPost);
+            ifContractBuilder.setSelf(vars.self);
+            ifContractBuilder.setLocalIns(MiscTools.toTermList(localInVariables));
+            ifContractBuilder.setLocalOuts(MiscTools.toTermList(localOutVariables));
+            ifContractBuilder.setResult(vars.result);
+            ifContractBuilder.setException(vars.exception);
+
+            // generate information flow contract application predicate
+            // and associated taclet
+            final Term contractApplTerm =
+                    ifContractBuilder.buildContractApplPredTerm();
+            Taclet informationFlowContractApp =
+                    ifContractBuilder.buildContractApplTaclet();
+
+            // set infFlowAssumptions
+            Term infFlowAssumptions = TB.and(heapAtPostEq, contractApplTerm);
+
+            // create information flow validity goal
+
+            // generate proof obligation variables
+            final ProofObligationVars instantiationVars =
+                    new ProofObligationVars(vars.self,
+                                            MiscTools.toTermList(localInVariables),
+                                            heapAtPre,
+                                            MiscTools.toTermList(localOutVariables),
+                                            vars.result, vars.exception,
+                                            heapAtPost, services);
+            final IFProofObligationVars ifVars =
+                    new IFProofObligationVars(instantiationVars, services);
+            application.update(ifVars, instantiation.context);
+
+            // create proof obligation
+            InfFlowPOSnippetFactory infFlowFactory =
+                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
+                                                   ifVars.c2, services);
+
+            Sequent seq = buildBodyPreservesSequent(infFlowFactory);
+            Goal infFlowGoal = goal.getCleanGoal(seq);
+            infFlowGoal.setBranchLabel("Information Flow Validity");
+
+            // create and add split-post and remove-post taclets
+            final Term post =
+                    infFlowFactory.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+            final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
+            final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
+            for (final Taclet t : splitPostTaclets) {
+                infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            }
+            final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
+            final ArrayList<Taclet> removePostTaclets = removePostTB.generateTaclets(post);
+            for (final Taclet t : removePostTaclets) {
+                infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            }
+
+            return new InfFlowValidityData(infFlowAssumptions, informationFlowContractApp, infFlowGoal);
+        } else {
+            return new InfFlowValidityData();
+        }
+    }
+
     private boolean occursNotAtTopLevelInSuccedent(final PosInOccurrence occurrence)
     {
         return occurrence == null || !occurrence.isTopLevel() || occurrence.isInAntec();
@@ -198,110 +299,28 @@ public class BlockContractRule implements BuiltInRule {
         final Term remembranceUpdate = updatesBuilder.buildRemembranceUpdate(heaps);
         final Term anonymisationUpdate = updatesBuilder.buildAnonymisationUpdate(anonymisationHeaps, /*anonymisationLocalVariables, */modifiesClauses);
 
-        final ContractPO po =
-                services.getSpecificationRepository().getPOForProof(goal.proof());
-        
-        Term infFlowAssumptions = TB.tt();
-        Taclet informationFlowContractApp = null;
-        Goal infFlowGoal = null;
-        if ((po instanceof InfFlowContractPO ||
-             po instanceof SymbolicExecutionPO ||
-             po instanceof BlockExecutionPO) &&
-            contract.hasModifiesClause() &&
-            contract.getRespects() != null) {
-            // prepare information flow analysis
-            assert anonymisationHeaps.size() == 1 : "information flow " +
-                                                    "extension is at the " +
-                                                    "moment not compatible " +
-                                                    "with the non-base-heap " +
-                                                    "setting";
 
-            final LocationVariable baseheap = services.getTypeConverter().getHeapLDT().getHeap();
-            final Term heapAtPre = TB.var(variables.remembranceHeaps.get(baseheap));
-//            final Map.Entry<LocationVariable, Function> anonHeap =
-//                    anonymisationHeaps.entrySet().iterator().next();
-            final Name heapAtPostName =
-                    new Name(TB.newName(services, "heapAfterBlock"));
-            final Term heapAtPost =
-                    TB.func(new Function(heapAtPostName, heapAtPre.sort(), true));
+        InfFlowValidityData infFlowValitidyData =
+                buildInfFlowValidityGoal(goal, contract, anonymisationHeaps, services, variables, heaps, localInVariables, localOutVariables, application, instantiation);
 
-            final Term heapAtPostEq =
-                    TB.equals(heapAtPost, TB.var(heaps.get(0))); // TB.var(heaps.get(0)) will be made anonymous by setUpUsageGoal
-
-            final InfFlowBlockContractTacletBuilder ifContractBuilder =
-                    new InfFlowBlockContractTacletBuilder(services);
-            ifContractBuilder.setContract(contract);
-            ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
-            ifContractBuilder.setHeapAtPre(heapAtPre);
-            ifContractBuilder.setHeapAtPost(heapAtPost);
-            final Terms vars = contract.getVariablesAsTerms();
-            ifContractBuilder.setSelf(vars.self);
-            ifContractBuilder.setLocalIns(MiscTools.toTermList(localInVariables));
-            ifContractBuilder.setLocalOuts(MiscTools.toTermList(localOutVariables));
-            ifContractBuilder.setResult(vars.result);
-            ifContractBuilder.setException(vars.exception);
-
-            // generate information flow contract application predicate
-            // and associated taclet
-            final Term contractApplTerm =
-                    ifContractBuilder.buildContractApplPredTerm();
-            informationFlowContractApp =
-                    ifContractBuilder.buildContractApplTaclet();
-
-            // set infFlowAssumptions
-            infFlowAssumptions = TB.and(heapAtPostEq, contractApplTerm);
-
-            // create information flow validity goal
-
-            // generate proof obligation variables
-            final ProofObligationVars instantiationVars =
-                    new ProofObligationVars(vars.self,
-                                            MiscTools.toTermList(localInVariables),
-                                            heapAtPre,
-                                            MiscTools.toTermList(localOutVariables),
-                                            vars.result, vars.exception,
-                                            heapAtPost, services);
-            final IFProofObligationVars ifVars =
-                    new IFProofObligationVars(instantiationVars, services);
-            application.update(ifVars, instantiation.context);
-
-            // create proof obligation
-            InfFlowPOSnippetFactory infFlowFactory =
-                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
-                                                   ifVars.c2, services);
-
-            Sequent seq = buildBodyPreservesSequent(infFlowFactory);
-            infFlowGoal = goal.getCleanGoal(seq);
-            infFlowGoal.setBranchLabel("Information Flow Validity");
-
-            // create and add split-post and remove-post taclets
-            final Term post =
-                    infFlowFactory.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-            final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
-            final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
-            for (final Taclet t : splitPostTaclets) {
-                infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-            }
-            final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
-            final ArrayList<Taclet> removePostTaclets = removePostTB.generateTaclets(post);
-            for (final Taclet t : removePostTaclets) {
-                infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-            }
-        }
-
-        ImmutableList<Goal> result = goal.split(3);
-        if (infFlowGoal != null) {
-            // add information flow validity branch
-            result = result.append(infFlowGoal);
-        }
-        
         final GoalsConfigurator configurator = new GoalsConfigurator(instantiation, contract.getLabels(), variables, application.posInOccurrence(), services);
-        configurator.setUpValidityGoal(
-            result.tail().tail().head(),
-            new Term[] {contextUpdate, remembranceUpdate},
-            new Term[] {precondition, wellFormedHeapsCondition, reachableInCondition},
-            new Term[] {postcondition, frameCondition/*, atMostOneFlagSetCondition*/}
-        );
+
+        ImmutableList<Goal> result;
+        if (infFlowValitidyData.hasInfFlowGoal()) {
+            result = goal.split(2);
+            // information flow validity branch has already been set up,
+            // it has to be added only
+            result = result.append(infFlowValitidyData.goal);
+        } else {
+            result = goal.split(3);
+
+            configurator.setUpValidityGoal(
+                result.tail().tail().head(),
+                new Term[] {contextUpdate, remembranceUpdate},
+                new Term[] {precondition, wellFormedHeapsCondition, reachableInCondition},
+                new Term[] {postcondition, frameCondition/*, atMostOneFlagSetCondition*/}
+            );
+        }
         configurator.setUpPreconditionGoal(
             result.tail().head(),
             contextUpdate,
@@ -310,8 +329,8 @@ public class BlockContractRule implements BuiltInRule {
         configurator.setUpUsageGoal(
             result.head(),
             new Term[] {contextUpdate, remembranceUpdate, anonymisationUpdate},
-            new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition, infFlowAssumptions},
-            informationFlowContractApp
+            new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition, atMostOneFlagSetCondition, infFlowValitidyData.assumptions},
+            infFlowValitidyData.taclet
         );
         return result;
     }
@@ -823,6 +842,19 @@ public class BlockContractRule implements BuiltInRule {
                 ),
                 occurrence
             );
+            final boolean oldInfFlowCheckInfoValue =
+                    goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
+                    goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY);
+            StrategyInfoUndoMethod undo =
+                    new StrategyInfoUndoMethod() {
+
+                        @Override
+                        public void undo(
+                                de.uka.ilkd.key.util.properties.Properties strategyInfos) {
+                            strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, oldInfFlowCheckInfoValue);
+                        }
+                    };
+            goal.addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, false, undo);
         }
 
         private Statement wrapInMethodFrameIfContextIsAvailable(final StatementBlock block)
@@ -1009,4 +1041,29 @@ public class BlockContractRule implements BuiltInRule {
 
     }
 
+
+    private class InfFlowValidityData {
+        final Term assumptions;
+        final Taclet taclet;
+        final Goal goal;
+
+
+        public InfFlowValidityData() {
+            assumptions = TB.tt();
+            taclet = null;
+            goal = null;
+        }
+
+        public InfFlowValidityData(final Term assumptions,
+                               final Taclet taclet,
+                               final Goal goal) {
+            this.assumptions = assumptions;
+            this.taclet = taclet;
+            this.goal = goal;
+        }
+
+        boolean hasInfFlowGoal() {
+            return goal != null;
+        }
+    }
 }

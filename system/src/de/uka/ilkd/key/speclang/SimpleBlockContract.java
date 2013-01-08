@@ -264,6 +264,12 @@ public final class SimpleBlockContract implements BlockContract {
 
 
     @Override
+    public Term getPost(Services services) {
+        return postconditions.get(services.getTypeConverter().getHeapLDT().getHeap());
+    }
+
+
+    @Override
     public Term getMod(Services services) {
         return modifiesClauses.get(services.getTypeConverter().getHeapLDT().getHeap());
     }

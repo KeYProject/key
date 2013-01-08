@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import java.util.Collection;
 
 
 /**
@@ -178,7 +177,9 @@ public class ProofObligationVars {
                                Term exception,
                                Term heapAtPost,
                                Services services) {
-        this(self, null, localIns, localOuts, result, null, exception, null,
+        this(self, null, localIns, localOuts, result,
+             buildAtPostVar(result, services), exception,
+             buildAtPostVar(exception, services),
              heap, null, heapAtPost, null, "", services);
     }
 
@@ -402,6 +403,23 @@ public class ProofObligationVars {
                 TB.var(TB.resultVar(services, "resultAtPost" + postfix, pm, true));
         register(resultAtPostVar.op(ProgramVariable.class), services);
         return resultAtPostVar;
+    }
+
+
+    private static Term buildAtPostVar(Term varTerm,
+                                       Services services) {
+        if (varTerm == null) {
+            return null;
+        }
+        assert varTerm.op() instanceof LocationVariable;
+
+        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+        String name = TB.newName(services, varTerm.toString() + "AtPost");
+        LocationVariable varAtPostVar =
+                new LocationVariable(new ProgramElementName(name), resultType);
+        register(varAtPostVar, services);
+        Term varAtPost = TB.var(varAtPostVar);
+        return varAtPost;
     }
 
 

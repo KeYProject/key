@@ -28,9 +28,11 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
+import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -255,7 +257,7 @@ public abstract class AbstractPO implements IPersistablePO {
         createProofHeader(javaModel.getModelDir(),
                           javaModel.getClassPath(),
                           javaModel.getBootClassPath());
-        return new Proof(proofName,
+        Proof p = new Proof(proofName,
                          poTerm,
                          header,
                          initConfig.createTacletIndex(),
@@ -264,6 +266,24 @@ public abstract class AbstractPO implements IPersistablePO {
                          initConfig.getSettings() != null
                          ? initConfig.getSettings()
                          : new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
+        assert p.openGoals().size() == 1 : "expected one first open goal";
+        if (this instanceof InfFlowRelatedPO) {
+            InfFlowRelatedPO po = (InfFlowRelatedPO) this;
+            if (po.getContract().hasModifiesClause() &&
+                po.getContract().getRespects() != null) {
+                StrategyInfoUndoMethod undo =
+                        new StrategyInfoUndoMethod() {
+
+                            @Override
+                            public void undo(
+                                    de.uka.ilkd.key.util.properties.Properties strategyInfos) {
+                                strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true);
+                            }
+                        };
+                p.openGoals().head().addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true, undo);
+            }
+        }
+        return p;
     }
 
 

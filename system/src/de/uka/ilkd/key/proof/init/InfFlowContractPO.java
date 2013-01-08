@@ -35,7 +35,8 @@ import java.util.Properties;
  *
  * @author christoph
  */
-public class InfFlowContractPO extends AbstractOperationPO implements ContractPO {
+public class InfFlowContractPO extends AbstractOperationPO
+        implements ContractPO, InfFlowRelatedPO {
 
     private final InformationFlowContract contract;
 
