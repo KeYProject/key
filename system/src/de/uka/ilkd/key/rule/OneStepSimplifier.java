@@ -21,6 +21,7 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -32,6 +33,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TacletFilter;
 import de.uka.ilkd.key.proof.TacletIndex;
 import de.uka.ilkd.key.util.LRUCache;
+import de.uka.ilkd.key.util.Pair;
 
 
 public final class OneStepSimplifier implements BuiltInRule, 	
@@ -221,6 +223,7 @@ public final class OneStepSimplifier implements BuiltInRule,
 	    RewriteTaclet taclet = (RewriteTaclet) app.rule();		
 	    SequentFormula result = taclet.getRewriteResult(services, app);
 	    return result;
+	    // TODO Idea: return new Pair<TacletApp, SequentFormula>(null, null);
 	}
 	return null;
     }
@@ -444,9 +447,12 @@ public final class OneStepSimplifier implements BuiltInRule,
     //-------------------------------------------------------------------------
     
     public void refresh(Proof proof) {
-	active = ProofSettings.DEFAULT_SETTINGS
-		              .getGeneralSettings()
-		              .oneStepSimplification();
+    active = ProofIndependentSettings.DEFAULT_INSTANCE
+    		.getGeneralSettings()
+    		.oneStepSimplification();
+//	active = ProofSettings.DEFAULT_SETTINGS
+//		              .getGeneralSettings()
+//		              .oneStepSimplification();
 	if(active && proof != null && !proof.closed()) {
 	    initIndices(proof);
 	} else {

@@ -68,7 +68,7 @@ public class LoopInvariantRuleCompletion implements
 
         if (inv != null && forced) {
             // overwrite old loop invariant in spec repo
-            services.getSpecificationRepository().setLoopInvariant(inv);
+            services.getSpecificationRepository().addLoopInvariant(inv);
         }
 
         return inv == null ? null : loopApp.setLoopInvariant(inv);

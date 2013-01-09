@@ -122,7 +122,7 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
                 = services.getSpecificationRepository().getLoopInvariant(x);
             if (li != null) {
                 li = li.setLoop((While)outerBlockStatements[initSize]);
-                services.getSpecificationRepository().setLoopInvariant(li);
+                services.getSpecificationRepository().addLoopInvariant(li);
             }
 
             addChild(outerBlock);

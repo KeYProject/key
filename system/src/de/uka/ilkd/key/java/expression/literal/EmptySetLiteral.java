@@ -26,16 +26,6 @@ public class EmptySetLiteral extends Literal {
 
     public static final EmptySetLiteral LOCSET = new EmptySetLiteral();
     
-    private final boolean locSet;
-    
-    private EmptySetLiteral() {
-    	locSet = true;
-    }   
-    
-    private EmptySetLiteral(boolean isLocSetType){
-    	locSet = isLocSetType;
-    }
-    
     
     @Override
     public boolean equalsModRenaming(SourceElement o, 

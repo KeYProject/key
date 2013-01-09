@@ -66,11 +66,14 @@ public class ProofSettings {
     /** profile */
     private Profile profile;
 
+//    private final static int STRATEGY_SETTINGS = 0;
+//    private final static int GENERAL_SETTINGS  = 1;
+//    private final static int CHOICE_SETTINGS    = 2;
+//    private final static int SMT_SETTINGS      = 3;
+//    private final static int VIEW_SETTINGS      = 4;
     private final static int STRATEGY_SETTINGS = 0;
-    private final static int GENERAL_SETTINGS  = 1;
-    private final static int CHOICE_SETTINGS    = 2;
-    private final static int SMT_SETTINGS      = 3;
-    private final static int VIEW_SETTINGS      = 4;
+    private final static int CHOICE_SETTINGS    = 1;
+    private final static int SMT_SETTINGS      = 2;
 
     
     /** create a proof settings object. 
@@ -80,10 +83,10 @@ public class ProofSettings {
     private ProofSettings() {       	
 	settings = new Settings[] {
             new StrategySettings(),
-            new GeneralSettings(),
+          //  new GeneralSettings(),
 	    new ChoiceSettings(),
 	    ProofDependentSMTSettings.getDefaultSettingsData(),
-	    new ViewSettings()
+	 //   new ViewSettings()
 
 	};
 	
@@ -268,17 +271,17 @@ public class ProofSettings {
     }
     
 
-
-
-    public GeneralSettings getGeneralSettings() {
-            ensureInitialized();
-            return (GeneralSettings) settings[GENERAL_SETTINGS];
-    }
-
-    public ViewSettings getViewSettings() {
-            ensureInitialized();
-            return (ViewSettings) settings[VIEW_SETTINGS];
-    }
+//
+//
+//    public GeneralSettings getGeneralSettings() {
+//            ensureInitialized();
+//            return (GeneralSettings) settings[GENERAL_SETTINGS];
+//    }
+//
+//    public ViewSettings getViewSettings() {
+//            ensureInitialized();
+//            return (ViewSettings) settings[VIEW_SETTINGS];
+//    }
 
     private class ProofSettingsListener implements SettingsListener {
 	

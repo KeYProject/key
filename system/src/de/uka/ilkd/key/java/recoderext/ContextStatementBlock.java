@@ -13,9 +13,7 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import recoder.java.Statement;
 import recoder.java.StatementBlock;
-import recoder.list.generic.ASTList;
 
 /**
    Statement block.
