@@ -282,6 +282,20 @@ public abstract class AbstractPO implements IPersistablePO {
                         };
                 p.openGoals().head().addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true, undo);
             }
+        } else if (this instanceof LoopInvExecutionPO) {
+            LoopInvExecutionPO po = (LoopInvExecutionPO) this;
+            if (po.getLoopInvariant().getRespects(services) != null) {
+                StrategyInfoUndoMethod undo =
+                        new StrategyInfoUndoMethod() {
+                    
+                            @Override
+                            public void undo(
+                                    de.uka.ilkd.key.util.properties.Properties strategyInfos) {
+                                strategyInfos.put(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true);
+                            }
+                        };
+                p.openGoals().head().addStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY, true, undo);
+            }
         }
         return p;
     }

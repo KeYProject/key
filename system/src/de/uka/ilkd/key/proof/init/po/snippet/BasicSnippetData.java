@@ -159,7 +159,7 @@ class BasicSnippetData {
 
         contractContents.put(Key.TARGET_METHOD, contract.getTarget());
         contractContents.put(Key.FOR_CLASS, contract.getKJT());
-        contractContents.put(Key.PRECONDITION, contract.getPre());
+        contractContents.put(Key.PRECONDITION, contract.getPre());        
         contractContents.put(Key.MODIFIES, contract.getMod());
         contractContents.put(Key.DEPENDENS, contract.getDep());
         contractContents.put(Key.MEASURED_BY, contract.getMby());

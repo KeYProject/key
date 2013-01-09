@@ -36,11 +36,9 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.init.BlockExecutionPO;
+import de.uka.ilkd.key.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.proof.init.SymbolicExecutionPO;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
@@ -432,9 +430,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term loopInvApplPredTerm = null;
         Taclet informationFlowInvariantApp = null;
 
-        if (po instanceof InfFlowContractPO ||
-                po instanceof SymbolicExecutionPO ||
-                po instanceof BlockExecutionPO) {
+        if (goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
+            goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) &&
+            inst.inv.getRespects(services) != null) {
             assert anonUpdateDatas.size() == 1 : "information flow " +
                                                  "extension is at the " +
                                                  "moment not compatible " +

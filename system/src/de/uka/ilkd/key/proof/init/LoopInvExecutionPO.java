@@ -23,7 +23,8 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
-public class LoopInvExecutionPO extends AbstractOperationPO implements ContractPO {
+public class LoopInvExecutionPO extends AbstractOperationPO
+        implements ContractPO {
     
     private final LoopInvariant loopInvariant;
     //private final InformationFlowContract generatedIFContract;
