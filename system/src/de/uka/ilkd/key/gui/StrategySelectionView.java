@@ -746,8 +746,8 @@ public final class StrategySelectionView extends JPanel {
         maxSlider.setAlignmentX(Component.LEFT_ALIGNMENT);
         box.add(maxSlider);
         box.add(Box.createVerticalStrut(8));
-        bSimpleJavaCardDLStrategy.setAlignmentX(Component.LEFT_ALIGNMENT);
-        box.add(bSimpleJavaCardDLStrategy);
+        //bSimpleJavaCardDLStrategy.setAlignmentX(Component.LEFT_ALIGNMENT);
+        //box.add(bSimpleJavaCardDLStrategy);
         javaDLOptionsScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
         box.add(javaDLOptionsScrollPane);       
 	
