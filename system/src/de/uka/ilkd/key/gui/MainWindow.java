@@ -70,6 +70,7 @@ import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
+import de.uka.ilkd.key.gui.actions.GoalBackAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
@@ -81,6 +82,7 @@ import de.uka.ilkd.key.gui.actions.OpenFileAction;
 import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
 import de.uka.ilkd.key.gui.actions.ProofManagementAction;
+import de.uka.ilkd.key.gui.actions.PruneProofAction;
 import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
 import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
 import de.uka.ilkd.key.gui.actions.SaveFileAction;
@@ -129,7 +131,6 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
-
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
@@ -518,7 +519,8 @@ public final class MainWindow extends JFrame  {
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();
-        toolBar.add(new UndoLastStepAction(this, false));
+        toolBar.add(new GoalBackAction(this, false));
+        toolBar.add(new PruneProofAction(this, false));
         JToggleButton oneStep = new JToggleButton(oneStepSimplAction);
         oneStep.setHideActionText(true);
         toolBar.addSeparator();
