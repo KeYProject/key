@@ -99,7 +99,7 @@ public class KeYParserF {
     }
 
     public ImmutableSet<Taclet> getTaclets() {
-	return this.getTaclets();
+	return this.keYParser.getTaclets();
     }
 
     public String getProofObligation() {
@@ -167,7 +167,7 @@ public class KeYParserF {
     }
 
     public Includes getIncludes() {
-	return this.getIncludes();
+	return this.keYParser.getIncludes();
     }
 
     public String bootClassPath() throws ANTLRException {
