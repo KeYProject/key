@@ -679,7 +679,7 @@ SL_COMMENT
 	@after { paraphrase.pop(); }
 :
 	'//'
-	(~('\n' | '\uFFFF'))* ('\n' | '\uFFFF')
+	(~('\n' | '\uFFFF'))* ('\n' | '\uFFFF' | EOF)
 	{ $channel = HIDDEN; newline(); }
 	;
 
