@@ -3290,14 +3290,15 @@ varIds returns [LinkedList list = new LinkedList()]
       }
   ;
 
-taclet[ImmutableSet<Choice> choices_] returns [Taclet r] 
+taclet[ImmutableSet<Choice> choices] returns [Taclet r] 
 @init{ 
     ifSeq = Sequent.EMPTY_SEQUENT;
     TacletBuilder b = null;
     int applicationRestriction = RewriteTaclet.NONE;
+    choices_ = choices;
 }
     : 
-        name=IDENT (choices__=option_list[choices_])? 
+        name=IDENT (choices_=option_list[choices_])? 
         LBRACE {
 	  //  schema var decls
 	  namespaces().setVariables(new Namespace(variables()));
@@ -3321,7 +3322,7 @@ taclet[ImmutableSet<Choice> choices_] returns [Taclet r]
         modifiers[b]
         RBRACE
         { 
-            b.setChoices(choices__);
+            b.setChoices(choices_);
             r = b.getTaclet(); 
             taclet2Builder.put(r,b);
 	  // dump local schema var decls
