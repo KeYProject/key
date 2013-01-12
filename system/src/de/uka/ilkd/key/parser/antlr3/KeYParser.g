@@ -2030,11 +2030,12 @@ func_decls
         RBRACE
     ;
 
-arrayopid returns [KeYJavaType componentType = null]
+arrayopid returns [KeYJavaType _array_op_id = null]
+@after{ _array_op_id = componentType; }
     :
         EMPTYBRACKETS
         LPAREN
-        componentType_ = keyjavatype {componentType = componentType_;}
+        componentType = keyjavatype
         RPAREN
     ;
 
@@ -2095,32 +2096,35 @@ ruleset_decls
         RBRACE
     ;
 
-sortId returns [Sort s = null]
+sortId returns [Sort _sort_id = null]
+@after{ _sort_id = s; }
     :
-        s_ = sortId_check[true] {s = s_;}
+        s = sortId_check[true]
     ;           
 
 // Non-generic sorts, array sorts allowed
-sortId_check [boolean checkSort] returns [Sort s = null]                
+sortId_check [boolean checkSort] returns [Sort _sort_id_check = null]                
+@after{ _sort_id_check = s; }
     :
         p = sortId_check_help[checkSort]
-        s_ = array_decls[p] {s = s_;}
+        s = array_decls[p]
     ;
 
 // Generic and non-generic sorts, array sorts allowed
-any_sortId_check [boolean checkSort] returns [Sort s = null]                
+any_sortId_check [boolean checkSort] returns [Sort _any_sort_id_check = null]                
+@after{ _any_sort_id_check = s; }
     :   
         p = any_sortId_check_help[checkSort]
-        s_ = array_decls[p] {s = s_;}
+        s = array_decls[p]
     ;
     
     
 // Non-generic sorts
-sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null]
+sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> _sort_id_check_help = null]
+@after{ _sort_id_check_help = result; }
     :
-        result_ = any_sortId_check_help[checkSort]
+        result = any_sortId_check_help[checkSort]
         {
-            result = result_;
             // don't allow generic sorts or collection sorts of
             // generic sorts at this point
             Sort s = result.first;
@@ -2267,9 +2271,10 @@ simple_sort_name returns [String name = ""]
     ;
 
 
-sort_name returns [String name = null]
+sort_name returns [String _sort_name = null]
+@after{ _sort_name = name; }
     :
-        name_ = simple_sort_name {name = name_;}
+        name = simple_sort_name
         (brackets=EMPTYBRACKETS {name += brackets.getText();} )*
 ;
 
@@ -2281,24 +2286,24 @@ sort_name returns [String name = null]
  * reads a formula/term and throws an error if it wasn't a formula.
  * This gives a rather late error message. */
 
-formula returns [Term a = null] 
+formula returns [Term _formula = null] 
+@after { _formula = a; }
     :
-        a_ = term 
+        a = term 
         {
-            a = a_;
             if (a != null && a.sort() != Sort.FORMULA ) {
                 semanticError("Just Parsed a Term where a Formula was expected.");
             }
         }
     ;
 
-term returns [Term result = null]
+term returns [Term _term = null]
+@after { _term = result; }
     :
-        result_=elementary_update_term
+        result=elementary_update_term
         (
            PARALLEL a=elementary_update_term
            {
-               result = result_;
                result = tf.createTerm(UpdateJunctor.PARALLEL_UPDATE, result, a);
            }
             
@@ -2311,13 +2316,13 @@ term returns [Term result = null]
         }
         
         
-elementary_update_term returns[Term result=null]
+elementary_update_term returns[Term _elementary_update_term=null]
+@after { _elementary_update_term = result; }
 :
-        result_=equivalence_term 
+        result=equivalence_term 
         (
             ASSIGN a=equivalence_term
             {
-                result = result_;
                 result = TermBuilder.DF.elementary(getServices(), result, a);
             }
         )?
@@ -2329,10 +2334,11 @@ elementary_update_term returns[Term result=null]
         }
 
 
-equivalence_term returns [Term a = null] 
-    :   a_=implication_term 
+equivalence_term returns [Term _equivalence_term = null] 
+@after{ _equivalence_term = a; }
+    :   a=implication_term 
         (EQV a1=implication_term 
-            { a = a_; a = tf.createTerm(Equality.EQV, new Term[]{a, a1});} )*
+            { a = tf.createTerm(Equality.EQV, new Term[]{a, a1});} )*
 ;
         catch [TermCreationException ex] {
               keh.reportException
@@ -2340,10 +2346,11 @@ equivalence_term returns [Term a = null]
 			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
         }
 
-implication_term returns [Term a = null] 
-    :   a_=disjunction_term 
+implication_term returns [Term _implication_term = null] 
+@after{ _implication_term = a; }
+    :   a=disjunction_term 
         (IMP a1=implication_term 
-            { a = a_; a = tf.createTerm(Junctor.IMP, new Term[]{a, a1});} )?
+            { a = tf.createTerm(Junctor.IMP, new Term[]{a, a1});} )?
 ;
         catch [TermCreationException ex] {
               keh.reportException
@@ -2351,10 +2358,11 @@ implication_term returns [Term a = null]
 			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
         }
 
-disjunction_term returns [Term a = null] 
-    :   a_=conjunction_term 
+disjunction_term returns [Term _disjunction_term = null] 
+@after { _disjunction_term = a; }
+    :   a=conjunction_term 
         (OR a1=conjunction_term 
-            { a = a_; a = tf.createTerm(Junctor.OR, new Term[]{a, a1});} )*
+            { a = tf.createTerm(Junctor.OR, new Term[]{a, a1});} )*
 ;
         catch [TermCreationException ex] {
               keh.reportException
@@ -2362,10 +2370,11 @@ disjunction_term returns [Term a = null]
 			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
         }
 
-conjunction_term returns [Term a = null] 
-    :   a_=term60 
+conjunction_term returns [Term _conjunction_term = null] 
+@after { _conjunction_term = a; }
+    :   a=term60 
         (AND a1=term60
-            { a = a_; a = tf.createTerm(Junctor.AND, new Term[]{a, a1});} )*
+            { a = tf.createTerm(Junctor.AND, new Term[]{a, a1});} )*
             
 ;
         catch [TermCreationException ex] {
@@ -2374,11 +2383,11 @@ conjunction_term returns [Term a = null]
 			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
         }
 
-term60 returns [Term a = null] 
-@after{a = a_;}
+term60 returns [Term _term_60 = null] 
+@after{ _term_60 = a; }
     :  
-        a_ = unary_formula
-    |   a_ = equality_term
+        a = unary_formula
+    |   a = equality_term
 ;
         catch [TermCreationException ex] {
               keh.reportException
@@ -2386,12 +2395,12 @@ term60 returns [Term a = null]
 			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
         }
 
-unary_formula returns [Term a = null] 
-@after{if (a == null) { a = a_; }}
+unary_formula returns [Term _unary_formula = null] 
+@after{ _unary_formula = a; }
     :  
         NOT a1  = term60 { a = tf.createTerm(Junctor.NOT,new Term[]{a1}); }
-    |	a_ = quantifierterm 
-    |   a_ = modality_dl_term
+    |	a = quantifierterm 
+    |   a = modality_dl_term
 ;
         catch [TermCreationException ex] {
               keh.reportException
@@ -2400,12 +2409,13 @@ unary_formula returns [Term a = null]
         }
 
 
-equality_term returns [Term a = null] 
+equality_term returns [Term _equality_term = null] 
 @init{
     boolean negated = false;
 }
+@after { _equality_term = a; }
     :
-        a_ =  logicTermReEntry {a = a_;}// accessterm 
+        a =  logicTermReEntry // accessterm 
         // a term like {o:=u}x=y is parsed as {o:=u}(x=y)
         (  
 	    (EQUALS | NOT_EQUALS {negated = true;}) a1 = logicTermReEntry
@@ -2491,9 +2501,10 @@ strong_arith_op returns [Function op = null]
 ;
 
 // term80
-logicTermReEntry returns [Term a = null]
+logicTermReEntry returns [Term _logic_term_re_entry = null]
+@after { _logic_term_re_entry = a; }
 :
-   a_ = weak_arith_op_term {a = a_;} ((relation_op)=> op = relation_op a1=weak_arith_op_term {
+   a = weak_arith_op_term ((relation_op)=> op = relation_op a1=weak_arith_op_term {
                  a = tf.createTerm(op, a, a1);
               })?
 ;
@@ -2504,9 +2515,10 @@ logicTermReEntry returns [Term a = null]
         }
 
 
-weak_arith_op_term returns [Term a = null]
+weak_arith_op_term returns [Term _weak_arith_op_term = null]
+@after { _weak_arith_op_term = a; }
 :
-   a_ = strong_arith_op_term {a = a_;} ( op = weak_arith_op a1=strong_arith_op_term {
+   a = strong_arith_op_term ( op = weak_arith_op a1=strong_arith_op_term {
                   a = tf.createTerm(op, a, a1);
                 })*
 ;
@@ -2516,9 +2528,10 @@ weak_arith_op_term returns [Term a = null]
 			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
         }
 
-strong_arith_op_term returns [Term a = null]
+strong_arith_op_term returns [Term _strong_arith_op_term = null]
+@after { _strong_arith_op_term = a; }
 :
-   a_ = term110 {a = a_;} ( op = strong_arith_op a1=term110 {
+   a = term110 ( op = strong_arith_op a1=term110 {
                   a = tf.createTerm(op, a, a1);
                 })*
 ;
@@ -2535,14 +2548,14 @@ strong_arith_op_term returns [Term a = null]
  * WATCHOUT: Woj: the check for Sort.FORMULA had to be removed to allow
  * infix operators and the whole bunch of grammar rules above.
  */
-term110 returns [Term result = null]
+term110 returns [Term _term110 = null]
+@after { _term110 = result; }
     :
         (
-            result_ = accessterm  |
-            result_ = update_or_substitution
+            result = accessterm  |
+            result = update_or_substitution
         ) 
         {
-        result = result_;
 	/*
             if (result.sort() == Sort.FORMULA) {
                 semanticError("Only terms may stand here.");
@@ -2656,16 +2669,17 @@ static_attribute_suffix returns [Term result = null]
         }
 
 
-attribute_or_query_suffix[Term prefix] returns [Term result = null]
+attribute_or_query_suffix[Term prefix] returns [Term _attribute_or_query_suffix = null]
 @init{
     Operator v = null;
     result = prefix;
     attributeName = "";    
 }    
+@after { _attribute_or_query_suffix = result; }
     :   
         DOT 
         ( 
-           (IDENT (AT LPAREN simple_ident_dots RPAREN)? LPAREN)=>( result_ = query[prefix] {result = result_;})
+           (IDENT (AT LPAREN simple_ident_dots RPAREN)? LPAREN)=>( result = query[prefix])
            | 
            attributeName = attrid 
            {   
@@ -2745,10 +2759,11 @@ static_query returns [Term result = null]
         }
 
 //term120
-accessterm returns [Term result = null] 
+accessterm returns [Term _accessterm = null] 
+@after { _accessterm = result; }
     :
-      (MINUS ~NUM_LITERAL) => MINUS result_ = term110
-        {   result = result_;
+      (MINUS ~NUM_LITERAL) => MINUS result = term110
+        {
             if (result.sort() != Sort.FORMULA) {
                 result = tf.createTerm
                 ((Function) functions().lookup(new Name("neg")), result);
@@ -2758,8 +2773,8 @@ accessterm returns [Term result = null]
         } 
       |
       (LPAREN any_sortId_check[false] RPAREN term110)=> 
-        LPAREN s = any_sortId_check[true] RPAREN result_=term110 
-        {result = result_;
+        LPAREN s = any_sortId_check[true] RPAREN result=term110 
+        {
          final Sort objectSort = getServices().getJavaInfo().objectSort();
          if(s==null) {
            semanticError("Tried to cast to unknown type.");
@@ -2773,15 +2788,14 @@ accessterm returns [Term result = null]
          result = tf.createTerm(s.getCastSymbol(getServices()), result);
 	  } |
       ( {isStaticQuery()}? // look for package1.package2.Class.query(
-        result_ = static_query
+        result = static_query
       | 
         {isStaticAttribute()}?            // look for package1.package2.Class.attr
-        result_ = static_attribute_suffix
+        result = static_attribute_suffix
       | 	
-        result_ = atom
+        result = atom
       )   
-      {result = result_;}
-         ((result_ = array_access_suffix[result] | result_ = attribute_or_query_suffix[result]){result = result_;})*
+         ((result = array_access_suffix[result] | result = attribute_or_query_suffix[result]))*
  ;
         catch [TermCreationException ex] {
               semanticError(ex.getMessage());
@@ -2789,10 +2803,12 @@ accessterm returns [Term result = null]
 
 
 
-array_access_suffix [Term arrayReference] returns [Term result = arrayReference] 
+array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = null] 
 @init{
     Term rangeFrom = null;
+    Term result = arrayReference;
 }
+@after{ _array_access_suffix = result; }
 	:
   	LBRACKET 
 	(   STAR {
@@ -2836,15 +2852,16 @@ accesstermlist returns [HashSet accessTerms = new HashSet()] :
      (t=accessterm {accessTerms.add(t);} ( COMMA t=accessterm {accessTerms.add(t);})* )? ;
 
 
-atom returns [Term a = null]
+atom returns [Term _atom = null]
+@after { _atom = a; }
     :
-        {isTermTransformer()}? a_ = specialTerm {a = a_;}
-    |   a_ = funcpredvarterm {a = a_;}
-    |   LPAREN a_ = term RPAREN {a = a_;}
+        {isTermTransformer()}? a = specialTerm
+    |   a = funcpredvarterm
+    |   LPAREN a = term RPAREN
     |   TRUE  { a = tf.createTerm(Junctor.TRUE); }
     |   FALSE { a = tf.createTerm(Junctor.FALSE); }
-    |   a_ = ifThenElseTerm {a = a_;}
-    |   a_ = ifExThenElseTerm {a = a_;}
+    |   a = ifThenElseTerm
+    |   a = ifExThenElseTerm
     |   literal=STRING_LITERAL
         {
             a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(literal.getText()));
@@ -2857,7 +2874,9 @@ atom returns [Term a = null]
         }
 
 
-abbreviation returns [Term a=null]
+abbreviation returns [Term _abbreviation=null]
+@init{ Term a = null; }
+@after{ _abbreviation = a; }
     :
         (   sc = simple_ident
             {
@@ -2873,7 +2892,9 @@ abbreviation returns [Term a=null]
     ;
 
 
-ifThenElseTerm returns [Term result = null]
+ifThenElseTerm returns [Term _if_then_else_term = null]
+@init{ Term result = null; }
+@after{ _if_then_else_term = result; }
     :
         IF LPAREN condF = term RPAREN
         {
@@ -2895,12 +2916,14 @@ ifThenElseTerm returns [Term result = null]
         }
         
         
-ifExThenElseTerm returns [Term result = null]
+ifExThenElseTerm returns [Term _if_ex_then_else_term = null]
 @init{
     exVars 
     	= ImmutableSLList.<QuantifiableVariable>nil();
     Namespace orig = variables();
+    Term result = null;
 }
+@after{ _if_ex_then_else_term = result; }
     :
         IFEX exVars = bound_variables
         LPAREN condF = term RPAREN
@@ -2932,28 +2955,29 @@ ifExThenElseTerm returns [Term result = null]
         }        
 
 
-argument returns [Term result = null]
+argument returns [Term _argument = null]
 @init{
     ImmutableArray<QuantifiableVariable> vars = null;
-    Term a;
 }
-@after{result = result_;}
+@after{ _argument = result; }
 :
  (
    // WATCHOUT Woj: can (should) this be unified to term60?
    {isTermParser() || isGlobalDeclTermParser()}? 
-     result_ = term 
+     result = term 
   |  
-     result_ = term60 
+     result = term60 
  )
  ;
   
 
-quantifierterm returns [Term a = null]
+quantifierterm returns [Term _quantifier_term = null]
 @init{
     Operator op = null;
     Namespace orig = variables();  
+    Term a = null;
 }
+@after{ _quantifier_term = a; }
 :
         (   FORALL { op = Quantifier.ALL; }
           | EXISTS  { op = Quantifier.EX;  })
@@ -2969,18 +2993,20 @@ quantifierterm returns [Term a = null]
 ;
 
 //term120_2
-update_or_substitution returns [Term result = null]
-@after{result = result_;}
+update_or_substitution returns [Term _update_or_substitution = null]
+@after{ _update_or_substitution = result; }
 :
-      (LBRACE SUBST) => result_ = substitutionterm
-      |  result_ = updateterm
+      (LBRACE SUBST) => result = substitutionterm
+      |  result = updateterm
     ; 
 
-substitutionterm returns [Term result = null] 
+substitutionterm returns [Term _substitution_term = null] 
 @init{
   SubstOp op = WarySubstOp.SUBST;
    Namespace orig = variables();  
+  Term result = null;
 }
+@after{ _substitution_term = result; }
 :
    LBRACE SUBST
      v = one_bound_variable SEMI
@@ -3010,7 +3036,9 @@ substitutionterm returns [Term result = null]
         }
 
 
-updateterm returns [Term result = null] 
+updateterm returns [Term _update_term = null] 
+@init{ Term result = null; }
+@after{ _update_term = result; }
 :
         LBRACE u=term RBRACE 
         ( 
@@ -3037,14 +3065,14 @@ bound_variables returns[ImmutableList<QuantifiableVariable> list = ImmutableSLLi
       SEMI
 ;
 
-one_bound_variable returns[QuantifiableVariable v=null]
-@after{v = v_;}
+one_bound_variable returns[QuantifiableVariable _one_bound_variable=null]
+@after{ _one_bound_variable = v; }
 :
-  {isGlobalDeclTermParser()}? v_ = one_logic_bound_variable_nosort
+  {isGlobalDeclTermParser()}? v = one_logic_bound_variable_nosort
  |
-  {inSchemaMode()}? v_ = one_schema_bound_variable
+  {inSchemaMode()}? v = one_schema_bound_variable
  |
-  {!inSchemaMode()}? v_ = one_logic_bound_variable
+  {!inSchemaMode()}? v = one_logic_bound_variable
 ;
 
 one_schema_bound_variable returns[QuantifiableVariable v=null]
@@ -3079,11 +3107,13 @@ one_logic_bound_variable_nosort returns[QuantifiableVariable v=null]
   }
 ;
 
-modality_dl_term returns [Term a = null]
+modality_dl_term returns [Term _modality_dl_term = null]
 @init{
     Operator op = null;
     PairOfStringAndJavaBlock sjb = null;
+    Term a = null;
 }
+@after{ _modality_dl_term = a; }
    :
    modality = MODALITY
      {
@@ -3121,10 +3151,12 @@ modality_dl_term returns [Term a = null]
         }
 
 
-argument_list returns [Term[\] result = null]
+argument_list returns [Term[\] _argument_list = null]
 @init{
     List<Term> args = new LinkedList<Term>();
+    Term[] result = null;
 }
+@after{ _argument_list = result; }
     :
         LPAREN 
         (p1 = argument { args.add(p1);  }
@@ -3138,13 +3170,14 @@ argument_list returns [Term[\] result = null]
 
     ;
 
-funcpredvarterm returns [Term a = null]
+funcpredvarterm returns [Term _func_pred_var_term = null]
 @init{
     String neg = "";
     boolean opSV = false;
     Namespace orig = variables();
     boolean limited = false;  
 }
+@after { _func_pred_var_term = a; }
     :
       ch=CHAR_LITERAL {
             String s = ch.getText();
@@ -3164,7 +3197,7 @@ funcpredvarterm returns [Term a = null]
     | 
         ((MINUS)? NUM_LITERAL) => (MINUS {neg = "-";})? number=NUM_LITERAL
         { a = toZNotation(neg+number.getText(), functions());}    
-    | AT a_ = abbreviation {a = a_;}
+    | AT a = abbreviation
     | varfuncid = funcpred_name (LIMITED {limited = true;})?
         (
             (
@@ -3236,12 +3269,13 @@ funcpredvarterm returns [Term a = null]
 			(ex.getMessage(), getSourceName(), getLine(), getColumn()));
         }
 
-specialTerm returns [Term result = null] 
+specialTerm returns [Term _special_term = null] 
 @init{
     Operator vf = null;
-}:
+}
+@after { _special_term = result; }:
      {isTacletParser() || isProblemParser()}?
-       result_ = metaTerm {result = result_;}
+       result = metaTerm
    ;
         catch [TermCreationException ex] {
               keh.reportException
@@ -3387,13 +3421,14 @@ termorseq returns [Object o]
         }
     ;
 
-semisequent returns [Semisequent ss]
+semisequent returns [Semisequent _semi_sequent]
 @init{ 
     ss = Semisequent.EMPTY_SEMISEQUENT; 
 }
+@after{ _semi_sequent = ss; }
     :
         /* empty */ | 
-        head=term ( COMMA ss_=semisequent {ss = ss_;}) ? 
+        head=term ( COMMA ss=semisequent) ? 
         { ss = ss.insertFirst(new SequentFormula(head)).semisequent(); }
     ;
 
@@ -3860,34 +3895,44 @@ goalspec[TacletBuilder b, ImmutableSet<Choice> soc]
         
     ;
 
-replacewith returns [Object o] @after{o = o_;}:
-        REPLACEWITH LPAREN o_=termorseq RPAREN;
+replacewith returns [Object _replace_with]
+@after{ _replace_with = o; }
+:
+        REPLACEWITH LPAREN o=termorseq RPAREN;
 
-add returns [Sequent s] @after{s = s_;}:
-        ADD LPAREN s_=seq RPAREN;
+add returns [Sequent _add]
+@after{ _add = s; }
+:
+        ADD LPAREN s=seq RPAREN;
 
-addrules returns [ImmutableList<Taclet> lor] @after{lor = lor_;}:
-        ADDRULES LPAREN lor_=tacletlist RPAREN;
+addrules returns [ImmutableList<Taclet> _add_rules]
+@after{ _add_rules = lor; }
+:
+        ADDRULES LPAREN lor=tacletlist RPAREN;
 
-addprogvar returns [ImmutableSet<SchemaVariable> pvs] @after{pvs = pvs_;}:
-        ADDPROGVARS LPAREN pvs_=pvset RPAREN;
+addprogvar returns [ImmutableSet<SchemaVariable> _add_prog_var]
+@after{ _add_prog_var = pvs; }
+:
+        ADDPROGVARS LPAREN pvs=pvset RPAREN;
 
-tacletlist returns [ImmutableList<Taclet> lor]
+tacletlist returns [ImmutableList<Taclet> _taclet_list]
 @init{ 
     lor = ImmutableSLList.<Taclet>nil(); 
 }
+@after{ _taclet_list = lor; }
     :
         head=taclet[DefaultImmutableSet.<Choice>nil()]   
-        ( /*empty*/ | COMMA lor_=tacletlist {lor = lor_;}) { lor = lor.prepend(head); }
+        ( /*empty*/ | COMMA lor=tacletlist) { lor = lor.prepend(head); }
     ;
 
-pvset returns [ImmutableSet<SchemaVariable> pvs] 
+pvset returns [ImmutableSet<SchemaVariable> _pv_set] 
 @init{
     pvs = DefaultImmutableSet.<SchemaVariable>nil();
 }
+@after{ _pv_set = pvs; }
     :
         pv=varId
-        ( /*empty*/ | COMMA pvs_=pvset {pvs = pvs_;}) { pvs = pvs.add
+        ( /*empty*/ | COMMA pvs=pvset) { pvs = pvs.add
                                           ((SchemaVariable)pv); };
 
 rulesets returns [Vector rs = new Vector()] :
@@ -4018,11 +4063,12 @@ one_invariant[ParsableVariable selfVar]
      } RBRACE SEMI
 ;
 
-problem returns [ Term a = null ]
+problem returns [ Term _problem = null ]
 @init{
     choices=DefaultImmutableSet.<Choice>nil();
     Namespace funcNSForSelectedChoices = new Namespace();
 }
+@after { _problem = a; }
     :
 
 	{ if (capturer != null) capturer.mark(); }
@@ -4072,7 +4118,7 @@ problem returns [ Term a = null ]
         ((PROBLEM LBRACE 
             {switchToNormalMode(); 
 	     if (capturer != null) capturer.capture();}
-                a_ = formula {a = a_;}
+                a = formula
             RBRACE) 
            | 
            CHOOSECONTRACT (chooseContract=string_literal SEMI)?
@@ -4097,8 +4143,10 @@ problem returns [ Term a = null ]
 	)?
    ;
    
-bootClassPath returns [String id = null] :
-  ( BOOTCLASSPATH id_=string_literal SEMI {id = id_;})? ;
+bootClassPath returns [String _boot_class_path = null]
+@after{ _boot_class_path = id; }
+:
+  ( BOOTCLASSPATH id=string_literal SEMI)? ;
    
 classPaths returns [ImmutableList<String> ids = ImmutableSLList.<String>nil()]
 :
@@ -4119,10 +4167,11 @@ classPaths returns [ImmutableList<String> ids = ImmutableSLList.<String>nil()]
   )*
   ;
 
-javaSource returns [String result = null]
+javaSource returns [String _java_source = null]
+@after { _java_source = result; }
 :
    (JAVASOURCE 
-      result_ = oneJavaSource {result = result_;}
+      result = oneJavaSource
     SEMI)?
     ;
 
@@ -4142,9 +4191,10 @@ oneJavaSource returns [String s = null]
   }
 ;
 
-preferences returns [String s = null]:
+preferences returns [String _preferences = null]
+@after{ _preferences = s; }:
 	( KEYSETTINGS LBRACE
-		(s_ = string_literal {s = s_;})?
+		(s = string_literal)?
 		RBRACE )?
 	;
 	
