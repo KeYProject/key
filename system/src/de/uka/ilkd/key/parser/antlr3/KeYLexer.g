@@ -780,10 +780,11 @@ NUM_LITERAL
 MODALITY
 @init {
     paraphrase.push("All possible modalities, including schema.");
+    int _begin = getText().length();
 }
 @after { paraphrase.pop(); }
 :	'\\' ( (LETTER | '_')+ | '<' | '[' | '[[') {
-    modalityBegin = getText().toString();
+    modalityBegin = getText();
     Debug.out("modalityBegin == ", modalityBegin);
     //int literalTest = testLiteralsTable(MODALITY);
     //Debug.out("testLiteralsTable == ", literalTest);
@@ -821,7 +822,7 @@ MODALITY
         }
         mMODALITYEND();
         //              mJAVABLOCK(false);
-        matchAndTransformModality(state.tokenStartCharIndex);
+        matchAndTransformModality(_begin);
     }else{
         if("\\includeFile".equals(modalityBegin)) {
             // File inclusion 
@@ -866,8 +867,9 @@ MODALITY
 ;
 
 fragment MODALITYEND
+@init{ int _begin = getText().length(); }
 :	'\\' ( 'endmodality' | '>' | ']' | ']]')  {
-	   modalityEnd = getText();
+	   modalityEnd = getText().substring(_begin);
            Debug.out("modalityEnd == ", modalityEnd);
 	}
 	;
