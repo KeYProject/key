@@ -287,7 +287,7 @@ lexer grammar KeYLexer;
         NEW : '\\new';
         NEWLABEL : '\\newLabel';
 // label occurs again for character `!'
-//	NOT : '\\not';
+	NOT_ : '\\not';
         NOTFREEIN : '\\notFreeIn';
 	SAME : '\\same';
 	STATIC : '\\static';

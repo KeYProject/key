@@ -3455,7 +3455,7 @@ varexp[TacletBuilder b]
     | varcond_simplifyIfThenElseUpdate[b]
   ) 
   | 
-  ( (NOT {negated = true;} )? 
+  ( (NOT_ {negated = true;} )? 
       (   varcond_abstractOrInterface[b, negated]
 	| varcond_array[b, negated]
         | varcond_array_length[b, negated]	
