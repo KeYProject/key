@@ -4068,7 +4068,7 @@ problem returns [ Term _problem = null ]
     choices=DefaultImmutableSet.<Choice>nil();
     Namespace funcNSForSelectedChoices = new Namespace();
 }
-@after { _problem = a; }
+@after { _problem = a; this.chooseContract = chooseContract; }
     :
 
 	{ if (capturer != null) capturer.mark(); }
