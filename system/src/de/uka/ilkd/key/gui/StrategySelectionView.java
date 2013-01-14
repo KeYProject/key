@@ -59,8 +59,7 @@ public final class StrategySelectionView extends JPanel {
 
     private Map<String, JRadioButton> buttonHashmap = new HashMap<String, JRadioButton>();
     
-//    final JRadioButton bSimpleJavaCardDLStrategy = newButton(
-//        "Java DL", JAVACARDDL_STRATEGY_NAME, false, false);
+
    
     ButtonGroup stratGroup = new ButtonGroup();
     ButtonGroup splittingGroup = new ButtonGroup();
@@ -935,27 +934,7 @@ public final class StrategySelectionView extends JPanel {
     private final MaxRuleAppSlider maxSlider = new MaxRuleAppSlider(null);
     
     
-//    private final class JavaDLOptionListener implements PropertyChangeListener, 
-//    ItemListener {
-//        public void propertyChange(PropertyChangeEvent evt) {
-//            if (evt.getNewValue() instanceof Boolean) {
-//                javaDLOptionsPanel.setEnabled(
-////                (bSimpleJavaCardDLStrategy.isSelected() && 
-//                        ((Boolean)evt.getNewValue()).booleanValue());
-//            } else {
-//                javaDLOptionsPanel.
-//                    setEnabled(
-////                    		bSimpleJavaCardDLStrategy.isSelected() && 
-//                            Boolean.getBoolean(""+evt.getNewValue()));
-//            }
-//        }
-//        public void itemStateChanged(ItemEvent e) {
-////            if (e.getItem() == bSimpleJavaCardDLStrategy) {
-////                javaDLOptionsPanel.setEnabled(bSimpleJavaCardDLStrategy.isSelected() &&
-////                        bSimpleJavaCardDLStrategy.isEnabled()); 
-////            }
-//        }
-//    }
+
 
 //    class TimeoutSpinner extends JSpinner {        
 //        public TimeoutSpinner() {
@@ -1112,14 +1091,6 @@ public final class StrategySelectionView extends JPanel {
         defaultButton.setEnabled(enable);
     	javaDLOptionsPanel.setEnabled(enable);
 
-//        if (mediator != null) {  
-//            final Iterator<StrategyFactory> supportedStrategies = 
-//               mediator.getProfile().supportedStrategies().iterator();
-//            while (supportedStrategies.hasNext()) {                  
-//                final StrategyFactory next = supportedStrategies.next();              
-//                getStrategyButton(next.name().toString()).setEnabled(enable);               
-//            }
-//        }
     }
 
     public Strategy getStrategy(String strategyName, 
