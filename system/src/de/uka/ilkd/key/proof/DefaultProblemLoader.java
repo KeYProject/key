@@ -129,7 +129,10 @@ public class DefaultProblemLoader {
             }  
          }
       }
-      catch (Exception e) {
+      catch (IOException e) {
+         throw new ProblemLoaderException(this, e);
+      }
+      catch (ProofInputException e) {
          throw new ProblemLoaderException(this, e);
       }
    }
