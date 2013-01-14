@@ -22,6 +22,8 @@ import org.key_project.keyide.ui.util.LogUtil;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
 import org.key_project.keyide.ui.views.StrategyPropertiesView;
 
+import de.uka.ilkd.key.gui.KeYSelectionEvent;
+import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
@@ -60,6 +62,32 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
 //      }
 //   };
    
+   private KeYSelectionListener keySelectionListener = new KeYSelectionListener() {
+      
+      @Override
+      public void selectedProofChanged(final KeYSelectionEvent e) {
+         // TODO Auto-generated method stub
+         getEditorSite().getShell().getDisplay().asyncExec(new Runnable() {
+            
+            @Override
+            public void run() {
+               // TODO Auto-generated method stub
+               if(e.getSource().getSelectedNode() != null){
+                  setShowNode(e.getSource().getSelectedNode());
+               }
+            }
+         });
+      }
+      
+      @Override
+      public void selectedNodeChanged(KeYSelectionEvent e) {
+         // TODO Auto-generated method stub
+         if(e.getSource().getSelectedNode() != null){
+            setShowNode(e.getSource().getSelectedNode());
+         }
+      }
+   };
+   
    
    
    
@@ -71,6 +99,14 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       this.showNode = showNode;
       // TODO: Update shown text
       // TODO: Thorw event to update outline
+      IEditorInput input = getEditorInput();
+      ((ProofEditorInput)input).setData(showNode);
+    try {
+       doSetInput(input);
+    }
+    catch (CoreException e) {
+       LogUtil.getLogger().logError(e);
+    }
    }
 
    /**
@@ -139,7 +175,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    @Override
    public void dispose() {
       getKeYEnvironment().getUi().removePropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
-//      outline.removeSelectionChangedListener(outlineSelectionListener);
+      getKeYEnvironment().getMediator().removeKeYSelectionListener(keySelectionListener);
       outline.dispose();
       super.dispose();
    }
@@ -171,8 +207,7 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
          synchronized (this) {
             if (outline == null) {
                outline = new ProofTreeContentOutlinePage(getProof(), getKeYEnvironment());
-               //adds a ISelectionChangedListener to the Outline
-//               outline.addSelectionChangedListener(outlineSelectionListener);
+               getKeYEnvironment().getMediator().addKeYSelectionListener(keySelectionListener);
             }
           
          }

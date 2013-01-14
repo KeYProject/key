@@ -206,7 +206,7 @@
                id="org.key_project.keyide.ui.toolbar">
                  <command
                        commandId="org.key_project.keyide.ui.commands.startAutoModeCommand"
-                       icon="icons/play.png"
+                       icon="icons/start.gif"
                        id="org.key_project.keyide.ui.commands.startAutoModeCommand"
                        label="Start Auto Mode"
                        tooltip="Start Auto Mode">
@@ -222,7 +222,7 @@
                 </command>
                  <command
                        commandId="org.key_project.keyide.ui.commands.stopAutoModeCommand"
-                       icon="icons/stop.png"
+                       icon="icons/stop.gif"
                        id="org.key_project.keyide.ui.commands.stopAutoModeCommand"
                        label="Stop Auto Mode"
                        style="push">
