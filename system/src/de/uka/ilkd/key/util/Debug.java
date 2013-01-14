@@ -23,10 +23,8 @@ public final class Debug implements DebugMBean {
 //    }
 
     /** has to be set in order to enable assertion */
-    public static boolean ENABLE_ASSERTION = Boolean.valueOf(System.getProperty("KeyAssertionFlag", "true"));
-//    		
-//    		Boolean.getBoolean("KeyAssertionFlag");
-////    		true;
+    public static boolean ENABLE_ASSERTION =
+            Boolean.valueOf(System.getProperty("KeyAssertionFlag", "true"));
 
     /** has to be set in order to enable debugging */
     public static boolean ENABLE_DEBUG = "on".equals(System

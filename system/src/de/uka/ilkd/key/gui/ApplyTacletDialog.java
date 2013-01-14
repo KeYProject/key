@@ -23,6 +23,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -128,7 +129,8 @@ public abstract class ApplyTacletDialog extends JDialog {
 //        tp.printTaclet(taclet, model[0].tacletApp().instantiations(),
         tp.printTaclet(taclet, 
         	       SVInstantiations.EMPTY_SVINSTANTIATIONS,
-        	       ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(), 
+        	       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(), 
+//        	       ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(), 
         	       false);
         tacletSB.append(backend.getString());
         

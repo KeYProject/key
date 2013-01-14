@@ -35,6 +35,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -85,8 +86,10 @@ public final class SLEnvInput extends AbstractEnvInput {
     //-------------------------------------------------------------------------
     
     private static String getLanguage() {
-        GeneralSettings gs 
-            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+//        GeneralSettings gs 
+//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();        
+    	GeneralSettings gs 
+        = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
         if(gs.useJML() && gs.useOCL()) {
             return "JML/OCL";
         } else if(gs.useJML()) {
@@ -295,7 +298,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 	    			pm, 
                         			(LoopStatement) loop);
                     if(inv != null) {
-                        specRepos.setLoopInvariant(inv);
+                        specRepos.addLoopInvariant(inv);
                     }
                 }
                 
@@ -352,8 +355,10 @@ public final class SLEnvInput extends AbstractEnvInput {
             throw new IllegalStateException("InitConfig not set.");
         }
             
-        final GeneralSettings gs 
-            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        final GeneralSettings gs
+        = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+
+//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
         if(gs.useJML()) {
             createSpecs(new JMLSpecExtractor(initConfig.getServices()));
         }

@@ -103,7 +103,9 @@ public class BatchMode {
             else
                 statPrinter.println ( "" + appliedRules + ", " + time );                
             statPrinter.close();
-        } catch ( IOException e ) {}
+        } catch ( IOException e ) {
+            e.printStackTrace();
+        }
     }
     
     private void saveProof(Proof proof, String filename) throws IOException {

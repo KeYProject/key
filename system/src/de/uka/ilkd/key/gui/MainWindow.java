@@ -70,6 +70,7 @@ import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
+import de.uka.ilkd.key.gui.actions.GoalBackAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
@@ -81,6 +82,7 @@ import de.uka.ilkd.key.gui.actions.OpenFileAction;
 import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
 import de.uka.ilkd.key.gui.actions.ProofManagementAction;
+import de.uka.ilkd.key.gui.actions.PruneProofAction;
 import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
 import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
 import de.uka.ilkd.key.gui.actions.SaveFileAction;
@@ -129,7 +131,6 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
-
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
@@ -299,7 +300,8 @@ public final class MainWindow extends JFrame  {
      */
     private void setLaF() {
         try{
-            if (ProofSettings.DEFAULT_SETTINGS.getViewSettings().useSystemLaF()) {
+        	 if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().useSystemLaF()) {
+//            if (ProofSettings.DEFAULT_SETTINGS.getViewSettings().useSystemLaF()) {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
                 // Workarounds for GTK+
@@ -379,7 +381,8 @@ public final class MainWindow extends JFrame  {
         // FIXME do this NOT in layout of GUI
         // minimize interaction
         final boolean stupidMode = 
-            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
+        		  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
+//            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
         mediator.setStupidMode(stupidMode);
         
         // set up actions
@@ -516,7 +519,8 @@ public final class MainWindow extends JFrame  {
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();
-        toolBar.add(new UndoLastStepAction(this, false));
+        toolBar.add(new GoalBackAction(this, false));
+        toolBar.add(new PruneProofAction(this, false));
         JToggleButton oneStep = new JToggleButton(oneStepSimplAction);
         oneStep.setHideActionText(true);
         toolBar.addSeparator();
@@ -766,7 +770,8 @@ public final class MainWindow extends JFrame  {
         
         JMenuItem laf = new JCheckBoxMenuItem("Use system look and feel (experimental)");
         laf.setToolTipText("If checked KeY tries to appear in the look and feel of your window manager, if not in the default Java LaF (aka Metal).");
-        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofSettings.DEFAULT_SETTINGS.getViewSettings();
+//        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofSettings.DEFAULT_SETTINGS.getViewSettings();
+        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         laf.setSelected(vs.useSystemLaF());
         laf.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -929,7 +934,8 @@ public final class MainWindow extends JFrame  {
         JMenu result = new JMenu("Specification Parser");       
         ButtonGroup group = new ButtonGroup();
         GeneralSettings gs 
-            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        =ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
                 
         JRadioButtonMenuItem jmlButton 
             = new JRadioButtonMenuItem("Source File Comments Are JML", gs.useJML());
@@ -939,7 +945,8 @@ public final class MainWindow extends JFrame  {
         jmlButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 GeneralSettings gs 
-                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+                =ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+//                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
                 gs.setUseJML(true);
                 gs.setUseOCL(false);
             }
@@ -952,7 +959,8 @@ public final class MainWindow extends JFrame  {
         noneButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
         	GeneralSettings gs 
-        	= ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        	=ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+    //    	= ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
         	gs.setUseJML(false);
         	gs.setUseOCL(false);
             }

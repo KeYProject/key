@@ -177,37 +177,39 @@ public class ExecutionValue extends AbstractExecutionElement implements IExecuti
          Sort valueSort = value.sort();
          if (valueSort != getServices().getJavaInfo().getNullType().getSort()) {
             KeYJavaType keyType = getServices().getJavaInfo().getKeYJavaType(valueSort);
-            Type javaType = keyType.getJavaType();
-            if (javaType instanceof ArrayDeclaration) {
-               // Array value
-               ArrayDeclaration ad = (ArrayDeclaration)javaType;
-               Set<IProgramVariable> pvs = SymbolicExecutionUtil.getProgramVariables(ad.length());
-               if (pvs.size() == 1) {
-                  ExecutionVariable lengthVariable = new ExecutionVariable(getVariable().getParentNode(), this, pvs.iterator().next());
-                  children.add(lengthVariable);
-                  ExecutionValue[] lengthValues = lengthVariable.getValues();
-                  for (ExecutionValue lengthValue : lengthValues) {
-                     try {
-                        int length = Integer.valueOf(lengthValue.getValueString());
-                        for (int i = 0; i < length; i++) {
-                           ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), this, i, lengthValue);
-                           children.add(childI);
+            if (keyType != null) { // Can be null, e.g. if Sort is the Sort of Heap
+               Type javaType = keyType.getJavaType();
+               if (javaType instanceof ArrayDeclaration) {
+                  // Array value
+                  ArrayDeclaration ad = (ArrayDeclaration)javaType;
+                  Set<IProgramVariable> pvs = SymbolicExecutionUtil.getProgramVariables(ad.length());
+                  if (pvs.size() == 1) {
+                     ExecutionVariable lengthVariable = new ExecutionVariable(getVariable().getParentNode(), this, pvs.iterator().next());
+                     children.add(lengthVariable);
+                     ExecutionValue[] lengthValues = lengthVariable.getValues();
+                     for (ExecutionValue lengthValue : lengthValues) {
+                        try {
+                           int length = Integer.valueOf(lengthValue.getValueString());
+                           for (int i = 0; i < length; i++) {
+                              ExecutionVariable childI = new ExecutionVariable(getVariable().getParentNode(), this, i, lengthValue);
+                              children.add(childI);
+                           }
                         }
-                     }
-                     catch (NumberFormatException e) {
-                        // Symbolic value, nothing to do.
+                        catch (NumberFormatException e) {
+                           // Symbolic value, nothing to do.
+                        }
                      }
                   }
                }
-            }
-            else if (javaType instanceof ClassType) {
-               // Normal value
-               ImmutableList<Field> fields = ((ClassType)javaType).getAllFields(getServices());
-               for (Field field : fields) {
-                  ImmutableList<ProgramVariable> vars = getServices().getJavaInfo().getAllAttributes(field.getFullName(), keyType);
-                  for (ProgramVariable var : vars) {
-                     if (!var.isImplicit() && !var.isStatic()) {
-                        children.add(new ExecutionVariable(getVariable().getParentNode(), this, field.getProgramVariable()));
+               else if (javaType instanceof ClassType) {
+                  // Normal value
+                  ImmutableList<Field> fields = ((ClassType)javaType).getAllFields(getServices());
+                  for (Field field : fields) {
+                     ImmutableList<ProgramVariable> vars = getServices().getJavaInfo().getAllAttributes(field.getFullName(), keyType);
+                     for (ProgramVariable var : vars) {
+                        if (!var.isImplicit() && !var.isStatic()) {
+                           children.add(new ExecutionVariable(getVariable().getParentNode(), this, field.getProgramVariable()));
+                        }
                      }
                   }
                }
