@@ -10,6 +10,7 @@
 package de.uka.ilkd.key.gui.prooftree;
 
 
+import java.lang.ref.WeakReference;
 import java.util.Enumeration;
 import java.util.LinkedList;
 
@@ -21,13 +22,18 @@ import de.uka.ilkd.key.proof.Node;
 public abstract class GUIAbstractTreeNode implements TreeNode {
 
     private GUIProofTreeModel tree;
-    
+
+    // made weak otherwise there are leaks in ExpansionState.map 
+    // and ProofTreeView.delegateView.lastPathComponent 
+    private WeakReference<Node> noderef;
+
     protected GUIProofTreeModel getProofTreeModel () {
 	return tree;
     }
 
-    public GUIAbstractTreeNode ( GUIProofTreeModel tree ) {
+    public GUIAbstractTreeNode (GUIProofTreeModel tree, Node node) {
 	this.tree = tree;
+	this.noderef = new WeakReference<Node>(node);
     }
 
     public abstract TreeNode getChildAt(int childIndex);
@@ -100,7 +106,9 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 	
     }
     
-    public abstract Node getNode();
+    public Node getNode() {
+        return noderef.get();
+    }
 
     protected Node findChild (Node n) {
         if ( n.childrenCount () == 1 ) return n.child ( 0 );

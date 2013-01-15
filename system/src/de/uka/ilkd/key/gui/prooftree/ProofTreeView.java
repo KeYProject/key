@@ -35,7 +35,6 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
-import de.uka.ilkd.key.gui.prooftree.GUIOneStepSimpTreeNode.GUIOneStepChildTreeNode;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;

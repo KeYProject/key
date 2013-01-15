@@ -12,7 +12,6 @@ package de.uka.ilkd.key.gui.prooftree;
 /** this class implements a TreeModel that can be displayed using the
  * JTree class framework 
  */
-import java.lang.ref.WeakReference;
 
 import javax.swing.tree.TreeNode;
 
@@ -21,14 +20,12 @@ import de.uka.ilkd.key.proof.Node;
 class GUIBranchNode extends GUIAbstractTreeNode 
                     implements TreeNode {
 
-    private WeakReference<Node>   subTreeRef;
     private Object label;
     
     public GUIBranchNode(GUIProofTreeModel tree,
 			 Node subTree,
 			 Object   label) {
-	super ( tree );
-	this.subTreeRef = new WeakReference<Node>(subTree);
+	super (tree, subTree);
 	this.label = label;
     }
 
@@ -64,7 +61,7 @@ class GUIBranchNode extends GUIAbstractTreeNode
         if ( childrenCache.length == 0 || childrenCache[0] != null ) return;
             
         int count = 0;
-        Node n = subTreeRef.get();
+        Node n = getNode();
         if(n==null){
             return;
         }
@@ -95,7 +92,7 @@ class GUIBranchNode extends GUIAbstractTreeNode
 
     private int getChildCountHelp() {
         int count = 0;
-        Node n = subTreeRef.get();
+        Node n = getNode();
         if(n==null){
             return 0;
         }
@@ -116,7 +113,7 @@ class GUIBranchNode extends GUIAbstractTreeNode
 
     
     public TreeNode getParent() {
-        Node self = subTreeRef.get();
+        Node self = getNode();
         if(self==null)
             return null;
 	Node n = self.parent();
@@ -131,13 +128,9 @@ class GUIBranchNode extends GUIAbstractTreeNode
 	}
     }
 
-    public Node getNode() {
-	return subTreeRef.get();
-    }
-
     // signalled by GUIProofTreeModel when the user has altered the value
     public void setLabel(String s) {
-	Node n = subTreeRef.get();
+	Node n = getNode();
 	if(n!=null){
 	    n.getNodeInfo().setBranchLabel(s);
 	}
@@ -148,7 +141,7 @@ class GUIBranchNode extends GUIAbstractTreeNode
     }
 
     public String toString() {
-        Node n = subTreeRef.get();
+        Node n = getNode();
         String res;
         if(n!=null){
             res = n.getNodeInfo().getBranchLabel();

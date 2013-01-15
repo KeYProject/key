@@ -480,11 +480,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     public GUIAbstractTreeNode getProofTreeNode(Node n) {
  	GUIAbstractTreeNode res = find(n);
 	if ( res == null ) {
-	    if(n.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
-	        res = new GUIOneStepSimpTreeNode(this, n);
-	    } else {
-	        res = new GUIProofTreeNode(this,n);
-	    }
+	    res = new GUIProofTreeNode(this,n);
 	    proofTreeNodes.put(n,res);
 	}
 	return res;
