@@ -585,19 +585,20 @@ public class ProofTreeView extends JPanel {
 
 	    
 	    GUIAbstractTreeNode treeNode = 
-		((GUIAbstractTreeNode)e.getNewLeadSelectionPath().
-		 getLastPathComponent());
-	    if (treeNode instanceof GUIProofTreeNode) {		
-		Node node = treeNode.getNode();
-		Goal selected = proof.getGoal(node);
-		if (selected != null) {
-		    mediator.goalChosen(selected);
-		} else {
-		    mediator.nonGoalNodeChosen(node);
-		}
-	    } else if (treeNode instanceof GUIBranchNode) {
-                selectBranchNode((GUIBranchNode)treeNode);
-            }
+	            ((GUIAbstractTreeNode)e.getNewLeadSelectionPath().
+	                    getLastPathComponent());
+	    if (treeNode instanceof GUIBranchNode) {
+	        selectBranchNode((GUIBranchNode)treeNode);
+	    } else {
+	        Node node = treeNode.getNode();
+	        Goal selected = proof.getGoal(node);
+	        if (selected != null) {
+	            mediator.goalChosen(selected);
+	        } else {
+	            mediator.nonGoalNodeChosen(node);
+	        }
+	    }
+
 	    // catching NullPointerException occurring when renaming root node
 	    if (treeNode instanceof GUIBranchNode && treeNode
 			.getNode().parent() != null) {
@@ -616,7 +617,7 @@ public class ProofTreeView extends JPanel {
          * 
          */
         private static final long serialVersionUID = -4990023575036168279L;
-    private Icon keyHole20x20 = IconFactory.keyHole(20, 20);       
+        private Icon keyHole20x20 = IconFactory.keyHole(20, 20);       
             
 	public Component getTreeCellRendererComponent(JTree tree,
 						      Object value,
