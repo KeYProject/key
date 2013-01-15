@@ -29,6 +29,8 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.util.Debug;
 
 /** An implementation of TreeModel that can be displayed using the
@@ -388,7 +390,7 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
      */
     private void updateTree(TreeNode trn) {
         if (trn == null || trn == getRoot()) { // bigger change, redraw whole tree
-	    proofTreeNodes = new WeakHashMap<Node, GUIProofTreeNode>();
+	    proofTreeNodes = new WeakHashMap<Node, GUIAbstractTreeNode>();
 	    branchNodes    = new WeakHashMap<Node, GUIBranchNode>();
             fireTreeStructureChanged(new Object[]{getRoot()});
             return;
@@ -462,23 +464,27 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     // caches for the GUIProofTreeNode and GUIBranchNode objects
     // generated to represent the nodes resp. subtrees of the Proof.
     
-    private WeakHashMap<Node, GUIProofTreeNode> proofTreeNodes = new WeakHashMap<Node, GUIProofTreeNode>();
+    private WeakHashMap<Node, GUIAbstractTreeNode> proofTreeNodes = new WeakHashMap<Node, GUIAbstractTreeNode>();
     private WeakHashMap<Node, GUIBranchNode> branchNodes    = new WeakHashMap<Node, GUIBranchNode>();
     
     /** Return the GUIProofTreeNode corresponding to node n, if one
      * has already been generated, and null otherwise.
      */
-    public GUIProofTreeNode find(Node n) {
+    public GUIAbstractTreeNode find(Node n) {
 	return (proofTreeNodes.get(n));
     }
 
     /** Return the GUIProofTreeNode corresponding to node n.
      * Generate one if necessary.
      */
-    public GUIProofTreeNode getProofTreeNode(Node n) {
- 	GUIProofTreeNode res = find(n);
+    public GUIAbstractTreeNode getProofTreeNode(Node n) {
+ 	GUIAbstractTreeNode res = find(n);
 	if ( res == null ) {
-	    res = new GUIProofTreeNode(this,n);
+	    if(n.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp) {
+	        res = new GUIOneStepSimpTreeNode(this, n);
+	    } else {
+	        res = new GUIProofTreeNode(this,n);
+	    }
 	    proofTreeNodes.put(n,res);
 	}
 	return res;

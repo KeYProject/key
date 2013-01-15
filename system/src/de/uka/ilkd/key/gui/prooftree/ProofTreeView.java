@@ -35,6 +35,7 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
 import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
+import de.uka.ilkd.key.gui.prooftree.GUIOneStepSimpTreeNode.GUIOneStepChildTreeNode;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -45,6 +46,7 @@ public class ProofTreeView extends JPanel {
     
     private static final long serialVersionUID = 3732875161168302809L;
     private static final Color PASTEL_COLOR = new Color(255,255,204);
+    private static final Color GRAY_COLOR = Color.DARK_GRAY;
     private static final Color BISQUE_COLOR = new Color(240,228,196);
     private static final Color PALE_RED_COLOR = new Color(255,153,153);
     private static final Color LIGHT_BLUE_COLOR = new Color(230,230,255);
@@ -309,7 +311,7 @@ public class ProofTreeView extends JPanel {
     public void makeNodeVisible(Node n) {
         if (n == null) return;
 	
-        final GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
+        final GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
         if (node==null) return;
  	
         TreeNode[] obs=node.getPath();
@@ -323,7 +325,7 @@ public class ProofTreeView extends JPanel {
 
 
     protected void makeNodeExpanded(Node n) {
-	GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
+	GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
  	if (node==null) return;
  	TreeNode[] obs=node.getPath();
  	TreePath tp = new TreePath(obs);
@@ -628,24 +630,31 @@ public class ProofTreeView extends JPanel {
 	        return super.getTreeCellRendererComponent(tree, value, sel, 
 	                expanded, leaf, row, hasFocus);
 	    }
-	    
-            if (!(value instanceof GUIProofTreeNode)) {
-		super.getTreeCellRendererComponent
-		    (tree, value, sel, expanded, leaf, row, hasFocus);
-		setBackgroundNonSelectionColor(BISQUE_COLOR);
-		if (value instanceof GUIBranchNode) {
-		    if ( ((GUIBranchNode)value).getNode().isClosed() ) {
-			// all goals below this node are closed
-			this.setIcon(IconFactory.provedFolderIcon());
-		    }
-		}
-		return this;
-	    }
-	    Node node = ((GUIProofTreeNode)value).getNode();
+
+	    if (value instanceof GUIBranchNode) {
+	        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+                setBackgroundNonSelectionColor(BISQUE_COLOR);
+                if ( ((GUIBranchNode)value).getNode().isClosed() ) {
+                    // all goals below this node are closed
+                    this.setIcon(IconFactory.provedFolderIcon());
+                }
+                return this;
+            }
+
+	    if (value instanceof GUIOneStepChildTreeNode) {
+	        super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+                setForeground(GRAY_COLOR);
+                setIcon(IconFactory.oneStepSimplifier(16));
+                setText(value.toString());
+                return this;
+            }
+
+            // now GUIProofTreeNode / GUIOneStepSimpTreeNode
+	    Node node = ((GUIAbstractTreeNode)value).getNode();
 	    String nodeText = node.serialNr()+":"+node.name();
 	    boolean isBranch = false;
 	    {
-                final Node child = ((GUIProofTreeNode)value).findChild( node );
+                final Node child = ((GUIAbstractTreeNode)value).findChild( node );
                 if ( child != null && child.getNodeInfo()
                     .getBranchLabel () != null ) {
                     isBranch = true;
@@ -905,7 +914,7 @@ public class ProofTreeView extends JPanel {
 		Node n;
 		while ( it.hasNext () ) {
 		    n = it.next ().node ();		  
-		    GUIProofTreeNode node = delegateModel.getProofTreeNode(n);
+		    GUIAbstractTreeNode node = delegateModel.getProofTreeNode(n);
 		    if (node==null) break;
 		    TreeNode[] obs=node.getPath();
 		    TreePath tp = new TreePath(obs);

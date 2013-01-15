@@ -35,6 +35,8 @@ public class IconFactory {
     private static Image keyLogoSmall        = getImage("images/key-color-icon-square.png");
     private static Icon provedFolderIcon     = KeYFolderIcon.getKeYFolderIconClosed();
     private static Icon closableFolderIcon   = KeYFolderIcon.getKeYFolderIconClosable();
+    
+    private static Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png"); 
 
     private static Icon expandedIcon   = KeYControlIcon.getKeYExpandedIcon();
     private static Icon collapsedIcon  = KeYControlIcon.getKeYCollapsedIcon();
@@ -89,10 +91,6 @@ public class IconFactory {
 	return scaleIcon(keyHole,x,y);
     }
     
-
-            
-            
-
     public static ImageIcon keyHoleClosed(int x, int y) {
 	return scaleIcon(keyHoleClosed,x,y);
     }
@@ -139,6 +137,10 @@ public class IconFactory {
 
     public static ImageIcon simplifyLogo(int size) {
 	return scaleIcon(decisionProcedureSimplify, size, size);
+    }
+    
+    public static Icon oneStepSimplifier(int size) {
+        return scaleIcon(oneStepSimplifier, size, size);
     }
 
     public static ImageIcon junitLogo(int size) {
@@ -355,4 +357,5 @@ public class IconFactory {
                     }
         }
     }
+
 }
