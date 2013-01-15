@@ -72,7 +72,6 @@ class TacletMenu extends JMenu {
     private static final Set<Name> CLUTTER_RULES = new HashSet<Name>();
 
     static {
-        CLUTTER_RULES.add(new Name("cut_direct"));
         CLUTTER_RULES.add(new Name("cut_direct_r"));
         CLUTTER_RULES.add(new Name("cut_direct_l"));
         CLUTTER_RULES.add(new Name("case_distinction_r"));
