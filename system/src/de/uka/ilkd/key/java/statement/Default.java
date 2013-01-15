@@ -80,7 +80,6 @@ public class Default extends BranchImp {
             if (len > index) {
                 return body.get(index);
             }
-            index -= len;
         }
         throw new ArrayIndexOutOfBoundsException();
     }

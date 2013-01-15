@@ -56,7 +56,8 @@ public class KeYUtilTest extends TestCase {
       IType type = project.findType("JDTMethodToKeYProgramMethodTest");
       IMethod doSomething = type.getMethods()[0];
       assertEquals("doSomething", doSomething.getElementName());
-      IType innerType = project.findType("JDTMethodToKeYProgramMethodTest$InnerClass");
+      IType innerType = type.getType("InnerClass");
+      assertNotNull(innerType);
       IMethod run = innerType.getMethods()[0];
       assertEquals("run", run.getElementName());
       // Open project in KeY

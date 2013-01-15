@@ -166,11 +166,11 @@ public class RedBlackTree implements AbstractMap {
         Node x = root;
         //@ ghost \seq visited = \seq_empty;
         
-        /*@ decreasing x.height;
-          @ maintaining 0 <= x.height && x.height <= root.height;
+        /*@ maintaining 0 <= x.height && x.height <= root.height;
           @ maintaining (\forall int i; 0 <= i && i < visited.length; ((Node)visited[i]).key != key);
           @ maintaining (\forall Node n; \contains(visited,n); \contains(theNodes,n));
           @ maintaining \invariant_for(x);
+          @ decreasing x.height;
           @*/
         // XXX still to weak, need to say something about ordering of keys
         while (x != Node.NIL && x.key != key){

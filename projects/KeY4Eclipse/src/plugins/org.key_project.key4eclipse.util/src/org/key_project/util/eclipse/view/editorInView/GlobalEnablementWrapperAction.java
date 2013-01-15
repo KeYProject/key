@@ -11,6 +11,8 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.events.HelpListener;
 import org.eclipse.swt.widgets.Event;
+import org.key_project.util.Activator;
+import org.key_project.util.eclipse.Logger;
 
 /**
  * Wrapps existing {@link IAction} to add a global enabled state defined
@@ -222,7 +224,13 @@ public class GlobalEnablementWrapperAction implements IAction, IGlobalEnablement
     */
    @Override
    public boolean isEnabled() {
-      return action.isEnabled() && isGlobalEnabled();
+      try {
+         return isGlobalEnabled() && action.isEnabled();
+      }
+      catch (Exception e) { // Sometimes org.eclipse.gef.editpolicies.NonResizableEditPolicy.getAlignCommand(NonResizableEditPolicy.java:236) throws a java.lang.NullPointerException for an unknown reason
+         new Logger(Activator.getDefault(), Activator.PLUGIN_ID).logError("Exception during computation of enabled state in " + getClass() + ".", e);
+         return false;
+      }
    }
 
    /**

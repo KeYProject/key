@@ -83,7 +83,6 @@ public class TypeCast extends TypeOperator {
             if (len > index) {
                 return children.get(index);
             }
-            index -= len;
         }
         throw new ArrayIndexOutOfBoundsException();
     }

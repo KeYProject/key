@@ -21,9 +21,7 @@ http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
 
 package de.uka.ilkd.key.gui;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;

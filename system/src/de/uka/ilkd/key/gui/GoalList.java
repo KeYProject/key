@@ -27,7 +27,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JPopupMenu;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
@@ -71,8 +70,6 @@ public class GoalList extends JList {
     
     /** listens to gui events */
     private GoalListGUIListener guiListener;
-    private JPopupMenu popupMenu; 
-
     /** 
      * This action enables or disables a selected goal.
      * 
@@ -347,20 +344,15 @@ public class GoalList extends JList {
             selectSelectedGoal();
         }
 
-        /** focused goal has changed */
-        public void selectedGoalChanged(KeYSelectionEvent e) {
-            selectSelectedGoal();
-        }
-
-	/** the selected proof has changed (e.g. a new proof has been
-	 * loaded) */ 
-	public void selectedProofChanged (KeYSelectionEvent e) {
+        /** the selected proof has changed (e.g. a new proof has been
+         * loaded) */ 
+        public void selectedProofChanged (KeYSelectionEvent e) {
             Debug.out ( "GoalList: initialize with new proof" );
             selectingListModel.setProof ( e.getSource ().getSelectedProof () );
             validate ();
         }
     }
-        
+
         
 
     private class GoalListInteractiveListener implements AutoModeListener {

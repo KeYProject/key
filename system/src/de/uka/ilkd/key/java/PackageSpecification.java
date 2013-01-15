@@ -71,7 +71,6 @@ public class PackageSpecification
     public ProgramElement getChildAt(int index) {
         if (reference != null) {
             if (index == 0) return reference;
-            index--;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
