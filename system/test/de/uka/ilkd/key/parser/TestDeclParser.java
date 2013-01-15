@@ -431,8 +431,6 @@ public class TestDeclParser extends TestCase {
 		 "  \\formula b;\n" +
 		 "}\n").decls();
 	  fail("Parsed in ambigious declaration");
-	} catch (AmbigiousDeclException ade) {
-	    // everything ok  
 	} catch(RuntimeException e){
 	    if(!(e.getCause() instanceof AmbigiousDeclException)){
 		fail("Unexpected excpetion. Testcase failed." +e);

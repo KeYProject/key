@@ -28,8 +28,13 @@ options {
 
   package de.uka.ilkd.key.parser.antlr3;
 
+  import de.uka.ilkd.key.parser.AmbigiousDeclException;
+  import de.uka.ilkd.key.parser.GenericSortException;
+  import de.uka.ilkd.key.parser.InvalidFindException;
   import de.uka.ilkd.key.parser.KeYSemanticException;
+  import de.uka.ilkd.key.parser.NotDeclException;
   import de.uka.ilkd.key.parser.SchemaVariableModifierSet;
+  import de.uka.ilkd.key.parser.UnfittingReplacewithException;
   import de.uka.ilkd.key.parser.ParserMode;
   import de.uka.ilkd.key.parser.DeclPicker;
   import de.uka.ilkd.key.parser.IdDeclaration;
@@ -676,7 +681,7 @@ options {
     				 boolean makeVariableSV,
             			 boolean makeSkolemTermSV,
             			 SchemaVariableModifierSet mods) 
-            			 	throws RecognitionException/*AmbigiousDeclException*/ {
+            			 	throws AmbigiousDeclException {
         if (!skip_schemavariables) {
             SchemaVariable v;
             if(s == Sort.FORMULA && !makeSkolemTermSV) {
@@ -706,11 +711,10 @@ options {
 
             if (inSchemaMode()) {
                if (variables().lookup(v.name()) != null) {
-                 throw new RecognitionException(input);
-            	 //throw new AmbigiousDeclException(v.name().toString(), 
-            	 //			          getSourceName(), 
-            	 // 				  getLine(), 
-            	 // 				  getColumn());
+            	 throw new AmbigiousDeclException(v.name().toString(), 
+            	 			          getSourceName(), 
+            	  				  getLine(), 
+            	  				  getColumn());
                }
                variables().add(v);
             }
@@ -819,9 +823,8 @@ options {
         }
 
         if ( result == null && !("length".equals(attributeName)) ) {
-            throw new RecognitionException(input);
-            //throw new NotDeclException ("Attribute ", attributeName,
-            //    getSourceName(), getLine(), getColumn());
+            throw new NotDeclException ("Attribute ", attributeName,
+                getSourceName(), getLine(), getColumn());
         }
         return result;
     }
@@ -1100,15 +1103,13 @@ options {
         
         // not found
         if (args==null) {
-            throw new RecognitionException(input);
-            //throw new NotDeclException
-            //    ("(program) variable or constant", varfunc_name,
-            //     getSourceName(), getLine(), getColumn());
+            throw new NotDeclException
+                ("(program) variable or constant", varfunc_name,
+                 getSourceName(), getLine(), getColumn());
         } else {
-            throw new RecognitionException(input);
-            //throw new NotDeclException
-            //    ("function or static query", varfunc_name,
-            //     getSourceName(), getLine(), getColumn());
+            throw new NotDeclException
+                ("function or static query", varfunc_name,
+                 getSourceName(), getLine(), getColumn());
         }
     }
 
@@ -1236,10 +1237,9 @@ options {
                 mod = "Application restrictions";               
             }
             
-            throw new RecognitionException(input);
-            //throw new InvalidFindException
-            //    ( mod +  " may only be used for rewrite taclets:" + find,
-            //     getSourceName(), getLine(), getColumn());
+            throw new InvalidFindException
+                ( mod +  " may only be used for rewrite taclets:" + find,
+                 getSourceName(), getLine(), getColumn());
         }
         if ( find == null ) {
             return new NoFindTacletBuilder();
@@ -1259,16 +1259,14 @@ options {
                 Term findFma = findSeq.succedent().get(0).formula();
                 return new SuccTacletBuilder().setFind(findFma);
             } else {
-                throw new RecognitionException(input);
-                //throw new InvalidFindException
-                //    ("Unknown find-sequent (perhaps null?):"+findSeq,
-                //     getSourceName(), getLine(), getColumn());
+                throw new InvalidFindException
+                    ("Unknown find-sequent (perhaps null?):"+findSeq,
+                     getSourceName(), getLine(), getColumn());
             }
         } else {
-            throw new RecognitionException(input);
-            //throw new InvalidFindException
-            //        ("Unknown find class type: " + find.getClass().getName(),
-            //         getSourceName(), getLine(), getColumn());
+            throw new InvalidFindException
+                    ("Unknown find class type: " + find.getClass().getName(),
+                     getSourceName(), getLine(), getColumn());
         }
     }       
 
@@ -1302,11 +1300,10 @@ options {
                                                              (Sequent)rwObj,
                                                              pvs);  
                     } else {
-                        throw new RecognitionException(input);
-                        //throw new UnfittingReplacewithException
-                        //    ("Replacewith in a Antec-or SuccTaclet has "+
-                        //     "to contain a sequent (not a term)", 
-                        //     getSourceName(), getLine(), getColumn());
+                        throw new UnfittingReplacewithException
+                            ("Replacewith in a Antec-or SuccTaclet has "+
+                             "to contain a sequent (not a term)", 
+                             getSourceName(), getLine(), getColumn());
                     }
                 } else if ( b instanceof RewriteTacletBuilder ) {
                     if ( rwObj instanceof Term ) {
@@ -1315,11 +1312,10 @@ options {
                                                            (Term)rwObj,
                                                            pvs);  
                     } else {
-                        throw new RecognitionException(input);
-                        //throw new UnfittingReplacewithException
-                        //    ("Replacewith in a RewriteTaclet has "+
-                        //     "to contain a term (not a sequent)", 
-                        //     getSourceName(), getLine(), getColumn());
+                        throw new UnfittingReplacewithException
+                            ("Replacewith in a RewriteTaclet has "+
+                             "to contain a term (not a sequent)", 
+                             getSourceName(), getLine(), getColumn());
                     }
                 }
             }
@@ -1473,9 +1469,8 @@ activated_choice @init{
         name = cat.getText()+":"+choice_.getText();
         c = (Choice) choices().lookup(new Name(name));
         if(c==null){
-            throw new RecognitionException(input);
-            //throw new NotDeclException("Option", choice_.getText(),
-            //                           getSourceName(), choice_.getLine(), choice_.getCharPositionInLine());
+            throw new NotDeclException("Option", choice_.getText(),
+                                       getSourceName(), choice_.getLine(), choice_.getCharPositionInLine());
         }else{
             activatedChoices=activatedChoices.add(c);
         }
@@ -1568,9 +1563,8 @@ one_sort_decl returns [ImmutableList<Sort> createdSorts = ImmutableSLList.<Sort>
                                 try {
                                     s = new GenericSort(sort_name, ext, oneOf);
                                 } catch (GenericSupersortException e) {
-                                    throw new RecognitionException(input);
-                                    //throw new GenericSortException ( "sort", "Illegal sort given",
-                                    //    e.getIllegalSort(), getSourceName(), getLine(), getColumn());
+                                    throw new GenericSortException ( "sort", "Illegal sort given",
+                                        e.getIllegalSort(), getSourceName(), getLine(), getColumn());
                                 }
                             } else if (new Name("any").equals(sort_name)) {
                                 s = Sort.ANY;
@@ -1902,11 +1896,10 @@ pred_decl
                 }
 		if (lookup(p.name()) != null) {
 		    if(!isProblemParser()) {
-                        throw new RecognitionException(input);
-		        //throw new AmbigiousDeclException(p.name().toString(), 
-		        //                                 getSourceName(), 
-		        //                                 getLine(), 
-		        //                                 getColumn());
+		        throw new AmbigiousDeclException(p.name().toString(), 
+		                                         getSourceName(), 
+		                                         getLine(), 
+		                                         getColumn());
 		                                     
 		    }
 		}else{
@@ -1998,11 +1991,10 @@ func_decl
 	        }
 		if (lookup(f.name()) != null) {
 		    if(!isProblemParser()) {
-                      throw new RecognitionException(input);
-		      //throw new AmbigiousDeclException(f.name().toString(), 
-		      //                               getSourceName(), 
-		      //                               getLine(), 
-		      //                               getColumn());
+		      throw new AmbigiousDeclException(f.name().toString(), 
+		                                     getSourceName(), 
+		                                     getLine(), 
+		                                     getColumn());
 		    }
 		}else{
 	    	    addFunction(f);
@@ -2125,10 +2117,9 @@ sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> _sort_id_check_he
             }
 
             if ( s instanceof GenericSort ) {
-                throw new RecognitionException(input);
-                //throw new GenericSortException ( "sort",
-                //    "Non-generic sort expected", s,
-                //    getSourceName (), getLine (), getColumn () );
+                throw new GenericSortException ( "sort",
+                    "Non-generic sort expected", s,
+                    getSourceName (), getLine (), getColumn () );
             }
         }
     ;
@@ -2167,12 +2158,11 @@ any_sortId_check_help [boolean checkSort] returns [Pair<Sort,Type> result = null
             if(checkSort) {
                 s = lookupSort(name);
                 if(s == null) {
-                  throw new RecognitionException(input);
-                  //throw new NotDeclException("sort", 
-                  //                         name, 
-                  //                         getSourceName(), 
-                  //                         getLine(),  
-                  //                         getColumn()); 
+                  throw new NotDeclException("sort", 
+                                           name, 
+                                           getSourceName(), 
+                                           getLine(),  
+                                           getColumn()); 
                 }
             }
             
@@ -2223,11 +2213,10 @@ attrid returns [String attr = "";]
             if (!isDeclParser()) {
 	        kjt = getTypeByClassName(classRef);
 		if(kjt == null)
-                  throw new RecognitionException(input);
-                  //throw new NotDeclException
-                  //  ("Class " + classRef + " is unknown.", 
-                  //   classRef, getSourceName(), getLine(), 
-                  //   getColumn());
+                  throw new NotDeclException
+                    ("Class " + classRef + " is unknown.", 
+                     classRef, getSourceName(), getLine(), 
+                     getColumn());
 		classRef = kjt.getFullName();
             }
          classRef+="::";
@@ -2572,11 +2561,10 @@ classReference returns [String classReference = ""]
             KeYJavaType kjt = null;
 	    kjt = getTypeByClassName(classReference);
             if ( kjt == null) {
-                throw new RecognitionException(input);
-                //throw new NotDeclException
-                //    ("Class " + classReference + " is unknown.", 
-                //     classReference, getSourceName(), getLine(), 
-                //     getColumn());
+                throw new NotDeclException
+                    ("Class " + classReference + " is unknown.", 
+                     classReference, getSourceName(), getLine(), 
+                     getColumn());
             }
 	    classReference = kjt.getFullName();
         }  
@@ -2617,11 +2605,10 @@ staticAttributeOrQueryReference returns [String attrReference = ""]
         {   KeYJavaType kjt = null;
             kjt = getTypeByClassName(attrReference);
             if (kjt == null) {
-                throw new RecognitionException(input);
-                //throw new NotDeclException
-                //    ("Class " + attrReference + " is unknown.", 
-                //     attrReference, getSourceName(), getLine(), 
-                //     getColumn());
+                throw new NotDeclException
+                    ("Class " + attrReference + " is unknown.", 
+                     attrReference, getSourceName(), getLine(), 
+                     getColumn());
             }	        
             attrReference = kjt.getSort().name().toString();            
             match(input, DOT, null);
@@ -2700,11 +2687,10 @@ query [Term prefix] returns [Term result = null]
          if(brackets) classRef += "[]";
          KeYJavaType kjt = getTypeByClassName(classRef);
          if(kjt == null)
-           throw new RecognitionException(input);
-           //throw new NotDeclException
-           //  ("Class " + classRef + " is unknown.", 
-           //   classRef, getSourceName(), getLine(), 
-           //   getColumn());
+           throw new NotDeclException
+             ("Class " + classRef + " is unknown.", 
+              classRef, getSourceName(), getLine(), 
+              getColumn());
          classRef = kjt.getFullName();
        }
        result = getServices().getJavaInfo().getProgramMethodTerm
@@ -2874,10 +2860,9 @@ abbreviation returns [Term _abbreviation=null]
             {
                 a =  scm.getTerm(sc);
                 if(a==null){
-                    throw new RecognitionException(input);
-                    //throw new NotDeclException
-                    //    ("abbreviation", sc, 
-                    //     getSourceName(), getLine(), getColumn());
+                    throw new NotDeclException
+                        ("abbreviation", sc, 
+                         getSourceName(), getLine(), getColumn());
                 }                                
             }
         )
@@ -3291,9 +3276,8 @@ varId returns [ParsableVariable v = null]
         {   
             v = (ParsableVariable) variables().lookup(new Name(id.getText()));
             if (v == null) {
-                throw new RecognitionException(input);
-                //throw new NotDeclException("variable", id.getText(), 
-                //                           getSourceName(), id.getLine(), id.getCharPositionInLine());
+                throw new NotDeclException("variable", id.getText(), 
+                                           getSourceName(), id.getLine(), id.getCharPositionInLine());
             }
         } 
   ;
@@ -3624,13 +3608,12 @@ varcond_hassort [TacletBuilder b]
    RPAREN 
    {
      if(!(s instanceof GenericSort)) {
-        throw new RecognitionException(input);
-   	// throw new GenericSortException("sort",
-   	//				"Generic sort expected", 
-   	//				s,
-   	//				getSourceName(),
-   	//				getLine(), 
-   	//				getColumn());
+   	 throw new GenericSortException("sort",
+   					"Generic sort expected", 
+   					s,
+   					getSourceName(),
+   					getLine(), 
+   					getColumn());
      } else if (!JavaTypeToSortCondition.checkSortedSV((SchemaVariable)x)) {
    	 semanticError("Expected schema variable of kind EXPRESSION or TYPE, " 
    	 	       + "but is " + x);
@@ -3652,13 +3635,12 @@ varcond_fieldtype [TacletBuilder b]
     RPAREN
     {
         if(!(s instanceof GenericSort)) {
-            throw new RecognitionException(input);
-            //throw new GenericSortException("sort",
-            //                            "Generic sort expected", 
-            //                            s,
-            //                            getSourceName(),
-            //                            getLine(), 
-            //                            getColumn());
+            throw new GenericSortException("sort",
+                                        "Generic sort expected", 
+                                        s,
+                                        getSourceName(),
+                                        getLine(), 
+                                        getColumn());
         } else if(!FieldTypeToSortCondition.checkSortedSV((SchemaVariable)x)) {
             semanticError("Expected schema variable of kind EXPRESSION or TYPE, " 
                           + "but is " + x);
@@ -3850,9 +3832,8 @@ option returns [Choice c=null]
         {
             c = (Choice) choices().lookup(new Name(cat.getText()+":"+choice_.getText()));
             if(c==null) {
-                throw new RecognitionException(input);
-                //throw new NotDeclException
-		//	("Option", choice_.getText(), getSourceName(), choice_.getLine(), choice_.getCharPositionInLine());
+                throw new NotDeclException
+			("Option", choice_.getText(), getSourceName(), choice_.getLine(), choice_.getCharPositionInLine());
 	    }
         }
     ;
@@ -3936,8 +3917,7 @@ ruleset[Vector rs]
         {   
             RuleSet h = (RuleSet) ruleSets().lookup(new Name(id.getText()));
             if (h == null) {
-                throw new RecognitionException(input);
-                //throw new NotDeclException("ruleset", id.getText(), getSourceName(), id.getLine(), id.getCharPositionInLine());
+                throw new NotDeclException("ruleset", id.getText(), getSourceName(), id.getLine(), id.getCharPositionInLine());
             }
             rs.add(h);
         }
