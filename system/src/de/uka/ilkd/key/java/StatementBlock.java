@@ -84,7 +84,7 @@ public class StatementBlock extends JavaStatement
         return computePrefixElements(b,0,this);
     }
 
-    /** computes the prefix elements for the given array of statment block */
+    /** computes the prefix elements for the given array of statement block */
     public static ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b, 
             int offset, ProgramPrefix current) {
         final ProgramPrefix[] pp;

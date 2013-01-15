@@ -47,7 +47,7 @@ public class InvariantConfigurator {
     private static final int INV_IDX = 0;
     private static final int MOD_IDX = 1;
     private static final int VAR_IDX = 2;
-    private static final int RSP_IDX = 4;
+    private static final int RSP_IDX = 3;
     private static final String DEFAULT = "Default";
 
     private static InvariantConfigurator configurator = null;
@@ -248,7 +248,7 @@ public class InvariantConfigurator {
             private void initInvariants() {
 
                 @SuppressWarnings({"unchecked"})
-                Map<String,String>[] loopInvTexts = new Map[VAR_IDX+1];
+                Map<String,String>[] loopInvTexts = new Map[RSP_IDX+1];
                 
                 loopInvTexts[INV_IDX] = new LinkedHashMap<String,String>();
                 final Map<LocationVariable,Term> atPres = loopInv.getInternalAtPres();

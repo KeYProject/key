@@ -37,7 +37,6 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.InfFlowCheckInfo;
-import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.init.InfFlowContractPO.IFProofObligationVars;
 import de.uka.ilkd.key.proof.init.po.snippet.InfFlowPOSnippetFactory;
@@ -422,10 +421,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         = TB.applySequential(new Term[]{inst.u, beforeLoopUpdate}, 
                 TB.and(anonAssumption,TB.apply(anonUpdate,uAnonInv)));
 
-        final ContractPO po 
-        = services.getSpecificationRepository()
-                  .getPOForProof(goal.proof());
-
         Goal infFlowGoal = null;
         Term loopInvApplPredTerm = null;
         Taclet informationFlowInvariantApp = null;
@@ -433,22 +428,24 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
             goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) &&
             inst.inv.getRespects(services) != null) {
+            
             assert anonUpdateDatas.size() == 1 : "information flow " +
                                                  "extension is at the " +
                                                  "moment not compatible " +
                                                  "with the non-base-heap " +
                                                  "setting";
-            final AnonUpdateData anonUpdateData = anonUpdateDatas.head();
+            final AnonUpdateData anonUpdateData = anonUpdateDatas.head();            
             
             InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
                     new InfFlowLoopInvariantTacletBuilder(services);
             ifInvariantBuilder.setInvariant(inst.inv);
+            ifInvariantBuilder.setGuard(TB.var(guardVar));
             ifInvariantBuilder.setContextUpdate(inst.u);
             ifInvariantBuilder.setHeapAtPre(anonUpdateData.loopHeapAtPre);
             ifInvariantBuilder.setHeapAtPost(anonUpdateData.loopHeap);
             ifInvariantBuilder.setSelf(inst.selfTerm);
-            ifInvariantBuilder.setLocalIns(TB.var(localIns));//.add(guardVar)
-            ifInvariantBuilder.setLocalOuts(TB.var(localOuts));//.add(guardVar)
+            ifInvariantBuilder.setLocalIns(TB.var(localIns));
+            ifInvariantBuilder.setLocalOuts(TB.var(localOuts));
             
             // generate information flow invariant application predicate
             // and associated taclet
@@ -462,17 +459,19 @@ public final class WhileInvariantRule implements BuiltInRule {
             // generate proof obligation variables
             final ProofObligationVars instantiationVars =
                     new ProofObligationVars(inst.selfTerm,
-                            TB.var(localIns),
-                            anonUpdateData.loopHeapAtPre,
-                            TB.var(localOuts),
-                            anonUpdateData.loopHeap, services);
+                                            TB.var(guardVar),
+                                            TB.var(localIns),
+                                            anonUpdateData.loopHeapAtPre,
+                                            TB.var(localOuts),
+                                            anonUpdateData.loopHeap,
+                                            services);
             final IFProofObligationVars ifVars =
                     new IFProofObligationVars(instantiationVars, services);
             ((LoopInvariantBuiltInRuleApp) ruleApp).setInformationFlowProofObligationVars(ifVars);
 
             // create proof obligation
             Pair<InfFlowPOSnippetFactory, Sequent> factoryAndSequent
-                = buildBodyPreservesSequent(ifVars, inst.inv, guardTrueTerm, services);
+                = buildBodyPreservesSequent(ifVars, inst.inv, TB.var(guardVar), services);
             Sequent seq = factoryAndSequent.second;
             infFlowGoal = goal.getCleanGoal(seq);
             infFlowGoal.setBranchLabel("Information Flow Validity");
@@ -494,24 +493,54 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         //split goal into three branches
-        ImmutableList<Goal> result = goal.split(3);
-        Goal initGoal = result.tail().tail().head();
-        Goal bodyGoal = result.tail().head();
-        Goal useGoal = result.head();
-        initGoal.setBranchLabel("Invariant Initially Valid");
-        bodyGoal.setBranchLabel("Body Preserves Invariant");
-        useGoal.setBranchLabel("Use Case");
-
-        if(infFlowGoal != null) {
-            assert loopInvApplPredTerm != null && informationFlowInvariantApp != null;            
-            result = result.append(infFlowGoal);
+        Goal initGoal, bodyGoal;
+        ImmutableList<Goal> result;
+        if (infFlowGoal == null) {
+            result = goal.split(3);
+            initGoal = result.tail().tail().head();
+            bodyGoal = result.tail().head();
+            Goal useGoal = result.head();
+            initGoal.setBranchLabel("Invariant Initially Valid");
+            bodyGoal.setBranchLabel("Body Preserves Invariant");
+            useGoal.setBranchLabel("Use Case");
             
+            // "Use Case":
+            // \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
+            // (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
+            // (#v1=FALSE -> \[{.. ...}\]post)),anon2))
+            useGoal.addFormula(new SequentFormula(wellFormedAnon), 
+                    true, 
+                    false);             
+            useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
+            useGoal.addFormula(new SequentFormula(postAssumption), 
+                    true, 
+                    false);
+
+            Term restPsi = TB.prog((Modality)inst.progPost.op(),
+                    JavaTools.removeActiveStatement(
+                            inst.progPost.javaBlock(), 
+                            services), 
+                            inst.progPost.sub(0));
+            Term guardFalseRestPsi = TB.box(guardJb, 
+                    TB.imp(guardFalseTerm, restPsi));
+            useGoal.changeFormula(new SequentFormula(TB.applySequential(
+                    uAnon,
+                    guardFalseRestPsi)), 
+                    ruleApp.posInOccurrence());
+        } else {
+            result = goal.split(2);
+            initGoal = result.tail().head();
+            bodyGoal = result.head();            
+            initGoal.setBranchLabel("Invariant Initially Valid");
+            bodyGoal.setBranchLabel("Body Preserves Invariant");
+            assert loopInvApplPredTerm != null && informationFlowInvariantApp != null;
+            result = result.append(infFlowGoal);
             // add term and taclet to post goal
-            useGoal.addFormula(new SequentFormula(loopInvApplPredTerm),
+            infFlowGoal.addFormula(new SequentFormula(loopInvApplPredTerm),
                     true,
                     false);
-            useGoal.addTaclet(informationFlowInvariantApp,
-                    SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            infFlowGoal.addTaclet(informationFlowInvariantApp,
+                                  SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         }
 
         //"Invariant Initially Valid":
@@ -575,39 +604,17 @@ public final class WhileInvariantRule implements BuiltInRule {
                 uBeforeLoopDefAnonVariant, 
                 guardTrueBody)), 
                 ruleApp.posInOccurrence());
-
-        // "Use Case":
-        // \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
-        // (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
-        // (#v1=FALSE -> \[{.. ...}\]post)),anon2))
-        useGoal.addFormula(new SequentFormula(wellFormedAnon), 
-                true, 
-                false);		
-        useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
-        useGoal.addFormula(new SequentFormula(postAssumption), 
-                true, 
-                false);
-
-        Term restPsi = TB.prog((Modality)inst.progPost.op(),
-                JavaTools.removeActiveStatement(
-                        inst.progPost.javaBlock(), 
-                        services), 
-                        inst.progPost.sub(0));
-        Term guardFalseRestPsi = TB.box(guardJb, 
-                TB.imp(guardFalseTerm, restPsi));
-        useGoal.changeFormula(new SequentFormula(TB.applySequential(
-                uAnon,
-                guardFalseRestPsi)), 
-                ruleApp.posInOccurrence());
+        
         return result;
     }
 
 
-    Pair<InfFlowPOSnippetFactory,Sequent> buildBodyPreservesSequent(IFProofObligationVars ifVars,
-                                      LoopInvariant inv,
-                                      Term guardTrueTerm,
-                                      Services services) {
-        inv.appendTermToAllRespects(guardTrueTerm);
+    Pair<InfFlowPOSnippetFactory,Sequent> buildBodyPreservesSequent(
+                IFProofObligationVars ifVars,
+                LoopInvariant inv,
+                Term guardTerm,
+                Services services) {
+        inv.appendTermToAllRespects(guardTerm);
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(inv, ifVars.c1, ifVars.c2, services);
         Term selfComposedExec =

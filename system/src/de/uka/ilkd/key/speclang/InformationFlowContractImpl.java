@@ -156,6 +156,16 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
              bc.getVariablesAsTerms().exception, null, bc.getRespects(),
              false, INVALID_ID);
     }
+    
+    
+    public InformationFlowContractImpl(LoopInvariant li, Services services) {
+
+        this(li.getName(), null, li.getKJT(), li.getTarget(), li.getKJT(),
+             Modality.BOX, li.getInvariant(services), null, li.getModifies(),
+             (li.getModifies() != TB.lessThanNothing()), li.getInternalSelfTerm(),
+             li.getLocalIns(), null, TB.var(TB.excVar(services, li.getTarget(), true)), null,
+             li.getRespects(services), false, INVALID_ID);
+    }
 
 
 

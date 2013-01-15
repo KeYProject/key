@@ -21,13 +21,15 @@ import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.InformationFlowContract;
+import de.uka.ilkd.key.speclang.InformationFlowContractImpl;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 
 public class LoopInvExecutionPO extends AbstractOperationPO
-        implements ContractPO {
+        implements ContractPO, InfFlowRelatedPO {
     
     private final LoopInvariant loopInvariant;
-    //private final InformationFlowContract generatedIFContract;
+    private final InformationFlowContract generatedIFContract;
     private final ProofObligationVars symbExecVars;
     private final Goal initiatingGoal;
     private final ExecutionContext context;
@@ -38,6 +40,8 @@ public class LoopInvExecutionPO extends AbstractOperationPO
                               Goal initiatingGoal,
                               ExecutionContext context) {
         super(initConfig, loopInv.getName());
+        this.generatedIFContract =
+                new InformationFlowContractImpl(loopInv, services);
         this.loopInvariant = loopInv;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
@@ -49,7 +53,8 @@ public class LoopInvExecutionPO extends AbstractOperationPO
     public void readProblem() throws ProofInputException {
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
-                POSnippetFactory.getBasicFactory(loopInvariant, symbExecVars, services);
+                POSnippetFactory.getBasicFactory(loopInvariant, symbExecVars,
+                                                 context, services);
 
         // loop invariant
         final Term loopInv =
@@ -153,9 +158,8 @@ public class LoopInvExecutionPO extends AbstractOperationPO
     }
 
     @Override
-    @Deprecated
-    public Contract getContract() {
-        throw new UnsupportedOperationException("Not a contract.");
+    public InformationFlowContract getContract() {        
+        return generatedIFContract;
     }
 
     @Override

@@ -150,6 +150,14 @@ class BasicSnippetData {
                                         invariant.getLocalIns(), invariant.getLocalOuts(),
                                         heap, services);
     }
+    
+    
+    BasicSnippetData(LoopInvariant invariant,
+                     ExecutionContext context,
+                     Services services) {
+        this(invariant, services);
+        contractContents.put(Key.CONTEXT, context);
+    }
 
 
     BasicSnippetData(InformationFlowContract contract,

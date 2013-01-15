@@ -32,12 +32,13 @@ abstract class ReplaceAndRegisterMethod {
 
         Iterator<Term> origVarsIt;
         Iterator<Term> poVarsIt;
-        if (origVars.localIns.isEmpty() && origVars.localOuts.isEmpty()) {
+        if (origVars.localIns.isEmpty() && origVars.localOuts.isEmpty()
+                && origVars.guard == null && origVars.guardAtPost == null) {            
             assert origVars.paddedTermListWithoutLocalVars.size() ==
                    poVars.paddedTermListWithoutLocalVars.size();
             origVarsIt = origVars.paddedTermListWithoutLocalVars.iterator();
             poVarsIt = poVars.paddedTermListWithoutLocalVars.iterator();
-        } else {
+        } else {             
             assert origVars.paddedTermList.size() ==
                    poVars.paddedTermList.size();
             origVarsIt = origVars.paddedTermList.iterator();
@@ -91,7 +92,7 @@ abstract class ReplaceAndRegisterMethod {
         for (int i = 0; i < terms.third.length; i++) {
             result3[i] = replace(terms.third[i], origVars, poVars);
         }
-        return new Triple(result1, result2, result3);
+        return new Triple<Term[], Term[], Term[]>(result1, result2, result3);
     }
 
 
@@ -114,7 +115,7 @@ abstract class ReplaceAndRegisterMethod {
         for (int i = 0; termIt3.hasNext(); i++) {
             result3[i] = replace(termIt3.next(), origVars, poVars);
         }
-        return new Triple(result1, result2, result3);
+        return new Triple<Term[], Term[], Term[]>(result1, result2, result3);
     }
 
 
@@ -130,7 +131,8 @@ abstract class ReplaceAndRegisterMethod {
 
 
     final Triple<Term[], Term[], Term[]>[] replace(
-            ImmutableList<Triple<ImmutableList<Term>, ImmutableList<Term>, ImmutableList<Term>>> termss,
+            ImmutableList<Triple<ImmutableList<Term>, ImmutableList<Term>,
+                                 ImmutableList<Term>>> termss,
             ProofObligationVars origVars,
             ProofObligationVars poVars) {
         final Triple<Term[], Term[], Term[]>[] result = new Triple[termss.size()];

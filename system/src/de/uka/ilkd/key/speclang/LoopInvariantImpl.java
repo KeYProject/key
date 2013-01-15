@@ -21,17 +21,10 @@ import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.InfFlowContractPO;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
 
 /**
@@ -364,6 +357,19 @@ public final class LoopInvariantImpl implements LoopInvariant {
     public void setExecutionContext(ExecutionContext execCont) {
         this.innermostExecCont = execCont;
     }
+    
+    @Override
+    public LoopInvariant addGuardToLocalVariables(Term guard) {
+        return new LoopInvariantImpl(loop,
+                                     originalInvariants,
+                                     originalModifies,
+                                     originalRespects,
+                                     originalVariant,
+                                     originalSelfTerm,
+                                     localIns.append(guard),
+                                     localOuts.append(guard),
+                                     originalAtPres);
+    }
 
     @Override
     public void appendTermToAllRespects(Term t) {
@@ -447,9 +453,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
 
     @Override
-    public KeYJavaType getKJT() {
-	assert false;
-	return null;
+    public KeYJavaType getKJT() {	
+	return pm.getContainerType();
     }
 
 

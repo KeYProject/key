@@ -1,26 +1,31 @@
 package de.uka.ilkd.key.proof.init.po.snippet;
 
 import java.util.Iterator;
-import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
-import de.uka.ilkd.key.java.expression.operator.New;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.statement.Do;
+import de.uka.ilkd.key.java.statement.EnhancedFor;
+import de.uka.ilkd.key.java.statement.For;
+import de.uka.ilkd.key.java.statement.Guard;
+import de.uka.ilkd.key.java.statement.IForUpdates;
+import de.uka.ilkd.key.java.statement.LoopInit;
+import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.util.ExtList;
 
 public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         implements FactoryMethod {
@@ -29,10 +34,14 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
         ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
-        if (poVars.selfAtPost != null) {
+        if (poVars.selfAtPost != null)
             posts = posts.append(d.tb.equals(poVars.selfAtPost, poVars.self));
-        }
+        
+        if (poVars.guard != null)
+            posts = posts.append(d.tb.equals(poVars.guardAtPost, poVars.guard));
+        
         posts = posts.append(d.tb.equals(poVars.heapAtPost, d.tb.getBaseHeap()));
+        
         final Term prog = buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
         return prog;
     }
@@ -44,7 +53,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
                                   TermBuilder.Serviced tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
             throw new UnsupportedOperationException("Tried to produce a " +
-                                                    "program-term for a contract without modality.");
+                                                    "program-term for a loop without modality.");
         }
         //create formal parameters
         ImmutableList<LocationVariable> formalParamVars =
@@ -58,14 +67,20 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
             formalParamVars = formalParamVars.append(formalParamVar);
             register(formalParamVar, tb.getServices());
         }
+        if (vs.guard != null) {
+            ProgramVariable paramVar = vs.guard.op(ProgramVariable.class);
+            ProgramElementName pen = new ProgramElementName("_"
+                    + paramVar.name());
+            LocationVariable formalParamVar =
+                    new LocationVariable(pen, paramVar.getKeYJavaType());
+            formalParamVars = formalParamVars.append(formalParamVar);
+            register(formalParamVar, tb.getServices());
+        }
         
         //create java block
         Modality modality =
                 (Modality) d.get(BasicSnippetData.Key.MODALITY);
-        final JavaBlock jb = buildJavaBlock(d, formalParamVars,
-                vs.self != null
-                ? vs.self.op(ProgramVariable.class)
-                        : null);
+        final JavaBlock jb = buildJavaBlock(d);
 
         //create program term
         final Modality symbExecMod;
@@ -79,7 +94,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         //create update
         Term update = tb.skip();
         Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
-        Iterator<Term> paramIt = vs.localIns.iterator();
+        Iterator<Term> paramIt = vs.localIns.append(vs.guard).iterator();
         while (formalParamIt.hasNext()) {
             Term paramUpdate = tb.elementary(formalParamIt.next(),
                     paramIt.next());
@@ -89,44 +104,35 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         return tb.apply(update, programTerm);
     }
     
-    private JavaBlock buildJavaBlock(
-            BasicSnippetData d,
-            ImmutableList<LocationVariable> formalParVars,
-            ProgramVariable selfVar) {
-        IObserverFunction targetMethod =
-                (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
-        if (!(targetMethod instanceof IProgramMethod)) {
-            throw new UnsupportedOperationException("Tried to produce a "
-                    + "java-block for an observer which is no program method.");
-        }
-        //JavaInfo javaInfo = d.tb.getServices().getJavaInfo();
-        IProgramMethod pm = (IProgramMethod) targetMethod;
+    private JavaBlock buildJavaBlock(BasicSnippetData d) {
+        LoopInvariant inv = (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
+        LoopStatement sb = inv.getLoop();
+        ExecutionContext context =
+                (ExecutionContext) d.get(BasicSnippetData.Key.CONTEXT);
 
-        //create method call
-        final ImmutableArray<Expression> formalArray =
-                new ImmutableArray<Expression>(formalParVars.toArray(
-                new ProgramVariable[formalParVars.size()]));
-        final StatementBlock sb;
-        if (pm.isConstructor()) {
-            assert selfVar != null;
-            final Expression[] formalArray2 =
-                formalArray.toArray(new Expression[formalArray.size()]);
-            KeYJavaType forClass =
-                    (KeYJavaType) d.get(BasicSnippetData.Key.FOR_CLASS);
-            final New n =
-                    new New(formalArray2, new TypeRef(forClass),
-                            null);
-            final CopyAssignment ca = new CopyAssignment(selfVar, n);
-            sb = new StatementBlock(ca);
+        Expression e = sb.getGuardExpression();
+        Guard g = (Guard) sb.getGuard();
+        Statement b = sb.getBody();
+        LoopInit i = (LoopInit) sb.getILoopInit();
+        IForUpdates u = sb.getIForUpdates();
+        
+        //create loop call
+        if (sb instanceof Do) {
+            sb = new Do(e, b, null);
+        } else if (sb instanceof EnhancedFor) {
+            sb = new EnhancedFor(i, g, sb, new ExtList(), null);
+        } else if (sb instanceof For) {
+            sb = new For(i, g, u, sb);
+        } else if (sb instanceof While) {
+            sb = new While(e, sb);
         } else {
-            final MethodBodyStatement call =
-                new MethodBodyStatement(pm, selfVar, null, formalArray);
-            sb = new StatementBlock(call);
+            throw new UnsupportedOperationException("Loop statement is not properly specified.");
         }
-
+        
         //create java block
-        JavaBlock result = JavaBlock.createJavaBlock(sb);
+        Statement s = new MethodFrame(null, context, new StatementBlock (sb));
+        JavaBlock result = JavaBlock.createJavaBlock(new StatementBlock(s));
 
-        return result;
+        return result;        
     }
 }

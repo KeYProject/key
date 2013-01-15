@@ -13,7 +13,6 @@ package de.uka.ilkd.key.speclang;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -119,6 +118,8 @@ public interface LoopInvariant extends SpecificationElement {
     public void setTarget(IProgramMethod newPM);
     
     public void setExecutionContext(ExecutionContext execCont);
+    
+    public LoopInvariant addGuardToLocalVariables(Term guard);
     
     public void appendTermToAllRespects(Term t);
     

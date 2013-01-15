@@ -111,7 +111,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                                      Services services);
 
 
-    private ProofObligationVars getProofObligationVars() {
+    ProofObligationVars getProofObligationVars() {
         return new ProofObligationVars(contractSelf, localIns,
                                        heapAtPre, localOuts, contractResult,
                                        exceptionVar, heapAtPost, services);
@@ -121,9 +121,9 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     abstract Term getContractApplPred(ProofObligationVars appData);
 
 
-    private ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
-                                                           ProofObligationVars appData,
-                                                           Services services) {
+    ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
+                                                   ProofObligationVars appData,
+                                                   Services services) {
         Term selfSV = createTermSV(appData.self, schemaPrefix, services);
         Term selfAtPostSV =
                 createTermSV(appData.selfAtPost, schemaPrefix, services);
@@ -203,9 +203,9 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     }
 
 
-    private Term createTermSV(Term t,
-                              String schemaPrefix,
-                              Services services) {
+    Term createTermSV(Term t,
+                      String schemaPrefix,
+                      Services services) {
         if (t == null) {
             return null;
         }
