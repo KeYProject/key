@@ -1725,7 +1725,7 @@ final class JMLTranslator {
     }
 
     private abstract class JMLBoundedNumericalQuantifierTranslationMethod extends JMLQuantifierTranslationMethod {
-        final static String notBounded = "Only numerical quantifier expressions of form (\\sum int i; l<=i && i<u; t) are permitted";
+        final static String notBounded = "Only numerical quantifier expressions of forms (\\sum int i; l<=i && i<u; t) and (\\product int i; l<=i && i<u; t) are permitted";
         final static String notInt = "Bounded numerical quantifier variable must be of types int or \\bigint.";
 
 
