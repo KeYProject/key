@@ -6,6 +6,7 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -66,12 +67,9 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       
       @Override
       public void selectedProofChanged(final KeYSelectionEvent e) {
-         // TODO Auto-generated method stub
          getEditorSite().getShell().getDisplay().asyncExec(new Runnable() {
-            
             @Override
             public void run() {
-               // TODO Auto-generated method stub
                if(e.getSource().getSelectedNode() != null){
                   setShowNode(e.getSource().getSelectedNode());
                }
@@ -80,17 +78,35 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       }
       
       @Override
-      public void selectedNodeChanged(KeYSelectionEvent e) {
-         // TODO Auto-generated method stub
-         if(e.getSource().getSelectedNode() != null){
-            setShowNode(e.getSource().getSelectedNode());
-         }
+      public void selectedNodeChanged(final KeYSelectionEvent e) {
+         getEditorSite().getShell().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               if(e.getSource().getSelectedNode() != null){
+                  setShowNode(e.getSource().getSelectedNode());
+               }
+            }
+         });
       }
    };
    
    
    
    
+   @Override
+   public void doSaveAs() {
+      // TODO Auto-generated method stub
+      super.doSaveAs();
+   }
+
+   @Override
+   public void doSave(IProgressMonitor progressMonitor) {
+      // TODO Auto-generated method stub
+      super.doSave(progressMonitor);
+      //Overrride isDirty();
+      firePropertyChange(PROP_DIRTY);
+   }
+
    public Node getShowNode() {
       return showNode;
    }

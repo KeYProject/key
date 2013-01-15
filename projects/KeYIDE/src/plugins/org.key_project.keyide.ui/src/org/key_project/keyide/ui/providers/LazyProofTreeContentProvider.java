@@ -40,7 +40,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
     * @param environment - the {@link KeYEnvironment}
     * @param proof - the {@link Proof}
     */
-   public  LazyProofTreeContentProvider(TreeViewer viewer, KeYEnvironment<CustomConsoleUserInterface> environment, Proof proof){
+   public LazyProofTreeContentProvider(TreeViewer viewer, KeYEnvironment<CustomConsoleUserInterface> environment, Proof proof){
       this.viewer=viewer;
       this.proof = proof;
       this.environment = environment;
@@ -62,6 +62,8 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
             public void run() {
                viewer.refresh(); // Refresh structure
                viewer.refresh(); // Referesh labels and icons
+               
+               System.out.println("refreshed");
             }
          });
       }
@@ -256,6 +258,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
    @Override
    public void updateElement(Object parent, int index) {
       Object element = getElementByIndex(parent, index);
+      if(element instanceof Node)System.out.println(((Node)element).serialNr());
       viewer.replace(parent, index, element);
       updateChildCount(element, -1);
    }

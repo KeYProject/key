@@ -7,7 +7,7 @@
             class="org.key_project.keyide.ui.editor.KeYEditor"
             contributorClass="org.eclipse.ui.editors.text.TextEditorActionContributor"
             default="false"
-            extensions="proof"
+            extensions="proof, key"
             icon="icons/logo16.gif"
             id="org.key_project.keyide.ui.editor"
             name="KeY Editor">

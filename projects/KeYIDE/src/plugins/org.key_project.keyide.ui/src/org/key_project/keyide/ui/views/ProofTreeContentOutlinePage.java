@@ -1,18 +1,18 @@
 package org.key_project.keyide.ui.views;
 
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.keyide.ui.providers.LazyProofTreeContentProvider;
 import org.key_project.keyide.ui.providers.ProofTreeLabelProvider;
-import org.key_project.keyide.ui.util.TreeViewerIterator;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
@@ -34,8 +34,7 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
    private KeYSelectionListener listener = new KeYSelectionListener() {
       @Override
       public void selectedProofChanged(KeYSelectionEvent e) {
-         getTreeViewer().getControl().getDisplay().asyncExec(new Runnable() {
-            
+         getControl().getDisplay().asyncExec(new Runnable() {
             @Override
             public void run() {
                updateSelectedNode();
@@ -45,7 +44,12 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
       
       @Override
       public void selectedNodeChanged(KeYSelectionEvent e) {
-         updateSelectedNode();
+         getControl().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+               updateSelectedNode();
+            }
+         });
       }
    };
    
@@ -53,11 +57,10 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
       
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
-      // TODO Auto-generated method stub
-         
-         Node node = getSelectedNode();
-         if (environment.getMediator().getSelectionModel().getSelectedNode() != null){
-            if (!environment.getMediator().getSelectionModel().getSelectedNode().equals(node)){
+         if (!environment.getMediator().autoMode()) {
+            Node node = getSelectedNode(event.getSelection());
+            Node mediatorNode = environment.getMediator().getSelectionModel().getSelectedNode();
+            if (!ObjectUtil.equals(node, mediatorNode)) {
                environment.getMediator().getSelectionModel().setSelectedNode(node);
             }
          }
@@ -115,7 +118,11 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
 //   }
    
    protected Node getSelectedNode() {
-      Object selectedObj = SWTUtil.getFirstElement(getSelection());
+    return getSelectedNode(getSelection());  
+   }
+
+   protected Node getSelectedNode(ISelection selection) {
+      Object selectedObj = SWTUtil.getFirstElement(selection);
       if (selectedObj instanceof Node) {
          return (Node)selectedObj;
       }
@@ -129,6 +136,12 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
    
    protected void updateSelectedNode() {
       Node mediatorNode = environment.getMediator().getSelectionModel().getSelectedNode();
+if (mediatorNode != null) {
+   System.out.println("Select: " + mediatorNode.serialNr());
+}
+else {
+   System.out.println("Select: null");
+}
       Object selectedNode = getSelectedNode();
       
       if (mediatorNode != selectedNode) {
