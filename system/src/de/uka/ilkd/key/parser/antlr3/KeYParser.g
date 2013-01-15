@@ -480,19 +480,11 @@ options {
     }
 
     private int getLine() {
-        int line = -1;
-            line = input.LT(0).getLine() + lineOffset;
-        return line;
+        return state.tokenStartLine;
     }   
 
     private int getColumn() {
-        int col = -1;
-//        try {
-            col = input.LT(0).getCharPositionInLine() + colOffset;
-//        } catch (TokenStreamException e) {
-//            System.err.println("No further token in stream");
-//        }
-        return col;
+        return state.tokenStartCharPositionInLine;
     }   
 
     private void resetSkips() {
