@@ -107,7 +107,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Observe frozen state of KeY Main Frame
       environment.getBuilder().getMediator().addAutoModeListener(autoModeListener);
       // Initialize proof to use the symbolic execution strategy
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun());
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), false);
    }
 
    /**
@@ -168,7 +168,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                               boolean stepReturn) {
       Proof proof = environment.getBuilder().getProof();
       // Set strategy to use
-      StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, true);
+      StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, isMethodTreatmentContract(proof));
       proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
       // Update stop condition
       CompoundStopCondition stopCondition = new CompoundStopCondition();
@@ -183,6 +183,11 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Run proof
       SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(proof);
       environment.getUi().startAutoMode(proof, goals);
+   }
+   
+   protected boolean isMethodTreatmentContract(Proof proof) {
+      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+      return StrategyProperties.METHOD_CONTRACT.equals(sp.getProperty(StrategyProperties.METHOD_OPTIONS_KEY));
    }
 
    /**
@@ -411,7 +416,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
     * @return The {@link Proof} instance from which the symbolic execution tree was extracted.
     */
    public Proof getProof() {
-      return environment.getProof();
+      return environment != null ? environment.getProof() : null;
    }
    
    /**

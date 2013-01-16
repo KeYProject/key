@@ -39,6 +39,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionElement;
@@ -51,6 +52,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
@@ -377,6 +379,9 @@ public class ExecutionNodeReader {
       else if (ExecutionNodeWriter.TAG_TERMINATION.equals(qName)) {
          return new KeYlessTermination(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isExceptionalTermination(attributes));
       }
+      else if (ExecutionNodeWriter.TAG_USE_OPERATION_CONTRACT.equals(qName)) {
+         return new KeYlessUseOperationContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes), isHasNotNullCheck(attributes), isNotNullCheckComplied(attributes));
+      }
       else {
          throw new SAXException("Unknown tag \"" + qName + "\".");
       }
@@ -416,6 +421,33 @@ public class ExecutionNodeReader {
     */
    protected boolean isExceptionalTermination(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_EXCEPTIONAL_TERMINATION));
+   }
+   
+   /**
+    * Returns the precondition complied value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isPreconditionComplied(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_PRECONDITION_COMPLIED));
+   }
+   
+   /**
+    * Returns the has not nullc heck value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isHasNotNullCheck(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_HAS_NOT_NULL_CHECK));
+   }
+   
+   /**
+    * Returns the not null check complied value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isNotNullCheckComplied(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_NOT_NULL_CHECK_COMPLIED));
    }
 
    /**
@@ -1236,6 +1268,99 @@ public class ExecutionNodeReader {
       @Override
       public String getElementType() {
          return "Statement";
+      }
+   }
+
+   /**
+    * An implementation of {@link IExecutionUseOperationContract} which is independent
+    * from KeY and provides such only children and default attributes.
+    * @author Martin Hentschel
+    */
+   public static class KeYlessUseOperationContract extends AbstractKeYlessStateNode<SourceElement> implements IExecutionUseOperationContract {
+      /**
+       * Is precondition complied?
+       */
+      private boolean preconditionComplied;
+      
+      /**
+       * Has not null check?
+       */
+      private boolean hasNotNullCheck;
+      
+      /**
+       * Is not null check complied?
+       */
+      private boolean notNullCheckComplied;
+
+      /**
+       * Constructor.
+       * @param parent The parent {@link IExecutionNode}.
+       * @param name The name of this node.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
+       * @param formatedPathCondition The formated path condition.
+       * @param preconditionComplied Is precondition complied?
+       * @param hasNotNullCheck Has not null check?
+       * @param notNullCheckComplied Is not null check complied?
+       */
+      public KeYlessUseOperationContract(IExecutionNode parent, 
+                                         String name, 
+                                         String formatedPathCondition,
+                                         boolean pathConditionChanged,
+                                         boolean preconditionComplied,
+                                         boolean hasNotNullCheck,
+                                         boolean notNullCheckComplied) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
+         this.preconditionComplied = preconditionComplied;
+         this.hasNotNullCheck = hasNotNullCheck;
+         this.notNullCheckComplied = notNullCheckComplied;
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Use Operation Contract";
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public Contract getContract() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public IProgramMethod getContractProgramMethod() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isPreconditionComplied() {
+         return preconditionComplied;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean hasNotNullCheck() {
+         return hasNotNullCheck;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isNotNullCheckComplied() {
+         return notNullCheckComplied;
       }
    }
    

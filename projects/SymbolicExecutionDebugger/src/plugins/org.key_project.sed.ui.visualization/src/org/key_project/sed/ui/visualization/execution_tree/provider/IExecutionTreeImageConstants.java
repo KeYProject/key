@@ -10,6 +10,7 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDUseOperationContract;
 
 /**
  * <p>
@@ -73,6 +74,26 @@ public interface IExecutionTreeImageConstants {
     * Key of the image for {@link ISEDTermination}s.
     */
    public static final String IMG_TERMINATION = PREFIX + "termination";
+
+   /**
+    * Key of the image for {@link ISEDUseOperationContract}s.
+    */
+   public static final String IMG_USE_OPERATION_CONTRACT = PREFIX + "useOperationContract";
+
+   /**
+    * Key of the image for {@link ISEDUseOperationContract}s.
+    */
+   public static final String IMG_USE_OPERATION_CONTRACT_NOT_NPC = PREFIX + "useOperationContractNotNpc";
+
+   /**
+    * Key of the image for {@link ISEDUseOperationContract}s.
+    */
+   public static final String IMG_USE_OPERATION_CONTRACT_NOT_PRE = PREFIX + "useOperationContractNotPre";
+
+   /**
+    * Key of the image for {@link ISEDUseOperationContract}s.
+    */
+   public static final String IMG_USE_OPERATION_CONTRACT_NOT_PRE_NOT_NPC = PREFIX + "useOperationContractNotPreAndNotNpc";
 
    /**
     * Key of the image for {@link ISEDThread}s.

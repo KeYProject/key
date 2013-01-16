@@ -37,6 +37,7 @@ import org.key_project.sed.core.model.memory.SEDMemoryMethodReturn;
 import org.key_project.sed.core.model.memory.SEDMemoryStatement;
 import org.key_project.sed.core.model.memory.SEDMemoryTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryThread;
+import org.key_project.sed.core.model.memory.SEDMemoryUseOperationContract;
 import org.key_project.sed.core.model.memory.SEDMemoryValue;
 import org.key_project.sed.core.model.memory.SEDMemoryVariable;
 import org.xml.sax.Attributes;
@@ -398,6 +399,9 @@ public class SEDXMLReader {
       else if (SEDXMLWriter.TAG_VALUE.equals(qName)) {
          return createValue(target, uri, localName, qName, attributes);
       }
+      else if (SEDXMLWriter.TAG_USE_OPERATION_CONTRACT.equals(qName)) {
+         return createUseOperationContract(target, parent, thread, uri, localName, qName, attributes);
+      }
       else {
          throw new SAXException("Unknown tag \"" + qName + "\".");
       }
@@ -584,6 +588,28 @@ public class SEDXMLReader {
    }
    
    /**
+    * Creates a {@link SEDMemoryUseOperationContract} instance for the content in the given tag.
+    * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
+    * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
+    * @param thread The parent {@link ISEDThread} or {@code null} if not available.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
+    * @return The created {@link SEDMemoryStatement}.
+    * @throws SAXException Occurred Exception.
+    */   
+   protected SEDMemoryUseOperationContract createUseOperationContract(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) throws SAXException {
+      SEDMemoryUseOperationContract useOperationContract = new SEDMemoryUseOperationContract(target, parent, thread);
+      fillDebugNode(useOperationContract, attributes);
+      fillStackFrame(useOperationContract, attributes);
+      useOperationContract.setPreconditionComplied(isPreconditionComplied(attributes));
+      useOperationContract.setHasNotNullCheck(hasNotNullCheck(attributes));
+      useOperationContract.setNotNullCheckComplied(isNotNullCheckComplied(attributes));
+      return useOperationContract;
+   }
+   
+   /**
     * Creates a {@link SEDMemoryTermination} instance for the content in the given tag.
     * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
     * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
@@ -744,6 +770,33 @@ public class SEDXMLReader {
     */
    protected boolean isAllocated(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_ALLOCATED));
+   }
+   
+   /**
+    * Returns the not null check complied value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isNotNullCheckComplied(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_NOT_NULL_CHECK_COMPLIED));
+   }
+   
+   /**
+    * Returns the has not null check value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean hasNotNullCheck(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_HAS_NOT_NULL_CHECK));
+   }
+   
+   /**
+    * Returns the precondition complied value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isPreconditionComplied(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(SEDXMLWriter.ATTRIBUTE_PRECONDITION_COMPLIED));
    }
    
    /**

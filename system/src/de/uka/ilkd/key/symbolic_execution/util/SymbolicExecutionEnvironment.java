@@ -65,10 +65,11 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> extends KeYEn
     * Configures the given {@link Proof} to use the symbolic execution strategy.
     * @param proof The {@link Proof} to configure.
     * @param maximalNumberOfNodesPerBranch The maximal number of nodes per branch.
+    * @param methodTreatmentContract {@code true} use operation contracts, {@code false} expand methods.
     */
-   public static void configureProofForSymbolicExecution(Proof proof, int maximalNumberOfNodesPerBranch) {
+   public static void configureProofForSymbolicExecution(Proof proof, int maximalNumberOfNodesPerBranch, boolean methodTreatmentContract) {
       if (proof != null) {
-         StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, true);
+         StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, methodTreatmentContract);
          proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
          proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
          proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfNodesPerBranch));

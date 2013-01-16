@@ -103,6 +103,11 @@ public interface Contract extends SpecificationElement {
     public String getHTMLText(Services services);
     
     /**
+     * Returns the contract in pretty plain text format.
+     */
+    public String getPlainText(Services services);
+    
+    /**
      * Tells whether, on saving a proof where this contract is available, the
      * contract should be saved too. (this is currently true for contracts
      * specified directly in DL, but not for JML contracts)

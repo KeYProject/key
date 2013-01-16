@@ -51,6 +51,7 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDUseOperationContract;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionLayoutFeature;
@@ -94,6 +95,10 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadAddFeat
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadLayoutFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseOperationContractAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseOperationContractCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseOperationContractLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseOperationContractUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.service.SEDIndependenceSolver;
 
 /**
@@ -138,7 +143,8 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
                                       new MethodReturnCreateFeature(this),
                                       new StatementCreateFeature(this),
                                       new TerminationCreateFeature(this),
-                                      new ThreadCreateFeature(this)};
+                                      new ThreadCreateFeature(this),
+                                      new UseOperationContractCreateFeature(this)};
       }
       else {
          return new ICreateFeature[0];
@@ -179,6 +185,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (context.getNewObject() instanceof ISEDThread) {
          return new ThreadAddFeature(this);
+      }
+      else if (context.getNewObject() instanceof ISEDUseOperationContract) {
+         return new UseOperationContractAddFeature(this);
       }
       else {
          return super.getAddFeature(context);
@@ -224,6 +233,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (bo instanceof ISEDThread) {
          return new ThreadUpdateFeature(this);
       }
+      else if (bo instanceof ISEDUseOperationContract) {
+         return new UseOperationContractUpdateFeature(this);
+      }
       else {
          return super.getUpdateFeature(context);
       }
@@ -265,6 +277,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (bo instanceof ISEDThread) {
          return new ThreadLayoutFeature(this);
+      }
+      else if (bo instanceof ISEDUseOperationContract) {
+         return new UseOperationContractLayoutFeature(this);
       }
       else {
          return super.getLayoutFeature(context);

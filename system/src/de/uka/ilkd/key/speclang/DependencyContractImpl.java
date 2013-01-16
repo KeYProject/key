@@ -281,23 +281,41 @@ public final class DependencyContractImpl implements DependencyContract {
    
     
     @Override
+    public String getPlainText(Services services) {
+       return getText(false, services);
+    }
+    
+    @Override
     public String getHTMLText(Services services) {
-	final String pre = LogicPrinter.quickPrintTerm(originalPre, services);
+       return getText(true, services);
+    }
+    
+    private String getText(boolean includeHtmlMarkup, Services services) {
+	     final String pre = LogicPrinter.quickPrintTerm(originalPre, services);
         final String mby = hasMby() 
         	           ? LogicPrinter.quickPrintTerm(originalMby, services)
         	           : null;
         final String dep = LogicPrinter.quickPrintTerm(originalDep, services);
-                      
-        return "<html>"
-                + "<b>pre</b> "
-                + LogicPrinter.escapeHTML(pre, false)
-                + "<br><b>dep</b> "
-                + LogicPrinter.escapeHTML(dep, false)
-                + (hasMby() 
-                   ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, 
-                	   						 false)
-                   : "")                
-                + "</html>";
+        
+        if (includeHtmlMarkup) {
+           return "<html>"
+                 + "<b>pre</b> "
+                 + LogicPrinter.escapeHTML(pre, false)
+                 + "<br><b>dep</b> "
+                 + LogicPrinter.escapeHTML(dep, false)
+                 + (hasMby() 
+                    ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, 
+                                         false)
+                    : "")                
+                 + "</html>";
+        }
+        else {
+           return "pre: "
+                 + pre
+                 + "\ndep: "
+                 + dep
+                 + (hasMby() ? "\nmeasured-by: " + mby : "");
+        }
     }    
     
     
