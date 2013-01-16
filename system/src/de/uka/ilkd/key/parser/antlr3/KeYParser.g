@@ -1709,7 +1709,8 @@ string_literal returns [String lit = null]
    :
      id=STRING_LITERAL {
        lit = id.getText();
-       lit = lit.substring(1,lit.length()-1);
+       // mSTRING_LITERAL already removes the quotation marks
+       //lit = lit.substring(1,lit.length()-1);
        stringLiteralLine = id.getLine();
      }
      ;
