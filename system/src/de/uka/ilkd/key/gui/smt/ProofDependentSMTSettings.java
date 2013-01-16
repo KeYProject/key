@@ -15,7 +15,7 @@ import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
 
 
-public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configuration.Settings {
+public class ProofDependentSMTSettings implements de.uka.ilkd.key.gui.configuration.Settings, Cloneable {
 	
 
 

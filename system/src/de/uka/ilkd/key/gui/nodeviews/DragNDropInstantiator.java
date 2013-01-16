@@ -31,6 +31,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -216,8 +217,10 @@ public class DragNDropInstantiator extends DropTargetAdapter {
                             services),
                     sequent, targetPos.getPosInOccurrence(), services));
         } else {
-            if (ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().isDndDirectionSensitive()) {
-                applicableApps = applicableApps.prepend(getDirectionDependentApps(sourcePos, targetPos, services, 
+//            if (ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().isDndDirectionSensitive()) {
+            if (ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isDndDirectionSensitive()) {
+
+        	applicableApps = applicableApps.prepend(getDirectionDependentApps(sourcePos, targetPos, services, 
                     sequent));
             } else {
                 applicableApps = applicableApps.

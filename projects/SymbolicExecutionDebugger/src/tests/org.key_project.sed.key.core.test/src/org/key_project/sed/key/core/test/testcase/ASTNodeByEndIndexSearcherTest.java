@@ -8,10 +8,10 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.internal.ui.javaeditor.ASTProvider;
 import org.junit.Test;
 import org.key_project.sed.key.core.test.Activator;
 import org.key_project.sed.key.core.util.ASTNodeByEndIndexSearcher;
@@ -22,6 +22,7 @@ import org.key_project.util.test.util.TestUtilsUtil;
  * Tests {@link ASTNodeByEndIndexSearcher}.
  * @author Martin Hentschel
  */
+@SuppressWarnings("restriction")
 public class ASTNodeByEndIndexSearcherTest extends TestCase {
    /**
     * Tests the search result of the search process via
@@ -38,7 +39,7 @@ public class ASTNodeByEndIndexSearcherTest extends TestCase {
       // Create AST
       IJavaElement element = JavaCore.create(method.getResource());
       assertTrue(element instanceof ICompilationUnit);
-      ASTParser parser = ASTParser.newParser(AST.JLS4);
+      ASTParser parser = ASTParser.newParser(ASTProvider.SHARED_AST_LEVEL);
       parser.setSource((ICompilationUnit)element);
       ASTNode root = parser.createAST(null);
       // Search method

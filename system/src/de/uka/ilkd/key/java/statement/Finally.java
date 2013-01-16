@@ -73,7 +73,6 @@ public class Finally extends BranchImp {
     public ProgramElement getChildAt(int index) {
         if (body != null) {
             if (index == 0) return body;
-            index--;
         }
         throw new ArrayIndexOutOfBoundsException();
     }

@@ -278,7 +278,7 @@ public abstract class KeYInstaller {
     protected void extractExamples(JarFile jarFile) 
                                                throws KeYInstallerException {
 	try {
-            Enumeration en = jarFile.entries();
+            Enumeration<JarEntry> en = jarFile.entries();
             while(en.hasMoreElements()) {
                 JarEntry entry = ((JarEntry)en.nextElement());
                 if (!entry.getName().startsWith("examples/")) continue;

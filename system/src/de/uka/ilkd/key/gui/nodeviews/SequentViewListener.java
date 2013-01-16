@@ -32,6 +32,7 @@ import javax.swing.event.PopupMenuListener;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -123,7 +124,7 @@ class SequentViewListener extends MouseInputAdapter
             String tOpClassString = t.op().getClass().toString();
             String operator = tOpClassString.substring(
                 tOpClassString.lastIndexOf('.')+1);
-            return  operator + ", Sort: " + t.sort();
+            return  operator + ", Sort: " + t.sort() + ", Hash:"+t.hashCode();
         }
         return null;
     }
@@ -134,7 +135,8 @@ class SequentViewListener extends MouseInputAdapter
 	    // activate another using the same click event 
 	    if (Math.abs(System.currentTimeMillis()-block)>=400) {   
 		mousePos = seqView.getPosInSequent(me.getPoint());  
-		boolean macroActive = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().isRightClickMacro();
+		boolean macroActive = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isRightClickMacro();
+//		boolean macroActive = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().isRightClickMacro();
 		if (mediator!= null && mousePos != null) {
 		    if (me.isShiftDown()) {
 			if (mediator.getInteractiveProver() != null) {

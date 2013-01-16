@@ -1060,12 +1060,31 @@ public final class SpecificationRepository {
         return loopInvs.get(loop);
     }
 
+    /**
+     * Copies a loop invariant from a loop statement to another.
+     * 
+     * If the original loop does not possess an invariant, 
+     * none is set to the target.
+     * 
+     * A possibly existing old registration will be overwritten, a registration
+     * for the original loop remains untouched.
+     * 
+     * @param from the loop with the original contract
+     * @param loop the loop for which the contract is to be copied
+     */
+    public void copyLoopInvariant(LoopStatement from, LoopStatement to) {
+        LoopInvariant inv = getLoopInvariant(from);
+        if(inv != null) {
+            inv = inv.setLoop(to);
+            addLoopInvariant(inv);
+        }
+    }
 
     /**
      * Registers the passed loop invariant, possibly overwriting an older
      * registration for the same loop.
      */
-    public void setLoopInvariant(LoopInvariant inv) {
+    public void addLoopInvariant(LoopInvariant inv) {
         LoopStatement loop = inv.getLoop();
         loopInvs.put(loop, inv);
     }
@@ -1125,7 +1144,7 @@ public final class SpecificationRepository {
                 addClassAxiom((ClassAxiom)spec);
             }
             else if (spec instanceof LoopInvariant) {
-                setLoopInvariant((LoopInvariant)spec);
+                addLoopInvariant((LoopInvariant)spec);
             }
             else if (spec instanceof BlockContract) {
                 addBlockContract((BlockContract) spec);

@@ -266,6 +266,7 @@ public final class TacletIndex  {
     }
 
     /** copies the index */
+    @SuppressWarnings("unchecked")
     public TacletIndex copy() {
 	return new TacletIndex((HashMap<Object, ImmutableList<NoPosTacletApp>>)rwList.clone(), 
 			     (HashMap<Object, ImmutableList<NoPosTacletApp>>)antecList.clone(), 
@@ -382,6 +383,7 @@ public final class TacletIndex  {
     }
 
     
+    @SuppressWarnings("deprecation")
     private ImmutableList<NoPosTacletApp> getListHelp(
 	    	HashMap<Object, ImmutableList<NoPosTacletApp>> map, 
 	    	Term term,
@@ -624,7 +626,7 @@ public final class TacletIndex  {
 	/**
 	 * the classes that represent prefix elements of a java block
 	 */
-	static final Class[] prefixClasses = new Class[]{
+	static final Class<?>[] prefixClasses = new Class<?>[]{
 	    StatementBlock.class,
 	    LabeledStatement.class,
 	    Try.class,	    
