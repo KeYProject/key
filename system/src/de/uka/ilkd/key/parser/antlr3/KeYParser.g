@@ -1412,19 +1412,19 @@ decls :
 	}
         (options_choice)? 
         (
-            {!onlyWith}? option_decls
+            {!onlyWith}?=> option_decls
         |    
-            {!onlyWith}? sort_decls
+            {!onlyWith}?=> sort_decls
         |
-            {!onlyWith}? prog_var_decls
+            {!onlyWith}?=> prog_var_decls
         |
-            {!onlyWith}? schema_var_decls
+            {!onlyWith}?=> schema_var_decls
         |
             pred_decls
         |
             func_decls
         |
-            {!onlyWith}? ruleset_decls
+            {!onlyWith}?=> ruleset_decls
 
         ) *
     ;
