@@ -25,7 +25,7 @@ public class Installer extends JFrame {
 	String os = System.getProperty ( "os.name" );
 	String currentDir = System.getProperty ( "user.dir" );
 	String defaultKeYHome = System.getProperty ( "user.home" );  
-	defaultKeYHome = ( defaultKeYHome == null ?  File.separator :  File.separator + defaultKeYHome ) +
+	defaultKeYHome = ( defaultKeYHome == null ?  File.separator :  defaultKeYHome + File.separator ) +
 	    "KeY" + File.separator;
 	String defaultKeYLib = defaultKeYHome + "key-ext-jars";
 	String javaHome = System.getProperty ( "java.home" );

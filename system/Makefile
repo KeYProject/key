@@ -300,7 +300,7 @@ javaFiles:
 ifneq ("$(GIT)","")
 	@$(GIT) ls-files | grep "\.java" | grep -v "aspects" | grep -v "gjava" | grep -v "\.java\." | grep -v "resources/" | sort > javaFiles
 else
-	@find de/ -name \*\.java  | grep -v "aspects" | grep -v "gjava" | grep -v "\.java\." | grep -v "resources/" | sort > javaFiles
+	@find $(SRC)/de/ -name \*\.java  | grep -v "aspects" | grep -v "gjava" | grep -v "\.java\." | grep -v "resources/" | sort > javaFiles
 endif
 
 argfile.normal: javaFiles
