@@ -10,7 +10,7 @@
 
 package de.uka.ilkd.key.parser;
 
-import de.uka.ilkd.key.logic.TestClashFreeSubst;
+//import de.uka.ilkd.key.logic.TestClashFreeSubst;
 
 /**
  * The mode in which the parser is currently running.

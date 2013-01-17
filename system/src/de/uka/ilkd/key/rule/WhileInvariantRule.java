@@ -450,7 +450,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             // generate information flow invariant application predicate
             // and associated taclet
             loopInvApplPredTerm =
-                    ifInvariantBuilder.buildContractApplPredTerm();
+                    ifInvariantBuilder.buildContractApplPredTerm(); // entspricht in BlockContractRule contractApplTerm, aber Gleichung muss ergänzt werden -> siehe infFlowAssumptions
             informationFlowInvariantApp =
                     ifInvariantBuilder.buildContractApplTaclet();
 
@@ -493,53 +493,86 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         //split goal into three branches
-        Goal initGoal, bodyGoal;
+        Goal initGoal, useGoal;
         ImmutableList<Goal> result;
         if (infFlowGoal == null) {
             result = goal.split(3);
             initGoal = result.tail().tail().head();
-            bodyGoal = result.tail().head();
-            Goal useGoal = result.head();
+            Goal bodyGoal = result.tail().head();
+            useGoal = result.head();
             initGoal.setBranchLabel("Invariant Initially Valid");
             bodyGoal.setBranchLabel("Body Preserves Invariant");
             useGoal.setBranchLabel("Use Case");
             
-            // "Use Case":
-            // \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
-            // (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
-            // (#v1=FALSE -> \[{.. ...}\]post)),anon2))
-            useGoal.addFormula(new SequentFormula(wellFormedAnon), 
-                    true, 
-                    false);             
-            useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
-            useGoal.addFormula(new SequentFormula(postAssumption), 
-                    true, 
+            //"Body Preserves Invariant":
+            // \replacewith (==>  #atPreEqs(anon1)
+            //                       -> #introNewAnonUpdate(#modifies, #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv ->
+            //                         (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
+            //                          #whileInvRule(\[{.. while (#e) #s ...}\]post,
+            //                               #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv)),anon1));
+            bodyGoal.addFormula(new SequentFormula(wellFormedAnon),
+                    true,
                     false);
 
-            Term restPsi = TB.prog((Modality)inst.progPost.op(),
-                    JavaTools.removeActiveStatement(
-                            inst.progPost.javaBlock(), 
-                            services), 
-                            inst.progPost.sub(0));
-            Term guardFalseRestPsi = TB.box(guardJb, 
-                    TB.imp(guardFalseTerm, restPsi));
-            useGoal.changeFormula(new SequentFormula(TB.applySequential(
-                    uAnon,
-                    guardFalseRestPsi)), 
+            bodyGoal.addFormula(new SequentFormula(uAnonInvVariantNonNeg),
+                    true,
+                    false);
+
+            //-->
+            final WhileInvRule wir
+            = (WhileInvRule) AbstractTermTransformer.WHILE_INV_RULE;
+            SVInstantiations svInst
+            = SVInstantiations.EMPTY_SVINSTANTIATIONS.replace(
+                    null,
+                    null,
+                    inst.innermostExecutionContext,
+                    null,
+                    services);
+            for(SchemaVariable sv : wir.neededInstantiations(inst.loop, svInst)) {
+                assert sv instanceof ProgramSV;
+                svInst = svInst.addInteresting(sv,
+                        (Name) new ProgramElementName(sv.name().toString()),
+                        services);
+            }
+
+            final Term invTerm2;
+            final StrategyProperties props = goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
+            final boolean queryTreatmenIsOn = props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_ON;
+            if(queryTreatmenIsOn ||
+                    props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_RESTRICTED){
+                invTerm2 = QueryExpand.INSTANCE.evaluateQueries(services, invTerm, true, queryTreatmenIsOn); //chrisg
+            }else{
+                invTerm2 = invTerm;
+            }
+
+            Term bodyTerm = TB.tf().createTerm(wir,
+                    inst.progPost,
+                    TB.and(new Term[]{invTerm2,
+                            frameCondition,
+                            variantPO}));
+            bodyTerm = wir.transform(bodyTerm, svInst, services);
+            final Term guardTrueBody = TB.box(guardJb,
+                    TB.imp(guardTrueTerm, bodyTerm));
+            //<--
+
+            bodyGoal.changeFormula(new SequentFormula(TB.applySequential(
+                    uBeforeLoopDefAnonVariant,
+                    guardTrueBody)),
                     ruleApp.posInOccurrence());
         } else {
             result = goal.split(2);
             initGoal = result.tail().head();
-            bodyGoal = result.head();            
+            useGoal = result.head();
             initGoal.setBranchLabel("Invariant Initially Valid");
-            bodyGoal.setBranchLabel("Body Preserves Invariant");
+            useGoal.setBranchLabel("Use Case");
             assert loopInvApplPredTerm != null && informationFlowInvariantApp != null;
             result = result.append(infFlowGoal);
+
             // add term and taclet to post goal
-            infFlowGoal.addFormula(new SequentFormula(loopInvApplPredTerm),
+            useGoal.addFormula(new SequentFormula(loopInvApplPredTerm),
                     true,
                     false);
-            infFlowGoal.addTaclet(informationFlowInvariantApp,
+            useGoal.addTaclet(informationFlowInvariantApp,
                                   SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         }
 
@@ -551,58 +584,28 @@ public final class WhileInvariantRule implements BuiltInRule {
                                 TB.and(invTerm, reachableState)))),
                                 ruleApp.posInOccurrence());
 
-        //"Body Preserves Invariant":
-        // \replacewith (==>  #atPreEqs(anon1) 
-        //                       -> #introNewAnonUpdate(#modifies, #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv -> 
-        //                         (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
-        //                          #whileInvRule(\[{.. while (#e) #s ...}\]post, 
-        //                               #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv)),anon1));
-        bodyGoal.addFormula(new SequentFormula(wellFormedAnon), 
-                true, 
-                false);		
-
-        bodyGoal.addFormula(new SequentFormula(uAnonInvVariantNonNeg), 
-                true, 
+        // "Use Case":
+        // \replacewith (==> #introNewAnonUpdate(#modifies, inv ->
+        // (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]
+        // (#v1=FALSE -> \[{.. ...}\]post)),anon2))
+        useGoal.addFormula(new SequentFormula(wellFormedAnon),
+                true,
+                false);
+        useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
+        useGoal.addFormula(new SequentFormula(postAssumption),
+                true,
                 false);
 
-        final WhileInvRule wir 
-        = (WhileInvRule) AbstractTermTransformer.WHILE_INV_RULE;
-        SVInstantiations svInst 
-        = SVInstantiations.EMPTY_SVINSTANTIATIONS.replace(
-                null, 
-                null, 
-                inst.innermostExecutionContext, 
-                null, 
-                services);
-        for(SchemaVariable sv : wir.neededInstantiations(inst.loop, svInst)) {
-            assert sv instanceof ProgramSV;
-            svInst = svInst.addInteresting(sv, 
-                    (Name) new ProgramElementName(sv.name().toString()), 
-                    services);
-        }
-
-        final Term invTerm2;
-        final StrategyProperties props = goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
-        final boolean queryTreatmenIsOn = props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_ON;
-        if(queryTreatmenIsOn || 
-                props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_RESTRICTED){
-            invTerm2 = QueryExpand.INSTANCE.evaluateQueries(services, invTerm, true, queryTreatmenIsOn); //chrisg
-        }else{
-            invTerm2 = invTerm;
-        }
-
-        Term bodyTerm = TB.tf().createTerm(wir, 
-                inst.progPost,
-                TB.and(new Term[]{invTerm2,
-                        frameCondition,
-                        variantPO}));
-        bodyTerm = wir.transform(bodyTerm, svInst, services);
-        final Term guardTrueBody = TB.box(guardJb, 
-                TB.imp(guardTrueTerm, bodyTerm)); 
-
-        bodyGoal.changeFormula(new SequentFormula(TB.applySequential(
-                uBeforeLoopDefAnonVariant, 
-                guardTrueBody)), 
+        Term restPsi = TB.prog((Modality)inst.progPost.op(),
+                JavaTools.removeActiveStatement(
+                        inst.progPost.javaBlock(),
+                        services),
+                        inst.progPost.sub(0));
+        Term guardFalseRestPsi = TB.box(guardJb,
+                TB.imp(guardFalseTerm, restPsi));
+        useGoal.changeFormula(new SequentFormula(TB.applySequential(
+                uAnon,
+                guardFalseRestPsi)),
                 ruleApp.posInOccurrence());
         
         return result;
