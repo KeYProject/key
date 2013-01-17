@@ -61,34 +61,34 @@ public final class StrategySelectionView extends JPanel {
     
 
    
-    ButtonGroup stratGroup = new ButtonGroup();
-    ButtonGroup splittingGroup = new ButtonGroup();
-    ButtonGroup loopGroup = new ButtonGroup();
-    ButtonGroup blockGroup = new ButtonGroup();
-    ButtonGroup methodGroup = new ButtonGroup();
-    ButtonGroup depGroup = new ButtonGroup();
-    ButtonGroup queryGroup = new ButtonGroup();
-    ButtonGroup queryAxiomGroup = new ButtonGroup();
-    ButtonGroup nonLinArithGroup = new ButtonGroup();
-    ButtonGroup quantifierGroup = new ButtonGroup();
-    ButtonGroup stopModeGroup = new ButtonGroup();
-    ButtonGroup retreatModeGroup = new ButtonGroup();
-    ButtonGroup autoInductionGroup = new ButtonGroup();     
-    ButtonGroup[] userTacletsGroup = new ButtonGroup[StrategyProperties.USER_TACLETS_NUM];
+    private ButtonGroup stratGroup = new ButtonGroup();
+    private ButtonGroup splittingGroup = new ButtonGroup();
+    private ButtonGroup loopGroup = new ButtonGroup();
+    private ButtonGroup blockGroup = new ButtonGroup();
+    private ButtonGroup methodGroup = new ButtonGroup();
+    private ButtonGroup depGroup = new ButtonGroup();
+    private ButtonGroup queryGroup = new ButtonGroup();
+    private ButtonGroup queryAxiomGroup = new ButtonGroup();
+    private ButtonGroup nonLinArithGroup = new ButtonGroup();
+    private ButtonGroup quantifierGroup = new ButtonGroup();
+    private ButtonGroup stopModeGroup = new ButtonGroup();
+    private ButtonGroup retreatModeGroup = new ButtonGroup();
+    private ButtonGroup autoInductionGroup = new ButtonGroup();     
+    private ButtonGroup[] userTacletsGroup = new ButtonGroup[StrategyProperties.USER_TACLETS_NUM];
     {
         for (int i = 0; i < StrategyProperties.USER_TACLETS_NUM; ++i)
             userTacletsGroup[i] = new ButtonGroup ();
     }
-    JRadioButton rdBut9;
-    JRadioButton rdBut10;
-    JRadioButton rdBut11;
-    JRadioButton rdBut12;
-    JRadioButton rdBut13;
-    JRadioButton rdBut14;
-    JRadioButton rdBut17;
-    JRadioButton rdBut18;
-    JRadioButton blockContractRadioButton;
-    JRadioButton blockExpandRadioButton;
+    private JRadioButton rdBut9;
+    private JRadioButton rdBut10;
+    private JRadioButton rdBut11;
+    private JRadioButton rdBut12;
+    private JRadioButton rdBut13;
+    private JRadioButton rdBut14;
+    private JRadioButton rdBut17;
+    private JRadioButton rdBut18;
+    private JRadioButton blockContractRadioButton;
+    private JRadioButton blockExpandRadioButton;
     //JRadioButton blockNoneRadioButton;
     private JRadioButton noRetreat;
     private JRadioButton retreat;
@@ -427,7 +427,7 @@ public final class StrategySelectionView extends JPanel {
         queryRestricted = newButton("Restricted", 
                 StrategyProperties.QUERY_RESTRICTED, false, false);
         queryRestricted.setToolTipText ( "<html>Rewrite query to a method call (expanded) so that contracts or inlining can be used.<br>" +
-                                         "<ul><li> Priority of expanding queries that occuring earlier on a branch is higher than<br>" +
+                                         "<ul><li> Priority of expanding queries occuring earlier on a branch is higher than<br>" +
         		                         " for queries introduced more recently. This approximates in a breath-first search<br>" +
                                          " with respect to query expansion.</li>" +
         		                         "<li> Reexpansion of identical query terms is suppressed.</li>" +
