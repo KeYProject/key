@@ -1123,7 +1123,7 @@ options {
             StringBuffer className = new StringBuffer(input.LT(n).getText());
 	    while (isPackage(className.toString()) || input.LA(n+2)==NUM_LITERAL || 
 	    		(input.LT(n+2)!=null && input.LT(n+2).getText()!=null && 
-	    		input.LT(n+2).getText().charAt(0)<='Z' && input.LT(n+2).getText().charAt(0)>='A' && 
+	    		input.LT(n+2).getText().length() > 0 && input.LT(n+2).getText().charAt(0)<='Z' && input.LT(n+2).getText().charAt(0)>='A' && 
 	    		(input.LT(n+2).getText().length()==1 || 
 	    		 input.LT(n+2).getText().charAt(1)<='z' && input.LT(n+2).getText().charAt(1)>='a'))){  	   
                 if (input.LA(n+1) != DOT && input.LA(n+1) != EMPTYBRACKETS) return false;
