@@ -302,22 +302,25 @@ public final class StrategySelectionView extends JPanel {
 			"Use loop invariants for loops.<br>"+
 			"Three properties have to be shown:<br>"+
 			"<ul><li>Validity of invariant of a loop is preserved by the<br>"+
-			"loop guard and loop body (initially valid).</li><br>"+
+			"loop guard and loop body (initially valid).</li>"+
 			"<li>If the invariant was valid at the start of the loop, it holds <br>"+
-			"after arbitrarily many loop iterations (body preserves invariant).</li><br>"+
-			"<li>Invariant holds after the loop terminates (use case).</li><br>"+
+			"after arbitrarily many loop iterations (body preserves invariant).</li>"+
+			"<li>Invariant holds after the loop terminates (use case).</li>"+
 			"</ul></html>");
         loopGroup.add(rdBut10);
         addJavaDLOption ( rdBut10, javaDLOptionsLayout, 2, yCoord, 2 );
 
         rdBut9 = newButton("Expand", StrategyProperties.LOOP_EXPAND, true, false);
         rdBut9.setToolTipText("<html>"+
-			"Expand loop body."+
+			"Unroll loop body."+
 			"</html>");
         loopGroup.add(rdBut9);
         addJavaDLOption ( rdBut9, javaDLOptionsLayout, 4, yCoord, 2 );
 
         rdBut11 = newButton("None", StrategyProperties.LOOP_NONE, false, false);
+        rdBut11.setToolTipText("<html>"+
+			"Leave loops untouched."+
+			"</html>");
         loopGroup.add(rdBut11);
         addJavaDLOption ( rdBut11, javaDLOptionsLayout, 6, yCoord, 2 );        
 
@@ -334,11 +337,11 @@ public final class StrategySelectionView extends JPanel {
 
         blockContractRadioButton = newButton("Contract", StrategyProperties.BLOCK_CONTRACT, false, false);
         blockContractRadioButton.setToolTipText("<html>"+
-        					"If block contracts are specified, Java blocks are replaced by their contract."+
-        					"Three properties have to be shown:<br>"+
-        					"<ul><li>Validity of block contract</li><br>"+
-        					"<li>Precondition of contract holds</li><br>"+
-        					"<li>Postcondition holds after block terminates</li><br>"+
+        					"If block contracts are specified, Java blocks are replaced by their contract.<br>"+
+        					"Three properties have to be shown:"+
+        					"<ul><li>Validity of block contract</li>"+
+        					"<li>Precondition of contract holds</li>"+
+        					"<li>Postcondition holds after block terminates</li>"+
         					"</ul></html>");
         blockGroup.add(blockContractRadioButton);
         addJavaDLOption(blockContractRadioButton, javaDLOptionsLayout, 2, yCoord, 2);
