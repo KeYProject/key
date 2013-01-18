@@ -4,18 +4,17 @@ import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.ILayoutFeature;
 import org.key_project.sed.core.model.ISEDUseLoopInvariant;
-import org.key_project.sed.core.model.ISEDUseOperationContract;
 
 /**
  * Implementation of {@link ILayoutFeature} for {@link ISEDUseLoopInvariant}s.
  * @author Martin Hentschel
  */
-public class UseOperationContractLayoutFeature extends AbstractDebugNodeLayoutFeature {
+public class UseLoopInvariantLayoutFeature extends AbstractDebugNodeLayoutFeature {
    /**
     * Constructor.
     * @param fp The {@link IFeatureProvider} which provides this {@link IAddFeature}.
     */
-   public UseOperationContractLayoutFeature(IFeatureProvider fp) {
+   public UseLoopInvariantLayoutFeature(IFeatureProvider fp) {
       super(fp);
    }
 
@@ -24,6 +23,6 @@ public class UseOperationContractLayoutFeature extends AbstractDebugNodeLayoutFe
     */
    @Override
    protected boolean canLayoutBusinessObject(Object businessObject) {
-      return businessObject instanceof ISEDUseOperationContract;
+      return businessObject instanceof ISEDUseLoopInvariant;
    }
 }

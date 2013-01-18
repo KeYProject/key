@@ -8,15 +8,15 @@ import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDThread;
-import org.key_project.sed.core.model.ISEDUseOperationContract;
-import org.key_project.sed.core.model.impl.AbstractSEDUseOperationContract;
+import org.key_project.sed.core.model.ISEDUseLoopInvariant;
+import org.key_project.sed.core.model.impl.AbstractSEDUseLoopInvariant;
 
 /**
- * Implementation of {@link ISEDUseOperationContract} that stores all
+ * Implementation of {@link ISEDUseLoopInvariant} that stores all
  * information in the memory.
  * @author Martin Hentschel
  */
-public class SEDMemoryUseOperationContract extends AbstractSEDUseOperationContract implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
+public class SEDMemoryUseLoopInvariant extends AbstractSEDUseLoopInvariant implements ISEDMemoryStackFrameCompatibleDebugNode, ISEDMemoryDebugNode {
    /**
     * The contained child nodes.
     */
@@ -63,19 +63,9 @@ public class SEDMemoryUseOperationContract extends AbstractSEDUseOperationContra
    private ISEDDebugNode[] callStack;
 
    /**
-    * Not null check complied?
+    * Initially valid?
     */
-   private boolean notNullCheckComplied;
-
-   /**
-    * Not null check available?
-    */
-   private boolean hasNotNullCheck;
-
-   /**
-    * Precondition check complied?
-    */
-   private boolean preconditionComplied;
+   private boolean initiallyValid;
    
    /**
     * Constructor.
@@ -83,7 +73,7 @@ public class SEDMemoryUseOperationContract extends AbstractSEDUseOperationContra
     * @param parent The parent in that this node is contained as child.
     * @param thread The {@link ISEDThread} in that this use operation contract is contained.
     */
-   public SEDMemoryUseOperationContract(ISEDDebugTarget target, 
+   public SEDMemoryUseLoopInvariant(ISEDDebugTarget target, 
                                         ISEDDebugNode parent, 
                                         ISEDThread thread) {
       super(target, parent, thread);
@@ -285,47 +275,15 @@ public class SEDMemoryUseOperationContract extends AbstractSEDUseOperationContra
     * {@inheritDoc}
     */
    @Override
-   public boolean isPreconditionComplied() {
-      return preconditionComplied;
+   public boolean isInitiallyValid() {
+      return initiallyValid;
    }
 
    /**
-    * {@inheritDoc}
+    * Sets the initially valid flag.
+    * @param initiallyValid The initially valid flag to set.
     */
-   @Override
-   public boolean hasNotNullCheck() {
-      return hasNotNullCheck;
-   }
-
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isNotNullCheckComplied() {
-      return notNullCheckComplied;
-   }
-
-   /**
-    * Defines if a not null check is available nor not.
-    * @param hasNotNullCheck {@code true} not null check available, {@code false} not null check is not available.
-    */
-   public void setHasNotNullCheck(boolean hasNotNullCheck) {
-      this.hasNotNullCheck = hasNotNullCheck;
-   }
-
-   /**
-    * Defines if the not null check is complied.
-    * @param notNullCheckComplied {@code true} not null check complied, {@code false} not null check not complied.
-    */
-   public void setNotNullCheckComplied(boolean notNullCheckComplied) {
-      this.notNullCheckComplied = notNullCheckComplied;
-   }
-
-   /**
-    * Defines if the precondition check is complied.
-    * @param preconditionComplied {@code true} precondition complied, {@code false} precondition not complied.
-    */
-   public void setPreconditionComplied(boolean preconditionComplied) {
-      this.preconditionComplied = preconditionComplied;
+   public void setInitiallyValid(boolean initiallyValid) {
+      this.initiallyValid = initiallyValid;
    }
 }

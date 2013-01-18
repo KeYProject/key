@@ -79,6 +79,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -985,6 +986,16 @@ public final class SymbolicExecutionUtil {
    public static boolean isUseOperationContract(Node node, RuleApp ruleApp) {
       return "Use Operation Contract".equals(MiscTools.getRuleDisplayName(ruleApp));
    }
+
+   /**
+    * Checks if the given node should be represented as loop invariant.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @return {@code true} represent node as use loop invariant, {@code false} represent node as something else. 
+    */
+   public static boolean isUseLoopInvariant(Node node, RuleApp ruleApp) {
+      return "Loop Invariant".equals(MiscTools.getRuleDisplayName(ruleApp));
+   }
    
    /**
     * Checks if the given node should be represented as method return.
@@ -1038,6 +1049,9 @@ public final class SymbolicExecutionUtil {
                    !isForLoopCondition(node, statement);
          }
          else if (isUseOperationContract(node, ruleApp)) {
+            return true;
+         }
+         else if (isUseLoopInvariant(node, ruleApp)) {
             return true;
          }
          else {
@@ -1235,6 +1249,9 @@ public final class SymbolicExecutionUtil {
       }
       else if (parent.getAppliedRuleApp() instanceof ContractRuleApp) {
         return computeContractRuleAppBranchCondition(parent, node, simplify);
+      }
+      else if (parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
+         return TermBuilder.DF.tt(); // TODO: Implement real branch condition of loop invariants!
       }
       else {
          throw new ProofInputException("Unsupported RuleApp in branch computation \"" + parent.getAppliedRuleApp() + "\"."); 
@@ -1838,12 +1855,28 @@ public final class SymbolicExecutionUtil {
     * @param useOperationContracts {@code true} use operation contracts, {@code false} expand methods.
     */
    public static void setUseOperationContracts(Proof proof, boolean useOperationContracts) {
-      if (proof != null) {
+      if (proof != null && !proof.isDisposed()) {
          String methodTreatmentValue = useOperationContracts ? 
                                        StrategyProperties.METHOD_CONTRACT : 
                                        StrategyProperties.METHOD_EXPAND;
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
          sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentValue);
+         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+      }
+   }
+
+   /**
+    * Configures the proof to use loop invariants or to expand loops instead.
+    * @param proof The {@link Proof} to configure.
+    * @param useLoopInvariants {@code true} use loop invariants, {@code false} expand loops.
+    */
+   public static void setUseLoopInvariants(Proof proof, boolean useLoopInvariants) {
+      if (proof != null && !proof.isDisposed()) {
+         String loopTreatmentValue = useLoopInvariants ? 
+                                     StrategyProperties.LOOP_INVARIANT : 
+                                     StrategyProperties.LOOP_EXPAND;
+         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       }
    }

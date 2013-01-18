@@ -51,6 +51,7 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDUseLoopInvariant;
 import org.key_project.sed.core.model.ISEDUseOperationContract;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.BranchConditionCreateFeature;
@@ -95,6 +96,10 @@ import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadAddFeat
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadLayoutFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.ThreadUpdateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseLoopInvariantAddFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseLoopInvariantCreateFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseLoopInvariantLayoutFeature;
+import org.key_project.sed.ui.visualization.execution_tree.feature.UseLoopInvariantUpdateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.UseOperationContractAddFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.UseOperationContractCreateFeature;
 import org.key_project.sed.ui.visualization.execution_tree.feature.UseOperationContractLayoutFeature;
@@ -144,6 +149,7 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
                                       new StatementCreateFeature(this),
                                       new TerminationCreateFeature(this),
                                       new ThreadCreateFeature(this),
+                                      new UseLoopInvariantCreateFeature(this),
                                       new UseOperationContractCreateFeature(this)};
       }
       else {
@@ -188,6 +194,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (context.getNewObject() instanceof ISEDUseOperationContract) {
          return new UseOperationContractAddFeature(this);
+      }
+      else if (context.getNewObject() instanceof ISEDUseLoopInvariant) {
+         return new UseLoopInvariantAddFeature(this);
       }
       else {
          return super.getAddFeature(context);
@@ -236,6 +245,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       else if (bo instanceof ISEDUseOperationContract) {
          return new UseOperationContractUpdateFeature(this);
       }
+      else if (bo instanceof ISEDUseLoopInvariant) {
+         return new UseLoopInvariantUpdateFeature(this);
+      }
       else {
          return super.getUpdateFeature(context);
       }
@@ -280,6 +292,9 @@ public class ExecutionTreeFeatureProvider extends DefaultFeatureProvider {
       }
       else if (bo instanceof ISEDUseOperationContract) {
          return new UseOperationContractLayoutFeature(this);
+      }
+      else if (bo instanceof ISEDUseLoopInvariant) {
+         return new UseLoopInvariantLayoutFeature(this);
       }
       else {
          return super.getLayoutFeature(context);

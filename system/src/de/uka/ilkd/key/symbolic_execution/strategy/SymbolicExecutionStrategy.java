@@ -17,10 +17,11 @@ import de.uka.ilkd.key.strategy.feature.ScaleFeature;
 public class SymbolicExecutionStrategy extends VBTStrategy {
     public static StrategyProperties getSymbolicExecutionStrategyProperties(boolean splittingRulesAllowed, 
                                                                             boolean quantifierInstantiationWithSplitting,
-                                                                            boolean methodTreatmentContract) {
+                                                                            boolean methodTreatmentContract,
+                                                                            boolean loopTreatmentInvariant) {
         final StrategyProperties res = new StrategyProperties();
         res.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
-                StrategyProperties.LOOP_EXPAND);
+              loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT : StrategyProperties.LOOP_EXPAND);
         res.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
                 StrategyProperties.BLOCK_EXPAND);
         res.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,

@@ -16,6 +16,7 @@ import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
 import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDTermination;
+import org.key_project.sed.core.model.ISEDUseLoopInvariant;
 import org.key_project.sed.core.model.ISEDUseOperationContract;
 import org.key_project.sed.ui.Activator;
 import org.key_project.util.eclipse.BundleUtil;
@@ -93,6 +94,16 @@ public final class SEDImages {
     public static final String USE_OPERATION_CONTRACT_NOT_PRE_NOT_NPC = "org.key_project.sed.ui.images.useOperationContractNotPreNotNpc";
     
     /**
+     * The key for the image that is used for use loop invariant.
+     */
+    public static final String USE_LOOP_INVARIANT = "org.key_project.sed.ui.images.useLoopInvariant";
+    
+    /**
+     * The key for the image that is used for use loop invariant.
+     */
+    public static final String USE_LOOP_INVARIANT_INITIALLY_INVALID = "org.key_project.sed.ui.images.useLoopInvariantInitiallyInvalid";
+
+    /**
      * Forbid instances.
      */
     private SEDImages() {
@@ -161,6 +172,12 @@ public final class SEDImages {
         else if (USE_OPERATION_CONTRACT_NOT_PRE_NOT_NPC.equals(key)) {
            path = "icons/use_operation_contract_not_pre_not_npc.gif";
         }
+        else if (USE_LOOP_INVARIANT.equals(key)) {
+           path = "icons/use_loop_invariant.gif";
+        }
+        else if (USE_LOOP_INVARIANT_INITIALLY_INVALID.equals(key)) {
+           path = "icons/use_loop_invariant _initially_invalid.gif";
+        }
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -200,14 +217,20 @@ public final class SEDImages {
             @Override
             public void run() {
                ImageRegistry registry = Activator.getDefault().getImageRegistry();
+               registry.remove(BRANCH_CONDITION);
+               registry.remove(BRANCH_NODE);
+               registry.remove(EXCEPTIONAL_TERMINATION);
+               registry.remove(LOOP_CONDITION);
+               registry.remove(LOOP_NODE);
                registry.remove(METHOD_CALL);
                registry.remove(METHOD_RETURN);
                registry.remove(TERMINATION);
-               registry.remove(BRANCH_NODE);
-               registry.remove(BRANCH_CONDITION);
-               registry.remove(EXCEPTIONAL_TERMINATION);
-               registry.remove(LOOP_NODE);
-               registry.remove(LOOP_CONDITION);
+               registry.remove(USE_LOOP_INVARIANT);
+               registry.remove(USE_LOOP_INVARIANT_INITIALLY_INVALID);
+               registry.remove(USE_OPERATION_CONTRACT);
+               registry.remove(USE_OPERATION_CONTRACT_NOT_NPC);
+               registry.remove(USE_OPERATION_CONTRACT_NOT_PRE);
+               registry.remove(USE_OPERATION_CONTRACT_NOT_PRE_NOT_NPC);
             }
          });
        }
@@ -260,6 +283,15 @@ public final class SEDImages {
              else {
                 return getImage(SEDImages.USE_OPERATION_CONTRACT_NOT_PRE_NOT_NPC);
              }
+          }
+       }
+       else if (element instanceof ISEDUseLoopInvariant) {
+          ISEDUseLoopInvariant node = (ISEDUseLoopInvariant)element;
+          if (node.isInitiallyValid()) {
+             return getImage(SEDImages.USE_LOOP_INVARIANT);
+          }
+          else {
+             return getImage(SEDImages.USE_LOOP_INVARIANT_INITIALLY_INVALID);
           }
        }
        else {

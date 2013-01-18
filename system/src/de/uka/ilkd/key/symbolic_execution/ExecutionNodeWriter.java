@@ -21,6 +21,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
@@ -123,6 +124,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Attribute name to store {@link IExecutionUseOperationContract#isNotNullCheckComplied()}.
     */
    public static final String ATTRIBUTE_NOT_NULL_CHECK_COMPLIED = "notNullCheckComplied";
+
+   /**
+    * Attribute name to store {@link IExecutionUseLoopInvariant#isInitiallyValid()}.
+    */
+   public static final String ATTRIBUTE_INITIALLY_VALID = "initiallyValid";
    
    /**
     * Tag name to store {@link IExecutionBranchCondition}s.
@@ -173,6 +179,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
     * Tag name to store {@link IExecutionUseOperationContract}s.
     */
    public static final String TAG_USE_OPERATION_CONTRACT = "useOperationContract";
+
+   /**
+    * Tag name to store {@link IExecutionUseLoopInvariant}s.
+    */
+   public static final String TAG_USE_LOOP_INVARIANT = "useLoopInvariant";
 
    /**
     * Tag name to store {@link IExecutionVariable}s.
@@ -301,6 +312,9 @@ public class ExecutionNodeWriter extends AbstractWriter {
       }
       else if (node instanceof IExecutionUseOperationContract) {
          appendExecutionUseOperationContract(level, (IExecutionUseOperationContract)node, saveVariables, saveCallStack, sb);
+      }
+      else if (node instanceof IExecutionUseLoopInvariant) {
+         appendExecutionUseLoopInvariant(level, (IExecutionUseLoopInvariant)node, saveVariables, saveCallStack, sb);
       }
       else {
          throw new IllegalArgumentException("Not supported node \"" + node + "\".");
@@ -536,6 +550,34 @@ public class ExecutionNodeWriter extends AbstractWriter {
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
       appendEndTag(level, TAG_USE_OPERATION_CONTRACT, sb);
+   }
+
+   /**
+    * Converts the given {@link IExecutionUseLoopInvariant} into XML and appends it to the {@link StringBuffer}.
+    * @param level The current child level.
+    * @param node The {@link IExecutionUseLoopInvariant} to convert.
+    * @param saveVariables Save variables? 
+    * @param saveCallStack Save method call stack?
+    * @param sb The {@link StringBuffer} to append to.
+    * @throws ProofInputException Occurred Exception.
+    */
+   protected void appendExecutionUseLoopInvariant(int level, 
+                                         IExecutionUseLoopInvariant node, 
+                                         boolean saveVariables, 
+                                         boolean saveCallStack, 
+                                         StringBuffer sb) throws ProofInputException {
+      Map<String, String> attributeValues = new LinkedHashMap<String, String>();
+      attributeValues.put(ATTRIBUTE_NAME, node.getName());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION, node.getFormatedPathCondition());
+      attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
+
+      attributeValues.put(ATTRIBUTE_INITIALLY_VALID, node.isInitiallyValid() + "");
+
+      appendStartTag(level, TAG_USE_LOOP_INVARIANT, attributeValues, sb);
+      appendVariables(level + 1, node, saveVariables, sb);
+      appendCallStack(level + 1, node, saveCallStack, sb);
+      appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
+      appendEndTag(level, TAG_USE_LOOP_INVARIANT, sb);
    }
 
    /**

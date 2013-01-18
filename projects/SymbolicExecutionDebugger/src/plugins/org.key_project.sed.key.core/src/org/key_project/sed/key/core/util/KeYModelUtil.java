@@ -29,6 +29,7 @@ import org.key_project.sed.key.core.model.KeYMethodCall;
 import org.key_project.sed.key.core.model.KeYMethodReturn;
 import org.key_project.sed.key.core.model.KeYStatement;
 import org.key_project.sed.key.core.model.KeYTermination;
+import org.key_project.sed.key.core.model.KeYUseLoopInvariant;
 import org.key_project.sed.key.core.model.KeYUseOperationContract;
 import org.key_project.sed.key.core.model.KeYVariable;
 import org.key_project.util.java.IOUtil;
@@ -46,6 +47,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStateNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
 
@@ -150,6 +152,9 @@ public final class KeYModelUtil {
       }
       else if (executionNode instanceof IExecutionUseOperationContract) {
          result = new KeYUseOperationContract(target, parent, thread, (IExecutionUseOperationContract)executionNode);
+      }
+      else if (executionNode instanceof IExecutionUseLoopInvariant) {
+         result = new KeYUseLoopInvariant(target, parent, thread, (IExecutionUseLoopInvariant)executionNode);
       }
       else if (executionNode instanceof IExecutionTermination) {
          IExecutionTermination terminationExecutionNode = (IExecutionTermination)executionNode;

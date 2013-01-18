@@ -65,6 +65,78 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySumFor
+    */
+   public void testUseLoopInvariantArraySumFor() throws Exception {
+      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
+//      doTest(keyRepDirectory, 
+//             "examples/_testcase/set/useLoopInvariantArraySumFor/test/ArraySumFor.java", 
+//             "ArraySumFor", 
+//             "sum", 
+//             "examples/_testcase/set/useLoopInvariantArraySumFor/oracle/ArraySumFor.xml",
+//             false,
+//             false,
+//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+//             false,
+//             true,
+//             true);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySumForEach
+    */
+   public void testUseLoopInvariantArraySumForEach() throws Exception {
+      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
+//      doTest(keyRepDirectory, 
+//             "examples/_testcase/set/useLoopInvariantArraySumForEach/test/ArraySumForEach.java", 
+//             "ArraySumForEach", 
+//             "sum", 
+//             "examples/_testcase/set/useLoopInvariantArraySumForEach/oracle/ArraySumForEach.xml",
+//             false,
+//             false,
+//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+//             false,
+//             true,
+//             true);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhile
+    */
+   public void testUseLoopInvariantArraySumWhile() throws Exception {
+      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
+//      doTest(keyRepDirectory, 
+//             "examples/_testcase/set/useLoopInvariantArraySumWhile/test/ArraySumWhile.java", 
+//             "ArraySumWhile", 
+//             "sum", 
+//             "examples/_testcase/set/useLoopInvariantArraySumWhile/oracle/ArraySumWhile.xml",
+//             false,
+//             false,
+//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+//             false,
+//             true,
+//             true);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid
+    */
+   public void testUseLoopInvariantArraySumWhileInitiallyInvalid() throws Exception {
+      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
+//      doTest(keyRepDirectory, 
+//             "examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid/test/ArraySumWhileInitiallyInvalid.java", 
+//             "ArraySumWhileInitiallyInvalid", 
+//             "sum", 
+//             "examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid/oracle/ArraySumWhileInitiallyInvalid.xml",
+//             false,
+//             false,
+//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+//             false,
+//             true,
+//             true);
+   }
+   
+   /**
     * Tests example: examples/_testcase/set/useOperationContractAllBranchesOpenTest
     */
    public void testUseOperationContractAllBranchesOpenTest() throws Exception {
@@ -77,7 +149,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true);
+             true,
+             false);
    }
    
    /**
@@ -93,7 +166,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true);
+             true,
+             false);
    }
    
    /**
@@ -109,7 +183,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true);
+             true,
+             false);
    }
    
    /**
@@ -125,7 +200,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true);
+             true,
+             false);
    }
    
    /**
@@ -141,7 +217,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true);
+             true,
+             false);
    }
    
    /**
@@ -157,7 +234,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true);
+             true,
+             false);
    }
    
    /**
@@ -173,7 +251,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true);
+             true,
+             false);
    }
    
    /**
@@ -189,7 +268,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true);
+             true,
+             false);
    }
    
    /**
@@ -205,7 +285,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true);
+             true,
+             false);
    }
    
    /**
@@ -221,7 +302,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true);
+             true,
+             false);
    }
    
    /**
@@ -237,7 +319,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true);
+             true,
+             false);
    }
    
    /**
@@ -252,6 +335,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              true,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -269,6 +353,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              true,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -284,6 +369,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              true,
              false,
              ALL_IN_ONE_RUN,
+             false,
              false,
              false);
    }
@@ -301,6 +387,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -317,6 +404,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              true,
+             false,
              false);
    }
    
@@ -333,6 +421,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              true,
+             false,
              false);
    }
    
@@ -348,6 +437,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -365,6 +455,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -380,6 +471,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -397,6 +489,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              ALL_IN_ONE_RUN,
              false,
+             false,
              false);
    }
    
@@ -412,6 +505,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              true,
              false,
              ALL_IN_ONE_RUN,
+             false,
              false,
              false);
    }
@@ -429,6 +523,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              ALL_IN_ONE_RUN,
              false,
+             false,
              false);
    }
    
@@ -444,6 +539,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              true,
              false,
              ALL_IN_ONE_RUN,
+             false,
              false,
              false);
    }
@@ -461,6 +557,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -476,6 +573,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -493,6 +591,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -508,6 +607,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -525,6 +625,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -540,6 +641,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -557,6 +659,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -572,6 +675,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -589,6 +693,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -604,6 +709,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -621,6 +727,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -636,6 +743,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -653,6 +761,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -668,6 +777,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -685,6 +795,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -700,6 +811,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -717,6 +829,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -732,6 +845,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -749,6 +863,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              true,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -764,6 +879,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              true,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -781,6 +897,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -797,6 +914,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -812,6 +930,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -835,6 +954,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              ALL_IN_ONE_RUN,
              false,
+             false,
              false);
    }
    
@@ -850,6 +970,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -867,6 +988,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -882,6 +1004,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -899,6 +1022,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -914,6 +1038,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -931,6 +1056,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -946,6 +1072,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -963,6 +1090,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -978,6 +1106,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -995,6 +1124,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
              false);
    }
    
@@ -1010,6 +1140,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              false,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
              false,
              false);
    }
@@ -1035,6 +1166,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * @param maximalNumberOfExecutedSetNodesPerRun The number of executed set nodes per auto mode run. The whole test is executed for each defined value.
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
+    * @param useLoopInvariants Use loop invariants?
     * @throws ProofInputException Occurred Exception
     * @throws IOException Occurred Exception
     * @throws ParserConfigurationException Occurred Exception
@@ -1050,7 +1182,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                          boolean includeCallStack,
                          int[] maximalNumberOfExecutedSetNodesPerRun,
                          boolean mergeBranchConditions,
-                         boolean useOperationContracts) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+                         boolean useOperationContracts,
+                         boolean useLoopInvariants) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       assertNotNull(maximalNumberOfExecutedSetNodesPerRun);
       for (int i = 0; i < maximalNumberOfExecutedSetNodesPerRun.length; i++) {
          doTest(baseDir, 
@@ -1062,7 +1195,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 includeCallStack,
                 maximalNumberOfExecutedSetNodesPerRun[i],
                 mergeBranchConditions,
-                useOperationContracts);
+                useOperationContracts,
+                useLoopInvariants);
       }
    }
    
@@ -1087,6 +1221,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * @param maximalNumberOfExecutedSetNodes The number of executed set nodes per auto mode run.
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
+    * @param useLoopInvariants Use loop invariants?
     * @throws ProofInputException Occurred Exception
     * @throws IOException Occurred Exception
     * @throws ParserConfigurationException Occurred Exception
@@ -1102,7 +1237,8 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                          boolean includeCallStack,
                          int maximalNumberOfExecutedSetNodes,
                          boolean mergeBranchConditions,
-                         boolean useOperationContracts) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+                         boolean useOperationContracts,
+                         boolean useLoopInvariants) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       String originalRuntimeExceptions = null;
       try {
          // Make sure that parameter are valid.
@@ -1117,13 +1253,13 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
          assertTrue(maximalNumberOfExecutedSetNodes >= 1);
          // Store original settings of KeY which requires that at least one proof was instantiated.
          if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, mergeBranchConditions, useOperationContracts);
+            createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, mergeBranchConditions, useOperationContracts, useLoopInvariants);
          }
          originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
          assertNotNull(originalRuntimeExceptions);
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          // Create proof environment for symbolic execution
-         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, mergeBranchConditions, useOperationContracts);
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, mergeBranchConditions, useOperationContracts, useLoopInvariants);
          // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
          ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
          env.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);

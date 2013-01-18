@@ -14,7 +14,7 @@ import org.key_project.sed.core.model.ISEDUseOperationContract;
 public abstract class AbstractSEDUseOperationContract extends AbstractSEDStackFrameCompatibleDebugNode implements ISEDUseOperationContract {
    /**
     * Constructor.
-    * @param target The {@link ISEDDebugTarget} in that this branch condition is contained.
+    * @param target The {@link ISEDDebugTarget} in that this use operation contract is contained.
     * @param parent The parent in that this node is contained as child.
     * @param thread The {@link ISEDThread} in that this node is contained.
     */

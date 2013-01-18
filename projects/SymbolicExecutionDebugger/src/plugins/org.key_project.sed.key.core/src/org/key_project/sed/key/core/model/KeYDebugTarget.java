@@ -107,7 +107,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       // Observe frozen state of KeY Main Frame
       environment.getBuilder().getMediator().addAutoModeListener(autoModeListener);
       // Initialize proof to use the symbolic execution strategy
-      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), false);
+      SymbolicExecutionEnvironment.configureProofForSymbolicExecution(environment.getBuilder().getProof(), KeYSEDPreferences.getMaximalNumberOfSetNodesPerBranchOnRun(), false, false);
    }
 
    /**
@@ -168,7 +168,7 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
                               boolean stepReturn) {
       Proof proof = environment.getBuilder().getProof();
       // Set strategy to use
-      StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, isMethodTreatmentContract(proof));
+      StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, isMethodTreatmentContract(proof), isLoopTreatmentInvariant(proof));
       proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
       // Update stop condition
       CompoundStopCondition stopCondition = new CompoundStopCondition();
@@ -185,9 +185,24 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
       environment.getUi().startAutoMode(proof, goals);
    }
    
+   /**
+    * Checks if the given {@link Proof} uses method treatment "Contract" right now.
+    * @param proof The {@link Proof} to check.
+    * @return {@code true} Contract, {@code false} Expand
+    */
    protected boolean isMethodTreatmentContract(Proof proof) {
       StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
       return StrategyProperties.METHOD_CONTRACT.equals(sp.getProperty(StrategyProperties.METHOD_OPTIONS_KEY));
+   }
+   
+   /**
+    * Checks if the given {@link Proof} uses loop treatment "Invariant" right now.
+    * @param proof The {@link Proof} to check.
+    * @return {@code true} Invariant, {@code false} Expand
+    */
+   protected boolean isLoopTreatmentInvariant(Proof proof) {
+      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+      return StrategyProperties.LOOP_INVARIANT.equals(sp.getProperty(StrategyProperties.LOOP_OPTIONS_KEY));
    }
 
    /**

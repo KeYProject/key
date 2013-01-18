@@ -3,6 +3,9 @@ package org.key_project.sed.key.ui.view;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.eclipse.debug.core.DebugEvent;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.IDebugEventSetListener;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.model.IDebugElement;
 import org.eclipse.debug.ui.IDebugUIConstants;
@@ -38,6 +41,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  */
 public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
    /**
+    * Global constant to enable or disable the usage of loop invariants.
+    */
+   public static final boolean LOOP_INVARIANTS_SUPPORTED = false;
+   
+   /**
     * ID of this view.
     */
    public static final String VIEW_ID = "org.key_project.sed.key.ui.view.SymbolicExecutionProofSearchStragyView";
@@ -51,6 +59,16 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
     * Shown string for method treatment "Contract".
     */
    public static final String METHOD_TREATMENT_CONTRACT = "Contract";
+
+   /**
+    * Shown string for loop treatment "Expand".
+    */
+   public static final String LOOP_TREATMENT_EXPAND = "Expand";
+
+   /**
+    * Shown string for loop treatment "Invariant".
+    */
+   public static final String LOOP_TREATMENT_INVARIANT = "Invariant";
    
    /**
     * Control to define the method treatment.
@@ -58,9 +76,19 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
    private Combo methodTreatmentCombo;
 
    /**
+    * Control to define the loop treatment.
+    */
+   private Combo loopTreatmentCombo;
+   
+   /**
     * The proof to edit its proof search strategy settings.
     */
    private Proof proof;
+   
+   /**
+    * The {@link KeYDebugTarget} which provides {@link #proof}.
+    */
+   private KeYDebugTarget proofsDebugTarget;
    
    /**
     * Listens for selection changes on {@link #getBaseView()}.
@@ -71,6 +99,11 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
          SymbolicExecutionSettingsView.this.selectionChanged(event.getSelection());
       }
    };
+   
+   /**
+    * Listens for debug events.
+    */
+   private IDebugEventSetListener debugEventListener;
    
    /**
     * {@inheritDoc}
@@ -93,6 +126,22 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
             methodTreatmentChanged(e);
          }
       });
+      // Loop treatment
+      if (LOOP_INVARIANTS_SUPPORTED) {
+         Group loopTreatmentGroup = new Group(parent, SWT.NONE);
+         loopTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+         loopTreatmentGroup.setText("Loop Treatment");
+         loopTreatmentGroup.setLayout(new FillLayout());
+         loopTreatmentCombo = new Combo(loopTreatmentGroup, SWT.READ_ONLY);
+         loopTreatmentCombo.add(LOOP_TREATMENT_EXPAND);
+         loopTreatmentCombo.add(LOOP_TREATMENT_INVARIANT);
+         loopTreatmentCombo.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+               loopTreatmentChanged(e);
+            }
+         });
+      }
       // Set read-only if required
       updateShownValues();
    }
@@ -101,13 +150,15 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
     * Updates the proof search strategy settings in the UI control when {@link #proof} has changed.
     */
    protected void updateShownValues() {
-      setEditable(proof != null);
-      if (proof != null) {
+      setEditable(proof != null && !proof.isDisposed());
+      if (proof != null && !proof.isDisposed()) {
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-         showSettings(sp.getProperty(StrategyProperties.METHOD_OPTIONS_KEY));
+         showSettings(sp.getProperty(StrategyProperties.METHOD_OPTIONS_KEY), 
+                      sp.getProperty(StrategyProperties.LOOP_OPTIONS_KEY));
       }
       else {
-         showSettings(StrategyProperties.METHOD_EXPAND);
+         showSettings(StrategyProperties.METHOD_EXPAND, 
+                      StrategyProperties.LOOP_EXPAND);
       }
    }
 
@@ -119,15 +170,22 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
       if (methodTreatmentCombo != null) {
          methodTreatmentCombo.setEnabled(editable);
       }
+      if (loopTreatmentCombo != null) {
+         loopTreatmentCombo.setEnabled(editable);
+      }
    }
 
    /**
     * Updates the shown proof search strategy settings.
     * @param methodOptionsKey The method treatment setting to show.
+    * @param loopOptionsKey The loop treatment setting to show.
     */
-   protected void showSettings(String methodOptionsKey) {
+   protected void showSettings(String methodOptionsKey, String loopOptionsKey) {
       if (methodTreatmentCombo != null) {
          methodTreatmentCombo.setText(StrategyProperties.METHOD_CONTRACT.equals(methodOptionsKey) ? METHOD_TREATMENT_CONTRACT : METHOD_TREATMENT_EXPAND);
+      }
+      if (loopTreatmentCombo != null) {
+         loopTreatmentCombo.setText(StrategyProperties.LOOP_INVARIANT.equals(loopOptionsKey) ? LOOP_TREATMENT_INVARIANT : LOOP_TREATMENT_EXPAND);
       }
    }
 
@@ -144,6 +202,10 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
     */
    @Override
    public void dispose() {
+      if (debugEventListener != null) {
+         DebugPlugin.getDefault().removeDebugEventListener(debugEventListener);
+         debugEventListener = null;
+      }
       if (getBaseView() != null) {
          getBaseView().getSite().getSelectionProvider().removeSelectionChangedListener(baseViewSelectionListener);
       }
@@ -192,6 +254,7 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
       // Collect all selected proofs.
       Object[] elements = SWTUtil.toArray(selection);
       Set<Proof> proofs = new HashSet<Proof>();
+      KeYDebugTarget target = null;
       for (Object element : elements) {
          // Try to find the IDebugTarget
          if (element instanceof ILaunch) {
@@ -202,13 +265,58 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
          }
          // Check if the IDebugTarget provides a proof
          if (element instanceof KeYDebugTarget) {
-            Proof proof = ((KeYDebugTarget) element).getProof();
+            target = (KeYDebugTarget)element;
+            Proof proof = target.getProof();
             if (proof != null) {
                proofs.add(proof);
             }
          }
       }
-      proofChanged(proofs.size() == 1 ? CollectionUtil.getFirst(proofs) : null);
+      if (proofs.size() == 1) {
+         // Make sure that the view listens for terminate events
+         if (debugEventListener == null) {
+            debugEventListener = new IDebugEventSetListener() {
+               @Override
+               public void handleDebugEvents(DebugEvent[] events) {
+                  for (DebugEvent event : events) {
+                     handleDebugEvent(event);
+                  }
+               }
+            };
+            DebugPlugin.getDefault().addDebugEventListener(debugEventListener);
+         }
+         // Update shown content
+         proofsDebugTarget = target;
+         proofChanged(CollectionUtil.getFirst(proofs));
+      }
+      else {
+         // Make sure that the view does not listen for terminate events 
+         if (debugEventListener != null) {
+            DebugPlugin.getDefault().removeDebugEventListener(debugEventListener);
+            debugEventListener = null;
+         }
+         // Update shown content
+         proofsDebugTarget = null;
+         CollectionUtil.getFirst(null);
+      }
+   }
+
+   /**
+    * When a debug event occurred.
+    * @param event The event.
+    */
+   protected void handleDebugEvent(DebugEvent event) {
+      if (event.getSource() == proofsDebugTarget) {
+         if (event.getKind() == DebugEvent.TERMINATE) {
+            getSite().getShell().getDisplay().syncExec(new Runnable() {
+               @Override
+               public void run() {
+                  // Update shown content and enabled state when the debug target was terminated
+                  updateShownValues();
+               }
+            });
+         }
+      }
    }
    
    /**
@@ -226,5 +334,13 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
     */
    protected void methodTreatmentChanged(SelectionEvent e) {
       SymbolicExecutionUtil.setUseOperationContracts(proof, METHOD_TREATMENT_CONTRACT.equals(methodTreatmentCombo.getText()));
+   }
+
+   /**
+    * When the selected loop treatment has changed.
+    * @param e The event.
+    */
+   protected void loopTreatmentChanged(SelectionEvent e) {
+      SymbolicExecutionUtil.setUseLoopInvariants(proof, LOOP_TREATMENT_INVARIANT.equals(loopTreatmentCombo.getText()));
    }
 }
