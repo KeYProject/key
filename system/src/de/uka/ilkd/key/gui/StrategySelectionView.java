@@ -298,10 +298,22 @@ public final class StrategySelectionView extends JPanel {
         ++yCoord;
 
         rdBut10 = newButton("Invariant", StrategyProperties.LOOP_INVARIANT, false, false);
+        rdBut10.setToolTipText("<html>"+
+			"Use loop invariants for loops.<br>"+
+			"Three properties have to be shown:<br>"+
+			"<ul><li>Validity of invariant of a loop is preserved by the<br>"+
+			"loop guard and loop body (initially valid).</li><br>"+
+			"<li>If the invariant was valid at the start of the loop, it holds <br>"+
+			"after arbitrarily many loop iterations (body preserves invariant).</li><br>"+
+			"<li>Invariant holds after the loop terminates (use case).</li><br>"+
+			"</ul></html>");
         loopGroup.add(rdBut10);
         addJavaDLOption ( rdBut10, javaDLOptionsLayout, 2, yCoord, 2 );
 
         rdBut9 = newButton("Expand", StrategyProperties.LOOP_EXPAND, true, false);
+        rdBut9.setToolTipText("<html>"+
+			"Expand loop body."+
+			"</html>");
         loopGroup.add(rdBut9);
         addJavaDLOption ( rdBut9, javaDLOptionsLayout, 4, yCoord, 2 );
 
@@ -321,10 +333,20 @@ public final class StrategySelectionView extends JPanel {
         ++yCoord;
 
         blockContractRadioButton = newButton("Contract", StrategyProperties.BLOCK_CONTRACT, false, false);
+        blockContractRadioButton.setToolTipText("<html>"+
+        					"If block contracts are specified, Java blocks are replaced by their contract."+
+        					"Three properties have to be shown:<br>"+
+        					"<ul><li>Validity of block contract</li><br>"+
+        					"<li>Precondition of contract holds</li><br>"+
+        					"<li>Postcondition holds after block terminates</li><br>"+
+        					"</ul></html>");
         blockGroup.add(blockContractRadioButton);
         addJavaDLOption(blockContractRadioButton, javaDLOptionsLayout, 2, yCoord, 2);
 
         blockExpandRadioButton = newButton("Expand", StrategyProperties.BLOCK_EXPAND, true, false);
+        blockExpandRadioButton.setToolTipText("<html>"+
+						"Do not use block contracts for Java blocks. Expand Java blocks."+
+						"</html>");
         blockGroup.add(blockExpandRadioButton);
         addJavaDLOption(blockExpandRadioButton, javaDLOptionsLayout, 4, yCoord, 2);
 
