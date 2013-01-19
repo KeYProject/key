@@ -23,16 +23,20 @@ public class DeclPicker extends LegacyCommonTokenStream {
       super(in.getKeYLexer());
   }
 
-  public int mark() {
-     lastMark = super.mark();
+  public int begin() {
+     // see super.mark() implementation
+     if (super.index() == -1) {
+	 super.fillBuffer();
+     }
+     lastMark = super.index();
      return lastMark;
   }
   
   public void capture() {
-     text = this.toString(lastMark, this.index());
+     text = this.toString(lastMark, super.index() - 1);
   }
   
-  public String getText() {
+  public String getCapturedText() {
       return text;
   }
 

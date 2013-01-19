@@ -148,7 +148,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 	       }
 	    }
 
-            problemHeader = lexer.getText();
+            problemHeader = lexer.getCapturedText();
             if(problemHeader != null && 
                problemHeader.lastIndexOf(searchS) != -1){
                 problemHeader = problemHeader.substring(

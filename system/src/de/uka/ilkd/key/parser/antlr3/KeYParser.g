@@ -4043,9 +4043,9 @@ problem returns [ Term _problem = null ]
 @after { _problem = a; this.chooseContract = chooseContract; this.proofObligation = proofObligation; }
     :
 
-	{ if (capturer != null) capturer.mark(); }
+	{ if (capturer != null) capturer.begin(); }
         (pref = preferences)
-        { if ((pref!=null) && (capturer != null)) capturer.mark(); }
+        { if ((pref!=null) && (capturer != null)) capturer.begin(); }
         
 
 
@@ -4087,9 +4087,11 @@ problem returns [ Term _problem = null ]
             )*
             RBRACE {choices=DefaultImmutableSet.<Choice>nil();}
         ) *
+        { if (capturer != null) capturer.capture(); }
         ((PROBLEM LBRACE 
             {switchToNormalMode(); 
-	     if (capturer != null) capturer.capture();}
+	     //if (capturer != null) capturer.capture();
+	    }
                 a = formula
             RBRACE) 
            | 
