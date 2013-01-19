@@ -4039,6 +4039,8 @@ problem returns [ Term _problem = null ]
 @init{
     choices=DefaultImmutableSet.<Choice>nil();
     Namespace funcNSForSelectedChoices = new Namespace();
+    chooseContract = this.chooseContract;
+    proofObligation = this.proofObligation;
 }
 @after { _problem = a; this.chooseContract = chooseContract; this.proofObligation = proofObligation; }
     :
