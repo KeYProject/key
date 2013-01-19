@@ -575,7 +575,7 @@ WS
 
 STRING_LITERAL
 @init { paraphrase.push("a string in double quotes"); StringBuilder _literal = new StringBuilder(); }
-@after { paraphrase.pop(); setText(_literal.toString()); }
+@after { paraphrase.pop(); setText('"' + _literal.toString() + '"'); }
 : '"' (  ESC { _literal.append(getText()); }
        | newline='\n' { newline(); _literal.appendCodePoint(newline); }
        | normal=~('\n' | '"' | '\\' | '\uFFFF') { _literal.appendCodePoint(normal); }
