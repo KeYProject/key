@@ -315,7 +315,7 @@ public class LexPathOrdering implements TermOrdering {
                  && ( (Function)p_op ).sort () instanceof NullSort )
                 return Integer.valueOf ( 2 );
             if ( p_op instanceof Function
-                 && ( opStr.equals ( "TRUE" ) | opStr.equals ( "FALSE" ) ) )
+                 && ( opStr.equals ( "TRUE" ) || opStr.equals ( "FALSE" ) ) )
                 return Integer.valueOf ( 3 );
 
             if ( opStr.equals ( "add" ) ) return Integer.valueOf ( 6 );

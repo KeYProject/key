@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Stack;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
@@ -25,8 +26,11 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ExtList;
 
@@ -46,7 +50,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /**  */
     protected ExtList labelList = new ExtList();
     /**  */
-    protected Stack stack = new Stack();
+    protected Stack<ExtList> stack = new Stack<ExtList>();
     /** if there is a loop inside the loop the breaks of these inner loops have
      * not to be replaced. The replaceBreakWithNoLabel counts the depth of the
      * loop cascades. Replacements are only performed if the value of the
@@ -85,10 +89,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      */
     protected ProgramElement result=null;
 
-    protected Stack labelStack = new Stack();
+    protected Stack<Label> labelStack = new Stack<Label>();
 
-
-    protected Stack methodStack = new Stack();
+    protected Stack<MethodFrame> methodStack = new Stack<MethodFrame>();
 
     /** creates the WhileLoopTransformation for the transformation mode
      * @param root the ProgramElement where to begin
@@ -157,7 +160,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	stack.push(new ExtList());		
 	walk(root());
 	if (runMode == TRANSFORMATION) {
-	    ExtList el=(ExtList)stack.peek();
+	    ExtList el=stack.peek();
 	    int i = ( el.get(0) == CHANGED ? 1 : 0);
 	    result = (ProgramElement) (el.get(i));	
 	}
@@ -168,6 +171,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	return result;
     }
     
+
     /** walks through the AST. While keeping track of the current node
      * @param node the JavaProgramElement the walker is at 
      */
@@ -181,7 +185,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    labelStack.push(((LabeledStatement)node).getLabel());
 	}
 	if (node instanceof MethodFrame) {
-	    methodStack.push(node);
+	    methodStack.push((MethodFrame)node);
 	}
 
 	super.walk(node);
@@ -315,7 +319,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /**
     *
     *     public void performActionOnFor(For x) {
-    * 	ExtList changeList = (ExtList)stack.peek();
+    * 	ExtList changeList = stack.peek();
     * 	if (replaceBreakWithNoLabel==0){
     * 	//most outer for loop
     * 	    if (changeList.getFirst() == CHANGED)
@@ -463,7 +467,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     * 
     */
     public void performActionOnFor(For x) {
-	ExtList changeList = (ExtList)stack.peek();
+	ExtList changeList = stack.peek();
 	if (replaceBreakWithNoLabel==0){
 	//most outer for loop
 	    if (changeList.getFirst() == CHANGED)
@@ -564,7 +568,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * @author mulbrich
      */
     public void performActionOnEnhancedFor(EnhancedFor x) {
-        ExtList changeList = (ExtList)stack.peek();
+        ExtList changeList = stack.peek();
         if (replaceBreakWithNoLabel == 0) {
             // the outermost loop
             Debug.log4jError("Enhanced for loops may not be toplevel in WhileLoopTransformation", null);
@@ -591,7 +595,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * Check if this is ok when labeled continue statements are involved.
      */
     public void performActionOnWhile(While x)     {
-	ExtList changeList = (ExtList)stack.peek();
+	ExtList changeList = stack.peek();
 	if (replaceBreakWithNoLabel == 0) {
 	    // the most outer while loop
 	    // get guard
@@ -608,7 +612,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	     * rename all occ. variables in the body (same name but different object)
 	     */
 	    ProgVarReplaceVisitor replacer = new ProgVarReplaceVisitor(body, 
-	            new HashMap(), true, services);
+	            new HashMap<ProgramVariable, ProgramVariable>(), true, services);
 	    replacer.start();
 	    body = (Statement) replacer.result();
 	    
@@ -649,7 +653,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
     public void performActionOnDo(Do x)     {
-	ExtList changeList = (ExtList)stack.peek();
+	ExtList changeList = stack.peek();
 	if (replaceBreakWithNoLabel == 0) {
 	    // the most outer do loop
             if (changeList.getFirst() == CHANGED) {
@@ -699,7 +703,6 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	}
     }
 
-
     public void performActionOnIf(If x)     {
 	DefaultAction def=new DefaultAction() {		
 		ProgramElement createNewElement(ExtList changeList) {
@@ -729,7 +732,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
     public void performActionOnLabeledStatement(LabeledStatement x) {
 	Label l = null;
-	ExtList changeList = (ExtList)stack.peek();
+	ExtList changeList = stack.peek();
 	if (changeList.getFirst() == CHANGED) {	    
 	    changeList.removeFirst();	    
 	    if (x.getLabel() != null) {
@@ -744,7 +747,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     } 
 
     public void performActionOnMethodFrame(MethodFrame x) {
-	ExtList changeList = (ExtList)stack.peek();
+	ExtList changeList = stack.peek();
 	if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {	    
 	    changeList.removeFirst();	    
 	    if (x.getChildCount() == 3) {
@@ -811,7 +814,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
     public void performActionOnCase(Case x)     {
 	Expression e = null;
-	ExtList changeList = (ExtList)stack.peek();
+	ExtList changeList = stack.peek();
 	if (changeList.getFirst() == CHANGED) {	    
 	    changeList.removeFirst();	    
 	    if (x.getExpression() != null) {
@@ -857,7 +860,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
 
     protected void changed() {
-	ExtList list = (ExtList)stack.peek();
+	ExtList list = stack.peek();
 	if (list.getFirst() != CHANGED) {
 	    list.addFirst(CHANGED);
 	}
@@ -865,7 +868,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 
     protected void addChild(SourceElement x) {
 	stack.pop();
-	ExtList list = (ExtList) stack.peek();
+	ExtList list = stack.peek();
 	list.add(x);
     }
     
@@ -878,7 +881,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	}
 	
 	public void doAction(ProgramElement x) {
-	    ExtList changeList = (ExtList)stack.peek();
+	    ExtList changeList = stack.peek();
 	    if ( changeList.size () > 0 && 
 		 changeList.getFirst() == CHANGED ) {	    
 		changeList.removeFirst();	    

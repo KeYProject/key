@@ -1,8 +1,9 @@
 public final class SuffixArray {
 
-    private final int[] a;
-    private final int[] suffixes;
-    private final int N;
+    final int[] a;
+    final int[] suffixes;
+    final int N;
+    final LCP lcp;
 
     /*@ invariant (\forall int i; 0 <= i && i < N; 
       @           (\exists int j; 0 <= j && j < N; suffixes[j]==i))
@@ -34,32 +35,8 @@ public final class SuffixArray {
         suffixes = new int[N];
         for (int i = 0; i < N; i++) suffixes[i] = i;
         sort(suffixes);
+        lcp = new LCP();
     }
-
-
-    public int select(int i) { 
-        return suffixes[i]; 
-    }
-
-
-    /*@ normal_behavior
-      @ requires a != null;
-      @ requires 0 <= x && x < a.length;
-      @ requires 0 <= y && y < a.length;
-      @ requires x != y;
-      @ ensures (\forall int i; 0 <= i && i < \result; a[x+i]==a[y+i]);
-      @ ensures a[x+\result]!=a[y+\result] 
-      @         || \result == a.length-x || \result == a.length-y;
-      @ strictly_pure 
-      @*/
-    private int lcp(int x, int y) {
-        int l = 0;
-        while (x+l<N && y+l<N && a[x+l]==a[y+l]) {
-            l++;
-        }
-        return l;
-    }
-
 
 // TODO: better spec with sortedness of suffixes in mind
 
@@ -67,20 +44,16 @@ public final class SuffixArray {
       @ requires 0 < i && i < N;
       @ ensures (\forall int j; 0 <= j && j < \result; a[suffixes[i]+j]==a[suffixes[i-1]+j]);
       @ ensures a[suffixes[i]+\result]!=a[suffixes[i-1]+\result] || \result == a.length-suffixes[i] || \result == a.length-suffixes[i-1];
-      @ strictly_pure
+      @ strictly_pure helper
       @*/
     public int lcp(int i) {
-        return lcp(suffixes[i], suffixes[i-1]);
+        return lcp.lcp(a,suffixes[i], suffixes[i-1]);
     }
 
 
     private int compare(int x, int y) {
         if (x == y) return 0;
-        int l = 0;
-
-        while (x+l<N && y+l<N && a[x+l] == a[y+l]) {
-            l++;
-        }
+        int l = lcp.lcp(a,x,y);
 
         if (x+l == N) return -1;
         if (y+l == N) return 1;

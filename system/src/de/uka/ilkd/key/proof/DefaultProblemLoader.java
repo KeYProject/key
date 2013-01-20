@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Properties;
 
 import de.uka.ilkd.key.gui.KeYMediator;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
@@ -103,26 +104,37 @@ public class DefaultProblemLoader {
     * @throws ProofInputException Occurred Exception.
     * @throws IOException Occurred Exception.
     */
-   public String load() throws ProofInputException, IOException {
-      // Read environment
-      envInput = createEnvInput();
-      problemInitializer = createProblemInitializer();
-      initConfig = createInitConfig();
-      // Read proof obligation settings
-      LoadedPOContainer poContainer = createProofObligationContainer();
+   public String load() throws ProblemLoaderException {
       try {
-         if (poContainer == null) {
-            return selectProofObligation();
+         // Read environment
+      boolean oneStepSimplifier = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();
+      ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(true);
+         envInput = createEnvInput();
+         problemInitializer = createProblemInitializer();
+         initConfig = createInitConfig();
+         // Read proof obligation settings
+         LoadedPOContainer poContainer = createProofObligationContainer();
+         try {
+            if (poContainer == null) {
+               return selectProofObligation();
+            }
+            // Create proof and apply rules again if possible
+            proof = createProof(poContainer);
+            if (proof != null) {
+               replayProof(proof);
+            }
+            return ""; // Everything fine
          }
-         // Create proof and apply rules again if possible
-         proof = createProof(poContainer);
-         return ""; // Everything fine
+         finally {
+    	  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setOneStepSimplification(oneStepSimplifier);
+            getMediator().resetNrGoalsClosedByHeuristics();
+            if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
+               ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
+            }  
+         }
       }
-      finally {
-         getMediator().resetNrGoalsClosedByHeuristics();
-         if (poContainer != null && poContainer.getProofOblInput() instanceof KeYUserProblemFile) {
-            ((KeYUserProblemFile)poContainer.getProofOblInput()).close();
-         }  
+      catch (Exception e) {
+         throw new ProblemLoaderException(this, e);
       }
    }
 
@@ -281,16 +293,18 @@ public class DefaultProblemLoader {
     * @throws ProofInputException Occurred Exception.
     */
    protected Proof createProof(LoadedPOContainer poContainer) throws ProofInputException {
-      mediator.setProof(problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum()));
+      return problemInitializer.startProver(initConfig, poContainer.getProofOblInput(), poContainer.getProofNum());
+   }
+   
+   protected void replayProof(Proof proof) throws ProofInputException {
+      mediator.setProof(proof);
 
-      Proof proof = mediator.getSelectedProof();
       mediator.stopInterface(true); // first stop (above) is not enough
 
       if (envInput instanceof KeYUserProblemFile) {
          problemInitializer.tryReadProof(new DefaultProofFileParser(proof, mediator), (KeYUserProblemFile) envInput);
       }
       mediator.getUI().resetStatus(this);
-      return proof;
    }
 
    /**

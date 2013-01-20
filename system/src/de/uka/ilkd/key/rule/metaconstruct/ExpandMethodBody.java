@@ -82,12 +82,15 @@ public class ExpandMethodBody extends ProgramTransformer {
 	// at this point all arguments should be program variables
 	ImmutableArray<? extends Expression> argsAsParam = mbs.getArguments();
 
-	final HashMap<IProgramVariable, Expression> map = 
-	    new HashMap<IProgramVariable, Expression>();	
+	final HashMap<ProgramVariable, ProgramVariable> map = 
+	    new HashMap<ProgramVariable, ProgramVariable>();	
 	for (int i = 0; i < argsAsParam.size(); i++) {
-	    map.put(methDecl.getParameterDeclarationAt(i).
-		    getVariableSpecification().getProgramVariable(), 
-		    argsAsParam.get(i));
+	    IProgramVariable pv = methDecl.getParameterDeclarationAt(i).
+	            getVariableSpecification().getProgramVariable();
+	    assert pv instanceof ProgramVariable : "Unexpected schematic variable";
+	    Expression arg = argsAsParam.get(i);
+	    assert arg instanceof ProgramVariable : "Unexpected schematic variable";
+	    map.put((ProgramVariable)pv, (ProgramVariable)argsAsParam.get(i));
 	}
 	ProgVarReplaceVisitor paramRepl = 
 	    new ProgVarReplaceVisitor(result, map, services); 

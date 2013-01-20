@@ -3,9 +3,7 @@ package org.key_project.key4eclipse.starter.core.util;
 import java.awt.Component;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.JOptionPane;
 
@@ -33,7 +31,6 @@ import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.key_project.key4eclipse.starter.core.job.AbstractKeYMainWindowJob;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.util.eclipse.ResourceUtil;
-import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.SwingUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithException;
@@ -58,11 +55,9 @@ import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.EnvNode;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.TaskTreeModel;
 import de.uka.ilkd.key.proof.mgt.TaskTreeNode;
 import de.uka.ilkd.key.util.MiscTools;
@@ -370,10 +365,10 @@ public final class KeYUtil {
      * @return The opened {@link InitConfig}.
      * @throws Exception Occurred Exception.
      */
-    public static InitConfig internalLoad(final File location,
-                                          final List<File> classPaths,
-                                          final File bootClassPath,
-                                          final boolean showKeYMainWindow) throws Exception {
+    private static InitConfig internalLoad(final File location,
+                                           final List<File> classPaths,
+                                           final File bootClassPath,
+                                           final boolean showKeYMainWindow) throws Exception {
         IRunnableWithResult<InitConfig> run = new AbstractRunnableWithResult<InitConfig>() {
             @Override
             public void run() {
@@ -513,16 +508,6 @@ public final class KeYUtil {
     }
     
     /**
-     * Removes the whole {@link ProofEnvironment} with all contained proofs
-     * from the proof list.
-     * @param main The {@link MainWindow} to handle.
-     * @param env The {@link ProofEnvironment} to remove.
-     */
-    public static void removeFromProofList(MainWindow main, Proof proof) {
-       main.getProofList().removeProof(proof);
-    }
-    
-    /**
      * Checks if the proof list contains some entries.
      * @param main The {@link MainWindow} to check.
      * @return {@code true} proof list is empty, {@code false} proof list contains at least on entry.
@@ -639,24 +624,6 @@ public final class KeYUtil {
         */
        public void run(MainWindow main) throws Exception;
     }
-   
-   /**
-    * Checks if the {@link Proof} exists in the user interface.
-    * @param proof The {@link Proof} to check.
-    * @return {@code true} = in UI, {@code false} = not in UI.
-    */
-   public static boolean isProofInUI(Proof proof) {
-      boolean inUI = false;
-      if (proof != null && !proof.isDisposed()) {
-         Set<ProofAggregate> proofAggregates = proof.env().getProofs();
-         Iterator<ProofAggregate> iter = proofAggregates.iterator();
-         while (!inUI && iter.hasNext()) {
-            ProofAggregate next = iter.next();
-            inUI = ArrayUtil.contains(next.getProofs(), proof);
-         }
-      }
-      return inUI;
-   }
 
    /**
     * <p>

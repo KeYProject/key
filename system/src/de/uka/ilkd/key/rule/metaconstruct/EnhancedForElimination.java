@@ -234,7 +234,7 @@ public class EnhancedForElimination extends ProgramTransformer {
                 services.getSpecificationRepository().getLoopInvariant(original);
         if (li != null) {
             li = li.setLoop(transformed);
-            services.getSpecificationRepository().setLoopInvariant(li);
+            services.getSpecificationRepository().addLoopInvariant(li);
         }
     }
 }

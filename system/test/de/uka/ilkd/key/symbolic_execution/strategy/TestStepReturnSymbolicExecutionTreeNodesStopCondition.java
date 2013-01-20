@@ -6,6 +6,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
@@ -21,7 +22,7 @@ public class TestStepReturnSymbolicExecutionTreeNodesStopCondition extends Abstr
    /**
     * Does some step return tests on one branch.
     */
-   public void testStepReturn() throws ProofInputException, IOException, ParserConfigurationException, SAXException {
+   public void testStepReturn() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       // Define test settings
       String javaPathInkeyRepDirectory = "examples/_testcase/set/stepReturnTest/test/StepReturnTest.java";
       String containerTypeName = "StepReturnTest";

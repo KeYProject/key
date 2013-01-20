@@ -215,7 +215,8 @@ provable: ./standard_key/arrays/arrayStoreException/arrayStoreKnownDynType.key
 provable: ./standard_key/arrays/arrayStoreException/reverseArray.key
 provable: ./standard_key/arrays/arrayStoreException/throwArrayStoreException.key
 provable: ./standard_key/arrays/creation/arrayCreation1.key
-provable: ./standard_key/BookExamples/chap02FirstOrderLogic/Ex2.58.key
+provable: ./standard_key/BookExamples/02FirstOrderLogic/Ex2.58.key
+provable: ./standard_key/BookExamples/03DynamicLogic/Sect3.3.1.key
 provable: ./standard_key/inEqSimp/division.key
 provable: ./standard_key/inEqSimp/inequations0.key
 provable: ./standard_key/inEqSimp/inequations1.key
@@ -272,6 +273,7 @@ provable: ./standard_key/java_dl/iteratedAssignment.key
 provable: ./standard_key/java_dl/java5/vararg.key
 provable: ./standard_key/java_dl/java5/for_Array.key
 provable: ./standard_key/java_dl/java5/for_Iterable.key
+provable: ./standard_key/java_dl/java5/for_ReferenceArray.key
 provable: ./standard_key/java_dl/jml-bigint/cast.key
 # commented out as proof gets too long
 # requires further investigations

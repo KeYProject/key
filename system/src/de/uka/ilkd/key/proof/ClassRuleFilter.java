@@ -18,9 +18,9 @@ import de.uka.ilkd.key.rule.Rule;
  */
 public class ClassRuleFilter implements RuleFilter {
 
-    private final Class c;
+    private final Class<?> c;
     
-    public ClassRuleFilter(Class c) {
+    public ClassRuleFilter(Class<?> c) {
 	this.c = c;
     }
     

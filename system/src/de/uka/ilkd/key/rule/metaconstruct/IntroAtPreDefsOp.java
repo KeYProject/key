@@ -142,7 +142,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                                             newVariant,
                                             selfTerm,
                                             atPres);
-                services.getSpecificationRepository().setLoopInvariant(newInv);
+                services.getSpecificationRepository().addLoopInvariant(newInv);
             }
         }
 

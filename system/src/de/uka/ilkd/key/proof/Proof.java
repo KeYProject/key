@@ -15,6 +15,7 @@ import java.util.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -81,7 +82,7 @@ public class Proof implements Named {
     private BasicTask task;
     
     private ProofSettings settings;
-
+    private ProofIndependentSettings pis;
     /**
      * when different users load and save a proof this vector fills up with
      * Strings containing the user names.
@@ -120,6 +121,7 @@ public class Proof implements Named {
                     }
                 };
         setSettings(settings);
+        pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }
 
     /**
@@ -422,7 +424,9 @@ public class Proof implements Named {
     public ProofSettings getSettings() {
         return settings;
     }
-
+    public ProofIndependentSettings getProofIndependentSettings(){
+    	return pis;
+    }
 
     /** 
      * returns the list of open goals

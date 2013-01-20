@@ -124,7 +124,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             if (runMode == CHECK) {
                 needInnerLabel = true;
             } else {
-                ExtList changeList = (ExtList) stack.peek();
+                ExtList changeList =  stack.peek();
                 if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
                     changeList.removeFirst();
                 }
@@ -201,7 +201,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
     }
 
     public void performActionOnWhile(While x) {
-        ExtList changeList = (ExtList) stack.peek();
+        ExtList changeList = stack.peek();
         if (replaceBreakWithNoLabel == 0) {
             // the most outer while loop
             // get guard
@@ -281,7 +281,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
      * If the loop is not top most, act like the super class.
      */
     public void performActionOnEnhancedFor(EnhancedFor x) {
-        ExtList changeList = (ExtList) stack.peek();
+        ExtList changeList =  stack.peek();
         if (replaceBreakWithNoLabel == 0) {
             if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
