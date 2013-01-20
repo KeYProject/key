@@ -79,6 +79,16 @@ lexer grammar KeYLexer;
 	//selector.select(this);
     }
 
+    public KeYLexer(CharStream in, KeYExceptionHandler keh) {
+	this(in);
+	if(keh != null) { this.keh = keh; }
+	this.selector = new Stack<SaveStruct>();
+    }
+
+    public KeYLexer(String in, KeYExceptionHandler keh) {
+	this(new ANTLRStringStream(in), keh);
+    }
+
     public void reportError(RecognitionException ex){
         keh.reportException(ex);
     }

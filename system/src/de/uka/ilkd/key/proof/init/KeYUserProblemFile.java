@@ -16,8 +16,8 @@ import java.io.FileNotFoundException;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.DeclPicker;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.CountingBufferedReader;
@@ -38,7 +38,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     private Term problemTerm = null;
     private String problemHeader = "";
     
-    private KeYParser lastParser;
+    private KeYParserF lastParser;
     
     
     //-------------------------------------------------------------------------
@@ -76,8 +76,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             ParserConfig pc = new ParserConfig
                 (initConfig.getServices(), 
                  initConfig.namespaces());
-            KeYParser problemParser = new KeYParser
-                (ParserMode.PROBLEM, new KeYLexer(getNewStream(),
+            KeYParserF problemParser = new KeYParserF
+                (ParserMode.PROBLEM, new KeYLexerF(getNewStream(),
                         initConfig.getServices().getExceptionHandler()), 
                         file.toString(), pc, pc, null, null);    
             problemParser.parseWith();            
@@ -116,15 +116,15 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
             CountingBufferedReader cinp = 
                 new CountingBufferedReader
                     (getNewStream(),monitor,getNumberOfChars()/100);
-            DeclPicker lexer = new DeclPicker(new KeYLexer(cinp,initConfig.getServices().getExceptionHandler()));
+            DeclPicker lexer = new DeclPicker(new KeYLexerF(cinp,initConfig.getServices().getExceptionHandler()));
             
             final ParserConfig normalConfig 
                 = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             final ParserConfig schemaConfig 
                 = new ParserConfig(initConfig.getServices(), initConfig.namespaces());
             
-            KeYParser problemParser 
-                    = new KeYParser(ParserMode.PROBLEM, 
+            KeYParserF problemParser 
+                    = new KeYParserF(ParserMode.PROBLEM, 
                                     lexer, 
                                     file.toString(), 
                                     schemaConfig, 

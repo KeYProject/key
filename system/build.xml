@@ -91,6 +91,7 @@
   	<echo message="Please set (if you have not yet done so)  the environment variable ANT_OPTS to -Xms512m -Xmx512m" />
   	
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser"/>
+	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/antlr3"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/schemajava"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/parser/proofjava"/>
 	<mkdir dir="${gen.dir}/de/uka/ilkd/key/speclang/jml/pretranslation"/>
@@ -127,7 +128,7 @@
   </target>
 
 
-  <target name="compile" depends="prepare, keyparser, proofjavaparser, schemajavaparser, 
+  <target name="compile" depends="prepare, keyparser-antlr3, proofjavaparser, schemajavaparser, 
   	                                   jmlparser, jmlpreparser, copy"
           description="Compiles all java files into the source directory.">
   	
@@ -187,6 +188,22 @@
      </antlr>
   </target>
 
+  <target name="keylexer-antlr3">
+        <java jar="${ext.dir}/antlr.jar" fork="true">
+        <arg value="-o" />
+        <arg value="${gen.dir}/de/uka/ilkd/key/parser/antlr3" />
+        <arg value="${src.dir}/de/uka/ilkd/key/parser/antlr3/KeYLexer.g" />
+     </java>
+  </target>
+
+
+  <target name="keyparser-antlr3"  depends="keylexer-antlr3">
+     <java jar="${ext.dir}/antlr.jar" fork="true">
+        <arg value="-o" />
+        <arg value="${gen.dir}/de/uka/ilkd/key/parser/antlr3" />
+        <arg value="${src.dir}/de/uka/ilkd/key/parser/antlr3/KeYParser.g" />
+     </java>
+  </target>
 	
 	<target name="jmlprelexer">
 	     <antlr

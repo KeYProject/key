@@ -31,8 +31,8 @@ import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.WaryClashFreeSubst;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 
 public class TestClashFreeSubst extends TestCase {
@@ -61,7 +61,7 @@ public class TestClashFreeSubst extends TestCase {
 	nss = services.getNamespaces();
 	
 	String sorts = "\\sorts{boolean;int;LocSet;}";
-	KeYParser basicSortsParser = new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(sorts),null),
+	KeYParserF basicSortsParser = new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(sorts,null),
 			      "No file. Call of parser from logic/TestClashFreeSubst.java",
 			      services, nss);
 	try {
@@ -125,16 +125,16 @@ public class TestClashFreeSubst extends TestCase {
     }
     
 
-    private KeYParser stringDeclParser(String s) {
+    private KeYParserF stringDeclParser(String s) {
 
-	return new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(s),null),
+	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s,null),
 			      "No file. Call of parser from logic/TestClashFreeSubst.java",
 			      services, nss);
     }
 
     public void parseDecls(String s) {
 	try {
-	    KeYParser p = stringDeclParser(s);
+	    KeYParserF p = stringDeclParser(s);
 	    p.decls();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
@@ -144,16 +144,16 @@ public class TestClashFreeSubst extends TestCase {
 	}
     }
 
-    private KeYParser stringTermParser(String s) {
-	return new KeYParser(ParserMode.GLOBALDECL,
-			     new KeYLexer(new StringReader(s),null),
+    private KeYParserF stringTermParser(String s) {
+	return new KeYParserF(ParserMode.GLOBALDECL,
+			     new KeYLexerF(s,null),
 			     services, 
 			     nss);
     }
 
     public Term parseTerm(String s) {
 	try {
-	    KeYParser p = stringTermParser(s);
+	    KeYParserF p = stringTermParser(s);
  	    return p.term();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
@@ -166,7 +166,7 @@ public class TestClashFreeSubst extends TestCase {
 
     public Term parseFma(String s) {
 	try {
-	    KeYParser p = stringTermParser(s);
+	    KeYParserF p = stringTermParser(s);
 	    
 	    return p.formula();
 	} catch (Exception e) {

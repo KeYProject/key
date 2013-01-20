@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.proof.io;
 
-import de.uka.ilkd.key.parser.KeYParser;
-
 /**
  * Defines the required which a {@link KeYParser} needs to parse a *.proof
  * file and to apply the reules again. 

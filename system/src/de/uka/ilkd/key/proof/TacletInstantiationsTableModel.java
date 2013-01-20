@@ -201,8 +201,8 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
     public IdDeclaration parseIdDeclaration ( String s )
         throws ParserException {
         try {
-            KeYParser parser =
-                new KeYParser (ParserMode.DECLARATION, new KeYLexer ( new StringReader ( s ),
+            KeYParserF parser =
+                new KeYParserF (ParserMode.DECLARATION, new KeYLexerF ( s,
                                  services.getExceptionHandler() ), "",
                                  services,   // should not be needed
                                  nss );
@@ -212,8 +212,6 @@ public class TacletInstantiationsTableModel extends AbstractTableModel {
                                       new Location(re.getFilename(),
                                                    re.getLine(),
                                                    re.getColumn()));
-        } catch (antlr.TokenStreamException tse) {
-            throw new ParserException(tse.getMessage(), null);
         }
     }
 

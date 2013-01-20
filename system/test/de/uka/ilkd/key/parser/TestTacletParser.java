@@ -92,15 +92,15 @@ public class TestTacletParser extends TestCase {
     }
     
 
-    private KeYParser stringDeclParser(String s) {
-	return new KeYParser(ParserMode.DECLARATION, new KeYLexer(new StringReader(s), null),
+    private KeYParserF stringDeclParser(String s) {
+	return new KeYParserF(ParserMode.DECLARATION, new KeYLexerF(s, null),
 			      "No file. parser/TestTacletParser.stringDeclParser("+s+")",  
 			       services, nss);
     }
 
     public void parseDecls(String s) {
 	try {
-	    KeYParser p = stringDeclParser(s);
+	    KeYParserF p = stringDeclParser(s);
 	    p.decls();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
@@ -113,16 +113,16 @@ public class TestTacletParser extends TestCase {
     //
     // Utility Methods for test cases.
     //
-    private KeYParser stringTacletParser(String s) {
-	return new KeYParser
-	    (ParserMode.TACLET,new KeYLexer(new StringReader(s), null), 
+    private KeYParserF stringTacletParser(String s) {
+	return new KeYParserF
+	    (ParserMode.TACLET,new KeYLexerF(s, null), 
 	     "No file. parser/TestTacletParser.stringTacletParser("+s+")",  
 	     services, nss);
     }
 
     public Term parseTerm(String s) {
 	try {
-	    KeYParser p = stringTacletParser(s);
+	    KeYParserF p = stringTacletParser(s);
 	    return p.term();
 	} catch (Exception e) {
 	    StringWriter sw = new StringWriter();
@@ -135,7 +135,7 @@ public class TestTacletParser extends TestCase {
 
     public Term parseFma(String s) {
 	try {
-	    KeYParser p = stringTacletParser(s);
+	    KeYParserF p = stringTacletParser(s);
 	    
 	    return p.formula();
 	} catch (Exception e) {
@@ -168,7 +168,7 @@ public class TestTacletParser extends TestCase {
     
     Taclet parseTaclet(String s) {
 	try {
-	    KeYParser p = stringTacletParser(s);
+	    KeYParserF p = stringTacletParser(s);
 	    
 	    return p.taclet(DefaultImmutableSet.<Choice>nil());
 	} catch (Exception e) {

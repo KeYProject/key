@@ -88,6 +88,10 @@ ifeq "$(ANTLR)" ""
 ANTLR=$(JAVA) -cp $(GENERATED_SRC_PATH):$(CLASSPATH) antlr.Tool
 endif
 
+ifeq "$(ANTLR3)" ""
+ANTLR3=$(JAVA) -cp $(GENERATED_SRC_PATH):$(CLASSPATH) org.antlr.Tool
+endif
+
 ifeq ($(JAVAC),ajc)
   OPTIONS=$(COMMON_OPTIONS) -nowarn -classpath $(ASPECTJRTPATH):$(CLASSPATH):$(GENERATED_SRC_PATH):$(BINARYPATH):.
 else
@@ -102,13 +106,14 @@ JAVADOC_OPTIONS=-use -quiet -breakiterator -linksource -J-Xmx512m
 
 
 ANTLR_PARSER= \
-	$(GENERATED_SRC_PATH)$(PFX)parser/KeYLexer.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/KeYLexerTokenTypes.java \
-	$(GENERATED_SRC_PATH)$(PFX)parser/KeYParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/pretranslation/KeYJMLPreParser.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLLexer.java \
 	$(GENERATED_SRC_PATH)$(PFX)speclang/jml/translation/KeYJMLParser.java
+
+ANTLR3_PARSER= \
+	$(GENERATED_SRC_PATH)$(PFX)parser/antlr3/KeYLexer.java \
+	$(GENERATED_SRC_PATH)$(PFX)parser/antlr3/KeYParser.java
 
 
 JAVACC_PARSER= \
@@ -250,7 +255,7 @@ all_gen:
 	@$(MAKE) -s all_hlp   	
 
 .PHONY: all_hlp
-all_hlp: argfile.normal $(ANTLR_PARSER) $(JAVACC_PARSER) $(PROOFJAVA_PARSER) $(DIFF_PARSER) copy
+all_hlp: argfile.normal $(ANTLR_PARSER) $(ANTLR3_PARSER) $(JAVACC_PARSER) $(PROOFJAVA_PARSER) $(DIFF_PARSER) copy
 ifeq "$(BRANDING)" ""
 # always update SHA1 hash in order to get useful bug reports		
 	@echo $(SHA1) > ${BINARYPATH}/de/uka/ilkd/key/util/sha1
@@ -261,7 +266,7 @@ endif
 	@rm -f critical.msg
 	@rm -f warning.msg
 	@echo [KeY is being compiled]
-	@echo $(ANTLR_PARSER) $(JAVACC_PARSER) \
+	@echo $(ANTLR_PARSER) $(ANTLR3_PARSER) $(JAVACC_PARSER) \
 	      $(PROOFJAVA_PARSER) $(DIFF_PARSER) \
               | xargs -n1 echo > argfile.other 
 ifeq ($(JAVAC),ajc)
@@ -343,6 +348,12 @@ $(GENERATED_SRC_PATH)$(PFX)parser/KeYParser.java \
 	@mkdir -p $(GENERATED_SRC_PATH)$(PFX)parser
 	@$(ANTLR) -glib $(SRC)$(PFX)parser/lexer.g \
 			 -o $(GENERATED_SRC_PATH)$(PFX)parser $<
+
+$(GENERATED_SRC_PATH)$(PFX)parser/antlr3/KeYLexer.java : $(SRC)$(PFX)parser/antlr3/KeYLexer.g
+	@$(ANTLR3) -fo $(GENERATED_SRC_PATH)$(PFX)parser/antlr3 $<
+
+$(GENERATED_SRC_PATH)$(PFX)parser/antlr3/KeYParser.java : $(SRC)$(PFX)parser/antlr3/KeYParser.g
+	@$(ANTLR3) -fo $(GENERATED_SRC_PATH)$(PFX)parser/antlr3 $<
 
 
 $(GENERATED_SRC_PATH)$(PFX)parser/simplify/SimplifyLexer.java \

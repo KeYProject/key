@@ -22,8 +22,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.KeYLexer;
-import de.uka.ilkd.key.parser.KeYParser;
+import de.uka.ilkd.key.parser.KeYLexerF;
+import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserConfig;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -141,10 +141,10 @@ public class TestTermParser extends TestCase {
     }
     
 
-    private KeYParser stringDeclParser(String s) {
+    private KeYParserF stringDeclParser(String s) {
         // fills namespaces 
         new Recoder2KeY(TacletForTests.services (), nss).parseSpecialClasses();
-	return new KeYParser(ParserMode.DECLARATION,new KeYLexer(new StringReader(s),null),
+	return new KeYParserF(ParserMode.DECLARATION,new KeYLexerF(s,null),
 			      "No file. Call of parser from parser/TestTermParser.java",
 			      serv, nss);
     }
@@ -165,9 +165,9 @@ public class TestTermParser extends TestCase {
 	try {	  
 	    new Recoder2KeY(TacletForTests.services (), 
 	                    nss).parseSpecialClasses();	   
-	    return new KeYParser
+	    return new KeYParserF
 		(ParserMode.PROBLEM, 
-	         new KeYLexer(new StringReader(s),null),
+	         new KeYLexerF(s,null),
 		 "No file. Call of parser from parser/TestTermParser.java",
 		 new ParserConfig(serv, nss),
 		 new ParserConfig(serv, nss),
@@ -180,10 +180,10 @@ public class TestTermParser extends TestCase {
 	}	
     }
 
-    private KeYParser stringTermParser(String s) {
-	return new KeYParser
+    private KeYParserF stringTermParser(String s) {
+	return new KeYParserF
 	    (ParserMode.TERM, 
-	     new KeYLexer(new StringReader(s), new DefaultExceptionHandler()), 
+	     new KeYLexerF(s, new DefaultExceptionHandler()), 
 	     "No file. Call of parser from parser/TestTermParser.java",
 	     r2k,
 	     serv, 

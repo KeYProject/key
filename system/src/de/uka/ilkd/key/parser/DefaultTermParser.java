@@ -10,6 +10,7 @@
 package de.uka.ilkd.key.parser;
 
 
+import java.io.IOException;
 import java.io.Reader;
 
 import antlr.RecognitionException;
@@ -75,8 +76,8 @@ public final class DefaultTermParser {
         throws ParserException
     {
         try{
-            KeYParser parser
-                = new KeYParser(ParserMode.TERM, new KeYLexer(
+            KeYParserF parser
+                = new KeYParserF(ParserMode.TERM, new KeYLexerF(
 		                in,
 		                services.getExceptionHandler()), 
 		                "",
@@ -91,7 +92,7 @@ public final class DefaultTermParser {
                                       new Location(re.getFilename(),
                                                    re.getLine(),
                                                    re.getColumn()));
-        } catch (TokenStreamException tse) {
+        } catch (IOException tse) {
             throw new ParserException(tse.getMessage(), null);
         }
     }

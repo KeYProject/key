@@ -10,50 +10,39 @@
 
 package de.uka.ilkd.key.parser;
 
-import antlr.CharScanner;
-import antlr.Token;
-import antlr.TokenStream;
+import org.antlr.runtime.LegacyCommonTokenStream;
+
 import antlr.TokenStreamSelector;
 
-
-public class DeclPicker implements TokenStream {
-
-  protected CharScanner input;
+public class DeclPicker extends LegacyCommonTokenStream {
   private String text = null;
   private int lastMark = 0;
 
   /** Stream to read tokens from */
-  public DeclPicker(CharScanner in) {
-    input = in;
-  }
-
-
-  public Token nextToken() throws antlr.TokenStreamException {
-    return getSelector().nextToken();
-  }
-
-  public TokenStreamSelector getSelector() {
-    return ((KeYLexer)input).getSelector();
-  }
-  
-  public void commit() {
-     input.commit();
+  public DeclPicker(KeYLexerF in) {
+      super(in.getKeYLexer());
   }
 
   public int mark() {
-     lastMark = input.mark();
+     lastMark = super.mark();
      return lastMark;
   }
   
   public void capture() {
-     text = input.getInputBuffer().getMarkedChars();
-     //workaround for using antlr with multiple marks
-     text = text.substring(lastMark);
+     text = this.toString(lastMark, this.index());
   }
   
   public String getText() {
       return text;
   }
+
+    /**
+     * @return <code>null</code>
+     * @deprecated
+     */
+    public TokenStreamSelector getSelector() {
+	return null;
+    }
   
 
 
