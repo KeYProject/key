@@ -136,7 +136,7 @@ public class InitArrayCreation extends InitArray {
 					 Services services) {
 	assert dimensions.length > 0;
 	bodyStmnts.add(KeYJavaASTFactory.assign(resultVar,
-		KeYJavaASTFactory.methodCall(arrayType, createArrayName)));
+		KeYJavaASTFactory.methodCall(arrayType, createArrayName, dimensions[0])));
 
 	if (dimensions.length > 1) {
 	    Expression[] baseDim = new Expression[dimensions.length-1];
