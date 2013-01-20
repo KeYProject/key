@@ -102,7 +102,7 @@ JAVACC_MAIN=javacc
 
 ## nice source links
 JAVADOC=javadoc
-JAVADOC_OPTIONS=-use -quiet -breakiterator -linksource -J-Xmx512m
+JAVADOC_OPTIONS=-use -quiet -breakiterator -linksource -J-Xmx1024m
 
 
 ANTLR_PARSER= \
@@ -159,7 +159,7 @@ doc: argfile
 	-windowtitle "KeY API Documentation" \
 	-doctitle "KeY API Documentation ($(KEY_VERSION_LONG))" \
 	-header "KeY $(KEY_VERSION_LONG)" \
-	-private -author -version -J-Xmx256m
+	-private -author -version -J-Xmx512m
 
 
 
@@ -178,8 +178,6 @@ dist:	branding all
 	@cp -r $(RESOURCEPATH)/de/uka/ilkd/key/util/install/* dist/setup/de/uka/ilkd/key/util/install/
 	@mkdir -p dist/setup/de/uka/ilkd/key/gui/
 	@cp -r $(BINARYPATH)/de/uka/ilkd/key/gui/IconFactory* dist/setup/de/uka/ilkd/key/gui/
-	@cp -r $(BINARYPATH)/de/uka/ilkd/key/gui/KeYFolderIcon* dist/setup/de/uka/ilkd/key/gui/
-	@cp -r $(BINARYPATH)/de/uka/ilkd/key/gui/KeYControlIcon* dist/setup/de/uka/ilkd/key/gui/
 	@cp -r $(RESOURCEPATH)/de/uka/ilkd/key/gui/* dist/setup/de/uka/ilkd/key/gui/
 	@find dist -name '*~' -exec rm \{\} \; 
 	@echo "[creating jar-file]"
@@ -307,7 +305,7 @@ javaFiles:
 ifneq ("$(GIT)","")
 	@$(GIT) ls-files | grep "\.java" | grep -v "aspects" | grep -v "gjava" | grep -v "\.java\." | grep -v "resources/" | sort > javaFiles
 else
-	@find de/ -name \*\.java  | grep -v "aspects" | grep -v "gjava" | grep -v "\.java\." | grep -v "resources/" | sort > javaFiles
+	@find $(SRC)/de/ -name \*\.java  | grep -v "aspects" | grep -v "gjava" | grep -v "\.java\." | grep -v "resources/" | sort > javaFiles
 endif
 
 argfile.normal: javaFiles

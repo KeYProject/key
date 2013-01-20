@@ -43,11 +43,8 @@ final class PrefixSumRec {
     }
     
     /*@ normal_behavior
-      @   requires x >= 0;
-      @   ensures \result == 
-      @           (\exists int y; y >= 0; y*2 == x);
-      @   ensures \result !=
-      @           (\exists int y; y >= 0; y*2 == x+1);
+      @   ensures \result == (\exists int y; y*2 == x);
+      @   ensures \result != (\exists int y; y*2 == x+1);
       @   accessible \nothing;
       @ strictly_pure helper
       @*/
@@ -58,13 +55,13 @@ final class PrefixSumRec {
     /*@ public normal_behavior
       @   requires right > left;
       @   requires 2*left-right+1 >= 0;
-      @   requires even(2*left-right+1);
-      @   requires !even(left);
       @   requires right < a.length;
       @   requires isPow2(right-left);
+      @   requires !even(right);
+      @   requires !even(left) || right-left==1;
       @   ensures (\forall int k; 2*left-right+1 <= k && k <= right && !even(k); 
       @            a[k] == (\sum int i; 2*left-right+1 <= i && i < k+1; \old(a[i])));
-      @   ensures !(\exists int k; 2*left-right+1 <= k && k <= right && !even(k);
+      @   ensures !(\exists int k; 2*left-right+1 <= k && k <= right && even(k);
       @             a[k] != \old(a[k]));
       @   measured_by right - left + 1;
       @   assignable a[*];
@@ -82,10 +79,10 @@ final class PrefixSumRec {
     /*@ normal_behavior
       @   requires right > left;
       @   requires 2*left-right+1 >= 0;
-      @   requires even(2*left-right+1);
-      @   requires !even(left);
       @   requires right < a.length;
       @   requires isPow2(right-left);
+      @   requires !even(right);
+      @   requires !even(left) || right-left==1;
       @   ensures (\forall int k; 2*left-right+1 <= k && k <= right && even(k);
       @                        a[k] == (\sum int i; left <= i && i < k+1;
       @                        ((isPow2(k-i+1) && k-i != 1) || i == right)? \old(a[i]) : 0));

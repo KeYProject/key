@@ -430,7 +430,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	 */
 	private static final long serialVersionUID = -4070450212306526804L;
 
-	private final Iterator<S> iterator =  new SLNilListIterator();
+	private final transient Iterator<S> iterator =  new SLNilListIterator();
 
 	private NIL() {
 	}

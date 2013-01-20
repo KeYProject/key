@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -90,9 +89,9 @@ class Pipe<T>{
 			try{
 				doWork();
 			}catch(Throwable e){
+				listenerLock.lock();
 				try{
 					e.printStackTrace();
-					listenerLock.lock();
 					for(PipeListener<T> listener : listeners){
 						listener.exceptionOccurred(Pipe.this,e);
 					}
@@ -206,8 +205,8 @@ class Pipe<T>{
 		
 		
 		private void deliverMessage(String message){
+			listenerLock.lock();
 			try{
-				listenerLock.lock();
 				for(PipeListener<T> listener : listeners){
 					listener.messageIncoming(Pipe.this,message, type);
 				}
@@ -301,10 +300,8 @@ class Pipe<T>{
 	
 	/** Wait until the output of the target process has been read completely. */
 	public void waitForPipe() throws InterruptedException {
-		Thread[] threads;
 		try{
 			workerLock.lock();
-			threads = workers.toArray(new Thread[0]);
 		}finally{
 			workerLock.unlock();
 		}

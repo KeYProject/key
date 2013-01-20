@@ -922,7 +922,7 @@ public class EqualityConstraint implements Constraint {
         }
     }
     
-    private static final Boolean joinCacheMonitor = Boolean.FALSE;
+    private static final Object joinCacheMonitor = new Object();
     
     private static HashMap<ECPair, Constraint> joinCache = 
         new HashMap<ECPair, Constraint> ();

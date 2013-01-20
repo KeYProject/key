@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * This class decribes a substitution,which store a map(varMap) from quantifiable 
@@ -62,7 +63,7 @@ class Substitution {
         while ( it.hasNext () ) {
             final Term t = getSubstitutedTerm(it.next ()); 
             if ( t.freeVars ().size () != 0 ) {
-        	System.out.println("evil free vars in term: " + t);
+            	Debug.out("evil free vars in term: " + t);
                 return false;
             }
         }
