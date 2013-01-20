@@ -1908,6 +1908,32 @@ public abstract class KeYJavaASTFactory {
     }
 
     /**
+     * Create a method call on a type.
+     * 
+     * <pre>
+     * type.name(args);
+     * </pre>
+     * 
+     * @param type
+     *            the {@link KeYJavaType} the method is called on
+     * @param name
+     *            the method's name {@link String}
+     * @param args
+     *            the argument {@link Expression}s to be passed to the method
+     * @return a new {@link MethodReference} for call of method
+     *         <code>name</code> on <code>type</code> with arguments
+     *         <code>args</code>
+     */
+    public static MethodReference methodCall(final KeYJavaType type,
+	    final String name, final Expression... args) {
+	final TypeReference typeRef = new TypeRef(type);
+	final MethodReference call = KeYJavaASTFactory.methodCall(typeRef,
+		name, args);
+
+	return call;
+    }
+
+    /**
      * Create a method call on a type with no arguments.
      * 
      * <pre>
