@@ -4,6 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 
+import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
+
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -32,6 +35,14 @@ public class OpenFileAction extends MainWindowAction {
     	if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour()) {
     		FileOpenNotification notification = new FileOpenNotification(mainWindow);
     		notification.setVisible(true);
+    		
+            JCheckBox checkbox = new JCheckBox("Don't show this warning again");
+            Object[] message = { "When you load a Java file, all java files in the current",
+                    "directory and all subdirectories will be loaded as well.",
+                    checkbox };
+            JOptionPane.showMessageDialog(mainWindow, message, 
+                    "Please note", JOptionPane.WARNING_MESSAGE);
+            System.out.println(checkbox.isSelected());
     	}
     	
     	
