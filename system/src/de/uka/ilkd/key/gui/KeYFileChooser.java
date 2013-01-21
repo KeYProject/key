@@ -41,13 +41,14 @@ public class KeYFileChooser {
 	fileChooser.setFileFilter(new javax.swing.filechooser.FileFilter() {
 		public boolean accept(File f) {
 		    return 
-			    f.isDirectory() 
+			    f.isDirectory()
+			|| f.toString().endsWith(".java")
 			|| f.toString().endsWith(".key") 
 			|| f.toString().endsWith(".proof");
 		}
 		
 		public String getDescription() {
-		    return "KeY files and Source Directories";
+		    return "Java files, KeY files and Source Directories";
 		}
 	    });
     }

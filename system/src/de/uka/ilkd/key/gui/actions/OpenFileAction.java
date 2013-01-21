@@ -9,6 +9,10 @@ import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.util.GuiUtilities;
 
+import de.uka.ilkd.key.gui.configuration.FileOpenNotification;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
+import de.uka.ilkd.key.gui.configuration.ViewSelector;
+
 public class OpenFileAction extends MainWindowAction {
     
     /**
@@ -25,6 +29,12 @@ public class OpenFileAction extends MainWindowAction {
     }
     
     public void actionPerformed(ActionEvent e) {
+    	if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour()) {
+    		FileOpenNotification notification = new FileOpenNotification(mainWindow);
+    		notification.setVisible(true);
+    	}
+    	
+    	
         KeYFileChooser keYFileChooser = 
             GuiUtilities.getFileChooser("Select file to load proof or problem");
         

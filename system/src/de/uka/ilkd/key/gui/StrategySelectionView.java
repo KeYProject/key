@@ -387,6 +387,9 @@ public final class StrategySelectionView extends JPanel {
 
         rdBut14 = newButton("None",
                 StrategyProperties.METHOD_NONE, false, false);
+        rdBut14.setToolTipText("<html>" +
+                "Stop when encountering a method" +
+                "</html>");
         methodGroup.add(rdBut14);
         addJavaDLOption ( rdBut14, javaDLOptionsLayout, 6, yCoord, 2 );        
         

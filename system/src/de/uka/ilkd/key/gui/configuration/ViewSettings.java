@@ -46,6 +46,7 @@ public class ViewSettings implements Settings, Cloneable {
     private boolean hideClosedSubtrees = false;
     /** whether to use system look and feel */
     private boolean useSystemLaF = false;
+    private boolean notifyLoadBehaviour = true;
 
 
     private LinkedList<SettingsListener> listenerList =
@@ -130,6 +131,22 @@ public class ViewSettings implements Settings, Cloneable {
             fireSettingsChanged();
         }
     }
+    
+    /**
+     * When loading a Java file, all other java files in the parent
+     * directory are loaded as well.  
+     * Should there be a notification about this when opening a file?
+     */
+    public boolean getNotifyLoadBehaviour() {
+    	return notifyLoadBehaviour;
+    }
+    
+    /**
+     * @param Whether a notification when opening a file should be shown
+     */
+    public void setNotifyLoadBehaviour(boolean show) {
+    	notifyLoadBehaviour = show;
+    }
 
     /**
      * @return true iff intermediate proofsteps should be hidden
@@ -139,7 +156,7 @@ public class ViewSettings implements Settings, Cloneable {
     }
 
     /**
-     * @param hide Wether intermediate proofsteps should be hidden
+     * @param hide Whether intermediate proofsteps should be hidden
      */
     public void setHideIntermediateProofsteps(boolean hide) {
         if (hide != hideIntermediateProofsteps) {
