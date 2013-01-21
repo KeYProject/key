@@ -143,10 +143,10 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         // assign element of the current iteration to the enhanced for-loop iterator variable
         final Statement getNextElement = KeYJavaASTFactory.assignArrayField(lvdVar, arrayVar, itVar);
-        final For forLoop = KeYJavaASTFactory.forLoop(inits, guard, updates, getNextElement, body);
+        final For forLoop = KeYJavaASTFactory.forLoop(inits, guard, updates, declArrayElemVar, getNextElement, body);
 
         setInvariant(enhancedFor, forLoop);
-        return KeYJavaASTFactory.block(declArrayElemVar, forLoop);
+        return forLoop;
     }
 
     // Methods to transform loops over Iterable
