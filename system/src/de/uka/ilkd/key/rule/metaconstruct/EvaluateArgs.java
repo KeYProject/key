@@ -50,7 +50,7 @@ public class EvaluateArgs extends ProgramTransformer{
 		.getSuggestiveNameProposalForSchemaVariable(e));
 	final ProgramVariable pv = KeYJavaASTFactory.localVariable(name, t);
 
-	l.add(KeYJavaASTFactory.declare(pv, t));
+	l.add(KeYJavaASTFactory.declare(pv, e, t));
 
 	return pv;
     }
