@@ -471,6 +471,9 @@ public final class StrategySelectionView extends JPanel {
 
         queryOff = newButton("Off", 
                 StrategyProperties.QUERY_OFF, false, false);
+        queryOff.setToolTipText("<html>"+
+                               "Turn rewriting of query off."+
+                              "</html>");
 
         queryGroup.add(queryOff);
         addJavaDLOption ( queryOff, javaDLOptionsLayout, 6, yCoord, 2 );
@@ -480,8 +483,11 @@ public final class StrategySelectionView extends JPanel {
         
         queryAxiomOn = newButton("On", 
                 StrategyProperties.QUERYAXIOM_ON, false, false);
-        String queryAxiomToolTip = "<html>Replaces queries by their method body in certain safe cases.<br>" + //TODO:I don't know in exactly what cases.
-                                          "This mechanism works independently of the query treatment <br>" +
+        String queryAxiomToolTip = "<html>Replaces queries by their method body in certain safe cases.<br>" + 
+                                          "Safe cases are:"+
+                                           "<ul><li>the return type of the expanded method is known</li>"+
+                                          "<li>the object on which the methodcall is invoked, is self or a parent of self</li></ul>"+
+        		                  "This mechanism works independently of the query treatment <br>" +
                                           "and method treatment settings above.<br>" +
                                           "<i>The internal rule name is Query Axiom</i></html>";
         queryAxiomOn.setToolTipText(queryAxiomToolTip);
@@ -489,7 +495,10 @@ public final class StrategySelectionView extends JPanel {
 
         queryAxiomOff = newButton("Off", 
                 StrategyProperties.QUERYAXIOM_OFF, false, false);
-        //queryAxiomOn.setToolTipText("<html></html>");
+        queryAxiomOff.setToolTipText("<html>"+
+                                    "Expansion of local queries is turned off. <br>"+
+        		             "This setting is independent of the query treatment setting."+
+        		            "</html>");
         queryAxiomGroup.add(queryAxiomOff);
 
         JPanel queryAxiomPanel = new JPanel();

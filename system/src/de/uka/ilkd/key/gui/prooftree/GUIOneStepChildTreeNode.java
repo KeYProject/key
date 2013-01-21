@@ -53,7 +53,7 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
     	//For prettyprinting
     	Services services = parent.getNode().proof().getServices();
     	String prettySubTerm =  LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
-        return app.rule().name() + " @ " +prettySubTerm;
+        return app.rule().name() + " ON " +prettySubTerm;
     }
 }
 
