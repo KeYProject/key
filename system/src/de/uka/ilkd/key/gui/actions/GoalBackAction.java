@@ -60,15 +60,9 @@ public final class GoalBackAction extends MainWindowAction {
                 } else {
                     final Goal selGoal = getMediator().getSelectedGoal();
                     final Node selNode = getMediator().getSelectedNode();
-                    setBackMode();
-
-                    if (selGoal == null) {
-                        setEnabled(false);
-                    } else  {
-                        /* we undo the last rule application, if
-                         * the goal refers not to the proof's root */
-                        setEnabled(selNode != proof.root());
-                    } 
+                    /* we undo the last rule application, if
+                     * the goal refers not to the proof's root */
+                    setEnabled(selNode != proof.root());
                 }
             }
             
@@ -115,8 +109,12 @@ public final class GoalBackAction extends MainWindowAction {
     }
     
     public void actionPerformed(ActionEvent e) {            
-        final Goal selGoal = getMediator().getSelectedGoal();
-        assert(selGoal != null);
+        Goal selGoal = getMediator().getSelectedGoal();
+        final Node selNode = getMediator().getSelectedNode();
+        if (selGoal == null) {
+        	assert(selNode != null);
+        	selGoal = getMediator().getSelectedProof().getSubtreeGoals(selNode).reverse().head();
+        }        
         getMediator().setBack(selGoal);
     }        
 }

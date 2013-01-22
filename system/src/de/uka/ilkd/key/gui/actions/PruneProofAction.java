@@ -60,12 +60,13 @@ public final class PruneProofAction extends MainWindowAction {
                 } else {
                     final Goal selGoal = getMediator().getSelectedGoal();
                     final Node selNode = getMediator().getSelectedNode();
-
-                    if (selGoal == null && selNode == null) {
+                    
+                    if (selGoal != null || selNode == null) {
                         setEnabled(false);
                     } else if (selGoal == null) {
                     	// pruning a tree only if the selected node has children
                         // and sub tree is not closed
+
                         setEnabled(!(selNode.leaf() || selNode.isClosed()));
                     } 
                 }
