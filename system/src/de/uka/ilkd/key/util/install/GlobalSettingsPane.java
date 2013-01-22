@@ -106,7 +106,7 @@ public class GlobalSettingsPane extends InstallationPane {
                 JOptionPane.showMessageDialog
                         (null,
                                 "Wrong path for " + anInstallPath.label(),
-                                "Wong Path", JOptionPane.ERROR_MESSAGE);
+                                "Wrong Path", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
         }

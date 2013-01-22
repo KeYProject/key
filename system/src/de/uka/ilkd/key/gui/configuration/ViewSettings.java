@@ -31,6 +31,7 @@ public class ViewSettings implements Settings, Cloneable {
     private static final String HIDE_CLOSED_SUBTREES =
         "[View]HideClosedSubtrees";
     private static final String USE_SYSTEM_LAF = "[View]UseSystemLookAndFeel";
+    private static final String SHOW_JAVA_WARNING = "[View]ShowJavaWarning";
 
 
     /** default max number of displayed tooltip lines is 40 */
@@ -194,6 +195,7 @@ public class ViewSettings implements Settings, Cloneable {
 		String val4 = props.getProperty(HIDE_INTERMEDIATE_PROOFSTEPS);
 		String val5 = props.getProperty(HIDE_CLOSED_SUBTREES);
 		String val6 = props.getProperty(USE_SYSTEM_LAF);
+		String val7 = props.getProperty(SHOW_JAVA_WARNING);
 		if (val1 != null) {
 		        maxTooltipLines = Integer.valueOf(val1).intValue();
 		} 
@@ -213,6 +215,9 @@ public class ViewSettings implements Settings, Cloneable {
 		}
 		if (val6 != null) {
 		    useSystemLaF = Boolean.valueOf(val6).booleanValue();
+		}
+		if (val7 != null) {
+		    notifyLoadBehaviour = Boolean.valueOf(val7).booleanValue();
 		}
 	}
 
@@ -235,6 +240,7 @@ public class ViewSettings implements Settings, Cloneable {
     	props.setProperty(HIDE_CLOSED_SUBTREES, "" +
             hideClosedSubtrees);
     	props.setProperty(USE_SYSTEM_LAF, ""+useSystemLaF);
+    	props.setProperty(SHOW_JAVA_WARNING, "" + notifyLoadBehaviour);
     }
 
     /** sends the message that the state of this setting has been
