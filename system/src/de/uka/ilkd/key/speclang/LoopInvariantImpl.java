@@ -33,8 +33,10 @@ import de.uka.ilkd.key.util.Triple;
 public final class LoopInvariantImpl implements LoopInvariant {
         
     private final LoopStatement loop;
-    private IProgramMethod pm;
-    private ExecutionContext innermostExecCont;
+    private final IProgramMethod pm;
+    private final ExecutionContext innermostExecCont;
+    private Term guard;
+    private Term guardAtPost;
     private final Map<LocationVariable,Term> originalInvariants;
     private final Map<LocationVariable,Term> originalModifies;
     private Map<LocationVariable,
@@ -63,6 +65,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
      * @param heapAtPre the term used for the at pre heap
      */
     public LoopInvariantImpl(LoopStatement loop,
+                             IProgramMethod pm,
+                             ExecutionContext innermostExecCont,
                              Map<LocationVariable,Term> invariants,
                              Map<LocationVariable,Term> modifies,
                              Map<LocationVariable,
@@ -78,8 +82,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
         //assert modifies != null;
         //assert heapAtPre != null;
         this.loop                       = loop;
-        this.pm                         = null;
-        this.innermostExecCont          = null;
+        this.pm                         = pm;
+        this.innermostExecCont          = innermostExecCont;
+        this.guard                      = null;
+        this.guardAtPost                = null;
         this.originalInvariants         = invariants == null ? new LinkedHashMap<LocationVariable,Term>() : invariants;
         this.originalVariant            = variant;
         this.originalModifies           = modifies == null ? new LinkedHashMap<LocationVariable,Term>() : modifies;
@@ -94,6 +100,22 @@ public final class LoopInvariantImpl implements LoopInvariant {
         this.localOuts                  = localOuts;
         this.originalAtPres             = atPres == null ? new LinkedHashMap<LocationVariable,Term>() : atPres;
     }
+    
+    public LoopInvariantImpl(LoopStatement loop,
+                             Map<LocationVariable,Term> invariants,
+                             Map<LocationVariable,Term> modifies,
+                             Map<LocationVariable,
+                             ImmutableList<Triple<ImmutableList<Term>,
+                             ImmutableList<Term>,
+                             ImmutableList<Term>>>> respects,
+                             Term variant, 
+                             Term selfTerm,
+                             ImmutableList<Term> localIns,
+                             ImmutableList<Term> localOuts,
+                             Map<LocationVariable,Term> atPres) {
+        this(loop, null, null, invariants, modifies, respects, variant, selfTerm,
+             localIns, localOuts, atPres);
+    }
 
     public LoopInvariantImpl(LoopStatement loop,
                              Map<LocationVariable,Term> invariants,
@@ -103,17 +125,17 @@ public final class LoopInvariantImpl implements LoopInvariant {
                              ImmutableList<Term> localIns,
                              ImmutableList<Term> localOuts,
                              Map<LocationVariable,Term> atPres) {
-        this(loop,invariants,modifies,null,variant,selfTerm,localIns,localOuts,atPres);
+        this(loop, invariants, modifies, null, variant, selfTerm, localIns, localOuts, atPres);
     }
     
     public LoopInvariantImpl(LoopStatement loop,
-            Map<LocationVariable,Term> invariants,
-            Map<LocationVariable,Term> modifies,   
-            Term variant,
-            Term selfTerm,
-            Map<LocationVariable,Term> atPres) {
-        this(loop,invariants,modifies,null,variant,selfTerm,
-             ImmutableSLList.<Term>nil(),ImmutableSLList.<Term>nil(),atPres);
+                             Map<LocationVariable,Term> invariants,
+                             Map<LocationVariable,Term> modifies,   
+                             Term variant,
+                             Term selfTerm,
+                             Map<LocationVariable,Term> atPres) {
+        this(loop, invariants, modifies, null, variant, selfTerm,
+             ImmutableSLList.<Term>nil(),ImmutableSLList.<Term>nil(), atPres);
     }
     
     /**
@@ -201,6 +223,16 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public ExecutionContext getExecutionContext() {
         return innermostExecCont;
+    }
+
+    @Override
+    public Term getGuard() {        
+        return guard;
+    }
+
+    @Override
+    public Term getGuardAtPost() {        
+        return guardAtPost;
     }
 
     @Override    
@@ -308,7 +340,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public Term getInternalSelfTerm() {
         return originalSelfTerm;
-    }
+    }    
     
     @Override
     public ImmutableList<Term> getLocalIns() {
@@ -336,8 +368,10 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     
     @Override
-    public LoopInvariant setLoop(LoopStatement loop) {
+    public LoopInvariant setLoop(LoopStatement loop) {        
         return new LoopInvariantImpl(loop,
+                                     pm,
+                                     innermostExecCont,
                                      originalInvariants,
                                      originalModifies,
                                      originalRespects,
@@ -349,54 +383,43 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
     
     @Override
-    public void setTarget(IProgramMethod newPM) {
-        this.pm = newPM;
-    }
-    
-    @Override
-    public void setExecutionContext(ExecutionContext execCont) {
-        this.innermostExecCont = execCont;
-    }
-    
-    @Override
-    public LoopInvariant addGuardToLocalVariables(Term guard) {
+    public LoopInvariant setTarget(IProgramMethod newPM) {
         return new LoopInvariantImpl(loop,
+                                     newPM,
+                                     innermostExecCont,
                                      originalInvariants,
                                      originalModifies,
                                      originalRespects,
-                                     originalVariant,
+                                     originalVariant, 
                                      originalSelfTerm,
-                                     localIns.append(guard),
-                                     localOuts.append(guard),
+                                     localIns,
+                                     localOuts,
+                                     originalAtPres);
+    }
+    
+    @Override
+    public LoopInvariant setExecutionContext(ExecutionContext execCont) {
+        return new LoopInvariantImpl(loop,
+                                     pm,
+                                     execCont,
+                                     originalInvariants,
+                                     originalModifies,
+                                     originalRespects,
+                                     originalVariant, 
+                                     originalSelfTerm,
+                                     localIns,
+                                     localOuts,
                                      originalAtPres);
     }
 
     @Override
-    public void appendTermToAllRespects(Term t) {
-        for(LocationVariable h: originalRespects.keySet()) {
-            ImmutableList<Triple<ImmutableList<Term>,
-                                 ImmutableList<Term>,
-                                 ImmutableList<Term>>>
-                respects = ImmutableSLList.<Triple<ImmutableList<Term>,
-                                                   ImmutableList<Term>,
-                                                   ImmutableList<Term>>>nil();
-            if(originalRespects.get(h)!= null) {
-                for(Triple<ImmutableList<Term>,
-                           ImmutableList<Term>,
-                           ImmutableList<Term>> trip: originalRespects.get(h)) {
-                    Triple<ImmutableList<Term>,
-                           ImmutableList<Term>,
-                           ImmutableList<Term>> newTrip
-                           = new Triple<ImmutableList<Term>,
-                                        ImmutableList<Term>,
-                                        ImmutableList<Term>>
-                                ((trip.first).append(t),trip.second,trip.third);
-                    respects = respects.append(newTrip);
-                }
-                originalRespects.remove(h);
-                originalRespects.put(h, respects);
-            }            
-        }
+    public void setGuard(Term guardTerm) {
+        this.guard = guardTerm;
+    }
+
+    @Override
+    public void setGuardAtPost(Term guardTerm) {
+        this.guardAtPost = guardTerm;
     }
     
     @Override
@@ -412,11 +435,13 @@ public final class LoopInvariantImpl implements LoopInvariant {
         for(LocationVariable heap : invariants.keySet()) {
            newInvariants.put(heap, or.replace(invariants.get(heap)));
         }
-        return new LoopInvariantImpl(loop, 
+        return new LoopInvariantImpl(loop,
+                                     pm,
+                                     innermostExecCont,
                                      newInvariants,
                                      originalModifies,
                                      originalRespects,
-                                     originalVariant, 
+                                     originalVariant,
                                      originalSelfTerm,
                                      localIns,
                                      localOuts,
@@ -460,9 +485,9 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     @Override
     public String getName() {
-        if(getTarget() != null)
+        if (pm != null)
             return "loop_invariant__"  + "at_line_" + getLoop().getStartPosition().getLine()
-                    + "_in_" + pm.getFullName();
+                    + "_in_" + pm.toString();
         else // TODO: We should always know the target, maybe generate earlier?
             return "loop_invariant__"  + "at_line_" + getLoop().getStartPosition().getLine()
                     + "_in_" + "unknown_method";

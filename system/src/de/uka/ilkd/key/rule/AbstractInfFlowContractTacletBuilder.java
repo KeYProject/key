@@ -33,14 +33,21 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     private Term contractResult;
     private Term exceptionVar;
     private Term heapAtPost;
+    private Term loopGuard;
+    private Term loopGuardAtPost;
 
 
     public AbstractInfFlowContractTacletBuilder(final Services services) {
         super(services);
         this.localIns = ImmutableSLList.<Term>nil();
-        this.localOuts = ImmutableSLList.<Term>nil();
+        this.localOuts = ImmutableSLList.<Term>nil();   
+        this.loopGuard = null;
+        this.loopGuardAtPost = null;
     }
-
+    
+    public Term getGuardAtPost() {
+        return loopGuardAtPost;
+    }
 
     public void setContextUpdate(Term... contextUpdates) {
         this.contextUpdates = contextUpdates;
@@ -61,11 +68,13 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         this.contractSelf = contractSelf;
     }
 
+    public void setLoopGuard(Term guard) {
+        this.loopGuard = guard;
+    }
 
     public void setLocalIns(ImmutableList<Term> localIns) {
         this.localIns = localIns;
     }
-
 
     public void setLocalOuts(ImmutableList<Term> localOuts) {
         this.localOuts = localOuts;
@@ -85,6 +94,8 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     // TODO: add exception var
     public Term buildContractApplPredTerm() {
         ProofObligationVars appData = getProofObligationVars();
+        if (this.loopGuard != null)
+            this.loopGuardAtPost = appData.guardAtPost;
         Term contractApplPredTerm = getContractApplPred(appData);
         for (Term update : contextUpdates) {
             contractApplPredTerm = apply(update, contractApplPredTerm);
@@ -96,6 +107,8 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     // TODO: add exception var
     public Taclet buildContractApplTaclet() {
         ProofObligationVars appData = getProofObligationVars();
+        if (this.loopGuard != null)
+            this.loopGuardAtPost = appData.guardAtPost;
         return genInfFlowContractApplTaclet(appData, services);
     }
 
@@ -111,10 +124,18 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                                      Services services);
 
 
-    ProofObligationVars getProofObligationVars() {
-        return new ProofObligationVars(contractSelf, localIns,
+    private ProofObligationVars getProofObligationVars() {
+        if (this.loopGuardAtPost == null)
+            return new ProofObligationVars(contractSelf, loopGuard, localIns,
+                                           heapAtPre, localOuts, contractResult,
+                                           exceptionVar, heapAtPost, services);
+        else
+            return new ProofObligationVars(contractSelf, loopGuard, localIns,
+                                           heapAtPre, loopGuardAtPost, localOuts, contractResult,
+                                           exceptionVar, heapAtPost, services);
+        /*return new ProofObligationVars(contractSelf, localIns,
                                        heapAtPre, localOuts, contractResult,
-                                       exceptionVar, heapAtPost, services);
+                                       exceptionVar, heapAtPost, services);*/
     }
 
 
@@ -124,20 +145,28 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
                                                    ProofObligationVars appData,
                                                    Services services) {
-        Term selfSV = createTermSV(appData.self, schemaPrefix, services);
+        Term selfSV =
+                createTermSV(appData.self, schemaPrefix, services);
         Term selfAtPostSV =
                 createTermSV(appData.selfAtPost, schemaPrefix, services);
         ImmutableList<Term> localInSVs =
-                createTermSV(appData.localIns, schemaPrefix, services);
+                createTermSV(appData.localIns, schemaPrefix, services);        
+        Term guardSV =
+                createTermSV(appData.guard, schemaPrefix, services);
         ImmutableList<Term> localOutSVs =
                 createTermSV(appData.localOuts, schemaPrefix, services);
-        Term resSV = createTermSV(appData.result, schemaPrefix, services);
+        Term guardAtPostSV =
+                createTermSV(appData.guardAtPost, schemaPrefix, services);
+        Term resSV =
+                createTermSV(appData.result, schemaPrefix, services);
         Term resAtPostSV =
                 createTermSV(appData.resultAtPost, schemaPrefix, services);
-        Term excSV = createTermSV(appData.exception, schemaPrefix, services);
+        Term excSV =
+                createTermSV(appData.exception, schemaPrefix, services);
         Term excAtPostSV =
                 createTermSV(appData.exceptionAtPost, schemaPrefix, services);
-        Term heapSV = createTermSV(appData.heap, schemaPrefix, services);
+        Term heapSV =
+                createTermSV(appData.heap, schemaPrefix, services);
         Term heapAtPreSV =
                 createTermSV(appData.heapAtPre, schemaPrefix, services);
         Term heapAtPostSV =
@@ -145,8 +174,8 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         Term mbyAtPreSV =
                 createTermSV(appData.mbyAtPre, schemaPrefix, services);
 
-        return new ProofObligationVars(selfSV, selfAtPostSV, localInSVs,
-                                       localOutSVs, resSV, resAtPostSV, excSV,
+        return new ProofObligationVars(selfSV, selfAtPostSV, guardSV, localInSVs,
+                                       guardAtPostSV, localOutSVs, resSV, resAtPostSV, excSV,
                                        excAtPostSV, heapSV, heapAtPreSV,
                                        heapAtPostSV, mbyAtPreSV, "", services);
     }

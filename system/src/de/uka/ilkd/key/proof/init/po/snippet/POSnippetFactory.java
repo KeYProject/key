@@ -40,14 +40,14 @@ public class POSnippetFactory {
             Services services) {
         return new BasicPOSnippetFactoryImpl(invariant, vars, context, services);
     }
-    
+
     public static BasicPOSnippetFactory getBasicFactory(
             InformationFlowContract contract,
             ProofObligationVars vars,
             Services services) {
         return new BasicPOSnippetFactoryImpl(contract, vars, services);
     }    
-    
+
     public static BasicPOSnippetFactory getBasicFactory(
             BlockContract contract,
             ProofObligationVars vars,
@@ -69,13 +69,21 @@ public class POSnippetFactory {
         return new BasicPOSnippetFactoryImpl(data, poVars);
     }
 
-
     public static InfFlowPOSnippetFactory getInfFlowFactory(
             LoopInvariant invariant,
             ProofObligationVars vars1,
             ProofObligationVars vars2,
             Services services) {
         return new InfFlowPOSnippetFactoryImpl(invariant, vars1, vars2, services);
+    }
+
+    public static InfFlowPOSnippetFactory getInfFlowFactory(
+            LoopInvariant invariant,
+            ProofObligationVars vars1,
+            ProofObligationVars vars2,
+            ExecutionContext context,
+            Services services) {
+        return new InfFlowPOSnippetFactoryImpl(invariant, vars1, vars2, context, services);
     }
     
     public static InfFlowPOSnippetFactory getInfFlowFactory(

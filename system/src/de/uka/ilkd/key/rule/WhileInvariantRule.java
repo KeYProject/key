@@ -74,8 +74,8 @@ public final class WhileInvariantRule implements BuiltInRule {
     //internal methods
     //-------------------------------------------------------------------------
     
-    private Instantiation instantiate(LoopInvariantBuiltInRuleApp app, Services services) throws RuleAbortException {
-	
+    private Instantiation instantiate(final LoopInvariantBuiltInRuleApp app, Services services)
+            throws RuleAbortException {
     Term focusTerm = app.posInOccurrence().subTerm();
         
     if(focusTerm == lastFocusTerm
@@ -107,7 +107,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final MethodFrame innermostMethodFrame 
 		= JavaTools.getInnermostMethodFrame(progPost.javaBlock(), 
 						    services);
-	inv.setTarget(innermostMethodFrame.getProgramMethod());
+	inv = inv.setTarget(innermostMethodFrame.getProgramMethod());
 	final Term selfTerm = innermostMethodFrame == null
 	                      ? null
 	                      : MiscTools.getSelfTerm(innermostMethodFrame, 
@@ -117,8 +117,9 @@ public final class WhileInvariantRule implements BuiltInRule {
 		  ? null
 		  : (ExecutionContext) 
 		          innermostMethodFrame.getExecutionContext();
-	inv.setExecutionContext(innermostExecutionContext);
-
+	inv = inv.setExecutionContext(innermostExecutionContext);
+	services.getSpecificationRepository().setLoopInvariant(inv);
+        
 	//cache and return result
 	Instantiation result = new Instantiation(u, 
 					         progPost, 
@@ -155,9 +156,9 @@ public final class WhileInvariantRule implements BuiltInRule {
      * @return (assumption, anon update, anon heap)
      */    
     private static AnonUpdateData createAnonUpdate(LocationVariable heap,
-	    			LoopInvariant loop_inv, 
-	    			Term mod,
-	    			Services services) {
+	    			                   LoopInvariant loop_inv, 
+	    			                   Term mod,
+	    			                   Services services) {
         assert loop_inv != null;
         
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -183,7 +184,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                 TB.equals(TB.anon(services, TB.var(heap), mod, anonHeap),
                           loopHeap);
 	
-	return new AnonUpdateData(assumption, anonUpdate, loopHeap, TB.getBaseHeap(services), anonHeap);
+	return new AnonUpdateData(
+	        assumption, anonUpdate, loopHeap, TB.getBaseHeap(services), anonHeap);
     }
     
     private static boolean checkFocus(final Term progPost) {
@@ -196,13 +198,12 @@ public final class WhileInvariantRule implements BuiltInRule {
     //-------------------------------------------------------------------------
 
     @Override
-    public boolean isApplicable(Goal goal, 
-            PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         return checkApplicability(goal,pio);
     }
 
     //focus must be top level succedent
-    static boolean checkApplicability (Goal g, PosInOccurrence pio){
+    static boolean checkApplicability (Goal g, PosInOccurrence pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec())
             return false;
 
@@ -214,8 +215,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         // active statement must be while loop
-        SourceElement activeStatement = JavaTools
-        .getActiveStatement(progPost.javaBlock());
+        SourceElement activeStatement = JavaTools.getActiveStatement(progPost.javaBlock());
         if (!(activeStatement instanceof While)) {
             return false;
         }
@@ -233,7 +233,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp)
+    public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
             throws RuleAbortException {
         
         final KeYJavaType booleanKJT = services.getTypeConverter().getBooleanType();
@@ -241,7 +241,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                 services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
         
         //get instantiation
-        Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);	
+        Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);
 
         final Map<LocationVariable,Term> atPres = inst.inv.getInternalAtPres();
         final List<LocationVariable> heapContext = ((IBuiltInRuleApp)ruleApp).getHeapContext();
@@ -283,11 +283,13 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         Term beforeLoopUpdate = null;
 
-        final Map<LocationVariable,Map<Term,Term>> heapToBeforeLoop = new LinkedHashMap<LocationVariable,Map<Term,Term>>();
+        final Map<LocationVariable,Map<Term,Term>> heapToBeforeLoop =
+                new LinkedHashMap<LocationVariable,Map<Term,Term>>();
 
         for(LocationVariable heap : heapContext) {
             heapToBeforeLoop.put(heap, new LinkedHashMap<Term,Term>());
-            final LocationVariable lv = TB.heapAtPreVar(services, heap+"Before_LOOP", heap.sort(), true);
+            final LocationVariable lv =
+                    TB.heapAtPreVar(services, heap+"Before_LOOP", heap.sort(), true);
             services.getNamespaces().programVariables().addSafely(lv);
             final Term u = TB.elementary(services, lv, TB.var(heap));
             if(beforeLoopUpdate == null) {
@@ -309,8 +311,9 @@ public final class WhileInvariantRule implements BuiltInRule {
                     TB.elementary(services, 
                             pvBeforeLoop, 
                             TB.var(pv)));
-            heapToBeforeLoop.get(services.getTypeConverter().getHeapLDT().getHeap()).put(TB.var(pv), TB.var(pvBeforeLoop));
-        }
+            heapToBeforeLoop.get(services.getTypeConverter().getHeapLDT().getHeap())
+                    .put(TB.var(pv), TB.var(pvBeforeLoop));
+        }               
 
         //prepare anon update, frame condition, etc.
         Term anonUpdate = createLocalAnonUpdate(localOuts, services); // can still be null
@@ -341,7 +344,8 @@ public final class WhileInvariantRule implements BuiltInRule {
             }
             final Term m = mods.get(heap);
             final Term fc;
-            if(TB.lessThanNothing().equals(m) && heap == services.getTypeConverter().getHeapLDT().getHeap()) {
+            if(TB.lessThanNothing().equals(m) &&
+                    heap == services.getTypeConverter().getHeapLDT().getHeap()) {
                 fc = TB.frameStrictlyEmpty(services, TB.var(heap), heapToBeforeLoop.get(heap)); 
             }else{
                 fc = TB.frame(services, TB.var(heap), heapToBeforeLoop.get(heap), m);
@@ -357,7 +361,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                 reachableState = TB.and(reachableState, TB.wellFormed(heap, services));
               }
         }
-        
+
         //prepare variant
         final ProgramElementName variantName 
         = new ProgramElementName(TB.newName(services, "variant"));
@@ -374,9 +378,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         = dia ? TB.and(variantNonNeg, 
                 TB.lt(variant, TB.var(variantPV), services)) 
                 : TB.tt();
-        
+
         //prepare guard
-        final ProgramElementName guardVarName 
+        final ProgramElementName guardVarName
         = new ProgramElementName(TB.newName(services, "b"));
         final LocationVariable guardVar = new LocationVariable(guardVarName, 
                 booleanKJT);
@@ -400,7 +404,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term guardTrueTerm = TB.equals(TB.var(guardVar), 
                 TB.TRUE(services));
         final Term guardFalseTerm = TB.equals(TB.var(guardVar), 
-                TB.FALSE(services));
+                TB.FALSE(services)); 
 
         //prepare common assumption
         final Term[] uAnon 
@@ -416,14 +420,55 @@ public final class WhileInvariantRule implements BuiltInRule {
         = TB.applySequential(uAnon, TB.and(new Term[]{invTerm, 
                 reachableOut, 
                 variantNonNeg}));
-
-        final Term postAssumption 
+        
+        Term postAssumption 
         = TB.applySequential(new Term[]{inst.u, beforeLoopUpdate}, 
-                TB.and(anonAssumption,TB.apply(anonUpdate,uAnonInv)));
+                TB.and(anonAssumption,TB.apply(anonUpdate, uAnonInv)));
+        
+        final WhileInvRule wir
+        = (WhileInvRule) AbstractTermTransformer.WHILE_INV_RULE;
+        SVInstantiations svInst
+        = SVInstantiations.EMPTY_SVINSTANTIATIONS.replace(
+                null,
+                null,
+                inst.innermostExecutionContext,
+                null,
+                services);
+        for(SchemaVariable sv : wir.neededInstantiations(inst.loop, svInst)) {
+            assert sv instanceof ProgramSV;
+            svInst = svInst.addInteresting(sv,
+                    (Name) new ProgramElementName(sv.name().toString()),
+                    services);
+        }
+
+        final Term invTerm2;
+        final StrategyProperties props = goal.proof().getSettings()
+                .getStrategySettings().getActiveStrategyProperties();
+        final boolean queryTreatmenIsOn =
+                props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)
+                    == StrategyProperties.QUERY_ON;
+        if(queryTreatmenIsOn ||
+           props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)
+               == StrategyProperties.QUERY_RESTRICTED){
+            invTerm2 = QueryExpand.INSTANCE
+                    .evaluateQueries(services, invTerm, true, queryTreatmenIsOn); //chrisg
+        } else {
+            invTerm2 = invTerm;
+        }
+
+        Term bodyTerm = TB.tf().createTerm(wir,
+                inst.progPost,
+                TB.and(new Term[]{invTerm2,
+                        frameCondition,
+                        variantPO}));
+        bodyTerm = wir.transform(bodyTerm, svInst, services);
+        final Term guardTrueBody = TB.box(guardJb,
+                TB.imp(guardTrueTerm, bodyTerm));
 
         Goal infFlowGoal = null;
         Term loopInvApplPredTerm = null;
         Taclet informationFlowInvariantApp = null;
+        Term infFlowAssumption = null;
 
         if (goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
             goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) &&
@@ -434,55 +479,69 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                  "moment not compatible " +
                                                  "with the non-base-heap " +
                                                  "setting";
-            final AnonUpdateData anonUpdateData = anonUpdateDatas.head();            
+            final AnonUpdateData anonUpdateData = anonUpdateDatas.head();
+            
+            final Term heapAtPostEq =
+                    TB.equals(anonUpdateData.loopHeap, TB.var(heapContext.get(0)));
             
             InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
-                    new InfFlowLoopInvariantTacletBuilder(services);
+                    new InfFlowLoopInvariantTacletBuilder(services);            
             ifInvariantBuilder.setInvariant(inst.inv);
-            ifInvariantBuilder.setGuard(TB.var(guardVar));
+            ifInvariantBuilder.setLoopGuard(TB.var(guardVar));
             ifInvariantBuilder.setContextUpdate(inst.u);
             ifInvariantBuilder.setHeapAtPre(anonUpdateData.loopHeapAtPre);
             ifInvariantBuilder.setHeapAtPost(anonUpdateData.loopHeap);
             ifInvariantBuilder.setSelf(inst.selfTerm);
-            ifInvariantBuilder.setLocalIns(TB.var(localIns));
-            ifInvariantBuilder.setLocalOuts(TB.var(localOuts));
-            
+            ifInvariantBuilder.setLocalIns(MiscTools.toTermList(localIns));
+            ifInvariantBuilder.setLocalOuts(MiscTools.toTermList(localOuts));
+
             // generate information flow invariant application predicate
             // and associated taclet
             loopInvApplPredTerm =
-                    ifInvariantBuilder.buildContractApplPredTerm(); // entspricht in BlockContractRule contractApplTerm, aber Gleichung muss ergänzt werden -> siehe infFlowAssumptions
+                    ifInvariantBuilder.buildContractApplPredTerm();
+            
+            inst.inv.setGuard(TB.var(guardVar));
+            inst.inv.setGuardAtPost(ifInvariantBuilder.getGuardAtPost());
+            services.getSpecificationRepository().setLoopInvariant(inst.inv);
+            
             informationFlowInvariantApp =
                     ifInvariantBuilder.buildContractApplTaclet();
+            
+            // set infFlowAssumptions
+            infFlowAssumption = TB.and(heapAtPostEq, loopInvApplPredTerm);
 
             // create information flow validity goal
 
             // generate proof obligation variables
             final ProofObligationVars instantiationVars =
                     new ProofObligationVars(inst.selfTerm,
-                                            TB.var(guardVar),
-                                            TB.var(localIns),
+                                            inst.inv.getGuard(),
+                                            MiscTools.toTermList(localIns),
                                             anonUpdateData.loopHeapAtPre,
-                                            TB.var(localOuts),
+                                            inst.inv.getGuardAtPost(),
+                                            MiscTools.toTermList(localOuts),
                                             anonUpdateData.loopHeap,
-                                            services);
+                                            services);            
+            
             final IFProofObligationVars ifVars =
                     new IFProofObligationVars(instantiationVars, services);
             ((LoopInvariantBuiltInRuleApp) ruleApp).setInformationFlowProofObligationVars(ifVars);
 
-            // create proof obligation
-            Pair<InfFlowPOSnippetFactory, Sequent> factoryAndSequent
-                = buildBodyPreservesSequent(ifVars, inst.inv, TB.var(guardVar), services);
-            Sequent seq = factoryAndSequent.second;
+            // create proof obligation            
+            InfFlowPOSnippetFactory f =
+                    POSnippetFactory.getInfFlowFactory(inst.inv, ifVars.c1, ifVars.c2, services);
+            Term selfComposedExec =
+                    f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
+            final Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+            final Term finalTerm = TB.imp(selfComposedExec, post);
+            Sequent seq = Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
             infFlowGoal = goal.getCleanGoal(seq);
             infFlowGoal.setBranchLabel("Information Flow Validity");
             
             // create and add split-post and remove-post taclets
-            InfFlowPOSnippetFactory infFlowFactory = factoryAndSequent.first;
-            final Term post = infFlowFactory
-                    .create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
             final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
             final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
-            for (final Taclet t : splitPostTaclets) {
+            for (final Taclet t : splitPostTaclets) {                
                 infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
             }
             final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
@@ -506,10 +565,15 @@ public final class WhileInvariantRule implements BuiltInRule {
             
             //"Body Preserves Invariant":
             // \replacewith (==>  #atPreEqs(anon1)
-            //                       -> #introNewAnonUpdate(#modifies, #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv ->
+            //                       -> #introNewAnonUpdate(
+            //                                  #modifies,
+            //                                  #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post)
+            //                          & inv ->
             //                         (\[{ method-frame(#ex):{#typeof(#e) #v1 = #e;} }\]#v1=TRUE ->
             //                          #whileInvRule(\[{.. while (#e) #s ...}\]post,
-            //                               #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post) & inv)),anon1));
+            //                               #locDepFunc(anon1, \[{.. while (#e) #s ...}\]post)
+            //                                  & inv)),
+            //                          anon1));
             bodyGoal.addFormula(new SequentFormula(wellFormedAnon),
                     true,
                     false);
@@ -517,43 +581,6 @@ public final class WhileInvariantRule implements BuiltInRule {
             bodyGoal.addFormula(new SequentFormula(uAnonInvVariantNonNeg),
                     true,
                     false);
-
-            //-->
-            final WhileInvRule wir
-            = (WhileInvRule) AbstractTermTransformer.WHILE_INV_RULE;
-            SVInstantiations svInst
-            = SVInstantiations.EMPTY_SVINSTANTIATIONS.replace(
-                    null,
-                    null,
-                    inst.innermostExecutionContext,
-                    null,
-                    services);
-            for(SchemaVariable sv : wir.neededInstantiations(inst.loop, svInst)) {
-                assert sv instanceof ProgramSV;
-                svInst = svInst.addInteresting(sv,
-                        (Name) new ProgramElementName(sv.name().toString()),
-                        services);
-            }
-
-            final Term invTerm2;
-            final StrategyProperties props = goal.proof().getSettings().getStrategySettings().getActiveStrategyProperties();
-            final boolean queryTreatmenIsOn = props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_ON;
-            if(queryTreatmenIsOn ||
-                    props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY)==StrategyProperties.QUERY_RESTRICTED){
-                invTerm2 = QueryExpand.INSTANCE.evaluateQueries(services, invTerm, true, queryTreatmenIsOn); //chrisg
-            }else{
-                invTerm2 = invTerm;
-            }
-
-            Term bodyTerm = TB.tf().createTerm(wir,
-                    inst.progPost,
-                    TB.and(new Term[]{invTerm2,
-                            frameCondition,
-                            variantPO}));
-            bodyTerm = wir.transform(bodyTerm, svInst, services);
-            final Term guardTrueBody = TB.box(guardJb,
-                    TB.imp(guardTrueTerm, bodyTerm));
-            //<--
 
             bodyGoal.changeFormula(new SequentFormula(TB.applySequential(
                     uBeforeLoopDefAnonVariant,
@@ -574,6 +601,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                     false);
             useGoal.addTaclet(informationFlowInvariantApp,
                                   SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+            
+            postAssumption = infFlowAssumption;
         }
 
         //"Invariant Initially Valid":
@@ -592,15 +621,15 @@ public final class WhileInvariantRule implements BuiltInRule {
                 true,
                 false);
         useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
-        useGoal.addFormula(new SequentFormula(postAssumption),
-                true,
-                false);
+        
+        useGoal.addFormula(new SequentFormula(postAssumption), true, false);
+        
 
         Term restPsi = TB.prog((Modality)inst.progPost.op(),
                 JavaTools.removeActiveStatement(
                         inst.progPost.javaBlock(),
                         services),
-                        inst.progPost.sub(0));
+                        inst.progPost.sub(0));        
         Term guardFalseRestPsi = TB.box(guardJb,
                 TB.imp(guardFalseTerm, restPsi));
         useGoal.changeFormula(new SequentFormula(TB.applySequential(
@@ -609,24 +638,6 @@ public final class WhileInvariantRule implements BuiltInRule {
                 ruleApp.posInOccurrence());
         
         return result;
-    }
-
-
-    Pair<InfFlowPOSnippetFactory,Sequent> buildBodyPreservesSequent(
-                IFProofObligationVars ifVars,
-                LoopInvariant inv,
-                Term guardTerm,
-                Services services) {
-        inv.appendTermToAllRespects(guardTerm);
-        InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(inv, ifVars.c1, ifVars.c2, services);
-        Term selfComposedExec =
-                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
-        Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-
-        final Term finalTerm = TB.imp(selfComposedExec, post);
-        return new Pair<InfFlowPOSnippetFactory,Sequent>
-            (f, Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm))));
     }
 
 
@@ -668,7 +679,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	public Instantiation(Term u, 
 			     Term progPost, 
 			     While loop,
-			     LoopInvariant inv, 
+			     LoopInvariant inv,
 			     Term selfTerm,
 			     ExecutionContext innermostExecutionContext) {
 	    assert u != null;

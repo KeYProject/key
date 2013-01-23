@@ -109,11 +109,11 @@ public class ProofObligationVars {
                 ImmutableSLList.<Term>nil();
         terms = appendIfNotNull(terms, self);
         terms = appendIfNotNull(terms, selfAtPost);
-        terms = appendIfNotNull(terms, guard); // TODO: consequences?
+        terms = appendIfNotNull(terms, guard);
         terms = terms.append(localIns);
         terms = appendIfNotNull(terms, heap);
         terms = appendIfNotNull(terms, heapAtPre);
-        terms = appendIfNotNull(terms, guardAtPost); // TODO: consequences?
+        terms = appendIfNotNull(terms, guardAtPost);
         terms = terms.append(localOuts);
         terms = appendIfNotNull(terms, result);
         terms = appendIfNotNull(terms, resultAtPost);
@@ -128,10 +128,10 @@ public class ProofObligationVars {
         allTerms = allTerms.append(heap);
         allTerms = allTerms.append(self);
         allTerms = allTerms.append(selfAtPost);
-        allTerms = allTerms.append(guard); // TODO: consequences?
+        allTerms = allTerms.append(guard);
         allTerms = allTerms.append(localIns);
         allTerms = allTerms.append(heapAtPre);
-        allTerms = allTerms.append(guardAtPost); // TODO: consequences?
+        allTerms = allTerms.append(guardAtPost);
         allTerms = allTerms.append(localOuts);
         allTerms = allTerms.append(result);
         allTerms = allTerms.append(resultAtPost);
@@ -142,11 +142,13 @@ public class ProofObligationVars {
         paddedTermList = allTerms;
 
         ImmutableList<Term> allTermsButLocalVars =
-                ImmutableSLList.<Term>nil(); // for this matter guard is part of localVars
+                ImmutableSLList.<Term>nil();
         allTermsButLocalVars = allTermsButLocalVars.append(heap);
         allTermsButLocalVars = allTermsButLocalVars.append(self);
         allTermsButLocalVars = allTermsButLocalVars.append(selfAtPost);
+        allTermsButLocalVars = allTermsButLocalVars.append(guard);
         allTermsButLocalVars = allTermsButLocalVars.append(heapAtPre);
+        allTermsButLocalVars = allTermsButLocalVars.append(guardAtPost);
         allTermsButLocalVars = allTermsButLocalVars.append(result);
         allTermsButLocalVars = allTermsButLocalVars.append(resultAtPost);
         allTermsButLocalVars = allTermsButLocalVars.append(exception);
@@ -199,6 +201,34 @@ public class ProofObligationVars {
         this(self, null, localIns, localOuts, result, null, exception, null,
              baseHeap, heapAtPre, heapAtPost, null, "", services);
     }
+    
+    public ProofObligationVars(Term self,
+                               Term guard,
+                               ImmutableList<Term> localIns,
+                               Term heap,
+                               Term guardAtPost,
+                               ImmutableList<Term> localOuts,
+                               Services services) {
+        this(self, guard, localIns, null, guardAtPost, localOuts,
+             null, null, heap, services);
+    }
+
+
+    public ProofObligationVars(Term self,
+                               Term guard,
+                               ImmutableList<Term> localIns,
+                               Term heap,
+                               Term guardAtPost,
+                               ImmutableList<Term> localOuts,
+                               Term result,
+                               Term exception,
+                               Term heapAtPost,
+                               Services services) {
+        this(self, null, guard, localIns, guardAtPost, localOuts, result,
+                buildAtPostVar(result, services), exception,
+                buildAtPostVar(exception, services), heap, null, heapAtPost,
+                null, "", services);
+    }
 
 
     public ProofObligationVars(Term self,
@@ -213,7 +243,7 @@ public class ProofObligationVars {
         this(self, null, guard, localIns, buildAtPostVar(guard, services),
              localOuts, result, buildAtPostVar(result, services), exception,
                 buildAtPostVar(exception, services), heap, null, heapAtPost,
-                null, "", services);
+                null, "", services);        
     }
     
     
@@ -230,6 +260,19 @@ public class ProofObligationVars {
              buildAtPostVar(exception, services),
              heap, null, heapAtPost, null, "", services);
     }
+    
+    public ProofObligationVars(Term self,
+                               Term guard,
+                               ImmutableList<Term> localIns,
+                               Term heap,
+                               Term guardAtPost,
+                               ImmutableList<Term> localOuts,                               
+                               Term heapAtPost,
+                               Services services) {
+        this(self, null, guard, localIns, guardAtPost, localOuts,
+             null, null, null, null, heap, null, heapAtPost,
+             null, "", services);
+    }
 
 
     public ProofObligationVars(Term self,
@@ -238,9 +281,19 @@ public class ProofObligationVars {
                                Term heap,
                                ImmutableList<Term> localOuts,                               
                                Term heapAtPost,
-                               Services services) {
+                               Services services) {        
         this(self, guard, localIns, heap, localOuts, null, null, heapAtPost, services);
     }
+
+
+    /*public ProofObligationVars(Term self,
+                               Term guard,
+                               ImmutableList<Term> localIns,
+                               ImmutableList<Term> localOuts,
+                               Term heap,
+                               Services services) {        
+        this(self, guard, localIns, heap, localOuts, null, null, null, services);
+    }*/
     
     
     public ProofObligationVars(Term self,
@@ -291,9 +344,9 @@ public class ProofObligationVars {
                                Services services) {
         this(copyLocationVariable(orig.self, postfix, services),
              copyLocationVariable(orig.selfAtPost, postfix, services),
-             copyLocationVariable(orig.guard, postfix, services), // TODO: consequences?
+             copyLocationVariable(orig.guard, postfix, services),
              copyLocationVariable(orig.localIns, postfix, services),
-             copyLocationVariable(orig.guardAtPost, postfix, services), // TODO: consequences?
+             copyLocationVariable(orig.guardAtPost, postfix, services),
              copyLocationVariable(orig.localOuts, postfix, services),
              copyLocationVariable(orig.result, postfix, services),
              copyLocationVariable(orig.resultAtPost, postfix, services),
@@ -472,7 +525,7 @@ public class ProofObligationVars {
         if (varTerm == null) {
             return null;
         }
-        assert varTerm.op() instanceof LocationVariable;
+        assert varTerm.op() instanceof LocationVariable;        
 
         KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
         String name = TB.newName(services, varTerm.toString() + "AtPost");

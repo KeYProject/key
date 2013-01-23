@@ -4,6 +4,8 @@
  */
 package de.uka.ilkd.key.proof.init.po.snippet;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
@@ -38,24 +40,44 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
         Triple<Term[],Term[],Term[]>[] respectsAtPre1 = replace(origRespects, d.origVars, poVars1);
         Triple<Term[],Term[],Term[]>[] respectsAtPre2 = replace(origRespects, d.origVars, poVars2);
         // the respects-sequents evaluated in the post-state
+        ImmutableList<Term> poVars1Pre =
+                poVars1.localIns
+                    .prepend(poVars1.heap, poVars1.self, poVars1.guard)
+                        .append(poVars1.result, poVars1.exception);
+        ImmutableList<Term> poVars1Post =
+                poVars1.localOuts
+                    .prepend(poVars1.heapAtPost, poVars1.selfAtPost, poVars1.guardAtPost)
+                        .append(poVars1.resultAtPost, poVars1.exceptionAtPost);
+        ImmutableList<Term> poVars2Pre =
+                poVars2.localIns
+                    .prepend(poVars2.heap, poVars2.self, poVars2.guard)
+                        .append(poVars2.result, poVars2.exception);
+        ImmutableList<Term> poVars2Post =
+                poVars2.localOuts
+                    .prepend(poVars2.heapAtPost, poVars2.selfAtPost, poVars2.guardAtPost)
+                        .append(poVars2.resultAtPost, poVars2.exceptionAtPost);
+        Term[] pre1 = new Term [poVars1.localIns.size() + 5];        
+        Term[] post1 = new Term [poVars1.localOuts.size() + 5];
+        Term[] pre2 = new Term [poVars2.localIns.size() + 5];        
+        Term[] post2 = new Term [poVars2.localOuts.size() + 5];
+        pre1 = poVars1Pre.toArray(pre1);
+        post1 = poVars1Pre.toArray(pre1);
+        pre2 = poVars1Pre.toArray(pre1);
+        post2 = poVars1Pre.toArray(pre1);
+        
+        /*
+        Term[] pre1 = {poVars1.heap, poVars1.self, poVars1.guard, poVars1.result, poVars1.exception};
+        Term[] post1 = {poVars1.heapAtPost, poVars1.selfAtPost, poVars1.guardAtPost, poVars1.resultAtPost, poVars1.exceptionAtPost};
+        Term[] pre2 = {poVars2.heap, poVars2.self, poVars2.guard, poVars2.result, poVars2.exception};
+        Term[] post2 = {poVars2.heapAtPost, poVars2.selfAtPost, poVars2.guardAtPost, poVars2.resultAtPost, poVars2.exceptionAtPost};
+        */
+        
         Triple<Term[],Term[],Term[]>[] respectsAtPost1 = replace(respectsAtPre1,
-                                                                 new Term[]{poVars1.heap,
-                                                                            poVars1.self,
-                                                                            poVars1.result,
-                                                                            poVars1.exception},
-                                                                 new Term[]{poVars1.heapAtPost,
-                                                                            poVars1.selfAtPost,
-                                                                            poVars1.resultAtPost,
-                                                                            poVars1.exceptionAtPost});
+                                                                 pre1,
+                                                                 post1);
         Triple<Term[],Term[],Term[]>[] respectsAtPost2 = replace(respectsAtPre2,
-                                                                 new Term[]{poVars2.heap,
-                                                                            poVars2.self,
-                                                                            poVars2.result,
-                                                                            poVars2.exception},
-                                                                 new Term[]{poVars2.heapAtPost,
-                                                                            poVars2.selfAtPost,
-                                                                            poVars2.resultAtPost,
-                                                                            poVars2.exceptionAtPost});
+                                                                 pre2,
+                                                                 post2);
 
 /*
         // get declassifies terms
@@ -139,7 +161,19 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
                 eqAtLocs[i + respects1.first.length] = d.tb.tt();
             }
         }
-        return d.tb.and(eqAtLocs);
+        Iterator<Term> itIn1 = vs1.localIns.iterator();
+        Iterator<Term> itIn2 = vs2.localIns.iterator();
+        Term[] eqAtLocalIns = new Term[vs1.localIns.size()];
+        int i = 0;
+        while (itIn1.hasNext()) {
+            eqAtLocalIns[i++] = d.tb.equals(itIn1.next(), itIn2.next());
+        }
+        Term eqAtGuard = d.tb.tt();
+        if (vs1.guard != null) {            
+            eqAtGuard = d.tb.equals(vs1.guard, vs2.guard);
+        }
+        Term[] eqAt = {d.tb.and(eqAtLocs), d.tb.and(eqAtLocalIns), eqAtGuard};
+        return d.tb.and(eqAt);
     }
 
     private Term buildOutputRelation(BasicSnippetData d,
@@ -159,7 +193,19 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod impleme
         for (int i = 0; i < respects1.third.length; i++) {
             eqAtLocs[i + respects1.first.length] = d.tb.equals(respects1.third[i], respects2.third[i]);
         }
-        return d.tb.and(eqAtLocs);
+        Iterator<Term> itOut1 = vs1.localOuts.iterator();
+        Iterator<Term> itOut2 = vs2.localOuts.iterator();
+        Term[] eqAtLocalOuts = new Term[vs1.localOuts.size()];
+        int i = 0;
+        while (itOut1.hasNext()) {
+            eqAtLocalOuts[i++] = d.tb.equals(itOut1.next(), itOut2.next());
+        }
+        Term eqAtGuard = d.tb.tt();
+        if (vs1.guard != null) {            
+            eqAtGuard = d.tb.equals(vs1.guardAtPost, vs2.guardAtPost);
+        }
+        Term[] eqAt = {d.tb.and(eqAtLocs), d.tb.and(eqAtLocalOuts), eqAtGuard};
+        return d.tb.and(eqAt);
     }
 
     private static class SearchVisitor extends Visitor {

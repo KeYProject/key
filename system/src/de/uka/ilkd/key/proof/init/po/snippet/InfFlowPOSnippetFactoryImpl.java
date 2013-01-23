@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.proof.init.po.snippet;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
@@ -54,15 +55,25 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
     }
     
     InfFlowPOSnippetFactoryImpl(LoopInvariant invariant,
-            ProofObligationVars vars1,
-            ProofObligationVars vars2,
-            Services services) {
+                                ProofObligationVars vars1,
+                                ProofObligationVars vars2,
+                                Services services) {
         this.data = new BasicSnippetData(invariant, services);
         this.poVars1 = vars1;
         this.poVars2 = vars2;
         registerFactoryMethods();
     }
 
+    InfFlowPOSnippetFactoryImpl(LoopInvariant invariant,
+                                ProofObligationVars vars1,
+                                ProofObligationVars vars2,
+                                ExecutionContext context,
+                                Services services) {        
+        this.data = new BasicSnippetData(invariant, context, services);
+        this.poVars1 = vars1;
+        this.poVars2 = vars2;
+        registerFactoryMethods();
+    }
 
     InfFlowPOSnippetFactoryImpl(BasicSnippetData d,
                                 ProofObligationVars vars1,

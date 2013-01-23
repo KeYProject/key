@@ -640,7 +640,7 @@ public final class Goal  {
     }
     
     public ImmutableList<Goal> apply( RuleApp p_ruleApp ) {
-//System.err.println(Thread.currentThread());    
+//      System.err.println(Thread.currentThread());
 
         final Proof proof = proof();
                 

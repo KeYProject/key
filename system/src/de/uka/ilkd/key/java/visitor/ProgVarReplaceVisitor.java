@@ -418,6 +418,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         LoopInvariant newInv
             = new LoopInvariantImpl(newLoop,
+                                    inv.getTarget(),
+                                    inv.getExecutionContext(),
                                     newInvariants,
                                     newMods,
                                     newRespects,

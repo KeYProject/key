@@ -10,7 +10,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -28,9 +27,8 @@ import de.uka.ilkd.key.util.MiscTools;
 public final class InfFlowLoopInvariantTacletBuilder
         extends AbstractInfFlowContractTacletBuilder {
     
-    private LoopInvariant loopinvariant;
-    private Term guard;
-    
+    private LoopInvariant loopinvariant;    
+
     public InfFlowLoopInvariantTacletBuilder(final Services services) {
         super(services);
     }
@@ -38,11 +36,7 @@ public final class InfFlowLoopInvariantTacletBuilder
     public void setInvariant(LoopInvariant invariant) {
         this.loopinvariant = invariant;
     }
-    
-    public void setGuard(Term guard) {
-        this.guard = guard;
-    }
-    
+
     @Override
     Name generateName() {
         return MiscTools.toValidTacletName("Use information flow contract for " +
@@ -51,7 +45,7 @@ public final class InfFlowLoopInvariantTacletBuilder
 
     @Override
     Term generateSchemaAssumes(ProofObligationVars schemaDataAssumes,
-                               Services services) {
+                               Services services) {        
         BasicPOSnippetFactory fAssumes =
                 POSnippetFactory.getBasicFactory(loopinvariant, schemaDataAssumes, services);
         return fAssumes.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
@@ -66,34 +60,15 @@ public final class InfFlowLoopInvariantTacletBuilder
         return fFind.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
         // TODO: Think about correctness
     }
-    
-    @Override
-    ProofObligationVars getProofObligationVars() {
-        ProofObligationVars pv = super.getProofObligationVars();
-        return new ProofObligationVars(pv.self, guard, pv.localIns,
-                                       pv.heapAtPre, pv.localOuts, pv.result,
-                                       pv.exception, pv.heapAtPost, services);
-    }
 
     @Override
     Term getContractApplPred(ProofObligationVars appData) {
         BasicPOSnippetFactory f =
-                POSnippetFactory.getBasicFactory(loopinvariant, appData,
-                                                 services);
+                POSnippetFactory.getBasicFactory(loopinvariant, appData, services);
         return f.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
         // TODO: Think about correctness
-    }
-    
-    ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
-                                                   ProofObligationVars appData,
-                                                   Services services) {
-        ProofObligationVars pv = super.generateApplicationDataSVs(schemaPrefix, appData, services);        
-        Term guardSV = super.createTermSV(appData.guard, schemaPrefix, services);
-        Term guardAtPostSV = super.createTermSV(appData.guardAtPost, schemaPrefix, services);
-        return new ProofObligationVars(pv.self, pv.selfAtPost, guardSV, pv.localIns, guardAtPostSV,
-                pv.localOuts, pv.result, pv.resultAtPost, pv.exception, pv.exceptionAtPost,
-                pv.heap, pv.heapAtPre, pv.heapAtPost, pv.mbyAtPre, "", services);
-    }
+    }    
+
 
     @Override
     Term buildContractApplications(ProofObligationVars contAppData,

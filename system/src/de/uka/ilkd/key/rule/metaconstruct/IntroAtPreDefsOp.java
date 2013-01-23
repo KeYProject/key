@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -154,14 +155,16 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 ImmutableList<Term> newLocalOuts = TB.var(MiscTools.getLocalOuts(loop, services));
                 final LoopInvariant newInv
                        = new LoopInvariantImpl(loop,
-                                            newInvariants,
-                                            newMods,
-                                            newRespects,
-                                            newVariant,
-                                            selfTerm,
-                                            newLocalIns,
-                                            newLocalOuts,
-                                            atPres);
+                               frame.getProgramMethod(),
+                               ec,
+                               newInvariants,
+                               newMods,
+                               newRespects,
+                               newVariant, 
+                               selfTerm,
+                               newLocalIns,
+                               newLocalOuts,
+                               atPres);
                 services.getSpecificationRepository().setLoopInvariant(newInv);
             }
         }

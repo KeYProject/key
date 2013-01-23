@@ -3,19 +3,14 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 import java.util.Iterator;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.Do;
-import de.uka.ilkd.key.java.statement.EnhancedFor;
-import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -25,7 +20,6 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopInvariant;
-import de.uka.ilkd.key.util.ExtList;
 
 public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         implements FactoryMethod {
@@ -39,6 +33,12 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         
         if (poVars.guard != null)
             posts = posts.append(d.tb.equals(poVars.guardAtPost, poVars.guard));
+        
+        Iterator<Term> itIn = poVars.localIns.iterator();
+        Iterator<Term> itOut = poVars.localOuts.iterator();
+        while (itIn.hasNext()) {
+            posts = posts.append(d.tb.equals(itIn.next(), itOut.next()));
+        }
         
         posts = posts.append(d.tb.equals(poVars.heapAtPost, d.tb.getBaseHeap()));
         
@@ -105,33 +105,16 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
     }
     
     private JavaBlock buildJavaBlock(BasicSnippetData d) {
-        LoopInvariant inv = (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
-        LoopStatement sb = inv.getLoop();
         ExecutionContext context =
                 (ExecutionContext) d.get(BasicSnippetData.Key.CONTEXT);
-
-        Expression e = sb.getGuardExpression();
-        Guard g = (Guard) sb.getGuard();
-        Statement b = sb.getBody();
-        LoopInit i = (LoopInit) sb.getILoopInit();
-        IForUpdates u = sb.getIForUpdates();
         
         //create loop call
-        if (sb instanceof Do) {
-            sb = new Do(e, b, null);
-        } else if (sb instanceof EnhancedFor) {
-            sb = new EnhancedFor(i, g, sb, new ExtList(), null);
-        } else if (sb instanceof For) {
-            sb = new For(i, g, u, sb);
-        } else if (sb instanceof While) {
-            sb = new While(e, sb);
-        } else {
-            throw new UnsupportedOperationException("Loop statement is not properly specified.");
-        }
+        LoopInvariant inv = (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
+        LoopStatement sb = inv.getLoop();
         
         //create java block
-        Statement s = new MethodFrame(null, context, new StatementBlock (sb));
-        JavaBlock result = JavaBlock.createJavaBlock(new StatementBlock(s));
+        ContextStatementBlock c = new ContextStatementBlock(sb, context);
+        JavaBlock result = JavaBlock.createJavaBlock(c);        
 
         return result;        
     }

@@ -58,18 +58,18 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
         return heaps;
     }
 	
-	@Override
-	public BlockContractBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence)
+    @Override
+    public BlockContractBuiltInRuleApp replacePos(final PosInOccurrence newOccurrence)
     {
-		return new BlockContractBuiltInRuleApp(builtInRule, newOccurrence, ifInsts, block, contract, heaps);
-	}
+        return new BlockContractBuiltInRuleApp(builtInRule, newOccurrence, ifInsts, block, contract, heaps);
+    }
 
-	@Override
-	public BlockContractBuiltInRuleApp setIfInsts(final ImmutableList<PosInOccurrence> ifInstantiations)
+    @Override
+    public BlockContractBuiltInRuleApp setIfInsts(final ImmutableList<PosInOccurrence> ifInstantiations)
     {
-		setMutable(ifInstantiations);
+        setMutable(ifInstantiations);
         return this;
-	}
+    }
 
     @Override
     public boolean complete()
@@ -83,8 +83,8 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
         return pio != null;
     }
 
-	@Override
-	public BlockContractBuiltInRuleApp tryToInstantiate(final Goal goal)
+    @Override
+    public BlockContractBuiltInRuleApp tryToInstantiate(final Goal goal)
     {
         if (complete() || cannotComplete(goal)) {
             return this;
@@ -96,7 +96,7 @@ public class BlockContractBuiltInRuleApp extends AbstractBuiltInRuleApp {
         contract = SimpleBlockContract.combine(contracts, services);
         heaps = HeapContext.getModHeaps(services, instantiation.isTransactional());
         return this;
-	}
+    }
 
     public boolean cannotComplete(final Goal goal)
     {

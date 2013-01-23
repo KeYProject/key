@@ -48,15 +48,16 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
             return false;
         }
         RuleApp app = goal.node().parent().getAppliedRuleApp();
+
         if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
             return false;
         }
         LoopInvariantBuiltInRuleApp loopInvRuleApp =
                 (LoopInvariantBuiltInRuleApp) app;
         LoopInvariant loopInv = loopInvRuleApp.getInvariant();
+
         IFProofObligationVars ifVars =
                 loopInvRuleApp.getInformationFlowProofObligationVars();
-
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(loopInv,
                                                    ifVars.c1,
@@ -87,8 +88,7 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
                 loopInvRuleApp.getInformationFlowProofObligationVars();
 
         LoopInvExecutionPO loopInvExecPO =
-                new LoopInvExecutionPO(initConfig, loopInv, ifVars.symbExecVars,
-                                     goal, loopInv.getExecutionContext());
+                new LoopInvExecutionPO(initConfig, loopInv, ifVars.symbExecVars, goal);
 
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(), mediator.getProfile(),

@@ -24,8 +24,7 @@ public class LoopInvariantRuleCompletion implements
         InteractiveRuleApplicationCompletion {
 
     @Override
-    public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal,
-            boolean forced) {
+    public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
         Services services = goal.proof().getServices();
 
         LoopInvariantBuiltInRuleApp loopApp = (LoopInvariantBuiltInRuleApp) app
@@ -50,7 +49,7 @@ public class LoopInvariantRuleCompletion implements
                 return null;
             }
         } else { // in interactive mode and there is an invariant in the
-                 // repository            
+            // repository            
             boolean requiresVariant = loopApp.variantRequired()
                     && !loopApp.variantAvailable();
             // Check if a variant is required

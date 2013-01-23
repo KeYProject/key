@@ -32,13 +32,12 @@ abstract class ReplaceAndRegisterMethod {
 
         Iterator<Term> origVarsIt;
         Iterator<Term> poVarsIt;
-        if (origVars.localIns.isEmpty() && origVars.localOuts.isEmpty()
-                && origVars.guard == null && origVars.guardAtPost == null) {            
+        if (origVars.localIns.isEmpty() && origVars.localOuts.isEmpty()) {            
             assert origVars.paddedTermListWithoutLocalVars.size() ==
                    poVars.paddedTermListWithoutLocalVars.size();
             origVarsIt = origVars.paddedTermListWithoutLocalVars.iterator();
             poVarsIt = poVars.paddedTermListWithoutLocalVars.iterator();
-        } else {             
+        } else {
             assert origVars.paddedTermList.size() ==
                    poVars.paddedTermList.size();
             origVarsIt = origVars.paddedTermList.iterator();

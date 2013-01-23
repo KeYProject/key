@@ -146,9 +146,9 @@ class BasicSnippetData {
         
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         origVars =
-                new ProofObligationVars(invariant.getInternalSelfTerm(),
-                                        invariant.getLocalIns(), invariant.getLocalOuts(),
-                                        heap, services);
+                new ProofObligationVars(invariant.getInternalSelfTerm(), invariant.getGuard(),
+                                        invariant.getLocalIns(), heap, invariant.getGuardAtPost(),
+                                        invariant.getLocalOuts(), services);
     }
     
     

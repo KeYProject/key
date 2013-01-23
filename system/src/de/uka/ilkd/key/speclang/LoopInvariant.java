@@ -41,6 +41,10 @@ public interface LoopInvariant extends SpecificationElement {
     
     public ExecutionContext getExecutionContext();
     
+    public Term getGuard();
+    
+    public Term getGuardAtPost();
+    
     /** Returns the invariant formula. */
     public Term getInvariant(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
     
@@ -114,14 +118,15 @@ public interface LoopInvariant extends SpecificationElement {
      * replaced with the passed one.
      */
     public LoopInvariant setLoop(LoopStatement loop);
+
+    public LoopInvariant setTarget(IProgramMethod newPM);
+
+    public LoopInvariant setExecutionContext(ExecutionContext execCont);    
+
+
+    public void setGuard(Term guardTerm);
     
-    public void setTarget(IProgramMethod newPM);
-    
-    public void setExecutionContext(ExecutionContext execCont);
-    
-    public LoopInvariant addGuardToLocalVariables(Term guard);
-    
-    public void appendTermToAllRespects(Term t);
+    public void setGuardAtPost(Term guardTerm);
     
     /**
      * Returns a new loop invariant where the invariant formula has been

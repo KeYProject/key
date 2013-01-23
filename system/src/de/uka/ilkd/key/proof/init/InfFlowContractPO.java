@@ -21,7 +21,6 @@ import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,12 +88,12 @@ public class InfFlowContractPO extends AbstractOperationPO
         }
     }
     
-    
+    /*
     //@Override
     public Term buildProblem(LoopInvariant loopInv, ProofObligationVars appData, Services services)
     throws ProofInputException {
         IFProofObligationVars ifVars = new IFProofObligationVars(appData, services);
-        // create proof obligation        
+        // create proof obligation
         InfFlowPOSnippetFactory f =
             POSnippetFactory.getInfFlowFactory(loopInv, ifVars.c1,
                                                ifVars.c2, services);
@@ -118,7 +117,7 @@ public class InfFlowContractPO extends AbstractOperationPO
         
         Term poTerms = TB.imp(selfComposedExec, post);
         return poTerms;
-    }
+    }*/
 
 
     @Override

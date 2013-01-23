@@ -25,6 +25,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -1298,7 +1299,10 @@ public class JMLSpecFactory {
         
         //create loop invariant annotation
         Term selfTerm = selfVar == null ? null : TB.var(selfVar);
+        
         return new LoopInvariantImpl(loop,
+                                     pm,
+                                     null,
                                      invariants,
                                      mods,
                                      respects,
