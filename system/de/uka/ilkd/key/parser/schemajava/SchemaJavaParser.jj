@@ -1823,6 +1823,7 @@ ConstructorDeclaration ConstructorDeclaration() :
     StatementBlock                  body;
     ASTList<Statement>            stats = new ASTArrayList<Statement>();
     Statement                       stat;
+    Throws                          th = null;
 }
 {
     {
@@ -1849,7 +1850,11 @@ ConstructorDeclaration ConstructorDeclaration() :
 	}
     pdl = FormalParameters()
 
-  [ "throws" nl = TypedNameList() ]
+  [ "throws" {
+      th = factory.createThrows();
+      setPrefixInfo(th);      
+    }
+    nl = TypedNameList() ]
 	"{"
     {
 	body = factory.createStatementBlock();
@@ -1877,8 +1882,6 @@ ConstructorDeclaration ConstructorDeclaration() :
 		for (int i = 0; i < s; i++) {
               trl.add(nl.get(i).toTypeReference());
 		}
-		Throws th = factory.createThrows(trl);
-		setPrefixInfo(th);
 		result.setThrown(th);
 	    }
 	    result.setBody(body);
