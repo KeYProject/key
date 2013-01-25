@@ -478,7 +478,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
 
     @Override
-    public KeYJavaType getKJT() {	
+    public KeYJavaType getKJT() {
+        assert (pm != null);
 	return pm.getContainerType();
     }
 

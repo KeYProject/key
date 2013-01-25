@@ -6,11 +6,13 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -103,18 +105,18 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
 
         return tb.apply(update, programTerm);
     }
-    
+
     private JavaBlock buildJavaBlock(BasicSnippetData d) {
         ExecutionContext context =
                 (ExecutionContext) d.get(BasicSnippetData.Key.CONTEXT);
-        
+
         //create loop call
         LoopInvariant inv = (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
-        LoopStatement sb = inv.getLoop();
-        
+        StatementBlock sb = (StatementBlock) inv.getLoop().getBody();
+
         //create java block
-        ContextStatementBlock c = new ContextStatementBlock(sb, context);
-        JavaBlock result = JavaBlock.createJavaBlock(c);        
+        Statement s = new MethodFrame(null, context, sb);
+        JavaBlock result = JavaBlock.createJavaBlock(new StatementBlock(s));
 
         return result;        
     }
