@@ -119,12 +119,11 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	if (o == this) {
 	    return true;
 	}
-	    S[] cmp = null;
-	
-	try {
+	S[] cmp = null;
+	if (o instanceof ImmutableArray) {
 	    cmp = ((ImmutableArray<S>) o).content;
-	} catch (ClassCastException e){
-	    return false;
+	} else {
+		return false;
 	}
 
 	if (cmp.length != content.length) {
@@ -133,7 +132,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 
 	for (int i = 0; i < content.length; i++) {
 	    if (!content[i].equals(cmp[i])) {
-		return false;
+	    	return false;
 	    }
 	}
 	return true;

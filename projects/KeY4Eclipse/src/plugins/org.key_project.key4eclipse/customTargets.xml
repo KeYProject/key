@@ -30,11 +30,6 @@
                 <mkdir dir="${basedir}/system/src"/>
                 <mkdir dir="${basedir}/system/test"/>
 		<!-- Copy source code to temporary directory required for compilation of pluginSrc -->
-                <copy todir="${basedir}/system/genSrc" failonerror="true" overwrite="true">
-                        <fileset dir="${key.rep}/system/genSrc">
-                                <include name="*"/>
-                        </fileset>
-                </copy>
                 <copy todir="${basedir}/system/src" failonerror="true" overwrite="true">
                         <fileset dir="${key.rep}/system/src">
                                 <include name="*/"/>
@@ -43,17 +38,122 @@
                 <!-- Copy external libraries into target directory -->
                 <copy todir="${basedir}/lib" failonerror="true" overwrite="true">
                         <fileset dir="${ext.dir}">
-                                <include name="*"/>
+                                <include name="antlr.jar"/>
+                                <include name="Antlr.License.txt"/>
+                                <include name="LGPL.txt"/>
+                                <include name="recoderKey.jar"/>
                         </fileset>
                 </copy>
-                <!-- Copy external libraries into target directory -->
-                <copy todir="${target.folder}" failonerror="true" overwrite="true">
-                        <fileset dir="${key.rep}/system/binary">
-                                <include name="*/"/>
-                        </fileset>
-                </copy>
+		<!-- Generate source code -->
+	        <mkdir dir="${basedir}/system/genSrc/de/uka/ilkd/key/parser"/>
+	        <mkdir dir="${basedir}/system/genSrc/de/uka/ilkd/key/parser/schemajava"/>
+	        <mkdir dir="${basedir}/system/genSrc/de/uka/ilkd/key/parser/proofjava"/>
+	        <mkdir dir="${basedir}/system/genSrc/de/uka/ilkd/key/speclang/jml/pretranslation"/>
+	        <mkdir dir="${basedir}/system/genSrc/de/uka/ilkd/key/speclang/jml/translation"/>
+		<antcall target="keylexer" />
+                <antcall target="keyparser" />
+                <antcall target="jmlprelexer" />
+                <antcall target="jmlpreparser" />
+                <antcall target="jmllexer" />
+                <antcall target="jmlparser" />
+                <antcall target="schemajavaparser" />
+                <antcall target="proofjavaparser" />
 	</target>
 
+	
+	
+<!-- ###################################################################### -->
+<!-- ## Begin copied source generation tasks from KeY's system/build.xml ## -->
+<!-- ###################################################################### -->
+	  <target name="keylexer">
+	     <antlr
+	         target="${basedir}/system/src/de/uka/ilkd/key/parser/lexer.g"
+	         outputdirectory="${basedir}/system/genSrc/de/uka/ilkd/key/parser">
+	        <classpath>
+	           <pathelement location="${ext.dir}/antlr.jar" />
+	        </classpath>
+	     </antlr>
+	  </target>
+	
+	  <target name="keyparser"  depends="keylexer">
+	     <antlr
+	         target="${basedir}/system/src/de/uka/ilkd/key/parser/keyparser.g"
+	         outputdirectory="${basedir}/system/genSrc/de/uka/ilkd/key/parser">
+	        <classpath>
+	           <pathelement location="${ext.dir}/antlr.jar" />
+	        </classpath>
+	     </antlr>
+	  </target>
+	
+	<target name="jmlprelexer">
+	             <antlr
+	                 target="${basedir}/system/src/de/uka/ilkd/key/speclang/jml/pretranslation/jmlprelexer.g"
+	                 outputdirectory="${basedir}/system/genSrc/de/uka/ilkd/key/speclang/jml/pretranslation">
+	                <classpath>
+	                   <pathelement location="${ext.dir}/antlr.jar" />
+	                </classpath>
+	             </antlr>
+	          </target>
+
+
+	          <target name="jmlpreparser"  depends="jmlprelexer">
+	             <antlr
+	                 target="${basedir}/system/src/de/uka/ilkd/key/speclang/jml/pretranslation/jmlpreparser.g"
+	                 outputdirectory="${basedir}/system/genSrc/de/uka/ilkd/key/speclang/jml/pretranslation">
+	                <classpath>
+	                   <pathelement location="${ext.dir}/antlr.jar" />
+	                </classpath>
+	             </antlr>
+	          </target>
+
+	        <target name="jmllexer">
+	             <antlr
+	                 target="${basedir}/system/src/de/uka/ilkd/key/speclang/jml/translation/jmllexer.g"
+	                 outputdirectory="${basedir}/system/genSrc/de/uka/ilkd/key/speclang/jml/translation">
+	                <classpath>
+	                   <pathelement location="${ext.dir}/antlr.jar" />
+	                </classpath>
+	             </antlr>
+	          </target>
+
+
+	          <target name="jmlparser"  depends="jmllexer">
+	             <antlr
+	                 target="${basedir}/system/src/de/uka/ilkd/key/speclang/jml/translation/jmlparser.g"
+	                 outputdirectory="${basedir}/system/genSrc/de/uka/ilkd/key/speclang/jml/translation">
+	                <classpath>
+	                   <pathelement location="${ext.dir}/antlr.jar" />
+	                </classpath>
+	             </antlr>
+	          </target>
+
+
+	  <target name="schemajavaparser"> 
+	        <copy tofile="${basedir}/system/genSrc/de/uka/ilkd/key/parser/schemajava/Token.java">
+	            <fileset file="${basedir}/system/src/de/uka/ilkd/key/parser/schemajava/Token.java.source"/>
+	        </copy>
+
+	     <javacc
+	         target="${basedir}/system/src/de/uka/ilkd/key/parser/schemajava/SchemaJavaParser.jj"
+	         outputdirectory="${basedir}/system/genSrc/de/uka/ilkd/key/parser/schemajava"          
+	         javacchome="${ext.dir}" />
+	  </target>
+
+	  <target name="proofjavaparser"> 
+	        <copy tofile="${basedir}/system/genSrc/de/uka/ilkd/key/parser/proofjava/Token.java">
+	            <fileset file="${basedir}/system/src/de/uka/ilkd/key/parser/proofjava/Token.java.source"/>
+	        </copy>
+	        <javacc
+	            target="${basedir}/system/src/de/uka/ilkd/key/parser/proofjava/ProofJavaParser.jj"
+	            outputdirectory="${basedir}/system/genSrc/de/uka/ilkd/key/parser/proofjava"
+	            javacchome="${ext.dir}" 
+	        />
+	  </target>
+<!-- ###################################################################### -->
+<!-- ## End copied source generation tasks from KeY's system/build.xml #### -->
+<!-- ###################################################################### -->
+	
+	
 	<!-- After PDE compilation -->
         <target name="post.@dot">
                 <!-- Load custom targets properties from properties file -->
@@ -76,23 +176,21 @@
    	        <!-- Copy external libraries into target directory -->
                 <copy todir="${target.folder}/lib" failonerror="true" overwrite="true">
                         <fileset dir="${ext.dir}">
-                                <include name="*"/>
+                                <include name="antlr.jar"/>
+                                <include name="Antlr.License.txt"/>
+                                <include name="LGPL.txt"/>
+                                <include name="recoderKey.jar"/>
                         </fileset>
                 </copy>
-                <!-- Copy all already complied resources into target directory -->
-                <copy todir="${target.folder}" failonerror="true" overwrite="true">
-                        <fileset dir="${key.rep}/system/binary">
-                                <include name="de/"/>
-                                <include name="recoder/"/>
-                        </fileset>
-                </copy>
-                <!-- Copy resources into target directory -->
+
+   		<!-- Copy resources into target directory -->
                 <copy todir="${target.folder}" failonerror="true" overwrite="true">
                         <fileset dir="${key.rep}/system/resources">
                                 <include name="de/"/>
-                                <include name="key.properties"/>
+                                <include name="META-INF/"/>
                         </fileset>
-                </copy> 
+                </copy>
+   		
                 <!-- Copy examples into target directory -->
                 <copy todir="${target.folder}/examples" failonerror="true" overwrite="true">
                         <fileset dir="${key.rep}/examples/">

@@ -35,6 +35,8 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.strategy.AutomatedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.FocussedRuleApplicationManager;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -324,7 +326,7 @@ public class InteractiveProver {
     ImmutableList<TacletApp> getNoFindTaclet() {
 	return filterTaclet(getInteractiveRuleAppIndex ().
 		       getNoFindTaclet(TacletFilter.TRUE,
-				       mediator.getServices()));
+				       mediator.getServices()), null);
     }    
 
     /** collects all applicable FindTaclets of the current goal
@@ -338,7 +340,7 @@ public class InteractiveProver {
             return filterTaclet(getInteractiveRuleAppIndex ().
 			      getFindTaclet(TacletFilter.TRUE,
 	 	                            pos.getPosInOccurrence(),
-		                            mediator.getServices()));
+		                            mediator.getServices()), pos);
 	}
 	return ImmutableSLList.<TacletApp>nil();
     }
@@ -352,7 +354,7 @@ public class InteractiveProver {
 	    return filterTaclet(getInteractiveRuleAppIndex ().
 		   getRewriteTaclet(TacletFilter.TRUE,
 				    pos.getPosInOccurrence(),
-				    mediator.getServices())); 
+				    mediator.getServices()), pos); 
 	}
 
 	return ImmutableSLList.<TacletApp>nil();
@@ -459,7 +461,8 @@ public class InteractiveProver {
      * takes NoPosTacletApps as arguments and returns a duplicate free list of
      * the contained TacletApps
      */
-    private ImmutableList<TacletApp> filterTaclet(ImmutableList<NoPosTacletApp> tacletInstances) {
+    private ImmutableList<TacletApp> filterTaclet(
+        ImmutableList<NoPosTacletApp> tacletInstances, PosInSequent pos) {
         java.util.HashSet<Taclet> applicableRules = new java.util.HashSet<Taclet>();
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
         for (NoPosTacletApp app : tacletInstances) {
@@ -469,6 +472,19 @@ public class InteractiveProver {
                                 mediator().getSelectedGoal().sequent(),
                                 mediator().getServices());
                 if (ifCandidates.size() == 0) continue; // skip this app
+                if (ifCandidates.size() == 1 && pos!=null) {
+                    TacletApp a = ifCandidates.head();
+                    ImmutableList<IfFormulaInstantiation> ifs = 
+                        a.ifFormulaInstantiations();
+                    if (ifs!=null && ifs.size()==1 &&
+                        ifs.head() instanceof IfFormulaInstSeq) {
+                        IfFormulaInstSeq ifis = (IfFormulaInstSeq) ifs.head();
+                        if (ifis.toPosInOccurrence().equals(
+                            pos.getPosInOccurrence().topLevel())) {
+                            continue; // skipp app if find and if same formula
+                        }
+                    }
+                }
             }
 
 

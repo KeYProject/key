@@ -129,11 +129,16 @@ public final class JavaInfo {
     /** caches the arrays' length attribute*/
     private ProgramVariable length;
     
+    /** caches the program variable for {@code <inv>} */
+    private ProgramVariable invProgVar;
+    
+    /** caches the observer for {@code <inv>} */
+    private IObserverFunction inv;
+    
     /** the name of the class used as default execution context */
     protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
     protected static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
     
-    private IObserverFunction inv;
     private HashMap<KeYJavaType,IObserverFunction> staticInvs = new HashMap<KeYJavaType,IObserverFunction>();
 
     
@@ -930,12 +935,14 @@ public final class JavaInfo {
      * @return the attribute program variable of the given name 
      * @throws IllegalArgumentException if the qualified class name is empty or
      * null
+     * @throws UnknownJavaTypeException if the qualified name refers to an unknown type
      */
     public ProgramVariable getAttribute(String programName, 
             String qualifiedClassName) {
     	if (qualifiedClassName == null || qualifiedClassName.length() == 0) {
     		throw new IllegalArgumentException("Missing qualified classname");
     	}
+    	
     	KeYJavaType kjt = null;
     	try {
     		kjt = getKeYJavaTypeByClassName(qualifiedClassName);
@@ -945,6 +952,11 @@ public final class JavaInfo {
     			kjt = getKeYJavaType(qualifiedClassName);
     		}
     	}
+    	
+    	if (kjt == null) {
+    		throw new UnknownJavaTypeException("Java type '" + qualifiedClassName + "' not known.");
+    	}
+    	
     	return getAttribute(programName, kjt);
     }
 
@@ -1277,6 +1289,7 @@ public final class JavaInfo {
     
     /**
      * Returns the special symbol <code>&lt;inv&gt;</code> which stands for the class invariant of an object.
+     * @see #getInvProgramVar()
      */
     public IObserverFunction getInv() {
 	if(inv == null) {
@@ -1289,6 +1302,22 @@ public final class JavaInfo {
         			       new ImmutableArray<KeYJavaType>());
 	}
 	return inv;
+    }
+    
+    /**
+     * Returns the special program variable symbol <code>&lt;inv&gt;</code>
+     * which stands for the class invariant of an object.
+     * 
+     * @see #getInv()
+     */
+    public ProgramVariable getInvProgramVar() {
+        if(invProgVar == null) {
+            ProgramElementName pen = new ProgramElementName("<inv>", "java.lang.Object");
+            invProgVar = new LocationVariable(pen, 
+                                getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
+                                getJavaLangObject(), false, true);
+        }
+        return invProgVar;
     }
 
     /**

@@ -9,6 +9,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
@@ -813,6 +814,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * @throws IOException Occurred Exception
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
+    * @throws ProblemLoaderException Occurred Exception
     */
    protected void doTest(File baseDir,
                          String javaPathInBaseDir,
@@ -822,7 +824,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                          boolean includeVariables,
                          boolean includeCallStack,
                          int[] maximalNumberOfExecutedSetNodesPerRun,
-                         boolean mergeBranchConditions) throws ProofInputException, IOException, ParserConfigurationException, SAXException {
+                         boolean mergeBranchConditions) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       assertNotNull(maximalNumberOfExecutedSetNodesPerRun);
       for (int i = 0; i < maximalNumberOfExecutedSetNodesPerRun.length; i++) {
          doTest(baseDir, 
@@ -861,6 +863,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * @throws IOException Occurred Exception
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
+    * @throws ProblemLoaderException Occurred Exception
     */
    protected void doTest(File baseDir,
                          String javaPathInBaseDir,
@@ -870,7 +873,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                          boolean includeVariables,
                          boolean includeCallStack,
                          int maximalNumberOfExecutedSetNodes,
-                         boolean mergeBranchConditions) throws ProofInputException, IOException, ParserConfigurationException, SAXException {
+                         boolean mergeBranchConditions) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       String originalRuntimeExceptions = null;
       try {
          // Make sure that parameter are valid.
@@ -902,7 +905,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
             nodeCount = env.getProof().countNodes();
             // Run proof
             SymbolicExecutionUtil.updateStrategyPropertiesForSymbolicExecution(env.getProof());
-            env.getUi().startAndWaitForProof(env.getProof());
+            env.getUi().startAndWaitForAutoMode(env.getProof());
             // Update symbolic execution tree 
             env.getBuilder().analyse();
             // Make sure that not to many set nodes are executed

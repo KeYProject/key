@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.java.recoderext.JMLTransformer;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -143,7 +144,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     services.getJavaInfo()
                             .getKeYJavaType("java.lang.Exception"))) {
                 exceptionsString 
-                    += exceptions.get(i).getName() + ", ";
+                    += exceptions.get(i).getKeYJavaType().getFullName() + ", ";
             }
         }
 

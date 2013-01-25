@@ -390,7 +390,7 @@ public class JMLSpecFactory {
                                             services);
             
             // less than nothing is marked by some special term;
-            if(translated == TB.lessThanNothing()) {
+            if(translated == TB.strictlyNothing()) {
                 if(originalClauses.size() > 1) {
                     throw new SLTranslationException(
                             "\"assignable \\less_than_nothing\" does not go with other " +
@@ -589,7 +589,7 @@ public class JMLSpecFactory {
                                             services);
             
             // less than nothing is marked by some special term;
-            if(translated == TB.lessThanNothing()) {
+            if(translated == TB.strictlyNothing()) {
                 return true;
             }
         }

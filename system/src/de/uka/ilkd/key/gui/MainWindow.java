@@ -114,7 +114,6 @@ import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.proof.Goal;
@@ -129,7 +128,6 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
-import de.uka.ilkd.key.util.UnicodeHelper;
 
 
 @SuppressWarnings("serial")
@@ -141,7 +139,7 @@ public final class MainWindow extends JFrame  {
     private static final int MAX_RECENT_FILES = 8;
     
     /** size of the tool bar icons */
-    public static final int TOOLBAR_ICON_SIZE = 15;
+    public static final int TOOLBAR_ICON_SIZE = 16;
     
     /** the tab bar at the left */
     private JTabbedPane tabbedPane;
@@ -300,7 +298,8 @@ public final class MainWindow extends JFrame  {
      */
     private void setLaF() {
         try{
-            if (ProofSettings.DEFAULT_SETTINGS.getViewSettings().useSystemLaF()) {
+        	 if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().useSystemLaF()) {
+//            if (ProofSettings.DEFAULT_SETTINGS.getViewSettings().useSystemLaF()) {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
                 // Workarounds for GTK+
@@ -380,7 +379,8 @@ public final class MainWindow extends JFrame  {
         // FIXME do this NOT in layout of GUI
         // minimize interaction
         final boolean stupidMode = 
-            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
+        		  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
+//            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
         mediator.setStupidMode(stupidMode);
         
         // set up actions
@@ -763,7 +763,8 @@ public final class MainWindow extends JFrame  {
         
         JMenuItem laf = new JCheckBoxMenuItem("Use system look and feel (experimental)");
         laf.setToolTipText("If checked KeY tries to appear in the look and feel of your window manager, if not in the default Java LaF (aka Metal).");
-        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofSettings.DEFAULT_SETTINGS.getViewSettings();
+//        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofSettings.DEFAULT_SETTINGS.getViewSettings();
+        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         laf.setSelected(vs.useSystemLaF());
         laf.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -816,7 +817,7 @@ public final class MainWindow extends JFrame  {
 	
 	options.add(new TacletOptionsAction(this));
 	options.add(new SMTOptionsAction(this));
-	options.add(setupSpeclangMenu());
+//	options.add(setupSpeclangMenu()); // legacy since only JML supported
 	options.addSeparator();
         options.add(new JCheckBoxMenuItem(new MinimizeInteraction(this)));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
@@ -925,7 +926,8 @@ public final class MainWindow extends JFrame  {
         JMenu result = new JMenu("Specification Parser");       
         ButtonGroup group = new ButtonGroup();
         GeneralSettings gs 
-            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        =ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
                 
         JRadioButtonMenuItem jmlButton 
             = new JRadioButtonMenuItem("Source File Comments Are JML", gs.useJML());
@@ -935,7 +937,8 @@ public final class MainWindow extends JFrame  {
         jmlButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 GeneralSettings gs 
-                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+                =ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+//                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
                 gs.setUseJML(true);
                 gs.setUseOCL(false);
             }
@@ -948,7 +951,8 @@ public final class MainWindow extends JFrame  {
         noneButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
         	GeneralSettings gs 
-        	= ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        	=ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+    //    	= ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
         	gs.setUseJML(false);
         	gs.setUseOCL(false);
             }

@@ -2,11 +2,11 @@ class StrictlyPure {
 
     int field;
 
-    // We use the new keyword "\less_than_nothing" to specify
+    // We use the new keyword "\strictly_nothing" to specify
     // strict purity.
 
     /*@ requires true;
-      @ assignable \less_than_nothing;
+      @ assignable \strictly_nothing;
       @ ensures \result == field;
       @*/
     int strictlyPureMethod() {
@@ -44,7 +44,7 @@ class StrictlyPure {
      * in a specification of a contract, you are likely
      * to encounter an infinite loop when using the contract.
      * Rather use the equivalent and more powerful
-     *  assignable \less_than_nothing;
+     *  assignable \strictly_nothing;
      * or the modifier
      *  strictly_pure
      */

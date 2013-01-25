@@ -36,6 +36,8 @@ It provides the following file structure:
 - org.key_project.key4eclipse.feature 
   // Provides the KeY code and utilities without any Eclipse UI integrations.
   - org.key_project.key4eclipse // KeY code
+  - org.key_project.key4eclipse.common.ui 
+    // General UI components and property page to define class paths for KeY.
   - org.key_project.key4eclipse.starter.core 
     // KeY specific settings and utilities for Eclipse based plug-ins.
   - org.key_project.key4eclipse.util // Utility code reused in other projects
@@ -49,6 +51,8 @@ It provides the following file structure:
 - <tests>
   - org.key_project.swtbot.swing // Extends SWTBot for Swing
   - org.key_project.key4eclipse.all.test // Allows to execute all tests at once
+  - org.key_project.key4eclipse.common.ui.test 
+    // Tests for org.key_project.key4eclipse.common.ui
   - org.key_project.key4eclipse.starter.core.test 
     // Tests for org.key_project.key4eclipse.starter.core
   - org.key_project.key4eclipse.starter.ui.test

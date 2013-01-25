@@ -185,7 +185,8 @@ public final class ProgVarReplacer {
 		    result = result.replace(sv, newPe, services);
 		}
 	    } else if(ie instanceof ProgramListInstantiation) {
-		ImmutableArray<ProgramElement> a = (ImmutableArray<ProgramElement>) inst;
+		@SuppressWarnings("unchecked")
+        ImmutableArray<ProgramElement> a = (ImmutableArray<ProgramElement>) inst;
 		int size = a.size();
                 ProgramElement[] array = new ProgramElement[size];
 

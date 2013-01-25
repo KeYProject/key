@@ -116,6 +116,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     {
         if (isJumpToOuterLabel(x)) {
             final ProgramVariable flag = flags.get(x.getLabel());
+            assert flag != null : "a label flag must not be null";
             final Statement assign = KeYJavaASTFactory.assign(flag, BooleanLiteral.TRUE);
             final Statement[] statements = new Statement[] {assign, breakOut};
             addChild(new StatementBlock(statements));
@@ -184,7 +185,9 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             changeList.removeFirst();
             Expression guard = ((Guard) changeList.removeFirst()).getExpression();
             Statement body = (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
-            addChild(new While(guard, body, x.getPositionInfo()));
+            While newLoop = new While(guard, body, x.getPositionInfo());
+            services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+            addChild(newLoop);
             changed();
         }
         else {
@@ -196,7 +199,9 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
-                return new For(changeList);
+                For newLoop = new For(changeList);
+                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                return newLoop;
             }
         };
         def.doAction(x);
@@ -206,7 +211,9 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     {
         DefaultAction def = new DefaultAction() {
             ProgramElement createNewElement(final ExtList changeList) {
-                return new EnhancedFor(changeList);
+                EnhancedFor newLoop = new EnhancedFor(changeList);
+                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                return newLoop;
             }
         };
         def.doAction(x);
@@ -217,9 +224,12 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         final ExtList changeList = stack.peek();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
-            Expression guard = (Expression) changeList.removeFirst();
-            Statement body = (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
-            addChild(new Do(guard, body, x.getPositionInfo()));
+            Statement body = changeList.removeFirstOccurrence(Statement.class);
+            Guard g = changeList.removeFirstOccurrence(Guard.class);
+            Expression guard = g == null ? null : g.getExpression();
+            Do newLoop = new Do(guard, body, x.getPositionInfo());
+            services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+            addChild(newLoop);
             changed();
         }
         else {

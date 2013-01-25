@@ -16,16 +16,16 @@ import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.DefaultProblemLoader;
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.OperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -60,9 +60,9 @@ public class MonKeYProof extends Bean {
     public static final String PROP_REUSE_STATUS = "reuseStatus";
 
     /**
-     * The {@link InitConfig} that contains the {@link OperationContract} to proof.
+     * The {@link KeYEnvironment} that contains the {@link OperationContract} to proof.
      */
-    private InitConfig initConfig;
+    private KeYEnvironment<?> environment;
 
     /**
      * The {@link Contract} to proof.
@@ -124,21 +124,21 @@ public class MonKeYProof extends Bean {
      * @param typeName The type.
      * @param targetName The target. 
      * @param contractName The contract.
-     * @param initConfig The {@link InitConfig} that contains the {@link OperationContract} to proof.
+     * @param environment The {@link KeYEnvironment} that contains the {@link OperationContract} to proof.
      * @param contract The {@link Contract} to proof.
      */
     public MonKeYProof(String typeName, 
                        String targetName, 
                        String contractName,
-                       InitConfig initConfig,
+                       KeYEnvironment<?> environment,
                        Contract contract) {
         super();
-        Assert.isNotNull(initConfig);
+        Assert.isNotNull(environment);
         Assert.isNotNull(contract);
         this.typeName = typeName;
         this.targetName = targetName;
         this.contractName = contractName;
-        this.initConfig = initConfig;
+        this.environment = environment;
         this.contract = contract;
     }
 
@@ -182,72 +182,84 @@ public class MonKeYProof extends Bean {
                            final boolean useDependencyContracts,
                            final boolean useQuery,
                            final boolean useDefOps) throws Exception {
-       // Check if the proof is still valid
-       if (proof != null && !KeYUtil.isProofInUI(proof)) {
-          // proof is invalid, reset this automatic proof instance
-          proof = null; 
-          setResult(MonKeYProofResult.UNKNOWN);
-          updateStatistics();
-       }
-       // Instantiate new proof if required
-       if (proof == null) {
-           IRunnableWithResult<Proof> run = new AbstractRunnableWithResult<Proof>() {
-               @Override
-               public void run() {
-                   try {
-                       ProofOblInput input = contract.createProofObl(initConfig, contract);
-                       Assert.isNotNull(input);
-                       Assert.isTrue(MainWindow.hasInstance());
-                       MainWindow main = MainWindow.getInstance();
-                       Assert.isNotNull(main);
-                       ProblemInitializer init = main.getUserInterface().createProblemInitializer();
-                       Assert.isNotNull(init);
-                       Proof proof = init.startProver(initConfig, input, 0);
-                       Assert.isNotNull(proof);
-                       setResult(proof);
-                   }
-                   catch (Exception e) {
-                       setException(e);
-                   }
-               }
-           };
-           SwingUtil.invokeAndWait(run);
-           if (run.getException() != null) {
-               throw run.getException();
-           }
-           proof = run.getResult();
-           proof.addProofTreeListener(new ProofTreeAdapter() {
-               @Override
-               public void proofClosed(ProofTreeEvent e) {
-                   handleProofClosed(e);
-               }
-           });
-           setResult(MonKeYProofResult.OPEN);
-           setReuseStatus("New Proof");
-       }
-       // Start auto mode if the proof has opened goals.
-       if (proof != null && !proof.openEnabledGoals().isEmpty()) {
-          SwingUtil.invokeAndWait(new Runnable() {
-             @Override
-             public void run() {
-                // Set proof strategy options
-                StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
-                sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, expandMethods ? StrategyProperties.METHOD_EXPAND : StrategyProperties.METHOD_CONTRACT);
-                sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, useDependencyContracts ? StrategyProperties.DEP_ON : StrategyProperties.DEP_OFF);
-                sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, useQuery ? StrategyProperties.QUERY_ON : StrategyProperties.QUERY_OFF);
-                sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, useDefOps ? StrategyProperties.NON_LIN_ARITH_DEF_OPS : StrategyProperties.NON_LIN_ARITH_NONE);
-                proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
-                // Make sure that the new options are used
-                ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
-                proof.setActiveStrategy(MainWindow.getInstance().getMediator().getProfile().getDefaultStrategyFactory().create(proof, sp));
+       // Start auto mode only if proof is not already closed.
+       if (!MonKeYProofResult.CLOSED.equals(getResult())) {
+          // Check if the proof is still valid
+          if (proof != null && !proof.isDisposed()) {
+             // proof is invalid, reset this automatic proof instance
+             proof = null; 
+             setResult(MonKeYProofResult.UNKNOWN);
+             updateStatistics();
+          }
+          // Instantiate new proof if required
+          if (proof == null) {
+              IRunnableWithResult<Proof> run = new AbstractRunnableWithResult<Proof>() {
+                  @Override
+                  public void run() {
+                      try {
+                          ProofOblInput input = contract.createProofObl(environment.getInitConfig(), contract);
+                          Assert.isNotNull(input);
+                          Proof proof = environment.createProof(input);
+                          Assert.isNotNull(proof);
+                          setResult(proof);
+                      }
+                      catch (Exception e) {
+                          setException(e);
+                      }
+                  }
+              };
+              SwingUtil.invokeAndWait(run);
+              if (run.getException() != null) {
+                  throw run.getException();
+              }
+              proof = run.getResult();
+              proof.addProofTreeListener(new ProofTreeAdapter() {
+                  @Override
+                  public void proofClosed(ProofTreeEvent e) {
+                      handleProofClosed(e);
+                  }
+              });
+              setResult(MonKeYProofResult.OPEN);
+              setReuseStatus("New Proof");
+          }
+          // Start auto mode if the proof has opened goals.
+          if (proof != null && !proof.openEnabledGoals().isEmpty()) {
+             SwingUtil.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                   // Set proof strategy options
+                   StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+                   sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, expandMethods ? StrategyProperties.METHOD_EXPAND : StrategyProperties.METHOD_CONTRACT);
+                   sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, useDependencyContracts ? StrategyProperties.DEP_ON : StrategyProperties.DEP_OFF);
+                   sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, useQuery ? StrategyProperties.QUERY_ON : StrategyProperties.QUERY_OFF);
+                   sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, useDefOps ? StrategyProperties.NON_LIN_ARITH_DEF_OPS : StrategyProperties.NON_LIN_ARITH_NONE);
+                   proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+                   // Make sure that the new options are used
+                   ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
+                   proof.setActiveStrategy(environment.getProfile().getDefaultStrategyFactory().create(proof, sp));
+                }
+             });
+             // Start interactive proof automatically
+             proofStartTime = System.currentTimeMillis();
+             if (isMainWindowEnvironment()) {
+                KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof); // Run auto mode without result dialog
              }
-          });
-          // Start interactive proof automatically
-          proofStartTime = System.currentTimeMillis();
-          KeYUtil.runProofInAutomaticModeWithoutResultDialog(proof);
-          // Update statistics
-          updateStatistics();
+             else {
+                environment.getUi().startAndWaitForAutoMode(proof); // Run auto mode outside of MainWindow where no result dialog exist
+             }
+             // Update statistics
+             updateStatistics();
+          }
        }
+    }
+    
+    /**
+     * Checks if the {@link KeYEnvironment} is shown in KeY's {@link MainWindow}.
+     * @return {@code true} {@link KeYEnvironment} is shown in {@link MainWindow}, {@code false} {@link KeYEnvironment} is not shown in {@link MainWindow}.
+     */
+    protected boolean isMainWindowEnvironment() {
+       return MainWindow.hasInstance() && 
+              MainWindow.getInstance().getUserInterface() == environment.getUi();
     }
 
     /**
@@ -359,12 +371,35 @@ public class MonKeYProof extends Bean {
     }
 
     /**
-     * Removes the complete proof environment of the current KeY proof
-     * from the {@link MainWindow}.  
+     * Removes the current KeY proof from the user interface.  
+     * @throws InvocationTargetException Occurred Exception
+     * @throws InterruptedException Occurred Exception
      */
-    public void removeProofEnvFromKeY() {
-       if (proof != null) {
-          KeYUtil.removeFromProofList(MainWindow.getInstance(), proof);
+    public void removeProof() throws InterruptedException, InvocationTargetException {
+       removeProof(proof);
+       proof = null;
+    }
+    
+    /**
+     * Removes the given proof from the user interface.
+     * @param proofToRemove The proof to remove.
+     * @throws InvocationTargetException Occurred Exception
+     * @throws InterruptedException Occurred Exception
+     */
+    protected void removeProof(final Proof proofToRemove) throws InterruptedException, InvocationTargetException {
+       if (proofToRemove != null) {
+          Runnable run = new Runnable() {
+             @Override
+             public void run() {
+                environment.getUi().removeProof(proofToRemove);
+             }
+          };
+          if (isMainWindowEnvironment()) {
+             SwingUtil.invokeAndWait(run);
+          }
+          else {
+             run.run();
+          }
        }
     }
 
@@ -436,72 +471,64 @@ public class MonKeYProof extends Bean {
     */
    public void loadProof(final String proofDirectory,
                          final String bootClassPath) throws Exception {
-      if (existsProofFile(proofDirectory)) {
-         IRunnableWithResult<Proof> run = new AbstractRunnableWithResult<Proof>() {
-            @Override
-            public void run() {
-                try {
-                    KeYUtil.runWithoutResultDialog(new KeYUtil.IRunnableWithMainWindow() {
-                       @Override
-                       public void run(MainWindow main) throws Exception {
-                          File bootClassPathFile = !StringUtil.isTrimmedEmpty(bootClassPath) ? new File(bootClassPath) : null;
-                          DefaultProblemLoader loader = main.getUserInterface().load(new File(proofDirectory, getProofFileName()), null, bootClassPathFile);
+      // Try proof loading only if proof is not already closed.
+      if (!MonKeYProofResult.CLOSED.equals(getResult())) {
+         if (existsProofFile(proofDirectory)) {
+            IRunnableWithResult<Proof> run = new AbstractRunnableWithResult<Proof>() {
+               @Override
+               public void run() {
+                   try {
+                       final File bootClassPathFile = !StringUtil.isTrimmedEmpty(bootClassPath) ? new File(bootClassPath) : null;
+                       if (isMainWindowEnvironment()) {
+                          KeYUtil.runWithoutResultDialog(new KeYUtil.IRunnableWithMainWindow() {
+                             @Override
+                             public void run(MainWindow main) throws Exception {
+                                DefaultProblemLoader loader = main.getUserInterface().load(new File(proofDirectory, getProofFileName()), null, bootClassPathFile);
+                                setResult(loader.getProof());
+                             }
+                          });
+                       }
+                       else {
+                          DefaultProblemLoader loader = environment.getUi().load(new File(proofDirectory, getProofFileName()), null, bootClassPathFile);
                           setResult(loader.getProof());
                        }
-                    });
-                }
-                catch (Exception e) {
-                    setException(e);
-                }
-            }
-        };
-        proofStartTime = System.currentTimeMillis();
-        SwingUtil.invokeAndWait(run);
-        if (run.getException() != null) {
-            setReuseStatus(run.getException().getMessage());
-            removeProof(run.getResult());
-        }
-        else {
-           proof = run.getResult();
-           setReuseStatus("Loaded Proof");
-           if(proof.closed()) {
-               setResult(MonKeYProofResult.CLOSED);
-           } else {
-               setResult(MonKeYProofResult.OPEN);
-               proof.addProofTreeListener(new ProofTreeAdapter() {
-                   @Override
-                   public void proofClosed(ProofTreeEvent e) {
-                       handleProofClosed(e);
                    }
-               });
-           }
-        }
-        updateStatistics();
-        removeProof(proof);
-      }
-   }
-
-   private void removeProof(Proof proof) throws InterruptedException, InvocationTargetException {
-       final Proof tmp = proof;
-       IRunnableWithResult<Proof> abandonProof = new AbstractRunnableWithResult<Proof>() {
-           @Override
-           public void run() {
-               try {
-                   KeYUtil.runWithoutResultDialog(new KeYUtil.IRunnableWithMainWindow() {
+                   catch (Exception e) {
+                       setException(e);
+                   }
+               }
+            };
+            proofStartTime = System.currentTimeMillis();
+            SwingUtil.invokeAndWait(run);
+            if (run.getException() != null) {
+               setReuseStatus(run.getException().getMessage());
+               // Try to remove proof which caused an exception during loading process
+               if (run.getException() instanceof ProblemLoaderException) {
+                  ProblemLoaderException ple = (ProblemLoaderException)run.getException();
+                  removeProof(ple.getOrigin().getProof());
+               }
+            }
+            else {
+               proof = run.getResult();
+               setReuseStatus("Loaded Proof");
+               updateStatistics();
+               if(proof.closed()) {
+                  setResult(MonKeYProofResult.CLOSED);
+                  removeProof(); // Remove closed proof to free memory
+               }
+               else {
+                  setResult(MonKeYProofResult.OPEN);
+                  // Maybe the user likes to close the proof manually, so listen for future changes
+                  proof.addProofTreeListener(new ProofTreeAdapter() {
                       @Override
-                      public void run(MainWindow main) throws Exception {
-                         main.getUserInterface().removeProof(tmp);
+                      public void proofClosed(ProofTreeEvent e) {
+                          handleProofClosed(e);
                       }
-                   });
+                  });
                }
-               catch (Exception e) {
-                   setException(e);
-               }
-           }
-       };
-       SwingUtil.invokeAndWait(abandonProof);
-       // release proof object for garbage collection (it is disposed anyway)
-       this.proof = null;
+            }
+         }
+      }
    }
    
    /**

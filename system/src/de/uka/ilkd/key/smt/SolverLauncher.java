@@ -416,9 +416,12 @@ public class SolverLauncher implements SolverListener {
      */
     private void notifySolverHasFinished(SMTSolver solver) {
 	lock.lock();
-	session.removeCurrentlyRunning(solver);
-	wait.signal();
-	lock.unlock();
+	try {
+		session.removeCurrentlyRunning(solver);
+		wait.signal();
+	} finally {
+		lock.unlock();
+	}
     }
 
     /**
@@ -507,7 +510,7 @@ class Session {
 	    Iterator<SMTSolver> it = currentlyRunning.iterator();
 	    while (it.hasNext()) {
 		SMTSolver next = it.next();
-		if (next.equals(next)) {
+		if (next.equals(solver)) {
 		    next.interrupt(reason);
 		    it.remove();
 		    break;

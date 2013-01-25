@@ -50,7 +50,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * stores the program variables to be replaced as keys and the new
      * program variables as values
      */
-    protected Map replaceMap;
+    protected Map<ProgramVariable, ProgramVariable> replaceMap;
 
 
     /**
@@ -59,7 +59,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * @param st the statement where the prog vars are replaced
      * @param map the HashMap with the replacements
      */
-    public ProgVarReplaceVisitor(ProgramElement st, Map map, Services services) {
+    public ProgVarReplaceVisitor(ProgramElement st, Map<ProgramVariable, ProgramVariable> map, Services services) {
     super(st, true, services);
     this.replaceMap = map;
         assert services != null;
@@ -74,7 +74,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * @param replaceall decides if all variables are to be replaced
      */
     public ProgVarReplaceVisitor(ProgramElement st,
-                                 Map map,
+                                 Map<ProgramVariable, ProgramVariable> map,
                                  boolean replaceall,
                                  Services services) {
         this(st, map, services);
@@ -166,16 +166,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
     if(t.op() instanceof ProgramVariable) {
         if(replaceMap.containsKey(t.op())) {
-        Object o = replaceMap.get(t.op());
-        if(o instanceof ProgramVariable){
-            return TermFactory.DEFAULT.createTerm
-            ((ProgramVariable) replaceMap.get(t.op()));
-        }else{
-            return TermFactory.DEFAULT.createTerm
-            ((SchemaVariable) replaceMap.get(t.op()));
-        }
+            ProgramVariable replacement = replaceMap.get(t.op());
+            return TermFactory.DEFAULT.createTerm(replacement);
         } else {
-        return t;
+            return t;
         }
     } else {
         Term subTerms[] = new Term[t.arity()];
@@ -197,7 +191,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                               t.javaBlock());
     }
     }
-
 
     private ImmutableSet<Term> replaceVariablesInTerms(ImmutableSet<Term> terms) {
         ImmutableSet<Term> res = DefaultImmutableSet.nil();
@@ -226,7 +219,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     private BlockContract createNewBlockContract(final BlockContract oldContract, final StatementBlock newBlock)
     {
-        final BlockContract.Variables newVariables = replaceBlockContractVariables(oldContract.getPlaceholderVariables());
+       final BlockContract.Variables newVariables = replaceBlockContractVariables(oldContract.getPlaceholderVariables());
         final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newModifiesClauses = new LinkedHashMap<LocationVariable, Term>();
@@ -351,6 +344,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                     newVariant,
                                     newSelfTerm,
                                     atPres);
-        services.getSpecificationRepository().setLoopInvariant(newInv);
+        services.getSpecificationRepository().addLoopInvariant(newInv);
     }
 }
