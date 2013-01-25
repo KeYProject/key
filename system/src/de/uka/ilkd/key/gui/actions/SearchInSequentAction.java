@@ -1,26 +1,25 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 
-import de.uka.ilkd.key.gui.IconFactory;
-import de.uka.ilkd.key.gui.Main;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.nodeviews.IncrementalSearch;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
 
 public class SearchInSequentAction extends MainWindowAction {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	public SearchInSequentAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Search in sequent view");
-        setTooltip("Search in the current sequent.");
+        setTooltip("Search for strings in the current sequent.");
         this.setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F3,0));
         
         getMediator().enableWhenProof(this);
