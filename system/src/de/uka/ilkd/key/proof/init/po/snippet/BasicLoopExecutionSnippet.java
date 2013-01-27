@@ -3,15 +3,9 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 import java.util.Iterator;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.Guard;
-import de.uka.ilkd.key.java.statement.IForUpdates;
-import de.uka.ilkd.key.java.statement.LoopInit;
-import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -113,9 +107,10 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         //create loop call
         LoopInvariant inv = (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         StatementBlock sb = (StatementBlock) inv.getLoop().getBody();
+        StatementBlock sl = new StatementBlock(inv.getLoop());
 
         //create java block
-        Statement s = new MethodFrame(null, context, sb);
+        Statement s = new MethodFrame(null, context, sl);
         JavaBlock result = JavaBlock.createJavaBlock(new StatementBlock(s));
 
         return result;        
