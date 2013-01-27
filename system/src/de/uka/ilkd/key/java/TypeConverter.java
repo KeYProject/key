@@ -176,6 +176,9 @@ public final class TypeConverter {
     	} else if(op instanceof Equals) {
 	    assert subs.length == 2;
 	    return TB.equals(subs[0], subs[1]);
+    	} else if(op instanceof NotEquals) {
+	    assert subs.length == 2;
+	    return TB.not(TB.equals(subs[0], subs[1]));
 	} else if(op instanceof Conditional) {
 	    assert subs.length == 3;
 	    return TB.ife(subs[0], subs[1], subs[2]);

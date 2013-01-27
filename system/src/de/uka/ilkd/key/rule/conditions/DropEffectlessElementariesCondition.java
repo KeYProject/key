@@ -48,10 +48,11 @@ public final class DropEffectlessElementariesCondition
 	    LocationVariable lhs = (LocationVariable) eu.lhs();
 	    if(relevantVars.contains(lhs)) {
 	        relevantVars.remove(lhs);
-	        // updates of the form "x:=x" can be discarded (MU,CS)
-	        if(lhs.equals(update.sub(0).op())) {
-	            return TB.skip();
-	        }
+	        // removed, see bug #1269 (MU, CS)
+//	        // updates of the form "x:=x" can be discarded (MU,CS)
+//	        if(lhs.equals(update.sub(0).op())) {
+//	            return TB.skip();
+//	        }
 		return null;
 	    } else {
 		return TB.skip();
