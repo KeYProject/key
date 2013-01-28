@@ -96,6 +96,7 @@ import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
 import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
 import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
 import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
+import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;

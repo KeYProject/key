@@ -1,10 +1,10 @@
-package de.uka.ilkd.key.gui;
+package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 
 import javax.swing.JCheckBoxMenuItem;
 
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
