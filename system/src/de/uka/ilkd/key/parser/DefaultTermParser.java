@@ -62,7 +62,7 @@ public final class DefaultTermParser {
     /** The method reads the input and parses a term with the
      * specified namespaces. The method ensures, that the term has the
      * specified sort.
-     * @param sort The expected sort of the term.
+     * @param sort The expected sort of the term; must not be null.
      * @return The parsed term of the specified sort.
      * @throws ParserException The method throws a ParserException, if
      * the input could not be parsed correctly or the term has an
@@ -85,7 +85,10 @@ public final class DefaultTermParser {
                                 nss, 
                                 scm);
 
-	    return parser.term();
+	    final Term result = parser.term();
+	    if (sort != null &&  ! result.sort().extendsTrans(sort))
+	        throw new ParserException("Expected sort "+sort+", but parser returns sort "+result.sort()+".", null);
+        return result;
         } catch (RecognitionException re) {
             throw new ParserException(re.getMessage(),
                                       new Location(re.getFilename(),
@@ -95,5 +98,5 @@ public final class DefaultTermParser {
             throw new ParserException(tse.getMessage(), null);
         }
     }
-
+    
 }

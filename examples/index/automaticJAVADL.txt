@@ -340,7 +340,8 @@ provable: ./standard_key/quantifiers/normalisation7.key
 provable: ./standard_key/quantifiers/normalisation8.key
 provable: ./standard_key/quantifiers/normalisation9.key
 provable: ./standard_key/quantifiers/normalisation10.key
-provable: ./standard_key/quantifiers/normalisation11.key
+#removed as long as we do not have a rule safely removing identical updates
+#provable: ./standard_key/quantifiers/normalisation11.key
 provable: ./standard_key/quantifiers/normalisation12.key
 provable: ./standard_key/quantifiers/normalisation13.key
 provable: ./standard_key/quantifiers/triggers0.key
