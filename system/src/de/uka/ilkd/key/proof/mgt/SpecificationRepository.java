@@ -258,8 +258,8 @@ public final class SpecificationRepository {
     private boolean axiomIsVisible(ClassAxiom ax, KeYJavaType visibleTo) {
         final KeYJavaType kjt = ax.getKJT();
         //TODO: package information not yet available
-        // DISCUSSION: how should it be treated in the mean time? as public? Our specifications rarely stretch over different packages... 
-        final boolean visibleToPackage = true;
+        // BUGFIX: package-private is understood as private (see bug #1268)
+        final boolean visibleToPackage = false;
         final VisibilityModifier visibility = ax.getVisibility();
         if (VisibilityModifier.isPublic(visibility))
             return true;
