@@ -261,6 +261,8 @@ public final class MainWindow extends JFrame  {
     private ExitMainAction exitMainAction;
 
     private ShowActiveSettingsAction showActiveSettingsAction;
+    
+    private UnicodeToggleAction unicodeToggleAction;
 
     /**
      * creates prover -- private, use {@link #createInstance(String)}
@@ -399,9 +401,9 @@ public final class MainWindow extends JFrame  {
         loadUserDefinedTacletsForProvingAction = new LemmaGenerationAction.ProveUserDefinedTaclets(this);
         loadKeYTaclets            = new LemmaGenerationAction.ProveKeYTaclets(this);
         lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
+        unicodeToggleAction = new UnicodeToggleAction(this);
         
 
-	
 	
         
 
@@ -784,7 +786,7 @@ public final class MainWindow extends JFrame  {
         
        
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
-        view.add(new JCheckBoxMenuItem(new UnicodeToggleAction(this)));
+        view.add(new JCheckBoxMenuItem(unicodeToggleAction));
         
         view.addSeparator();
         {
@@ -1757,6 +1759,10 @@ public final class MainWindow extends JFrame  {
 
     public Action getOpenMostRecentFileAction() {
         return openMostRecentFileAction;
+    }
+    
+    public Action getUnicodeToggleAction() {
+    	return unicodeToggleAction;
     }
 
     public void savePreferences() {
