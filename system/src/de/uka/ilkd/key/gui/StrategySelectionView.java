@@ -401,6 +401,12 @@ public final class StrategySelectionView extends JPanel {
         
         depOff = new JRadioButtonHashMap("Off", 
                 StrategyProperties.DEP_OFF, false, false);
+        depOff.setToolTipText("<html>Does <i>not</i> use the framing information contained in JML's <br>" +
+                                     "<tt>accessible</tt> clauses automatically in order to simplify heap terms.<br>" +
+        		             "This prevents the automatic proof search to find proofs for a number of problems.<br>" +
+        		             "On the other hand, the automatic proof search does not use a particular order in<br>" +
+                                     "which <tt>accessible</tt> clauses are used. Since the usage of an <tt>accessible</tt><br>" +
+                                     "clause is splitting, this might result in huge (or even infeasible) proofs.</html>");
 //        queryProgramsToRight.setToolTipText ( "<html>Move all program blocks to the" +
 //                                              " succedent.<br>" +
 //                                              " This is necessary" +
