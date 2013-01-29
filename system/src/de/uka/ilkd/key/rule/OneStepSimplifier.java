@@ -528,8 +528,6 @@ public final class OneStepSimplifier implements BuiltInRule,
         assert ruleApp instanceof OneStepSimplifierRuleApp :
             "The rule app must be suitable for OSS";
         
-	final ImmutableList<Goal> result = goal.split(1);
-	final Goal resultGoal = result.head();
 	final PosInOccurrence pos = ruleApp.posInOccurrence();
 	assert pos != null && pos.isTopLevel();
 	
@@ -542,7 +540,11 @@ public final class OneStepSimplifier implements BuiltInRule,
 				       goal.sequent(),
 				       protocol);
 	
+	((OneStepSimplifierRuleApp)ruleApp).setProtocol(protocol);
+	
 	//change goal, set if-insts
+	final ImmutableList<Goal> result = goal.split(1);
+	final Goal resultGoal = result.head();
 	resultGoal.changeFormula(inst.getCf(), pos);
 	goal.setBranchLabel(inst.getNumAppliedRules() 
 		            + (inst.getNumAppliedRules() > 1 
@@ -550,7 +552,6 @@ public final class OneStepSimplifier implements BuiltInRule,
 		               : " rule"));
 	ruleApp = ((IBuiltInRuleApp)ruleApp).setIfInsts(inst.getIfInsts());
 	
-	((OneStepSimplifierRuleApp)ruleApp).setProtocol(protocol);
 	
 	return result;
     }

@@ -41,9 +41,10 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     public abstract int getChildCount();
 
     public abstract TreeNode getParent();
-    
+
     public abstract boolean isLeaf();
 
+    public abstract void flushCache();
 
     public int getIndex(TreeNode node) {
 	for ( int i=0; i<getChildCount(); i++ ) {
@@ -125,6 +126,6 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
         }
     
         return nextN;
-    }    
+    }
 }
 

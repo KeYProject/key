@@ -81,6 +81,7 @@ class GUIBranchNode extends GUIAbstractTreeNode
         }
     }
 
+    @Override
     public void flushCache() {
         childrenCache = null;
     }

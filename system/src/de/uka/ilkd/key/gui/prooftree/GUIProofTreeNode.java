@@ -87,4 +87,9 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
             children = new GUIAbstractTreeNode[0];
         }
     }
+    
+    @Override 
+    public void flushCache() {
+        children = null;
+    }
 }
