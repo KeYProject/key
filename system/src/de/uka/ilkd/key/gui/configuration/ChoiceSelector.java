@@ -84,7 +84,8 @@ public class ChoiceSelector extends JDialog {
 	    layoutChoiceSelector();
 	    setChoiceList();
 	    pack();
-	    setLocation(70, 70);
+	    setLocationRelativeTo(null);
+	    //setLocation(70, 70);
 	    setVisible(true);
 	}
     }

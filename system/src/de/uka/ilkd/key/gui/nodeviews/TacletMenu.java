@@ -367,7 +367,7 @@ class TacletMenu extends JMenu {
     
     private void addClipboardItem(MenuControl control) {
 	addSeparator();
-	JMenuItem item = new JMenuItem("to clipboard");
+	JMenuItem item = new JMenuItem("copy to clipboard");
 	item.addActionListener(control);
 	add(item);
     }
@@ -504,7 +504,7 @@ class TacletMenu extends JMenu {
 	                                     mediator.getSelectedGoal () );
 	    } else {
 		if (((JMenuItem)e.getSource()).getText()
-		    .startsWith("to clipboard")){
+		    .startsWith("copy to clipboard")){
                     GuiUtilities.copyHighlightToClipboard(sequentView);
 		} else if(((JMenuItem)e.getSource()).getText().
 			  startsWith("Pop method frame")){
