@@ -61,8 +61,8 @@ public final class GoalBackAction extends MainWindowAction {
                     final Goal selGoal = getMediator().getSelectedGoal();
                     final Node selNode = getMediator().getSelectedNode();
                     /* we undo the last rule application, if
-                     * the goal refers not to the proof's root */
-                    setEnabled(selNode != proof.root());
+                     * the goal refers not to the proof's root and the node is not a closed goal node */
+                    setEnabled(selNode != proof.root() && !selNode.isClosed());
                 }
             }
             
@@ -110,11 +110,12 @@ public final class GoalBackAction extends MainWindowAction {
     
     public void actionPerformed(ActionEvent e) {            
         Goal selGoal = getMediator().getSelectedGoal();
+        
         final Node selNode = getMediator().getSelectedNode();
-        if (selGoal == null) {
-        	assert(selNode != null);
-        	selGoal = getMediator().getSelectedProof().getSubtreeGoals(selNode).reverse().head();
-        }        
-        getMediator().setBack(selGoal);
-    }        
+       	if (selGoal == null) {
+       		assert(selNode != null);
+       		selGoal = getMediator().getSelectedProof().getSubtreeGoals(selNode).reverse().head();
+       	}        
+       	getMediator().setBack(selGoal);
+    }   	
 }
