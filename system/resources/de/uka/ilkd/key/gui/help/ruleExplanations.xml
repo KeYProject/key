@@ -41,7 +41,7 @@ This rule gives rise to three or four subgoals:
 4. Null reference: The receiver of the call can be null. This case is considered on this branch. If KeY can figure out automatically that this cannot be the case, this branch is suppressed.
 </entry>
 
-<entry key="Evaluate Query"> TODO
+<entry key="Evaluate Query"> 
 The QueryExpand rule allows to apply contracts or to symbolically execute a query 
 expression in the logic. It replaces the query expression by a new constant and 
 constructs a box formula in the antecedent 'defining' the constant as the result of 
@@ -77,9 +77,13 @@ In automatic strategy, this rule is applied lazily (only once all other means of
 
 <entry key="Block Contract">
 Like methods, statement blocks can be annotated with contracts. The application of the Block Contract rules then gives rise to subgoals which roughly correspond to those of the Use Operation Contract rule (see there).
+Three properties have to be shown:
 
-TODO -> Christoph Scheben knows more.
-The precondition and validity check create new proof obligations and the postcondition can be used. (?)
+1. Validity of block contract
+
+2. Precondition of contract holds
+
+3. Postcondition holds after block terminates
 </entry>
 
 <entry key="Loop Invariant">
