@@ -371,7 +371,10 @@ public final class MainWindow extends JFrame  {
     private void layoutMain() {
         // set overall layout manager
         getContentPane().setLayout(new BorderLayout());
-        
+
+        // default size
+        setSize(1000, 750);
+
         // FIXME FIXME
         recentFiles = new RecentFileMenu(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -404,10 +407,6 @@ public final class MainWindow extends JFrame  {
         lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
         unicodeToggleAction = new UnicodeToggleAction(this);
         
-
-	
-        
-
 	// create empty views
 	createViews();
 	
@@ -462,11 +461,8 @@ public final class MainWindow extends JFrame  {
             }
         });
         
-        // default size
-        setSize(1000, 750);
-        setName("mainWindow");
-        
         // load preferred sizes from system preferences
+        setName("mainWindow");
         prefSaver.load(this);
     }
 
