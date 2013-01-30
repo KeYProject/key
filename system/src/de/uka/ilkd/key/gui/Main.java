@@ -201,7 +201,7 @@ public class Main {
         cl.addText("Usage: ./runProver [options] [filename]\n\n", false);
         cl.addSection("Options for the KeY-Prover");
         cl.addOption(HELP, null, "display this text");
-        cl.addTextPart("--Khelp", "display help for technical/debug parameters\n", true);
+        cl.addTextPart("--K-help", "display help for technical/debug parameters\n", true);
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
         cl.addSection("Batchmode options:");
