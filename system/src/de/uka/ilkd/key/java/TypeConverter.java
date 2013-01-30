@@ -184,9 +184,7 @@ public final class TypeConverter {
 	    return TB.ife(subs[0], subs[1], subs[2]);
 	} else if(op instanceof DLEmbeddedExpression) {
 	    DLEmbeddedExpression emb = (DLEmbeddedExpression) op;
-	    Function f = emb.getFunctionSymbol();
-	    // TODO make a sensible error recovery
-	    return TB.func(f, subs);
+	    return emb.makeTerm(heapLDT.getHeap(), subs);
 	} else if(op instanceof TypeCast) {
 	    TypeCast tc = (TypeCast) op;
 	    return TB.cast(services, tc.getKeYJavaType(services).getSort(), subs[0]);
