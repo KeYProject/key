@@ -100,7 +100,7 @@ public class DLEmbeddedExpression extends Operator {
             // or use equals here?! Subtyping?!
             // if unknown type (null), be content and go on
             // XXX Check this
-            if(kjtExpected != null && kjtActual != kjtExpected) {
+            if(kjtExpected != null && !kjtActual.getSort().extendsTrans(kjtExpected.getSort())) {
                 throw new ConvertException("Received " + child
                         + " as argument " + i + " for function "
                         + functionSymbol + ". Was expecting type "
