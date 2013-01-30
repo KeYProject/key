@@ -49,7 +49,6 @@ public final class InfFlowLoopInvariantTacletBuilder
         BasicPOSnippetFactory fAssumes =
                 POSnippetFactory.getBasicFactory(loopinvariant, schemaDataAssumes, services);
         return fAssumes.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
-        // TODO: Think about correctness
     }
 
     @Override
@@ -58,7 +57,6 @@ public final class InfFlowLoopInvariantTacletBuilder
         BasicPOSnippetFactory fFind =
                 POSnippetFactory.getBasicFactory(loopinvariant, schemaDataFind, services);
         return fFind.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
-        // TODO: Think about correctness
     }
 
     @Override
@@ -66,7 +64,6 @@ public final class InfFlowLoopInvariantTacletBuilder
         BasicPOSnippetFactory f =
                 POSnippetFactory.getBasicFactory(loopinvariant, appData, services);
         return f.create(BasicPOSnippetFactory.Snippet.LOOP_CALL_RELATION);
-        // TODO: Think about correctness
     }    
 
 
@@ -78,6 +75,5 @@ public final class InfFlowLoopInvariantTacletBuilder
                 POSnippetFactory.getInfFlowFactory(loopinvariant, contAppData,
                         contAppData2, services);
         return f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_LOOP_INVARIANT_APPL);
-        // TODO: Think about correctness
     }
 }

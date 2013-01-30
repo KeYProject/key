@@ -46,7 +46,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
     private final Term originalVariant;
     private final Term originalSelfTerm;
     private final ImmutableList<Term> localIns;
-    private final ImmutableList<Term> localOuts;
+    private ImmutableList<Term> localOuts;
     private final Map<LocationVariable,Term> originalAtPres;
     
     
@@ -410,6 +410,11 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                      localIns,
                                      localOuts,
                                      originalAtPres);
+    }
+    
+    @Override
+    public void setLocalOuts(ImmutableList<Term> localOuts) {
+        this.localOuts = localOuts;
     }
 
     @Override

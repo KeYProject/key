@@ -121,8 +121,10 @@ public interface LoopInvariant extends SpecificationElement {
 
     public LoopInvariant setTarget(IProgramMethod newPM);
 
-    public LoopInvariant setExecutionContext(ExecutionContext execCont);    
+    public LoopInvariant setExecutionContext(ExecutionContext execCont);
 
+
+    public void setLocalOuts(ImmutableList<Term> localOuts);
 
     public void setGuard(Term guardTerm);
     

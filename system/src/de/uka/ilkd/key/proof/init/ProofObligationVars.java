@@ -103,8 +103,7 @@ public class ProofObligationVars {
         this.heapAtPre = heapAtPre;
         this.heapAtPost = heapAtPost;
         this.mbyAtPre = mbyAtPre;
-
-
+        
         ImmutableList<Term> terms =
                 ImmutableSLList.<Term>nil();
         terms = appendIfNotNull(terms, self);
@@ -160,19 +159,19 @@ public class ProofObligationVars {
     
     
     public ProofObligationVars(Term self,
-            Term selfAtPost,
-            ImmutableList<Term> localIns,
-            ImmutableList<Term> localOuts,
-            Term result,
-            Term resultAtPost,
-            Term exception,
-            Term exceptionAtPost,
-            Term heap,
-            Term heapAtPre,
-            Term heapAtPost,
-            Term mbyAtPre,
-            String postfix,
-            Services services) {
+                               Term selfAtPost,
+                               ImmutableList<Term> localIns,
+                               ImmutableList<Term> localOuts,
+                               Term result,
+                               Term resultAtPost,
+                               Term exception,
+                               Term exceptionAtPost,
+                               Term heap,
+                               Term heapAtPre,
+                               Term heapAtPost,
+                               Term mbyAtPre,
+                               String postfix,
+                               Services services) {
         this(self, selfAtPost, null, localIns, null, localOuts, result, resultAtPost,
              exception, exceptionAtPost, heap, heapAtPre, heapAtPost, mbyAtPre,
              postfix, services);
@@ -209,8 +208,8 @@ public class ProofObligationVars {
                                Term guardAtPost,
                                ImmutableList<Term> localOuts,
                                Services services) {
-        this(self, guard, localIns, null, guardAtPost, localOuts,
-             null, null, heap, services);
+        this(self, guard, localIns, heap, guardAtPost, localOuts,
+             null, null, null, services);
     }
 
 
@@ -225,9 +224,45 @@ public class ProofObligationVars {
                                Term heapAtPost,
                                Services services) {
         this(self, null, guard, localIns, guardAtPost, localOuts, result,
-                buildAtPostVar(result, services), exception,
-                buildAtPostVar(exception, services), heap, null, heapAtPost,
-                null, "", services);
+             buildAtPostVar(result, services), exception,
+             buildAtPostVar(exception, services), heap, null, heapAtPost,
+             null, "", services);
+    }
+    
+    public ProofObligationVars(Term self,
+                               Term guard,
+                               ImmutableList<Term> localIns,
+                               Term heap,
+                               Term guardAtPost,
+                               ImmutableList<Term> localOuts,
+                               Term result,
+                               Term exception,
+                               Term heapAtPost,
+                               Services services,
+                               boolean localOutsRenamed) {
+        this(self, null, guard, localIns, guardAtPost,
+             buildLocalOuts(localOuts, localOutsRenamed, services),
+             result, buildAtPostVar(result, services), exception,
+             buildAtPostVar(exception, services), heap, null, heapAtPost,
+             null, "", services);
+    }
+
+    public ProofObligationVars(Term self,
+                               Term guard,
+                               ImmutableList<Term> localIns,
+                               Term heap,
+                               ImmutableList<Term> localOuts,
+                               Term result,
+                               Term exception,
+                               Term heapAtPost,
+                               Services services,
+                               boolean localOutsRenamed) {
+        this(self, null, buildAtPreVar(guard, services),
+             localIns, buildAtPostVar(guard, services),
+             buildLocalOuts(localOuts, localOutsRenamed, services),
+             result, buildAtPostVar(result, services),
+             exception, buildAtPostVar(exception, services), heap,
+             null, heapAtPost, null, "", services);        
     }
 
 
@@ -520,6 +555,23 @@ public class ProofObligationVars {
     }
 
 
+    private static Term buildAtPreVar(Term varTerm,
+                                      Services services) {
+        if (varTerm == null) {
+            return null;
+        }
+        assert varTerm.op() instanceof LocationVariable;        
+
+        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+        String name = TB.newName(services, varTerm.toString() + "AtPre");
+        LocationVariable varAtPreVar =
+                new LocationVariable(new ProgramElementName(name), resultType);
+        register(varAtPreVar, services);
+        Term varAtPre = TB.var(varAtPreVar);
+        return varAtPre;
+    }
+
+
     private static Term buildAtPostVar(Term varTerm,
                                        Services services) {
         if (varTerm == null) {
@@ -534,6 +586,28 @@ public class ProofObligationVars {
         register(varAtPostVar, services);
         Term varAtPost = TB.var(varAtPostVar);
         return varAtPost;
+    }
+    
+    private static ImmutableList<Term> buildLocalOuts(ImmutableList<Term> varTerms,
+                                                      boolean renamed,
+                                                      Services services) {
+        if (varTerms == null || varTerms.isEmpty() || renamed) {
+            return varTerms;
+        }
+        ImmutableList<Term> renamedLocalOuts = ImmutableSLList.<Term>nil();
+        for(Term varTerm: varTerms) {
+            assert varTerm.op() instanceof LocationVariable;        
+
+            KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+
+            String name = TB.newName(services, varTerm.toString() + "Out");
+            LocationVariable varAtPostVar =
+                    new LocationVariable(new ProgramElementName(name), resultType);
+            register(varAtPostVar, services);
+            Term varAtPost = TB.var(varAtPostVar);
+            renamedLocalOuts = renamedLocalOuts.append(varAtPost);
+        }
+        return renamedLocalOuts;
     }
 
 

@@ -11,6 +11,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
@@ -499,9 +500,9 @@ public final class WhileInvariantRule implements BuiltInRule {
             // and associated taclet
             loopInvApplPredTerm =
                     ifInvariantBuilder.buildContractApplPredTerm();
-            
-            inst.inv.setGuard(TB.var(guardVar));
+            inst.inv.setGuard(ifInvariantBuilder.getGuard());
             inst.inv.setGuardAtPost(ifInvariantBuilder.getGuardAtPost());
+            inst.inv.setLocalOuts(ifInvariantBuilder.getLocalOuts());            
             services.getSpecificationRepository().setLoopInvariant(inst.inv);
             
             informationFlowInvariantApp =
@@ -516,10 +517,10 @@ public final class WhileInvariantRule implements BuiltInRule {
             final ProofObligationVars instantiationVars =
                     new ProofObligationVars(inst.selfTerm,
                                             inst.inv.getGuard(),
-                                            MiscTools.toTermList(localIns),
+                                            inst.inv.getLocalIns(),
                                             anonUpdateData.loopHeapAtPre,
                                             inst.inv.getGuardAtPost(),
-                                            MiscTools.toTermList(localOuts),
+                                            inst.inv.getLocalOuts(),
                                             anonUpdateData.loopHeap,
                                             services);            
             

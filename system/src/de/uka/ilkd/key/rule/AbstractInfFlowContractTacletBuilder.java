@@ -35,6 +35,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     private Term heapAtPost;
     private Term loopGuard;
     private Term loopGuardAtPost;
+    private boolean localVarsRenamed;
 
 
     public AbstractInfFlowContractTacletBuilder(final Services services) {
@@ -43,10 +44,20 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         this.localOuts = ImmutableSLList.<Term>nil();   
         this.loopGuard = null;
         this.loopGuardAtPost = null;
+        this.localVarsRenamed = false;
     }
-    
+
+    public Term getGuard() {
+        return loopGuard;
+    }
+
     public Term getGuardAtPost() {
         return loopGuardAtPost;
+    }
+    
+    public ImmutableList<Term> getLocalOuts() {
+        assert localVarsRenamed;
+        return localOuts;
     }
 
     public void setContextUpdate(Term... contextUpdates) {
@@ -94,8 +105,13 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     // TODO: add exception var
     public Term buildContractApplPredTerm() {
         ProofObligationVars appData = getProofObligationVars();
-        if (this.loopGuard != null)
+        if (this.loopGuardAtPost != null)
+            this.loopGuard = appData.guard;
             this.loopGuardAtPost = appData.guardAtPost;
+        if (!this.localVarsRenamed) {
+            this.localVarsRenamed = true;
+            this.localOuts = appData.localOuts;
+        }            
         Term contractApplPredTerm = getContractApplPred(appData);
         for (Term update : contextUpdates) {
             contractApplPredTerm = apply(update, contractApplPredTerm);
@@ -107,8 +123,14 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     // TODO: add exception var
     public Taclet buildContractApplTaclet() {
         ProofObligationVars appData = getProofObligationVars();
-        if (this.loopGuard != null)
+        if (this.loopGuard != null) {
+            this.loopGuard = appData.guard;
             this.loopGuardAtPost = appData.guardAtPost;
+        }            
+        if (this.localOuts != null) {
+            this.localVarsRenamed = true;
+            this.localOuts = appData.localOuts;
+        }            
         return genInfFlowContractApplTaclet(appData, services);
     }
 
@@ -128,11 +150,11 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         if (this.loopGuardAtPost == null)
             return new ProofObligationVars(contractSelf, loopGuard, localIns,
                                            heapAtPre, localOuts, contractResult,
-                                           exceptionVar, heapAtPost, services);
+                                           exceptionVar, heapAtPost, services, localVarsRenamed);
         else
             return new ProofObligationVars(contractSelf, loopGuard, localIns,
                                            heapAtPre, loopGuardAtPost, localOuts, contractResult,
-                                           exceptionVar, heapAtPost, services);
+                                           exceptionVar, heapAtPost, services, localVarsRenamed);
         /*return new ProofObligationVars(contractSelf, localIns,
                                        heapAtPre, localOuts, contractResult,
                                        exceptionVar, heapAtPost, services);*/
@@ -173,7 +195,6 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                 createTermSV(appData.heapAtPost, schemaPrefix, services);
         Term mbyAtPreSV =
                 createTermSV(appData.mbyAtPre, schemaPrefix, services);
-
         return new ProofObligationVars(selfSV, selfAtPostSV, guardSV, localInSVs,
                                        guardAtPostSV, localOutSVs, resSV, resAtPostSV, excSV,
                                        excAtPostSV, heapSV, heapAtPreSV,
