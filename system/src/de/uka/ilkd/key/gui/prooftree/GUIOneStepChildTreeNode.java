@@ -55,5 +55,9 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
     	String prettySubTerm =  LogicPrinter.quickPrintTerm(app.posInOccurrence().subTerm(), services);
         return app.rule().name() + " ON " +prettySubTerm;
     }
+
+    @Override public void flushCache() {
+        // nothing to do
+    }
 }
 

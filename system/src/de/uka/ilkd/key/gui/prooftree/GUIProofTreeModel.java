@@ -383,10 +383,13 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     }
 
 
-    /** Take the appropriate actions after a change in the Proof.
+    /**
+     * Take the appropriate actions after a change in the Proof.
      * Currently, this means throwing all cached Information away
      * and fire an indiscriminating TreeStructureChanged event.
      * This should probably be made more efficient.
+     *
+     * @param trn tree node to update.
      */
     private void updateTree(TreeNode trn) {
         if (trn == null || trn == getRoot()) { // bigger change, redraw whole tree
@@ -398,15 +401,18 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
         // otherwise redraw only a certain subtree
         // starting from the parent of trn
         flushCaches ( trn );
+        // also flush the current node, it might be an OSS conceiving children in this step
+        ((GUIAbstractTreeNode)trn).flushCache();
         TreeNode[] path = ((GUIAbstractTreeNode)trn.getParent()).getPath();
         fireTreeStructureChanged(path);
     }
 
     public void updateTree(Node p_node) {
-	if ( p_node == null )
-	    updateTree ( (TreeNode)null );
-	else
-	    updateTree ( getProofTreeNode ( p_node ) );
+        if ( p_node == null ) {
+            updateTree ( (TreeNode)null );
+        } else {
+            updateTree ( getProofTreeNode ( p_node ) );
+        }
     }
 
     private void flushCaches (TreeNode trn) {
