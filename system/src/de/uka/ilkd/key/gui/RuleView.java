@@ -134,6 +134,12 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
     }
 
     protected void layoutPane() {
+        // initial placement of the divider
+        setDividerLocation(300);
+
+        // growing goes to the upper half only
+        setResizeWeight(1.0);
+
         // this triggers storing the bar position
         setName("ruleViewPane");
         {
@@ -149,6 +155,7 @@ public class RuleView extends JSplitPane implements TreeSelectionListener, java.
             contentScrollPane = new JScrollPane(contentPane);
             setRightComponent(contentScrollPane);
         }
+
     }
 
     private class SelectionListener implements KeYSelectionListener {

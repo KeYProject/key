@@ -101,7 +101,6 @@ import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
@@ -371,7 +370,10 @@ public final class MainWindow extends JFrame  {
     private void layoutMain() {
         // set overall layout manager
         getContentPane().setLayout(new BorderLayout());
-        
+
+        // default size
+        setSize(1000, 750);
+
         // FIXME FIXME
         recentFiles = new RecentFileMenu(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -404,10 +406,6 @@ public final class MainWindow extends JFrame  {
         lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
         unicodeToggleAction = new UnicodeToggleAction(this);
         
-
-	
-        
-
 	// create empty views
 	createViews();
 	
@@ -462,11 +460,8 @@ public final class MainWindow extends JFrame  {
             }
         });
         
-        // default size
-        setSize(1000, 750);
-        setName("mainWindow");
-        
         // load preferred sizes from system preferences
+        setName("mainWindow");
         prefSaver.load(this);
     }
 
