@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -114,9 +113,6 @@ public class DLEmbeddedExpression extends Operator {
             Expression child = children.get(i);
             KeYJavaType kjtActual = javaServ.getTypeConverter().getKeYJavaType(child);
             
-            // or use equals here?! Subtyping?!
-            // if unknown type (null), be content and go on
-            // XXX Check this
             if(kjtExpected != null && !kjtActual.getSort().extendsTrans(kjtExpected.getSort())) {
                 throw new ConvertException("Received " + child
                         + " as argument " + i + " for function "
@@ -128,8 +124,7 @@ public class DLEmbeddedExpression extends Operator {
 
 
     private static Sort getHeapSort(Services javaServ) {
-        // TODO how do implement that better?
-        return (Sort)javaServ.getNamespaces().sorts().lookup("Heap");
+        return javaServ.getTypeConverter().getHeapLDT().targetSort();
     }
 
     private static KeYJavaType getKeYJavaType(Services javaServ, Sort argSort) {
