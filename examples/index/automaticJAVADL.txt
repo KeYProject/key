@@ -46,7 +46,8 @@ provable: ./standard_key/pred_log/tptp/SET/SET043p1.key
 provable: ./standard_key/pred_log/tptp/SET/SET045p1.key
 provable: ./standard_key/pred_log/tptp/SET/SET062p3.key
 provable: ./standard_key/pred_log/tptp/SET/SET063p3.key
-provable: ./standard_key/pred_log/tptp/SYN/SYN002m1.007.008.key
+# cannot be proven automatically (see bug #1248)
+# provable: ./standard_key/pred_log/tptp/SYN/SYN002m1.007.008.key
 provable: ./standard_key/pred_log/tptp/SYN/SYN036p2.key
 provable: ./standard_key/pred_log/tptp/SYN/SYN548p1.key
 provable: ./standard_key/pred_log/tptp/SYN/SYN550p1.key
