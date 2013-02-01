@@ -181,7 +181,6 @@ while [ $# -ne 0 ]; do
         #values: xms and Xmx
 	--J-Xms*)
 	    option=${1#--J}
-	    echo "$option"
 	    javaOptionXms=${option}
 	    xms = true;
 	    shift
@@ -189,7 +188,6 @@ while [ $# -ne 0 ]; do
 	    
 	--J-Xmx*)
 	    option=${1#--J}
-	    echo "$option"
 	    javaOptionXmx=${option}
 	    shift
 	    continue;;
