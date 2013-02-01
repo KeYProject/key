@@ -30,7 +30,8 @@ public class UnicodeToggleAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
 	boolean useUnicode = ((JCheckBoxMenuItem) e.getSource()).isSelected(); 
 	ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUseUnicode(useUnicode);
-        NotationInfo.UNICODE_ENABLED = useUnicode;
+	boolean usePretty = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().isUsePretty();
+        NotationInfo.UNICODE_ENABLED = useUnicode && usePretty;
         mainWindow.makePrettyView();
     }
 
