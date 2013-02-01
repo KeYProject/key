@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -42,6 +43,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -999,15 +1001,24 @@ public final class LogicPrinter {
 			        : services.getTypeConverter().getHeapLDT();
         if(NotationInfo.PRETTY_SYNTAX
             && heapLDT != null
-            && t.sub(0).op() == heapLDT.getHeap()) {
+            && t.sub(0).op().sort(t.subs()).equals(
+               services.getNamespaces().sorts().lookup(new Name("Heap")))) {
             startTerm(3);
             
             final Term objectTerm = t.sub(1);
             final Term fieldTerm  = t.sub(2);
                 
-            markStartSub();
+            final boolean printHeap = t.sub(0).op() != heapLDT.getHeap();
+            if (printHeap) {
+                markStartSub();
+                printTerm(t.sub(0));
+                markEndSub();
+                layouter.print("[");
+            } else {
+                markStartSub();
             //heap not printed
             markEndSub();
+            }
 
             if(objectTerm.equals(TermBuilder.DF.NULL(services))
                 && fieldTerm.op() instanceof Function
@@ -1061,6 +1072,9 @@ public final class LogicPrinter {
             } else {
         	printFunctionTerm(t.op().name().toString(), t);
             }	
+            if (printHeap) {
+                layouter.print("]");
+            }
         } else {
             printFunctionTerm(t.op().name().toString(), t);
         }
@@ -1093,12 +1107,22 @@ public final class LogicPrinter {
 			        : services.getTypeConverter().getHeapLDT();	
 	if(NotationInfo.PRETTY_SYNTAX
            && heapLDT != null 
-           && t.sub(0).op() == heapLDT.getHeap()) {
-	    final IObserverFunction obs = (IObserverFunction) t.op();
+           && t.sub(0).op().sort(t.subs()).equals(
+                services.getNamespaces().sorts().lookup(new Name("Heap")))) {
+	    final ObserverFunction obs = (ObserverFunction) t.op();
             startTerm(t.arity());
-            markStartSub();
+
+            final boolean printHeap = t.sub(0).op() != heapLDT.getHeap();
+            if (printHeap) {
+                markStartSub();
+                printTerm(t.sub(0));
+                markEndSub();
+                layouter.print("[");
+            } else {
+                markStartSub();
             //heap not printed
             markEndSub();
+            }
             
             if(!obs.isStatic()) {
         	markStartSub();
@@ -1124,6 +1148,9 @@ public final class LogicPrinter {
                     }
         	}
         	layouter.print(")").end();
+            }
+            if (printHeap) {
+                layouter.print("]");
             }
         } else {
             printFunctionTerm(t.op().name().toString(), t);            
