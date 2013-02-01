@@ -40,7 +40,7 @@ import de.uka.ilkd.key.rule.metaconstruct.WhileInvRuleWrapper;
  * For example, {@link de.uka.ilkd.key.rule.TacletApp} uses this class 
  * to determine all uninstantiated schemavariables.
  */
-public class TacletSchemaVariableCollector extends Visitor {
+public class TacletSchemaVariableCollector extends DefaultVisitor {
 
     /** collects all found variables */
     protected ImmutableList<SchemaVariable> varList;

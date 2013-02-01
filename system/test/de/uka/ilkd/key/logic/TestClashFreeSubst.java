@@ -190,7 +190,7 @@ public class TestClashFreeSubst extends TestCase {
 	return v.getResult();
     }
 
-    private class ToMultiVisitor extends Visitor {
+    private class ToMultiVisitor extends DefaultVisitor {
 	private Stack subStack;
 	
 	ToMultiVisitor() {

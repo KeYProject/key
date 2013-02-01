@@ -24,7 +24,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
  * The visitor implements also a continuation on sequents, traversing all of
  * the formulas occuring in the sequent.
  */
-public class BoundVarsVisitor extends Visitor{
+public class BoundVarsVisitor extends DefaultVisitor{
   
     private ImmutableSet<QuantifiableVariable> bdVars =
 	DefaultImmutableSet.<QuantifiableVariable>nil();  
