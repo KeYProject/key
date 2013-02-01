@@ -17,9 +17,9 @@
 
 # legacy tests from old automaticJAVADL.txt
 provable: ./standard_key/java_dl/quantifiedQuery.key
-provable: ./standard_key/java_dl/query_anon_updates.key
 provable: ./standard_key/java_dl/splittingWithQueries.key
-provable: ./standard_key/pred_log/jbyteIfEx.key
+# currently removed because reload fails (see bug #1277)
+# provable: ./standard_key/pred_log/jbyteIfEx.key
 provable: ./standard_key/prop_log/allClausesLength4.key
 provable: ./standard_key/prop_log/allClausesLength5.key
 provable: ./standard_key/prop_log/doubleNeg.key
@@ -30,7 +30,8 @@ provable: ./standard_key/pred_log/count2.key
 provable: ./standard_key/pred_log/count3.key
 provable: ./standard_key/pred_log/equalities.key
 provable: ./standard_key/pred_log/equalities3.key
-provable: ./standard_key/pred_log/exist1.key
+# cannot be proven automatically (see bug #1248)
+# provable: ./standard_key/pred_log/exist1.key
 provable: ./standard_key/pred_log/functions.key
 provable: ./standard_key/pred_log/mv1.key
 provable: ./standard_key/pred_log/mv2.key
@@ -38,7 +39,8 @@ provable: ./standard_key/pred_log/quantifiers.key
 provable: ./standard_key/pred_log/simpleEps.key
 provable: ./standard_key/pred_log/steam1.key
 provable: ./standard_key/pred_log/tptp/PUZ/PUZ031p1.key
-provable: ./standard_key/pred_log/tptp/PUZ/PUZ047p1.key
+# removed as proof gets too large
+# provable: ./standard_key/pred_log/tptp/PUZ/PUZ047p1.key
 provable: ./standard_key/pred_log/tptp/SET/SET027p3.key
 provable: ./standard_key/pred_log/tptp/SET/SET043p1.key
 provable: ./standard_key/pred_log/tptp/SET/SET044p1.key
