@@ -120,6 +120,10 @@ list_help(){
 keysysprops=""
 keyoptions=""
 
+#default values for Java Options Xmx and Xms
+javaOptionXmx="-Xmx2048m";
+javaOptionXms="-Xms64m";
+
 while [ $# -ne 0 ]; do
     case $1 in
 #     -K options for configuration options of KeY, such as debugmode, flags,
@@ -173,13 +177,29 @@ while [ $# -ne 0 ]; do
             continue;;
 
         # -J options following conventions of Java for -J options
+        #special treatment of the options which are also set with deafult 
+        #values: xms and Xmx
+	--J-Xms*)
+	    option=${1#--J}
+	    echo "$option"
+	    javaOptionXms=${option}
+	    xms = true;
+	    shift
+	    continue;;
+	    
+	--J-Xmx*)
+	    option=${1#--J}
+	    echo "$option"
+	    javaOptionXmx=${option}
+	    shift
+	    continue;;
+
 	--J*)
 	    option=${1#--J}
 	    JAVA_OPTIONS="${JAVA_OPTIONS} ${option}"
 	    shift
 	    continue;;
-
-
+	    
          # key options beginning with a minus or filenames  
          *) break;;
 
@@ -204,10 +224,11 @@ export PATH
 #
 #-server \
 #-XX:CompileThreshold=1500 \
+# -ea:de.uka.ilkd.key... -Xms64m -Xmx2048m \
 
 
 $JAVA $JAVA_OPTIONS $keysysprops \
--ea:de.uka.ilkd.key... -Xms64m -Xmx2048m \
+-ea:de.uka.ilkd.key... $javaOptionXms $javaOptionXmx \
 -Dkey.home="$KEY_HOME" \
 -Dkey.simplify.logdir="$KEY_SIMPLIFY_LOG_DIR" \
 -Dkey.ics.logdir="$KEY_ICS_LOG_DIR" \
