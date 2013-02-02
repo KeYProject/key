@@ -882,8 +882,9 @@ public abstract class ProgramSVSort extends AbstractSort {
 	    if(pe instanceof MethodReference) {
 		MethodReference mr = (MethodReference)pe;
 		Name localname = mr.getProgramElementName();
-		if (mr.getReferencePrefix() instanceof SuperReference ||
-		    mr.getReferencePrefix() instanceof TypeReference) {
+//		if (mr.getReferencePrefix() instanceof SuperReference ||
+//		    mr.getReferencePrefix() instanceof TypeReference) {
+		if (mr.getReferencePrefix() instanceof SuperReference) {
 		    return false;
 		}
 		if (mr.getReferencePrefix() != null && 
