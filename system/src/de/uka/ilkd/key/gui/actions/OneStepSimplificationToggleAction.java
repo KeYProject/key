@@ -5,12 +5,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import javax.swing.AbstractButton;
+import javax.swing.Icon;
 import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 
 public class OneStepSimplificationToggleAction extends MainWindowAction {
@@ -28,9 +28,8 @@ public class OneStepSimplificationToggleAction extends MainWindowAction {
         putValue(SHORT_DESCRIPTION, "Toggle the aggregation of simplification rules." +
         		" Faster if on, more transparent if off.");
         
-        Image image = IconFactory.getImage("images/toolbar/oneStepSimplifier.png");
-        putValue(SMALL_ICON, IconFactory.scaleIcon(image, MainWindow.TOOLBAR_ICON_SIZE, 
-                MainWindow.TOOLBAR_ICON_SIZE));
+        Icon icon = IconFactory.oneStepSimplifier(MainWindow.TOOLBAR_ICON_SIZE);
+        putValue(SMALL_ICON, icon);
 
         final boolean oneStepSimplificationOn = 
         		ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().oneStepSimplification();

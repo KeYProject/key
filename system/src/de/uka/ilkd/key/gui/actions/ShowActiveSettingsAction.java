@@ -22,7 +22,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
     public ShowActiveSettingsAction(MainWindow mainWindow) {
 	super(mainWindow);
-	setName("Show Active Settings...");
+	setName("Show All Active Settings...");
     }
 
     @Override
@@ -44,7 +44,7 @@ public class ShowActiveSettingsAction extends MainWindowAction {
 
 	JScrollPane settingsPane = new JScrollPane(settings);
 
-	JOptionPane.showMessageDialog(mainWindow, settingsPane, "Settings",
+	JOptionPane.showMessageDialog(mainWindow, settingsPane, "Settings used in the current proof",
 	        JOptionPane.INFORMATION_MESSAGE);
     }
 
