@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import java.util.WeakHashMap;
 
@@ -166,7 +167,7 @@ public class QueryExpand implements BuiltInRule {
         		   lvTrms[i] = tb.var(instVars[i]);
         		   lvSorts[i] = instVars[i].sort();
         	   }
-        	   ImmutableArray<Sort> imArrlvSorts = new ImmutableArray(lvSorts);
+        	   ImmutableArray<Sort> imArrlvSorts = new ImmutableArray<Sort>(lvSorts);
         	   placeHolderResult    = new Function(new Name(logicResultName), query.sort(), imArrlvSorts);
         	   placeHolderResultTrm = tb.func(placeHolderResult, lvTrms, null); //I'm not sure about the third parameter!
            }
@@ -256,7 +257,7 @@ public class QueryExpand implements BuiltInRule {
     public Term evaluateQueries(Services services,  Term term, boolean positiveContext, boolean allowExpandBelowInstQuantifier){
     	//System.out.println("---------- evaluateQueries on:  ---------------- "+term+"\n-------------------------------\n");
     	final int depth =term.depth(); 
-    	Vector<QueryEvalPos> qeps = new Vector<QueryEvalPos>();
+    	List<QueryEvalPos> qeps = new Vector<QueryEvalPos>();
     	Vector<Integer> path = new Vector<Integer>(depth);
     	path.setSize(depth);
     	final ImmutableSLList<QuantifiableVariable> instVars;
@@ -266,9 +267,6 @@ public class QueryExpand implements BuiltInRule {
     		instVars = null;
     	}
     	findQueriesAndEvaluationPositions(term, 0, path, instVars, positiveContext, 0, positiveContext, qeps);
-    	final Term result;
-    	//QueryEvalPos qep = qeps.get(7);
-
     	removeRedundant(qeps);
     	//sorting is important in order to ensure that the original term is modified in a depth-first order.
     	Collections.sort(qeps);
@@ -308,9 +306,10 @@ public class QueryExpand implements BuiltInRule {
      * @param qeps The resulting collection of query evaluation positions.
      * @author gladisch 
      */
+    @SuppressWarnings("unchecked")
     private void findQueriesAndEvaluationPositions(Term t, int level, Vector<Integer> pathInTerm, 
     		               ImmutableList<QuantifiableVariable> instVars, boolean curPosIsPositive, 
-    		               int qepLevel, boolean qepIsPositive, Vector<QueryEvalPos> qeps){
+    		               int qepLevel, boolean qepIsPositive, List<QueryEvalPos> qeps){
     	if(t==null){
     		return;
     	}
@@ -408,7 +407,7 @@ public class QueryExpand implements BuiltInRule {
     /**
      * Tries to remove redundant query evaluations/expansions.
      */
-    private void removeRedundant(Vector<QueryEvalPos> qeps){
+    private void removeRedundant(List<QueryEvalPos> qeps){
     	int size=qeps.size();
     	for(int i=0;i<size;i++){
     		QueryEvalPos cur = qeps.get(i);
@@ -429,7 +428,7 @@ public class QueryExpand implements BuiltInRule {
      * in a formula.
      * @author gladisch
      */
-    private class QueryEvalPos implements Comparable{
+    private class QueryEvalPos implements Comparable<QueryEvalPos> {
     	
     	/** The query that is subject to query evaluation/expansion. 
     	 * The query itself is not modified but a formula is added at a position 
@@ -443,7 +442,8 @@ public class QueryExpand implements BuiltInRule {
     	
     	final public LogicVariable[] instVars;
 
-    	public QueryEvalPos(Term query, Vector<Integer> path, int level, ImmutableList<QuantifiableVariable> iVars, boolean isPositive){
+    	@SuppressWarnings("unchecked")
+        public QueryEvalPos(Term query, Vector<Integer> path, int level, ImmutableList<QuantifiableVariable> iVars, boolean isPositive){
     		this.query = query;
     		pathInTerm = (Vector<Integer>)path.clone();
 			pathInTerm.setSize(level);
@@ -496,8 +496,7 @@ public class QueryExpand implements BuiltInRule {
     	/** For sorting. Longer paths come first in order to apply 
     	 * modifications to the target term in a depth-first order.	 */
 		@Override
-		public int compareTo(Object arg0) {
-			QueryEvalPos other = (QueryEvalPos)arg0;
+		public int compareTo(QueryEvalPos other) {
 			final int otherSize = other.pathInTerm.size();
 			final int thisSize  = pathInTerm.size();
 			return (thisSize<otherSize? 1 : (thisSize>otherSize? -1 : 0));

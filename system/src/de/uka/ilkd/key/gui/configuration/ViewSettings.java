@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 package de.uka.ilkd.key.gui.configuration;
 
 import java.util.LinkedList;
@@ -32,7 +36,8 @@ public class ViewSettings implements Settings, Cloneable {
         "[View]HideClosedSubtrees";
     private static final String USE_SYSTEM_LAF = "[View]UseSystemLookAndFeel";
     private static final String SHOW_JAVA_WARNING = "[View]ShowJavaWarning";
-
+    private static final String PRETTY_SYNTAX = "[View]PrettySyntax";
+    private static final String USE_UNICODE = "[View]UseUnicodeSymbols";
 
     /** default max number of displayed tooltip lines is 40 */
     private int maxTooltipLines = 40; 
@@ -48,7 +53,9 @@ public class ViewSettings implements Settings, Cloneable {
     /** whether to use system look and feel */
     private boolean useSystemLaF = false;
     private boolean notifyLoadBehaviour = true;
-
+    /** Pretty Syntax is true by default, use Unicode symbols not */
+    private boolean usePretty = true;
+    private boolean useUnicode = false;
 
     private LinkedList<SettingsListener> listenerList =
         new LinkedList<SettingsListener>();
@@ -196,6 +203,8 @@ public class ViewSettings implements Settings, Cloneable {
 		String val5 = props.getProperty(HIDE_CLOSED_SUBTREES);
 		String val6 = props.getProperty(USE_SYSTEM_LAF);
 		String val7 = props.getProperty(SHOW_JAVA_WARNING);
+		String val8 = props.getProperty(PRETTY_SYNTAX);
+		String val9 = props.getProperty(USE_UNICODE);
 		if (val1 != null) {
 		        maxTooltipLines = Integer.valueOf(val1).intValue();
 		} 
@@ -219,6 +228,12 @@ public class ViewSettings implements Settings, Cloneable {
 		if (val7 != null) {
 		    notifyLoadBehaviour = Boolean.valueOf(val7).booleanValue();
 		}
+		if (val8 != null) {
+		    usePretty = Boolean.valueOf(val8).booleanValue();
+		}
+		if (val9 != null) {
+		    useUnicode = Boolean.valueOf(val9).booleanValue();
+		}
 	}
 
   
@@ -241,6 +256,8 @@ public class ViewSettings implements Settings, Cloneable {
             hideClosedSubtrees);
     	props.setProperty(USE_SYSTEM_LAF, ""+useSystemLaF);
     	props.setProperty(SHOW_JAVA_WARNING, "" + notifyLoadBehaviour);
+    	props.setProperty(PRETTY_SYNTAX, ""+ usePretty);
+    	props.setProperty(USE_UNICODE, "" + useUnicode);
     }
 
     /** sends the message that the state of this setting has been
@@ -259,5 +276,39 @@ public class ViewSettings implements Settings, Cloneable {
     public void addSettingsListener(SettingsListener l) {
 	listenerList.add(l);
     }
+
+public boolean isUsePretty() {
+	return usePretty;
+}
+
+public void setUsePretty(boolean usePretty) {
+	this.usePretty = usePretty;
+	if(!usePretty){
+	    setUseUnicode(false);
+	}
+	fireSettingsChanged();
+}
+/** 
+ * Use Unicode Symbols is only allowed if pretty syntax is used
+ * @return setting of use unicode symbols (if use pretty syntax is on, return the value which is set, if use retty is false, return false)
+ */
+public boolean isUseUnicode() {
+	if(isUsePretty()){ 
+	return useUnicode;
+	} else {
+	setUseUnicode(false);
+	return false;
+	}
+	
+}
+
+public void setUseUnicode(boolean useUnicode) {
+	if(isUsePretty()){
+	 this.useUnicode = useUnicode;
+	} else {
+	 this.useUnicode = false;	
+	}
+	fireSettingsChanged();
+}
     
 }
