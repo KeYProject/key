@@ -68,6 +68,7 @@ public class LicenseAction extends MainWindowAction {
         fr.getContentPane().add(ok, BorderLayout.SOUTH);
         fr.setSize(600,900);
         fr.getContentPane().add(scroll);
+        fr.setLocationRelativeTo(null);
         fr.setVisible(true);
     }
     

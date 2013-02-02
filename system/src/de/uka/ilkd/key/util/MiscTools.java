@@ -1,16 +1,22 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.util;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -528,4 +534,21 @@ public final class MiscTools {
 	}
     }
 
+    /**
+     * read an input stream to its end into a string.
+     * 
+     * @param is
+     *            a non-null open input stream
+     * @return the string created from the input of the stream
+     * @throws IOException may occur while reading the stream
+     */
+    public static String toString(InputStream is) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        byte[] buffer = new byte[2048];
+        int read;
+        while((read=is.read(buffer)) > 0) {
+            sb.append(new String(buffer, 0, read));
+        }
+        return sb.toString();
+    }
 }

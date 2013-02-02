@@ -30,6 +30,9 @@ public class ShowKnownTypesAction extends MainWindowAction {
     public ShowKnownTypesAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Show Known Types...");
+	
+	getMediator().enableWhenProof(this);
+
     }
 
     @Override
