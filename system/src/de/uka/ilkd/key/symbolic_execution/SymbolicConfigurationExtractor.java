@@ -18,6 +18,7 @@ import de.uka.ilkd.key.gui.ApplyStrategy;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -25,7 +26,6 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -1099,7 +1099,7 @@ public class SymbolicConfigurationExtractor {
    protected Set<Term> collectSymbolicObjectsFromTerm(Term term, 
                                                       final Set<Term> objectsToIgnore) throws ProofInputException {
       final Set<Term> result = new LinkedHashSet<Term>();
-      term.execPreOrder(new Visitor() {
+      term.execPreOrder(new DefaultVisitor() {
          @Override
          public void visit(Term visited) {
             if (SymbolicExecutionUtil.hasReferenceSort(getServices(), visited) && 

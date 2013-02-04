@@ -32,7 +32,7 @@ import de.uka.ilkd.key.logic.op.SubstOp;
  * or skolem functions.
  */
 
-public class SVNameCorrespondenceCollector extends Visitor {
+public class SVNameCorrespondenceCollector extends DefaultVisitor {
 
     /**
      * This map contains (a, b) if there is a substitution {b a}

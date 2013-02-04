@@ -37,6 +37,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -62,7 +63,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.util.Debug;
 
-public final class SyntacticalReplaceVisitor extends Visitor { 	
+public final class SyntacticalReplaceVisitor extends DefaultVisitor { 	
 
     private final SVInstantiations svInst;
     @Deprecated
