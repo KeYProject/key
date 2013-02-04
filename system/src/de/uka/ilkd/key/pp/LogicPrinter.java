@@ -1425,8 +1425,11 @@ public final class LogicPrinter {
 
         layouter.print ( keyword );
 
-        assert t.boundVars().isEmpty();
-
+        if ( t.varsBoundHere ( 0 ).size () > 0 ) {
+            layouter.print ( " " );
+            printVariables ( t.varsBoundHere ( 0 ) );
+        }
+        
         layouter.print( " (" );
         markStartSub ();
         printTerm ( t.sub ( 0 ) );
