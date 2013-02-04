@@ -354,8 +354,7 @@ provable: ./standard_key/pred_log/tptp/SYN/SYN036p2.key
 provable: ./standard_key/pred_log/tptp/SYN/SYN550p1.key
 notprovable: ./standard_key/prop_log/reallySimple.key
 notprovable: ./standard_key/pred_log/sameName1.key
-# currently removed because reload fails (see bug #1277)
-# provable: ./standard_key/pred_log/jbyteIfEx.key
+provable: ./standard_key/pred_log/jbyteIfEx.key
 provable: ./standard_key/prop_log/allClausesLength4.key
 provable: ./standard_key/prop_log/allClausesLength5.key
 provable: ./standard_key/prop_log/doubleNeg.key
