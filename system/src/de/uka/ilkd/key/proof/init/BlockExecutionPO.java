@@ -83,7 +83,8 @@ public class BlockExecutionPO extends AbstractOperationPO
         // add class axioms
         Proof initiatingProof = initiatingGoal.proof();
         AbstractOperationPO initatingPO =
-                (AbstractOperationPO) services.getSpecificationRepository().getPOForProof(initiatingProof);
+                (AbstractOperationPO) services.getSpecificationRepository()
+                                                    .getPOForProof(initiatingProof);
         taclets = initatingPO.getInitialTaclets();
     }
 

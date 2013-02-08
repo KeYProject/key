@@ -25,7 +25,8 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                         ProofObligationVars poVars1,
                         ProofObligationVars poVars2)
             throws UnsupportedOperationException {
-
+        if (d.get(BasicSnippetData.Key.LOOP_INVARIANT) != null)
+            System.out.println("InOut for LOOOOOOOOOPS!"); // TODO: for debugging, to be removed
         // get respects terms
         if (d.get(BasicSnippetData.Key.RESPECTS) == null) {
             throw new UnsupportedOperationException("Tried to produce "
@@ -41,24 +42,26 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         Triple<Term[],Term[],Term[]>[] respectsAtPre1 = replace(origRespects, d.origVars, poVars1);
         Triple<Term[],Term[],Term[]>[] respectsAtPre2 = replace(origRespects, d.origVars, poVars2);
         // the respects-sequents evaluated in the post-state
-        Triple<Term[],Term[],Term[]>[] respectsAtPost1 = replace(respectsAtPre1,
-                new Term[]{poVars1.heap,
-                           poVars1.self,
-                           poVars1.result,
-                           poVars1.exception},
-                new Term[]{poVars1.heapAtPost,
-                           poVars1.selfAtPost,
-                           poVars1.resultAtPost,
-                           poVars1.exceptionAtPost});
-        Triple<Term[],Term[],Term[]>[] respectsAtPost2 = replace(respectsAtPre2,
-                new Term[]{poVars2.heap,
-                           poVars2.self,
-                           poVars2.result,
-                           poVars2.exception},
-                new Term[]{poVars2.heapAtPost,
-                           poVars2.selfAtPost,
-                           poVars2.resultAtPost,
-                           poVars2.exceptionAtPost});        
+        Triple<Term[],Term[],Term[]>[] respectsAtPost1 =
+                replace(respectsAtPre1,
+                        new Term[]{poVars1.heap,
+                                   poVars1.self,
+                                   poVars1.result,
+                                   poVars1.exception},
+                        new Term[]{poVars1.heapAtPost,
+                                   poVars1.selfAtPost,
+                                   poVars1.resultAtPost,
+                                   poVars1.exceptionAtPost});
+        Triple<Term[],Term[],Term[]>[] respectsAtPost2 =
+                replace(respectsAtPre2,
+                        new Term[]{poVars2.heap,
+                                   poVars2.self,
+                                   poVars2.result,
+                                   poVars2.exception},
+                        new Term[]{poVars2.heapAtPost,
+                                   poVars2.selfAtPost,
+                                   poVars2.resultAtPost,
+                                   poVars2.exceptionAtPost});
         // create input-output-relations
         final Term[] relations = new Term[respectsAtPre1.length];
         for (int i = 0; i < respectsAtPre1.length; i++) {
@@ -108,7 +111,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         for (int i = 0; i < respects1.first.length; i++) {
             SearchVisitor search = new SearchVisitor(vs1.result, vs1.resultAtPost);
             respects1.first[i].execPreOrder(search);
-            if (!search.termFound && !vs1.localIns.contains(respects1.first[i])) {
+            if (!search.termFound && (i == 0)) {
                 // refLocTerms which contain \result are not included in
                 // the precondition
                 eqAtLocs[i] = d.tb.equals(respects1.first[i], respects2.first[i]);
@@ -158,9 +161,8 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                                            ? vs1.localOuts.size() : 0) +
                                    (vs1.guardAtPost != null ? 1 : 0)];
         for (int i = 0; i < respects1.first.length; i++) {
-            if (!vs1.localIns.contains(respects1.first[i]) ||
-                vs1.localOuts == null || vs1.localOuts.isEmpty()) {
-            eqAtLocs[i] = d.tb.equals(respects1.first[i], respects2.first[i]);
+            if ((i == 0)) {
+                eqAtLocs[i] = d.tb.equals(respects1.first[i], respects2.first[i]);
             } else {
                 eqAtLocs[i] = d.tb.tt();
             }

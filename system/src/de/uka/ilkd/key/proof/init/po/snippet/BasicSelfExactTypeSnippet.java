@@ -33,8 +33,16 @@ class BasicSelfExactTypeSnippet implements FactoryMethod {
         }
         final IProgramMethod pm = (IProgramMethod) targetMethod;
         KeYJavaType forClass = (KeYJavaType) d.get(BasicSnippetData.Key.FOR_CLASS);
-        final Sort contractSort = forClass.getSort();
-        return (poVars.self == null || pm.isConstructor())
-               ? d.tb.tt() : d.tb.exactInstance(contractSort, poVars.self);
+        Term result = d.tb.tt();
+        if (forClass != null) {
+            final Sort contractSort = forClass.getSort();
+            result = (poVars.self == null || pm.isConstructor())
+                    ? d.tb.tt() : d.tb.exactInstance(contractSort, poVars.self);
+        } else if (d.get(BasicSnippetData.Key.LOOP_INVARIANT_TERM) != null) {
+            final Sort loopInvSort= pm.sort();
+            result = (poVars.self == null || pm.isConstructor())
+                    ? d.tb.tt() : d.tb.exactInstance(loopInvSort, poVars.self);
+        }
+        return result;
     }
 }

@@ -83,8 +83,10 @@ public final class SpecificationRepository {
     
     private final Map<Pair<KeYJavaType,IObserverFunction>, ImmutableSet<Contract>> contracts 
     		= new LinkedHashMap<Pair<KeYJavaType,IObserverFunction>,ImmutableSet<Contract>>();
-    private final Map<Pair<KeYJavaType,IProgramMethod>, ImmutableSet<FunctionalOperationContract>> operationContracts 
-    		= new LinkedHashMap<Pair<KeYJavaType,IProgramMethod>,ImmutableSet<FunctionalOperationContract>>();    
+    private final Map<Pair<KeYJavaType,IProgramMethod>,
+                           ImmutableSet<FunctionalOperationContract>> operationContracts 
+    		= new LinkedHashMap<Pair<KeYJavaType,IProgramMethod>,
+    		                    ImmutableSet<FunctionalOperationContract>>();    
     private final Map<String,Contract> contractsByName
                 = new LinkedHashMap<String,Contract>();
     private final Map<KeYJavaType,ImmutableSet<IObserverFunction>> contractTargets
@@ -399,7 +401,8 @@ public final class SpecificationRepository {
 
     
     private void registerContract(Contract contract) {
-        final Pair<KeYJavaType, IObserverFunction> target = new Pair<KeYJavaType,IObserverFunction>(contract.getKJT(), contract.getTarget());
+        final Pair<KeYJavaType, IObserverFunction> target =
+                new Pair<KeYJavaType,IObserverFunction>(contract.getKJT(), contract.getTarget());
         registerContract(contract, target);
     }
 
@@ -430,7 +433,8 @@ public final class SpecificationRepository {
                   getContracts(targetKJT, targetMethod).add(contract));
         
         if(contract instanceof FunctionalOperationContract) {
-        operationContracts.put(new Pair<KeYJavaType,IProgramMethod>(targetKJT, (IProgramMethod)targetMethod), 
+        operationContracts
+            .put(new Pair<KeYJavaType,IProgramMethod>(targetKJT, (IProgramMethod)targetMethod), 
                            getOperationContracts(targetKJT, 
                                              (IProgramMethod)targetMethod)
                                       .add((FunctionalOperationContract)contract));
@@ -445,11 +449,15 @@ public final class SpecificationRepository {
     /** Removes the contract from the repository, but keeps its target. */
     private void unregisterContract(Contract contract) {
         final KeYJavaType kjt = contract.getKJT();
-        final Pair<KeYJavaType,IObserverFunction> tp = new Pair<KeYJavaType, IObserverFunction>(kjt, contract.getTarget());
-        final Pair<KeYJavaType,IProgramMethod> tp2 = new Pair<KeYJavaType, IProgramMethod>(kjt, (IProgramMethod) contract.getTarget());
+        final Pair<KeYJavaType,IObserverFunction> tp =
+                new Pair<KeYJavaType, IObserverFunction>(kjt, contract.getTarget());
+        final Pair<KeYJavaType,IProgramMethod> tp2 =
+                new Pair<KeYJavaType, IProgramMethod>(kjt, (IProgramMethod) contract.getTarget());
         contracts.put(tp, contracts.get(tp).remove(contract));
         if (contract instanceof FunctionalOperationContract){
-            operationContracts.put(tp2, operationContracts.get(tp2).remove((FunctionalOperationContract)contract));
+            operationContracts.put(tp2,
+                                   operationContracts.get(tp2)
+                                       .remove((FunctionalOperationContract)contract));
         }
         contractsByName.remove(contract.getName());
     }
@@ -547,12 +555,15 @@ public final class SpecificationRepository {
 	    				       IProgramMethod pm,
 	    				       Modality modality) {
 	ImmutableSet<FunctionalOperationContract> result = getOperationContracts(kjt, pm);
-	final boolean transactionModality = (modality == Modality.DIA_TRANSACTION || modality == Modality.BOX_TRANSACTION);
-	final Modality matchModality = transactionModality ? ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA :
+	final boolean transactionModality =
+	        (modality == Modality.DIA_TRANSACTION || modality == Modality.BOX_TRANSACTION);
+	final Modality matchModality = transactionModality
+	        ? ((modality == Modality.DIA_TRANSACTION) ? Modality.DIA :
 	          Modality.BOX) : modality;
 	for(FunctionalOperationContract contract : result) {
             if(!contract.getModality().equals(matchModality)
-             || (transactionModality && !contract.transactionApplicableContract() && !contract.isReadOnlyContract(services))) {
+             || (transactionModality && !contract.transactionApplicableContract()
+                     && !contract.isReadOnlyContract(services))) {
 		result = result.remove(contract);
 	    }
 	}
@@ -649,7 +660,8 @@ public final class SpecificationRepository {
         		        		              contract.getTarget()));
         
         registerContract(contract, impls);
-        assert contractTargets.get(contract.getKJT()).contains(contract.getTarget()) : "target "+contract.getTarget()+" missing for contract "+contract;
+        assert contractTargets.get(contract.getKJT()).contains(contract.getTarget())
+                    : "target "+contract.getTarget()+" missing for contract "+contract;
     }
     
     /** Registers the passed (atomic) contract without inheriting it. */
@@ -760,7 +772,8 @@ public final class SpecificationRepository {
             for (InitiallyClause inv: initiallyClauses.get(kjt)){
                 createContractsFromInitiallyClause(inv,kjt);
                 if (VisibilityModifier.allowsInheritance(inv.getVisibility())){
-                    final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
+                    final ImmutableList<KeYJavaType> subs =
+                            services.getJavaInfo().getAllSubtypes(kjt);
                     for (KeYJavaType sub: subs){
                     createContractsFromInitiallyClause(inv,sub);
                     }}
@@ -1124,13 +1137,14 @@ public final class SpecificationRepository {
         }
     }
 
-    public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block, final Modality modality)
-    {
+    public ImmutableSet<BlockContract> getBlockContracts(final StatementBlock block,
+                                                         final Modality modality) {
         ImmutableSet<BlockContract> result = getBlockContracts(block);
         final Modality matchModality = getMatchModality(modality);
         for (BlockContract contract : result) {
             if (!contract.getModality().equals(matchModality)
-                    || (modality.transaction() && !contract.isTransactionApplicable() && !contract.isReadOnly(services))) {
+                    || (modality.transaction() && !contract.isTransactionApplicable()
+                            && !contract.isReadOnly(services))) {
                 result = result.remove(contract);
             }
         }
@@ -1185,7 +1199,8 @@ public final class SpecificationRepository {
 	    					IObserverFunction obs) {
 	assert limitedToUnlimited.get(obs) == null 
 	       : " observer is already limited: " + obs;
-	if(!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) { // TODO Was the exact class match "obs.getClass() != ObserverFunction.class" correctly converted into IProgramMethod?
+	if(!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) {
+	    // TODO Was the exact class match "obs.getClass() != ObserverFunction.class" correctly converted into IProgramMethod?
 	    return null;
 	}
 	

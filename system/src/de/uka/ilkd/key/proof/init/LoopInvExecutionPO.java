@@ -9,6 +9,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -30,17 +31,20 @@ public class LoopInvExecutionPO extends AbstractOperationPO
     private final InformationFlowContract generatedIFContract;
     private final ProofObligationVars symbExecVars;
     private final Goal initiatingGoal;
+    private final ExecutionContext context;
 
     public LoopInvExecutionPO(InitConfig initConfig,
                               LoopInvariant loopInv,
                               ProofObligationVars symbExecVars,
-                              Goal initiatingGoal) {
-        super(initConfig, loopInv.getName());        
+                              Goal initiatingGoal,
+                              ExecutionContext context) {
+        super(initConfig, loopInv.getName());
         this.generatedIFContract =
                 new InformationFlowContractImpl(loopInv, services);
         this.loopInvariant = loopInv;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
+        this.context = context;
     }
 
 
@@ -49,11 +53,14 @@ public class LoopInvExecutionPO extends AbstractOperationPO
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
                 POSnippetFactory.getBasicFactory(loopInvariant, symbExecVars,
-                                                 services);
+                                                 context, services);
 
         // loop invariant
+        final Term freeInv =
+                symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_INV);
         final Term loopInv =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.LOOP_INV);
+        final Term inv = TB.and(freeInv, loopInv);
 
         // symbolic execution
         Term symExec =
@@ -61,7 +68,7 @@ public class LoopInvExecutionPO extends AbstractOperationPO
 
         // final symbolic execution term
         Term finalTerm = TB.applyElementary(services, symbExecVars.heap,
-                                            TB.not(TB.and(loopInv, symExec)));
+                                            TB.not(TB.and(inv, symExec)));
 
         // register final term
         assignPOTerms(finalTerm);
@@ -89,6 +96,10 @@ public class LoopInvExecutionPO extends AbstractOperationPO
 
     public Goal getInitiatingGoal() {
         return initiatingGoal;
+    }
+
+    public ExecutionContext getExecutionContext() {
+        return context;
     }
 
     @Override
@@ -150,7 +161,7 @@ public class LoopInvExecutionPO extends AbstractOperationPO
     }
 
     @Override
-    public InformationFlowContract getContract() {        
+    public InformationFlowContract getContract() {
         return generatedIFContract;
     }
 

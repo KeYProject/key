@@ -43,11 +43,11 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
         super(mods);
         for(Name heap : HeapLDT.VALID_HEAP_NAMES) {
           assignables.put(heap.toString(), ImmutableSLList.<PositionedString>nil());
-          invariants.put(heap.toString(), ImmutableSLList.<PositionedString>nil());          
+          invariants.put(heap.toString(), ImmutableSLList.<PositionedString>nil());
         }
     }
 
-       
+
     public void addInvariant(PositionedString ps) {
         addGeneric(invariants, ps);
     }
@@ -55,15 +55,15 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     public void addAssignable(PositionedString ps) {
         addGeneric(assignables, ps);
     }
-    
+
     public void addRespects(PositionedString ps) {
         respects = respects.append(ps);
     }
-    
+
     public void addRespects(ImmutableList<PositionedString> l) {
         respects = respects.append(l);
     }
-    
+
     public void setVariant(PositionedString ps) {
         assert variant == null;
         variant = ps;
@@ -71,12 +71,12 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
 
     public ImmutableList<PositionedString> getInvariant(String hName) {
         return invariants.get(hName);
-    }    
-    
+    }
+
     public ImmutableList<PositionedString> getInvariant() {
         return invariants.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
-    
+
     public ImmutableList<PositionedString> getAssignable() {
         return assignables.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
@@ -88,7 +88,7 @@ public final class TextualJMLLoopSpec extends TextualJMLConstruct {
     public Map<String,ImmutableList<PositionedString>> getAssignables() {
         return assignables;
     }
-    
+
     public ImmutableList<PositionedString> getRespects() {
         return respects;
     }

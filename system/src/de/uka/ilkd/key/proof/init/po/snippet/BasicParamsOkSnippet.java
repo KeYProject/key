@@ -25,11 +25,38 @@ class BasicParamsOkSnippet implements FactoryMethod {
         for (Term param : poVars.localIns) {
             if (!(param.op() instanceof ProgramVariable)) {
                 throw new UnsupportedOperationException("Tried to produce "
-                        + "PARAMS_OK for an term "
+                        + "PARAMS_OK for a term "
                         + "which is no ProgramVariable.");
             }
             ProgramVariable pv = (ProgramVariable) param.op();
             paramsOK = d.tb.and(paramsOK, d.tb.reachableValue(poVars.heap, param, pv.getKeYJavaType()));
+        }
+        for (Term param : poVars.localOuts) {
+            if (!(param.op() instanceof ProgramVariable)) {
+                throw new UnsupportedOperationException("Tried to produce "
+                        + "PARAMS_OK for a term "
+                        + "which is no ProgramVariable.");
+            }
+            ProgramVariable pv = (ProgramVariable) param.op();
+            paramsOK = d.tb.and(paramsOK, d.tb.reachableValue(poVars.heap, param, pv.getKeYJavaType()));
+        }
+        if (poVars.guard != null) {
+            if (!(poVars.guard.op() instanceof ProgramVariable)) {
+                throw new UnsupportedOperationException("Tried to produce "
+                        + "PARAMS_OK for a term "
+                        + "which is no ProgramVariable.");
+            }
+            ProgramVariable pv = (ProgramVariable) poVars.guard.op();
+            paramsOK = d.tb.and(paramsOK, d.tb.reachableValue(poVars.heap, poVars.guard, pv.getKeYJavaType()));
+        }
+        if (poVars.guardAtPost != null) {
+            if (!(poVars.guardAtPost.op() instanceof ProgramVariable)) {
+                throw new UnsupportedOperationException("Tried to produce "
+                        + "PARAMS_OK for a term "
+                        + "which is no ProgramVariable.");
+            }
+            ProgramVariable pv = (ProgramVariable) poVars.guardAtPost.op();
+            paramsOK = d.tb.and(paramsOK, d.tb.reachableValue(poVars.heap, poVars.guardAtPost, pv.getKeYJavaType()));
         }
         return paramsOK;
     }

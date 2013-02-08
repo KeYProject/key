@@ -71,9 +71,15 @@ public final class InfFlowLoopInvariantTacletBuilder
     Term buildContractApplications(ProofObligationVars contAppData,
                                    ProofObligationVars contAppData2,
                                    Services services) {
+        LoopInvariant ifContract =
+                services.getSpecificationRepository().getLoopInvariant(loopinvariant.getLoop());
+
         InfFlowPOSnippetFactory f =
-                POSnippetFactory.getInfFlowFactory(loopinvariant, contAppData,
-                        contAppData2, services);
-        return f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_LOOP_INVARIANT_APPL);
+                POSnippetFactory.getInfFlowFactory(ifContract, contAppData,
+                                                       contAppData2, services);
+        Term contractApplication =
+                f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_LOOP_INVARIANT_APPL);
+
+        return contractApplication;
     }
 }

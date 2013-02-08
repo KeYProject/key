@@ -82,6 +82,10 @@ public interface LoopInvariant extends SpecificationElement {
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
     public Term getInternalSelfTerm();
+
+    public Term getSelf();
+
+    public Term getSelfAtPost();
     
     public ImmutableList<Term> getLocalIns();
     
@@ -124,11 +128,17 @@ public interface LoopInvariant extends SpecificationElement {
     public LoopInvariant setExecutionContext(ExecutionContext execCont);
 
 
+    public void setLocalIns(ImmutableList<Term> localIns);
+
     public void setLocalOuts(ImmutableList<Term> localOuts);
 
     public void setGuard(Term guardTerm);
     
-    public void setGuardAtPost(Term guardTerm);
+    public void setGuardAtPost(Term guardAtPostTerm);
+
+    public void setSelf(Term selfTerm);
+
+    public void setSelfAtPost(Term selfAtPostTerm);
     
     /**
      * Returns a new loop invariant where the invariant formula has been

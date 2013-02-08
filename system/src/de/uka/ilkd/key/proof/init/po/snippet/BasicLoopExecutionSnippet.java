@@ -106,7 +106,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
 
         //create loop call
         LoopInvariant inv = (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
-        StatementBlock sb = (StatementBlock) inv.getLoop().getBody();        
+        StatementBlock sb = (StatementBlock) inv.getLoop().getBody();
 
         //create java block
         Statement s = new MethodFrame(null, context, sb);

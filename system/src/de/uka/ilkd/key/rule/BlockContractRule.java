@@ -216,7 +216,8 @@ public class BlockContractRule implements BuiltInRule {
                                             MiscTools.toTermList(localInVariables),
                                             heapAtPre,
                                             MiscTools.toTermList(localOutVariables),
-                                            vars.result, vars.exception,
+                                            vars.result, ifContractBuilder.getResultPost(),
+                                            vars.exception, ifContractBuilder.getExceptionAtPost(),
                                             heapAtPost, services);
             final IFProofObligationVars ifVars =
                     new IFProofObligationVars(instantiationVars, services);

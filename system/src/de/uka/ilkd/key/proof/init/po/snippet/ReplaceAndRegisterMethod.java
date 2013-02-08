@@ -32,7 +32,7 @@ abstract class ReplaceAndRegisterMethod {
 
         Iterator<Term> origVarsIt;
         Iterator<Term> poVarsIt;
-        if (origVars.localIns.isEmpty() && origVars.localOuts.isEmpty()) {            
+        if (origVars.localIns.isEmpty() && origVars.localOuts.isEmpty()) {
             assert origVars.paddedTermListWithoutLocalVars.size() ==
                    poVars.paddedTermListWithoutLocalVars.size();
             origVarsIt = origVars.paddedTermListWithoutLocalVars.iterator();
@@ -56,9 +56,11 @@ abstract class ReplaceAndRegisterMethod {
                 map.put(origTerm, poTerm);
             }
         }
-
+        System.out.println("RaR-map:" + map.toString()); // TODO: for debugging, to be removed
+        System.out.println("RaR-term:" + term.toString()); // TODO: for debugging, to be removed
         OpReplacer or = new OpReplacer(map);
         Term result = or.replace(term);
+        System.out.println("RaR-res:" + result.toString());
 
         return result;
     }

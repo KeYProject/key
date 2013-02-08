@@ -28,10 +28,10 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
  */
 public class OpReplacer {
     private static final TermFactory TF = TermFactory.DEFAULT;
-    
+
     private final Map<? extends SVSubstitute, ? extends SVSubstitute> map;
-    
-    
+
+
     /**
      * @param map mapping from the operators/terms to be replaced to the ones to 
      * replace them with
@@ -73,10 +73,15 @@ public class OpReplacer {
      * Replaces in an operator.
      */
     public Operator replace(Operator op) {
-        Operator newOp = (Operator) map.get(op);
+        System.out.println("Mapping: " + map.toString()); // TODO: for debugging, to be removed
+        Operator newOp = (Operator) map.get(op);        
+        System.out.println("Found? " + map.containsKey(op)); // TODO: for debugging, to be removed
+        System.out.println("Old Operator " + op.toString()); // TODO: for debugging, to be removed
         if(newOp != null) {
+            System.out.println("New Operator: " + newOp.toString()); // TODO: for debugging, to be removed
             return newOp;
         } else {
+            System.out.println("No new Operator."); // TODO: for debugging, to be removed
             return op;
         }
     }
@@ -89,9 +94,10 @@ public class OpReplacer {
         if(term == null) {
             return null;
         }
-        
+        System.out.println("Term: " + term.toString()); // TODO: for debugging, to be removed
         final Term newTerm = (Term) map.get(term); 
         if(newTerm != null) {
+            System.out.println("New Term! " + newTerm.toString()); // TODO: for debugging, to be removed
             return newTerm;
         }
 
@@ -102,7 +108,9 @@ public class OpReplacer {
         boolean changedSubTerm = false;
         for(int i = 0; i < arity; i++) {
             Term subTerm = term.sub(i);
+            System.out.println("Subterm " + i + ": " + subTerm.toString() + " ..."); // TODO: for debugging, to be removed          
             newSubTerms[i] = replace(subTerm);
+            System.out.println("... becomes " + i + ": " + newSubTerms[i].toString()); // TODO: for debugging, to be removed
     
             if(newSubTerms[i] != subTerm) {
                 changedSubTerm = true;
@@ -112,6 +120,14 @@ public class OpReplacer {
         final ImmutableArray<QuantifiableVariable> newBoundVars 
         	= replace(term.boundVars());
     
+        if (newOp != term.op())
+            System.out.println("Operator! " + newOp.toString()); // TODO: for debugging, to be removed
+        else if (changedSubTerm)
+            System.out.println("Subterm!"); // TODO: for debugging, to be removed
+        else if (newBoundVars != term.boundVars())
+            System.out.println("Bounded Variables! " + newBoundVars.toString()); // TODO: for debugging, to be removed
+        else
+            System.out.println("No success! " + term.toString()); // TODO: for debugging, to be removed
         final Term result;
         if(newOp != term.op()  
            || changedSubTerm
@@ -120,6 +136,7 @@ public class OpReplacer {
                                    newSubTerms,
                                    newBoundVars,
                                    term.javaBlock());
+            System.out.println("Term created! "  + result.toString()); // TODO: for debugging, to be removed
         } else {
             result = term;
         }

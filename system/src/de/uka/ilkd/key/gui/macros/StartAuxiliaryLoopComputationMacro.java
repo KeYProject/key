@@ -62,6 +62,7 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
                 POSnippetFactory.getInfFlowFactory(loopInv,
                                                    ifVars.c1,
                                                    ifVars.c2, services);
+        
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
 
@@ -88,7 +89,8 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
                 loopInvRuleApp.getInformationFlowProofObligationVars();
 
         LoopInvExecutionPO loopInvExecPO =
-                new LoopInvExecutionPO(initConfig, loopInv, ifVars.symbExecVars, goal);
+                new LoopInvExecutionPO(initConfig, loopInv, ifVars.symbExecVars,
+                                       goal, loopInv.getExecutionContext());
 
         ProblemInitializer pi =
                 new ProblemInitializer(mediator.getUI(), mediator.getProfile(),

@@ -3,6 +3,7 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -12,6 +13,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -92,7 +94,8 @@ class BasicSnippetData {
         /**
          * Variables originally used during parsing.
          */
-        BLOCK_VARS(Variables.class),
+        BLOCK_VARS(Variables.class),  // TODO: Maybe we need something similar
+                                      //for self variable of loop invariants?
         LABELS(Label[].class),
         CONTEXT(ExecutionContext.class); // this does not fit well here
 
@@ -126,8 +129,8 @@ class BasicSnippetData {
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         origVars =
                 new ProofObligationVars(contract.getSelf(),
-                                        contract.getParams(), contract.getResult(), contract.getExc(),
-                                        heap, services);
+                                        contract.getParams(), contract.getResult(),
+                                        contract.getExc(), heap, services);
 
     }
     
@@ -145,10 +148,26 @@ class BasicSnippetData {
         contractContents.put(Key.RESPECTS, invariant.getRespects(services));
         
         final Term heap = TermBuilder.DF.getBaseHeap(services);
+        final ImmutableSet<ProgramVariable> localInVariables =
+                MiscTools.getLocalIns(invariant.getLoop(), services);
+        final ImmutableSet<ProgramVariable> localOutVariables =
+                MiscTools.getLocalOuts(invariant.getLoop(), services);
+        final ImmutableList<Term> localInTerms = toTermList(localInVariables);
+        final ImmutableList<Term> localOutTerms = toTermList(localOutVariables);
+        final Term self = TermBuilder.DF.var(
+                TermBuilder.DF.selfVar(services,
+                                       invariant.getTarget(),
+                                       invariant.getTarget().getContainerType(),
+                                       false));
+        
         origVars =
-                new ProofObligationVars(invariant.getInternalSelfTerm(), invariant.getGuard(),
-                                        invariant.getLocalIns(), heap, invariant.getGuardAtPost(),
-                                        invariant.getLocalOuts(), services);
+                new ProofObligationVars(self,
+                                        //invariant.getSelfAtPost(),
+                                        invariant.getGuard(),
+                                        localInTerms, heap,
+                                        //invariant.getGuardAtPost(),
+                                        localOutTerms,
+                                        services);
     }
     
     

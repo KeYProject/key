@@ -45,7 +45,9 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                      ImmutableList<Term>>>> originalRespects;
     private final Term originalVariant;
     private final Term originalSelfTerm;
-    private final ImmutableList<Term> localIns;
+    private Term selfTerm;
+    private Term selfAtPostTerm;
+    private ImmutableList<Term> localIns;
     private ImmutableList<Term> localOuts;
     private final Map<LocationVariable,Term> originalAtPres;
     
@@ -86,19 +88,22 @@ public final class LoopInvariantImpl implements LoopInvariant {
         this.innermostExecCont          = innermostExecCont;
         this.guard                      = null;
         this.guardAtPost                = null;
-        this.originalInvariants         = invariants == null ? new LinkedHashMap<LocationVariable,Term>() : invariants;
+        this.originalInvariants         =
+                invariants == null ? new LinkedHashMap<LocationVariable,Term>() : invariants;
         this.originalVariant            = variant;
-        this.originalModifies           = modifies == null ? new LinkedHashMap<LocationVariable,Term>() : modifies;
-        this.originalRespects           = respects == null ?
-                                          new LinkedHashMap<LocationVariable,
-                                                            ImmutableList<Triple<ImmutableList<Term>,
-                                                                                 ImmutableList<Term>,
-                                                                                 ImmutableList<Term>>>>()
-                                                                                 : respects;
+        this.originalModifies           =
+                modifies == null ? new LinkedHashMap<LocationVariable,Term>() : modifies;
+        this.originalRespects           =
+                respects == null ? new LinkedHashMap<LocationVariable,
+                                                     ImmutableList<Triple<ImmutableList<Term>,
+                                                                          ImmutableList<Term>,
+                                                                          ImmutableList<Term>>>>()
+                                 : respects;
         this.originalSelfTerm           = selfTerm;
         this.localIns                   = localIns;
         this.localOuts                  = localOuts;
-        this.originalAtPres             = atPres == null ? new LinkedHashMap<LocationVariable,Term>() : atPres;
+        this.originalAtPres             =
+                atPres == null ? new LinkedHashMap<LocationVariable,Term>() : atPres;
     }
     
     public LoopInvariantImpl(LoopStatement loop,
@@ -340,8 +345,18 @@ public final class LoopInvariantImpl implements LoopInvariant {
     @Override
     public Term getInternalSelfTerm() {
         return originalSelfTerm;
-    }    
-    
+    }
+
+    @Override
+    public Term getSelf() {
+        return selfTerm;
+    }
+
+    @Override
+    public Term getSelfAtPost() {
+        return selfAtPostTerm;
+    }
+
     @Override
     public ImmutableList<Term> getLocalIns() {
         return localIns;
@@ -411,7 +426,12 @@ public final class LoopInvariantImpl implements LoopInvariant {
                                      localOuts,
                                      originalAtPres);
     }
-    
+
+    @Override
+    public void setLocalIns(ImmutableList<Term> localIns) {
+        this.localIns = localIns;
+    }
+
     @Override
     public void setLocalOuts(ImmutableList<Term> localOuts) {
         this.localOuts = localOuts;
@@ -423,10 +443,20 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public void setGuardAtPost(Term guardTerm) {
-        this.guardAtPost = guardTerm;
+    public void setGuardAtPost(Term guardAtPostTerm) {
+        this.guardAtPost = guardAtPostTerm;
     }
-    
+
+    @Override
+    public void setSelf(Term self) {
+        this.selfTerm = self;
+    }
+
+    @Override
+    public void setSelfAtPost(Term selfAtPost) {
+        this.selfAtPostTerm = selfAtPost;
+    }
+
     @Override
     public LoopInvariant setInvariant(Map<LocationVariable,Term> invariants, 
             			      Term selfTerm,

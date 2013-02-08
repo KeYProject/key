@@ -19,6 +19,9 @@ public interface BasicPOSnippetFactory {
         // free precondition (the "general assumption")
         FREE_PRE (BasicFreePreSnippet.class),
         
+     // free precondition (the "general assumption")
+        FREE_INV (BasicFreeInvSnippet.class),
+        
         // precondition of the contract (without free precondition)
         CONTRACT_PRE (BasicPreconditionSnippet.class),
 
@@ -42,7 +45,8 @@ public interface BasicPOSnippetFactory {
 
         BLOCK_EXEC (BasicBlockExecutionSnippet.class),
 
-        // RELATED_BY_package.class::m(self, localIn1, ..., localInN, heap, localOut1, ..., localOutN, result, exc, heapAtPost)
+        // RELATED_BY_package.class::m(self, localIn1, ..., localInN, heap,
+        // localOut1, ..., localOutN, result, exc, heapAtPost)
         // This predicate is semantically equivalent to:
         // [P] (heap = heapAtPost & self = selfAtPost & result = resultAtPost &
         //      exc = excAtPost)
@@ -61,7 +65,8 @@ public interface BasicPOSnippetFactory {
         //      exc = excAtPost)
         BLOCK_CALL_RELATION (BlockCallPredicateSnippet.class),
 
-        // EXECUTION_OF_package.class::m_WITH_PRE(self, localIn1, ..., localInN, heap, localOut1, ..., localOutN, result, exc, heapAtPost)
+        // EXECUTION_OF_package.class::m_WITH_PRE(self, localIn1, ..., localInN, heap,
+        // localOut1, ..., localOutN, result, exc, heapAtPost)
         // This predicate is semantically equivalent to:
         // Pre & [P] (heap = heapAtPost & self = selfAtPost &
         //            result = resultAtPost & exc = excAtPost)

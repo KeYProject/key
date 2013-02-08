@@ -534,7 +534,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         //configure contract
         final FunctionalOperationContract contract = 
         		(FunctionalOperationContract)((AbstractContractRuleApp) ruleApp)
-                .getInstantiation(); 
+                .getInstantiation();
         assert contract.getTarget().equals(inst.pm);
 
         Modality md =
@@ -596,8 +596,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         				  services);
         final Term post = contract.getPost(heapContext,
                                            heapTerms,
-        	                               contractSelf, 
-        				                   contractParams, 
+        	                           contractSelf, 
+        				   contractParams, 
                                            contractResult, 
                                            TB.var(excVar), 
                                            atPres,
@@ -785,8 +785,10 @@ public final class UseOperationContractRule implements BuiltInRule {
             ifContractBuilder.setHeapAtPost(heapAtPost);
             ifContractBuilder.setSelf(contractSelf);
             ifContractBuilder.setLocalIns(contractParams);
+            ifContractBuilder.setLocalOuts(contractParams);
             ifContractBuilder.setResult(contractResult);
             ifContractBuilder.setException(TB.var(excVar));
+            
 
             // generate information flow contract application predicate
             // and associated taclet

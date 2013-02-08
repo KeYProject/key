@@ -51,7 +51,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     private final Term origExc;
     private final boolean toBeSaved;
     private final Term origDep;
-    private final ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> origRespects;
+    private final ImmutableList<Triple<ImmutableList<Term>,
+                                       ImmutableList<Term>,
+                                       ImmutableList<Term>>> origRespects;
 
     /**
      * If a method is strictly pure, it has no modifies clause which could
@@ -80,7 +82,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                           Term result,
                                           Term exc,
                                           Term dep,
-                                          ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> respects,
+                                          ImmutableList<Triple<ImmutableList<Term>,
+                                                               ImmutableList<Term>,
+                                                               ImmutableList<Term>>> respects,
                                           boolean toBeSaved,
                                           int id) {
         assert baseName != null;
@@ -95,7 +99,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
         if (result == null){
             assert (pm.isVoid() || pm.isConstructor()) : "resultVar == null for method "+pm;
         } else {
-            assert (!pm.isVoid() && !pm.isConstructor()) : "non-null result variable for void method or constructor "+pm+" with return type "+pm.getReturnType();
+            assert (!pm.isVoid() && !pm.isConstructor())
+                : "non-null result variable for void method or constructor "+
+                    pm+" with return type "+pm.getReturnType();
         }
         assert exc != null;
 //        assert dep != null;
@@ -138,7 +144,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                        Term result,
                                        Term exc,
                                        Term dep,
-                                       ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> respects,
+                                       ImmutableList<Triple<ImmutableList<Term>,
+                                                            ImmutableList<Term>,
+                                                            ImmutableList<Term>>> respects,
                                        boolean toBeSaved) {
 
         this(baseName, null, forClass, pm, specifiedIn, modality, pre, mby, mod,
@@ -162,8 +170,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
         this(li.getName(), null, li.getKJT(), li.getTarget(), li.getKJT(),
              Modality.BOX, li.getInvariant(services), null, li.getModifies(),
-             (li.getModifies() != TB.lessThanNothing()), li.getInternalSelfTerm(),
-             li.getLocalIns(), null, TB.var(TB.excVar(services, li.getTarget(), true)), null,
+             (li.getModifies() != TB.lessThanNothing()), li.getSelf(),
+             ImmutableSLList.<Term>nil(), null, // TODO: Why here no localIns?
+             TB.var(TB.excVar(services, li.getTarget(), true)), null,
              li.getRespects(services), false, INVALID_ID);
     }
 
@@ -247,8 +256,8 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public ImmutableList<Term> getParams() {
         return origParams;
     }
-    
-    
+
+
     @Override
     public Term getResult() {
         return origResult;
@@ -374,13 +383,17 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     }
 
     
-    private String getHTMLFor(ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> originalTerms,
+    private String getHTMLFor(ImmutableList<Triple<ImmutableList<Term>,
+                                                   ImmutableList<Term>,
+                                                   ImmutableList<Term>>> originalTerms,
                               String htmlName,
                               Services services) {
         String respects = "";
         if (hasRespects()) {
             respects = "<br><b>" + htmlName + "</b> ";
-            for (Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>> pair : originalTerms) {
+            for (Triple<ImmutableList<Term>,
+                        ImmutableList<Term>,
+                        ImmutableList<Term>> pair : originalTerms) {
                 respects += "(" + getHTMLFor(pair.first, services) + ")";
                 if (!pair.second.isEmpty()) {
                     respects += ", declassifies (" + getHTMLFor(pair.second, services) + ")";
@@ -512,7 +525,9 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
 
     @Override
-    public ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>> getRespects() {
+    public ImmutableList<Triple<ImmutableList<Term>,
+                                ImmutableList<Term>,
+                                ImmutableList<Term>>> getRespects() {
         return origRespects;
     }
 

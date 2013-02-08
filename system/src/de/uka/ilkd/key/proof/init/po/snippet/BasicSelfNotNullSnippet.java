@@ -7,10 +7,7 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
 
 /**
  * Generate term "self != null".
