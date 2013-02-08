@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
@@ -76,7 +77,7 @@ public interface ApplicationCheck {
 		
 		private String checkFormula(Term formula){
 			final List<String> newSymbols = new LinkedList<String>();
-			formula.execPreOrder(new Visitor() {
+			formula.execPreOrder(new DefaultVisitor() {
 				
 				@Override
 				public void visit(Term visited) {
