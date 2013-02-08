@@ -1464,7 +1464,9 @@ public final class TestSedCoreUtil {
       for (int i = 1; i < indexPathToItem.length + 1; i++) {
          int[] subPath = Arrays.copyOf(indexPathToItem, i);
          item = TestUtilsUtil.selectInTree(debugTree, subPath);
-         item.expand();
+         if (!item.isExpanded()) {
+            item.expand();
+         }
          TestUtilsUtil.waitForJobs();
       }
       return item;
