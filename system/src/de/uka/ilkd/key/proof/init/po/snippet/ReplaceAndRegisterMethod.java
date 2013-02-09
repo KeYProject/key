@@ -118,9 +118,10 @@ abstract class ReplaceAndRegisterMethod {
 
 
     final Triple<Term[], Term[], Term[]>[] replace(Triple<Term[], Term[], Term[]>[] termss,
-                                         Term[] origVars,
-                                         Term[] poVars) {
-        final Triple<Term[], Term[], Term[]>[] result = new Triple[termss.length];
+                                                   Term[] origVars,
+                                                   Term[] poVars) {
+        final Triple<Term[], Term[], Term[]>[] result =
+                (Triple<Term[], Term[], Term[]>[]) new Triple[termss.length];
         for (int i = 0; i < termss.length; i++) {
             result[i] = replace(termss[i], origVars, poVars);
         }
@@ -128,12 +129,13 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final Triple<Term[], Term[], Term[]>[] replace(
-            ImmutableList<Triple<ImmutableList<Term>, ImmutableList<Term>,
-                                 ImmutableList<Term>>> termss,
-            ProofObligationVars origVars,
-            ProofObligationVars poVars) {
-        final Triple<Term[], Term[], Term[]>[] result = new Triple[termss.size()];
+    final Triple<Term[], Term[], Term[]>[] replace(ImmutableList<Triple<ImmutableList<Term>,
+                                                                        ImmutableList<Term>,
+                                                                        ImmutableList<Term>>> termss,
+                                                   ProofObligationVars origVars,
+                                                   ProofObligationVars poVars) {
+        final Triple<Term[], Term[], Term[]>[] result =
+                (Triple<Term[], Term[], Term[]>[]) new Triple[termss.size()];
         Iterator<Triple<ImmutableList<Term>, ImmutableList<Term>, ImmutableList<Term>>> it =
                 termss.iterator();
         for (int i = 0; it.hasNext(); i++) {

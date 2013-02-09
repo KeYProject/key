@@ -3,7 +3,6 @@ package de.uka.ilkd.key.gui.lemmatagenerator;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 
 import de.uka.ilkd.key.gui.Main;

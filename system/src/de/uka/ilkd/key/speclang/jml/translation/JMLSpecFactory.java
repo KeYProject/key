@@ -396,9 +396,12 @@ public class JMLSpecFactory {
                 Triple<ImmutableList<Term>,
                        ImmutableList<Term>,
                        ImmutableList<Term>> translated =
-                            JMLTranslator.translate(expr, pm.getContainerType(),
-                                                    selfVar, paramVars, resultVar,
-                                                    null, null, Triple.class, services);
+                            (Triple<ImmutableList<Term>,
+                                    ImmutableList<Term>,
+                                    ImmutableList<Term>>) JMLTranslator
+                                            .translate(expr, pm.getContainerType(),
+                                                       selfVar, paramVars, resultVar,
+                                                       null, null, Triple.class, services);
                 result = result.append(translated);
             }
             return result;

@@ -164,7 +164,7 @@ public class QueryExpand implements BuiltInRule {
         		   lvTrms[i] = tb.var(instVars[i]);
         		   lvSorts[i] = instVars[i].sort();
         	   }
-        	   ImmutableArray<Sort> imArrlvSorts = new ImmutableArray(lvSorts);
+        	   ImmutableArray<Sort> imArrlvSorts = new ImmutableArray<Sort>(lvSorts);
         	   placeHolderResult    = new Function(new Name(logicResultName), query.sort(), imArrlvSorts);
         	   placeHolderResultTrm = tb.func(placeHolderResult, lvTrms, null); //I'm not sure about the third parameter!
            }
@@ -429,7 +429,6 @@ public class QueryExpand implements BuiltInRule {
      * @author gladisch
      */
     private class QueryEvalPos implements Comparable{
-    	
     	/** The query that is subject to query evaluation/expansion. 
     	 * The query itself is not modified but a formula is added at a position 
     	 * described by the other fields. */

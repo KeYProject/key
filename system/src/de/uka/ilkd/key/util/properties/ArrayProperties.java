@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.util.properties;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class ArrayProperties extends AbstractProperties {

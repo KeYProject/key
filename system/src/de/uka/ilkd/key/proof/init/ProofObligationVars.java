@@ -608,7 +608,6 @@ public class ProofObligationVars {
         return resultAtPostVar;
     }
 
-
     private static Term buildAtPreVar(Term varTerm,
                                       Services services) {
         if (varTerm == null) {

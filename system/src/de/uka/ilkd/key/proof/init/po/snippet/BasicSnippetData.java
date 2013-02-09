@@ -3,7 +3,6 @@ package de.uka.ilkd.key.proof.init.po.snippet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
-import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -13,7 +12,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -94,8 +92,7 @@ class BasicSnippetData {
         /**
          * Variables originally used during parsing.
          */
-        BLOCK_VARS(Variables.class),  // TODO: Maybe we need something similar
-                                      //for self variable of loop invariants?
+        BLOCK_VARS(Variables.class),
         LABELS(Label[].class),
         CONTEXT(ExecutionContext.class); // this does not fit well here
 
@@ -235,28 +232,6 @@ class BasicSnippetData {
         this(contract, services);
         contractContents.put(Key.CONTEXT, context);
     }
-
-
-    private Term[][] doubleListToArray(ImmutableList<ImmutableList<Term>> termss) {
-        Term[][] result = new Term[termss.size()][];
-        int i = 0;
-        for (ImmutableList<Term> terms : termss) {
-            result[i] = terms.toArray(Term.class);
-            i++;
-        }
-        return result;
-    }
-    
-    private ImmutableList<Term> doubleListToList(ImmutableList<ImmutableList<Term>> termss) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
-        for (ImmutableList<Term> terms : termss) {
-            for (Term term : terms) {
-                result = result.append(term);
-            }
-        }
-        return result;
-    }
-
 
     private ImmutableList<Term> toTermList(ImmutableSet<ProgramVariable> vars) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();

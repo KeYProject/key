@@ -20,7 +20,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.StrategyInfoUndoMethod;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.properties.Properties;
-import java.util.ArrayList;
 
 
 /**
@@ -30,9 +29,10 @@ import java.util.ArrayList;
 public class InfFlowTaclet extends RewriteTaclet {
 
     public static final Properties.Property<ImmutableList<Term>> INF_FLOW_CONTRACT_APPL_PROPERTY =
-            new Properties.Property<ImmutableList<Term>>((Class<ImmutableList<Term>>) (Class<?>) ImmutableList.class,
-                                                     "information flow contract " +
-                                                     "applicaton property");
+            new Properties.Property<ImmutableList<Term>>(
+                    (Class<ImmutableList<Term>>) (Class<?>) ImmutableList.class,
+                     "information flow contract " +
+                             "applicaton property");
 
 
     public InfFlowTaclet(Name name,

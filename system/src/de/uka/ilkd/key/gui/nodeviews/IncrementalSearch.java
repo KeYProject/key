@@ -161,7 +161,7 @@ public class IncrementalSearch {
 
 
     private void clearSearchResults() {
-        for (Pair result : searchResults) {
+        for (Pair<Integer, Object> result : searchResults) {
             seqView.removeHighlight(result.second);
         }
         searchResults.clear();

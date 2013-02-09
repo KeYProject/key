@@ -210,24 +210,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
         return res;
     }
-    
-    
-    private ImmutableList<Term> replaceVariablesInTermList(ImmutableList<Term> terms) {
-        ImmutableList<Term> res = ImmutableSLList.<Term>nil();
-        for (final Term term : terms) {
-            res = res.append(replaceVariablesInTerm(term));
-        }
-        return res;
-    }
-
-    private ImmutableList<ImmutableList<Term>>
-    replaceVariablesInTermLists(ImmutableList<ImmutableList<Term>> termlists) {
-        ImmutableList<ImmutableList<Term>> res = ImmutableSLList.<ImmutableList<Term>>nil();
-        for (final ImmutableList<Term> terms : termlists) {
-            res = res.append(replaceVariablesInTermList(terms));
-        }
-        return res;
-    }
 
 
     private ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>>
