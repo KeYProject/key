@@ -45,44 +45,12 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         super(services);
     }
 
-    public Term getGuard() {
-        return loopGuard;
-    }
-
-    public Term getGuardAtPost() {
-        return loopGuardAtPost;
-    }
-
-    public Term getSelf() {
-        return contractSelf;
-    }
-
-    public Term getSelfAtPost() {
-        return contractSelfAtPost;
-    }
-
-    public Term getResult() {
-        return contractResult;
-    }
-
     public Term getResultPost() {
         return contractResultAtPost;
     }
 
-    public Term getException() {
-        return exceptionVar;
-    }
-
     public Term getExceptionAtPost() {
         return exceptionVarAtPost;
-    }
-
-    public ImmutableList<Term> getLocalIns() {
-        return localIns;
-    }
-
-    public ImmutableList<Term> getLocalOuts() {
-        return localOuts;
     }
 
     public void setContextUpdate(Term... contextUpdates) {
@@ -109,16 +77,19 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
     }
 
     public void setGuard(Term guard) {
-        this.loopGuard = buildBeforeVar(guard, services);
-        this.loopGuardAtPost = buildAfterVar(guard, services);
+        this.loopGuard = guard;
+    }
+
+    public void setGuardAtPost(Term guardAtPost) {
+        this.loopGuardAtPost = guardAtPost;
     }
 
     public void setLocalIns(ImmutableList<Term> localIns) {
-        this.localIns = buildLocalIns(localIns, services);
+        this.localIns = localIns;
     }
 
     public void setLocalOuts(ImmutableList<Term> localOuts) {
-        this.localOuts = buildLocalOuts(localOuts, services);
+        this.localOuts = localOuts;
     }
 
     public void setResult(Term contractResult) {
@@ -275,22 +246,6 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         return var(SchemaVariableFactory.createTermSV(name, sort));
 
     }
-
-    private static Term buildVar(Term varTerm,
-                                 Services services) {
-        if (varTerm == null) {
-            return null;
-        }
-        assert varTerm.op() instanceof LocationVariable;        
-
-        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-        String name = TermBuilder.DF.newName(services, varTerm.toString());
-        LocationVariable varAtPostVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
-        register(varAtPostVar, services);
-        Term varAtPost = TermBuilder.DF.var(varAtPostVar);
-        return varAtPost;
-    }
     
     private static Term buildAtPostVar(Term varTerm,
                                        Services services) {
@@ -307,80 +262,6 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         Term varAtPost = TermBuilder.DF.var(varAtPostVar);
         return varAtPost;
     }
-
-    private static Term buildBeforeVar(Term varTerm,
-                                      Services services) {
-        if (varTerm == null) {
-            return null;
-        }
-        assert varTerm.op() instanceof LocationVariable;        
-
-        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before");
-        LocationVariable varAtPreVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
-        register(varAtPreVar, services);
-        Term varAtPre = TermBuilder.DF.var(varAtPreVar);
-        return varAtPre;
-    }
-
-    private static Term buildAfterVar(Term varTerm,
-                                      Services services) {
-        if (varTerm == null) {
-            return null;
-        }
-        assert varTerm.op() instanceof LocationVariable;        
-
-        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_After");
-        LocationVariable varAtPostVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
-        register(varAtPostVar, services);
-        Term varAtPost = TermBuilder.DF.var(varAtPostVar);
-        return varAtPost;
-    }
-
-    private static ImmutableList<Term> buildLocalIns(ImmutableList<Term> varTerms,
-                                                     Services services) {
-        if (varTerms == null || varTerms.isEmpty()) {
-            return varTerms;
-        }
-        ImmutableList<Term> renamedLocalIns = ImmutableSLList.<Term>nil();
-        for(Term varTerm: varTerms) {
-            assert varTerm.op() instanceof LocationVariable;        
-
-            KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-
-            String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before");
-            LocationVariable varAtPreVar =
-                    new LocationVariable(new ProgramElementName(name), resultType);
-            register(varAtPreVar, services);
-            Term varAtPre = TermBuilder.DF.var(varAtPreVar);
-            renamedLocalIns = renamedLocalIns.append(varAtPre);
-        }
-        return renamedLocalIns;
-    }
-
-    private static ImmutableList<Term> buildLocalOuts(ImmutableList<Term> varTerms,
-                                                      Services services) {
-        if (varTerms == null || varTerms.isEmpty()) {
-            return varTerms;
-        }
-        ImmutableList<Term> renamedLocalOuts = ImmutableSLList.<Term>nil();
-        for(Term varTerm: varTerms) {
-            assert varTerm.op() instanceof LocationVariable;        
-
-            KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-
-            String name = TermBuilder.DF.newName(services, varTerm.toString() + "_After");
-            LocationVariable varAtPostVar =
-                    new LocationVariable(new ProgramElementName(name), resultType);
-            register(varAtPostVar, services);
-            Term varAtPost = TermBuilder.DF.var(varAtPostVar);
-            renamedLocalOuts = renamedLocalOuts.append(varAtPost);
-        }
-        return renamedLocalOuts;
-    }
     
     static void register(ProgramVariable pv,
                          Services services) {
@@ -389,7 +270,6 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
             progVarNames.addSafely(pv);
         }
     }
-
 
     abstract Term buildContractApplications(ProofObligationVars contAppData,
                                             ProofObligationVars contAppData2,

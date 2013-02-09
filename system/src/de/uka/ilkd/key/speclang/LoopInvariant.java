@@ -28,71 +28,74 @@ import de.uka.ilkd.key.util.Triple;
  * predicates, a modifies clause, and a variant term.
  */
 public interface LoopInvariant extends SpecificationElement {
-    
+
     /**
      * Returns the loop to which the invariant belongs.
      */
     public LoopStatement getLoop();
-    
+
     /**
      * Returns the contracted function symbol.
      */
     public IProgramMethod getTarget();
-    
+
     public ExecutionContext getExecutionContext();
-    
+
     public Term getGuard();
-    
-    public Term getGuardAtPost();
-    
+
     /** Returns the invariant formula. */
-    public Term getInvariant(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
-    
+    public Term getInvariant(LocationVariable heap, Term selfTerm,
+                             Map<LocationVariable,Term> atPres, Services services);
+
     public Term getInvariant(Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
-    
+
     public Term getInvariant(Services services);
 
     /**
      * Returns the modifies clause.
      */
-    public Term getModifies(LocationVariable heap, Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
-    
+    public Term getModifies(LocationVariable heap, Term selfTerm,
+                            Map<LocationVariable,Term> atPres, Services services);
+
     public Term getModifies(Term selfTerm, Map<LocationVariable,Term> atPres, Services services);
-    
+
     /**
      * Returns the respects clause.
      */
     public ImmutableList<Triple<ImmutableList<Term>,
                                 ImmutableList<Term>,
                                 ImmutableList<Term>>> getRespects(LocationVariable heap);
-    
+
     public ImmutableList<Triple<ImmutableList<Term>,
                                 ImmutableList<Term>,
                                 ImmutableList<Term>>> getRespects(Services services);
-    
+
+    public ImmutableList<Triple<ImmutableList<Term>,
+                                ImmutableList<Term>,
+                                ImmutableList<Term>>> getRespects(LocationVariable heap,
+                                                                  Term selfTerm,
+                                                                  Map<LocationVariable,Term> atPres,
+                                                                  Services services);
+
     /**
      * Returns the variant term. 
      */
     public Term getVariant(Term selfTerm, 
             		   Map<LocationVariable,Term> atPres,
             		   Services services);
-    
+
     /**
      * Returns the term internally used for self. 
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
     public Term getInternalSelfTerm();
 
-    public Term getSelf();
-
-    public Term getSelfAtPost();
-    
     public ImmutableList<Term> getLocalIns();
-    
+
     public ImmutableList<Term> getLocalOuts();
-    
+
     public Term getModifies();
-    
+
     /**
      * Returns operators internally used for the pre-heap.
      */
@@ -109,9 +112,9 @@ public interface LoopInvariant extends SpecificationElement {
      * Use with care - it is likely that this is *not* the right "self" for you.
      */
     public Term getInternalVariant();
-    
+
     public Map<LocationVariable,Term> getInternalModifies();
-    
+
     public Map<LocationVariable,
                ImmutableList<Triple<ImmutableList<Term>,
                                     ImmutableList<Term>,
@@ -127,19 +130,8 @@ public interface LoopInvariant extends SpecificationElement {
 
     public LoopInvariant setExecutionContext(ExecutionContext execCont);
 
-
-    public void setLocalIns(ImmutableList<Term> localIns);
-
-    public void setLocalOuts(ImmutableList<Term> localOuts);
-
     public void setGuard(Term guardTerm);
-    
-    public void setGuardAtPost(Term guardAtPostTerm);
 
-    public void setSelf(Term selfTerm);
-
-    public void setSelfAtPost(Term selfAtPostTerm);
-    
     /**
      * Returns a new loop invariant where the invariant formula has been
      * replaced with the passed one. Take care: the variables used for
@@ -149,7 +141,7 @@ public interface LoopInvariant extends SpecificationElement {
             			      Term selfTerm,
             			      Map<LocationVariable,Term> atPres,
             			      Services services); 
-    
+
     /** 
      * Loop invariants can be visited like source elements:
      * This method calls the corresponding method of a visitor in order to

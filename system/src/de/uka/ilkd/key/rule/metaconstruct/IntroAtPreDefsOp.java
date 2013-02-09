@@ -145,7 +145,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                   final Term m = inv.getModifies(heap, selfTerm, atPres, services);
                   final ImmutableList<Triple<ImmutableList<Term>,
                                              ImmutableList<Term>,
-                                             ImmutableList<Term>>> r = inv.getRespects(heap);
+                                             ImmutableList<Term>>> r =
+                                 inv.getRespects(heap, selfTerm, atPres, services);
                   final Term i = inv.getInvariant(heap, selfTerm, atPres, services);
                   newMods.put(heap, m);
                   newRespects.put(heap, r);

@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.util.Triple;
 
 
 /**
@@ -73,15 +74,10 @@ public class OpReplacer {
      * Replaces in an operator.
      */
     public Operator replace(Operator op) {
-        System.out.println("Mapping: " + map.toString()); // TODO: for debugging, to be removed
-        Operator newOp = (Operator) map.get(op);        
-        System.out.println("Found? " + map.containsKey(op)); // TODO: for debugging, to be removed
-        System.out.println("Old Operator " + op.toString()); // TODO: for debugging, to be removed
+        Operator newOp = (Operator) map.get(op);
         if(newOp != null) {
-            System.out.println("New Operator: " + newOp.toString()); // TODO: for debugging, to be removed
             return newOp;
         } else {
-            System.out.println("No new Operator."); // TODO: for debugging, to be removed
             return op;
         }
     }
@@ -94,10 +90,8 @@ public class OpReplacer {
         if(term == null) {
             return null;
         }
-        System.out.println("Term: " + term.toString()); // TODO: for debugging, to be removed
         final Term newTerm = (Term) map.get(term); 
         if(newTerm != null) {
-            System.out.println("New Term! " + newTerm.toString()); // TODO: for debugging, to be removed
             return newTerm;
         }
 
@@ -107,27 +101,16 @@ public class OpReplacer {
         final Term newSubTerms[] = new Term[arity];    
         boolean changedSubTerm = false;
         for(int i = 0; i < arity; i++) {
-            Term subTerm = term.sub(i);
-            System.out.println("Subterm " + i + ": " + subTerm.toString() + " ..."); // TODO: for debugging, to be removed          
+            Term subTerm = term.sub(i);          
             newSubTerms[i] = replace(subTerm);
-            System.out.println("... becomes " + i + ": " + newSubTerms[i].toString()); // TODO: for debugging, to be removed
     
             if(newSubTerms[i] != subTerm) {
                 changedSubTerm = true;
             }
-        }
-        
+        }        
         final ImmutableArray<QuantifiableVariable> newBoundVars 
         	= replace(term.boundVars());
-    
-        if (newOp != term.op())
-            System.out.println("Operator! " + newOp.toString()); // TODO: for debugging, to be removed
-        else if (changedSubTerm)
-            System.out.println("Subterm!"); // TODO: for debugging, to be removed
-        else if (newBoundVars != term.boundVars())
-            System.out.println("Bounded Variables! " + newBoundVars.toString()); // TODO: for debugging, to be removed
-        else
-            System.out.println("No success! " + term.toString()); // TODO: for debugging, to be removed
+        
         final Term result;
         if(newOp != term.op()  
            || changedSubTerm
@@ -136,7 +119,6 @@ public class OpReplacer {
                                    newSubTerms,
                                    newBoundVars,
                                    term.javaBlock());
-            System.out.println("Term created! "  + result.toString()); // TODO: for debugging, to be removed
         } else {
             result = term;
         }
@@ -154,6 +136,38 @@ public class OpReplacer {
         }
         return result;
     }    
+    
+    /**
+     * Replaces in a list of triples of lists of terms.
+     */
+    public ImmutableList<Triple<ImmutableList<Term>,
+                                ImmutableList<Term>,
+                                ImmutableList<Term>>> replaceTriples(
+                                        ImmutableList<Triple<ImmutableList<Term>,
+                                                             ImmutableList<Term>,
+                                                             ImmutableList<Term>>> terms) {
+        ImmutableList<Triple<ImmutableList<Term>,
+                             ImmutableList<Term>,
+                             ImmutableList<Term>>>
+                result = ImmutableSLList.<Triple<ImmutableList<Term>,
+                                                 ImmutableList<Term>,
+                                                 ImmutableList<Term>>>nil();
+        if (terms == null) {
+            return result;
+        }
+        
+        for(final Triple<ImmutableList<Term>,
+                         ImmutableList<Term>,
+                         ImmutableList<Term>> trip : terms) {
+            final ImmutableList<Term> res1 = replace(trip.first);
+            final ImmutableList<Term> res2 = replace(trip.second);
+            final ImmutableList<Term> res3 = replace(trip.third);
+            result = result.append(new Triple<ImmutableList<Term>,
+                                              ImmutableList<Term>,
+                                              ImmutableList<Term>> (res1, res2, res3));
+        }
+        return result;
+    }
     
     
     /**

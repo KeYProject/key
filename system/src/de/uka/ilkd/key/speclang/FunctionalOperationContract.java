@@ -15,9 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.collection.ImmutableList;
-import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;

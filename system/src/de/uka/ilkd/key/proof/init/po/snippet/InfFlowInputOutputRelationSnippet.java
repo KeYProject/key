@@ -25,8 +25,6 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                         ProofObligationVars poVars1,
                         ProofObligationVars poVars2)
             throws UnsupportedOperationException {
-        if (d.get(BasicSnippetData.Key.LOOP_INVARIANT) != null)
-            System.out.println("InOut for LOOOOOOOOOPS!"); // TODO: for debugging, to be removed
         // get respects terms
         if (d.get(BasicSnippetData.Key.RESPECTS) == null) {
             throw new UnsupportedOperationException("Tried to produce "
@@ -46,20 +44,24 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                 replace(respectsAtPre1,
                         new Term[]{poVars1.heap,
                                    poVars1.self,
+                                   poVars1.guard,
                                    poVars1.result,
                                    poVars1.exception},
                         new Term[]{poVars1.heapAtPost,
                                    poVars1.selfAtPost,
+                                   poVars1.guardAtPost,
                                    poVars1.resultAtPost,
                                    poVars1.exceptionAtPost});
         Triple<Term[],Term[],Term[]>[] respectsAtPost2 =
                 replace(respectsAtPre2,
                         new Term[]{poVars2.heap,
                                    poVars2.self,
+                                   poVars2.guard,
                                    poVars2.result,
                                    poVars2.exception},
                         new Term[]{poVars2.heapAtPost,
                                    poVars2.selfAtPost,
+                                   poVars2.guardAtPost,
                                    poVars2.resultAtPost,
                                    poVars2.exceptionAtPost});
         // create input-output-relations

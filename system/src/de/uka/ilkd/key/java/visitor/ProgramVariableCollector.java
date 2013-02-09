@@ -105,6 +105,29 @@ public class ProgramVariableCollector extends JavaASTVisitor {
            }
         }
 
+      //respect (TODO: does this really belong here?)
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            ImmutableList<Triple<ImmutableList<Term>,
+                                 ImmutableList<Term>,
+                                 ImmutableList<Term>>> resp =
+                   x.getRespects(heap, selfTerm, atPres, services);
+            if (resp != null) {
+                for (Triple<ImmutableList<Term>,
+                            ImmutableList<Term>,
+                            ImmutableList<Term>> trip : resp) {
+                    for (Term t: trip.first) {
+                        t.execPostOrder(tpvc);
+                    }
+                    for (Term t: trip.second) {
+                        t.execPostOrder(tpvc);
+                    }
+                    for (Term t: trip.third) {
+                        t.execPostOrder(tpvc);
+                    }
+                }
+            }
+        }
+
         //variant
         Term v = x.getVariant(selfTerm, atPres, services);
         if(v != null) {

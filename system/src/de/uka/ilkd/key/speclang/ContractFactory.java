@@ -60,13 +60,17 @@ public class ContractFactory {
      * Returns another contract like this one, except that the passed term
      * has been added as a postcondition (regardless of termination case).
      */
-    public FunctionalOperationContract addPost(FunctionalOperationContract old, Term addedPost,
-            ProgramVariable selfVar, ProgramVariable resultVar, ProgramVariable excVar,
-            ImmutableList<ProgramVariable> paramVars, Map<LocationVariable, LocationVariable> atPreVars){
+    public FunctionalOperationContract
+                addPost(FunctionalOperationContract old, Term addedPost, ProgramVariable selfVar,
+                        ProgramVariable resultVar, ProgramVariable excVar,
+                        ImmutableList<ProgramVariable> paramVars,
+                        Map<LocationVariable, LocationVariable> atPreVars) {
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
-    FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
-    addedPost = replaceVariables(addedPost, selfVar, resultVar, excVar, paramVars, atPreVars, 
-            foci.originalSelfVar, foci.originalResultVar, foci.originalExcVar, foci.originalParamVars, foci.originalAtPreVars);
+        FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
+        addedPost = replaceVariables(addedPost, selfVar, resultVar, excVar, paramVars, atPreVars, 
+                                     foci.originalSelfVar, foci.originalResultVar,
+                                     foci.originalExcVar, foci.originalParamVars,
+                                     foci.originalAtPreVars);
 
     Map<LocationVariable,Term> newPosts = new LinkedHashMap<LocationVariable,Term>();
     for(LocationVariable h : foci.originalPosts.keySet()) {
@@ -100,7 +104,7 @@ public class ContractFactory {
     }
     
     /** Add the specification contained in InitiallyClause as a postcondition. */
-    public FunctionalOperationContract addPost(FunctionalOperationContract old, InitiallyClause ini){
+    public FunctionalOperationContract addPost(FunctionalOperationContract old, InitiallyClause ini) {
         final ProgramVariable selfVar = tb.selfVar(services, ini.getKJT(), true);
         return addPost(old, ini.getClause(selfVar, services), null, null, null, null, null);
     }
@@ -112,7 +116,8 @@ public class ContractFactory {
     public FunctionalOperationContract addPre(FunctionalOperationContract old,
                                               Term addedPre,
                                               ProgramVariable selfVar,
-                                              ImmutableList<ProgramVariable> paramVars, Map<LocationVariable,LocationVariable> atPreVars) {
+                                              ImmutableList<ProgramVariable> paramVars,
+                                              Map<LocationVariable,LocationVariable> atPreVars) {
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci =
                 (FunctionalOperationContractImpl) old;
@@ -148,8 +153,9 @@ public class ContractFactory {
                                                    foci.originalAtPreVars,
                                                    foci.id,
                                                    foci.toBeSaved,
-                                                   foci.originalMods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null
-                                                   );
+                                                   foci.originalMods
+                                                   .get(services.getTypeConverter()
+                                                           .getHeapLDT().getSavedHeap()) != null);
     }
 
     public DependencyContract dep(KeYJavaType containerType,
@@ -221,7 +227,7 @@ public class ContractFactory {
                 modality, requires, measuredBy, modifies, hasMod, self, params,
                 result, exc, accessible, respects, toBeSaved);
     }
-    
+
     @Override
     public boolean equals (Object o){
         if (o instanceof ContractFactory){
@@ -256,23 +262,35 @@ public class ContractFactory {
             Map<LocationVariable,LocationVariable> atPreVars,
             boolean toBeSaved) {
         return new FunctionalOperationContractImpl(baseName, kjt, pm, pm.getContainerType(), modality, 
-                pres, mby, posts, mods, hasMod, selfVar, paramVars,resultVar,excVar,atPreVars, toBeSaved, 
-                mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
+                                                   pres, mby, posts, mods, hasMod, selfVar, paramVars,
+                                                   resultVar,excVar,atPreVars, toBeSaved, 
+                                                   mods.get(services.getTypeConverter().getHeapLDT()
+                                                           .getSavedHeap()) != null);
     }
        
-    public FunctionalOperationContract func (String baseName, IProgramMethod pm, boolean terminates, Map<LocationVariable,Term> pres,
-               Term mby, Map<LocationVariable,Term> posts, Map<LocationVariable,Term> mods, boolean hasMod, ProgramVariableCollection pv){
-        return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres, mby, posts, mods, hasMod, pv, false, mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
+    public FunctionalOperationContract func (String baseName, IProgramMethod pm, boolean terminates,
+                                             Map<LocationVariable,Term> pres, Term mby,
+                                             Map<LocationVariable,Term> posts,
+                                             Map<LocationVariable,Term> mods, boolean hasMod,
+                                             ProgramVariableCollection pv) {
+        return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX,
+                    pres, mby, posts, mods, hasMod, pv, false,
+                    mods.get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
   
 
-    public FunctionalOperationContract func (String baseName, IProgramMethod pm,
-            Modality modality, Map<LocationVariable,Term> pres, Term mby, Map<LocationVariable,Term> posts, Map<LocationVariable,Term> mods, boolean hasMod,
-            ProgramVariableCollection progVars, boolean toBeSaved, boolean transaction) {
-        return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm, pm.getContainerType(), modality, pres, mby,
-                posts, mods, hasMod, progVars.selfVar, progVars.paramVars,
-                progVars.resultVar, progVars.excVar, progVars.atPreVars,
-                Contract.INVALID_ID, toBeSaved, transaction);
+    public FunctionalOperationContract func (String baseName, IProgramMethod pm, Modality modality,
+                                             Map<LocationVariable,Term> pres, Term mby,
+                                             Map<LocationVariable,Term> posts,
+                                             Map<LocationVariable,Term> mods, boolean hasMod,
+                                             ProgramVariableCollection progVars,
+                                             boolean toBeSaved, boolean transaction) {
+        return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
+                                                   pm.getContainerType(), modality, pres, mby,
+                                                   posts, mods, hasMod, progVars.selfVar,
+                                                   progVars.paramVars, progVars.resultVar,
+                                                   progVars.excVar, progVars.atPreVars,
+                                                   Contract.INVALID_ID, toBeSaved, transaction);
     }
         
     /**
@@ -281,8 +299,9 @@ public class ContractFactory {
      * instead, which additionally takes care that the combined contract can be 
      * loaded later. The resulting contract has id "INVALID_ID".
      */
-    public FunctionalOperationContract union(FunctionalOperationContract ... contracts){
-        assert contracts[0] instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
+    public FunctionalOperationContract union(FunctionalOperationContract ... contracts) {
+        assert contracts[0] instanceof FunctionalOperationContractImpl
+                : UNKNOWN_CONTRACT_IMPLEMENTATION;
         
         FunctionalOperationContractImpl t = (FunctionalOperationContractImpl) contracts[0];
         FunctionalOperationContract[] others = Arrays.copyOfRange(contracts, 1, contracts.length);
@@ -429,19 +448,26 @@ public class ContractFactory {
 
     /** replace in original the variables used for self and parameters */
     private Term replaceVariables(Term original, ProgramVariable selfVar,
-            ImmutableList<ProgramVariable> paramVars, Map<LocationVariable,LocationVariable> atPreVars,
-            ProgramVariable originalSelfVar, ImmutableList<ProgramVariable> originalParamVars, 
-            Map<LocationVariable,LocationVariable> originalAtPreVars) {
+                                  ImmutableList<ProgramVariable> paramVars,
+                                  Map<LocationVariable,LocationVariable> atPreVars,
+                                  ProgramVariable originalSelfVar,
+                                  ImmutableList<ProgramVariable> originalParamVars, 
+                                  Map<LocationVariable,LocationVariable> originalAtPreVars) {
         return replaceVariables(original,
                                 selfVar, null, null, paramVars, atPreVars,
                                 originalSelfVar, null, null, originalParamVars, originalAtPreVars);
     }
     
     /** replace in original the variables used for self, result, exception, heap, and parameters */
-    private Term replaceVariables(Term original, ProgramVariable selfVar, ProgramVariable resultVar, ProgramVariable excVar,
-            ImmutableList<ProgramVariable> paramVars, Map<LocationVariable,LocationVariable> atPreVars,
-            ProgramVariable originalSelfVar, ProgramVariable originalResultVar,ProgramVariable originalExcVar, ImmutableList<ProgramVariable> originalParamVars,
-            Map<LocationVariable,LocationVariable> originalAtPreVars) {
+    private Term replaceVariables(Term original, ProgramVariable selfVar,
+                                  ProgramVariable resultVar, ProgramVariable excVar,
+                                  ImmutableList<ProgramVariable> paramVars,
+                                  Map<LocationVariable,LocationVariable> atPreVars,
+                                  ProgramVariable originalSelfVar,
+                                  ProgramVariable originalResultVar,
+                                  ProgramVariable originalExcVar,
+                                  ImmutableList<ProgramVariable> originalParamVars,
+                                  Map<LocationVariable,LocationVariable> originalAtPreVars) {
         Map <Operator, Operator> map = new LinkedHashMap<Operator,Operator>();
         addToMap(selfVar, originalSelfVar, map);
         addToMap(resultVar, originalResultVar, map);

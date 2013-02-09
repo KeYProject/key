@@ -154,18 +154,12 @@ class BasicSnippetData {
                 MiscTools.getLocalOuts(invariant.getLoop(), services);
         final ImmutableList<Term> localInTerms = toTermList(localInVariables);
         final ImmutableList<Term> localOutTerms = toTermList(localOutVariables);
-        final Term self = TermBuilder.DF.var(
-                TermBuilder.DF.selfVar(services,
-                                       invariant.getTarget(),
-                                       invariant.getTarget().getContainerType(),
-                                       false));
         
         origVars =
-                new ProofObligationVars(self,
-                                        //invariant.getSelfAtPost(),
+                new ProofObligationVars(invariant.getInternalSelfTerm(),
                                         invariant.getGuard(),
-                                        localInTerms, heap,
-                                        //invariant.getGuardAtPost(),
+                                        localInTerms,
+                                        heap,
                                         localOutTerms,
                                         services);
     }

@@ -170,7 +170,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
         this(li.getName(), null, li.getKJT(), li.getTarget(), li.getKJT(),
              Modality.BOX, li.getInvariant(services), null, li.getModifies(),
-             (li.getModifies() != TB.lessThanNothing()), li.getSelf(),
+             (li.getModifies() != TB.lessThanNothing()), li.getInternalSelfTerm(),
              ImmutableSLList.<Term>nil(), null, // TODO: Why here no localIns?
              TB.var(TB.excVar(services, li.getTarget(), true)), null,
              li.getRespects(services), false, INVALID_ID);

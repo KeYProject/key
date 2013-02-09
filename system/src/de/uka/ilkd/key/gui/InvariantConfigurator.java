@@ -249,13 +249,13 @@ public class InvariantConfigurator {
 
                 @SuppressWarnings({"unchecked"})
                 Map<String,String>[] loopInvTexts = new Map[RSP_IDX+1];
-                
+
                 loopInvTexts[INV_IDX] = new LinkedHashMap<String,String>();
                 final Map<LocationVariable,Term> atPres = loopInv.getInternalAtPres();
 
                 for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                   final Term i = loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
-                
+
                   if (i == null) {
                     // FIXME check again and think what is the default for savedHeap
                     loopInvTexts[INV_IDX].put(heap.toString(), "true");
@@ -277,13 +277,13 @@ public class InvariantConfigurator {
                     loopInvTexts[MOD_IDX].put(heap.toString(), printTerm(modifies, false));
                   }
                 }
-                
+
                 loopInvTexts[RSP_IDX] = new LinkedHashMap<String,String>();
 
                 for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                   final ImmutableList<Triple<ImmutableList<Term>,ImmutableList<Term>,ImmutableList<Term>>>
-                          respects = loopInv.getRespects(heap);
-                
+                          respects = loopInv.getRespects(heap, loopInv.getInternalSelfTerm(), atPres, services);
+
                   if (respects == null) {                    
                     loopInvTexts[RSP_IDX].put(heap.toString(), "noRespects");
                   } else {

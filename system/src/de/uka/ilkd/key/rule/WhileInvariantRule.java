@@ -175,16 +175,6 @@ public final class WhileInvariantRule implements BuiltInRule {
 	final Function anonHeapFunc = new Function(anonHeapName,heap.sort(), true);
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
 	final Term anonHeap = TB.func(anonHeapFunc);
-	
-	/*final Term self = loop_inv.getSelf();
-	final ProgramElementName loopSelfName =
-	        new ProgramElementName(TB.newName(services, self+"AtPost_LOOP"));
-        final LocationVariable loopSelfVar =
-                new LocationVariable(loopSelfName,
-                                     ((LocationVariable)self.op()).getKeYJavaType(),
-                                     true);
-        services.getNamespaces().programVariables().addSafely(loopSelfVar);
-        final Term loopSelf = TB.var(loopSelfVar);*/ // TODO: Probably not good/necessary, is it?
 
 	// check for strictly pure loops
 	final Term anonUpdate;
@@ -207,39 +197,8 @@ public final class WhileInvariantRule implements BuiltInRule {
         return progPost.op() instanceof Modality;
     }
 
-    private static Term buildLoopSelf(Term varTerm,
-                                      Services services) {
-        if (varTerm == null) {
-            return null;
-        }
-        assert varTerm.op() instanceof LocationVariable;        
-
-        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-        String name = TB.newName(services, varTerm.toString() + "_LOOP");
-        LocationVariable varAtPreVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
-        register(varAtPreVar, services);
-        Term varAtPre = TB.var(varAtPreVar);
-        return varAtPre;
-    }
-    
-    private static Term buildLoopSelfAtPost(Term varTerm,
-                                            Services services) {
-        if (varTerm == null) {
-            return null;
-        }
-        assert varTerm.op() instanceof LocationVariable;        
-
-        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-        String name = TB.newName(services, varTerm.toString() + "AtPost_LOOP");
-        LocationVariable varAtPreVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
-        register(varAtPreVar, services);
-        Term varAtPre = TB.var(varAtPreVar);
-        return varAtPre;
-    }
-
     private static Term buildAtPostVar(Term varTerm,
+                                       String suffix,
                                        Services services) {
         if (varTerm == null) {
             return null;
@@ -247,14 +206,91 @@ public final class WhileInvariantRule implements BuiltInRule {
         assert varTerm.op() instanceof LocationVariable;
 
         KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-        String name = TermBuilder.DF.newName(services, varTerm.toString() + "AtPost");
+        if (!suffix.equalsIgnoreCase("")) {
+            suffix = new String("_" + suffix);
+        }
+        String name = TermBuilder.DF.newName(services, varTerm.toString() + "AtPost" + suffix);
         LocationVariable varAtPostVar =
                 new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPostVar, services);
         Term varAtPost = TermBuilder.DF.var(varAtPostVar);
         return varAtPost;
     }
-   
+
+    private static Term buildBeforeVar(Term varTerm,
+                                       Services services) {
+        if (varTerm == null) {
+            return null;
+        }
+        assert varTerm.op() instanceof LocationVariable;        
+
+        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before");
+        LocationVariable varAtPreVar =
+                new LocationVariable(new ProgramElementName(name), resultType);
+        register(varAtPreVar, services);
+        Term varAtPre = TermBuilder.DF.var(varAtPreVar);
+        return varAtPre;
+    }
+
+    private static Term buildAfterVar(Term varTerm,
+                                      Services services) {
+        if (varTerm == null) {
+            return null;
+        }
+        assert varTerm.op() instanceof LocationVariable;        
+
+        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_After");
+        LocationVariable varAtPostVar =
+                new LocationVariable(new ProgramElementName(name), resultType);
+        register(varAtPostVar, services);
+        Term varAtPost = TermBuilder.DF.var(varAtPostVar);
+        return varAtPost;
+    }
+
+    private static ImmutableList<Term> buildLocalIns(ImmutableList<Term> varTerms,
+                                                     Services services) {
+        if (varTerms == null || varTerms.isEmpty()) {
+            return varTerms;
+        }
+        ImmutableList<Term> renamedLocalIns = ImmutableSLList.<Term>nil();
+        for(Term varTerm: varTerms) {
+            assert varTerm.op() instanceof LocationVariable;        
+
+            KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+
+            String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before");
+            LocationVariable varAtPreVar =
+                    new LocationVariable(new ProgramElementName(name), resultType);
+            register(varAtPreVar, services);
+            Term varAtPre = TermBuilder.DF.var(varAtPreVar);
+            renamedLocalIns = renamedLocalIns.append(varAtPre);
+        }
+        return renamedLocalIns;
+    }
+
+    private static ImmutableList<Term> buildLocalOuts(ImmutableList<Term> varTerms,
+                                                      Services services) {
+        if (varTerms == null || varTerms.isEmpty()) {
+            return varTerms;
+        }
+        ImmutableList<Term> renamedLocalOuts = ImmutableSLList.<Term>nil();
+        for(Term varTerm: varTerms) {
+            assert varTerm.op() instanceof LocationVariable;        
+
+            KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+
+            String name = TermBuilder.DF.newName(services, varTerm.toString() + "_After");
+            LocationVariable varAtPostVar =
+                    new LocationVariable(new ProgramElementName(name), resultType);
+            register(varAtPostVar, services);
+            Term varAtPost = TermBuilder.DF.var(varAtPostVar);
+            renamedLocalOuts = renamedLocalOuts.append(varAtPost);
+        }
+        return renamedLocalOuts;
+    }
+
     static void register(ProgramVariable pv,
                          Services services) {
         Namespace progVarNames = services.getNamespaces().programVariables();
@@ -312,7 +348,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         Instantiation inst = instantiate((LoopInvariantBuiltInRuleApp) ruleApp, services);
 
         final Map<LocationVariable,Term> atPres = inst.inv.getInternalAtPres();
-        final List<LocationVariable> heapContext = ((IBuiltInRuleApp)ruleApp).getHeapContext();
+        final List<LocationVariable> heapContext = ((IBuiltInRuleApp)ruleApp).getHeapContext();        
 
         Term invTerm = null;
         for(LocationVariable heap : heapContext) {
@@ -329,6 +365,22 @@ public final class WhileInvariantRule implements BuiltInRule {
             final Term m = inst.inv.getModifies(heap, inst.selfTerm, atPres, services);
             mods.put(heap, m);
         }
+
+        /*final Map<LocationVariable,
+                  ImmutableList<Triple<ImmutableList<Term>,
+                                       ImmutableList<Term>,
+                                       ImmutableList<Term>>>> resp =
+                     new LinkedHashMap<LocationVariable,
+                                       ImmutableList<Triple<ImmutableList<Term>,
+                                                            ImmutableList<Term>,
+                                                            ImmutableList<Term>>>>();
+        for(LocationVariable heap : heapContext) {
+            final ImmutableList<Triple<ImmutableList<Term>,
+                                       ImmutableList<Term>,
+                                       ImmutableList<Term>>> r =
+                    inst.inv.getRespects(heap, inst.selfTerm, atPres, services);
+            resp.put(heap, r);
+        }*/
 
         final Term variant = inst.inv.getVariant(inst.selfTerm, atPres, services);
         
@@ -367,26 +419,6 @@ public final class WhileInvariantRule implements BuiltInRule {
             }
             heapToBeforeLoop.get(heap).put(TB.var(heap), TB.var(lv));
         }
-        final Term self = TB.var(
-                TB.selfVar(services,
-                           inst.inv.getTarget(),
-                           inst.inv.getTarget().getContainerType(),
-                           false));
-                //OpReplacer.replace(TB.getBaseHeap(services),atPres.get(heapContext.get(0)),inst.selfTerm);
-        inst.inv.setSelf(buildLoopSelf(self, services));
-        inst.inv.setSelfAtPost(buildLoopSelfAtPost(self, services));
-        /*final KeYJavaType selfResultType = ((LocationVariable)selfAtPost.op()).getKeYJavaType();
-        final LocationVariable loopSelfAtPostVar =
-                    TB.selfVar(services, selfResultType, true, "Before_" + inst.inv.getName());
-        services.getNamespaces().programVariables().addSafely(loopSelfAtPostVar);
-        beforeLoopUpdate = TB.parallel(beforeLoopUpdate,
-                TB.elementary(services,
-                        loopSelfAtPostVar,
-                        selfAtPost));
-        heapToBeforeLoop.get(services.getTypeConverter().getHeapLDT().getHeap())
-                .put(selfAtPost, TB.var(loopSelfAtPostVar));
-        inst.inv.setSelfAtPost(selfAtPost);*/ // TODO: Probably not good/necessary either, right?
-        //final Term self = buildLoopSelf(tSelf, services);
 
         for(ProgramVariable pv : localOuts) {
             final String pvBeforeLoopName 
@@ -476,7 +508,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         final VariableSpecification guardVarSpec 
         = new VariableSpecification(guardVar, 
                 inst.loop.getGuardExpression(), 
-                booleanKJT);
+                booleanKJT);        
         final LocalVariableDeclaration guardVarDecl 
         = new LocalVariableDeclaration(new TypeRef(booleanKJT), 
                 guardVarSpec);
@@ -571,26 +603,32 @@ public final class WhileInvariantRule implements BuiltInRule {
             final LocationVariable baseHeap = heapContext.get(0);
             final Term heapAtPostEq =
                     TB.equals(anonUpdateData.loopHeap, TB.var(baseHeap));
-            
+
+            final Term guardTerm = TB.var(guardVar);
+            inst.inv.setGuard(guardTerm);
+            final Term guard = buildBeforeVar(guardTerm, services);            
+            services.getSpecificationRepository().setLoopInvariant(inst.inv);
+            final Term guardAtPost = buildAfterVar(guardTerm, services);
+            final Term selfAtPost = buildAtPostVar(inst.selfTerm, "LOOP", services);
+            final ImmutableList<Term> localInTerms = MiscTools.toTermList(localIns);
+            final ImmutableList<Term> newLocalIns = buildLocalIns(localInTerms, services);
+            final ImmutableList<Term> localOutTerms = MiscTools.toTermList(localOuts);
+            final ImmutableList<Term> newLocalOuts = buildLocalOuts(localOutTerms, services);
+
+
             InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
                     new InfFlowLoopInvariantTacletBuilder(services);            
-            
-            ifInvariantBuilder.setGuard(TB.var(guardVar));
+
+            ifInvariantBuilder.setInvariant(inst.inv);
+            ifInvariantBuilder.setGuard(guard);
+            ifInvariantBuilder.setGuardAtPost(guardAtPost);
             ifInvariantBuilder.setContextUpdate(inst.u);
             ifInvariantBuilder.setHeapAtPre(anonUpdateData.loopHeapAtPre);
             ifInvariantBuilder.setHeapAtPost(anonUpdateData.loopHeap);
-            ifInvariantBuilder.setSelf(inst.inv.getSelf());
-            ifInvariantBuilder.setSelfAtPost(inst.inv.getSelfAtPost());
-            ifInvariantBuilder.setLocalIns(MiscTools.toTermList(localIns));
-            ifInvariantBuilder.setLocalOuts(MiscTools.toTermList(localOuts));
-
-            inst.inv.setGuard(ifInvariantBuilder.getGuard());
-            inst.inv.setGuardAtPost(ifInvariantBuilder.getGuardAtPost());
-            inst.inv.setLocalIns(ifInvariantBuilder.getLocalIns());
-            inst.inv.setLocalOuts(ifInvariantBuilder.getLocalOuts());
-
-            ifInvariantBuilder.setInvariant(inst.inv);
-            services.getSpecificationRepository().setLoopInvariant(inst.inv);
+            ifInvariantBuilder.setSelf(inst.selfTerm);
+            ifInvariantBuilder.setSelfAtPost(selfAtPost);
+            ifInvariantBuilder.setLocalIns(newLocalIns);
+            ifInvariantBuilder.setLocalOuts(newLocalOuts);
 
             // generate information flow invariant application predicate
             // and associated taclet
@@ -603,41 +641,39 @@ public final class WhileInvariantRule implements BuiltInRule {
             // set infFlowAssumptions
             infFlowAssumptions = TB.and(heapAtPostEq, loopInvApplPredTerm);
 
-            Term selfAssumption = TB.equals(inst.inv.getSelf(), self);
-            Term guardAssumption = TB.equals(inst.inv.getGuard(), TB.var(guardVar));
-            Iterator<Term> it = inst.inv.getLocalIns().iterator();
-            Term locInAssumptions = TB.tt();
-            for (Term locVar: MiscTools.toTermList(localIns)) {
-                locInAssumptions = TB.and(locInAssumptions, TB.equals(it.next(), locVar));
+            Iterator<Term> newIns = newLocalIns.iterator();
+            Term beforeAssumptions = TB.tt();
+            for (Term locIn: localInTerms) {
+                beforeAssumptions = TB.and(beforeAssumptions, TB.equals(newIns.next(), locIn));
             }
 
-            Term selfAfterAssumption = TB.equals(inst.inv.getSelfAtPost(), self);
-            Term guardAfterAssumption = TB.equals(inst.inv.getGuardAtPost(), TB.var(guardVar));            
-            it = inst.inv.getLocalOuts().iterator();
-            Term locOutAssumptions = TB.tt();
-            for (Term locVar: MiscTools.toTermList(localOuts)) {
-                locOutAssumptions = TB.and(locOutAssumptions, TB.equals(it.next(), locVar));
+            Iterator<Term> newOuts = newLocalOuts.iterator();
+            Term afterAssumptions = TB.tt();
+            for (Term locVar: localOutTerms) {
+                afterAssumptions = TB.and(afterAssumptions, TB.equals(newOuts.next(), locVar));
             }
             
-            Term beforeAssumption = TB.apply(inst.u,
-                    TB.and(selfAssumption, guardAssumption, locInAssumptions));
-            Term afterAssumption = TB.apply(anonUpdate,
-                    TB.and(selfAfterAssumption, guardAfterAssumption, locOutAssumptions));
+            beforeAssumptions = TB.apply(inst.u,
+                    TB.and(TB.equals(guard, guardTerm), beforeAssumptions));
+            afterAssumptions = TB.apply(anonUpdate,
+                    TB.and(TB.equals(guardAtPost, guardTerm),
+                            TB.equals(selfAtPost, inst.selfTerm),
+                            afterAssumptions));
             
-            infFlowAssumptions = TB.and(beforeAssumption, afterAssumption,
+            infFlowAssumptions = TB.and(beforeAssumptions, afterAssumptions,
                                         TB.and(infFlowAssumptions));
             
             // create information flow validity goal
 
             // generate proof obligation variables
             final ProofObligationVars instantiationVars =
-                    new ProofObligationVars(inst.inv.getSelf(),
-                                            inst.inv.getSelfAtPost(),
-                                            inst.inv.getGuard(),
-                                            inst.inv.getLocalIns(),
+                    new ProofObligationVars(inst.selfTerm,
+                                            selfAtPost,
+                                            guard,
+                                            newLocalIns,
                                             anonUpdateData.loopHeapAtPre,
-                                            inst.inv.getGuardAtPost(),
-                                            inst.inv.getLocalOuts(),
+                                            guardAtPost,
+                                            newLocalOuts,
                                             anonUpdateData.loopHeap,
                                             services);
 
@@ -650,10 +686,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                     POSnippetFactory.getInfFlowFactory(inst.inv, ifVars.c1, ifVars.c2, services);
             Term selfComposedExec =
                     f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
-
             Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-            // FIXME: In post should be self and selfAtPost, strangely there is only self and
-            // not renamed (with _A and _B)
             final Term finalTerm = TB.imp(selfComposedExec, post);
             
             Sequent seq = Sequent.createSuccSequent(
@@ -726,16 +759,6 @@ public final class WhileInvariantRule implements BuiltInRule {
                     false);*/
             /*useGoal.addTaclet(informationFlowInvariantApp,
                                   SVInstantiations.EMPTY_SVINSTANTIATIONS, true);*/
-            
-            // dum di dum
-            /*goal.addFormula(new SequentFormula(
-                    TB.applySequential(updates, TB.and(assumptions))), true, false);
-            goal.changeFormula(new SequentFormula(
-                    TB.applySequential(updates, buildUsageFormula())), occurrence);
-            if (informationFlowContractApp != null) {
-                goal.addTaclet(
-                        informationFlowContractApp, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-            }*/
         }
 
         //"Invariant Initially Valid":
