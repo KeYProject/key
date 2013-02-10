@@ -63,7 +63,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
                viewer.refresh(); // Refresh structure
                viewer.refresh(); // Referesh labels and icons
                
-               System.out.println("refreshed");
             }
          });
       }
@@ -258,7 +257,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
    @Override
    public void updateElement(Object parent, int index) {
       Object element = getElementByIndex(parent, index);
-      if(element instanceof Node)System.out.println(((Node)element).serialNr());
       viewer.replace(parent, index, element);
       updateChildCount(element, -1);
    }

@@ -103,19 +103,12 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
       getTreeViewer().setLabelProvider(new ProofTreeLabelProvider(getTreeViewer(), environment, proof));
       getTreeViewer().setInput(proof);
       getTreeViewer().addSelectionChangedListener(selectionChangedListener);
-//      updateSelectedNode();
       
       MenuManager menuManager = new MenuManager("Outline popup", "org.key_project.keyide.ui.view.outline.popup");
       Menu menu = menuManager.createContextMenu(getTreeViewer().getControl());
       getTreeViewer().getControl().setMenu(menu);
       getSite().registerContextMenu ("org.key_project.keyide.ui.view.outline.popup", menuManager, getTreeViewer());
    }
-
-//   @Override
-//   public void selectionChanged(SelectionChangedEvent event) {
-//      Node node = getSelectedNode();
-//      environment.getMediator().getSelectionModel().setSelectedNode(node);
-//   }
    
    protected Node getSelectedNode() {
     return getSelectedNode(getSelection());  
@@ -136,12 +129,6 @@ public class ProofTreeContentOutlinePage extends ContentOutlinePage {
    
    protected void updateSelectedNode() {
       Node mediatorNode = environment.getMediator().getSelectionModel().getSelectedNode();
-if (mediatorNode != null) {
-   System.out.println("Select: " + mediatorNode.serialNr());
-}
-else {
-   System.out.println("Select: null");
-}
       Object selectedNode = getSelectedNode();
       
       if (mediatorNode != selectedNode) {

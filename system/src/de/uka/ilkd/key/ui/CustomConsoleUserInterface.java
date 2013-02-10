@@ -79,7 +79,6 @@ public class CustomConsoleUserInterface extends ConsoleUserInterface {
                g = proof.openGoals().head();
             }
             getMediator().goalChosen(g);
-            System.out.println("Goal choosen: " + g.node().serialNr());
          }
       }
    }

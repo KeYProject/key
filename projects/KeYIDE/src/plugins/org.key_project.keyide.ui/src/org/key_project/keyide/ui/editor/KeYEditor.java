@@ -5,21 +5,17 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.key_project.keyide.ui.editor.input.ProofEditorInput;
-import org.key_project.keyide.ui.providers.BranchFolder;
 import org.key_project.keyide.ui.tester.AutoModeTester;
-import org.key_project.keyide.ui.util.LogUtil;
 import org.key_project.keyide.ui.views.ProofTreeContentOutlinePage;
 import org.key_project.keyide.ui.views.StrategyPropertiesView;
 
@@ -43,25 +39,12 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    
    private ProofTreeContentOutlinePage outline;
    
-   private Node showNode;
+   private Node showNode; 
    
-   // TODO: Remove uncommented code
-   // TODO: Observe seletion in getKeYEvenrionment().getMediator() and change shown sequent if it changes
-   // TODO: Observe structure of selected node and update content if it is pruned.
+   private ProofTextViewer textViewer;
    
-//   /**
-//    * Listener that changes the current EditorInput if the selection in the outline has changed.
-//    */
-//   private ISelectionChangedListener outlineSelectionListener = new ISelectionChangedListener() {
-//
-//      /**
-//       * {@inheritDoc}
-//       */
-//      @Override
-//      public void selectionChanged(SelectionChangedEvent event) {
-//         updateInput(event);
-//      }
-//   };
+   
+
    
    private KeYSelectionListener keySelectionListener = new KeYSelectionListener() {
       
@@ -112,58 +95,9 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    }
 
    public void setShowNode(Node showNode) {
-      this.showNode = showNode;
-      // TODO: Update shown text
-      // TODO: Thorw event to update outline
-      IEditorInput input = getEditorInput();
-      ((ProofEditorInput)input).setData(showNode);
-    try {
-       doSetInput(input);
-    }
-    catch (CoreException e) {
-       LogUtil.getLogger().logError(e);
-    }
+      this.showNode=showNode;
+      textViewer.setDocumentForNode(getShowNode(), getKeYEnvironment().getMediator());
    }
-
-   /**
-    * Updates the {@link ProofEditorInput} and shows the new {@link ProofEditorInput} in the {@link KeYEditor}.
-    * @param event - the {@link SelectionChangedEvent} with the Information for the new Input.
-    */
-   
-   
-//   private void updateInput(SelectionChangedEvent event){
-//      getKeYEnvironment().getMediator().getSelectionModel().setSelectedNode(n)
-//      Node node = null;
-//      IEditorInput input = getEditorInput();
-//      if(input instanceof ProofEditorInput){
-//         //get the selected item
-//         ISelection selection = event.getSelection();
-//         if(!selection.isEmpty()){
-//            if(selection instanceof TreeSelection){
-//               TreeSelection treeSelection = (TreeSelection) selection;
-//               if(!treeSelection.isEmpty()){
-//                  if(treeSelection.getFirstElement() instanceof Node){
-//                     //get the Node
-//                     node = (Node) treeSelection.getFirstElement();
-//                  }
-//                  else if(treeSelection.getFirstElement() instanceof BranchFolder){
-//                     //get the BranchFolders ChildNode
-//                     BranchFolder branchFolder = (BranchFolder) treeSelection.getFirstElement();
-//                     node = branchFolder.getChild();
-//                  }
-//               }
-//            }
-//            //SetUp the new EditorInput
-//            ((ProofEditorInput)input).setData(node);
-//            try {
-//               doSetInput(input);
-//            }
-//            catch (CoreException e) {
-//               LogUtil.getLogger().logError(e);
-//            }
-//         }
-//      }
-//   }
    
    /**
     * Listens for changes on {@link ConsoleUserInterface#isAutoMode()} 
@@ -175,7 +109,15 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
          AutoModeTester.updateProperties();
       }
    };
+   
+   private MouseMoveListener mouseMoveListener = new MouseMoveListener(){
 
+      @Override
+      public void mouseMove(org.eclipse.swt.events.MouseEvent e) {
+         textViewer.setBackgroundColorForHover();
+      }
+   };
+   
    /**
     * {@inheritDoc}
     */
@@ -185,6 +127,25 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       getKeYEnvironment().getUi().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
    }
 
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void createPartControl(Composite parent){
+      getKeYEnvironment().getUi().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
+      textViewer = new ProofTextViewer(parent, SWT.MULTI|SWT.V_SCROLL);
+      textViewer.getControl().addMouseMoveListener(mouseMoveListener);
+      textViewer.setEditable(false);
+      if(this.getShowNode()!=null){
+         textViewer.setDocumentForNode(getShowNode(), getKeYEnvironment().getMediator());
+      }else{
+         textViewer.setDocumentForNode(getProof().root(), getKeYEnvironment().getMediator());
+      }
+   }
+
+   
+
+   
    /**
     * {@inheritDoc}
     */
@@ -239,5 +200,5 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       else {
          return super.getAdapter(adapter);
       }
-   } 
+   }
 }

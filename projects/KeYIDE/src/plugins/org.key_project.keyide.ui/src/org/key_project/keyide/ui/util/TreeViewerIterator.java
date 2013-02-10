@@ -49,22 +49,7 @@ public class TreeViewerIterator {
       }
       return item;
    }
-   
-   public void printList(){
-      for(TreeItem item : treeItemList){
-         viewer.getTree().showItem(item);
-         Object obj = item.getData();
-         if(obj instanceof Node){
-            Node node = (Node) obj;
-            System.out.println(node.serialNr() + ":" + node.name());
-         }
-         else if(obj instanceof BranchFolder){
-            BranchFolder bf = (BranchFolder) obj;
-            System.out.println(bf.getLabel() + " | " + bf.getChild().serialNr() + ":" + bf.getChild().name());
-         }
-      }
-   }
-   
+      
    public LinkedList<TreeItem> getList(){
       return treeItemList;
    }

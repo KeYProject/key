@@ -80,12 +80,12 @@ public class StrategyContentProvider extends ScrolledForm{
    private void initializeContent(Composite parent) {
       FormToolkit toolkit = new FormToolkit(parent.getDisplay());
       getBody().setLayout(new GridLayout(1, false));
-      
+      getBody().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       
       Label maxStepLabel = new Label(getBody(), SWT.NONE);
       maxStepLabel.setText("&Maximum number of steps:");
       maxStepText = new Text(getBody(), SWT.BORDER);
-      maxStepText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL)); // TODO: Set layout in all components
+      maxStepText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       maxStepText.addModifyListener(maxStepListener);
       maxStepText.setTextLimit(7);
       
@@ -97,6 +97,7 @@ public class StrategyContentProvider extends ScrolledForm{
       Group stopAtGroup = new Group(javaDLOptionsGroup, SWT.SHADOW_IN);
       stopAtGroup.setText("Stop at");
       stopAtGroup.setLayout(new GridLayout());
+      stopAtGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       stopAtDefault = toolkit.createButton(stopAtGroup, "Default", SWT.RADIO);
       stopAtUnclosable = toolkit.createButton(stopAtGroup, "Unclosable", SWT.RADIO);
       stopAtDefault.addSelectionListener(listener);
@@ -106,6 +107,7 @@ public class StrategyContentProvider extends ScrolledForm{
       Group treatmentOfNewUnclosableGoalsGroup = new Group(javaDLOptionsGroup, SWT.SHADOW_IN);
       treatmentOfNewUnclosableGoalsGroup.setText("Treatment of new unclosable goals");
       treatmentOfNewUnclosableGoalsGroup.setLayout(new GridLayout());
+      treatmentOfNewUnclosableGoalsGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       treatmentOfNewUnclosableGoalsNone = toolkit.createButton(treatmentOfNewUnclosableGoalsGroup, "None", SWT.RADIO);
       treatmentOfNewUnclosableGoalsAutoPrune = toolkit.createButton(treatmentOfNewUnclosableGoalsGroup, "AutoPrune", SWT.RADIO);
       treatmentOfNewUnclosableGoalsNone.addSelectionListener(listener);
@@ -114,6 +116,7 @@ public class StrategyContentProvider extends ScrolledForm{
       Group logicalSplittingGroup = new Group(javaDLOptionsGroup, SWT.SHADOW_IN);
       logicalSplittingGroup.setText("Logical splitting");
       logicalSplittingGroup.setLayout(new GridLayout());
+      logicalSplittingGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       logicalSplittingDelayed = toolkit.createButton(logicalSplittingGroup, "Delayed", SWT.RADIO);
       logicalSplittingFree = toolkit.createButton(logicalSplittingGroup, "Free", SWT.RADIO);
       logicalSplittingOff = toolkit.createButton(logicalSplittingGroup, "Off", SWT.RADIO);
@@ -124,6 +127,7 @@ public class StrategyContentProvider extends ScrolledForm{
       Group loopTreatmentGroup = new Group(javaDLOptionsGroup, SWT.SHADOW_IN);
       loopTreatmentGroup.setText("Loop treatment");
       loopTreatmentGroup.setLayout(new GridLayout());
+      loopTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       loopTreatmentInvariant = toolkit.createButton(loopTreatmentGroup, "Invariant", SWT.RADIO);
       loopTreatmentExpand = toolkit.createButton(loopTreatmentGroup, "Expand", SWT.RADIO);
       loopTreatmentNone = toolkit.createButton(loopTreatmentGroup, "None", SWT.RADIO);
@@ -134,6 +138,7 @@ public class StrategyContentProvider extends ScrolledForm{
       Group blockTreatmentGroup = new Group(javaDLOptionsGroup, SWT.SHADOW_IN);
       blockTreatmentGroup.setText("Block treatment");
       blockTreatmentGroup.setLayout(new GridLayout());
+      blockTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       blockTreatmentContract = toolkit.createButton(blockTreatmentGroup, "Contract", SWT.RADIO);
       blockTreatmentExpand = toolkit.createButton(blockTreatmentGroup, "Expand", SWT.RADIO);
       blockTreatmentContract.addSelectionListener(listener);
@@ -142,6 +147,7 @@ public class StrategyContentProvider extends ScrolledForm{
       Group methodTreatmentGroup = new Group(javaDLOptionsGroup, SWT.SHADOW_IN);
       methodTreatmentGroup.setText("Method treatment");
       methodTreatmentGroup.setLayout(new GridLayout());
+      methodTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       methodTreatmentContract = toolkit.createButton(methodTreatmentGroup, "Contract", SWT.RADIO);
       methodTreatmentExpand = toolkit.createButton(methodTreatmentGroup, "Expand", SWT.RADIO);
       methodTreatmentNone = toolkit.createButton(methodTreatmentGroup, "None", SWT.RADIO);
@@ -152,6 +158,7 @@ public class StrategyContentProvider extends ScrolledForm{
       Group dependencyContratcsGroup = new Group(javaDLOptionsGroup, SWT.SHADOW_IN);
       dependencyContratcsGroup.setText("Dependency contracts");
       dependencyContratcsGroup.setLayout(new GridLayout());
+      dependencyContratcsGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       dependencyContratcsOn = toolkit.createButton(dependencyContratcsGroup, "On", SWT.RADIO);
       dependencyContratcsOff = toolkit.createButton(dependencyContratcsGroup, "Off", SWT.RADIO);
       dependencyContratcsOn.addSelectionListener(listener);
@@ -162,6 +169,7 @@ public class StrategyContentProvider extends ScrolledForm{
       GridLayout queryLayout = new GridLayout();
       queryLayout.numColumns=3;
       queryTreatmentGroup.setLayout(queryLayout);
+      queryTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       queryTreatmentOn = toolkit.createButton(queryTreatmentGroup, "On", SWT.RADIO);
       queryTreatmentRestricted = toolkit.createButton(queryTreatmentGroup, "Restricted", SWT.RADIO);
       queryTreatmentOff = toolkit.createButton(queryTreatmentGroup, "Off", SWT.RADIO);
@@ -172,6 +180,7 @@ public class StrategyContentProvider extends ScrolledForm{
       Group expandLocalQueriesGroup = new Group(queryTreatmentGroup, SWT.SHADOW_IN);
       expandLocalQueriesGroup.setText("Expand local queries");
       expandLocalQueriesGroup.setLayout(new GridLayout());
+      expandLocalQueriesGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       expandLocalQueriesOn = toolkit.createButton(expandLocalQueriesGroup, "On", SWT.RADIO);
       expandLocalQueriesOff = toolkit.createButton(expandLocalQueriesGroup, "Off", SWT.RADIO);
       expandLocalQueriesOn.addSelectionListener(listener);
@@ -180,6 +189,7 @@ public class StrategyContentProvider extends ScrolledForm{
       Group arithmeticTreatmentGroup = new Group(javaDLOptionsGroup, SWT.SHADOW_IN);
       arithmeticTreatmentGroup.setText("Arithmetic treatment");
       arithmeticTreatmentGroup.setLayout(new GridLayout());
+      arithmeticTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       arithmeticTreatmentBasic = toolkit.createButton(arithmeticTreatmentGroup, "Basic", SWT.RADIO);
       arithmeticTreatmentDefOps = toolkit.createButton(arithmeticTreatmentGroup, "DefOps", SWT.RADIO);
       arithmeticTreatmentModelSearch = toolkit.createButton(arithmeticTreatmentGroup, "Model Search", SWT.RADIO);
@@ -192,6 +202,7 @@ public class StrategyContentProvider extends ScrolledForm{
       GridLayout quantifierLayout = new GridLayout();
       quantifierLayout.numColumns=2;
       quantifierTreatmentGroup.setLayout(quantifierLayout);
+      quantifierTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       quantifierTreatmentNone = toolkit.createButton(quantifierTreatmentGroup, "None", SWT.RADIO);
       quantifierTreatmentNoSplits = toolkit.createButton(quantifierTreatmentGroup, "No Splits", SWT.RADIO);
       quantifierTreatmentNoSplitsWithProgs = toolkit.createButton(quantifierTreatmentGroup, "No Splits with Progs", SWT.RADIO);
@@ -204,6 +215,7 @@ public class StrategyContentProvider extends ScrolledForm{
       Group autoInductionGroup = new Group(javaDLOptionsGroup, SWT.SHADOW_IN);
       autoInductionGroup.setText("Auto Induction");
       autoInductionGroup.setLayout(new GridLayout());
+      autoInductionGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       autoInductionOn = toolkit.createButton(autoInductionGroup, "On", SWT.RADIO);
       autoInductionRestricted = toolkit.createButton(autoInductionGroup, "Restricted", SWT.RADIO);
       autoInductionOff = toolkit.createButton(autoInductionGroup, "Off", SWT.RADIO);
@@ -216,11 +228,12 @@ public class StrategyContentProvider extends ScrolledForm{
       GridLayout tacletLayout = new GridLayout();
       tacletLayout.numColumns=1;
       userSpecificTacletsGroup.setLayout(tacletLayout);
-      
+      userSpecificTacletsGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));      
       
       Group firstUserSpecificTacletsGroup = new Group(userSpecificTacletsGroup, SWT.SHADOW_IN);
       firstUserSpecificTacletsGroup.setText("1:");
       firstUserSpecificTacletsGroup.setLayout(new GridLayout());
+      firstUserSpecificTacletsGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       userSpecificTacletsOneOff = toolkit.createButton(firstUserSpecificTacletsGroup, "Off", SWT.RADIO);
       userSpecificTacletsOneLowPrior = toolkit.createButton(firstUserSpecificTacletsGroup, "Low prior.", SWT.RADIO);
       userSpecificTacletsOneHighPrior = toolkit.createButton(firstUserSpecificTacletsGroup, "High prior.", SWT.RADIO);
@@ -231,6 +244,7 @@ public class StrategyContentProvider extends ScrolledForm{
       Group secondUserSpecificTacletsGroup = new Group(userSpecificTacletsGroup, SWT.SHADOW_IN);
       secondUserSpecificTacletsGroup.setText("2:");
       secondUserSpecificTacletsGroup.setLayout(new GridLayout());
+      secondUserSpecificTacletsGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       userSpecificTacletsTwoOff = toolkit.createButton(secondUserSpecificTacletsGroup, "Off", SWT.RADIO);
       userSpecificTacletsTwoLowPrior = toolkit.createButton(secondUserSpecificTacletsGroup, "Low prior.", SWT.RADIO);
       userSpecificTacletsTwoHighPrior = toolkit.createButton(secondUserSpecificTacletsGroup, "High prior.", SWT.RADIO);
@@ -241,15 +255,13 @@ public class StrategyContentProvider extends ScrolledForm{
       Group thirdUserSpecificTacletsGroup = new Group(userSpecificTacletsGroup, SWT.SHADOW_IN);
       thirdUserSpecificTacletsGroup.setText("3:");
       thirdUserSpecificTacletsGroup.setLayout(new GridLayout());
+      thirdUserSpecificTacletsGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       userSpecificTacletsThreeOff = toolkit.createButton(thirdUserSpecificTacletsGroup, "Off", SWT.RADIO);
       userSpecificTacletsThreeLowPrior = toolkit.createButton(thirdUserSpecificTacletsGroup, "Low prior.", SWT.RADIO);
       userSpecificTacletsThreeHighPrior = toolkit.createButton(thirdUserSpecificTacletsGroup, "High prior.", SWT.RADIO);
       userSpecificTacletsThreeOff.addSelectionListener(listener);
       userSpecificTacletsThreeLowPrior.addSelectionListener(listener);
       userSpecificTacletsThreeHighPrior.addSelectionListener(listener);
-      
-      
-      
   }
 
    public void setProof(Proof proof){

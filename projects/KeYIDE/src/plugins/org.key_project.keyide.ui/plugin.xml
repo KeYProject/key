@@ -415,5 +415,23 @@
             type="org.eclipse.jface.viewers.StructuredSelection">
       </propertyTester>
    </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+            id="org.key_project.keyide.ui.ruleContextMenu"
+            targetID="org.key_project.keyide.ui.editor">
+         <menu
+               icon="icons/releng_gears.gif"
+               id="org.key_project.keyide.ui.rules"
+               label="Applicable rules">
+         </menu>
+         <action
+               class="org.key_project.keyide.ui.Cut"
+               icon="icons/prune.png"
+               id="org.key_project.keyide.ui.cut"
+               label="Cut">
+         </action>
+      </viewerContribution>
+   </extension>
 
 </plugin>
