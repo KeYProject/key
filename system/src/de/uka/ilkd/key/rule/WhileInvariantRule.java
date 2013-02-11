@@ -136,7 +136,6 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
 
-
     private Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts, Services services) {
       Term anonUpdate = null;
       for(ProgramVariable pv : localOuts) {
@@ -661,7 +660,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                             afterAssumptions));
             
             infFlowAssumptions = TB.and(beforeAssumptions, afterAssumptions,
-                                        TB.and(infFlowAssumptions));
+                                        TB.apply(anonUpdate, TB.and(infFlowAssumptions)));
             
             // create information flow validity goal
 

@@ -504,14 +504,14 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     
     
     
-    Collection<?> expansionState = Collections.EMPTY_SET;
+    Collection expansionState = Collections.EMPTY_SET;
     
-    public void storeExpansionState(Collection<?> c) {
+    public void storeExpansionState(Collection c) {
        expansionState = c;
 //System.err.println("Proof "+proof.name()+" stor. state: "+ expansionState   );
     }
 
-    public Collection<?> getExpansionState() {
+    public Collection getExpansionState() {
 //System.err.println("Proof "+proof.name()+" retr. state: "+ expansionState   );
        return expansionState;
     }
