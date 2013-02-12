@@ -35,6 +35,9 @@ import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
+// TODO: Tests LazyProofTreeContentProvider#getParent() on each possible node (visible structure not proof tree structure!)
+// TODO: Tests LazyProofTreeContentProvider#getIndexOf(Object, Object) on each possible parent child combinations (visible structure not proof tree structure!)
+
 public class TreeViewerIteratorTest extends TestCase {
    // TODO Comments
    /**
