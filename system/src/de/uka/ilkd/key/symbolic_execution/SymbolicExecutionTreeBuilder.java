@@ -45,6 +45,8 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionUseLoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionUseOperationContract;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -550,6 +552,12 @@ public class SymbolicExecutionTreeBuilder {
          else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
             result = new ExecutionStatement(mediator, node);
          }
+      }
+      else if (SymbolicExecutionUtil.isUseOperationContract(node, node.getAppliedRuleApp())) {
+         result = new ExecutionUseOperationContract(mediator, node);
+      }
+      else if (SymbolicExecutionUtil.isUseLoopInvariant(node, node.getAppliedRuleApp())) {
+         result = new ExecutionUseLoopInvariant(mediator, node);
       }
       return result;
    }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
 import org.key_project.util.eclipse.swt.view.AbstractViewBasedView;
 import org.key_project.util.test.testcase.AbstractViewBasedViewTest;
 
@@ -43,6 +44,14 @@ public class LoggingAbstractViewBasedView extends AbstractViewBasedView {
     */
    @Override
    public void setFocus() {
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected boolean shouldHandleBaseViewReference(IViewReference baseViewReference) {
+      return BASE_VIEW_ID.equals(baseViewReference.getId());
    }
 
    /**
