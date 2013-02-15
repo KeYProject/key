@@ -39,7 +39,7 @@ public class WebstartMain {
 
     private static File setupExamples() {
         try {
-            URL examplesURL = WebstartMain.class.getResource("/examples-heap.jar");	
+            URL examplesURL = WebstartMain.class.getResource("/examples.jar");	
             if(examplesURL == null) {
                 throw new IOException("Missing examples.jar in resources");
             }

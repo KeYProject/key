@@ -109,10 +109,10 @@ public abstract class SequentialProofMacro implements ProofMacro {
                         }
                     });
 
-                    for(Goal g : mediator.getInteractiveProver().getProof().openGoals()) {
-                        System.out.println(g.node().serialNr());
-                    }
-                    System.out.println(mediator.getInteractiveProver().getProof().openGoals().size());
+//                    for(Goal g : mediator.getInteractiveProver().getProof().openGoals()) {
+//                        System.out.println(g.node().serialNr());
+//                    }
+//                    System.out.println(mediator.getInteractiveProver().getProof().openGoals().size());
                 }
             }
 

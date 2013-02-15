@@ -171,7 +171,7 @@ dist:	branding all
 	@mkdir -p dist/key/
 	@cp -r $(BINARYPATH)/* dist/key/
 	@cp -r $(RESOURCEPATH)/* dist/key/
-	@jar cMf dist/key/examples-heap.jar -C ../examples/heap .
+	@jar cMf dist/key/examples.jar -C ../examples/firstTouch .
 # for setup.jar
 	@mkdir -p dist/setup/de/uka/ilkd/key/util/
 	@cp -r $(BINARYPATH)/de/uka/ilkd/key/util/* dist/setup/de/uka/ilkd/key/util/

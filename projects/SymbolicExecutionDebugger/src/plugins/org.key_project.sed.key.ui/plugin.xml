@@ -418,4 +418,32 @@
             </contentTypeBinding>
          </editor>
       </extension>
+      <extension
+            point="org.eclipse.ui.views">
+         <view
+               category="org.key_project.sed.ui.category"
+               class="org.key_project.sed.key.ui.view.SymbolicExecutionSettingsView"
+               icon="icons/logo16.gif"
+               id="org.key_project.sed.key.ui.view.SymbolicExecutionProofSearchStragyView"
+               name="Symbolic Execution Settings"
+               restorable="true">
+         </view>
+      </extension>
+      <extension
+            point="org.eclipse.ui.perspectiveExtensions">
+         <perspectiveExtension
+               targetID="org.key_project.sed.ui.perspective">
+            <view
+                  id="org.key_project.sed.key.ui.view.SymbolicExecutionProofSearchStragyView"
+                  minimized="false"
+                  ratio="0.1"
+                  relationship="left"
+                  relative="org.eclipse.ui.views.PropertySheet"
+                  visible="true">
+            </view>
+            <viewShortcut
+                  id="org.key_project.sed.key.ui.view.SymbolicExecutionProofSearchStragyView">
+            </viewShortcut>
+         </perspectiveExtension>
+      </extension>
 </plugin>

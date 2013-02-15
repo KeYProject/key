@@ -323,7 +323,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 		    ed.setCaretPosition( col - 1 );
 
 		} catch (IllegalArgumentException iae) {
-		    System.out.println("tacletmatchcompletiondialog:: something is " + 
+		    Debug.out("tacletmatchcompletiondialog:: something is " + 
 				       "wrong with the caret position calculation.");
 
 		}
