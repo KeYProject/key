@@ -1,5 +1,6 @@
 package org.key_project.util.test.util;
 
+import static org.eclipse.swtbot.swt.finder.finders.UIThreadRunnable.syncExec;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.ByteArrayInputStream;
@@ -40,6 +41,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
+import org.eclipse.swtbot.swt.finder.results.BoolResult;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
@@ -67,6 +69,7 @@ import org.key_project.swtbot.swing.bot.finder.waits.Conditions;
 import org.key_project.util.eclipse.Logger;
 import org.key_project.util.eclipse.WorkbenchUtil;
 import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.java.thread.AbstractRunnableWithResult;
 import org.key_project.util.java.thread.IRunnableWithResult;
 import org.key_project.util.test.Activator;
@@ -993,5 +996,81 @@ public class TestUtilsUtil {
             }
          }
       });
+   }
+   
+   /**
+    * Waits until the selection of the given {@link SWTBotTree} contains the given element. 
+    * @param bot The {@link SWTWorkbenchBot} to use.
+    * @param tree The {@link SWTBotTree} to check selection.
+    * @param element The element to check if it is contained in the selection of the tree.
+    */
+   public static void waitUntilSelected(SWTWorkbenchBot bot, SWTBotTree tree, Object element) {
+      WaitForSelectedCondition condition = new WaitForSelectedCondition(tree, element);
+      bot.waitUntil(condition);
+   }
+   
+   /**
+    * {@link ICondition} to check if the given element is selected.
+    * @author Martin Hentschel
+    */
+   private static class WaitForSelectedCondition implements ICondition {
+      /**
+       * The {@link SWTBotTree} to check selection.
+       */
+      private SWTBotTree tree;
+      
+      /**
+       * The element to check if it is contained in the selection of {@link #tree}.
+       */
+      private Object element;
+
+      /**
+       * Constructor.
+       * @param tree The {@link SWTBotTree} to check selection.
+       * @param element The element to check if it is contained in the selection of the tree.
+       */
+      public WaitForSelectedCondition(SWTBotTree tree, Object element) {
+         this.tree = tree;
+         this.element = element;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean test() throws Exception {
+         return syncExec(new BoolResult() {
+            @Override
+            public Boolean run() {
+               boolean containsElement = false;
+               TreeItem[] selection = tree.widget.getSelection();
+               if (selection != null) {
+                  int i = 0;
+                  while (!containsElement && i < selection.length) {
+                     if (ObjectUtil.equals(selection[i].getData(), element)) {
+                        containsElement = true;
+                     }
+                     i++;
+                  }
+               }
+               return containsElement;
+            }
+         });
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void init(SWTBot bot) {
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getFailureMessage() {
+         return "Element \"" + element + "\" is not selected.";
+      }
    }
 }

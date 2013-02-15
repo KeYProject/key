@@ -6,6 +6,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotEditor;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotStyledText;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -160,6 +161,10 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
                                            int selectionLength,
                                            String expectedSelectedText,
                                            String expectedModelPathInBundle) throws Exception {
+      // Get current settings to restore them in finally block
+      long originalTimeout = SWTBotPreferences.TIMEOUT;
+      // Increase timeout
+      SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 4;
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       TestUtilsUtil.closeWelcomeView(bot);
@@ -195,6 +200,8 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
          assertDebugTargetViaOracle(target, expectedModelPathInBundle, false, false);
       }
       finally {
+         // Restore timeout
+         SWTBotPreferences.TIMEOUT = originalTimeout;
          // Close opened editor.
          if (editor != null) {
             editor.close();

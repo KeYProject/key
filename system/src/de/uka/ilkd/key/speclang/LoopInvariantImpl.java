@@ -266,6 +266,16 @@ public final class LoopInvariantImpl implements LoopInvariant {
                 + originalVariant;
     }
 
+    @Override
+    public String getPlainText(Services services) {
+       return "invariants: " 
+             + originalInvariants
+             + ";\nmodifies: " 
+             + originalModifies
+             + ";\nvariant: "
+             + originalVariant;
+    }
+
 
     @Override
     public String getDisplayName() {
