@@ -75,7 +75,7 @@ public final class ExampleChooser extends JDialog {
 
         @Override 
         public String toString() {
-            return file.getName();
+            return file.getName().substring(3); // remove leading index number
         }
     }
     
