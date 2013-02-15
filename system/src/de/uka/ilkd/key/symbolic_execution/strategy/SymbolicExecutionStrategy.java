@@ -15,28 +15,17 @@ import de.uka.ilkd.key.strategy.feature.ScaleFeature;
  * Strategy tailored to VBT aimed symbolic execution.
  */
 public class SymbolicExecutionStrategy extends VBTStrategy {
-
-    public static final String VISUAL_DEBUGGER_SPLITTING_RULES_KEY = "VD_SPLITTING_RULES_KEY";
-    public static final String VISUAL_DEBUGGER_WATCHPOINTS_KEY = "WATCHPOINTS_KEY";
-
-    public static final String VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY = "VD_IN_UPDATE_AND_ASSUMES_RULES_KEY";
-
-    public static final String VISUAL_DEBUGGER_IN_INIT_PHASE_KEY = "VD_IN_INIT_PHASE_KEY";
-
-    public static final String VISUAL_DEBUGGER_TRUE = "TRUE";
-
-    public static final String VISUAL_DEBUGGER_FALSE = "FALSE";
-
-    public static StrategyProperties getSymbolicExecutionStrategyProperties(
-            boolean splittingRulesAllowed, boolean inUpdateAndAssumes,
-            boolean inInitPhase, boolean quantifierInstantiationWithSplitting) { // , List<WatchPoint> watchpoints
+    public static StrategyProperties getSymbolicExecutionStrategyProperties(boolean splittingRulesAllowed, 
+                                                                            boolean quantifierInstantiationWithSplitting,
+                                                                            boolean methodTreatmentContract,
+                                                                            boolean loopTreatmentInvariant) {
         final StrategyProperties res = new StrategyProperties();
         res.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
-                StrategyProperties.LOOP_EXPAND);
+              loopTreatmentInvariant ? StrategyProperties.LOOP_INVARIANT : StrategyProperties.LOOP_EXPAND);
         res.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
                 StrategyProperties.BLOCK_EXPAND);
         res.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
-                StrategyProperties.METHOD_EXPAND);
+                methodTreatmentContract ? StrategyProperties.METHOD_CONTRACT : StrategyProperties.METHOD_EXPAND);
         res.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
                 StrategyProperties.QUERY_OFF);
         res.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
@@ -49,9 +38,6 @@ public class SymbolicExecutionStrategy extends VBTStrategy {
               StrategyProperties.QUERYAXIOM_OFF);
         res.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
               StrategyProperties.SPLITTING_DELAYED);
-//        res.put(VISUAL_DEBUGGER_WATCHPOINTS_KEY, watchpoints);
-//        res.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
-//                StrategyProperties.SPLITTING_NORMAL);
 
         if (quantifierInstantiationWithSplitting) {
             res.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
@@ -60,17 +46,6 @@ public class SymbolicExecutionStrategy extends VBTStrategy {
             res.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
                     StrategyProperties.QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
         }
-
-        res.setProperty(VISUAL_DEBUGGER_SPLITTING_RULES_KEY,
-                splittingRulesAllowed ? VISUAL_DEBUGGER_TRUE
-                        : VISUAL_DEBUGGER_FALSE);
-
-        res.setProperty(VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY,
-                inUpdateAndAssumes ? VISUAL_DEBUGGER_TRUE
-                        : VISUAL_DEBUGGER_FALSE);
-
-        res.setProperty(VISUAL_DEBUGGER_IN_INIT_PHASE_KEY,
-                inInitPhase ? VISUAL_DEBUGGER_TRUE : VISUAL_DEBUGGER_FALSE);
 
         return res;
     }
@@ -144,33 +119,8 @@ public class SymbolicExecutionStrategy extends VBTStrategy {
         public Factory() {
         }
 
-        public Strategy create(Proof p_proof,
-                StrategyProperties strategyProperties) {
-
-//            List<WatchPoint> watchpoints =  (List<WatchPoint>) strategyProperties
-//                    .get(VISUAL_DEBUGGER_WATCHPOINTS_KEY);
-            injectDebuggerDefaultOptionsIfUnset(strategyProperties);
-            
-            return new SymbolicExecutionStrategy(p_proof, strategyProperties); // ,watchpoints
-        }
-
-        private void injectDebuggerDefaultOptionsIfUnset(
-                StrategyProperties props) {
-
-            if (!props.containsKey(VISUAL_DEBUGGER_SPLITTING_RULES_KEY)) {
-                props.put(VISUAL_DEBUGGER_SPLITTING_RULES_KEY,
-                        VISUAL_DEBUGGER_TRUE);
-            }
-
-            if (!props.containsKey(VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY)) {
-                props.put(VISUAL_DEBUGGER_IN_UPDATE_AND_ASSUMES_KEY,
-                        VISUAL_DEBUGGER_FALSE);
-            }
-
-            if (!props.containsKey(VISUAL_DEBUGGER_IN_INIT_PHASE_KEY)) {
-                props.put(VISUAL_DEBUGGER_IN_INIT_PHASE_KEY,
-                        VISUAL_DEBUGGER_TRUE);
-            }
+        public Strategy create(Proof p_proof, StrategyProperties strategyProperties) {
+            return new SymbolicExecutionStrategy(p_proof, strategyProperties);
         }
 
         public Name name() {

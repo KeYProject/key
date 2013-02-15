@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.smt;
 
@@ -783,6 +787,25 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                             element.add(usedDisplaySort.get(f.argSort(i)));
                         }
                     }
+                    //add the sort definitions for the free variables of the bound terms
+                    for (int j = 0; j < f.arity(); j++) {
+                        if (f.bindVarsAt(j)) {
+                            Iterator<QuantifiableVariable> iter = t.sub(j).freeVars().iterator();
+                            ImmutableArray<QuantifiableVariable> bv = t.boundVars();
+                            while (iter.hasNext()) {
+                                QuantifiableVariable q = iter.next();
+                                boolean isBound = false;
+                                for (QuantifiableVariable temp: bv) {
+                                    isBound = isBound || temp.equals(q);
+                                }
+                                if (!isBound) {
+                                    //add on position 1, since position 0 is used for the function name
+                                    element.add(1, usedDisplaySort.get(q.sort()));
+                                }
+                            }
+                        }
+                    }
+                    
                     element.add(usedDisplaySort.get(f.sort()));
                     toReturn.add(element);
                 }
@@ -839,6 +862,27 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                             element.add(usedDisplaySort.get(t.sub(i).sort()));
                         }
                     }
+                    
+                    //add the sort definitions for the free variables of the bound terms
+                    for (int j = 0; j < t.op().arity(); j++) {
+                        if (t.op().bindVarsAt(j)) {
+                            Iterator<QuantifiableVariable> iter = t.sub(j).freeVars().iterator();
+                            ImmutableArray<QuantifiableVariable> bv = t.boundVars();
+                            while (iter.hasNext()) {
+                                QuantifiableVariable q = iter.next();
+                                boolean isBound = false;
+                                for (QuantifiableVariable temp: bv) {
+                                    isBound = isBound || (temp.equals(q));
+                                }
+                                if (!isBound) {
+                                    //add on position 1, because position 0 is ised for the predicate name
+                                    element.add(1, usedDisplaySort.get(q.sort()));
+                                }
+                            }
+                        }
+                    }
+                    
+                    
                     toReturn.add(element);
                 }
                 
@@ -2248,6 +2292,26 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             }
             if (used != null) {
                 //The term was aready used. reuse the function name.
+                
+                //add the free variables in the term to the bound functions as parameter
+                for (int i = 0; i < term.arity(); i++) {
+                    if (fun.bindVarsAt(i)) {
+                        Iterator<QuantifiableVariable> iter = term.sub(i).freeVars().iterator();
+                        //do not add those bound by the top level operator
+                        ImmutableArray<QuantifiableVariable> qv = term.boundVars();
+                        while (iter.hasNext()) {
+                            QuantifiableVariable fv = iter.next();
+                            boolean isBound = false;
+                            for (QuantifiableVariable temp: qv) {
+                                isBound = isBound || temp.equals(fv);
+                            }
+                            if (!isBound) {
+                                subterms.add(0, translateVariable(fv));
+                            }
+                        }
+                    }
+                }                
+                
                 return translateFunction(uninterpretedBindingPredicateNames.get(used), subterms);
             } else {
                 // create a new functionname
@@ -2262,6 +2326,26 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         alreadyContains = alreadyContains || s.toString().equals(newName.toString());
                     }
                 }
+                
+                //add the free variables in the term to the bound functions as parameter
+                for (int j = 0; j < term.arity(); j++) {
+                    if (fun.bindVarsAt(j)) {
+                        Iterator<QuantifiableVariable> iter = term.sub(j).freeVars().iterator();
+                        //do not add those bound by the top level operator
+                        ImmutableArray<QuantifiableVariable> qv = term.boundVars();
+                        while (iter.hasNext()) {
+                            QuantifiableVariable fv = iter.next();
+                            boolean isBound = false;
+                            for (QuantifiableVariable temp: qv) {
+                                isBound = isBound || temp.equals(fv);
+                            }
+                            if (!isBound) {
+                                subterms.add(0, translateVariable(fv));
+                            }
+                        }
+                    }
+                }
+                
                 // add the function
                 uninterpretedBindingPredicateNames.put(term, newName);
                 //translate the new function
@@ -2318,6 +2402,26 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             }
             if (used != null) {
                 //The term was aready used. reuse the function name.
+                //add the free variables in the term to the bound functions as parameter
+                for (int i = 0; i < term.arity(); i++) {
+                    if (fun.bindVarsAt(i)) {
+                        Iterator<QuantifiableVariable> iter = term.sub(i).freeVars().iterator();
+                        //do not add those bound by the top level operator
+                        ImmutableArray<QuantifiableVariable> qv = term.boundVars();
+                        while (iter.hasNext()) {
+                            QuantifiableVariable fv = iter.next();
+                            boolean isBound = false;
+                            for (QuantifiableVariable temp: qv) {
+                                isBound = isBound || temp.equals(fv);
+                            }
+                            if (!isBound) {
+                                subterms.add(0, translateVariable(fv));
+                            }
+                        }
+                    }
+                }
+                
+                
                 return translateFunction(uninterpretedBindingFunctionNames.get(used), subterms);
             } else {
                 // create a new functionname
@@ -2332,6 +2436,25 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                         alreadyContains = alreadyContains || s.toString().equals(newName.toString());
                     }
                 }
+                //add the free variables of the bound terms as parameter
+                for (int j = 0; j < term.arity(); j++) {
+                    if (fun.bindVarsAt(j)) {
+                        Iterator<QuantifiableVariable> iter = term.sub(j).freeVars().iterator();
+                        //do not add those bound by the top level operator
+                        ImmutableArray<QuantifiableVariable> qv = term.boundVars();
+                        while (iter.hasNext()) {
+                            QuantifiableVariable fv = iter.next();
+                            boolean isBound = false;
+                            for (QuantifiableVariable temp: qv) {
+                                isBound = isBound || temp.equals(fv);
+                            }
+                            if (!isBound) {
+                                subterms.add(0, translateVariable(fv));
+                            }
+                        }
+                    }
+                }
+                
                 // add the function
                 uninterpretedBindingFunctionNames.put(term, newName);
                 //translate the new function

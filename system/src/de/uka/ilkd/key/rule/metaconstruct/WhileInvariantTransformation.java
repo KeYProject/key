@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
@@ -124,7 +128,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             if (runMode == CHECK) {
                 needInnerLabel = true;
             } else {
-                ExtList changeList = (ExtList) stack.peek();
+                ExtList changeList =  stack.peek();
                 if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
                     changeList.removeFirst();
                 }
@@ -203,7 +207,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
     }
 
     public void performActionOnWhile(While x) {
-        ExtList changeList = (ExtList) stack.peek();
+        ExtList changeList = stack.peek();
         if (replaceBreakWithNoLabel == 0) {
             // the most outer while loop
             // get guard
@@ -255,7 +259,9 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 Statement body =
                         (Statement) (changeList.isEmpty() ? null
                                 : changeList.removeFirst());
- 		addChild(new While(guard, body, x.getPositionInfo()));
+                While newLoop = new While(guard, body, x.getPositionInfo());
+                services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
+                addChild(newLoop);
                 changed();
             } else {
                 doDefaultAction(x);
@@ -283,7 +289,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
      * If the loop is not top most, act like the super class.
      */
     public void performActionOnEnhancedFor(EnhancedFor x) {
-        ExtList changeList = (ExtList) stack.peek();
+        ExtList changeList =  stack.peek();
         if (replaceBreakWithNoLabel == 0) {
             if (changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();

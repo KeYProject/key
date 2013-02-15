@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 package de.uka.ilkd.key.proof;
@@ -25,6 +29,7 @@ import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
 
 public class RuleTreeModel extends DefaultTreeModel {
@@ -92,9 +97,10 @@ public class RuleTreeModel extends DefaultTreeModel {
         for (final BuiltInRule br : getBuiltInIndex().rules()) {
             insertAsLast(new DefaultMutableTreeNode(br), builtInRoot);
         }
-        final List<NoPosTacletApp> apps = 
-            sort(getTacletIndex().allNoPosTacletApps());
-        for (final NoPosTacletApp app : apps) {
+        ImmutableSet<NoPosTacletApp> set = getTacletIndex().allNoPosTacletApps();
+        set = set.union(OneStepSimplifier.INSTANCE.getCapturedTaclets());
+
+        for (final NoPosTacletApp app : sort(set)) {
             RuleJustification just = mgt().getJustification(app);
             if (just==null) continue; // do not break system because of this
             if (just.isAxiomJustification()) {

@@ -1,5 +1,7 @@
 package org.key_project.sed.core.test.util;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,6 +69,8 @@ import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDTermination;
 import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISEDUseLoopInvariant;
+import org.key_project.sed.core.model.ISEDUseOperationContract;
 import org.key_project.sed.core.model.ISEDValue;
 import org.key_project.sed.core.util.ISEDIterator;
 import org.key_project.sed.core.util.LaunchUtil;
@@ -837,6 +841,14 @@ public final class TestSedCoreUtil {
             TestCase.assertTrue("Expected ISEDThread on " + ((ISEDThread)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDThread);
             compareThread((ISEDThread)expectedNext, (ISEDThread)currentNext, true, compareId);
          }
+         else if (expectedNext instanceof ISEDUseOperationContract) {
+            TestCase.assertTrue("Expected ISEDUseOperationContract on " + ((ISEDUseOperationContract)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDUseOperationContract);
+            compareUseOperationContract((ISEDUseOperationContract)expectedNext, (ISEDUseOperationContract)currentNext, true, compareId, compareVariables, compareCallStack);
+         }
+         else if (expectedNext instanceof ISEDUseLoopInvariant) {
+            TestCase.assertTrue("Expected ISEDUseLoopInvariant on " + ((ISEDUseLoopInvariant)expectedNext).getName() + " instance but is " + ObjectUtil.getClass(currentNext) + ".", currentNext instanceof ISEDUseLoopInvariant);
+            compareUseLoopInvariant((ISEDUseLoopInvariant)expectedNext, (ISEDUseLoopInvariant)currentNext, true, compareId, compareVariables, compareCallStack);
+         }
          else {
             TestCase.fail("Unknown node type \"" + (expectedNext != null ? expectedNext.getClass() : null) + "\".");
          }
@@ -894,7 +906,7 @@ public final class TestSedCoreUtil {
          // Compare node
          TestCase.assertNotNull(current);
          TestCase.assertTrue(expected.getName() + " does not match " + current.getName(), StringUtil.equalIgnoreWhiteSpace(expected.getName(), current.getName()));
-         TestCase.assertEquals(expected.getPathCondition(), current.getPathCondition());
+         TestCase.assertTrue(expected.getPathCondition() + " does not match " + current.getPathCondition(), StringUtil.equalIgnoreWhiteSpace(expected.getPathCondition(), current.getPathCondition()));
          TestCase.assertEquals(expected.getNodeType(), current.getNodeType());
          compareDebugElement(expected, current, compareReferences, compareVariables);
          // Compare call stack
@@ -956,6 +968,14 @@ public final class TestSedCoreUtil {
                else if (expectedChildren[i] instanceof ISEDThread) {
                   TestCase.assertTrue("Expected ISEDThread on " + ((ISEDThread)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDThread);
                   compareThread((ISEDThread)expectedChildren[i], (ISEDThread)currentChildren[i], true, compareVariables);
+               }
+               else if (expectedChildren[i] instanceof ISEDUseOperationContract) {
+                  TestCase.assertTrue("Expected ISEDUseOperationContract on " + ((ISEDUseOperationContract)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDUseOperationContract);
+                  compareUseOperationContract((ISEDUseOperationContract)expectedChildren[i], (ISEDUseOperationContract)currentChildren[i], false, compareId, compareVariables, compareCallStack);
+               }
+               else if (expectedChildren[i] instanceof ISEDUseLoopInvariant) {
+                  TestCase.assertTrue("Expected ISEDUseLoopInvariant on " + ((ISEDUseLoopInvariant)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDUseLoopInvariant);
+                  compareUseLoopInvariant((ISEDUseLoopInvariant)expectedChildren[i], (ISEDUseLoopInvariant)currentChildren[i], false, compareId, compareVariables, compareCallStack);
                }
                else {
                   TestCase.fail("Unknown node type \"" + (expectedChildren[i] != null ? expectedChildren[i].getClass() : null) + "\".");
@@ -1361,6 +1381,50 @@ public final class TestSedCoreUtil {
    }
 
    /**
+    * Compares the given {@link ISEDUseOperationContract}s with each other.
+    * @param expected The expected {@link ISEDUseOperationContract}.
+    * @param current The current {@link ISEDUseOperationContract}.
+    * @param compareReferences Compare also the containment hierarchy?
+    * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
+    * @param compareCallStack Compare call stack?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareUseOperationContract(ISEDUseOperationContract expected, 
+                                                     ISEDUseOperationContract current, 
+                                                     boolean compareReferences, 
+                                                     boolean compareId, 
+                                                     boolean compareVariables,
+                                                     boolean compareCallStack) throws DebugException {
+      compareStackFrame(expected, current, compareVariables);
+      compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
+      assertEquals(expected.isPreconditionComplied(), current.isPreconditionComplied());
+      assertEquals(expected.hasNotNullCheck(), current.hasNotNullCheck());
+      assertEquals(expected.isNotNullCheckComplied(), current.isNotNullCheckComplied());
+   }
+
+   /**
+    * Compares the given {@link ISEDUseLoopInvariant}s with each other.
+    * @param expected The expected {@link ISEDUseLoopInvariant}.
+    * @param current The current {@link ISEDUseLoopInvariant}.
+    * @param compareReferences Compare also the containment hierarchy?
+    * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
+    * @param compareCallStack Compare call stack?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareUseLoopInvariant(ISEDUseLoopInvariant expected, 
+                                                 ISEDUseLoopInvariant current, 
+                                                 boolean compareReferences, 
+                                                 boolean compareId, 
+                                                 boolean compareVariables,
+                                                 boolean compareCallStack) throws DebugException {
+      compareStackFrame(expected, current, compareVariables);
+      compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
+      assertEquals(expected.isInitiallyValid(), current.isInitiallyValid());
+   }
+
+   /**
     * Compares the given {@link ISEDTermination}s with each other.
     * @param expected The expected {@link ISEDTermination}.
     * @param current The current {@link ISEDTermination}.
@@ -1400,7 +1464,9 @@ public final class TestSedCoreUtil {
       for (int i = 1; i < indexPathToItem.length + 1; i++) {
          int[] subPath = Arrays.copyOf(indexPathToItem, i);
          item = TestUtilsUtil.selectInTree(debugTree, subPath);
-         item.expand();
+         if (!item.isExpanded()) {
+            item.expand();
+         }
          TestUtilsUtil.waitForJobs();
       }
       return item;

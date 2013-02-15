@@ -10,6 +10,7 @@
 
 package de.uka.ilkd.key.taclettranslation;
 
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -21,7 +22,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 
-public abstract class TacletVisitor extends Visitor {
+public abstract class TacletVisitor extends DefaultVisitor {
         private String failureDescription = null;
 
         private void visit(Semisequent semiseq) {

@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
@@ -84,12 +88,15 @@ public class ExpandMethodBody extends ProgramTransformer {
 	// at this point all arguments should be program variables
 	ImmutableArray<? extends Expression> argsAsParam = mbs.getArguments();
 
-	final HashMap<IProgramVariable, Expression> map = 
-	    new HashMap<IProgramVariable, Expression>();	
+	final HashMap<ProgramVariable, ProgramVariable> map = 
+	    new HashMap<ProgramVariable, ProgramVariable>();	
 	for (int i = 0; i < argsAsParam.size(); i++) {
-	    map.put(methDecl.getParameterDeclarationAt(i).
-		    getVariableSpecification().getProgramVariable(), 
-		    argsAsParam.get(i));
+	    IProgramVariable pv = methDecl.getParameterDeclarationAt(i).
+	            getVariableSpecification().getProgramVariable();
+	    assert pv instanceof ProgramVariable : "Unexpected schematic variable";
+	    Expression arg = argsAsParam.get(i);
+	    assert arg instanceof ProgramVariable : "Unexpected schematic variable";
+	    map.put((ProgramVariable)pv, (ProgramVariable)argsAsParam.get(i));
 	}
 	ProgVarReplaceVisitor paramRepl = 
 	    new ProgVarReplaceVisitor(result, map, services); 

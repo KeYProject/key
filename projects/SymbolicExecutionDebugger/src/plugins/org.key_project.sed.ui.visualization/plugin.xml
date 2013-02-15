@@ -200,12 +200,8 @@
 
   <extension
         point="org.eclipse.ui.views">
-     <category
-           id="org.key_project.sed.ui.graphiti.category"
-           name="Symbolic Execution Debugger (SED)">
-     </category>
      <view
-           category="org.key_project.sed.ui.graphiti.category"
+           category="org.key_project.sed.ui.category"
            class="org.key_project.sed.ui.visualization.view.ExecutionTreeView"
            icon="icons/symbolic_debug.gif"
            id="org.key_project.sed.ui.graphiti.view.ExecutionTreeView"
@@ -213,7 +209,7 @@
            restorable="true">
      </view>
      <view
-           category="org.key_project.sed.ui.graphiti.category"
+           category="org.key_project.sed.ui.category"
            class="org.key_project.sed.ui.visualization.view.ExecutionTreeThumbNailView"
            icon="icons/symbolic_debug.gif"
            id="org.key_project.sed.ui.graphiti.view.ExecutionTreeThumbNailView"

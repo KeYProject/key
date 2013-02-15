@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.proof.mgt;
 
@@ -258,8 +262,8 @@ public final class SpecificationRepository {
     private boolean axiomIsVisible(ClassAxiom ax, KeYJavaType visibleTo) {
         final KeYJavaType kjt = ax.getKJT();
         //TODO: package information not yet available
-        // DISCUSSION: how should it be treated in the mean time? as public? Our specifications rarely stretch over different packages... 
-        final boolean visibleToPackage = true;
+        // BUGFIX: package-private is understood as private (see bug #1268)
+        final boolean visibleToPackage = false;
         final VisibilityModifier visibility = ax.getVisibility();
         if (VisibilityModifier.isPublic(visibility))
             return true;
@@ -1060,12 +1064,31 @@ public final class SpecificationRepository {
         return loopInvs.get(loop);
     }
 
+    /**
+     * Copies a loop invariant from a loop statement to another.
+     * 
+     * If the original loop does not possess an invariant, 
+     * none is set to the target.
+     * 
+     * A possibly existing old registration will be overwritten, a registration
+     * for the original loop remains untouched.
+     * 
+     * @param from the loop with the original contract
+     * @param loop the loop for which the contract is to be copied
+     */
+    public void copyLoopInvariant(LoopStatement from, LoopStatement to) {
+        LoopInvariant inv = getLoopInvariant(from);
+        if(inv != null) {
+            inv = inv.setLoop(to);
+            addLoopInvariant(inv);
+        }
+    }
 
     /**
      * Registers the passed loop invariant, possibly overwriting an older
      * registration for the same loop.
      */
-    public void setLoopInvariant(LoopInvariant inv) {
+    public void addLoopInvariant(LoopInvariant inv) {
         LoopStatement loop = inv.getLoop();
         loopInvs.put(loop, inv);
     }
@@ -1125,7 +1148,7 @@ public final class SpecificationRepository {
                 addClassAxiom((ClassAxiom)spec);
             }
             else if (spec instanceof LoopInvariant) {
-                setLoopInvariant((LoopInvariant)spec);
+                addLoopInvariant((LoopInvariant)spec);
             }
             else if (spec instanceof BlockContract) {
                 addBlockContract((BlockContract) spec);

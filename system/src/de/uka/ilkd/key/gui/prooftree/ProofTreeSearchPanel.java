@@ -94,6 +94,10 @@ class ProofTreeSearchPanel extends JPanel implements DocumentListener,
             this.proofTreeView.delegateView.requestFocusInWindow();
         }
     }
+    
+    public void requestFocus() {
+    	searchString.requestFocus();
+    }
 
     private synchronized void searchNext() {
         if (cache == null) fillCache();

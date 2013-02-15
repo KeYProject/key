@@ -22,9 +22,9 @@ public final class EditMostRecentFileAction extends MainWindowAction {
     public EditMostRecentFileAction(MainWindow mainWindow) {
 	super(mainWindow);
 	
-	setName("Edit");
+	setName("Edit last opened file");
 	setIcon(IconFactory.editFile(MainWindow.TOOLBAR_ICON_SIZE));
-	setTooltip("Edit last opened file.");
+	setTooltip("Open the last opened file with the default external editor");
 	
 	if (!Desktop.isDesktopSupported()
 	        || (!Desktop.getDesktop().isSupported(Desktop.Action.EDIT) && !Desktop
