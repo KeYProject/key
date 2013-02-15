@@ -210,7 +210,7 @@ public final class ExampleChooser extends JDialog {
         if(path.startsWith("file:")) {
             path = path.substring("file:".length());
         }
-        int i = path.lastIndexOf("/");
+        int i = path.lastIndexOf(File.separator);
         while(i > 0) {
             path = path.substring(0, i);
             final String resultPath = path + EXAMPLES_PATH;
@@ -218,7 +218,7 @@ public final class ExampleChooser extends JDialog {
             if(result.isDirectory()) {
         	return result;
             }
-            i = path.lastIndexOf("/");
+            i = path.lastIndexOf(File.separator);
         }
     	return null;
     }
