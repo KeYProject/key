@@ -469,6 +469,8 @@ public final class LoopInvariantImpl implements LoopInvariant {
                 + originalRespects
                 + "; variant: "
                 + originalVariant
+                + "; guard: "
+                + (guard != null ? guard : "none")
                 + "; input parameters: " 
                 + localIns
                 + "; output parameters: " 

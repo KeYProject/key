@@ -298,6 +298,89 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
     }
 
+    private Goal buildInfFlowValidityGoal(Goal goal, LoopInvariant inv,
+                                          InfFlowData infFlowData,
+                                          RuleApp ruleApp,                                          
+                                          Goal infFlowGoal) {        
+        // generate proof obligation variables
+        final ProofObligationVars instantiationVars =
+                new ProofObligationVars(infFlowData.self,
+                                        infFlowData.selfAtPost,
+                                        infFlowData.guardAtPre,
+                                        infFlowData.newIns,
+                                        infFlowData.heapAtPre,
+                                        infFlowData.guardAtPost,
+                                        infFlowData.newOuts,
+                                        infFlowData.heapAtPost,
+                                        infFlowData.services);
+        
+        final IFProofObligationVars ifVars =
+                new IFProofObligationVars(instantiationVars, infFlowData.services);
+        ((LoopInvariantBuiltInRuleApp) ruleApp).setInformationFlowProofObligationVars(ifVars);
+
+        // create proof obligation
+        InfFlowPOSnippetFactory f =
+                POSnippetFactory.getInfFlowFactory(inv, ifVars.c1, ifVars.c2, infFlowData.services);
+        Term selfComposedExec =
+                f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
+        Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+        final Term finalTerm = TB.imp(selfComposedExec, post);
+
+        Sequent seq = Sequent.createSuccSequent(
+                new Semisequent(new SequentFormula(finalTerm)));
+        infFlowGoal = goal.getCleanGoal(seq);
+        infFlowGoal.setBranchLabel("Information Flow Validity");
+
+        // create and add split-post and remove-post taclets
+        final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
+        final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
+        for (final Taclet t : splitPostTaclets) {                
+            infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        }
+        final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
+        final ArrayList<Taclet> removePostTaclets = removePostTB.generateTaclets(post);
+        for (final Taclet t : removePostTaclets) {
+            infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        }
+        
+        return infFlowGoal;
+    }
+
+    private Goal addInfFlowAssumptionsAndTaclet(InfFlowData infData, Goal goal) {
+        final Term heapAtPreEq =
+                TB.equals(infData.heapAtPre, infData.baseHeap);
+        final Term heapAtPostEq =
+                TB.equals(infData.heapAtPost, infData.baseHeap);
+
+        Term beforeAssumptions = TB.and(heapAtPreEq,
+                                        TB.equals(infData.guardAtPre, infData.guardTerm));
+        Iterator<Term> newIns = infData.newIns.iterator();
+        for (Term locIn: infData.localIns) {
+            beforeAssumptions = TB.and(beforeAssumptions, TB.equals(newIns.next(), locIn));
+        }
+
+        Term afterAssumptions = TB.and(heapAtPostEq,
+                                       TB.equals(infData.guardAtPost, infData.guardTerm),
+                                       TB.equals(infData.selfAtPost, infData.self));
+        Iterator<Term> newOuts = infData.newOuts.iterator();        
+        for (Term locOut: infData.localOuts) {
+            afterAssumptions = TB.and(afterAssumptions, TB.equals(newOuts.next(), locOut));
+        }
+
+        final Term infFlowAssumptions = TB.applySequential(infData.updates,
+                                                           TB.and(beforeAssumptions,
+                                                                  afterAssumptions,
+                                                                  infData.applPredTerm));
+        
+        goal.addFormula(new SequentFormula(infFlowAssumptions),
+                        true,
+                        false);
+        goal.addTaclet(infData.infFlowApp,
+                       SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
+        
+        return goal;
+    }
+
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
@@ -529,9 +612,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Term[] uAnon 
         = new Term[]{inst.u, anonUpdate};
         final Term[] uBeforeLoopDefAnonVariant 
-        = new Term[]{inst.u, 
+        = new Term[]{inst.u,
                 beforeLoopUpdate, 
-                anonUpdate, 
+                anonUpdate,
                 variantUpdate};
         final Term uAnonInv 
         = TB.applySequential(uAnon, TB.and(invTerm, reachableOut));
@@ -585,9 +668,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                 TB.imp(guardTrueTerm, bodyTerm));
 
         Goal infFlowGoal = null;
-        Term loopInvApplPredTerm = null;
-        Taclet informationFlowInvariantApp = null;
-        Term infFlowAssumptions = null;
+        InfFlowData infFlowData = null;
 
         if (goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) != null &&
             goal.getStrategyInfo(InfFlowCheckInfo.INF_FLOW_CHECK_PROPERTY) &&
@@ -599,14 +680,17 @@ public final class WhileInvariantRule implements BuiltInRule {
                                                  "with the non-base-heap " +
                                                  "setting";
             final AnonUpdateData anonUpdateData = anonUpdateDatas.head();
-            final LocationVariable baseHeap = heapContext.get(0);
-            final Term heapAtPostEq =
-                    TB.equals(anonUpdateData.loopHeap, TB.var(baseHeap));
-
+            final Term baseHeap = anonUpdateData.loopHeapAtPre;
+                    //heapContext.get(0);
             final Term guardTerm = TB.var(guardVar);
             inst.inv.setGuard(guardTerm);
-            final Term guard = buildBeforeVar(guardTerm, services);            
             services.getSpecificationRepository().setLoopInvariant(inst.inv);
+
+            final Term heapAtPre =
+                    TB.var(TB.heapAtPreVar(services, baseHeap + "_Before_LOOP",
+                                           baseHeap.sort(), false));
+            final Term heapAtPost = anonUpdateData.loopHeap;
+            final Term guardAtPre = buildBeforeVar(guardTerm, services);
             final Term guardAtPost = buildAfterVar(guardTerm, services);
             final Term selfAtPost = buildAtPostVar(inst.selfTerm, "LOOP", services);
             final ImmutableList<Term> localInTerms = MiscTools.toTermList(localIns);
@@ -614,16 +698,15 @@ public final class WhileInvariantRule implements BuiltInRule {
             final ImmutableList<Term> localOutTerms = MiscTools.toTermList(localOuts);
             final ImmutableList<Term> newLocalOuts = buildLocalOuts(localOutTerms, services);
 
-
             InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
                     new InfFlowLoopInvariantTacletBuilder(services);            
 
             ifInvariantBuilder.setInvariant(inst.inv);
-            ifInvariantBuilder.setGuard(guard);
+            ifInvariantBuilder.setGuard(guardAtPre);
             ifInvariantBuilder.setGuardAtPost(guardAtPost);
-            ifInvariantBuilder.setContextUpdate(inst.u);
-            ifInvariantBuilder.setHeapAtPre(anonUpdateData.loopHeapAtPre);
-            ifInvariantBuilder.setHeapAtPost(anonUpdateData.loopHeap);
+            ifInvariantBuilder.setContextUpdate(/*inst.u*/);
+            ifInvariantBuilder.setHeapAtPre(heapAtPre);
+            ifInvariantBuilder.setHeapAtPost(heapAtPost);
             ifInvariantBuilder.setSelf(inst.selfTerm);
             ifInvariantBuilder.setSelfAtPost(selfAtPost);
             ifInvariantBuilder.setLocalIns(newLocalIns);
@@ -631,87 +714,28 @@ public final class WhileInvariantRule implements BuiltInRule {
 
             // generate information flow invariant application predicate
             // and associated taclet
-            loopInvApplPredTerm =
+            final Term loopInvApplPredTerm =
                     ifInvariantBuilder.buildContractApplPredTerm();
 
-            informationFlowInvariantApp =
+            final Taclet informationFlowInvariantApp =
                     ifInvariantBuilder.buildContractApplTaclet();
             
-            // set infFlowAssumptions
-            infFlowAssumptions = TB.and(heapAtPostEq, loopInvApplPredTerm);
+            infFlowData = new InfFlowData(heapAtPre, heapAtPost, baseHeap, services,
+                                          inst.selfTerm, selfAtPost,
+                                          guardAtPre, guardAtPost, guardTerm,
+                                          localInTerms, newLocalIns, localOutTerms, newLocalOuts,
+                                          uAnon, loopInvApplPredTerm, informationFlowInvariantApp);
 
-            Iterator<Term> newIns = newLocalIns.iterator();
-            Term beforeAssumptions = TB.tt();
-            for (Term locIn: localInTerms) {
-                beforeAssumptions = TB.and(beforeAssumptions, TB.equals(newIns.next(), locIn));
-            }
-
-            Iterator<Term> newOuts = newLocalOuts.iterator();
-            Term afterAssumptions = TB.tt();
-            for (Term locVar: localOutTerms) {
-                afterAssumptions = TB.and(afterAssumptions, TB.equals(newOuts.next(), locVar));
-            }
-            
-            beforeAssumptions = TB.apply(inst.u,
-                    TB.and(TB.equals(guard, guardTerm), beforeAssumptions));
-            afterAssumptions = TB.apply(anonUpdate,
-                    TB.and(TB.equals(guardAtPost, guardTerm),
-                            TB.equals(selfAtPost, inst.selfTerm),
-                            afterAssumptions));
-            
-            infFlowAssumptions = TB.and(beforeAssumptions, afterAssumptions,
-                                        TB.apply(anonUpdate, TB.and(infFlowAssumptions)));
-            
             // create information flow validity goal
-
-            // generate proof obligation variables
-            final ProofObligationVars instantiationVars =
-                    new ProofObligationVars(inst.selfTerm,
-                                            selfAtPost,
-                                            guard,
-                                            newLocalIns,
-                                            anonUpdateData.loopHeapAtPre,
-                                            guardAtPost,
-                                            newLocalOuts,
-                                            anonUpdateData.loopHeap,
-                                            services);
-
-            final IFProofObligationVars ifVars =
-                    new IFProofObligationVars(instantiationVars, services);
-            ((LoopInvariantBuiltInRuleApp) ruleApp).setInformationFlowProofObligationVars(ifVars);
-
-            // create proof obligation
-            InfFlowPOSnippetFactory f =
-                    POSnippetFactory.getInfFlowFactory(inst.inv, ifVars.c1, ifVars.c2, services);
-            Term selfComposedExec =
-                    f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
-            Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-            final Term finalTerm = TB.imp(selfComposedExec, post);
-            
-            Sequent seq = Sequent.createSuccSequent(
-                    new Semisequent(new SequentFormula(finalTerm)));
-            infFlowGoal = goal.getCleanGoal(seq);
-            infFlowGoal.setBranchLabel("Information Flow Validity");
-            
-            // create and add split-post and remove-post taclets
-            final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
-            final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
-            for (final Taclet t : splitPostTaclets) {                
-                infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-            }
-            final RemovePostTacletBuilder removePostTB = new RemovePostTacletBuilder();
-            final ArrayList<Taclet> removePostTaclets = removePostTB.generateTaclets(post);
-            for (final Taclet t : removePostTaclets) {
-                infFlowGoal.addTaclet(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-            }
-            
-            
+            infFlowGoal = buildInfFlowValidityGoal(goal, inst.inv, infFlowData, ruleApp, infFlowGoal);
+        } else {
+            infFlowData = new InfFlowData();
         }
 
         //split goal into three branches
         Goal initGoal, useGoal;
         ImmutableList<Goal> result;
-        if (infFlowGoal == null) {
+        if (!infFlowData.isInfFlow) {
             result = goal.split(3);
             initGoal = result.tail().tail().head();
             Goal bodyGoal = result.tail().head();
@@ -749,15 +773,10 @@ public final class WhileInvariantRule implements BuiltInRule {
             useGoal = result.head();
             initGoal.setBranchLabel("Invariant Initially Valid");
             useGoal.setBranchLabel("Use Case");
-            assert loopInvApplPredTerm != null && informationFlowInvariantApp != null;
             result = result.append(infFlowGoal);
-
-            // add term and taclet to post goal
-            /*useGoal.addFormula(new SequentFormula(loopInvApplPredTerm),
-                    true,
-                    false);*/
-            /*useGoal.addTaclet(informationFlowInvariantApp,
-                                  SVInstantiations.EMPTY_SVINSTANTIATIONS, true);*/
+            
+            // set infFlowAssumptions, add term and taclet to post goal
+            useGoal = addInfFlowAssumptionsAndTaclet(infFlowData, useGoal);
         }
 
         //"Invariant Initially Valid":
@@ -791,15 +810,6 @@ public final class WhileInvariantRule implements BuiltInRule {
                 uAnon,
                 guardFalseRestPsi)),
                 ruleApp.posInOccurrence());
-        
-        if (infFlowGoal != null) {
-            // add term and taclet to post goal
-            useGoal.addFormula(new SequentFormula(infFlowAssumptions),
-                    true,
-                    false);
-            useGoal.addTaclet(informationFlowInvariantApp,
-                    SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
-        }
         
         return result;
     }
@@ -876,6 +886,73 @@ public final class WhileInvariantRule implements BuiltInRule {
             this.loopHeap = loopHeap;
             this.loopHeapAtPre = loopHeapAtPre;
             this.anonHeap = anonHeap;
+        }
+    }
+
+    private static final class InfFlowData {
+        public final Term heapAtPre;
+        public final Term heapAtPost;
+        public final Term baseHeap;
+        public final Services services;
+        public final Term self;
+        public final Term selfAtPost;
+        public final Term guardAtPre;
+        public final Term guardAtPost;
+        public final Term guardTerm;
+        public final ImmutableList<Term> localIns;
+        public final ImmutableList<Term> newIns;
+        public final ImmutableList<Term> localOuts;
+        public final ImmutableList<Term> newOuts;
+        public final Term[] updates;
+        public final Term applPredTerm;
+        public final Taclet infFlowApp;
+        public final boolean isInfFlow;
+        
+        public InfFlowData() {
+            this.heapAtPre = null;
+            this.heapAtPost = null;
+            this.baseHeap = null;
+            this.services = null;
+            this.self = null;
+            this.selfAtPost = null;
+            this.guardAtPre = null;
+            this.guardAtPost = null;
+            this.guardTerm = null;
+            this.localIns = null;
+            this.newIns = null;
+            this.localOuts = null;
+            this.newOuts = null;
+            this.updates = null;
+            this.infFlowApp = null;
+            this.applPredTerm = null;
+            this.isInfFlow = false;
+        }
+
+        public InfFlowData(Term heapAtPre, Term heapAtPost, Term baseHeap, Services services,
+                           Term self, Term selfAtPost,
+                           Term guardAtPre, Term guardAtPost, Term guardTerm,
+                           ImmutableList<Term> localIns,
+                           ImmutableList<Term> newIns,
+                           ImmutableList<Term> localOuts,
+                           ImmutableList<Term> newOuts,
+                           Term[] updates, Term applPredTerm, Taclet infFlowApp) {
+            this.heapAtPre = heapAtPre;
+            this.heapAtPost = heapAtPost;
+            this.baseHeap = baseHeap;
+            this.services = services;
+            this.self = self;
+            this.selfAtPost = selfAtPost;
+            this.guardAtPre = guardAtPre;
+            this.guardAtPost = guardAtPost;
+            this.guardTerm = guardTerm;
+            this.localIns = localIns;
+            this.newIns = newIns;
+            this.localOuts = localOuts;
+            this.newOuts = newOuts;
+            this.updates = updates;
+            this.infFlowApp = infFlowApp;
+            this.applPredTerm = applPredTerm;
+            this.isInfFlow = true;
         }
     }
 }

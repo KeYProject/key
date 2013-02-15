@@ -27,13 +27,21 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         if (poVars.selfAtPost != null)
             posts = posts.append(d.tb.equals(poVars.selfAtPost, poVars.self));
         
-        if (poVars.guard != null)
-            posts = posts.append(d.tb.equals(poVars.guardAtPost, poVars.guard));
+        if (poVars.guard != null) {
+            Term guard = poVars.guard;
+            Term u = d.tb.elementary(d.tb.getServices(), guard, d.origVars.guard);
+            guard = d.tb.apply(u, guard);
+            posts = posts.append(d.tb.equals(poVars.guardAtPost, guard));
+        }
         
         Iterator<Term> itIn = poVars.localIns.iterator();
         Iterator<Term> itOut = poVars.localOuts.iterator();
+        Iterator<Term> origParamIt = d.origVars.localIns.iterator();
         while (itIn.hasNext()) {
-            posts = posts.append(d.tb.equals(itIn.next(), itOut.next()));
+            Term in = itIn.next();
+            Term u = d.tb.elementary(d.tb.getServices(), in, origParamIt.next());
+            in = d.tb.apply(u, in);
+            posts = posts.append(d.tb.equals(itOut.next(), in));
         }
         
         posts = posts.append(d.tb.equals(poVars.heapAtPost, d.tb.getBaseHeap()));
@@ -72,7 +80,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
             formalParamVars = formalParamVars.append(formalParamVar);
             register(formalParamVar, tb.getServices());
         }
-        
+
         //create java block
         Modality modality =
                 (Modality) d.get(BasicSnippetData.Key.MODALITY);
@@ -86,17 +94,21 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
             symbExecMod = Modality.BOX;
         }
         final Term programTerm = tb.prog(symbExecMod, jb, postTerm);
-        
+
         //create update
         Term update = tb.skip();
-        Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
+        Iterator<Term> formalParamIt = vs.localIns.append(vs.guard).iterator();
+                //formalParamVars.iterator();
         Iterator<Term> paramIt = vs.localIns.append(vs.guard).iterator();
+        Iterator<Term> origParamIt = d.origVars.localIns.append(d.origVars.guard).iterator();
         while (formalParamIt.hasNext()) {
-            Term paramUpdate = tb.elementary(formalParamIt.next(),
-                    paramIt.next());
+            Term formalParam = formalParamIt.next();
+            Term paramUpdate =
+                    d.tb.elementary(d.tb.getServices(), origParamIt.next(), formalParam);
+                    //d.tb.elementary(formalParam, origParamIt.next());
+            //Term paramUpdate = tb.elementary(formalParam, paramIt.next());
             update = tb.parallel(update, paramUpdate);
         }
-
         return tb.apply(update, programTerm);
     }
 

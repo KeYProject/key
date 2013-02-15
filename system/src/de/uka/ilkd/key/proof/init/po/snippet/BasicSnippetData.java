@@ -135,7 +135,7 @@ class BasicSnippetData {
                      Services services) {
         this.hasMby = false;
         this.tb = new TermBuilder.Serviced(services);
-        
+
         contractContents.put(Key.TARGET_METHOD, invariant.getTarget());
         contractContents.put(Key.CONTEXT, invariant.getExecutionContext());
         contractContents.put(Key.LOOP_INVARIANT, invariant);
@@ -143,7 +143,7 @@ class BasicSnippetData {
         contractContents.put(Key.MODIFIES, invariant.getModifies());
         contractContents.put(Key.MODALITY, Modality.BOX);
         contractContents.put(Key.RESPECTS, invariant.getRespects(services));
-        
+
         final Term heap = TermBuilder.DF.getBaseHeap(services);
         final ImmutableSet<ProgramVariable> localInVariables =
                 MiscTools.getLocalIns(invariant.getLoop(), services);
@@ -151,7 +151,7 @@ class BasicSnippetData {
                 MiscTools.getLocalOuts(invariant.getLoop(), services);
         final ImmutableList<Term> localInTerms = toTermList(localInVariables);
         final ImmutableList<Term> localOutTerms = toTermList(localOutVariables);
-        
+
         origVars =
                 new ProofObligationVars(invariant.getInternalSelfTerm(),
                                         invariant.getGuard(),

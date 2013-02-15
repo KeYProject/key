@@ -71,6 +71,7 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
 
     @Override
     public void applyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
+        Services services = mediator.getServices();
         Proof proof = mediator.getSelectedProof();
         Goal goal = mediator.getSelectedGoal();
         InitConfig initConfig = proof.env().getInitConfig();
@@ -84,7 +85,8 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
         }
         LoopInvariantBuiltInRuleApp loopInvRuleApp =
                 (LoopInvariantBuiltInRuleApp) app;
-        LoopInvariant loopInv = loopInvRuleApp.getInvariant();
+        LoopInvariant loopInv =
+                loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
         IFProofObligationVars ifVars =
                 loopInvRuleApp.getInformationFlowProofObligationVars();
 
