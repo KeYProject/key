@@ -46,6 +46,7 @@ import javax.swing.event.ListSelectionListener;
 
 public final class ExampleChooser extends JDialog {
     
+    private static final String EXAMPLES_PATH = File.separator+"examples"+File.separator+"firstTouch";
     private static final long serialVersionUID = -4405666868752394532L;
     private static final String KEY_FILE_NAME = "project.key";
     private static final String README_NAME = "README.txt";
@@ -74,7 +75,7 @@ public final class ExampleChooser extends JDialog {
 
         @Override 
         public String toString() {
-            return file.getName();
+            return file.getName().substring(3); // remove leading index number
         }
     }
     
@@ -209,15 +210,15 @@ public final class ExampleChooser extends JDialog {
         if(path.startsWith("file:")) {
             path = path.substring("file:".length());
         }
-        int i = path.lastIndexOf("/");
+        int i = path.lastIndexOf(File.separator);
         while(i > 0) {
             path = path.substring(0, i);
-            final String resultPath = path + "/examples/heap";
+            final String resultPath = path + EXAMPLES_PATH;
             final File result = new File(resultPath);
             if(result.isDirectory()) {
         	return result;
             }
-            i = path.lastIndexOf("/");
+            i = path.lastIndexOf(File.separator);
         }
     	return null;
     }
