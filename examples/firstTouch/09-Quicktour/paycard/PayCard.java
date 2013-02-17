@@ -117,11 +117,11 @@ public class PayCard {
     
     /*@
       @ public normal_behavior
-      @ requires log.\inv;
-      @ ensures \result == (unsuccessfulOperations<=3) && log.\inv; 
+      @ requires true;
+      @ ensures \result == (unsuccessfulOperations<=3); 
       @ assignable \nothing;
       @*/
-    public /*@helper pure@*/ boolean isValid() {
+    public /*@ pure @*/ boolean isValid() {
 	if (unsuccessfulOperations<=3) {
 	    return true;
 	} else {

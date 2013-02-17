@@ -27,6 +27,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -208,29 +210,32 @@ public final class ExampleChooser extends JDialog {
     
     private static File lookForExamples() {
         final ClassLoader loader = ExampleChooser.class.getClassLoader();
+        URI uri;
+    
         URL url = loader.getResource(".");
         if (url == null) {
+            uri = new File(System.getProperty("key.home")).toURI();
+        } else {     
             try {
-                url = new File(System.getProperty("key.home")).toURI().toURL();
-            } catch (MalformedURLException e) {
+                uri = url.toURI();
+            } catch (URISyntaxException e) {
                 return null;
             }
         }
         
-        String path = url.getPath();
-        if(path.startsWith("file:")) {
-            path = path.substring("file:".length());
-        }
-        int i = path.lastIndexOf(File.separator);
-        while(i > 0) {
-            path = path.substring(0, i);
-            final String resultPath = path + EXAMPLES_PATH;
-            final File result = new File(resultPath);
+        // without leading slash so the URI lookup does not start at root
+        String path = EXAMPLES_PATH.substring(1);
+        
+        URI newURI;
+        do { 
+            newURI = uri.resolve(path).normalize();
+            final File result = new File(newURI);
+
             if(result.isDirectory()) {
-        	return result;
+                return result;
             }
-            i = path.lastIndexOf(File.separator);
-        }
+            path = "../" + path;
+        } while (!newURI.getPath().contains(".."));
     	return null;
     }
     

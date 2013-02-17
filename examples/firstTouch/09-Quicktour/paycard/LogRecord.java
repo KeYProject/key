@@ -14,13 +14,8 @@ public class LogRecord {
     private /*@ spec_public @*/ boolean empty = true;
     
     
-    /*@ public normal_behavior
-      @ requires true;
-      @ ensures transactionCounter == 0;
-      @ assignable transactionCounter;
-      @*/
+
     public /*@pure@*/ LogRecord() {
-        transactionCounter = 0;
     }
     
       
