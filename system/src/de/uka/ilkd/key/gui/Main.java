@@ -93,7 +93,7 @@ public class Main {
 
     public static final String COPYRIGHT="(C) Copyright 2001-2013 "
             +"Karlsruhe Institute of Technology, "
-            +"Chalmers University of Technology, Technische Universit\u00e4t Darmstadt";
+            +"Chalmers University of Technology, and Technische Universit\u00e4t Darmstadt";
 
     private static final boolean VERBOSE_UI = Boolean.getBoolean("key.verbose-ui");
 

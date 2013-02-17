@@ -37,7 +37,7 @@ public class WebstartMain {
     } 
 
 
-    private static File setupExamples() {
+    public static File setupExamples() {
         try {
             URL examplesURL = WebstartMain.class.getResource("/examples.jar");	
             if(examplesURL == null) {
