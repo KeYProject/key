@@ -331,7 +331,7 @@ public class KeYInstallerGUI extends KeYInstallerUI {
 	
 	if ( "linux".equals ( os () ) ) {
 	    try {
-		Runtime.getRuntime ().exec ( "chmod a+x " + startProverScriptFilePath () );
+		Runtime.getRuntime ().exec ( new String[]{"chmod", "a+x", startProverScriptFilePath ()});
 	    } catch ( IOException e) { 
 		todo.append ( "Please set " + startProverScriptFilePath () +  
 			      " executable : chmod a+x " + startProverScriptFilePath ());
