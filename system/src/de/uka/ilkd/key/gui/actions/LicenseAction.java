@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 import javax.swing.JButton;
@@ -40,7 +41,7 @@ public class LicenseAction extends MainWindowAction {
             "LICENSE.TXT"); 
         StringBuffer sb=new StringBuffer();
         try {
-            FileInputStream inp=new FileInputStream(lic.getFile());
+            InputStream inp = lic.openStream();
             while (inp.available()>0) sb.append((char)inp.read());	   
             inp.close();
         } catch (IOException ioe) {
