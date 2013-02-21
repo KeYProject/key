@@ -101,7 +101,7 @@ public class OpReplacer {
         final Term newSubTerms[] = new Term[arity];    
         boolean changedSubTerm = false;
         for(int i = 0; i < arity; i++) {
-            Term subTerm = term.sub(i);          
+            Term subTerm = term.sub(i);
             newSubTerms[i] = replace(subTerm);
     
             if(newSubTerms[i] != subTerm) {

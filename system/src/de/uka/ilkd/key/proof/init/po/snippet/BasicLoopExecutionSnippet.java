@@ -28,20 +28,13 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
             posts = posts.append(d.tb.equals(poVars.selfAtPost, poVars.self));
         
         if (poVars.guard != null) {
-            Term guard = poVars.guard;
-            Term u = d.tb.elementary(d.tb.getServices(), guard, d.origVars.guard);
-            guard = d.tb.apply(u, guard);
-            posts = posts.append(d.tb.equals(poVars.guardAtPost, guard));
+            posts = posts.append(d.tb.equals(poVars.guardAtPost, d.origVars.guard));
         }
-        
-        Iterator<Term> itIn = poVars.localIns.iterator();
+
         Iterator<Term> itOut = poVars.localOuts.iterator();
-        Iterator<Term> origParamIt = d.origVars.localIns.iterator();
+        Iterator<Term> itIn = d.origVars.localIns.iterator();
         while (itIn.hasNext()) {
-            Term in = itIn.next();
-            Term u = d.tb.elementary(d.tb.getServices(), in, origParamIt.next());
-            in = d.tb.apply(u, in);
-            posts = posts.append(d.tb.equals(itOut.next(), in));
+            posts = posts.append(d.tb.equals(itOut.next(), itIn.next()));
         }
         
         posts = posts.append(d.tb.equals(poVars.heapAtPost, d.tb.getBaseHeap()));
