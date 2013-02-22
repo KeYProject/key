@@ -321,13 +321,15 @@ public class KeYInstallerGUI extends KeYInstallerUI {
  		    "and redo the installation afterwards.\nDetail: " + kie );
  	}
 
+	File examplesFile = new File(keyJarPath(), EXAMPLES_JAR_FILE);
 	try {
-	    extractExamples( keyJarFile );
- 	} catch ( KeYInstallerException kie ) {
- 	    abortError ( "Could not unpack the examples. Please " + 
-			 "resolve the problem first " + 
-			 "and redo the installation afterwards.\nDetail:" + kie );	    
- 	}
+		JarFile examplesJarFile = new JarFile(examplesFile);
+		extractExamples( examplesJarFile );
+ 	} catch (IOException e) {
+ 		abortError ( "Could not unpack the examples. Please " + 
+ 				"resolve the problem first " + 
+ 				"and redo the installation afterwards.\nDetail:" + e );	    
+        }
 	
 	if ( "linux".equals ( os () ) ) {
 	    try {
@@ -374,7 +376,9 @@ public class KeYInstallerGUI extends KeYInstallerUI {
 		( null, trim 
 		  ( "To start KeY, change directory to "
 		    + binaryPath () +  " and execute " + 
-		    startProverScriptFileName (), 60 ),
+		    startProverScriptFileName () +
+		    ". Examples can be found using 'Load " +
+		    "Examples' from the 'File' menu.", 60 ),
 		  "Installation successfully completed",
 		  JOptionPane.INFORMATION_MESSAGE );
 	}
