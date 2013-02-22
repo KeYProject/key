@@ -20,6 +20,9 @@ public class ShowActiveTactletOptionsAction extends MainWindowAction {
     public ShowActiveTactletOptionsAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Show Active Taclet Options...");
+	
+	getMediator().enableWhenProof(this);
+
     }
 
     @Override
@@ -35,14 +38,24 @@ public class ShowActiveTactletOptionsAction extends MainWindowAction {
                     + "for a proof you have to load one first"));
         } else {
             String message = "Active Taclet Options:\n";
-            for (final String choice : currentProof.getSettings().
+            int rows = 0;
+			int columns = 0;
+			for (final String choice : currentProof.getSettings().
                     getChoiceSettings().getDefaultChoices().values()) {
-                message += choice + "\n";
-            }
-            final JTextComponent activeOptions = new JTextArea(message);
-            activeOptions.setEditable(false);
-            JOptionPane.showMessageDialog(mainWindow, activeOptions, "Active Taclet Options",
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
+				message += choice + "\n";
+				rows++;
+				if (columns < choice.length()) {
+					columns = choice.length();
+				}
+			}
+			final JTextComponent activeOptions = new JTextArea(message, rows, columns);
+			activeOptions.setEditable(false);
+			Object[] toDisplay = {activeOptions,
+					"These options can be changed in Options->Taclet Options"
+			};
+			JOptionPane.showMessageDialog(mainWindow, toDisplay,
+					"Taclet Options used in the current proof",
+					JOptionPane.INFORMATION_MESSAGE);
+		}
     }
 }

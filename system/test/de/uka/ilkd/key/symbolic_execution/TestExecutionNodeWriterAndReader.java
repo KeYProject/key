@@ -22,6 +22,8 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessMethodRetur
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStartNode;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessStatement;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessTermination;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessUseLoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessUseOperationContract;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessValue;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessVariable;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -138,6 +140,10 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       KeYlessMethodReturn mr = new KeYlessMethodReturn(mc, "mr", "pc9", true, "mc with return value");
       mc.addCallStackEntry(mc);
       mc.addChild(mr);
+      KeYlessUseOperationContract useContract = new KeYlessUseOperationContract(root, "useOperationContract", "pcUse", true, false, true, false);
+      root.addChild(useContract);
+      KeYlessUseLoopInvariant useInvariant = new KeYlessUseLoopInvariant(root, "useLoppInvariant", "pcUseLoopInvariant", false, true);
+      root.addChild(useInvariant);
       KeYlessStatement s = new KeYlessStatement(root, "s", "pc10", true);
       root.addChild(s);
       KeYlessVariable sVar1 = new KeYlessVariable(null, true, 2, "sVar1");

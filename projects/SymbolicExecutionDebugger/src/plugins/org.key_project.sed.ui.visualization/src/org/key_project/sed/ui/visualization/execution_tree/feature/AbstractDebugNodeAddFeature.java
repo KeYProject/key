@@ -101,7 +101,7 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
 
       // create and set image graphics algorithm
       int dummyHeight = 20; // Real height is defined via layout feature
-      Image image = gaService.createImage(imageShape, getImageId());
+      Image image = gaService.createImage(imageShape, getImageId(addedNode));
       gaService.setLocationAndSize(image, MARGIN, 0, IMAGE_WIDTH, dummyHeight);
       
       // create link and wire it
@@ -181,9 +181,10 @@ public abstract class AbstractDebugNodeAddFeature extends AbstractAddShapeFeatur
 
    /**
     * Returns the image ID to use.
+    * @param The {@link ISEDDebugNode} to get the image for.
     * @return The image ID to use.
     */
-   protected abstract String getImageId();
+   protected abstract String getImageId(ISEDDebugNode node);
 
    /**
     * Computes the initial height for a node with the given text.

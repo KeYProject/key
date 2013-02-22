@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    
+<comment>
+    These properties define the help comments which are to be displayed
+    in the rule pane when selecting non-taclet tree elements
+</comment>
+
+<entry key="No proof loaded">
+In this pane, the available logical rules will be displayed and/or explained.
+</entry>
+
+<entry key="Built-In">
+Some logical rules are implemented in Java code. This is because their semantics cannot easily be expressed in KeY's Taclet language.
+</entry>
+
+<entry key="Taclet Base">
+Most logical rules are implemented as Taclets.
+
+Taclets are schematic logical rules formulated in the Taclet Language.
+The language is defined and explained in the KeY book.
+</entry>
+
+<entry key="Lemmas">
+Taclets which have been introduced using File->Load User-Defined Taclets are filed here.
+
+Loading User Defined Taclets opens side branches on which the soundness of the lemma taclets must be established.
+</entry>
+
+<entry key="Use Operation Contract">
+When symbolic execution reaches a method call, the according method can be approximated by its specified contract (more precisely, one or more of its contracts).
+
+This rule gives rise to three or four subgoals:
+1. Pre: It must be established that the pre-condition of the method holds prior to the method call.
+
+2. Post: The method terminates normally, the post-condition of the method can be assumed and symbolic execution continues.
+
+3. Exceptional Post: The method terminates abruptly with an exception, the exceptional post-condition is assumed, and symbolic execution continues with this exception thrown.
+
+4. Null reference: The receiver of the call can be null. This case is considered on this branch. If KeY can figure out automatically that this cannot be the case, this branch is suppressed.
+</entry>
+
+<entry key="Evaluate Query"> 
+The QueryExpand rule allows to apply contracts or to symbolically execute a query 
+expression in the logic. It replaces the query expression by a new constant and 
+constructs a box formula in the antecedent 'defining' the constant as the result of 
+a method call. The method call is encoded directly as a method call in the box modality. 
+The query is invoked in a context equal to the container type of the query method.
+</entry>
+<entry key="One Step Simplification">
+The One Step Simplifier (OSS) aggregates the application of simplification rules into a single rule. This is done to make the calculus more efficient.
+
+You can activate/deactivate the simplifier by toggling the menu entry Options->One Step Simplifier. An active OSS makes the proof faster, a deactivated more transparent.
+
+In particular, the OSS performs normalisation and simplification on updated terms:
+  * Updates on terms without modality are resolved.
+  * Updates without effects are dropped.
+  * Sequential updates are merged into one parallel update.
+
+Technical Information:
+The OSS aggregates the rules from the following heuristics (-> Taclet Base):
+  concrete, 
+  update_elim, 
+  update_apply_on_update, 
+  update_apply
+  update_join,
+  elimQuantifier
+</entry>
+
+<entry key="Use Dependency Contract">
+Methods and model fields may be annotated with an accessible clause. This defines a dependency contract describing the heap locations its value may depend on.
+
+If the heap changes in locations the symbol does not depend on, its value remains unchanged. This rules adds an according implication for a heap-dependent symbol to the sequent's antecedent.
+
+In automatic strategy, this rule is applied lazily (only once all other means of advancing the proof have been exhausted) to avoid endless loops.</entry>
+
+<entry key="Block Contract">
+Like methods, statement blocks can be annotated with contracts. The application of the Block Contract rules then gives rise to subgoals which roughly correspond to those of the Use Operation Contract rule (see there).
+Three properties have to be shown:
+
+1. Validity of block contract
+
+2. Precondition of contract holds
+
+3. Postcondition holds after block terminates
+</entry>
+
+<entry key="Loop Invariant">
+Loops can be handled by expanding or by using a loop invariant.
+An invariant can be created manually or supplied by the JML specification.
+Use of this rule creates three subgoals, two of which are new proof obligations:
+
+1. It must be shown that the loop invariant is initially valid.
+
+2. The loop body needs to preserve the invariant.
+
+In the third subgoal, the loop invariant can be used. 
+</entry>
+
+</properties>
+

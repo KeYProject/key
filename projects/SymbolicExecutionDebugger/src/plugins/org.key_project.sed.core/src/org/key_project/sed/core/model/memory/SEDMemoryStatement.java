@@ -7,11 +7,12 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDStatement;
 
 /**
- * Implementation of {@link ISEDThread} that stores all
+ * Implementation of {@link ISEDStatement} that stores all
  * information in the memory.
  * @author Martin Hentschel
  */

@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui;
 
@@ -35,11 +39,14 @@ public class IconFactory {
     private static Image keyLogoSmall        = getImage("images/key-color-icon-square.png");
     private static Icon provedFolderIcon     = KeYFolderIcon.getKeYFolderIconClosed();
     private static Icon closableFolderIcon   = KeYFolderIcon.getKeYFolderIconClosable();
+    
+    private static Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png"); 
 
     private static Icon expandedIcon   = KeYControlIcon.getKeYExpandedIcon();
     private static Icon collapsedIcon  = KeYControlIcon.getKeYCollapsedIcon();
 
     private static Image reuse    = getImage("images/toolbar/ff.gif");
+    private static Image prune		= getImage("images/toolbar/pruneProof.png");
     private static Image goalBack = getImage("images/toolbar/goalBack.png");
     private static Image autoResume = getImage("images/toolbar/autoResume.png");
     private static Image autoResumeDisabled = 
@@ -88,10 +95,6 @@ public class IconFactory {
 	return scaleIcon(keyHole,x,y);
     }
     
-
-            
-            
-
     public static ImageIcon keyHoleClosed(int x, int y) {
 	return scaleIcon(keyHoleClosed,x,y);
     }
@@ -139,6 +142,10 @@ public class IconFactory {
     public static ImageIcon simplifyLogo(int size) {
 	return scaleIcon(decisionProcedureSimplify, size, size);
     }
+    
+    public static Icon oneStepSimplifier(int size) {
+        return scaleIcon(oneStepSimplifier, size, size);
+    }
 
     public static ImageIcon junitLogo(int size) {
 	return scaleIcon(junit, size, size);
@@ -154,6 +161,10 @@ public class IconFactory {
 
     public static ImageIcon icsLogo(int size) {
 	return scaleIcon(decisionProcedureICS, size, size);
+    }
+    
+    public static ImageIcon pruneLogo(int size) {
+    	return scaleIcon(prune, size, size);
     }
 
     public static ImageIcon goalBackLogo(int size) {
@@ -350,4 +361,5 @@ public class IconFactory {
                     }
         }
     }
+
 }
