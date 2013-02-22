@@ -372,16 +372,21 @@ public final class WhileInvariantRule implements BuiltInRule {
                 TB.equals(infData.heapAtPre, infData.baseHeap);
         final Term heapAtPostEq =
                 TB.equals(infData.heapAtPost, infData.baseHeap);
-
+        /*final Term guardFalseTerm = TB.equals(TB.var((LocationVariable) infData.guardTerm.op()), 
+                TB.FALSE(infData.services));*/
         Term beforeAssumptions = TB.and(heapAtPreEq,
-                                        TB.equals(infData.guardAtPre, infData.guardTerm));
+                                        TB.box(infData.guardJb,
+                                               TB.equals(infData.guardAtPre,
+                                                         infData.guardTerm)));
         Iterator<Term> newIns = infData.newIns.iterator();
         for (Term locIn: infData.localIns) {
             beforeAssumptions = TB.and(beforeAssumptions, TB.equals(newIns.next(), locIn));
         }
 
         Term afterAssumptions = TB.and(heapAtPostEq,
-                                       TB.equals(infData.guardAtPost, infData.guardTerm),
+                                       TB.box(infData.guardJb,
+                                              TB.equals(infData.guardAtPost,
+                                                        infData.guardTerm)),
                                        TB.equals(infData.selfAtPost, infData.self));
         Iterator<Term> newOuts = infData.newOuts.iterator();        
         for (Term locOut: infData.localOuts) {
@@ -747,7 +752,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
             infFlowData = new InfFlowData(heapAtPre, heapAtPost, baseHeap, services,
                                           inst.selfTerm, selfAtPost,
-                                          guardAtPre, guardAtPost, guardTerm,
+                                          guardAtPre, guardAtPost, guardJb, guardTerm,
                                           localInTerms, newLocalIns, localOutTerms, newLocalOuts,
                                           updates, loopInvApplPredTerm, informationFlowInvariantApp);
 
@@ -923,6 +928,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         public final Term selfAtPost;
         public final Term guardAtPre;
         public final Term guardAtPost;
+        public final JavaBlock guardJb;
         public final Term guardTerm;
         public final ImmutableList<Term> localIns;
         public final ImmutableList<Term> newIns;
@@ -942,6 +948,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             this.selfAtPost = null;
             this.guardAtPre = null;
             this.guardAtPost = null;
+            this.guardJb = null;
             this.guardTerm = null;
             this.localIns = ImmutableSLList.<Term>nil();
             this.newIns = ImmutableSLList.<Term>nil();
@@ -955,7 +962,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         public InfFlowData(Term heapAtPre, Term heapAtPost, Term baseHeap, Services services,
                            Term self, Term selfAtPost,
-                           Term guardAtPre, Term guardAtPost, Term guardTerm,
+                           Term guardAtPre, Term guardAtPost, JavaBlock guardJb, Term guardTerm,
                            ImmutableList<Term> localIns,
                            ImmutableList<Term> newIns,
                            ImmutableList<Term> localOuts,
@@ -969,6 +976,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             this.selfAtPost = selfAtPost;
             this.guardAtPre = guardAtPre;
             this.guardAtPost = guardAtPost;
+            this.guardJb = guardJb;
             this.guardTerm = guardTerm;
             this.localIns = localIns;
             this.newIns = newIns;

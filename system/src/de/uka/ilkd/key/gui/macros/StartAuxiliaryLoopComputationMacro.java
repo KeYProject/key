@@ -36,7 +36,8 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
     }
 
     @Override
-    public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
+    public boolean canApplyTo(KeYMediator mediator,
+                              PosInOccurrence posInOcc) {
         if (posInOcc == null || posInOcc.subTerm() == null) {
             return false;
         }
@@ -48,21 +49,22 @@ public class StartAuxiliaryLoopComputationMacro implements ProofMacro {
             return false;
         }
         RuleApp app = goal.node().parent().getAppliedRuleApp();
-
         if (!(app instanceof LoopInvariantBuiltInRuleApp)) {
             return false;
         }
         LoopInvariantBuiltInRuleApp loopInvRuleApp =
                 (LoopInvariantBuiltInRuleApp) app;
-        LoopInvariant loopInv = loopInvRuleApp.getInvariant();
-
+        LoopInvariant loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
         IFProofObligationVars ifVars =
                 loopInvRuleApp.getInformationFlowProofObligationVars();
+        if (ifVars == null) {
+            return false;
+        }
+
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(loopInv,
                                                    ifVars.c1,
-                                                   ifVars.c2, services);
-        
+                                                   ifVars.c2, services);        
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
 

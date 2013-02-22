@@ -68,6 +68,9 @@ public class StartAuxiliaryBlockComputationMacro implements ProofMacro {
         BlockContract contract = blockRuleApp.getContract();
         IFProofObligationVars ifVars =
                 blockRuleApp.getInformationFlowProofObligationVars();
+        if (ifVars == null) {
+            return false;
+        }
 
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract,
