@@ -47,7 +47,6 @@ public class LicenseAction extends MainWindowAction {
             }
             inp.close();
         } catch (IOException ioe) {
-            ioe.printStackTrace();
             System.out.println("License file cannot be loaded or is missing: \n"+
                     Main.COPYRIGHT+"\nKeY is protected by the "
                     +"GNU General Public License");
