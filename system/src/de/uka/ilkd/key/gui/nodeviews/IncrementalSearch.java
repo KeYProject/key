@@ -80,35 +80,35 @@ public class IncrementalSearch {
         documentListenerAdapter = new DocumentListenerAdapter();
         regExpSearch = false;
         searchDialog = new SearchDialog();
-        searchDialog.addKeyListener(new KeyListener() {
-
-            @Override
-            public void keyTyped(KeyEvent e) {
-                final char ch = e.getKeyChar();
-                switch (ch) {
-                case KeyEvent.VK_ESCAPE:
-                    disableSearch();
-                    return;
-                case KeyEvent.VK_ENTER:
-                    highlightNext();
-                    return;
-                }
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_F3) {
-                    highlightPrev();
-                } else if (e.getKeyCode() == KeyEvent.VK_F3) {
-                    highlightNext();
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-            }
-
-        });
+//        searchDialog.addKeyListener(new KeyListener() {
+//
+//            @Override
+//            public void keyTyped(KeyEvent e) {
+//                final char ch = e.getKeyChar();
+//                switch (ch) {
+//                case KeyEvent.VK_ESCAPE:
+//                    disableSearch();
+//                    return;
+//                case KeyEvent.VK_ENTER:
+//                    highlightNext();
+//                    return;
+//                }
+//            }
+//
+//            @Override
+//            public void keyPressed(KeyEvent e) {
+//                if (e.isShiftDown() && e.getKeyCode() == KeyEvent.VK_F3) {
+//                    highlightPrev();
+//                } else if (e.getKeyCode() == KeyEvent.VK_F3) {
+//                    highlightNext();
+//                }
+//            }
+//
+//            @Override
+//            public void keyReleased(KeyEvent e) {
+//            }
+//
+//        });
         searchDialog.addDocumentListener(documentListenerAdapter);
     }
 
@@ -146,7 +146,7 @@ public class IncrementalSearch {
         }
         this.seqView = seqView;
         this.seqView.getDocument().addDocumentListener(documentListenerAdapter);
-        searchDialog.setVisible(true);
+//        searchDialog.setVisible(true);
         searchPattern();
     }
 
@@ -155,7 +155,7 @@ public class IncrementalSearch {
      * disable this searcher
      */
     public void disableSearch() {
-        searchDialog.setVisible(false);
+//        searchDialog.setVisible(false);
         if (seqView != null) {
             clearSearchResults();
             seqView.getDocument().removeDocumentListener(documentListenerAdapter);
@@ -256,7 +256,7 @@ public class IncrementalSearch {
 
 
     public void requestFocus() {
-        searchDialog.requestFocus();
+//        searchDialog.requestFocus();
     }
 
 

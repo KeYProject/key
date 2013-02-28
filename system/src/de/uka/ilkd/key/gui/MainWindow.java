@@ -135,6 +135,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
+import de.uka.ilkd.key.gui.nodeviews.SequentSearchPanel2;
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
@@ -370,6 +371,9 @@ public final class MainWindow extends JFrame  {
         super.setVisible(v && visible);
     }
     
+    // Search panel for current goal view.
+    public SequentSearchPanel2 sequentSearchPanel;
+    
     /** initialised, creates GUI and lays out the main frame */
     private void layoutMain() {
         // set overall layout manager
@@ -443,7 +447,13 @@ public final class MainWindow extends JFrame  {
         leftPane.setName("leftPane");
         leftPane.setOneTouchExpandable(true);
         
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, goalView);
+        sequentSearchPanel = new SequentSearchPanel2(sequentView);
+        JPanel j = new JPanel();
+        j.setLayout(new BorderLayout());
+	j.add(goalView, BorderLayout.CENTER);
+	j.add(sequentSearchPanel, BorderLayout.SOUTH);
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, j);
         splitPane.setResizeWeight(0); // the right pane is more important
         splitPane.setOneTouchExpandable(true);
         splitPane.setName("splitPane");

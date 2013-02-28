@@ -29,6 +29,7 @@ public class SearchInSequentAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
 		if (mainWindow.getMediator().getProof() != null) {
 			SequentView seqView = mainWindow.getSequentView();
+                        mainWindow.sequentSearchPanel.toggleVisibility();
 			IncrementalSearch search = IncrementalSearch.getInstance();
             if (!search.isInitialised()) {
                 search.initSearch(seqView);

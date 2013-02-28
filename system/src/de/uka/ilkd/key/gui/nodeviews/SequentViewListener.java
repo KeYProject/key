@@ -245,17 +245,21 @@ class SequentViewListener extends MouseInputAdapter
      * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
      */
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_F3) {
-            IncrementalSearch search = IncrementalSearch.getInstance();
-            if (!search.isInitialised()) {
-                search.initSearch(seqView);
-            } else {
-                search.requestFocus();
-            }
-        } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            IncrementalSearch search = IncrementalSearch.getInstance();
-            search.disableSearch();
-        } else if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
+//        if (e.getKeyCode() == KeyEvent.VK_F3) {
+//            
+//            MainWindow.getInstance().s.toggleVisibility();
+//            
+//            IncrementalSearch search = IncrementalSearch.getInstance();
+//            if (!search.isInitialised()) {
+//                search.initSearch(seqView);
+//            } else {
+//                search.requestFocus();
+//            }
+//        } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+//            IncrementalSearch search = IncrementalSearch.getInstance();
+//            search.disableSearch();
+//        } else if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
+        if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
             synchronized(this) {
                 showTermInfo = true;	    
             }
