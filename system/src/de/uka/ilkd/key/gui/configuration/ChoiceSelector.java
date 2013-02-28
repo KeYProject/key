@@ -55,7 +55,7 @@ public class ChoiceSelector extends JDialog {
      * 
      */
     private static final long serialVersionUID = -4470713015801365801L;
-    private static final String EXPLANATIONS_RESOURCE = "de/uka/ilkd/key/gui/help/choiceExplanations.xml";
+    private static final String EXPLANATIONS_RESOURCE = "/de/uka/ilkd/key/gui/help/choiceExplanations.xml";
     private ChoiceSettings settings;
     private HashMap<String, String> category2DefaultChoice;
     private HashMap<String, Set<String>> category2Choices;
@@ -239,7 +239,7 @@ public class ChoiceSelector extends JDialog {
     private String getExplanation(String selection) {
         if(explanationMap == null) {
             explanationMap = new Properties();
-            InputStream is = ClassLoader.getSystemResourceAsStream(EXPLANATIONS_RESOURCE);
+            InputStream is = getClass().getResourceAsStream(EXPLANATIONS_RESOURCE);
             try {
                 if (is == null) {
                     throw new FileNotFoundException(EXPLANATIONS_RESOURCE + " not found");

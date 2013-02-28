@@ -50,7 +50,8 @@ import javax.swing.event.ListSelectionListener;
 
 public final class ExampleChooser extends JDialog {
     
-    private static final String EXAMPLES_PATH = File.separator+"examples"+File.separator+"firstTouch";
+    private static final String EXAMPLES_PATH =  
+		    "examples" + File.separator + "firstTouch";
     private static final long serialVersionUID = -4405666868752394532L;
     private static final String KEY_FILE_NAME = "project.key";
     private static final String README_NAME = "README.txt";
@@ -209,34 +210,9 @@ public final class ExampleChooser extends JDialog {
     //-------------------------------------------------------------------------    
     
     private static File lookForExamples() {
-        final ClassLoader loader = ExampleChooser.class.getClassLoader();
-        URI uri;
-    
-        URL url = loader.getResource(".");
-        if (url == null) {
-            uri = new File(System.getProperty("key.home")).toURI();
-        } else {     
-            try {
-                uri = url.toURI();
-            } catch (URISyntaxException e) {
-                return null;
-            }
-        }
         
-        // without leading slash so the URI lookup does not start at root
-        String path = EXAMPLES_PATH.substring(1);
-        
-        URI newURI;
-        do { 
-            newURI = uri.resolve(path).normalize();
-            final File result = new File(newURI);
-
-            if(result.isDirectory()) {
-                return result;
-            }
-            path = "../" + path;
-        } while (!newURI.getPath().contains(".."));
-    	return null;
+	// greatly simplified version without parent path lookup.
+        return new File(System.getProperty("key.home"), EXAMPLES_PATH);
     }
     
     
