@@ -124,9 +124,9 @@ public class KeYLoopNode extends AbstractSEDLoopNode implements IKeYSEDDebugNode
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
+   public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = KeYModelUtil.getSourceName(executionNode.getActivePositionInfo());
+         sourceName = KeYModelUtil.getSourcePath(executionNode.getActivePositionInfo());
       }
       return sourceName;
    }

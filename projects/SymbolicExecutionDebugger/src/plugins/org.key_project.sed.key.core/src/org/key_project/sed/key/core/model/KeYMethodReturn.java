@@ -126,10 +126,10 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
+   public String getSourcePath() {
       if (sourceName == null) {
          KeYMethodCall debugCallNode = getMethodCall();
-         sourceName = debugCallNode != null ? debugCallNode.getSourceName() : null;
+         sourceName = debugCallNode != null ? debugCallNode.getSourcePath() : null;
       }
       return sourceName;
    }

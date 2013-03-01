@@ -127,9 +127,9 @@ public class KeYUseOperationContract extends AbstractSEDUseOperationContract imp
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
+   public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = KeYModelUtil.getSourceName(executionNode.getContractProgramMethod().getPositionInfo());
+         sourceName = KeYModelUtil.getSourcePath(executionNode.getContractProgramMethod().getPositionInfo());
       }
       return sourceName;
    }

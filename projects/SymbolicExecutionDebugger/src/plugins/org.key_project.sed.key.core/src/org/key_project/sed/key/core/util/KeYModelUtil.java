@@ -173,22 +173,22 @@ public final class KeYModelUtil {
    }
    
    /**
-    * Returns the name of the source file defined by the given {@link PositionInfo}.
+    * Returns the path to the source file defined by the given {@link PositionInfo}.
     * @param posInfo The {@link PositionInfo} to extract source file from.
     * @return The source file name or {@code null} if not available.
     */
-   public static String getSourceName(PositionInfo posInfo) {
+   public static String getSourcePath(PositionInfo posInfo) {
+      String result = null;
       if (posInfo.getFileName() != null) {
-         File file = new File(posInfo.getFileName()); // posInfo.getFileName() is a path to a file
-         return file.getName();
+         result = posInfo.getFileName(); // posInfo.getFileName() is a path to a file
       }
       else if (posInfo.getParentClass() != null) {
-         File file = new File(posInfo.getParentClass()); // posInfo.getParentClass() is a path to a file
-         return file.getName();
+         result = posInfo.getParentClass(); // posInfo.getParentClass() is a path to a file
       }
-      else {
-         return null;
+      if (result != null && result.startsWith("FILE:")) {
+         result = result.substring("FILE:".length());
       }
+      return result;
    }
 
    /**
@@ -203,13 +203,8 @@ public final class KeYModelUtil {
       try {
          if (posInfo != null && posInfo != PositionInfo.UNDEFINED) {
             // Try to find the source file.
-            File file = null;
-            if (posInfo.getFileName() != null) {
-               file = new File(posInfo.getFileName());
-            }
-            else if (posInfo.getParentClass() != null) {
-               file = new File(posInfo.getParentClass());
-            }
+            String path = getSourcePath(posInfo);
+            File file = path != null ? new File(path) : null;
             // Check if a source file is available
             int charStart = -1;
             int charEnd = -1;
