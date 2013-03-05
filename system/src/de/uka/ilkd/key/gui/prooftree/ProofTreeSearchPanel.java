@@ -1,127 +1,57 @@
-/**
- * 
- */
 package de.uka.ilkd.key.gui.prooftree;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import de.uka.ilkd.key.gui.SearchPanel;
 import java.util.Vector;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.text.Position;
 import javax.swing.tree.TreePath;
 
-class ProofTreeSearchPanel extends JPanel implements DocumentListener,
-        TreeModelListener {
+class ProofTreeSearchPanel
+        extends SearchPanel implements TreeModelListener {
 
     private final ProofTreeView proofTreeView;
-    private static final long serialVersionUID = -1945019325314041986L;
-    private JTextField searchString = new JTextField(20);
-    private JButton prev = new JButton("Prev ");
-    private JButton next = new JButton("Next");
-    private JPanel panel = new JPanel();        
-    private JButton close = new JButton("Close");
     private int startRow = 0;
     private int currentRow = 0;
-    private Position.Bias direction = Position.Bias.Forward;
-    
-    private ActionListener closePanel = new ActionListener() {
-        public void actionPerformed(ActionEvent actionEvent) {
-            setVisible(false);
-        }
-    };
-    private ActionListener search = new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == next) {        
-                direction = Position.Bias.Forward;
-                searchString.requestFocusInWindow();
-            } else if (e.getSource() == prev) {
-                direction = Position.Bias.Backward;
-                searchString.requestFocusInWindow();
-            } else {
-                // if e.g. called by pressing enter, perform a forward search
-                direction = Position.Bias.Forward;
-            }
-            searchNext();
-        }
-    };
 
     public ProofTreeSearchPanel(ProofTreeView proofTreeView) {
         this.proofTreeView = proofTreeView;
-        registerKeyboardAction(closePanel, KeyStroke
-            .getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent
-            .WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        registerKeyboardAction(search, KeyStroke
-            .getKeyStroke(KeyEvent.VK_ENTER, 0), JComponent
-            .WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        searchString.getDocument().addDocumentListener(this);
-        prev.addActionListener(search);
-        next.addActionListener(search);
-        close.addActionListener(closePanel);
-        
-        setLayout(new BorderLayout());
-        add(searchString, BorderLayout.NORTH);
-        panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
-        panel.add(new JLabel("Search"));
-        panel.add(Box.createHorizontalGlue());
-        panel.add(prev);
-        panel.add(next);
-        panel.add(Box.createHorizontalGlue());
-        panel.add(close);
-        add(panel, BorderLayout.SOUTH);
-        super.setVisible(false);
     }
 
+    @Override
     public void setVisible(boolean vis) {
         super.setVisible(vis);
-        if (vis) {
-            searchString.selectAll();
-            searchString.requestFocusInWindow();
-        } else {
-            this.proofTreeView.delegateView.requestFocusInWindow();
+        if (!vis && proofTreeView != null) {
+            proofTreeView.delegateView.requestFocusInWindow();
         }
+    }
+
+    public void searchNext() {
+        fillCache();
+        startRow = currentRow + 1;
+        startRow %= cache.size();
+        search(searchField.getText(), Position.Bias.Forward);
+    }
+
+    public void searchPrevious() {
+        fillCache();
+        startRow = currentRow - 1;
+        startRow %= cache.size();
+        search(searchField.getText(), Position.Bias.Backward);
     }
     
-    public void requestFocus() {
-    	searchString.requestFocus();
+    public boolean search(String searchString){
+        return search(searchString, Position.Bias.Forward);
     }
 
-    private synchronized void searchNext() {
-        if (cache == null) fillCache();
-        if (direction == Position.Bias.Forward) {
-            if (currentRow + 1 < cache.size()) {
-                startRow = currentRow + 1;
-            } else {
-                startRow = 0;
-            }
-        } else {
-            if (currentRow - 1 >= 0) {
-                startRow = currentRow - 1;
-            } else {
-                startRow = cache.size() - 1;
-            }
-        }
-        search();
-    }
-
-    private synchronized void search() {
-        if (searchString.getText().equals("")) {
+    private synchronized boolean search(String searchString, 
+            Position.Bias direction) {
+        if (searchString.equals("")) {
                 startRow = 0;
         }
-        currentRow = getNextMatch(searchString.getText(),
+        currentRow = getNextMatch(searchString,
             startRow, direction);
         GUIAbstractTreeNode node = null;
         TreePath tp = null;
@@ -135,6 +65,7 @@ class ProofTreeSearchPanel extends JPanel implements DocumentListener,
             this.proofTreeView.delegateView.scrollPathToVisible(tp);
             this.proofTreeView.delegateView.setSelectionPath(tp);
         }
+        return (currentRow != -1);
     }
 
     public void changedUpdate(DocumentEvent e) {
@@ -172,10 +103,12 @@ class ProofTreeSearchPanel extends JPanel implements DocumentListener,
     }
 
     private void fillCache() {
-        cache = new Vector<GUIAbstractTreeNode>();
-        if (this.proofTreeView.delegateModel.getRoot() != null) {
-            cache.add((GUIAbstractTreeNode)this.proofTreeView.delegateModel.getRoot());
-            fillCacheHelp((GUIBranchNode)this.proofTreeView.delegateModel.getRoot());
+        if (cache == null) {
+            cache = new Vector<GUIAbstractTreeNode>();
+            if (this.proofTreeView.delegateModel.getRoot() != null) {
+                cache.add((GUIAbstractTreeNode) this.proofTreeView.delegateModel.getRoot());
+                fillCacheHelp((GUIBranchNode) this.proofTreeView.delegateModel.getRoot());
+            }
         }
     }
 
@@ -192,7 +125,7 @@ class ProofTreeSearchPanel extends JPanel implements DocumentListener,
 
     private int getNextMatch(String searchString, int startingRow,
             Position.Bias bias) {
-        if (cache == null) fillCache();
+        fillCache();
         String s = searchString.toLowerCase();
         
         if (bias == Position.Bias.Forward) {

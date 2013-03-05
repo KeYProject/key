@@ -21,9 +21,9 @@ import javax.swing.event.DocumentListener;
 public abstract class SearchPanel extends JPanel {
 
     public JTextField searchField = new JTextField(20);
-    public JButton prev = new JButton("Prev");
-    public JButton next = new JButton("Next");
-    public JButton close = new JButton("Close");
+    private JButton prev = new JButton("Prev");
+    private JButton next = new JButton("Next");
+    private JButton close = new JButton("Close");
     private final Color ALLERT_COLOR = new Color(255, 178, 178);
 
     public SearchPanel() {
