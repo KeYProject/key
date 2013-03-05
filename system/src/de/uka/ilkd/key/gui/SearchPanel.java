@@ -81,10 +81,6 @@ public abstract class SearchPanel extends JPanel {
         setVisible(false);
     }
 
-    public void toggleVisibility() {
-        setVisible(!this.isVisible());
-    }
-
     @Override
     public void setVisible(boolean vis) {
         super.setVisible(vis);
