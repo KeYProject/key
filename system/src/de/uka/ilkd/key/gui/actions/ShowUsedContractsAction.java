@@ -18,7 +18,7 @@ public class ShowUsedContractsAction extends MainWindowAction {
 	super(mainWindow);
 	setName("Show Used Contracts...");
 	
-	getMediator().enableWhenProof(this);
+	getMediator().enableWhenProofLoaded(this);
 
     }
 

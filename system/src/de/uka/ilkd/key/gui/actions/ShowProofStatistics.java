@@ -21,7 +21,7 @@ public class ShowProofStatistics extends MainWindowAction {
 	super(mainWindow);
 	setName("Show Proof Statistics...");
 	
-	getMediator().enableWhenProof(this);
+	getMediator().enableWhenProofLoaded(this);
 
     }
 

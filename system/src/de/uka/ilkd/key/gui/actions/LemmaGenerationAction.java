@@ -35,7 +35,7 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
         putValue(NAME,getTitle());
         putValue(SHORT_DESCRIPTION,getDescription());
         if(proofIsRequired()){
-                getMediator().enableWhenProof(this);
+                getMediator().enableWhenProofLoaded(this);
         }
     }
 

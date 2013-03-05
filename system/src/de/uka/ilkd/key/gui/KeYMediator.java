@@ -847,7 +847,10 @@ public class KeYMediator {
 	}	
     }
     
-    public void enableWhenProof(final Action a) {
+    /*
+     * Disable certain actions until a proof is loaded.
+     */
+    public void enableWhenProofLoaded(final Action a) {
         a.setEnabled(getProof() != null);
         addKeYSelectionListener(new KeYSelectionListener() {
             public void selectedNodeChanged(KeYSelectionEvent e) {}

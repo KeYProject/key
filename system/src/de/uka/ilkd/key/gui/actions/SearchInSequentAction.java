@@ -17,13 +17,11 @@ public class SearchInSequentAction extends MainWindowAction {
         setName("Search in sequent view");
         setTooltip("Search for strings in the current sequent.");
         this.setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
-        getMediator().enableWhenProof(this); // ??
+        getMediator().enableWhenProofLoaded(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (mainWindow.getMediator().getProof() != null) {
-            mainWindow.sequentSearchBar.setVisible(true);
-        }
+        mainWindow.sequentSearchBar.setVisible(true);
     }
 }

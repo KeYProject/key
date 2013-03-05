@@ -26,7 +26,7 @@ public final class SaveFileAction extends MainWindowAction {
         setTooltip("Save current proof.");
         setAcceleratorLetter(KeyEvent.VK_S);
         
-        mainWindow.getMediator().enableWhenProof(this);
+        mainWindow.getMediator().enableWhenProofLoaded(this);
     }
     
     public void actionPerformed(ActionEvent e) {
