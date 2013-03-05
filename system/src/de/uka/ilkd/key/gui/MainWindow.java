@@ -135,11 +135,14 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
-import de.uka.ilkd.key.gui.nodeviews.SequentSearchPanel2;
+import de.uka.ilkd.key.gui.nodeviews.SequentSearchBar;
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
 
+    // Search bar for Sequent Views.
+    public SequentSearchBar sequentSearchBar;
+    
     /**
      * The maximum number of recent files displayed.
      */
@@ -371,9 +374,6 @@ public final class MainWindow extends JFrame  {
         super.setVisible(v && visible);
     }
     
-    // Search panel for current goal view.
-    public SequentSearchPanel2 sequentSearchPanel;
-    
     /** initialised, creates GUI and lays out the main frame */
     private void layoutMain() {
         // set overall layout manager
@@ -447,13 +447,14 @@ public final class MainWindow extends JFrame  {
         leftPane.setName("leftPane");
         leftPane.setOneTouchExpandable(true);
         
-        sequentSearchPanel = new SequentSearchPanel2(sequentView);
-        JPanel j = new JPanel();
-        j.setLayout(new BorderLayout());
-	j.add(goalView, BorderLayout.CENTER);
-	j.add(sequentSearchPanel, BorderLayout.SOUTH);
+        this.sequentSearchBar = new SequentSearchBar(sequentView);
+        JPanel rightPane = new JPanel();
+        rightPane.setLayout(new BorderLayout());
+	rightPane.add(goalView, BorderLayout.CENTER);
+	rightPane.add(sequentSearchBar, 
+                BorderLayout.SOUTH);
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, j);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, rightPane);
         splitPane.setResizeWeight(0); // the right pane is more important
         splitPane.setOneTouchExpandable(true);
         splitPane.setName("splitPane");
