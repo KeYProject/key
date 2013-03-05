@@ -37,7 +37,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -245,20 +244,6 @@ class SequentViewListener extends MouseInputAdapter
      * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
      */
     public void keyPressed(KeyEvent e) {
-//        if (e.getKeyCode() == KeyEvent.VK_F3) {
-//            
-//            MainWindow.getInstance().s.toggleVisibility();
-//            
-//            IncrementalSearch search = IncrementalSearch.getInstance();
-//            if (!search.isInitialised()) {
-//                search.initSearch(seqView);
-//            } else {
-//                search.requestFocus();
-//            }
-//        } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-//            IncrementalSearch search = IncrementalSearch.getInstance();
-//            search.disableSearch();
-//        } else if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
         if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
             synchronized(this) {
                 showTermInfo = true;	    
