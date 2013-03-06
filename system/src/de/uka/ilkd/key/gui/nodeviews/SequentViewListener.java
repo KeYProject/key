@@ -88,7 +88,6 @@ class SequentViewListener extends MouseInputAdapter
 	menu = new TacletMenu();     
 
 	seqViewDragGestureListener = new SequentViewGestures();
-	
         
 	setRefreshHighlightning(true);
 	setModalDragNDropEnabled(false);
@@ -102,21 +101,29 @@ class SequentViewListener extends MouseInputAdapter
         seqView.setLastHighlightedCaretPos(seqView.correctedViewToModel(p));
     }
 	
-    public void mouseMoved(MouseEvent me) {	    
-	if (me.getSource() == seqView && refreshHighlightning())  { 
-	    highlight(me.getPoint());            
-            if (showTermInfo) { 
+    @Override
+    public void mouseMoved(MouseEvent me) {
+        if (me.getSource() == seqView && refreshHighlightning()) {
+            highlight(me.getPoint());
+            if (showTermInfo) {
                 final String info = getTermInfo();
-               
+
                 if (info == null) {
-                	MainWindow.getInstance().setStandardStatusLine();
-                } else {                    
-                	MainWindow.getInstance().setStatusLine(info);
+                    MainWindow.getInstance().setStandardStatusLine();
+                } else {
+                    MainWindow.getInstance().setStatusLine(info);
                 }
-            }	    
-	}
-    }       
+            }
+        }
+    }
     
+    @Override
+    public void mouseExited(MouseEvent me) {
+        if (me.getSource() == seqView && refreshHighlightning()) {
+            seqView.disableHighlights();
+        }
+    }
+
     private String getTermInfo() {
         if ((mousePos == null)||
             ("".equals(seqView.getHighlightedText()))) return null;
@@ -132,6 +139,7 @@ class SequentViewListener extends MouseInputAdapter
         return null;
     }
                 	           
+    @Override
     public void mouseClicked(MouseEvent me) {                
         if (!modalDragNDropEnabled()) { 
 	    // if a popup menu is cancelled by a click we do not want to 
@@ -148,12 +156,12 @@ class SequentViewListener extends MouseInputAdapter
 							mediator.getSelectedGoal () );
 			}
 		    } else if(macroActive && SwingUtilities.isRightMouseButton(me)) { 
-		        ProofMacroMenu menu = new ProofMacroMenu(mediator, 
+		        ProofMacroMenu macroMenu = new ProofMacroMenu(mediator, 
 		                mousePos.getPosInOccurrence());
-		        if(menu.isEmpty()) {
-		            menu.add(new JLabel("no strategies available"));
+		        if(macroMenu.isEmpty()) {
+		            macroMenu.add(new JLabel("no strategies available"));
 		        } 
-		        JPopupMenu popupMenu = menu.getPopupMenu();
+		        JPopupMenu popupMenu = macroMenu.getPopupMenu();
 		        popupMenu.setLabel("Strategy macros");
 		        popupMenu.show(seqView, me.getX()-5, me.getY()-5);
 		    } else {		    		  
@@ -202,6 +210,7 @@ class SequentViewListener extends MouseInputAdapter
 	}
     }
 
+    @Override
     public void mouseReleased(MouseEvent me) {                
         if  (!modalDragNDropEnabled() && menu.isPopupMenuVisible() &&      
                 !menu.getPopupMenu().contains(me.getX()-menu.getX(), 
@@ -210,6 +219,7 @@ class SequentViewListener extends MouseInputAdapter
 	}
     }
     
+    @Override
     public void mouseEntered(MouseEvent me) {
         seqView.requestFocusInWindow();
     }
@@ -308,6 +318,7 @@ class SequentViewListener extends MouseInputAdapter
 				  new PosInSequentTransferable(localMousePos,
 				      mediator.getServices()),
 				  new DragSourceAdapter() {
+                                      @Override
 				      public void dragDropEnd(DragSourceDropEvent event) {
 					  // Enable updating the subterm 
 					  // highlightning ...

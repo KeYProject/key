@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -122,6 +121,5 @@ public abstract class SearchPanel extends JPanel {
         next.setMargin(new java.awt.Insets(2,1,2,1));
         add(close);
         close.setMargin(new java.awt.Insets(2,1,2,1));
-        add(Box.createHorizontalGlue());
     }
 }
