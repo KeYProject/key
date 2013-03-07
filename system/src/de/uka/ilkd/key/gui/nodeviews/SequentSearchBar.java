@@ -17,13 +17,12 @@ import javax.swing.JCheckBox;
  * Search bar implementing search function for SequentView.
  */
 
-public class SequentSearchBar extends SearchPanel
-{
+public class SequentSearchBar extends SearchPanel {
 
     public static final Color SEARCH_HIGHLIGHT_COLOR_1 =
             new Color(255, 140, 0, 178);
     public static final Color SEARCH_HIGHLIGHT_COLOR_2 =
-            new Color(255, 140, 0, 76);
+            new Color(255, 140, 0, 100);
     
     private List<Pair<Integer,Object>> searchResults;
     private int resultIteratorPos;
@@ -33,6 +32,11 @@ public class SequentSearchBar extends SearchPanel
     public SequentSearchBar(SequentView sequentView) {
         this.sequentView = sequentView;
         searchResults = new ArrayList<Pair<Integer,Object>>();
+    }
+    
+    public void setSequentView(SequentView sequentView){
+        this.sequentView = sequentView;
+        search();
     }
     
     @Override
@@ -52,25 +56,25 @@ public class SequentSearchBar extends SearchPanel
             checkBox.setToolTipText("Evaluate as regular expression");
         add(checkBox);
     }
-    
+
     public void searchNext() {
         if (!searchResults.isEmpty()) {
             resetExtraHighlight();
-            resultIteratorPos = (resultIteratorPos + 1) % searchResults.size();
+            resultIteratorPos++;
+            resultIteratorPos %= searchResults.size();
             setExtraHighlight(resultIteratorPos);
         }
     }
 
     public void searchPrevious() {
-                if (!searchResults.isEmpty()) {
+        if (!searchResults.isEmpty()) {
             resetExtraHighlight();
-            resultIteratorPos =
-                    (resultIteratorPos - 1 + searchResults.size()) %
-                    searchResults.size();
+            resultIteratorPos++;
+            resultIteratorPos %= searchResults.size();
             setExtraHighlight(resultIteratorPos);
         }
     }
-    
+
     @Override
     public void setVisible(boolean vis) {
         if (!vis && sequentView != null) {
@@ -88,10 +92,8 @@ public class SequentSearchBar extends SearchPanel
         if (sequentView == null || sequentView.getText() == null || search.equals("")) {
             return true;
         }
-
-        searchResults.clear();
+        
         resultIteratorPos = 0;
-
         int searchFlag = 0;
         if (search.toLowerCase().equals(search)) {
             // no capital letters used --> case insensitive matching
@@ -151,16 +153,10 @@ public class SequentSearchBar extends SearchPanel
         searchResults.set(resultIndex, highlightPair);
     }
     
-    public void setRegExpSearch(boolean b) {
-        regExpSearch = b;
-        search();
-    }
-    
     private void clearSearchResults() {
         for (Pair result : searchResults) {
             sequentView.removeHighlight(result.second);
         }
         searchResults.clear();
     }
-    
 }

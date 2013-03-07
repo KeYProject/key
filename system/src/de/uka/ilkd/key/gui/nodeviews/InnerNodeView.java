@@ -66,17 +66,12 @@ import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
 
-public class NonGoalInfoView extends JTextArea {
+public class InnerNodeView extends SequentView {
     	 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -868094158643337989L;
     private SequentPrintFilter filter;
     private InitialPositionTable posTable;
     private ConfigChangeListener configChangeListener 
     	= new ConfigChangeAdapter(this);
-    
     
     private static void writeSVModifiers(StringBuffer out, SchemaVariable sv) {        
         boolean started = false;        
@@ -162,7 +157,7 @@ public class NonGoalInfoView extends JTextArea {
     }    
     
     
-    public NonGoalInfoView (Node node, KeYMediator mediator) {
+    public InnerNodeView (Node node, KeYMediator mediator) {
 	filter = new IdentitySequentPrintFilter( node.sequent () );
 	
    LogicPrinter printer = new LogicPrinter
@@ -170,7 +165,7 @@ public class NonGoalInfoView extends JTextArea {
           mediator.getNotationInfo(),
           mediator.getServices());
    String s = computeText(mediator, node, filter, printer);
-   posTable = printer.getPositionTable();
+   posTable = printer.getInitialPositionTable();
 
 	Config.DEFAULT.addConfigChangeListener(configChangeListener);
 
@@ -184,8 +179,7 @@ public class NonGoalInfoView extends JTextArea {
 	    // no rule app	 
 	    setCaretPosition(0);	 
 	}
-	
-	setEditable(false);
+        
     }
 
     /**
@@ -236,7 +230,7 @@ public class NonGoalInfoView extends JTextArea {
               s += "\nNode Nr "+node.serialNr()+"\n";
               
          if ( app != null ) {
-             s = s + "\n \nUpcoming rule application: \n";
+             s = s + "\nThe following rule was applied on this node: \n\n";
              if (app.rule() instanceof Taclet) {
             LogicPrinter tacPrinter = new LogicPrinter 
                 (new ProgramPrinter(null),                        
@@ -307,12 +301,12 @@ public class NonGoalInfoView extends JTextArea {
     
     static final Highlighter.HighlightPainter RULEAPP_HIGHLIGHTER =	 
 	new DefaultHighlighter	 
-	.DefaultHighlightPainter(new Color(0.5f,1.0f,0.5f));	 
+	.DefaultHighlightPainter(new Color(0.5f,1.0f,0.5f,0.4f));
  	 
     
     static final Highlighter.HighlightPainter IF_FORMULA_HIGHLIGHTER =	 
 	new DefaultHighlighter	 
-	.DefaultHighlightPainter(new Color(0.8f,1.0f,0.8f));	 
+	.DefaultHighlightPainter(new Color(0.8f,1.0f,0.8f,0.5f));
  	 
  	 
     private void highlightRuleAppPosition(RuleApp app) {	 
@@ -358,7 +352,7 @@ public class NonGoalInfoView extends JTextArea {
 			final TextUI ui = getUI ();
 			if(ui == null)
 			    return;
-			final NonGoalInfoView t = NonGoalInfoView.this;	 
+			final InnerNodeView t = InnerNodeView.this;	 
 			final Rectangle rect = ui.modelToView ( t, r.start () );
 			rect.add ( ui.modelToView ( t, r.end () ) );	 
  	 
@@ -439,4 +433,9 @@ public class NonGoalInfoView extends JTextArea {
 	    Debug.out("KEY-INNER_NODE_FONT not available, use standard font.");
 	}
     }
+    
+    public String getTitle() {
+        return "Inner Node";
+    }
+    
 }

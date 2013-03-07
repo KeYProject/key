@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /** This is an abstract clas that encapsulates a schemvariable and its
  *  instantiation. It is needed because schemavariables can be
- *  instantiated as ProgramElements and as Terms accroding to their
+ *  instantiated as ProgramElements and as Terms according to their
  *  type. But we have to put the pair (schemavariable,
  *  term/programelment) in one map. Therefore a map from
  *  SchemaVariable to InstantiationEntry is used

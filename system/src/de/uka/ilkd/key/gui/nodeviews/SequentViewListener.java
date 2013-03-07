@@ -57,7 +57,7 @@ class SequentViewListener extends MouseInputAdapter
     implements KeyListener  {  
 	
     private KeYMediator mediator;
-    private SequentView seqView;
+    private LeafNodeView seqView;
 
     private TacletMenu menu;
    
@@ -79,7 +79,7 @@ class SequentViewListener extends MouseInputAdapter
 
     private DragGestureListener seqViewDragGestureListener;
 
-    SequentViewListener(SequentView seqView,
+    SequentViewListener(LeafNodeView seqView,
 			KeYMediator mediator) {
 	this.mediator = mediator;
 	this.seqView = seqView;
@@ -300,7 +300,7 @@ class SequentViewListener extends MouseInputAdapter
 	public void dragGestureRecognized(DragGestureEvent dgEvent) {	
 	    final Object oldHighlight = seqView.getCurrentHighlight();	
 	    final Object dndHighlight =
-                    seqView.getColorHighlight(SequentView.DND_HIGHLIGHT_COLOR);
+                    seqView.getColorHighlight(LeafNodeView.DND_HIGHLIGHT_COLOR);
 	    seqView.updateUpdateHighlights();
 	
 	    seqView.setCurrentHighlight(dndHighlight);

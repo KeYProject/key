@@ -178,7 +178,7 @@ public class ProofTreeView extends JPanel {
 	if (selProof != null) {
 	    setProof(selProof);
 	}
-	
+
 	
 	final ActionListener keyboardAction = new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {
@@ -441,15 +441,11 @@ public class ProofTreeView extends JPanel {
 	}
     }
 
-
-
-    // INNER CLASSES 
-
     public void showSearchPanel() {
         proofTreeSearchPanel.setVisible(true);
     }
 
-
+    // INNER CLASSES 
 
     // listens to gui events
     class GUIProofTreeGUIListener implements GUIListener,
@@ -813,8 +809,6 @@ public class ProofTreeView extends JPanel {
 	    
 	    this.add(new JSeparator());
 
-	    
-
 	    this.add(expandAll);
 	    expandAll.addActionListener(this);
 	    this.add(expandAllBelow);
@@ -986,7 +980,7 @@ public class ProofTreeView extends JPanel {
 			selectBranchNode((GUIBranchNode)sibling);
 		}
             } else if (e.getSource() == search) {
-		proofTreeSearchPanel.setVisible(true);
+		showSearchPanel();
             } 
 	}
 

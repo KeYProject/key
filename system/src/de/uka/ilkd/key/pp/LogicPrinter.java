@@ -1749,7 +1749,7 @@ public final class LogicPrinter {
      * this method with a null returning body if position information
      * is not computed there.
      */
-    public InitialPositionTable getPositionTable() {
+    public InitialPositionTable getInitialPositionTable() {
         if (pure) {
             return null;
         }
