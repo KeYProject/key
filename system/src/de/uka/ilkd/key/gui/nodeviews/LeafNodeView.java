@@ -27,16 +27,11 @@ import java.awt.event.HierarchyBoundsListener;
 import java.awt.event.HierarchyEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.HashMap;
-import java.util.Vector;
 
-import javax.swing.JEditorPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter;
-import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -198,7 +193,7 @@ public class LeafNodeView extends SequentView implements Autoscroll {
 
         this.setAutoscrolls(true);
 	this.setDropTarget(aDropTarget);
-	               
+                
         
 	// add listener to KeY GUI events
         mediator().addGUIListener(guiListener);
@@ -207,7 +202,6 @@ public class LeafNodeView extends SequentView implements Autoscroll {
         changeListener = new SeqViewChangeListener();
         addComponentListener(changeListener);                      
         addPropertyChangeListener("font", changeListener);
-                  
 	addHierarchyBoundsListener(changeListener);
     
     }

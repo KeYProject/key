@@ -77,8 +77,12 @@ public class SequentSearchBar extends SearchPanel {
 
     @Override
     public void setVisible(boolean vis) {
-        if (!vis && sequentView != null) {
-            clearSearchResults();
+        if (sequentView != null) {
+            if (vis) {
+                search();
+            } else {
+                clearSearchResults();
+            }
         }
         super.setVisible(vis);
     }

@@ -157,29 +157,26 @@ public class InnerNodeView extends SequentView {
     }    
     
     
-    public InnerNodeView (Node node, KeYMediator mediator) {
-	filter = new IdentitySequentPrintFilter( node.sequent () );
-	
-   LogicPrinter printer = new LogicPrinter
-         (new ProgramPrinter(null), 
-          mediator.getNotationInfo(),
-          mediator.getServices());
-   String s = computeText(mediator, node, filter, printer);
-   posTable = printer.getInitialPositionTable();
-
-	Config.DEFAULT.addConfigChangeListener(configChangeListener);
-
-	updateUI();
-	setText(s);
-
-	RuleApp app = node.getAppliedRuleApp();
-	if (app != null) {	 
-	    highlightRuleAppPosition(app);	 
-	} else {	 
-	    // no rule app	 
-	    setCaretPosition(0);	 
-	}
+    public InnerNodeView(Node node, KeYMediator mediator) {
         
+        filter = new IdentitySequentPrintFilter(node.sequent());
+        LogicPrinter printer = new LogicPrinter(new ProgramPrinter(null),
+                mediator.getNotationInfo(),
+                mediator.getServices());
+        String s = computeText(mediator, node, filter, printer);
+        setText(s);
+        posTable = printer.getInitialPositionTable();
+        Config.DEFAULT.addConfigChangeListener(configChangeListener);
+        updateUI();
+
+        RuleApp app = node.getAppliedRuleApp();
+        if (app != null) {
+            highlightRuleAppPosition(app);
+        } else {
+            // no rule app	 
+            setCaretPosition(0);
+        }
+
     }
 
     /**

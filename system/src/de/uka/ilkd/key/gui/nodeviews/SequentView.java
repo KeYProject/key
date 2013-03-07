@@ -1,12 +1,9 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import static de.uka.ilkd.key.gui.nodeviews.LeafNodeView.UPDATE_HIGHLIGHT_COLOR;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.util.Debug;
 import java.awt.Color;
 import java.util.HashMap;
-import java.util.Vector;
 import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
