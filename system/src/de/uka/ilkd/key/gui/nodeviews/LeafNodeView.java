@@ -352,11 +352,8 @@ public class LeafNodeView extends SequentView implements Autoscroll {
         }
         
 	restorePosition();
-	updateUpdateHighlights();
-
         addMouseMotionListener(listener);
 	addMouseListener(listener);        
-
 	repaint();
     }
      

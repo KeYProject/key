@@ -301,8 +301,6 @@ class SequentViewListener extends MouseInputAdapter
 	    final Object oldHighlight = seqView.getCurrentHighlight();	
 	    final Object dndHighlight =
                     seqView.getColorHighlight(LeafNodeView.DND_HIGHLIGHT_COLOR);
-	    seqView.updateUpdateHighlights();
-	
 	    seqView.setCurrentHighlight(dndHighlight);
 	
 	    hideMenu();

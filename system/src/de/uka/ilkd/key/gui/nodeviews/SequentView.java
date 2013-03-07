@@ -20,12 +20,9 @@ public abstract class SequentView extends JTextArea {
     // all known highlights
     private HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight =
             new HashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
-    // a vector of highlights to mark updates
-    private Vector<Object> updateHighlights;
     
     SequentView(){
         setEditable(false);
-        updateHighlights = new Vector<Object>();
     }
 
     /**
@@ -36,31 +33,6 @@ public abstract class SequentView extends JTextArea {
      */
     public void removeHighlight(Object highlight) {
         getHighlighter().removeHighlight(highlight);
-    }
-
-    /**
-     * updates all updateHighlights. Firstly removes all displayed ones and then
-     * gets a new list of updates to highlight
-     */
-    public void updateUpdateHighlights() {
-//        if (printer == null) {
-//            return;
-//        }
-
-//        for (Object updateHighlight : updateHighlights) {
-//            removeHighlight(updateHighlight);
-//        }
-//        
-//        updateHighlights.clear();
-        
-//        Range[] ranges = printer.getInitialPositionTable().getUpdateRanges();
-//        if (ranges != null) {
-//            for (Range range : ranges) {
-//                Object tag = getColorHighlight(UPDATE_HIGHLIGHT_COLOR);
-//                updateHighlights.addElement(tag);
-//                paintHighlight(range, tag);
-//            }
-//        }
     }
 
     /**

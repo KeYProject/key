@@ -124,7 +124,6 @@ public class SequentSearchBar extends SearchPanel {
                 loopEnterd = true;
         }
         if (loopEnterd) {
-            sequentView.updateUpdateHighlights();
             return true;
         } else {
             return false;
@@ -149,7 +148,6 @@ public class SequentSearchBar extends SearchPanel {
         Pair<Integer, Object> highlightPair =
                 new Pair<Integer, Object>(pos, highlight);
         sequentView.paintHighlight(new Range(pos, pos + searchField.getText().length()), highlight);
-        sequentView.updateUpdateHighlights();
         searchResults.set(resultIndex, highlightPair);
     }
     
