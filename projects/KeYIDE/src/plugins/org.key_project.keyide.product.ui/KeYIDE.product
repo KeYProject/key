@@ -15,6 +15,9 @@ Integrates KeY in the Eclipse-Environment
    </configIni>
 
    <launcherArgs>
+      <vmArgs>-Xms128m
+-Xmx1024m
+-XX:MaxPermSize=256m</vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
@@ -25,13 +28,16 @@ Integrates KeY in the Eclipse-Environment
       startupProgressRect="30,275,445,15"
       startupMessageRect="30,252,445,20"
       startupForegroundColor="000000" />
-   <launcher>
+   <launcher name="KeYIDE">
+      <linux icon="/org.key_project.keyide.ui/icons/logo48.xpm"/>
+      <macosx icon="/org.key_project.keyide.ui/icons/logo.icns"/>
       <solaris/>
-      <win useIco="false">
+      <win useIco="true">
          <ico path="/org.key_project.keyide.product.ui/icons/logo.ico"/>
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
