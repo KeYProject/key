@@ -451,7 +451,9 @@ public final class SymbolicExecutionUtil {
    public static ApplyStrategyInfo startSideProof(Proof proof, ProofStarter starter, String splittingOption) {
       assert starter != null;
       starter.setMaxRuleApplications(1000);
-      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); // Is a clone that can be modified
+      StrategyProperties sp = !proof.isDisposed() ? 
+                              proof.getSettings().getStrategySettings().getActiveStrategyProperties() : // Is a clone that can be modified
+                              new StrategyProperties();
       sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, splittingOption); // Logical Splitting: Off is faster and avoids splits, but Normal allows to determine that two objects are different.
       sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE); // Method Treatment: Off
       sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF); // Dependency Contracts: Off

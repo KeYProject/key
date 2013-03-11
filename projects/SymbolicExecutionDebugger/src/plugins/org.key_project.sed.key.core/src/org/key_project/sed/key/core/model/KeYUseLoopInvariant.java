@@ -127,10 +127,10 @@ public class KeYUseLoopInvariant extends AbstractSEDUseLoopInvariant implements 
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
+   public String getSourcePath() {
       if (sourceName == null) {
          // TODO: Use position info of original loop statement instead of the replaced while instance.
-         sourceName = KeYModelUtil.getSourceName(executionNode.getLoopStatement().getPositionInfo());
+         sourceName = KeYModelUtil.getSourcePath(executionNode.getLoopStatement().getPositionInfo());
       }
       return sourceName;
    }

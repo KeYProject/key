@@ -12,6 +12,8 @@ public class ClassA {
    
    private String onlyInA = "A";
    
+   private boolean booleanField = true;
+   
    private int getPrivate() {
       return 42;
    }

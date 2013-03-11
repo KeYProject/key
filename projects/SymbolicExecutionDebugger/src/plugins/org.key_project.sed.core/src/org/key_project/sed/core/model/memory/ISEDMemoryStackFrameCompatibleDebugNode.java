@@ -31,7 +31,7 @@ public interface ISEDMemoryStackFrameCompatibleDebugNode extends ISEDMemoryDebug
     * Sets the source name.
     * @param sourceName The source name to set.
     */
-   public void setSourceName(String sourceName);
+   public void setSourcePath(String sourceName);
    
    /**
     * Adds the given {@link IVariable}.

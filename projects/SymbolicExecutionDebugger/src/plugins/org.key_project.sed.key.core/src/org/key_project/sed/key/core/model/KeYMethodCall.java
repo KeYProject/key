@@ -128,9 +128,9 @@ public class KeYMethodCall extends AbstractSEDMethodCall implements IKeYSEDDebug
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
+   public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = KeYModelUtil.getSourceName(executionNode.getProgramMethod().getPositionInfo());
+         sourceName = KeYModelUtil.getSourcePath(executionNode.getProgramMethod().getPositionInfo());
       }
       return sourceName;
    }
