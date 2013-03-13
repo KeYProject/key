@@ -89,7 +89,6 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         Modality modality =
                 (Modality) d.get(BasicSnippetData.Key.MODALITY);
         final Pair<JavaBlock, JavaBlock> jb = buildJavaBlock(d);
-        //final JavaBlock jb = buildJavaBlock(d);
 
         //create program term
         final Modality symbExecMod;
@@ -100,9 +99,12 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         }
         final Term guardTrueTerm = d.tb.equals(d.tb.var((LocationVariable) inv.getGuard().op()), 
                                                d.tb.TRUE(services));
+        final Term guardFalseTerm = d.tb.equals(d.tb.var((LocationVariable) inv.getGuard().op()), 
+                d.tb.FALSE(services));
         final Term bodyTerm = tb.prog(symbExecMod, jb.first, postTerm);
         final Term guardTrueBody = d.tb.imp(guardTrueTerm, bodyTerm);
-        final Term programTerm = d.tb.box(jb.second, guardTrueBody);
+        final Term guardFalseBody = d.tb.imp(guardFalseTerm, postTerm);
+        final Term programTerm = d.tb.box(jb.second, d.tb.and(guardTrueBody, guardFalseBody));
 
         //create update
         Term update = tb.skip();
