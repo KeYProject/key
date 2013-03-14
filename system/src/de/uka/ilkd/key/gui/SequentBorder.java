@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.gui;
 
+import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import java.awt.BasicStroke;
@@ -9,6 +10,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.RenderingHints;
+import javax.swing.UIManager;
 
 import javax.swing.border.AbstractBorder;
 
@@ -26,7 +29,10 @@ public class SequentBorder extends AbstractBorder {
     public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
 
         Graphics2D g2d = (Graphics2D) g;
-        FontMetrics fm = c.getFontMetrics(c.getFont());
+        g2d.setFont(UIManager.getFont(Config.KEY_FONT_CURRENT_GOAL_VIEW));
+        FontMetrics fm = c.getFontMetrics(g2d.getFont());
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
         offset = 0;
         offset2 = 0;
         x += 15;
@@ -38,7 +44,7 @@ public class SequentBorder extends AbstractBorder {
         if (sequentView instanceof InnerNodeView) {
             offset = 40;
             offset2 = 16;
-            
+
             InnerNodeView inw = (InnerNodeView) sequentView;
 
             g2d.setColor(new Color(250, 90, 90));
