@@ -1,10 +1,15 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
+import de.uka.ilkd.key.gui.SequentBorder;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.util.Debug;
 import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.util.HashMap;
 import javax.swing.JTextArea;
+import javax.swing.border.Border;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;
@@ -18,8 +23,12 @@ public abstract class SequentView extends JTextArea {
     private HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight =
             new HashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
     
+    SequentBorder border;
+    
     SequentView(){
         setEditable(false);
+        border = new SequentBorder(this);
+        setBorder(border);
     }
 
     /**
@@ -81,4 +90,5 @@ public abstract class SequentView extends JTextArea {
     }
 
     public abstract String getTitle();
+    
 }

@@ -32,6 +32,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.SequentBorder;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
@@ -64,6 +65,10 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 import de.uka.ilkd.key.util.Debug;
+import java.awt.Cursor;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 
 public class InnerNodeView extends SequentView {
@@ -156,15 +161,30 @@ public class InnerNodeView extends SequentView {
         }
     }    
     
+    String sequentOnly;
+    String tacletDescription;
+    public boolean showTaclet = false;
+    
+    void toggleText(){
+        showTaclet = !showTaclet;
+        if(showTaclet){
+            setText(sequentOnly+"\n"+tacletDescription);
+        }else{
+            setText(sequentOnly);
+        }
+        setBorder(new SequentBorder(this));
+    }
     
     public InnerNodeView(Node node, KeYMediator mediator) {
-        
+ 
         filter = new IdentitySequentPrintFilter(node.sequent());
         LogicPrinter printer = new LogicPrinter(new ProgramPrinter(null),
                 mediator.getNotationInfo(),
                 mediator.getServices());
-        String s = computeText(mediator, node, filter, printer);
-        setText(s);
+        printer.printSequent(null, filter);
+        sequentOnly = printer.toString();
+        tacletDescription = getTacletDescription(mediator, node, filter);
+        setText(sequentOnly);
         posTable = printer.getInitialPositionTable();
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
         updateUI();
@@ -177,27 +197,10 @@ public class InnerNodeView extends SequentView {
             setCaretPosition(0);
         }
 
-    }
-
-    /**
-     * <p>
-     * Computes the text to show in this {@link JTextArea} which consists
-     * of the sequent including the applied rule.
-     * </p>
-     * <p>
-     * This information is also relevant for other tools like the
-     * Symbolic Execution Debugger.
-     * </p>
-     * @param mediator The {@link KeYMediator} to use.
-     * @param node The {@link Node} to use.
-     * @return The text to show.
-     */
-    public static String computeText(KeYMediator mediator, Node node) {
-       SequentPrintFilter filter = new IdentitySequentPrintFilter(node.sequent());
-       LogicPrinter printer = new LogicPrinter(new ProgramPrinter(null), 
-                                               mediator.getNotationInfo(), 
-                                               node.proof().getServices());
-       return computeText(mediator, node, filter, printer);
+        InnerNodeMouseListener innerNodeMouseListener = new InnerNodeMouseListener();
+        addMouseMotionListener(innerNodeMouseListener);
+        addMouseListener(innerNodeMouseListener);
+        
     }
 
     /**
@@ -215,19 +218,15 @@ public class InnerNodeView extends SequentView {
      * @param printer The {@link LogicPrinter} to use.
      * @return The text to show.
      */
-    public static String computeText(KeYMediator mediator, 
+    public String getTacletDescription(KeYMediator mediator, 
                                      Node node, 
-                                     SequentPrintFilter filter, 
-                                     LogicPrinter printer) {
+                                     SequentPrintFilter filter) {
        
-         printer.printSequent (null, filter);
-         String s = printer.toString();
-              printer=null;
          RuleApp app = node.getAppliedRuleApp();
-              s += "\nNode Nr "+node.serialNr()+"\n";
-              
+         String s = "";
+
          if ( app != null ) {
-             s = s + "\nThe following rule was applied on this node: \n\n";
+             s += "The following rule was applied on this node: \n\n";
              if (app.rule() instanceof Taclet) {
             LogicPrinter tacPrinter = new LogicPrinter 
                 (new ProgramPrinter(null),                        
@@ -257,6 +256,9 @@ public class InnerNodeView extends SequentView {
 //                  s = s + "\n\nApplication justified by: ";
 //                  s = s + mediator.getSelectedProof().env().getJustifInfo()
 //                                      .getJustification(app, mediator.getServices())+"\n";            
+         }else{
+             // Is this case possible?
+             s += "No rule was applied on this node.";
          }
          return s;
     }
@@ -304,7 +306,7 @@ public class InnerNodeView extends SequentView {
     static final Highlighter.HighlightPainter IF_FORMULA_HIGHLIGHTER =	 
 	new DefaultHighlighter	 
 	.DefaultHighlightPainter(new Color(0.8f,1.0f,0.8f,0.5f));
- 	 
+    
  	 
     private void highlightRuleAppPosition(RuleApp app) {	 
 	try {	 
@@ -433,6 +435,50 @@ public class InnerNodeView extends SequentView {
     
     public String getTitle() {
         return "Inner Node";
+    }
+    
+    private class InnerNodeMouseListener
+            implements MouseMotionListener, MouseListener {
+
+        public void mouseDragged(MouseEvent me) {
+        }
+        
+        private Cursor linkCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+        private Cursor defaultCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+        private boolean isHandCursor = false; // only change cursor when necessary
+
+        public void mouseMoved(MouseEvent me) {
+            if (me.getX() >= border.xForHighLight
+                    && me.getY() <= border.yForHighLight) {
+                if (!isHandCursor) {
+                    isHandCursor = true;
+                    setCursor(linkCursor);
+                }
+            } else {
+                if (isHandCursor) {
+                    isHandCursor = false;
+                    setCursor(defaultCursor);
+                }
+            }
+        }
+
+        public void mouseClicked(MouseEvent me) {
+            if (isHandCursor && SwingUtilities.isLeftMouseButton(me)) {
+                toggleText();
+            }
+        }
+
+        public void mousePressed(MouseEvent me) {
+        }
+
+        public void mouseReleased(MouseEvent me) {
+        }
+
+        public void mouseEntered(MouseEvent me) {
+        }
+
+        public void mouseExited(MouseEvent me) {
+        }
     }
     
 }

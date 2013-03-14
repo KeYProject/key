@@ -107,6 +107,7 @@ import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
+import de.uka.ilkd.key.gui.nodeviews.EmptySequent;
 import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
 import de.uka.ilkd.key.gui.nodeviews.LeafNodeView;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
@@ -137,6 +138,7 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.gui.nodeviews.SequentSearchBar;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
+import javax.swing.BorderFactory;
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
@@ -546,7 +548,7 @@ public final class MainWindow extends JFrame  {
     
     private void createViews() {
 	goalView = new JScrollPane();
-	GuiUtilities.paintEmptyViewComponent(goalView, "No proof loaded");	
+	paintGoalView(new EmptySequent());
 
 //	proofView = new JPanel();
 //        proofView.setLayout(new BorderLayout(0,0));
@@ -1007,7 +1009,7 @@ public final class MainWindow extends JFrame  {
             vp.removeAll();
         }
         goalView.setViewportView(sequentView);
-        goalView.setBorder(new TitledBorder(borderTitle));
+//        goalView.setBorder(new TitledBorder(borderTitle));
         goalView.setBackground(sequentView.getBackground());
         goalView.validate();
         validate();
