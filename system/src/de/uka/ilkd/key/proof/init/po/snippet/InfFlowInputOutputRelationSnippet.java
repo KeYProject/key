@@ -19,7 +19,6 @@ import de.uka.ilkd.key.util.Triple;
  */
 class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     implements InfFlowFactoryMethod {
-
     @Override
     public Term produce(BasicSnippetData d,
                         ProofObligationVars poVars1,
@@ -103,22 +102,23 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         Term[] eqAtLocs =
                 new Term[respects1.first.length +
                          respects1.second.length +
-                         ((vs1.localIns != null && !vs1.localIns.isEmpty())
-                                 ? vs1.localIns.size() : 0) +
                          (vs1.guard != null ? 1 : 0)];
-        for (int i = 0; i < respects1.first.length; i++) {
-            SearchVisitor search = new SearchVisitor(vs1.result, vs1.resultAtPost);
-            respects1.first[i].execPreOrder(search);
-            if (!search.termFound && (i == 0)) {
-                // refLocTerms which contain \result are not included in
-                // the precondition
-                eqAtLocs[i] = d.tb.equals(respects1.first[i], respects2.first[i]);
-            } else {
-                eqAtLocs[i] = d.tb.tt();
-            }
+        Iterator<Term> in1 = vs1.localIns.iterator();
+        Iterator<Term> in2 = vs2.localIns.iterator();
+        SearchVisitor search = new SearchVisitor(vs1.result, vs1.resultAtPost);
+        respects1.first[0].execPreOrder(search);
+        if (!search.termFound) {
+            // refLocTerms which contain \result are not included in
+            // the precondition
+            eqAtLocs[0] = d.tb.equals(respects1.first[0], respects2.first[0]);
+        } else {
+            eqAtLocs[0] = d.tb.tt();
+        }
+        for(int i = 1; in1.hasNext() && respects1.first.length > i; i++) {
+            eqAtLocs[i] = d.tb.equals(in1.next(), in2.next());
         }
         for (int i = 0; i < respects1.second.length; i++) {
-            SearchVisitor search = new SearchVisitor(vs1.result, vs1.resultAtPost);
+            search = new SearchVisitor(vs1.result, vs1.resultAtPost);
             respects1.second[i].execPreOrder(search);
             if (!search.termFound) {
                 // refLocTerms which contain \result are not included in
@@ -129,15 +129,8 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                 eqAtLocs[i + respects1.first.length] = d.tb.tt();
             }
         }
-        Iterator<Term> it = vs2.localIns.iterator();
-        int j = 0;
-        for(Term in: vs1.localIns) {
-            eqAtLocs[j + respects1.first.length + respects1.second.length] =
-                    d.tb.equals(in, it.next());            
-            j++;
-        }
         if (vs1.guard != null) {
-            eqAtLocs[j + respects1.first.length + respects1.second.length]
+            eqAtLocs[respects1.first.length + respects1.second.length]
                              = d.tb.equals(vs1.guard, vs2.guard);
         }
         return d.tb.and(eqAtLocs);
@@ -155,29 +148,29 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
 
         Term[] eqAtLocs = new Term[respects1.first.length +
                                    respects1.third.length +
-                                   ((vs1.localOuts != null && !vs1.localOuts.isEmpty())
-                                           ? vs1.localOuts.size() : 0) +
+                                   /*((vs1.localOuts != null && !vs1.localOuts.isEmpty())
+                                           ? vs1.localOuts.size() : 0) +*/
                                    (vs1.guardAtPost != null ? 1 : 0)];
         for (int i = 0; i < respects1.first.length; i++) {
-            if ((i == 0)) {
+            //if ((i == 0)) {
                 eqAtLocs[i] = d.tb.equals(respects1.first[i], respects2.first[i]);
-            } else {
+            /*} else {
                 eqAtLocs[i] = d.tb.tt();
-            }
+            }*/
         }
         for (int i = 0; i < respects1.third.length; i++) {
             eqAtLocs[i + respects1.first.length] =
                     d.tb.equals(respects1.third[i], respects2.third[i]);
         }
-        Iterator<Term> it = vs2.localOuts.iterator();
+        /*Iterator<Term> it = vs2.localOuts.iterator();
         int j = 0;
         for(Term out: vs1.localOuts) {
             eqAtLocs[j + respects1.first.length + respects1.third.length] =
                     d.tb.equals(out, it.next());
             j++;
-        }
+        }*/
         if (vs1.guardAtPost != null) {
-            eqAtLocs[j + respects1.first.length + respects1.third.length]
+            eqAtLocs[respects1.first.length + respects1.third.length]
                              = d.tb.equals(vs1.guardAtPost, vs2.guardAtPost);
         }
         return d.tb.and(eqAtLocs);
