@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model>
+   <equivalenceClass representativeTerm="current.right">
+      <term term="current.right"/>
+      <term term="current.right.left"/>
+   </equivalenceClass>
+   <equivalenceClass representativeTerm="null">
+      <term term="\if (current.right.left = current)
+    \then (current.right.left)
+    \else (current.parent)"/>
+      <term term="current.parent"/>
+      <term term="null"/>
+   </equivalenceClass>
+   <state name="One Step Simplification resulting in return current;">
+      <association name="current" programVariable="current" isArrayIndex="false" arrayIndex="-1" target="o1"/>
+      <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o3"/>
+   </state>
+   <object xml:id="o1" name="current" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
+      <value name="parent" programVariable="parent" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
+      <association name="right" programVariable="right" isArrayIndex="false" arrayIndex="-1" target="o2"/>
+   </object>
+   <object xml:id="o2" name="current.right" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.Node">
+      <association name="left" programVariable="left" isArrayIndex="false" arrayIndex="-1" target="o2"/>
+   </object>
+   <object xml:id="o3" name="self" type="algorithm.AssociationSourceIsNotRepresentativeTermOfEquivalenceClass">
+   </object>
+</model>

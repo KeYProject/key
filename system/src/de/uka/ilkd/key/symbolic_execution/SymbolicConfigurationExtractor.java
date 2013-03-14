@@ -44,8 +44,10 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
+import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.AbstractSymbolicAssociationValueContainer;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.impl.SymbolicConfiguration;
@@ -1201,10 +1203,11 @@ public class SymbolicConfigurationExtractor {
     * @param pairs Provides the available objects, their values and associations together with the variables and association of the state.
     * @param stateName The name of the state.
     * @return The created {@link ISymbolicConfiguration} with the given content.
+    * @throws ProofInputException Occurred Exception.
     */
    protected ISymbolicConfiguration createConfigurationFromExecutionVariableValuePairs(ImmutableList<ISymbolicEquivalenceClass> equivalentClasses, 
                                                                                        Set<ExecutionVariableValuePair> pairs,
-                                                                                       String stateName) {
+                                                                                       String stateName) throws ProofInputException {
       SymbolicConfiguration result = new SymbolicConfiguration(equivalentClasses);
       // Create state
       SymbolicState state = new SymbolicState(stateName);
@@ -1246,7 +1249,8 @@ public class SymbolicConfigurationExtractor {
          Term valueTerm = pair.getValue();
          AbstractSymbolicAssociationValueContainer container;
          if (parent != null) {
-            container = objects.get(parent);
+            ISymbolicEquivalenceClass equivalentClass = findEquivalentClass(equivalentClasses, parent);
+            container = objects.get(equivalentClass != null ? equivalentClass.getRepresentative() : parent);
          }
          else {
             if (pair.isStateMember() || !objectsToIgnore.contains(valueTerm)) {
@@ -1273,7 +1277,18 @@ public class SymbolicConfigurationExtractor {
                else {
                   association = new SymbolicAssociation(pair.getProgramVariable(), target);
                }
-               container.addAssociation(association);
+               // Add association only if not already present
+               ISymbolicAssociation existingAssociation = container.getAssociation(association.getProgramVariable(), association.isArrayIndex(), association.getArrayIndex());
+               if (existingAssociation == null) {
+                  // Add association to the container
+                  container.addAssociation(association);
+               }
+               else {
+                  // Make sure that target is the same
+                  if (!JavaUtil.equals(association.getTarget(), existingAssociation.getTarget())) {
+                     throw new ProofInputException("Multiple association targets found: " + association + " and " + existingAssociation + ".");
+                  }
+               }
             }
             else {
                SymbolicValue value;
@@ -1283,7 +1298,18 @@ public class SymbolicConfigurationExtractor {
                else {
                   value = new SymbolicValue(getServices(), pair.getProgramVariable(), valueTerm);
                }
-               container.addValue(value);
+               // Add value only if not already present
+               ISymbolicValue existingValue = container.getValue(value.getProgramVariable(), value.isArrayIndex(), value.getArrayIndex());
+               if (existingValue == null) {
+                  // Add value to the container
+                  container.addValue(value);
+               }
+               else {
+                  // Make sure that the value is the same
+                  if (!JavaUtil.equals(value.getValue(), existingValue.getValue())) {
+                     throw new ProofInputException("Multiple values found: " + value + " and " + existingValue + ".");
+                  }
+               }
             }
          }
       }
