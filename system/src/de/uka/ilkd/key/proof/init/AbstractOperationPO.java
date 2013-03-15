@@ -39,6 +39,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SymbolicExecutionLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -91,12 +92,18 @@ public abstract class AbstractOperationPO extends AbstractPO {
    private boolean addUninterpretedPredicate;
 
    /**
+    * If this is {@code true} the {@link SymbolicExecutionLabel} will be added
+    * to the initial modality which is proven.
+    */
+   private boolean addSymbolicExecutionLabel;
+   
+   /**
     * Constructor.
     * @param initConfig The {@link InitConfig} to use.
     * @param name The name to use.
     */
    public AbstractOperationPO(InitConfig initConfig, String name) {
-      this(initConfig, name, false);
+      this(initConfig, name, false, false);
    }
 
    /**
@@ -104,12 +111,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @param initConfig The {@link InitConfig} to use.
     * @param name he name to use.
     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
+    * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionLabel} to the modality, {@code false} to not label the modality.
     */
    public AbstractOperationPO(InitConfig initConfig, 
                               String name, 
-                              boolean addUninterpretedPredicate) {
+                              boolean addUninterpretedPredicate,
+                              boolean addSymbolicExecutionLabel) {
       super(initConfig, name);
       this.addUninterpretedPredicate = addUninterpretedPredicate;
+      this.addSymbolicExecutionLabel = addSymbolicExecutionLabel;
    }
 
    /**
@@ -385,6 +395,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
    }
    
    /**
+    * Checks if the modality is labeled with the {@link SymbolicExecutionLabel}.
+    * @return {@code true} modality is labled, {@code false} modality is not labled.
+    */
+   public boolean isAddSymbolicExecutionLabel() {
+      return addSymbolicExecutionLabel;
+   }
+
+   /**
     * Returns the name used for the uninterpreted predicate.
     * @return The name of the uninterpreted predicate.
     */
@@ -457,7 +475,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
       final JavaBlock jb = buildJavaBlock(formalParamVars, selfVar, resultVar, exceptionVar, atPreVars.keySet().contains(getSavedHeap()), sb);
 
       // create program term
-      final Term programTerm = TB.prog(getTerminationMarker(), jb, postTerm);
+      Term programTerm = TB.prog(getTerminationMarker(), jb, postTerm);
+      
+      // label modality if required 
+      if (addSymbolicExecutionLabel) {
+         programTerm = TB.label(programTerm, SymbolicExecutionLabel.INSTANCE);
+      }
 
       // create update
       Term update = buildUpdate(paramVars, formalParamVars, atPreVars);
@@ -577,6 +600,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
        if (isAddUninterpretedPredicate()) {
            properties.setProperty("addUninterpretedPredicate", isAddUninterpretedPredicate() + "");
        }
+       if (isAddSymbolicExecutionLabel()) {
+          properties.setProperty("addSymbolicExecutionLabel", isAddSymbolicExecutionLabel() + "");
+       }
    }
    
    /**
@@ -586,6 +612,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
     */
    protected static boolean isAddUninterpretedPredicate(Properties properties) {
       String value = properties.getProperty("addUninterpretedPredicate"); 
+      return value != null && !value.isEmpty() ? Boolean.valueOf(value) : false;
+   }
+   
+   /**
+    * Checks if the "addSymbolicExecutionLabel" value is set in the given {@link Properties}.
+    * @param properties The {@link Properties} to read value from.
+    * @return {@code true} is set, {@code false} is not set.
+    */
+   protected static boolean isAddSymbolicExecutionLabel(Properties properties) {
+      String value = properties.getProperty("addSymbolicExecutionLabel"); 
       return value != null && !value.isEmpty() ? Boolean.valueOf(value) : false;
    }
 }

@@ -267,6 +267,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                             settings.getPrecondition(), 
                                             start, 
                                             end,
+                                            true,
                                             true);
        }
        else if (settings.isUseExistingContract()) {
@@ -281,7 +282,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
           }
           // Instantiate proof obligation
           if (contract instanceof FunctionalOperationContract) {
-             input = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract, true);
+             input = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract, true, true);
           }
           else {
               throw new CoreException(LogUtil.getLogger().createErrorStatus("Contract of class \"" + contract.getClass().getCanonicalName() + "\" are not supported."));
@@ -292,6 +293,7 @@ public class KeYLaunchConfigurationDelegate extends LaunchConfigurationDelegate 
                                       computeProofObligationName(pm, null, null), 
                                       pm, 
                                       settings.getPrecondition(), 
+                                      true,
                                       true);
        }
        return input;

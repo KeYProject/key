@@ -8,10 +8,11 @@ import de.uka.ilkd.key.logic.UnknownLabelException;
 public class RuleLabelFactory extends LabelFactory {
 
     public static ITermLabel createLabel(String name) throws UnknownLabelException {
-        switch (name) {
-            case "*" : return TermLabelWildcard.WILDCARD;            
-            default:
-                return LabelFactory.createLabel(name);
+        if ("*".equals(name)) {
+            return TermLabelWildcard.WILDCARD;
+        }
+        else {
+            return LabelFactory.createLabel(name);
         }
     }    
 

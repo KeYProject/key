@@ -7,12 +7,12 @@ package de.uka.ilkd.key.logic;
  * label factory in package rule.label
  */
 public class LabelFactory {
-
-    public static ITermLabel createLabel(String name) throws UnknownLabelException {
-        switch (name) {
-            case "SE" : return SymbolicExecutionLabel.INSTANCE;            
-        }
-        throw new UnknownLabelException(name);
-    }
-
+   public static ITermLabel createLabel(String name) throws UnknownLabelException {
+      if ("SE".equals(name)) {
+         return SymbolicExecutionLabel.INSTANCE;
+      }
+      else {
+         throw new UnknownLabelException(name);
+      }
+   }
 }
