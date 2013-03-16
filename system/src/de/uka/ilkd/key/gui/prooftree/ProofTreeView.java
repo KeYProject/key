@@ -76,8 +76,11 @@ public class ProofTreeView extends JPanel {
     private GUITreeSelectionListener treeSelectionListener;
     private GUIProofTreeGUIListener guiListener;
 
-    /** KeYStroke for the search panel */
-    private final static KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
+    /** KeYStroke for the search panel: STRG+SHIFT+F */
+    public final static KeyStroke searchKeyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_F,
+            java.awt.event.InputEvent.CTRL_DOWN_MASK
+            | java.awt.event.InputEvent.SHIFT_DOWN_MASK
+            | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
 
     private ConfigChangeListener configChangeListener =  new ConfigChangeListener() {
                                             public void configChanged(ConfigChangeEvent e) {

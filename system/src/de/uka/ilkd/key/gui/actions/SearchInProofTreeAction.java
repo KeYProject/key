@@ -14,9 +14,11 @@ public class SearchInProofTreeAction extends MainWindowAction {
         super(mainWindow);
         setName("Search in proof tree");
         setTooltip("Search for rule names or node numbers in the proof tree.");
-        this.setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F,
-                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        
+        this.setAcceleratorKey(
+                de.uka.ilkd.key.gui.prooftree.ProofTreeView.searchKeyStroke);
         getMediator().enableWhenProofLoaded(this);
+        
     }
 
     @Override

@@ -5,6 +5,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.KeyStroke;
 
 import de.uka.ilkd.key.gui.MainWindow;
+import java.awt.Toolkit;
 
 /*
  * Menu option, to show the sequent search bar.
@@ -16,7 +17,9 @@ public class SearchInSequentAction extends MainWindowAction {
         super(mainWindow);
         setName("Search in sequent view");
         setTooltip("Search for strings in the current sequent.");
-        this.setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F3, 0));
+        // Key combination for this action: STRG+F.
+        this.setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F,
+                Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         getMediator().enableWhenProofLoaded(this);
     }
 
