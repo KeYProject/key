@@ -62,12 +62,15 @@ public class ProofObligationVars {
     public final Term heapAtPost;
 
     public final Term mbyAtPre;
+    
+    public final boolean local;
 
     ProofObligationVars(IProgramMethod pm,
                         KeYJavaType kjt, // contract.getKJT()
                         Services services,
-                        boolean withHeapAtPre) {
-        this(pm, kjt, "", services, withHeapAtPre);
+                        boolean withHeapAtPre,
+                        boolean local) {
+        this(pm, kjt, "", services, withHeapAtPre, local);
     }
 
 
@@ -86,7 +89,8 @@ public class ProofObligationVars {
                                Term heapAtPost,
                                Term mbyAtPre,
                                String postfix,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this.postfix = postfix;
 
         this.self = self;
@@ -103,22 +107,23 @@ public class ProofObligationVars {
         this.heapAtPre = heapAtPre;
         this.heapAtPost = heapAtPost;
         this.mbyAtPre = mbyAtPre;
-        
+        this.local = local;
+
         ImmutableList<Term> terms =
                 ImmutableSLList.<Term>nil();
+        terms = appendIfNotNull(terms, heap);
         terms = appendIfNotNull(terms, self);
         terms = appendIfNotNull(terms, selfAtPost);
         terms = appendIfNotNull(terms, guard);
-        terms = terms.append(localIns);
-        terms = appendIfNotNull(terms, heap);
-        terms = appendIfNotNull(terms, heapAtPre);
         terms = appendIfNotNull(terms, guardAtPost);
+        terms = terms.append(localIns);
         terms = terms.append(localOuts);
+        terms = appendIfNotNull(terms, heapAtPre);
+        terms = appendIfNotNull(terms, heapAtPost);        
         terms = appendIfNotNull(terms, result);
         terms = appendIfNotNull(terms, resultAtPost);
         terms = appendIfNotNull(terms, exception);
-        terms = appendIfNotNull(terms, exceptionAtPost);
-        terms = appendIfNotNull(terms, heapAtPost);
+        terms = appendIfNotNull(terms, exceptionAtPost);        
         terms = appendIfNotNull(terms, mbyAtPre);
         termList = terms;
 
@@ -128,15 +133,15 @@ public class ProofObligationVars {
         allTerms = allTerms.append(self);
         allTerms = allTerms.append(selfAtPost);
         allTerms = allTerms.append(guard);
-        allTerms = allTerms.append(localIns);
-        allTerms = allTerms.append(heapAtPre);
         allTerms = allTerms.append(guardAtPost);
+        allTerms = allTerms.append(localIns);
         allTerms = allTerms.append(localOuts);
+        allTerms = allTerms.append(heapAtPre);
+        allTerms = allTerms.append(heapAtPost);
         allTerms = allTerms.append(result);
         allTerms = allTerms.append(resultAtPost);
         allTerms = allTerms.append(exception);
-        allTerms = allTerms.append(exceptionAtPost);
-        allTerms = allTerms.append(heapAtPost);
+        allTerms = allTerms.append(exceptionAtPost);        
         allTerms = allTerms.append(mbyAtPre);
         paddedTermList = allTerms;
 
@@ -146,18 +151,18 @@ public class ProofObligationVars {
         allTermsButLocalVars = allTermsButLocalVars.append(self);
         allTermsButLocalVars = allTermsButLocalVars.append(selfAtPost);
         allTermsButLocalVars = allTermsButLocalVars.append(guard);
+        allTermsButLocalVars = allTermsButLocalVars.append(guardAtPost);        
         allTermsButLocalVars = allTermsButLocalVars.append(heapAtPre);
-        allTermsButLocalVars = allTermsButLocalVars.append(guardAtPost);
+        allTermsButLocalVars = allTermsButLocalVars.append(heapAtPost);
         allTermsButLocalVars = allTermsButLocalVars.append(result);
         allTermsButLocalVars = allTermsButLocalVars.append(resultAtPost);
         allTermsButLocalVars = allTermsButLocalVars.append(exception);
-        allTermsButLocalVars = allTermsButLocalVars.append(exceptionAtPost);
-        allTermsButLocalVars = allTermsButLocalVars.append(heapAtPost);
+        allTermsButLocalVars = allTermsButLocalVars.append(exceptionAtPost);        
         allTermsButLocalVars = allTermsButLocalVars.append(mbyAtPre);
         paddedTermListWithoutLocalVars = allTermsButLocalVars;
     }
-    
-    
+
+
     public ProofObligationVars(Term self,
                                Term selfAtPost,
                                ImmutableList<Term> localIns,
@@ -171,10 +176,11 @@ public class ProofObligationVars {
                                Term heapAtPost,
                                Term mbyAtPre,
                                String postfix,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this(self, selfAtPost, null, localIns, null, localOuts, result, resultAtPost,
              exception, exceptionAtPost, heap, heapAtPre, heapAtPost, mbyAtPre,
-             postfix, services);
+             postfix, services, local);
     }
     
 
@@ -196,9 +202,10 @@ public class ProofObligationVars {
                                Term baseHeap,
                                Term heapAtPre,
                                Term heapAtPost,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this(self, null, localIns, localOuts, result, null, exception, null,
-             baseHeap, heapAtPre, heapAtPost, null, "", services);
+             baseHeap, heapAtPre, heapAtPost, null, "", services, local);
     }
     
     public ProofObligationVars(Term self,
@@ -207,9 +214,10 @@ public class ProofObligationVars {
                                Term heap,
                                Term guardAtPost,
                                ImmutableList<Term> localOuts,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this(self, guard, localIns, heap, guardAtPost, localOuts,
-             null, null, null, null, null, services);
+             null, null, null, null, null, services, local);
     }
     
     public ProofObligationVars(Term self,
@@ -217,9 +225,10 @@ public class ProofObligationVars {
                                ImmutableList<Term> localIns,
                                Term heap,
                                ImmutableList<Term> localOuts,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this(self, null, guard, localIns, heap, null, localOuts,
-                null, null, null, null, null, services);
+                null, null, null, null, null, services, local);
     }
 
     public ProofObligationVars(Term self,
@@ -229,9 +238,10 @@ public class ProofObligationVars {
                                Term heap,
                                Term guardAtPost,
                                ImmutableList<Term> localOuts,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this(self, selfAtPost, guard, localIns, heap, guardAtPost, localOuts,
-                null, null, null, null, null, services);
+                null, null, null, null, null, services, local);
     }
 
     public ProofObligationVars(Term self,
@@ -245,10 +255,11 @@ public class ProofObligationVars {
                                Term exception,
                                Term exceptionAtPost,
                                Term heapAtPost,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this(self, null, guard, localIns, guardAtPost,
              localOuts, result, resultAtPost, exception, exceptionAtPost, heap,
-             null, heapAtPost, null, "", services);
+             null, heapAtPost, null, "", services, local);
     }
 
     public ProofObligationVars(Term self,
@@ -263,10 +274,11 @@ public class ProofObligationVars {
                                Term exception,
                                Term exceptionAtPost,
                                Term heapAtPost,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this(self, selfAtPost, guard, localIns, guardAtPost, localOuts, result,
                 resultAtPost, exception, exceptionAtPost, heap, null,
-                heapAtPost, null, "", services);
+                heapAtPost, null, "", services, local);
     }
    /* public ProofObligationVars(Term self,
                                Term guard,
@@ -330,10 +342,11 @@ public class ProofObligationVars {
                                Term exception,
                                Term exceptionAtPost,
                                Term heapAtPost,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this(self, null, localIns, localOuts, result, resultAtPost,
              exception, exceptionAtPost,
-             heap, null, heapAtPost, null, "", services);
+             heap, null, heapAtPost, null, "", services, local);
     }
     
     public ProofObligationVars(Term self,
@@ -343,10 +356,11 @@ public class ProofObligationVars {
                                Term guardAtPost,
                                ImmutableList<Term> localOuts,                               
                                Term heapAtPost,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this(self, null, guard, localIns, guardAtPost, localOuts,
              null, null, null, null, heap, null, heapAtPost,
-             null, "", services);
+             null, "", services, local);
     }
 
     public ProofObligationVars(Term self,
@@ -357,10 +371,11 @@ public class ProofObligationVars {
                                Term guardAtPost,
                                ImmutableList<Term> localOuts,                               
                                Term heapAtPost,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this(self, selfAtPost, guard, localIns, guardAtPost, localOuts,
                 null, null, null, null, heap, null, heapAtPost,
-                null, "", services);
+                null, "", services, local);
     }
 
     /*public ProofObligationVars(Term self,
@@ -389,9 +404,10 @@ public class ProofObligationVars {
                                Term heap,
                                ImmutableList<Term> localOuts,                               
                                Term heapAtPost,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this(self, localIns, heap, localOuts, null,
-             null, null, null, heapAtPost, services);
+             null, null, null, heapAtPost, services, local);
     }
 
 
@@ -400,9 +416,10 @@ public class ProofObligationVars {
                                Term result,
                                Term exception,
                                Term heap,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this(self, null, params, ImmutableSLList.<Term>nil(), result, null,
-             exception, null, heap, null, null, null, "", services);
+             exception, null, heap, null, null, null, "", services, local);
     }
     
     
@@ -410,9 +427,10 @@ public class ProofObligationVars {
                                ImmutableList<Term> localIns,
                                ImmutableList<Term> localOuts,
                                Term heap,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this(self, null, localIns, localOuts, null, null,
-                null, null, heap, null, null, null, "", services);
+                null, null, heap, null, null, null, "", services, local);
     }
 
 
@@ -422,15 +440,17 @@ public class ProofObligationVars {
                                Term result,
                                Term exception,
                                Term heap,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this(self, null, localIns, localOuts, result, null,
-             exception, null, heap, null, null, null, "", services);
+             exception, null, heap, null, null, null, "", services, local);
     }
 
 
     public ProofObligationVars(ProofObligationVars orig,
                                String postfix,
-                               Services services) {
+                               Services services,
+                               boolean local) {
         this(copyLocationVariable(orig.self, postfix, services),
              copyLocationVariable(orig.selfAtPost, postfix, services),
              copyLocationVariable(orig.guard, postfix, services),
@@ -445,8 +465,7 @@ public class ProofObligationVars {
              copyLocationVariable(orig.heapAtPre, postfix, services),
              copyLocationVariable(orig.heapAtPost, postfix, services),
              newFunction(orig.mbyAtPre, postfix, services),
-             postfix,
-             services);
+             postfix, services, local);
     }
 
 
@@ -528,7 +547,8 @@ public class ProofObligationVars {
                         KeYJavaType kjt,
                         String postfix,
                         Services services,
-                        boolean withHeapAtPre) {
+                        boolean withHeapAtPre,
+                        boolean local) {
         this(buildSelfVar(services, pm, kjt, postfix),
              buildSelfAtPostVar(services, pm, kjt, postfix),
              buildParamVars(services, postfix, pm),
@@ -541,8 +561,7 @@ public class ProofObligationVars {
              withHeapAtPre ? buildHeapAtPreVar(postfix, services) : null,
              buildHeapAtPostVar(postfix, services),
              buildMbyVar(postfix, services),
-             postfix,
-             services);
+             postfix, services, local);
     }
 
 
@@ -582,6 +601,23 @@ public class ProofObligationVars {
         return paramVars;
     }
 
+    private static ImmutableList<Term> buildLocalIns(Services services,
+                                                     String postfix,
+                                                     IProgramMethod pm) {
+        ImmutableList<Term> paramVars =
+                TB.var(TB.paramVars(services, "_Before" + postfix, pm, true));
+        register(ops(paramVars, ProgramVariable.class), services);
+        return paramVars;
+    }
+
+    private static ImmutableList<Term> buildLocalOuts(Services services,
+                                                      String postfix,
+                                                      IProgramMethod pm) {
+        ImmutableList<Term> paramVars =
+                TB.var(TB.paramVars(services, "_After" + postfix, pm, true));
+        register(ops(paramVars, ProgramVariable.class), services);
+        return paramVars;
+    }
 
     private static Term buildResultVar(IProgramMethod pm,
                                        Services services,

@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  * and a modality.
  */
 public interface FunctionalOperationContract extends OperationContract {
-    
+
     /**
      * Returns the modality of the contract.
      */

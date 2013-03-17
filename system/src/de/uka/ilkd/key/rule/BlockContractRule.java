@@ -205,9 +205,9 @@ public class BlockContractRule implements BuiltInRule {
             // generate information flow contract application predicate
             // and associated taclet
             final Term contractApplTerm =
-                    ifContractBuilder.buildContractApplPredTerm();
+                    ifContractBuilder.buildContractApplPredTerm(true);
             Taclet informationFlowContractApp =
-                    ifContractBuilder.buildContractApplTaclet();
+                    ifContractBuilder.buildContractApplTaclet(true);
 
             // set infFlowAssumptions
             Term infFlowAssumptions = TB.and(heapAtPostEq, contractApplTerm);
@@ -222,9 +222,9 @@ public class BlockContractRule implements BuiltInRule {
                                             MiscTools.toTermList(localOutVariables),
                                             vars.result, ifContractBuilder.getResultPost(),
                                             vars.exception, ifContractBuilder.getExceptionAtPost(),
-                                            heapAtPost, services);
+                                            heapAtPost, services, true);
             final IFProofObligationVars ifVars =
-                    new IFProofObligationVars(instantiationVars, services);
+                    new IFProofObligationVars(instantiationVars, services, true);
             application.update(ifVars, instantiation.context);
 
             // create proof obligation

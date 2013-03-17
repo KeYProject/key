@@ -125,8 +125,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     protected StatementBlock buildOperationBlock(ImmutableList<LocationVariable> formalParVars,
                                                  ProgramVariable selfVar,
                                                  ProgramVariable resultVar) {
-       final ImmutableArray<Expression> formalArray = new ImmutableArray<Expression>(formalParVars.toArray(
-             new ProgramVariable[formalParVars.size()]));
+       final ImmutableArray<Expression> formalArray =
+               new ImmutableArray<Expression>(formalParVars.toArray(
+                       new ProgramVariable[formalParVars.size()]));
 
        if (getContract().getTarget().isConstructor()) {
             assert selfVar != null;
@@ -200,7 +201,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                           Services services) {
        return contract.getPre(modHeaps, selfVar, paramVars, atPreVars, services);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -211,9 +212,10 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                            ProgramVariable exceptionVar, 
                            Map<LocationVariable, LocationVariable> atPreVars, 
                            Services services) {
-       return contract.getPost(modHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars, services);
+       return contract.getPost(modHeaps, selfVar, paramVars, resultVar,
+                               exceptionVar, atPreVars, services);
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -267,7 +269,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                                Map<LocationVariable,LocationVariable> atPreVars) {
        Term update = null;
        for(LocationVariable heap : atPreVars.keySet()) {
-          final Term u = TB.elementary(services, atPreVars.get(heap), heap == getSavedHeap() ? TB.getBaseHeap(services) : TB.var(heap));
+          final Term u =
+                  TB.elementary(services, atPreVars.get(heap),
+                                heap == getSavedHeap() ? TB.getBaseHeap(services) : TB.var(heap));
           if(update == null) {
              update = u;
           }else{
@@ -356,7 +360,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * @return The instantiated proof obligation.
      * @throws IOException Occurred Exception.
      */
-    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties) throws IOException {
+    public static LoadedPOContainer loadFrom(InitConfig initConfig, Properties properties)
+            throws IOException {
        String contractName = properties.getProperty("contract");
        int proofNum = 0;
        String baseContractName = null;
@@ -375,7 +380,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
        else {
           baseContractName = contractName.substring(0, ind);
        }
-       final Contract contract = initConfig.getServices().getSpecificationRepository().getContractByName(baseContractName);
+       final Contract contract = initConfig.getServices().getSpecificationRepository()
+               .getContractByName(baseContractName);
        if (contract == null) {
           throw new RuntimeException("Contract not found: " + baseContractName);
        }
@@ -383,9 +389,12 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
           ProofOblInput po;
           if (isAddUninterpretedPredicate(properties)) {
              if (!(contract instanceof FunctionalOperationContract)) {
-                throw new IOException("Found contract \"" + contract + "\" is no FunctionalOperationContract.");
+                throw new IOException("Found contract \"" + contract +
+                                      "\" is no FunctionalOperationContract.");
              }
-             po = new FunctionalOperationContractPO(initConfig, (FunctionalOperationContract)contract, true);
+             po = new FunctionalOperationContractPO(initConfig,
+                                                    (FunctionalOperationContract)contract,
+                                                    true);
           }
           else {
              po = contract.createProofObl(initConfig);

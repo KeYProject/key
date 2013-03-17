@@ -100,13 +100,13 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
 
     public void setException(Term exceptionVar) {
         this.exceptionVar = exceptionVar;
-        this.exceptionVarAtPost = buildAtPostVar(exceptionVar, services);
+        //this.exceptionVarAtPost = buildAtPostVar(exceptionVar, services);
     }
 
 
     // TODO: add exception var
-    public Term buildContractApplPredTerm() {
-        ProofObligationVars appData = getProofObligationVars();
+    public Term buildContractApplPredTerm(boolean local) {
+        ProofObligationVars appData = getProofObligationVars(local);
         Term contractApplPredTerm = getContractApplPred(appData);
         for (Term update : contextUpdates) {
             contractApplPredTerm = apply(update, contractApplPredTerm);
@@ -116,9 +116,9 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
 
 
     // TODO: add exception var
-    public Taclet buildContractApplTaclet() {
-        ProofObligationVars appData = getProofObligationVars();
-        return genInfFlowContractApplTaclet(appData, services);
+    public Taclet buildContractApplTaclet(boolean local) {
+        ProofObligationVars appData = getProofObligationVars(local);
+        return genInfFlowContractApplTaclet(appData, services, local);
     }
 
 
@@ -133,11 +133,11 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
                                      Services services);
 
 
-    private ProofObligationVars getProofObligationVars() {
+    private ProofObligationVars getProofObligationVars(boolean local) {
         return new ProofObligationVars(contractSelf, contractSelfAtPost, loopGuard, localIns,
                                        heapAtPre, loopGuardAtPost, localOuts, contractResult,
                                        contractResultAtPost, exceptionVar, exceptionVarAtPost,
-                                       heapAtPost, services);
+                                       heapAtPost, services, local);
     }
 
 
@@ -146,7 +146,8 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
 
     ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
                                                    ProofObligationVars appData,
-                                                   Services services) {
+                                                   Services services,
+                                                   boolean local) {
         Term selfSV =
                 createTermSV(appData.self, schemaPrefix, services);
         Term selfAtPostSV =
@@ -178,20 +179,21 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         return new ProofObligationVars(selfSV, selfAtPostSV, guardSV, localInSVs,
                                        guardAtPostSV, localOutSVs, resSV, resAtPostSV, excSV,
                                        excAtPostSV, heapSV, heapAtPreSV,
-                                       heapAtPostSV, mbyAtPreSV, "", services);
+                                       heapAtPostSV, mbyAtPreSV, "", services, local);
     }
 
 
     private Taclet genInfFlowContractApplTaclet(ProofObligationVars appData,
-                                                Services services) {
+                                                Services services,
+                                                boolean local) {
         Name tacletName = generateName();
 
         // generate schemaFind and schemaAssumes terms
         ProofObligationVars schemaDataFind = generateApplicationDataSVs(
-                "find_", appData, services);
+                "find_", appData, services, local);
         Term schemaFind = generateSchemaFind(schemaDataFind, services);
         ProofObligationVars schemaDataAssumes = generateApplicationDataSVs(
-                "assumes_", appData, services);
+                "assumes_", appData, services, local);
         Term schemaAssumes = generateSchemaAssumes(schemaDataAssumes, services);
 
         // generate post term

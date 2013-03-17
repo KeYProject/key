@@ -8,7 +8,6 @@ public class BasicFreeInvSnippet implements FactoryMethod {
     @Override
     public Term produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
-        // TODO Auto-generated method stub
         BasicPOSnippetFactory f =
                 POSnippetFactory.getBasicFactory(d, poVars);
         

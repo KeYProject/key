@@ -152,23 +152,17 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                                            ? vs1.localOuts.size() : 0) +*/
                                    (vs1.guardAtPost != null ? 1 : 0)];
         for (int i = 0; i < respects1.first.length; i++) {
-            //if ((i == 0)) {
+            if ((d.origVars.local || i != 1)) {
                 eqAtLocs[i] = d.tb.equals(respects1.first[i], respects2.first[i]);
-            /*} else {
+            } else {
                 eqAtLocs[i] = d.tb.tt();
-            }*/
+            }
         }
         for (int i = 0; i < respects1.third.length; i++) {
             eqAtLocs[i + respects1.first.length] =
                     d.tb.equals(respects1.third[i], respects2.third[i]);
         }
-        /*Iterator<Term> it = vs2.localOuts.iterator();
-        int j = 0;
-        for(Term out: vs1.localOuts) {
-            eqAtLocs[j + respects1.first.length + respects1.third.length] =
-                    d.tb.equals(out, it.next());
-            j++;
-        }*/
+
         if (vs1.guardAtPost != null) {
             eqAtLocs[respects1.first.length + respects1.third.length]
                              = d.tb.equals(vs1.guardAtPost, vs2.guardAtPost);

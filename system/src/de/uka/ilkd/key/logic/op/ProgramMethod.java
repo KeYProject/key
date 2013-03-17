@@ -326,8 +326,9 @@ public final class ProgramMethod extends ObserverFunction
     */
    @Override
    public String getFullName() {
-    	return getMethodDeclaration().getFullName();
-    }
+    	return getMethodDeclaration().getFullName() +
+    	        "_" + Math.abs(getMethodDeclaration().hashCode());
+    } // Included HasCode to make IF-Predicates unique
 
     /* (non-Javadoc)
     * @see de.uka.ilkd.key.logic.op.IProgramMethod#getName()

@@ -52,15 +52,16 @@ public class InfFlowContractPO extends AbstractOperationPO
         // generate proof obligation variables
         IProgramMethod pm = contract.getTarget();
         symbExecVars =
-                new ProofObligationVars(pm, contract.getKJT(), services, false);
+                new ProofObligationVars(pm, contract.getKJT(), services,
+                                        false, contract == null);
         assert (symbExecVars.self == null) == (pm.isStatic());
-        ifVars = new IFProofObligationVars(symbExecVars, services);
+        ifVars = new IFProofObligationVars(symbExecVars, services, contract == null);
     }
 
 
     @Override
     public void readProblem() throws ProofInputException {
-        // create proof obligation        
+        // create proof obligation
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
                                                    ifVars.c2, services);
@@ -77,13 +78,19 @@ public class InfFlowContractPO extends AbstractOperationPO
         final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
         final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
         for (final Taclet t : splitPostTaclets) {
-            taclets = taclets.add(NoPosTacletApp.createFixedNoPosTacletApp(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, services));
+            taclets = taclets.add(NoPosTacletApp
+                    .createFixedNoPosTacletApp(t,
+                                               SVInstantiations.EMPTY_SVINSTANTIATIONS,
+                                               services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
         }
         final RemovePostTacletBuilder tb = new RemovePostTacletBuilder();
         final ArrayList<Taclet> removePostTaclets = tb.generateTaclets(post);
         for (final Taclet t : removePostTaclets) {
-            taclets = taclets.add(NoPosTacletApp.createFixedNoPosTacletApp(t, SVInstantiations.EMPTY_SVINSTANTIATIONS, services));
+            taclets = taclets.add(NoPosTacletApp
+                    .createFixedNoPosTacletApp(t,
+                                               SVInstantiations.EMPTY_SVINSTANTIATIONS,
+                                               services));
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
         }
     }
@@ -356,9 +363,9 @@ public class InfFlowContractPO extends AbstractOperationPO
 
 
         public IFProofObligationVars(ProofObligationVars symbExecVars,
-                                     Services services) {
-            this(new ProofObligationVars(symbExecVars, "_A", services),
-                 new ProofObligationVars(symbExecVars, "_B", services),
+                                     Services services, boolean local) {
+            this(new ProofObligationVars(symbExecVars, "_A", services, local),
+                 new ProofObligationVars(symbExecVars, "_B", services, local),
                  symbExecVars);
         }
 

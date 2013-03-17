@@ -81,12 +81,12 @@ final class TermImpl implements Term {
 	    freeVars = freeVars.union(subFreeVars);	   
 	}
     }
-    
-    
+
+
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
-    
+
     /**
      * Checks whether the Term is valid on the top level. If this is
      * the case this method returns the Term unmodified. Otherwise a
@@ -94,8 +94,8 @@ final class TermImpl implements Term {
      */
     public Term checked() {
     	if(op().validTopLevel(this)) {
-	    return this;	    
-	} else {	   	    
+	    return this;
+	} else {
 	    throw new TermCreationException(op(), this);
 	}
     }    

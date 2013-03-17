@@ -127,7 +127,7 @@ class BasicSnippetData {
         origVars =
                 new ProofObligationVars(contract.getSelf(),
                                         contract.getParams(), contract.getResult(),
-                                        contract.getExc(), heap, services);
+                                        contract.getExc(), heap, services, false);
 
     }
     
@@ -155,10 +155,8 @@ class BasicSnippetData {
         origVars =
                 new ProofObligationVars(invariant.getInternalSelfTerm(),
                                         invariant.getGuard(),
-                                        localInTerms,
-                                        heap,
-                                        localOutTerms,
-                                        services);
+                                        localInTerms, heap, localOutTerms,
+                                        services, true);
     }
     
     
@@ -188,7 +186,7 @@ class BasicSnippetData {
         origVars =
                 new ProofObligationVars(contract.getSelf(),
                                         contract.getParams(), contract.getResult(),
-                                        contract.getExc(), heap, services);
+                                        contract.getExc(), heap, services, false);
 
     }
 
@@ -222,7 +220,7 @@ class BasicSnippetData {
         origVars =
                 new ProofObligationVars(vars.self, localInTerms, localOutTerms,
                                         vars.result, vars.exception, heapTerm,
-                                        services);
+                                        services, true);
     }
 
 

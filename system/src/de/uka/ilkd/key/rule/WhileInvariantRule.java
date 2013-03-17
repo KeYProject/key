@@ -333,10 +333,11 @@ public final class WhileInvariantRule implements BuiltInRule {
                                         infFlowData.guardAtPost,
                                         infFlowData.newOuts,
                                         infFlowData.heapAtPost,
-                                        infFlowData.services);
-        
+                                        infFlowData.services,
+                                        true);
+
         final IFProofObligationVars ifVars =
-                new IFProofObligationVars(instantiationVars, infFlowData.services);
+                new IFProofObligationVars(instantiationVars, infFlowData.services, true);
         ((LoopInvariantBuiltInRuleApp) ruleApp).setInformationFlowProofObligationVars(ifVars);
 
         // create proof obligation
@@ -635,8 +636,6 @@ public final class WhileInvariantRule implements BuiltInRule {
               }
         }
 
-        
-
         //prepare common assumption
         final Term[] uAnon 
         = new Term[]{inst.u, anonUpdate};
@@ -651,11 +650,11 @@ public final class WhileInvariantRule implements BuiltInRule {
         = TB.applySequential(uAnon, TB.and(new Term[]{invTerm, 
                 reachableOut, 
                 variantNonNeg}));
-        
+
         /*Term postAssumption 
         =  TB.applySequential(new Term[]{inst.u, beforeLoopUpdate}, 
                 TB.and(anonAssumption,TB.apply(anonUpdate, uAnonInv)));*/
-        
+
         final WhileInvRule wir
         = (WhileInvRule) AbstractTermTransformer.WHILE_INV_RULE;
         SVInstantiations svInst
@@ -746,9 +745,9 @@ public final class WhileInvariantRule implements BuiltInRule {
             // generate information flow invariant application predicate
             // and associated taclet
             final Term loopInvApplPredTerm =
-                    ifInvariantBuilder.buildContractApplPredTerm();
+                    ifInvariantBuilder.buildContractApplPredTerm(true);
             final Taclet informationFlowInvariantApp =
-                    ifInvariantBuilder.buildContractApplTaclet();
+                    ifInvariantBuilder.buildContractApplTaclet(true);
 
             infFlowData = new InfFlowData(heapAtPre, heapAtPost, baseHeap, services,
                                           inst.selfTerm, selfAtPost,

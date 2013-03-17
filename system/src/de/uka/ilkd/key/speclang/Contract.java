@@ -28,27 +28,27 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
  * A contractual agreement about an ObserverFunction.
  */
 public interface Contract extends SpecificationElement {
-    
+
     public static final int INVALID_ID = Integer.MIN_VALUE;
-        
-    
+
+
     /**
      * Returns the id number of the contract. If a contract has instances for
      * several methods (inheritance!), all instances have the same id.
      * The id is either non-negative or equal to INVALID_ID.
      */
     public int id();
-    
+
     /**
      * Returns the contracted function symbol.
      */
     public IObserverFunction getTarget();
-        
+
     /**
      * Tells whether the contract contains a measured_by clause.
      */
     public boolean hasMby();
-    
+
     /**
      * Returns the precondition of the contract.
      */
@@ -63,7 +63,7 @@ public interface Contract extends SpecificationElement {
 	    	       ImmutableList<ProgramVariable> paramVars,
                        Map<LocationVariable,? extends ProgramVariable> atPreVars,
 	    	       Services services);
-    
+
     /**
      * Returns the precondition of the contract.
      */
@@ -80,15 +80,15 @@ public interface Contract extends SpecificationElement {
 	    	       ImmutableList<Term> paramTerms,
                        Map<LocationVariable,Term> atPres,
 	    	       Services services);    
-    
-    
+
+
     /**
      * Returns the measured_by clause of the contract.
      */
     public Term getMby(ProgramVariable selfVar,
 	               ImmutableList<ProgramVariable> paramVars,
 	               Services services);    
-        
+
     /**
      * Returns the measured_by clause of the contract.
      */
@@ -96,12 +96,12 @@ public interface Contract extends SpecificationElement {
 	               Term selfTerm,
 	               ImmutableList<Term> paramTerms,
 	               Services services);
-    
+
     /**
      * Returns the contract in pretty HTML format.
      */
     public String getHTMLText(Services services);
-    
+
     /**
      * Tells whether, on saving a proof where this contract is available, the
      * contract should be saved too. (this is currently true for contracts
@@ -116,38 +116,38 @@ public interface Contract extends SpecificationElement {
      * Precondition: toBeSaved() must be true.
      */
     public String proofToString(Services services);
-    
-    
+
+
     /**
      * Returns a proof obligation to the passed contract and initConfig.
      */
     public ProofOblInput createProofObl(InitConfig initConfig);
-    
-    
+
+
     /**
      * Lookup the proof obligation belonging to the contract in the
      * specification repository.
      */
     public ProofOblInput getProofObl(Services services);
 
-    
+
     /**
      * Returns a contract which is identical this contract except that
      * the id is set to the new id.
      */
     public Contract setID(int newId);
-    
-    
+
+
     /**
      * Returns a contract which is identical to this contract except that
      * the KeYJavaType and IObserverFunction are set to the new values.
      */
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM);
-    
-    
+
+   
     /**
      * Returns technical name for the contract type.
      */
     public String getTypeName();
-    
+
 }

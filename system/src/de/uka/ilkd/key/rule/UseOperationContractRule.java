@@ -785,17 +785,16 @@ public final class UseOperationContractRule implements BuiltInRule {
             ifContractBuilder.setHeapAtPost(heapAtPost);
             ifContractBuilder.setSelf(contractSelf);
             ifContractBuilder.setLocalIns(contractParams);
-            ifContractBuilder.setLocalOuts(contractParams);
+            ifContractBuilder.setLocalOuts(ImmutableSLList.<Term>nil());
             ifContractBuilder.setResult(contractResult);
             ifContractBuilder.setException(TB.var(excVar));
-            
 
             // generate information flow contract application predicate
             // and associated taclet
             Term contractApplPredTerm =
-                    ifContractBuilder.buildContractApplPredTerm();
+                    ifContractBuilder.buildContractApplPredTerm(false);
             Taclet informationFlowContractApp =
-                    ifContractBuilder.buildContractApplTaclet();
+                    ifContractBuilder.buildContractApplTaclet(false);
 
             // add term and taclet to post goal
             postGoal.addFormula(new SequentFormula(contractApplPredTerm),
@@ -805,8 +804,6 @@ public final class UseOperationContractRule implements BuiltInRule {
                                SVInstantiations.EMPTY_SVINSTANTIATIONS, true);
         }
 
-
-        
         //create "Exceptional Post" branch
         final StatementBlock excPostSB 
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
@@ -870,7 +867,7 @@ public final class UseOperationContractRule implements BuiltInRule {
      * Store pre- / poststate of the method invocation and generate information
      * flow taclet.
      *//*
-    // TODO: add exception var
+    // add exception var
     private Term storePrePostInPredAndGenInfoFlowTaclet(final FunctionalOperationContract contract,
                                                         final Instantiation inst,
                                                         final AnonUpdateData anonUpdateData,
