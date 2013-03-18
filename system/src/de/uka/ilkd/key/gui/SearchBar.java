@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.gui;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -11,6 +13,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -21,9 +27,9 @@ import javax.swing.event.DocumentListener;
 public abstract class SearchBar extends JPanel {
 
     public JTextField searchField = new JTextField(20);
-    private JButton prev = new JButton("Prev");
-    private JButton next = new JButton("Next");
-    private JButton close = new JButton("Close");
+    private JButton prev = new JButton("\u2190");
+    private JButton next = new JButton("\u2192");
+    private JButton close = new JButton("\u00d7");
     private final Color ALLERT_COLOR = new Color(255, 178, 178);
 
     public SearchBar() {
@@ -77,10 +83,25 @@ public abstract class SearchBar extends JPanel {
             }
         });
         
-        // set the tooltips
-        prev.setToolTipText("Jump to next match.");
-        next.setToolTipText("Jump to previous match.");
-        close.setToolTipText("Close this search bar.");
+        // prepare search buttons
+        
+        Font font = prev.getFont().deriveFont(20.0f);
+        prev.setFont(font);
+        next.setFont(font);
+        close.setFont(font);
+        
+        prev.setToolTipText("Jump to previous match");
+        next.setToolTipText("Jump to next match");
+        close.setToolTipText("Close search bar");
+        
+        Insets insets = new Insets(0, 4, 0, 4);
+        Border border = new CompoundBorder(
+                new LineBorder(Color.GRAY, 1),
+                new EmptyBorder(insets));
+        
+        prev.setBorder(border);
+        next.setBorder(border);
+        close.setBorder(border);
 
         createUI();
         setVisible(false);

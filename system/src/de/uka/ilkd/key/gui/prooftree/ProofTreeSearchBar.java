@@ -49,10 +49,10 @@ class ProofTreeSearchBar
     private synchronized boolean search(String searchString, 
             Position.Bias direction) {
         if (searchString.equals("")) {
-                startRow = 0;
+            startRow = 0;
         }
         currentRow = getNextMatch(searchString,
-            startRow, direction);
+                startRow, direction);
         GUIAbstractTreeNode node = null;
         TreePath tp = null;
         if (currentRow != -1) {
