@@ -1,15 +1,20 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 package de.uka.ilkd.key.gui.prooftree;
 
 
+import java.lang.ref.WeakReference;
 import java.util.Enumeration;
 import java.util.LinkedList;
 
@@ -21,13 +26,18 @@ import de.uka.ilkd.key.proof.Node;
 public abstract class GUIAbstractTreeNode implements TreeNode {
 
     private GUIProofTreeModel tree;
-    
+
+    // made weak otherwise there are leaks in ExpansionState.map 
+    // and ProofTreeView.delegateView.lastPathComponent 
+    private WeakReference<Node> noderef;
+
     protected GUIProofTreeModel getProofTreeModel () {
 	return tree;
     }
 
-    public GUIAbstractTreeNode ( GUIProofTreeModel tree ) {
+    public GUIAbstractTreeNode (GUIProofTreeModel tree, Node node) {
 	this.tree = tree;
+	this.noderef = new WeakReference<Node>(node);
     }
 
     public abstract TreeNode getChildAt(int childIndex);
@@ -35,9 +45,10 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
     public abstract int getChildCount();
 
     public abstract TreeNode getParent();
-    
+
     public abstract boolean isLeaf();
 
+    public abstract void flushCache();
 
     public int getIndex(TreeNode node) {
 	for ( int i=0; i<getChildCount(); i++ ) {
@@ -100,7 +111,9 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
 	
     }
     
-    public abstract Node getNode();
+    public Node getNode() {
+        return noderef.get();
+    }
 
     protected Node findChild (Node n) {
         if ( n.childrenCount () == 1 ) return n.child ( 0 );
@@ -117,6 +130,6 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
         }
     
         return nextN;
-    }    
+    }
 }
 

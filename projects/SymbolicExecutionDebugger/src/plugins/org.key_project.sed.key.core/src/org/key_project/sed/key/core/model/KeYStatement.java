@@ -124,9 +124,9 @@ public class KeYStatement extends AbstractSEDStatement implements IKeYSEDDebugNo
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
+   public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = KeYModelUtil.getSourceName(executionNode.getActivePositionInfo());
+         sourceName = KeYModelUtil.getSourcePath(executionNode.getActivePositionInfo());
       }
       return sourceName;
    }
