@@ -40,7 +40,7 @@ public class TacletButton extends JLabel
             activatedColor = customRed;
             deactivatedColor = customRedLight;
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            this.setToolTipText("Display applied rule information for Inner Nodes.");
+            this.setToolTipText("Show taclet information.");
         }
 
         setForeground(textColor);

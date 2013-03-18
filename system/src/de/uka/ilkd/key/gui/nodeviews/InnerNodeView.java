@@ -183,9 +183,6 @@ public class InnerNodeView extends SequentView {
         RuleApp app = node.getAppliedRuleApp();
         if (app != null) {
             highlightRuleAppPosition(app);
-        } else {
-            // no rule app	 
-            setCaretPosition(0);
         }
         
     }
@@ -320,7 +317,6 @@ public class InnerNodeView extends SequentView {
 		highlightIfInsts ( (IBuiltInRuleApp)app );	 		
 	    }
 
-	    if ( r != null ) makeRangeVisible ( r );	 
 	} catch(BadLocationException badLocation) {	 
 	    System.err.println("NonGoalInfoView tried to "	 
 			       +"highlight an area "	 
@@ -329,46 +325,6 @@ public class InnerNodeView extends SequentView {
 	}	 
     }	 
  	 
-    
-    /**	 
-     * Ensure that the given range is visible	 
-     */	 
-    private void makeRangeVisible (final Range r) {	 
-	setCaretPosition ( r.start () );	 
-	final Runnable safeScroller = new Runnable () {	 
-		public void run () {	 
-		    try {	 
-			final TextUI ui = getUI ();
-			if(ui == null)
-			    return;
-			final InnerNodeView innerNodeView = InnerNodeView.this;
-                        final Rectangle rect = ui.modelToView(innerNodeView, r.start());
-                        if (rect == null) {
-                            return;
-                        }
-                        rect.add(ui.modelToView(innerNodeView, r.end()));
-
-			for ( int i = 4; i >= 0; --i ) {	 
-			    final Rectangle rect2 = new Rectangle ( rect );	 
-			    final int border = i * 30;	 
-			    rect2.add ( rect.getMinX () - border,	 
-					rect.getMinY () - border );	 
-			    rect2.add ( rect.getMaxX () + border,	 
-					rect.getMaxY () + border );	 
-			    scrollRectToVisible ( rect2 );	 
-			}	 
-		    } catch ( BadLocationException badLocation ) {	 
-			System.err.println("NonGoalInfoView tried to "	 
-					   +"make an area visible "	 
-					   +"that does not exist.");	 
-			System.err.println("Exception:"+badLocation);	 
-		    }	 
-		}	 
-	    };	 
-	SwingUtilities.invokeLater ( safeScroller );	 
-    }
- 	 
-    
     /**	 
      * @param tapp The taclet app for which the if formulae	 
      * should be highlighted.	 
@@ -386,21 +342,17 @@ public class InnerNodeView extends SequentView {
                             PosInTerm.TOP_LEVEL,
                             inst.inAntec());
             final Range r = highlightPos(pos, IF_FORMULA_HIGHLIGHTER);
-            makeRangeVisible(r);
         }
     }	 
-    
     
     private void highlightIfInsts(IBuiltInRuleApp bapp) 
     		throws BadLocationException {
 	final ImmutableList<PosInOccurrence> ifs = bapp.ifInsts();
 	for(PosInOccurrence pio : ifs) {
 	    final Range r = highlightPos ( pio, IF_FORMULA_HIGHLIGHTER );	 
-	    makeRangeVisible ( r );	 
 	}	 
     }	 
     
- 	 
     /**	 
      * @param pos   the PosInOccurrence that should be highlighted.	 
      * @param light the painter for the highlight.	 
