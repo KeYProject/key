@@ -22,7 +22,7 @@ public class TacletButton extends JLabel
 
     private static char turnstile = '\u22A2';
     private boolean isActivated = false;
-    private boolean isTransparent = false;
+    public boolean isTransparent = false;
     Color textColor, activatedColor, deactivatedColor;
 
     public void setTransparent(boolean b) {

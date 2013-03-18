@@ -15,12 +15,9 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
-import java.awt.Rectangle;
 import java.util.Iterator;
 
 import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
-import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter;

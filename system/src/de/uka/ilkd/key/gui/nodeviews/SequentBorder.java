@@ -15,6 +15,8 @@ import javax.swing.border.AbstractBorder;
 
 public class SequentBorder extends AbstractBorder {
 
+    private static Color darkBorder = new Color(100, 10, 50);
+    
     private int thickness = 1;
     String title;
     TacletButton tacletButton;
@@ -50,11 +52,22 @@ public class SequentBorder extends AbstractBorder {
         height -= insets.top + insets.bottom / 2 + offsetY;
         width -= insets.left / 2 + insets.right / 2;
 
-        int titleHorizontalPaddings = 10;
+        int titleHorizontalPaddings = 14;
         int indentLeft = 35;
         g2d.setColor(Color.black);
         g2d.drawString(title, x + indentLeft + titleHorizontalPaddings,
                 y + fm.getHeight() / 3);
+
+        if (!tacletButton.isTransparent) {
+            g2d.setColor(new Color(140, 170, 120));
+        }else{
+            g2d.setColor(darkBorder);
+        }
+        g2d.drawRect(
+                x + titleHorizontalPaddings / 2 + indentLeft,
+                insets.top,
+                fm.stringWidth(title) + titleHorizontalPaddings,
+                fm.getHeight()+2);
 
         polylineIndex = 0;
 
@@ -75,7 +88,7 @@ public class SequentBorder extends AbstractBorder {
                 - indentLeft;
         addPoint(x, y);
 
-        g2d.setColor(new Color(100,10,50));
+        g2d.setColor(darkBorder);
         g2d.setStroke(new BasicStroke(thickness));
         g2d.drawPolyline(polylineX, polylineY, polylineX.length);
 
