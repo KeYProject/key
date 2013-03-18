@@ -341,13 +341,13 @@ public class InnerNodeView extends SequentView {
 			final TextUI ui = getUI ();
 			if(ui == null)
 			    return;
-			final InnerNodeView t = InnerNodeView.this;	 
-			final Rectangle rect = ui.modelToView ( t, r.start () );
-                        if(rect==null){
-                            throw new Error("Nullpointer: Rectangle rect");
+			final InnerNodeView innerNodeView = InnerNodeView.this;
+                        final Rectangle rect = ui.modelToView(innerNodeView, r.start());
+                        if (rect == null) {
+                            return;
                         }
-			rect.add ( ui.modelToView ( t, r.end () ) );	 
- 	 
+                        rect.add(ui.modelToView(innerNodeView, r.end()));
+
 			for ( int i = 4; i >= 0; --i ) {	 
 			    final Rectangle rect2 = new Rectangle ( rect );	 
 			    final int border = i * 30;	 
@@ -366,7 +366,7 @@ public class InnerNodeView extends SequentView {
 		}	 
 	    };	 
 	SwingUtilities.invokeLater ( safeScroller );	 
-    }	 
+    }
  	 
     
     /**	 
