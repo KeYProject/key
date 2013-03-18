@@ -54,6 +54,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.SymbolicExecutionLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -998,6 +999,29 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
+    * Checks if the {@link Term} on which the {@link RuleApp} was applied contains the {@link SymbolicExecutionLabel}.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} contains the {@link SymbolicExecutionLabel}, {@code false} does not contain the {@link SymbolicExecutionLabel} or the given {@link RuleApp} is {@code null}.
+    */
+   public static boolean hasSymbolicExecutionLabel(RuleApp ruleApp) {
+      if (ruleApp != null && ruleApp.posInOccurrence() != null) {
+         return hasSymbolicExecutionLabel(ruleApp.posInOccurrence().subTerm());
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Checks if the given {@link Term} contains the {@link SymbolicExecutionLabel}.
+    * @param term The {@link Term} to check.
+    * @return {@code true} contains the {@link SymbolicExecutionLabel}, {@code false} does not contain the {@link SymbolicExecutionLabel} or the given {@link Term} is {@code null}.
+    */
+   public static boolean hasSymbolicExecutionLabel(Term term) {
+      return term != null && term.containsLabel(SymbolicExecutionLabel.INSTANCE);
+   }
+   
+   /**
     * Checks if the given {@link Node} in KeY's proof tree represents
     * also a {@link Node} in a symbolic execution tree.
     * @param node The {@link Node} of KeY's proof tree to check.
@@ -1005,7 +1029,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is also symbolic execution tree node, {@code false} is no node in a symbolic execution tree.
     */
    public static boolean isSymbolicExecutionTreeNode(Node node, RuleApp ruleApp) {
-      if (node != null) {
+      if (node != null && hasSymbolicExecutionLabel(ruleApp)) {
          SourceElement statement = NodeInfo.computeActiveStatement(ruleApp);
          PositionInfo posInfo = statement != null ? statement.getPositionInfo() : null;
          if (isMethodReturnNode(node, ruleApp)) {
