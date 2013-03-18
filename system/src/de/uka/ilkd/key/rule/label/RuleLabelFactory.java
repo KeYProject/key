@@ -20,6 +20,10 @@ public class RuleLabelFactory extends LabelFactory {
     public static ITermLabel createLabelUnion(ITermLabel left, ITermLabel right) throws UnknownLabelException {
         return new TermLabelUnion(left, right);
     }    
+    
+    public static ITermLabel createLabelIntersection(ITermLabel left, ITermLabel right) throws UnknownLabelException {
+       return new TermLabelIntersection(left, right);
+   }    
 
     public static ITermLabel createLabelSubstraction(ITermLabel left, ITermLabel right) throws UnknownLabelException {
         return new TermLabelSubstraction(left, right);

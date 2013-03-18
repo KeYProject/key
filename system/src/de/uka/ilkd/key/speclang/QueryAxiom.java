@@ -222,7 +222,7 @@ public final class QueryAxiom extends ClassAxiom {
 	
 	//create added sequent
 	final Term addedFormula 
-		= TB.label(TB.apply(update, TB.prog(Modality.BOX, jb, post)), TermLabelWildcard.WILDCARD);
+		= TB.label(TB.apply(update, TB.prog(Modality.BOX, jb, post), null), TermLabelWildcard.WILDCARD);
 	final SequentFormula addedCf = new SequentFormula(addedFormula);
 	final Semisequent addedSemiSeq = Semisequent.EMPTY_SEMISEQUENT
 	                                            .insertFirst(addedCf)

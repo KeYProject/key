@@ -112,7 +112,7 @@ public abstract class FindTaclet extends Taclet {
             Term update = UpdateApplication.getUpdate(term);
             matchCond = matchCond
                     .setInstantiations ( matchCond.getInstantiations ().
-                            addUpdate (update) );
+                            addUpdate (update, term.getLabels()) );
             return matchAndIgnoreUpdatePrefix(UpdateApplication.getTarget(term), 
                     template, matchCond, services);       
         } else {

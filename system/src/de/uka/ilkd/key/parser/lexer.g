@@ -165,6 +165,7 @@ tokens {
         BIGINT = "\\bigint";
         
         // term label constructors
+        INTERSECTION = "\\cap";
         UNION = "\\cup";
         DIFF = "\\diff";
         

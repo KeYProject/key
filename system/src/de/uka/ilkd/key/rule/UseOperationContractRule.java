@@ -714,18 +714,16 @@ public final class UseOperationContractRule implements BuiltInRule {
         final Term postAssumption 
         	= TB.applySequential(new Term[]{inst.u, atPreUpdates}, 
         		   	     TB.and(anonAssumption,
-        		   		    TB.apply(anonUpdate,
-        		   	                     TB.and(new Term[]{excNull, 
-                                	     	                       freePost, 
-                                	     	                       post}))));
+        		   		    TB.apply(anonUpdate, TB.and(new Term[]{excNull, 
+                          freePost, 
+                          post}), null)));
         final Term excPostAssumption 
         	= TB.applySequential(new Term[]{inst.u, atPreUpdates}, 
         		   TB.and(anonAssumption,
-                                  TB.apply(anonUpdate,
-                                           TB.and(new Term[]{TB.not(excNull),
-                                	     	             excCreated, 
-                                	     	             freeExcPost, 
-                                	     	             post}))));
+                                  TB.apply(anonUpdate, TB.and(new Term[]{TB.not(excNull),
+                                  excCreated, 
+                                  freeExcPost, 
+                                  post}), null)));
        
         //create "Pre" branch
 	int i = 0;
@@ -763,15 +761,13 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock postSB 
         	= replaceStatement(jb, resultAssign);
         final Term normalPost 
-            	= TB.apply(anonUpdate,
-                           TB.prog(inst.mod,
-                                   JavaBlock.createJavaBlock(postSB),
-                                   inst.progPost.sub(0)));
+            	= TB.apply(anonUpdate, TB.prog(inst.mod,
+        JavaBlock.createJavaBlock(postSB),
+        inst.progPost.sub(0)), null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon), 
         	            true, 
         	            false);
-        postGoal.changeFormula(new SequentFormula(TB.apply(inst.u, 
-        						       normalPost)),
+        postGoal.changeFormula(new SequentFormula(TB.apply(inst.u, normalPost, null)),
         	               ruleApp.posInOccurrence());
         postGoal.addFormula(new SequentFormula(postAssumption), 
         	            true, 
@@ -781,15 +777,13 @@ public final class UseOperationContractRule implements BuiltInRule {
         final StatementBlock excPostSB 
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
         final Term excPost
-            = TB.apply(anonUpdate,
-                       TB.prog(inst.mod,
-                               JavaBlock.createJavaBlock(excPostSB), 
-                               inst.progPost.sub(0)));
+            = TB.apply(anonUpdate, TB.prog(inst.mod,
+       JavaBlock.createJavaBlock(excPostSB), 
+       inst.progPost.sub(0)), null);
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon), 
                 	       true, 
                 	       false);        
-        excPostGoal.changeFormula(new SequentFormula(TB.apply(inst.u, 
-        						          excPost)),
+        excPostGoal.changeFormula(new SequentFormula(TB.apply(inst.u, excPost, null)),
         	                  ruleApp.posInOccurrence());        
         excPostGoal.addFormula(new SequentFormula(excPostAssumption), 
         	               true, 
@@ -800,9 +794,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         if(nullGoal != null) {
             final Term actualSelfNotNull 
             	= TB.not(TB.equals(inst.actualSelf, TB.NULL(services)));
-            nullGoal.changeFormula(new SequentFormula(TB.apply(
-        	    				inst.u, 
-        					actualSelfNotNull)),
+            nullGoal.changeFormula(new SequentFormula(TB.apply(inst.u, actualSelfNotNull, null)),
         	                   ruleApp.posInOccurrence());                    
         }
         

@@ -11,6 +11,17 @@ import de.uka.ilkd.key.logic.Term;
 
 public class TermLabelOperationsInterpreter {
 
+   public static ImmutableArray<ITermLabel> intersection(
+           ImmutableArray<ITermLabel> left, ImmutableArray<ITermLabel> right) {
+       final HashSet<ITermLabel> set = new LinkedHashSet<ITermLabel>();
+       for (ITermLabel r : right) {
+           if (left.contains(r)) {
+              set.add(r);
+           }
+       }
+       return new ImmutableArray<ITermLabel>(set.toArray(new ITermLabel[set.size()]));
+   }
+   
     public static ImmutableArray<ITermLabel> union(
             ImmutableArray<ITermLabel> left, ImmutableArray<ITermLabel> right) {
         final HashSet<ITermLabel> set = new LinkedHashSet<ITermLabel>();

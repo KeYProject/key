@@ -210,7 +210,7 @@ public class QueryExpand implements BuiltInRule {
 
            update = tb.parallel(update, tb.parallel(argUpdates));
 
-           Term topLevel = tb.not(tb.apply(update, methodCall));
+           Term topLevel = tb.not(tb.apply(update, methodCall, null));
 
 
            // The following additional equation increases performance (sometimes significantly, e.g. by factor 10). 

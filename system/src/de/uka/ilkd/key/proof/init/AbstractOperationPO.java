@@ -489,7 +489,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
       // create update
       Term update = buildUpdate(paramVars, formalParamVars, atPreVars);
 
-      return TB.apply(update, programTerm);
+      return TB.apply(update, programTerm, null);
    }
 
    /**

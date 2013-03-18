@@ -45,7 +45,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     private static Term applyUpdateOnRigid(Term update, Term target) {
 	Term[] updatedSubs = new Term[target.arity()];
 	for(int i = 0; i < updatedSubs.length; i++) {
-	    updatedSubs[i] = TB.apply(update, target.sub(i));
+	    updatedSubs[i] = TB.apply(update, target.sub(i), null);
 	}
 	Term result = TB.tf().createTerm(target.op(), 
 				         updatedSubs,

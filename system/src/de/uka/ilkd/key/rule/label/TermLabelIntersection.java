@@ -7,15 +7,15 @@ import de.uka.ilkd.key.logic.label.TermLabelOperationsInterpreter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * A term label which represents the union of term labels of its parameters.  
+ * A term label which represents the intersection of term labels of its parameters.  
  */
-public class TermLabelUnion extends TermLabelOperation {
+public class TermLabelIntersection extends TermLabelOperation {
 
     /**
-     * creates an instance which represents the union of the term labels of its parameters
+     * creates an instance which represents the intersection of the term labels of its parameters
      */
-    TermLabelUnion(ITermLabel left,ITermLabel right) {
-        super("\\cup", new ITermLabel[]{left, right});
+    TermLabelIntersection(ITermLabel left,ITermLabel right) {
+        super("\\cap", new ITermLabel[]{left, right});
     }
 
     @Override
@@ -27,7 +27,7 @@ public class TermLabelUnion extends TermLabelOperation {
         ImmutableArray<ITermLabel> right = getChild(1) instanceof TermLabelOperation ? ((TermLabelOperation) getChild(1))
                 .evaluate(svInst, services) : new ImmutableArray<ITermLabel>(
                 getChild(1));
-        return TermLabelOperationsInterpreter.union(left, right);
+        return TermLabelOperationsInterpreter.intersection(left, right);
     }
         
 }

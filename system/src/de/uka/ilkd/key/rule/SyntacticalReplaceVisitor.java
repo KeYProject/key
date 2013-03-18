@@ -38,12 +38,13 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
@@ -60,6 +61,7 @@ import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.label.TermLabelOperation;
+import de.uka.ilkd.key.rule.label.TermLabelWildcard;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
@@ -395,10 +397,15 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                 Term newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb, labels);
                 pushNew(resolveSubst(newTerm));
             } else {
-                Term t = resolveSubst(visited);
-                if (labels.size() != 0) {
-                    t = TermBuilder.DF.label(t, labels);
+                Term t;
+                if (!visited.hasLabels() && labels.isEmpty()) {
+                   t = visited;
                 }
+                else {
+                   t = TermFactory.DEFAULT.createTerm(visited.op(), visited.subs(), visited.boundVars(), 
+                       visited.javaBlock(), labels);
+                }
+                t = resolveSubst(t);
                 if (t == visited)
                     subStack.push(t);
                 else
@@ -496,7 +503,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
     public void subtreeLeft(Term subtreeRoot){
 	if (subtreeRoot.op() instanceof TermTransformer) {
 	    TermTransformer mop = (TermTransformer) subtreeRoot.op();
-	    pushNew(mop.transform((Term)subStack.pop(),svInst, getServices()));
+	    pushNew(TermBuilder.DF.label(mop.transform((Term)subStack.pop(),svInst, getServices()), instantiateAnnotations(subtreeRoot)));
 	} 
    }
 }

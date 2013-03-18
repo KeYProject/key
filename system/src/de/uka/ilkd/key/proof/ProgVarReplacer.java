@@ -286,7 +286,7 @@ public final class ProgVarReplacer {
         final ProgramVariable pv = (ProgramVariable) t.op();
         Object o = map.get(pv);
         if (o instanceof ProgramVariable) {
-            return TermFactory.DEFAULT.createTerm((ProgramVariable)o);
+            return TermFactory.DEFAULT.createTerm((ProgramVariable)o, t.getLabels());
         } else if (o instanceof Term) {
             return (Term) o;
         }
@@ -323,7 +323,7 @@ public final class ProgVarReplacer {
             result = TermFactory.DEFAULT.createTerm(t.op(),
                     newSubTerms,
                     t.boundVars(),
-                    newJb);
+                    newJb, t.getLabels());
         }
         return result;
     }    

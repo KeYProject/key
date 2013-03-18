@@ -14,8 +14,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -30,7 +28,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -38,15 +35,24 @@ import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.Debug;
 
 
@@ -591,7 +597,7 @@ public abstract class Taclet implements Rule, Named {
 	if (p_matchCond.getInstantiations().getUpdateContext().isEmpty())
 	    updateFormula = p_template;
 	else
-	    updateFormula = TB.applySequential(p_matchCond.getInstantiations()
+	    updateFormula = TB.applyUpdatePairsSequential(p_matchCond.getInstantiations()
 		    .getUpdateContext(), p_template);
 
 	IfFormulaInstantiation cf;
@@ -871,11 +877,13 @@ public abstract class Taclet implements Rule, Named {
 	
         Term instantiatedFormula = syntacticalReplace(schemaFormula.formula(), 
                     services, matchCond);
-        
+                
         if (!svInst.getUpdateContext().isEmpty()) {
-            instantiatedFormula = TB.applySequential(svInst.getUpdateContext(), 
+            instantiatedFormula = TB.applyUpdatePairsSequential(svInst.getUpdateContext(), 
             		           	             instantiatedFormula);         
-	} 
+	     }
+        
+        
 	        
 	return new SequentFormula(instantiatedFormula);
     }

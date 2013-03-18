@@ -59,6 +59,7 @@ import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -836,7 +837,7 @@ public class TermBuilder {
 
 
     public Term sequential(Term u1, Term u2) {
-    return parallel(u1, apply(u1, u2));
+    return parallel(u1, apply(u1, u2, null));
     }
 
 
@@ -863,8 +864,7 @@ public class TermBuilder {
     }
     }
 
-
-    public Term apply(Term update, Term target) {
+    public Term apply(Term update, Term target, ImmutableArray<ITermLabel> labels) {
     if(update.sort() != Sort.UPDATE) {
         throw new TermCreationException("Not an update: " + update);
     } else if(update.op() == UpdateJunctor.SKIP) {
@@ -874,7 +874,8 @@ public class TermBuilder {
         } else {
         return tf.createTerm(UpdateApplication.UPDATE_APPLICATION,
                      update,
-                     target);
+                     target,
+                     labels);
     }
     }
 
@@ -883,14 +884,14 @@ public class TermBuilder {
                             Term loc,
                             Term value,
                             Term target) {
-    return apply(elementary(services, loc, value), target);
+    return apply(elementary(services, loc, value), target, null);
     }
 
 
     public Term applyElementary(Services services,
                             Term heap,
                             Term target) {
-    return apply(elementary(services, heap), target);
+    return apply(elementary(services, heap), target, null);
     }
 
 
@@ -899,19 +900,19 @@ public class TermBuilder {
                             Iterable<Term> targets) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();
         for (Term target : targets) {
-            result = result.append(apply(elementary(services, heap), target));
+            result = result.append(apply(elementary(services, heap), target, null));
         }
     return result;
     }
 
 
     public Term applyParallel(Term[] updates, Term target) {
-    return apply(parallel(updates), target);
+    return apply(parallel(updates), target, null);
     }
 
 
     public Term applyParallel(ImmutableList<Term> updates, Term target) {
-    return apply(parallel(updates), target);
+    return apply(parallel(updates), target, null);
     }
 
 
@@ -919,7 +920,7 @@ public class TermBuilder {
                           Term[] lhss,
                           Term[] values,
                           Term target) {
-    return apply(parallel(services, lhss, values), target);
+    return apply(parallel(services, lhss, values), target, null);
     }
 
 
@@ -931,7 +932,7 @@ public class TermBuilder {
                                             .append(updates)
                                             .tail();
         return apply(updates[0],
-                 applySequential(updateList, target));
+                 applySequential(updateList, target), null);
     }
     }
 
@@ -941,11 +942,18 @@ public class TermBuilder {
         return target;
     } else {
         return apply(updates.head(),
-                 applySequential(updates.tail(), target));
+                 applySequential(updates.tail(), target), null);
     }
     }
 
-
+    public Term applyUpdatePairsSequential(ImmutableList<UpdateLabelPair> updates, Term target) {
+       if(updates.isEmpty()) {
+           return target;
+       } else {
+           return apply(updates.head().getUpdate(),
+                 applyUpdatePairsSequential(updates.tail(), target), updates.head().getUpdateApplicationlabels());
+       }
+       }
 
     //-------------------------------------------------------------------------
     //boolean operators
@@ -1354,7 +1362,7 @@ public class TermBuilder {
     }
     
     public Term label(Term term, ImmutableArray<ITermLabel> labels) {
-        if (labels.size() == 0) {
+        if ((labels == null || labels.isEmpty())) {
             return term;
         } else {
             return TermFactory.DEFAULT.createTerm(term.op(), term.subs(), term.boundVars(), 
@@ -1889,5 +1897,7 @@ public class TermBuilder {
         }
 
     }
+
+
 
 }

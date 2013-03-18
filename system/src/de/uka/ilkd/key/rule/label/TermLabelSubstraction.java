@@ -16,7 +16,7 @@ public class TermLabelSubstraction extends TermLabelOperation {
      * creates an instance which represents the set difference of the termlabels of its parameters
      */
     TermLabelSubstraction(ITermLabel left, ITermLabel right) {
-        super("\\sub", new ITermLabel[]{left, right});
+        super("\\diff", new ITermLabel[]{left, right});
     }
 
     @Override

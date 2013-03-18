@@ -2950,6 +2950,15 @@ single_label returns [ITermLabel label=null]
   	label = RuleLabelFactory.createLabelUnion(left, right);
     }
   | 
+   (INTERSECTION LPAREN left = single_label COMMA right=single_label RPAREN)
+    {
+        if (!inSchemaMode()) {
+                new KeYSemanticException
+                        ("Term constructors can only be used by rules.", getFilename(), getLine(), getColumn());
+        }
+        label = RuleLabelFactory.createLabelIntersection(left, right);
+    }
+  | 
    (DIFF LPAREN left = single_label COMMA right=single_label RPAREN)
     {
         if (!inSchemaMode()) {

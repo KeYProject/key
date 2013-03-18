@@ -182,7 +182,7 @@ public final class RewriteTaclet extends FindTaclet {
                 return null;
                 } else {
                 Term update = UpdateApplication.getUpdate(t);
-                svi = svi.addUpdate ( update );
+                svi = svi.addUpdate(update, t.getLabels());
                 }
 
             } else if (op instanceof Modality || op instanceof ModalOperatorSV) {
@@ -245,7 +245,8 @@ public final class RewriteTaclet extends FindTaclet {
 	    return TermFactory.DEFAULT.createTerm(term.op(), 
 	            				  subs, 
 	            				  term.boundVars(), 
-	            				  term.javaBlock());
+	            				  term.javaBlock(),
+	            				  term.getLabels());
 	} 
                                       
 	with = syntacticalReplace(with, services, mc);   

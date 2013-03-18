@@ -279,7 +279,7 @@ public class TacletGenerator {
         final Term replaced = or.replace(term);
         final Term update = TB.elementary(services, TB.var(heapSV));
 
-        return TB.apply(update, replaced);
+        return TB.apply(update, replaced, null);
     }
 
 

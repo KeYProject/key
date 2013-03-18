@@ -717,7 +717,7 @@ public class BlockContractRule implements BuiltInRule {
         public void setUpPreconditionGoal(final Goal goal, final Term update, final Term[] preconditions)
         {
             goal.setBranchLabel("Precondition");
-            goal.changeFormula(new SequentFormula(TB.apply(update, TB.and(preconditions))), occurrence);
+            goal.changeFormula(new SequentFormula(TB.apply(update, TB.and(preconditions), null)), occurrence);
         }
 
         public void setUpUsageGoal(final Goal goal, final Term[] updates, final Term[] assumptions)

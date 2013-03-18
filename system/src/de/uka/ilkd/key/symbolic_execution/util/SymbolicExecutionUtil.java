@@ -1447,16 +1447,16 @@ public final class SymbolicExecutionUtil {
             ImmutableList<Term> newSuccedents = ImmutableSLList.nil();
             // Apply updates on antecedents and add result to new antecedents list
             for (Term a : antecedents) {
-               newAntecedents = newAntecedents.append(TermBuilder.DF.applySequential(app.instantiations().getUpdateContext(), a));
+               newAntecedents = newAntecedents.append(TermBuilder.DF.applyUpdatePairsSequential(app.instantiations().getUpdateContext(), a));
             }
             // Apply updates on succedents and add result to new succedents list
             for (Term suc : succedents) {
-               newSuccedents = newSuccedents.append(TermBuilder.DF.applySequential(app.instantiations().getUpdateContext(), suc));
+               newSuccedents = newSuccedents.append(TermBuilder.DF.applyUpdatePairsSequential(app.instantiations().getUpdateContext(), suc));
             }
             // Add additional equivalenz term to antecedent with the replace object which must be equal to the find term 
             Term replaceTerm = (Term)goalTemplate.replaceWithExpressionAsObject();
             replaceTerm = TermBuilder.DF.equals(replaceTerm, ((PosTacletApp)app).posInOccurrence().subTerm());
-            replaceTerm = TermBuilder.DF.applySequential(app.instantiations().getUpdateContext(), replaceTerm);
+            replaceTerm = TermBuilder.DF.applyUpdatePairsSequential(app.instantiations().getUpdateContext(), replaceTerm);
             newAntecedents = newAntecedents.append(replaceTerm);
             // Replace old with new lists
             antecedents = newAntecedents;
@@ -1476,7 +1476,7 @@ public final class SymbolicExecutionUtil {
          // Simplify branch condition if required
          if (simplify) {
             // Append update context because otherwise the formula is evaluated in wrong state
-            result = TermBuilder.DF.applySequential(instantiations.getUpdateContext(), leftAndRight);
+            result = TermBuilder.DF.applyUpdatePairsSequential(instantiations.getUpdateContext(), leftAndRight);
             // Execute simplification
             result = SymbolicExecutionUtil.simplify(node.proof(), result);
          }

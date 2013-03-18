@@ -61,8 +61,8 @@ public class TestDropEffectlessElementary extends TestCase {
             Term t0 = TacletForTests.parseTerm("{i := i+1}0").sub(0);
             Term t1 = TacletForTests.parseTerm("{i := i}0").sub(0);
             Term t2 = TacletForTests.parseTerm("i=0");
-            Term t3 = df.apply(t0, t1);
-            term = df.apply(t3, t2);
+            Term t3 = df.apply(t0, t1, null);
+            term = df.apply(t3, t2, null);
         }
         assertEquals("{{i:=i + 1}i:=i}(i = 0)", 
                 LogicPrinter.quickPrintTerm(term, TacletForTests.services).trim());

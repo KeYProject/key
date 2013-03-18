@@ -162,7 +162,7 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
             result = TermBuilder.DF.parallel(result, euw.createIfElseTerm(phi, services));
         }
         
-        result = TermBuilder.DF.apply(result, t);
+        result = TermBuilder.DF.apply(result, t, null);
         return result;
     }
     

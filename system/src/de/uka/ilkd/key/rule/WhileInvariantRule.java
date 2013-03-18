@@ -400,9 +400,8 @@ public final class WhileInvariantRule implements BuiltInRule {
 	//"Invariant Initially Valid":
 	// \replacewith (==> inv );
 	initGoal.changeFormula(new SequentFormula(
-		                 TB.apply(inst.u, 
-		                         TB.and(variantNonNeg, 
-		                             TB.and(invTerm, reachableState)))),
+		                 TB.apply(inst.u, TB.and(variantNonNeg, 
+                       TB.and(invTerm, reachableState)), null)),
 			         ruleApp.posInOccurrence());
 
 	//"Body Preserves Invariant":

@@ -183,8 +183,8 @@ public class JoinProcessor implements Runnable{
     }
     
     private Term buildIfElseTerm(){
-         Term thenTerm = TermBuilder.DF.apply(partner.getUpdate(0),partner.getCommonFormula());
-         Term elseTerm = TermBuilder.DF.apply(partner.getUpdate(1),partner.getCommonFormula());
+         Term thenTerm = TermBuilder.DF.apply(partner.getUpdate(0), partner.getCommonFormula(), null);
+         Term elseTerm = TermBuilder.DF.apply(partner.getUpdate(1), partner.getCommonFormula(), null);
          
          return TermBuilder.DF.ife(partner.getCommonPredicate(), thenTerm,elseTerm);
         
