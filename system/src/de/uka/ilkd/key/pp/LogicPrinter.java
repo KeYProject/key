@@ -947,7 +947,16 @@ public final class LogicPrinter {
      *
      * @param t the Term to be printed */
     public void printTermContinuingBlock(Term t) throws IOException {
-        notationInfo.getNotation(t.op(), services).printContinuingBlock(t,this);
+       if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+           layouter.print("(");
+       }
+       notationInfo.getNotation(t.op(), services).printContinuingBlock(t,this);
+       if(t.hasLabels() && notationInfo.getNotation(t.op(), services).getPriority() < NotationInfo.PRIORITY_ATOM) {
+           layouter.print(")");
+       }
+       if (t.hasLabels()) {
+          printLabels(t);
+       }
     }
 
 
