@@ -63,7 +63,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputAdapter;
@@ -119,7 +118,6 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SMTSettings;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -138,7 +136,6 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
 import de.uka.ilkd.key.gui.nodeviews.SequentSearchBar;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
-import javax.swing.BorderFactory;
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
@@ -549,11 +546,6 @@ public final class MainWindow extends JFrame  {
     private void createViews() {
 	goalView = new JScrollPane();
 	paintGoalView(new EmptySequent());
-
-//	proofView = new JPanel();
-//        proofView.setLayout(new BorderLayout(0,0));
-       
-//	paintEmptyViewComponent(proofView, "Proof");
 
 	openGoalsView = new JScrollPane();
 	GuiUtilities.paintEmptyViewComponent(openGoalsView, "Open Goals");
@@ -990,12 +982,7 @@ public final class MainWindow extends JFrame  {
     
     public ProofTreeView getProofView(){
         return proofTreeView;
-    }
-    
-    public LeafNodeView getSequentView(){
-    	return leafNodeView;
-    }
-    
+    }    
     
     /**
      * Sets the content of the current goal view. Do not use this method from outside, take method
@@ -1003,15 +990,12 @@ public final class MainWindow extends JFrame  {
      */
     private void paintGoalView(SequentView sv) {
         sequentView = sv;
-        String borderTitle = sequentView.getTitle();
         JViewport vp = goalView.getViewport();
         if (vp != null) {
             vp.removeAll();
         }
         goalView.setViewportView(sequentView);
-//        goalView.setBorder(new TitledBorder(borderTitle));
         goalView.setBackground(sequentView.getBackground());
-        goalView.validate();
         validate();
     }
     
@@ -1201,7 +1185,7 @@ public final class MainWindow extends JFrame  {
         }
 
         Goal goal = getMediator().getSelectedGoal();
-        final SequentView sequentView;
+        final SequentView sequentViewLocal;
         if (goal != null && !goal.node().isClosed()) {
             SequentPrintFilter filter = new IdentitySequentPrintFilter(goal.sequent());
             final LogicPrinter printer = new LogicPrinter(new ProgramPrinter(null),
@@ -1210,21 +1194,21 @@ public final class MainWindow extends JFrame  {
 
             leafNodeView.setPrinter(printer, filter, null);
             leafNodeView.printSequent();
-            sequentView = leafNodeView;
+            sequentViewLocal = leafNodeView;
         } else {
             InnerNodeView innerNodeView =
                     new InnerNodeView(getMediator().getSelectedNode(),
                     getMediator());
-            sequentView = innerNodeView;
+            sequentViewLocal = innerNodeView;
         }
-        sequentSearchBar.setSequentView(sequentView);
+        sequentSearchBar.setSequentView(sequentViewLocal);
 
         if (SwingUtilities.isEventDispatchThread()) {
-            paintGoalView(sequentView);
+            paintGoalView(sequentViewLocal);
         } else {
             Runnable sequentUpdater = new Runnable() {
                 public void run() {
-                    paintGoalView(sequentView);
+                    paintGoalView(sequentViewLocal);
                 }
             };
             SwingUtilities.invokeLater(sequentUpdater);

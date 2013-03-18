@@ -18,6 +18,8 @@ import javax.swing.text.Highlighter;
  * Parent class of LeafNodeView and InnerNodeView.
  */
 public abstract class SequentView extends JTextArea {
+    
+    public static final Color BACKGROUND_COLOR = new Color(249, 249, 249);
 
     // all known highlights
     private HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight =
@@ -29,6 +31,7 @@ public abstract class SequentView extends JTextArea {
         setEditable(false);
         border = new SequentBorder(this);
         setBorder(border);
+        setBackground(BACKGROUND_COLOR);
     }
 
     /**

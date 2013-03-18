@@ -62,8 +62,6 @@ public class LeafNodeView extends SequentView implements Autoscroll {
 
     public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
 
-    public static final Color BACKGROUND_COLOR = new Color(249, 249, 249);
-
     // the used sequentprinter
     public LogicPrinter printer;
     
@@ -116,8 +114,6 @@ public class LeafNodeView extends SequentView implements Autoscroll {
      */
     public LeafNodeView(KeYMediator mediator) {
 	setMediator(mediator);
-        // set background color
-        setBackground(BACKGROUND_COLOR);
 	// disables selection
 	setSelectionColor(getBackground());
 	// sets the painter for the highlightning
