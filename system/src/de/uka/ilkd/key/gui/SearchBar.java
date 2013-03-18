@@ -18,7 +18,7 @@ import javax.swing.event.DocumentListener;
  * Abstract parent class of SequentSearchBar and ProofTreeSearchPanel.
  * Might be used for additional search bars.
  */
-public abstract class SearchPanel extends JPanel {
+public abstract class SearchBar extends JPanel {
 
     public JTextField searchField = new JTextField(20);
     private JButton prev = new JButton("Prev");
@@ -26,7 +26,7 @@ public abstract class SearchPanel extends JPanel {
     private JButton close = new JButton("Close");
     private final Color ALLERT_COLOR = new Color(255, 178, 178);
 
-    public SearchPanel() {
+    public SearchBar() {
 
         // Initialize the Actionlisteners here:
 
@@ -76,6 +76,11 @@ public abstract class SearchPanel extends JPanel {
                 search();
             }
         });
+        
+        // set the tooltips
+        prev.setToolTipText("Jump to next match.");
+        next.setToolTipText("Jump to previous match.");
+        close.setToolTipText("Close this search bar.");
 
         createUI();
         setVisible(false);

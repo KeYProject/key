@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.gui.SearchPanel;
+import de.uka.ilkd.key.gui.SearchBar;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.util.Pair;
 import java.awt.Color;
@@ -17,7 +17,7 @@ import javax.swing.JCheckBox;
  * Search bar implementing search function for SequentView.
  */
 
-public class SequentSearchBar extends SearchPanel {
+public class SequentSearchBar extends SearchBar {
 
     public static final Color SEARCH_HIGHLIGHT_COLOR_1 =
             new Color(255, 140, 0, 178);

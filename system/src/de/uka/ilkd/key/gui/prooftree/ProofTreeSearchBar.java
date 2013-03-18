@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.gui.prooftree;
 
-import de.uka.ilkd.key.gui.SearchPanel;
+import de.uka.ilkd.key.gui.SearchBar;
 import java.util.Vector;
 
 import javax.swing.event.DocumentEvent;
@@ -9,14 +9,14 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.text.Position;
 import javax.swing.tree.TreePath;
 
-class ProofTreeSearchPanel
-        extends SearchPanel implements TreeModelListener {
+class ProofTreeSearchBar
+        extends SearchBar implements TreeModelListener {
 
     private final ProofTreeView proofTreeView;
     private int startRow = 0;
     private int currentRow = 0;
 
-    public ProofTreeSearchPanel(ProofTreeView proofTreeView) {
+    public ProofTreeSearchBar(ProofTreeView proofTreeView) {
         this.proofTreeView = proofTreeView;
     }
 

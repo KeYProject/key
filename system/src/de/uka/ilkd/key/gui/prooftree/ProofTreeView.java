@@ -95,7 +95,7 @@ public class ProofTreeView extends JPanel {
     private HashSet<Node>    modifiedSubtreesCache = null;
     
     /** the search dialog */
-    private ProofTreeSearchPanel proofTreeSearchPanel;
+    private ProofTreeSearchBar proofTreeSearchPanel;
 
     /** creates a new proof tree */
     public ProofTreeView (KeYMediator mediator) {
@@ -172,7 +172,7 @@ public class ProofTreeView extends JPanel {
 
 	this.setLayout(new BorderLayout());
 	this.add(new JScrollPane(delegateView), BorderLayout.CENTER);
-	this.proofTreeSearchPanel = new ProofTreeSearchPanel(this);
+	this.proofTreeSearchPanel = new ProofTreeSearchBar(this);
 	this.add(proofTreeSearchPanel, BorderLayout.SOUTH);	
 	
 	layoutKeYComponent();	
