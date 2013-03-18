@@ -1,12 +1,15 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import de.uka.ilkd.key.gui.SequentBorder;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.util.Debug;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.util.HashMap;
+import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
@@ -19,25 +22,21 @@ import javax.swing.text.Highlighter;
 public abstract class SequentView extends JTextArea {
 
     public static final Color BACKGROUND_COLOR = new Color(249, 249, 249);
-
     // all known highlights
     private HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight =
             new HashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
-    SequentBorder border;
 
     SequentView() {
-        setEditable(false);
-        border = new SequentBorder(this);
-        setBorder(border);
-        setBackground(BACKGROUND_COLOR);
         
+        setEditable(false);
+        setBackground(BACKGROUND_COLOR);
         Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
         if (myFont != null) {
             setFont(myFont);
         } else {
             Debug.out("KEY_FONT_CURRENT_GOAL_VIEW not available. Use standard font.");
         }
-        
+
     }
 
     /**

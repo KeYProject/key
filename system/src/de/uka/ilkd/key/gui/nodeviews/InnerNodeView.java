@@ -15,13 +15,11 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Rectangle;
 import java.util.Iterator;
 
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
@@ -32,7 +30,6 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.SequentBorder;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeAdapter;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
@@ -64,11 +61,6 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
-import de.uka.ilkd.key.util.Debug;
-import java.awt.Cursor;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 
 
 public class InnerNodeView extends SequentView {
@@ -172,7 +164,6 @@ public class InnerNodeView extends SequentView {
         }else{
             setText(sequentOnly);
         }
-        setBorder(new SequentBorder(this));
     }
     
     public InnerNodeView(Node node, KeYMediator mediator) {
@@ -196,10 +187,6 @@ public class InnerNodeView extends SequentView {
             // no rule app	 
             setCaretPosition(0);
         }
-
-        InnerNodeMouseListener innerNodeMouseListener = new InnerNodeMouseListener();
-        addMouseMotionListener(innerNodeMouseListener);
-        addMouseListener(innerNodeMouseListener);
         
     }
 
@@ -356,6 +343,9 @@ public class InnerNodeView extends SequentView {
 			    return;
 			final InnerNodeView t = InnerNodeView.this;	 
 			final Rectangle rect = ui.modelToView ( t, r.start () );
+                        if(rect==null){
+                            throw new Error("Nullpointer: Rectangle rect");
+                        }
 			rect.add ( ui.modelToView ( t, r.end () ) );	 
  	 
 			for ( int i = 4; i >= 0; --i ) {	 
@@ -428,50 +418,6 @@ public class InnerNodeView extends SequentView {
     
     public String getTitle() {
         return "Inner Node";
-    }
-    
-    private class InnerNodeMouseListener
-            implements MouseMotionListener, MouseListener {
-
-        public void mouseDragged(MouseEvent me) {
-        }
-        
-        private Cursor linkCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
-        private Cursor defaultCursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
-        private boolean isHandCursor = false; // only change cursor when necessary
-
-        public void mouseMoved(MouseEvent me) {
-            if (me.getX() >= border.xForHighLight
-                    && me.getY() <= border.yForHighLight) {
-                if (!isHandCursor) {
-                    isHandCursor = true;
-                    setCursor(linkCursor);
-                }
-            } else {
-                if (isHandCursor) {
-                    isHandCursor = false;
-                    setCursor(defaultCursor);
-                }
-            }
-        }
-
-        public void mouseClicked(MouseEvent me) {
-            if (isHandCursor && SwingUtilities.isLeftMouseButton(me)) {
-                toggleText();
-            }
-        }
-
-        public void mousePressed(MouseEvent me) {
-        }
-
-        public void mouseReleased(MouseEvent me) {
-        }
-
-        public void mouseEntered(MouseEvent me) {
-        }
-
-        public void mouseExited(MouseEvent me) {
-        }
     }
     
 }

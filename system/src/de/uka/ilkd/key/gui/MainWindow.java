@@ -109,6 +109,7 @@ import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.nodeviews.EmptySequent;
 import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
 import de.uka.ilkd.key.gui.nodeviews.LeafNodeView;
+import de.uka.ilkd.key.gui.nodeviews.MainFrame;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
@@ -139,7 +140,7 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
-
+    
     // Search bar for Sequent Views.
     public SequentSearchBar sequentSearchBar;
     
@@ -161,18 +162,16 @@ public final class MainWindow extends JFrame  {
     private JToolBar fileOpToolBar;
     
     /** the current goal view */
-    private JScrollPane goalView;
+    public MainFrame goalView;
 
     /** the current proof tree*/
     private ProofTreeView proofTreeView;
 
     /** the list of current open goals*/
     private JScrollPane openGoalsView;
-    
+
     /** the view of a sequent */
-    private LeafNodeView leafNodeView;
-    
-    public SequentView sequentView;
+    public LeafNodeView leafNodeView;
     
     /** the rule view */
     private RuleView ruleView = null;
@@ -448,7 +447,7 @@ public final class MainWindow extends JFrame  {
         JSplitPane leftPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, proofListView, tabbedPane);
         leftPane.setName("leftPane");
         leftPane.setOneTouchExpandable(true);
-        
+
         this.sequentSearchBar = new SequentSearchBar(leafNodeView);
         JPanel rightPane = new JPanel();
         rightPane.setLayout(new BorderLayout());
@@ -466,16 +465,6 @@ public final class MainWindow extends JFrame  {
                 + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."
                 + " See About | License.", getFont());
         getContentPane().add(statusLine, BorderLayout.SOUTH);
-        
-     // FIXME put this somewhere descent
-        goalView.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW ).put(
-                KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()), 
-        "copy");
-        goalView.getActionMap().put("copy", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                GuiUtilities.copyHighlightToClipboard(leafNodeView);
-            }
-        });
         
         // load preferred sizes from system preferences
         setName("mainWindow");
@@ -544,8 +533,7 @@ public final class MainWindow extends JFrame  {
     }
     
     private void createViews() {
-	goalView = new JScrollPane();
-	paintGoalView(new EmptySequent());
+	goalView = new MainFrame();
 
 	openGoalsView = new JScrollPane();
 	GuiUtilities.paintEmptyViewComponent(openGoalsView, "Open Goals");
@@ -980,23 +968,8 @@ public final class MainWindow extends JFrame  {
         return result;
     }
     
-    public ProofTreeView getProofView(){
+    public ProofTreeView getProofView() {
         return proofTreeView;
-    }    
-    
-    /**
-     * Sets the content of the current goal view. Do not use this method from outside, take method
-     * {@link #updateSequentView(SequentView)} instead (thread safe)
-     */
-    private void paintGoalView(SequentView sv) {
-        sequentView = sv;
-        JViewport vp = goalView.getViewport();
-        if (vp != null) {
-            vp.removeAll();
-        }
-        goalView.setViewportView(sequentView);
-        goalView.setBackground(sequentView.getBackground());
-        validate();
     }
     
     /** saves a proof */
@@ -1045,24 +1018,6 @@ public final class MainWindow extends JFrame  {
         getMediator().setProof(proof);
         return proof;
     }
-    
-    
-    /**
-     * The progress monitor that displays a progress bar in a corner of the main window.
-     */
-//    class MainProgressMonitor implements ProgressMonitor {
-//	public void setProgress(final int progress) {
-//	    KeYMediator.invokeOnEventQueue(new Runnable() {
-//		public void run() {
-//		    statusLine.setProgress(progress);
-//		}
-//	    });
-//	}
-//        
-//        public void setMaximum(int maximum) {
-//            statusLine.setProgressBarMaximum(maximum);
-//        }
-//    }
     
     /** invoked if a frame that wants modal access is opened */
     class MainGUIListener implements GUIListener {
@@ -1204,11 +1159,11 @@ public final class MainWindow extends JFrame  {
         sequentSearchBar.setSequentView(sequentViewLocal);
 
         if (SwingUtilities.isEventDispatchThread()) {
-            paintGoalView(sequentViewLocal);
+            goalView.setSequentView(sequentViewLocal);
         } else {
             Runnable sequentUpdater = new Runnable() {
                 public void run() {
-                    paintGoalView(sequentViewLocal);
+                    goalView.setSequentView(sequentViewLocal);
                 }
             };
             SwingUtilities.invokeLater(sequentUpdater);
@@ -1242,7 +1197,7 @@ public final class MainWindow extends JFrame  {
             }
             
             disableCurrentGoalView = false;	    
-            goalView.setViewportView(null);
+            goalView.setSequentView(new EmptySequent());
             
             updateSequentView();
            
