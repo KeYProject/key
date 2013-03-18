@@ -6,7 +6,8 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.swt.SWT;
+import org.eclipse.jface.text.source.ISourceViewer;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
@@ -41,9 +42,14 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
    
    private Node showNode; 
    
-   private ProofTextViewer textViewer;
-   
-   
+   private ProofSourceViewerDecorator textViewer;
+  
+   private MouseMoveListener mouseMoveListener = new MouseMoveListener(){
+      @Override
+      public void mouseMove(MouseEvent e) {
+         textViewer.setBackgroundColorForHover();
+      }
+   };
 
    
    private KeYSelectionListener keySelectionListener = new KeYSelectionListener() {
@@ -110,14 +116,6 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
       }
    };
    
-   private MouseMoveListener mouseMoveListener = new MouseMoveListener(){
-
-      @Override
-      public void mouseMove(org.eclipse.swt.events.MouseEvent e) {
-         textViewer.setBackgroundColorForHover();
-      }
-   };
-   
    /**
     * {@inheritDoc}
     */
@@ -131,19 +129,20 @@ public class KeYEditor extends TextEditor implements IProofEnvironmentProvider {
     * {@inheritDoc}
     */
    @Override
-   public void createPartControl(Composite parent){
+   public void createPartControl(Composite parent) {
+      super.createPartControl(parent);
       getKeYEnvironment().getUi().addPropertyChangeListener(ConsoleUserInterface.PROP_AUTO_MODE, autoModeActiveListener);
-      textViewer = new ProofTextViewer(parent, SWT.MULTI|SWT.V_SCROLL);
-      textViewer.getControl().addMouseMoveListener(mouseMoveListener);
-      textViewer.setEditable(false);
-      if(this.getShowNode()!=null){
+      ISourceViewer sourceViewer = getSourceViewer();
+      textViewer = new ProofSourceViewerDecorator(sourceViewer);
+      sourceViewer.setEditable(false);
+      sourceViewer.getTextWidget().addMouseMoveListener(mouseMoveListener);
+      if (this.getShowNode() != null) {
          textViewer.setDocumentForNode(getShowNode(), getKeYEnvironment().getMediator());
-      }else{
+      }
+      else {
          textViewer.setDocumentForNode(getProof().root(), getKeYEnvironment().getMediator());
       }
    }
-
-   
 
    
    /**
