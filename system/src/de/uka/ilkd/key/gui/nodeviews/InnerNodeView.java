@@ -264,12 +264,14 @@ public class InnerNodeView extends SequentView {
     }
     
     
+    @Override
     public void addNotify() {
         super.addNotify();
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
     }
     
     
+    @Override
     public void removeNotify(){
         super.removeNotify();
         unregisterListener();
@@ -283,6 +285,7 @@ public class InnerNodeView extends SequentView {
     }
     
     
+    @Override
     protected void finalize(){
         try{
             unregisterListener();
@@ -421,16 +424,6 @@ public class InnerNodeView extends SequentView {
 	Range r = posTable.rangeForPath(path);	 
 	getHighlighter().addHighlight(r.start(), r.end(), light);	 
 	return r;
-    }
-
-    public void updateUI() {
-	super.updateUI();
-	Font myFont = UIManager.getFont(Config.KEY_FONT_INNER_NODE_VIEW);
-	if (myFont != null) {
-	    setFont(myFont);
-	} else {
-	    Debug.out("KEY-INNER_NODE_FONT not available, use standard font.");
-	}
     }
     
     public String getTitle() {

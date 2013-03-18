@@ -128,10 +128,7 @@ public class LeafNodeView extends SequentView implements Autoscroll {
 	additionalHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR);
 	defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR);
 	currentHighlight = defaultHighlight;
-		
-        setSequentViewFont();
-
-	listener = new SequentViewListener(this, mediator());
+	listener = new SequentViewListener(this, getMediator());
 	
 	guiListener = new GUIListener(){
 		/** invoked if a frame that wants modal access is opened */
@@ -192,7 +189,7 @@ public class LeafNodeView extends SequentView implements Autoscroll {
                 
         
 	// add listener to KeY GUI events
-        mediator().addGUIListener(guiListener);
+        getMediator().addGUIListener(guiListener);
         
         // add a listener to this component
         changeListener = new SeqViewChangeListener();
@@ -202,18 +199,21 @@ public class LeafNodeView extends SequentView implements Autoscroll {
     
     }
     
+    @Override
     public void addNotify() {
         super.addNotify();
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
         updateUI();
     }
     
+    @Override
     public void removeNotify(){
         super.removeNotify();
         Config.DEFAULT.removeConfigChangeListener(configChangeListener);
     }
 
 
+    @Override
     protected void finalize(){
         try{
             Config.DEFAULT.removeConfigChangeListener(configChangeListener);
@@ -275,20 +275,6 @@ public class LeafNodeView extends SequentView implements Autoscroll {
     public void disableHighlights() {
         disableHighlight(currentHighlight);
         disableHighlight(additionalHighlight);        
-    }
-    
-    public void updateUI() {
-	super.updateUI();
-	setSequentViewFont();       
-    }
-
-    private void setSequentViewFont() {
-	Font myFont = UIManager.getFont(Config.KEY_FONT_CURRENT_GOAL_VIEW);
-        if (myFont != null) {
-	    setFont(myFont);
-	} else {
-	    Debug.out("KEY_FONT_CURRENT_GOAL_VIEW not available. Use standard font.");
-	}        
     }
 
     /** sets the text being printed */
@@ -416,7 +402,7 @@ public class LeafNodeView extends SequentView implements Autoscroll {
     /** returns the mediator of this view
      * @return the KeYMediator
      */
-    public KeYMediator mediator() {
+    public KeYMediator getMediator() {
 	return mediator;
     }
 
@@ -426,7 +412,7 @@ public class LeafNodeView extends SequentView implements Autoscroll {
      * rule 
      */
     void selectedTaclet(TacletApp taclet, PosInSequent pos) {
-    	mediator().selectedTaclet(taclet, pos);
+    	getMediator().selectedTaclet(taclet, pos);
     }
 
     /**
@@ -604,9 +590,3 @@ public class LeafNodeView extends SequentView implements Autoscroll {
     }
 
 }
-
-
-
-
-
-

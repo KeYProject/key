@@ -108,7 +108,7 @@ public class ProofDiffFrame extends JFrame {
         {
             this.textArea = new JEditorPane();
             textArea.setContentType("text/html");
-            Font myFont = UIManager.getFont(Config.KEY_FONT_CURRENT_GOAL_VIEW);
+            Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
             textArea.setFont(myFont);
             //            textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
             textArea.setEditable(false);

@@ -29,7 +29,7 @@ public class SequentBorder extends AbstractBorder {
     public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
 
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setFont(UIManager.getFont(Config.KEY_FONT_CURRENT_GOAL_VIEW));
+        g2d.setFont(UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW));
         FontMetrics fm = c.getFontMetrics(g2d.getFont());
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);

@@ -112,7 +112,7 @@ class TacletMenu extends JMenu {
 	       PosInSequent pos) {
         super();        
 	this.sequentView = sequentView;
-	this.mediator = sequentView.mediator();
+	this.mediator = sequentView.getMediator();
  	this.pos = pos;
  	findList = removeObsolete(findList);
     rewriteList = removeObsolete(rewriteList);
