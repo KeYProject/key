@@ -82,8 +82,6 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     public static final AbstractTermTransformer META_LONG_UNSIGNEDSHIFTRIGHT = new MetaJavaLongUnsignedShiftRight();
 
-    public static final AbstractTermTransformer WHILE_INV_RULE = new WhileInvRule();
-
     public static final AbstractTermTransformer ARRAY_BASE_INSTANCE_OF = new ArrayBaseInstanceOf();
 
     public static final AbstractTermTransformer CONSTANT_VALUE = new ConstantValue();

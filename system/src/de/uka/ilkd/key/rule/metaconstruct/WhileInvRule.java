@@ -18,23 +18,40 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
+import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.TransactionStatement;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.LabelInstantiatorDispatcher;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
-public class WhileInvRule extends AbstractTermTransformer {
-
+public final class WhileInvRule {
     /** the outer label that is used to leave the while loop ('l1') */
     private final SchemaVariable outerLabel = 
         SchemaVariableFactory.createProgramSV(new ProgramElementName("outer_label"),
@@ -68,7 +85,6 @@ public class WhileInvRule extends AbstractTermTransformer {
     private KeYJavaType returnType;
     
     public WhileInvRule() {
-        super(new Name("#whileInvRule"), 2, Sort.FORMULA);
     }
 
    
@@ -78,10 +94,10 @@ public class WhileInvRule extends AbstractTermTransformer {
      * @param services the Services providing access to signature and
      * type model
      */
-    private void init(Term term, Services services) {
+    private void init(Term initialPost, Term invariantFramingTermination, Services services) {
         root = (JavaNonTerminalProgramElement)
-        term.sub(0).javaBlock().program();  
-        modality = (Modality)term.sub(0).op();
+              initialPost.javaBlock().program();  
+        modality = (Modality)initialPost.op();
         
         ReplaceWhileLoop removeWhile = 
             new ReplaceWhileLoop(root, null, services);
@@ -91,8 +107,8 @@ public class WhileInvRule extends AbstractTermTransformer {
         
         // some initialisations...
                 
-        inv = term.sub(1);
-        post = term.sub(0).sub(0);
+        inv = invariantFramingTermination;
+        post = initialPost.sub(0);
 
         javaInfo = services.getJavaInfo();
         tf = TermFactory.DEFAULT ;
@@ -103,10 +119,10 @@ public class WhileInvRule extends AbstractTermTransformer {
     
     
     /** calculates the resulting term. */
-    public Term transform(Term term, SVInstantiations svInst, Services services) {
+    public Term transform(WhileInvariantRule rule, PosInOccurrence applicationPos, Term initialPost, Term invariantFramingTermination, SVInstantiations svInst, Services services) {
         
         // global initialisation
-        init(term, services);
+        init(initialPost, invariantFramingTermination, services);
         
         // local initialisation
         ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
@@ -171,14 +187,17 @@ public class WhileInvRule extends AbstractTermTransformer {
         // normal case and continue
         if (w.continueOccurred()) {
             stmnt.add(contFlagDecl(contFlag));
-            contFlagTerm = TB.equals(typeConv.convertToLogicElement(contFlag), 
+            contFlagTerm = TermBuilder.DF.equals(typeConv.convertToLogicElement(contFlag), 
         	    	             typeConv.getBooleanLDT().getTrueTerm());
         }
         
         // exception case
         resultSubterms.add(throwCase(excFlag, 
                                      thrownException, 
-                                     post));
+                                     post,
+                                     rule,
+                                     applicationPos,
+                                     services));
         
         // return case
         if (w.returnOccurred()) {
@@ -187,7 +206,7 @@ public class WhileInvRule extends AbstractTermTransformer {
                 typeConv.convertToLogicElement(returnFlag);
             resultSubterms.add
             (returnCase(returnFlag, returnType,
-                        returnExpression, post));
+                        returnExpression, post, rule, applicationPos, services));
             
             if (returnType != null) {
                 stmnt.add(KeYJavaASTFactory.declare
@@ -202,7 +221,10 @@ public class WhileInvRule extends AbstractTermTransformer {
             breakFlagTerm = 
                 typeConv.convertToLogicElement(breakFlag);
             resultSubterms.add(breakCase(breakFlag, post, 
-                                         breakIfCascade)); 
+                                         breakIfCascade,
+                                         rule,
+                                         applicationPos,
+                                         services)); 
         }
         
         
@@ -235,13 +257,13 @@ public class WhileInvRule extends AbstractTermTransformer {
         
         Modality loopBodyModality = modality;
         final boolean transaction = (loopBodyModality == Modality.DIA_TRANSACTION || loopBodyModality == Modality.BOX_TRANSACTION);
-        return TB.prog(loopBodyModality, 
-        	      JavaBlock.createJavaBlock(transaction ? 
-        	         new StatementBlock(new Statement[]{
-        	                  resSta, 
-        	                  new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)})
-        	      : new StatementBlock(resSta)), 
-        	      result); 
+        JavaBlock mainJavaBlock = JavaBlock.createJavaBlock(transaction ? 
+                                                            new StatementBlock(new Statement[]{resSta, new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)}) : 
+                                                            new StatementBlock(resSta));
+        return TermBuilder.DF.prog(loopBodyModality, 
+                                   mainJavaBlock, 
+                                   result,
+                                   LabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock)); 
     }
 
     /**
@@ -334,15 +356,18 @@ public class WhileInvRule extends AbstractTermTransformer {
     private Term returnCase(ProgramVariable returnFlag,
                             KeYJavaType returnType,
                             ProgramVariable returnExpression,
-                            Term post) {
-        Term executeReturn = TB.prog
-            (modality, 
-             addContext(root, new StatementBlock
-                        (KeYJavaASTFactory.returnClause(returnExpression))), 
-             post);
+                            Term post,
+                            WhileInvariantRule rule, 
+                            PosInOccurrence applicationPos, 
+                            Services services) {
+        JavaBlock returnJavaBlock = addContext(root, new StatementBlock(KeYJavaASTFactory.returnClause(returnExpression)));
+        Term executeReturn = TermBuilder.DF.prog(modality, 
+                                                 returnJavaBlock, 
+                                                 post,
+                                                 LabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, modality, new ImmutableArray<Term>(post), null, returnJavaBlock));
         
-        return TB.imp( 
-             TB.equals(typeConv.convertToLogicElement(returnFlag), 
+        return TermBuilder.DF.imp( 
+              TermBuilder.DF.equals(typeConv.convertToLogicElement(returnFlag), 
                                 typeConv.getBooleanLDT().getTrueTerm()), 
              executeReturn);
         
@@ -363,13 +388,16 @@ public class WhileInvRule extends AbstractTermTransformer {
 
     private Term breakCase(ProgramVariable breakFlag,
                            Term post,
-                           ArrayList<If> breakIfCascade) {
-        Term executeBreak = 
-            TB.prog(modality,
-             addContext(root, new StatementBlock
-                        (breakIfCascade.toArray(new Statement[breakIfCascade.size()]))),
-             post);
-        return TB.imp(TB.equals(typeConv.convertToLogicElement(breakFlag), 
+                           ArrayList<If> breakIfCascade,
+                           WhileInvariantRule rule, 
+                           PosInOccurrence applicationPos, 
+                           Services services) {
+        JavaBlock executeJavaBlock = addContext(root, new StatementBlock(breakIfCascade.toArray(new Statement[breakIfCascade.size()])));
+        Term executeBreak = TermBuilder.DF.prog(modality, 
+                                                executeJavaBlock, 
+                                                post,
+                                                LabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, modality, new ImmutableArray<Term>(post), null, executeJavaBlock));
+        return TermBuilder.DF.imp(TermBuilder.DF.equals(typeConv.convertToLogicElement(breakFlag), 
                                 typeConv.getBooleanLDT().getTrueTerm()), 
                                 executeBreak); 
     }
@@ -386,36 +414,40 @@ public class WhileInvRule extends AbstractTermTransformer {
         ArrayList<Term> al = new ArrayList<Term>();
 
         if (returnFlagTerm != null)
-            al.add(TB.equals(returnFlagTerm, TRUE_TERM));
+            al.add(TermBuilder.DF.equals(returnFlagTerm, TRUE_TERM));
         if (breakFlagTerm != null)
-            al.add(TB.equals(breakFlagTerm, TRUE_TERM));
+            al.add(TermBuilder.DF.equals(breakFlagTerm, TRUE_TERM));
         if (excFlagTerm != null)
-            al.add(TB.equals(excFlagTerm, TRUE_TERM));
+            al.add(TermBuilder.DF.equals(excFlagTerm, TRUE_TERM));
 
         if (al.size() == 0) {
             if (contFlagTerm == null)
                 return inv;
             else 
-                return TB.imp(contFlagTerm, inv);
+                return TermBuilder.DF.imp(contFlagTerm, inv);
         } else {
-            Term premiss = TB.not(createLongJunctorTerm(Junctor.OR, al));
+            Term premiss = TermBuilder.DF.not(createLongJunctorTerm(Junctor.OR, al));
             if (contFlagTerm != null)
-                premiss = TB.imp(contFlagTerm, premiss);            
+                premiss = TermBuilder.DF.imp(contFlagTerm, premiss);            
             
-            return TB.imp(premiss, inv);
+            return TermBuilder.DF.imp(premiss, inv);
         }       
     }
     
 
     private Term throwCase(ProgramVariable excFlag,
                            ProgramVariable thrownException,
-                           Term post) {
-        Term throwException = 
-            TB.prog(modality, 
-        	   addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException))), 
-                   post);
-        return TB.imp( 
-             TB.equals(typeConv.convertToLogicElement(excFlag), 
+                           Term post,
+                           WhileInvariantRule rule, 
+                           PosInOccurrence applicationPos, 
+                           Services services) {
+        JavaBlock throwJavaBlock = addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException)));
+        Term throwException = TermBuilder.DF.prog(modality, 
+                                                  throwJavaBlock, 
+                                                  post,
+                                                  LabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, modality, new ImmutableArray<Term>(post), null, throwJavaBlock));
+        return TermBuilder.DF.imp( 
+              TermBuilder.DF.equals(typeConv.convertToLogicElement(excFlag), 
         	       typeConv.getBooleanLDT().getTrueTerm()), 
              throwException);
     }

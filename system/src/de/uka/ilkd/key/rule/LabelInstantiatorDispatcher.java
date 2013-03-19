@@ -34,6 +34,13 @@ public class LabelInstantiatorDispatcher {
                                                        JavaBlock newTermJavaBlock) {
       return instantiateLabels(labelInstantiators, applicationPosInOccurrence, rule, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock);
    }
+
+   public static Term label(Services services,
+                            Rule rule,
+                            PosInOccurrence applicationPosInOccurrence, 
+                            Term term) {
+      return TermBuilder.DF.label(term, instantiateLabels(services, applicationPosInOccurrence, rule, null, term.op(), term.subs(), term.boundVars(), term.javaBlock()));
+   }
    
    public static ImmutableArray<ITermLabel> instantiateLabels(Services services,
          PosInOccurrence applicationPosInOccurrence,

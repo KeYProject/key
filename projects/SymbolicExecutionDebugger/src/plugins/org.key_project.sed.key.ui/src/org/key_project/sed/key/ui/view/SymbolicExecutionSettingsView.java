@@ -41,11 +41,6 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  */
 public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
    /**
-    * Global constant to enable or disable the usage of loop invariants.
-    */
-   public static final boolean LOOP_INVARIANTS_SUPPORTED = false;
-   
-   /**
     * ID of this view.
     */
    public static final String VIEW_ID = "org.key_project.sed.key.ui.view.SymbolicExecutionProofSearchStragyView";
@@ -127,21 +122,19 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView {
          }
       });
       // Loop treatment
-      if (LOOP_INVARIANTS_SUPPORTED) {
-         Group loopTreatmentGroup = new Group(parent, SWT.NONE);
-         loopTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-         loopTreatmentGroup.setText("Loop Treatment");
-         loopTreatmentGroup.setLayout(new FillLayout());
-         loopTreatmentCombo = new Combo(loopTreatmentGroup, SWT.READ_ONLY);
-         loopTreatmentCombo.add(LOOP_TREATMENT_EXPAND);
-         loopTreatmentCombo.add(LOOP_TREATMENT_INVARIANT);
-         loopTreatmentCombo.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-               loopTreatmentChanged(e);
-            }
-         });
-      }
+      Group loopTreatmentGroup = new Group(parent, SWT.NONE);
+      loopTreatmentGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+      loopTreatmentGroup.setText("Loop Treatment");
+      loopTreatmentGroup.setLayout(new FillLayout());
+      loopTreatmentCombo = new Combo(loopTreatmentGroup, SWT.READ_ONLY);
+      loopTreatmentCombo.add(LOOP_TREATMENT_EXPAND);
+      loopTreatmentCombo.add(LOOP_TREATMENT_INVARIANT);
+      loopTreatmentCombo.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+            loopTreatmentChanged(e);
+         }
+      });
       // Set read-only if required
       updateShownValues();
    }
