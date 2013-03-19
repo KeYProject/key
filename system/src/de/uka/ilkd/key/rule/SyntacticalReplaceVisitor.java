@@ -21,7 +21,6 @@
  */
 package de.uka.ilkd.key.rule;
 
-import java.util.ArrayList;
 import java.util.Stack;
 
 import de.uka.ilkd.key.collection.DefaultImmutableMap;
@@ -38,13 +37,12 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ModalOperatorSV;
@@ -60,8 +58,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.label.TermLabelOperation;
-import de.uka.ilkd.key.rule.label.TermLabelWildcard;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
@@ -79,6 +75,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
     private TypeConverter typeConverter = null;
     private final boolean allowPartialReplacement;
     private final boolean resolveSubsts;
+    private final LabelInstantiator labelInstantiator;
 
     /**
      * the stack contains the subterms that will be added in the next step of
@@ -98,41 +95,40 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
 
     /**
      */
-    public SyntacticalReplaceVisitor(Services              services, 
-				     SVInstantiations      svInst,
-				     Constraint            metavariableInst,
-				     boolean               allowPartialReplacement,
-
-				     boolean               resolveSubsts) { 
+    public SyntacticalReplaceVisitor(Services services, 
+				                         SVInstantiations svInst,
+				                         LabelInstantiator labelInstantiator,
+                                     Constraint metavariableInst,
+                                     boolean allowPartialReplacement,
+                                     boolean  resolveSubsts) { 
 	this.services         = services;	
 	this.svInst           = svInst;
 	this.metavariableInst = metavariableInst;
 	this.allowPartialReplacement = allowPartialReplacement;
 	this.resolveSubsts    = resolveSubsts;
+	this.labelInstantiator = labelInstantiator;
 	subStack = new Stack<Object>(); // of Term
     }
 
     public SyntacticalReplaceVisitor(Services services, 
-				     SVInstantiations svInst) { 
-	this ( services, svInst, Constraint.BOTTOM, false, true );
+				                         SVInstantiations svInst,
+				                         LabelInstantiator labelInstantiator) { 
+       this(services, svInst, labelInstantiator, Constraint.BOTTOM, false, true);
     }
 
     public SyntacticalReplaceVisitor(Services services, 
-				     Constraint metavariableInst) { 
-	this ( services,
-	       SVInstantiations.EMPTY_SVINSTANTIATIONS,
-	       metavariableInst, 
-	       false, true );
+				                         Constraint metavariableInst,
+				                         LabelInstantiator labelInstantiator) { 
+       this(services,
+            SVInstantiations.EMPTY_SVINSTANTIATIONS,
+            labelInstantiator,
+            metavariableInst, 
+            false, 
+            true);
     }
 
-    public SyntacticalReplaceVisitor(Services services, 
-                                     SVInstantiations svInst,
-                                     Constraint metavariableInst) { 
-        this ( services, svInst, metavariableInst, false, true );
-    }
-
-    public SyntacticalReplaceVisitor(Constraint metavariableInst) { 
-	this ( null, metavariableInst );
+    public SyntacticalReplaceVisitor(Constraint metavariableInst, LabelInstantiator labelInstantiator) { 
+       this(null, metavariableInst, labelInstantiator);
     }
 
     private JavaProgramElement addContext(StatementBlock pe) {
@@ -225,7 +221,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                 // use the visitor recursively for replacing metavariables that
                 // might occur in the term (if possible)
                 final SyntacticalReplaceVisitor srv =
-                    new SyntacticalReplaceVisitor ( metavariableInst );
+                    new SyntacticalReplaceVisitor (metavariableInst, labelInstantiator);
                 t.execPostOrder ( srv );
                 return srv.getTerm ();
             }
@@ -347,7 +343,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                 && (!(visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp)
                         .isListSV()))) {
             Term newTerm = toTerm(svInst.getInstantiation((SchemaVariable) visitedOp));            
-            pushNew(TermBuilder.DF.label(newTerm, instantiateAnnotations(visited)));
+            pushNew(TermBuilder.DF.label(newTerm, instantiateLabels(visited, newTerm.op(), newTerm.subs(), newTerm.boundVars(), newTerm.javaBlock())));
         } else if ((visitedOp instanceof Metavariable)
                 && metavariableInst.getInstantiation((Metavariable) visitedOp)
                         .op() != visitedOp) {
@@ -378,7 +374,6 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
             final ImmutableArray<QuantifiableVariable> boundVars = instantiateBoundVariables(visited);
 
             // instantiate annotations
-            ImmutableArray<ITermLabel> labels = instantiateAnnotations(visited);
             
             // instantiate sub terms
             Term[] neededsubs = neededSubs(newOp.arity());
@@ -387,6 +382,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
                 assert neededsubs.length == 1;
                 Term newTerm = TermBuilder.DF.elementary(services,
                         elementaryUpdateLhs, neededsubs[0]);
+                ImmutableArray<ITermLabel> labels = instantiateLabels(visited, newTerm.op(), newTerm.subs(), newTerm.boundVars(), newTerm.javaBlock());
                 if (labels.size() != 0) {
                     newTerm = TermBuilder.DF.label(newTerm, labels);
                 }
@@ -394,11 +390,13 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
             } else if (boundVars != visited.boundVars() || jblockChanged
                     || operatorInst
                     || (!subStack.empty() && subStack.peek() == newMarker)) {
-                Term newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb, labels);
+               ImmutableArray<ITermLabel> labels = instantiateLabels(visited, newOp, new ImmutableArray<Term>(neededsubs), boundVars, jb);
+               Term newTerm = tf.createTerm(newOp, neededsubs, boundVars, jb, labels);
                 pushNew(resolveSubst(newTerm));
             } else {
                 Term t;
-                if (!visited.hasLabels() && labels.isEmpty()) {
+                ImmutableArray<ITermLabel> labels = instantiateLabels(visited, visited.op(), visited.subs(), visited.boundVars(), visited.javaBlock());
+                if (!visited.hasLabels() && labels != null && labels.isEmpty()) {
                    t = visited;
                 }
                 else {
@@ -414,25 +412,17 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
         }
     }
 
-    private ImmutableArray<ITermLabel> instantiateAnnotations(Term visited) {
-        ImmutableArray<ITermLabel> labels;
-        if (visited.hasLabels()) {
-            ArrayList<ITermLabel> instantiatedLabels = new ArrayList<ITermLabel>(10);
-            ImmutableArray<ITermLabel> visitedLabels = visited.getLabels();
-            for (ITermLabel l : visitedLabels) {
-                if (l instanceof TermLabelOperation) {
-                    for (final ITermLabel result : ((TermLabelOperation) l).evaluate(svInst, services)) {
-                        instantiatedLabels.add(result);
-                    }
-                } else {
-                    instantiatedLabels.add(l);
-                }
-            }
-            labels = new ImmutableArray<ITermLabel>(instantiatedLabels);
-        } else {
-            labels = new ImmutableArray<ITermLabel>();
-        }
-        return labels;
+    private ImmutableArray<ITermLabel> instantiateLabels(Term tacletTerm, 
+                                                         Operator newTermOp, 
+                                                         ImmutableArray<Term> newTermSubs, 
+                                                         ImmutableArray<QuantifiableVariable> newTermBoundVars,
+                                                         JavaBlock newTermJavaBlock) {
+       if (labelInstantiator != null) {
+          return labelInstantiator.instantiateLabels(tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock);
+       }
+       else {
+          return null;
+       }
     }
     
     private Operator handleSortDependingSymbol (SortDependingFunction depOp) {
@@ -503,7 +493,8 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
     public void subtreeLeft(Term subtreeRoot){
 	if (subtreeRoot.op() instanceof TermTransformer) {
 	    TermTransformer mop = (TermTransformer) subtreeRoot.op();
-	    pushNew(TermBuilder.DF.label(mop.transform((Term)subStack.pop(),svInst, getServices()), instantiateAnnotations(subtreeRoot)));
+	    Term newTerm = mop.transform((Term)subStack.pop(),svInst, getServices());
+	    pushNew(TermBuilder.DF.label(newTerm, instantiateLabels(subtreeRoot, newTerm.op(), newTerm.subs(), newTerm.boundVars(), newTerm.javaBlock())));
 	} 
    }
 }

@@ -32,7 +32,6 @@ header {
   import de.uka.ilkd.key.proof.io.*;
 
   import de.uka.ilkd.key.rule.*;
-  import de.uka.ilkd.key.rule.label.*;
   import de.uka.ilkd.key.rule.tacletbuilder.*;
   import de.uka.ilkd.key.rule.conditions.*;
  
@@ -2938,35 +2937,9 @@ single_label returns [ITermLabel label=null]
 :
   (name:IDENT {labelName=name.getText();} | star:STAR {labelName=star.getText();} ) (LPAREN param1:IDENT (COMMA param2:IDENT)* RPAREN)? 
   {
-  	label = inSchemaMode() ? RuleLabelFactory.createLabel(labelName) : LabelFactory.createLabel(labelName);
+  	label = LabelFactory.createLabel(labelName);
   }
-  | 
-   (UNION LPAREN left = single_label COMMA right=single_label RPAREN)
-    {
-        if (!inSchemaMode()) {
-        	new KeYSemanticException
-			("Term constructors can only be used by rules.", getFilename(), getLine(), getColumn());
-        }
-  	label = RuleLabelFactory.createLabelUnion(left, right);
-    }
-  | 
-   (INTERSECTION LPAREN left = single_label COMMA right=single_label RPAREN)
-    {
-        if (!inSchemaMode()) {
-                new KeYSemanticException
-                        ("Term constructors can only be used by rules.", getFilename(), getLine(), getColumn());
-        }
-        label = RuleLabelFactory.createLabelIntersection(left, right);
-    }
-  | 
-   (DIFF LPAREN left = single_label COMMA right=single_label RPAREN)
-    {
-        if (!inSchemaMode()) {
-        	new KeYSemanticException
-			("Term constructors can only be used by rules.", getFilename(), getLine(), getColumn());
-        }
-  	label = RuleLabelFactory.createLabelSubstraction(left, right);
-    }
+ 
 ;  exception
         catch [UnknownLabelException ex] {
               keh.reportException
@@ -3453,8 +3426,8 @@ taclet[ImmutableSet<Choice> choices] returns [Taclet r]
 	  namespaces().setVariables(new Namespace(variables()));
         } 
 	( SCHEMAVAR one_schema_var_decl ) *
-        ( ASSUMES LPAREN ifSeq=seq[false] RPAREN ) ?
-        ( FIND LPAREN find = termorseq[true] RPAREN 
+        ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
+        ( FIND LPAREN find = termorseq RPAREN 
             (   SAMEUPDATELEVEL { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
               | INSEQUENTSTATE { applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE; }
               | ANTECEDENTPOLARITY { applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY; }
@@ -3499,8 +3472,8 @@ modifiers[TacletBuilder b]
         ) *
     ;
 
-seq[boolean addWildcard] returns [Sequent s] {Semisequent ant,suc; s = null; } : 
-        ant=semisequent[addWildcard] SEQARROW suc=semisequent[addWildcard] 
+seq returns [Sequent s] {Semisequent ant,suc; s = null; } : 
+        ant=semisequent SEQARROW suc=semisequent
         { s = Sequent.createSequent(ant, suc); }
     ;
 exception
@@ -3512,7 +3485,7 @@ exception
 	 keh.reportException(betterEx);			
      }
      
-termorseq[boolean addWildcard] returns [Object o]
+termorseq returns [Object o]
 {
     Term head = null;
     Sequent s = null;
@@ -3520,11 +3493,8 @@ termorseq[boolean addWildcard] returns [Object o]
     o = null; 
 }
     :
-        head=term ( COMMA s=seq[addWildcard] | SEQARROW ss=semisequent[addWildcard] ) ?
-        {
-            if (addWildcard && !head.hasLabels()) { 
-                head = TermBuilder.DF.label(head, TermLabelWildcard.WILDCARD); 
-            } 
+        head=term ( COMMA s=seq | SEQARROW ss=semisequent ) ?
+        {        
             if ( s == null ) {
                 if ( ss == null ) {
                     // Just a term
@@ -3545,24 +3515,21 @@ termorseq[boolean addWildcard] returns [Object o]
             }
         }
     |
-        SEQARROW ss=semisequent[true]
+        SEQARROW ss=semisequent
         {
             o = Sequent.createSequent(Semisequent.EMPTY_SEMISEQUENT,ss);
         }
     ;
 
-semisequent[boolean addWildcard] returns [Semisequent ss]
+semisequent returns [Semisequent ss]
 { 
     Term head = null;
     ss = Semisequent.EMPTY_SEMISEQUENT; 
 }
     :
         /* empty */ | 
-        head=term ( COMMA ss=semisequent[addWildcard] ) ? 
+        head=term ( COMMA ss=semisequent ) ? 
         { 
-          if (addWildcard && !head.hasLabels()) {
-                head = TermBuilder.DF.label(head, TermLabelWildcard.WILDCARD); 
-          }
           ss = ss.insertFirst(new SequentFormula(head)).semisequent(); 
         }
     ;
@@ -4116,11 +4083,11 @@ goalspec[TacletBuilder b, ImmutableSet<Choice> soc, boolean ruleWithFind]
     :
         (name = string_literal COLON)?
         (   ( rwObj = replacewith
-                (addSeq=add[ruleWithFind])? 
+                (addSeq=add)? 
                 (addRList=addrules)? 
                 (addpv=addprogvar)?
             )
-        | ( addSeq=add[ruleWithFind] (addRList=addrules)? )
+        | ( addSeq=add (addRList=addrules)? )
         | ( addRList=addrules )
         )
         {
@@ -4130,10 +4097,10 @@ goalspec[TacletBuilder b, ImmutableSet<Choice> soc, boolean ruleWithFind]
     ;
 
 replacewith returns [Object o] { o = null; } :
-        REPLACEWITH LPAREN o=termorseq[true] RPAREN;
+        REPLACEWITH LPAREN o=termorseq RPAREN;
 
-add[boolean ruleWithFind] returns [Sequent s] { s = null;} :
-        ADD LPAREN s=seq[ruleWithFind] RPAREN;
+add returns [Sequent s] { s = null;} :
+        ADD LPAREN s=seq RPAREN;
 
 addrules returns [ImmutableList<Taclet> lor] { lor = null; } :
         ADDRULES LPAREN lor=tacletlist RPAREN;

@@ -1503,7 +1503,7 @@ public final class SymbolicExecutionUtil {
                                                            Semisequent semisequent) {
       ImmutableList<Term> terms = ImmutableSLList.nil();
       for (SequentFormula sf : semisequent) {
-         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, svInst);
+         SyntacticalReplaceVisitor visitor = new SyntacticalReplaceVisitor(services, svInst, null);
          sf.formula().execPostOrder(visitor);
          terms = terms.append(visitor.getTerm());
       }

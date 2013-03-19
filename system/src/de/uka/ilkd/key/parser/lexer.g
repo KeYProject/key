@@ -163,12 +163,6 @@ tokens {
         LOCSET = "\\locset";
         SEQ = "\\seq";
         BIGINT = "\\bigint";
-        
-        // term label constructors
-        INTERSECTION = "\\cap";
-        UNION = "\\cup";
-        DIFF = "\\diff";
-        
 }
 
 {

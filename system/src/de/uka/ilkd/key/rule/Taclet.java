@@ -825,10 +825,12 @@ public abstract class Taclet implements Rule, Named {
      */
     protected Term syntacticalReplace(Term term,
 				      Services services,
-				      MatchConditions mc) {	
+				      MatchConditions mc,
+				      PosInOccurrence applicationPosInOccurrence) {	
 	final SyntacticalReplaceVisitor srVisitor = 
 	    new SyntacticalReplaceVisitor(services,
-                                      mc.getInstantiations());
+                                     mc.getInstantiations(),
+                                     new LabelInstantiator(applicationPosInOccurrence, this));
 	term.execPostOrder(srVisitor);
 
 	return srVisitor.getTerm();
@@ -866,17 +868,19 @@ public abstract class Taclet implements Rule, Named {
      * @param services the Services object carrying ja related information
      * @param matchCond the MatchConditions object with the instantiations of
      * the schemavariables, constraints etc.
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
      * @return the as far as possible instantiated SequentFormula
      */
     private SequentFormula 
 	instantiateReplacement(SequentFormula schemaFormula,
 			       Services           services,
-			       MatchConditions    matchCond) { 
+			       MatchConditions    matchCond,
+			       PosInOccurrence applicationPosInOccurrence) { 
 
 	final SVInstantiations svInst = matchCond.getInstantiations ();
 	
         Term instantiatedFormula = syntacticalReplace(schemaFormula.formula(), 
-                    services, matchCond);
+                    services, matchCond, applicationPosInOccurrence);
                 
         if (!svInst.getUpdateContext().isEmpty()) {
             instantiatedFormula = TB.applyUpdatePairsSequential(svInst.getUpdateContext(), 
@@ -895,17 +899,18 @@ public abstract class Taclet implements Rule, Named {
      * @param services the Services
      * @param matchCond the MatchConditions including the mapping 
      * Schemavariables to concrete logic elements
+     * @param applicationPosInOccurrence The {@link PosInOccurrence} of the {@link Term} which is rewritten
      * @return the instanted formulas of the semisquent as list
      */
     private ImmutableList<SequentFormula> instantiateSemisequent(Semisequent semi, Services services, 
-            MatchConditions matchCond) {       
+            MatchConditions matchCond, PosInOccurrence applicationPosInOccurrence) {       
         
         ImmutableList<SequentFormula> replacements = ImmutableSLList.<SequentFormula>nil();
         final Iterator<SequentFormula> it = semi.iterator();        
         
         while (it.hasNext()) {
             replacements = replacements.append
-                (instantiateReplacement(it.next(), services, matchCond));           
+                (instantiateReplacement(it.next(), services, matchCond, applicationPosInOccurrence));           
         }
         return replacements;
     }
@@ -927,7 +932,7 @@ public abstract class Taclet implements Rule, Named {
 				PosInOccurrence pos,
 				Services services, 
 				MatchConditions matchCond) {
-	goal.changeFormula(instantiateSemisequent(semi, services, matchCond),
+	goal.changeFormula(instantiateSemisequent(semi, services, matchCond, pos),
                 pos);
     }
 
@@ -953,7 +958,7 @@ public abstract class Taclet implements Rule, Named {
 			    Services services, 
 			    MatchConditions matchCond ) {
 	final ImmutableList<SequentFormula> replacements = 
-            instantiateSemisequent(semi, services, matchCond);
+            instantiateSemisequent(semi, services, matchCond, pos);
 	
 	if (pos != null) {
 	    goal.addFormula(replacements, pos);

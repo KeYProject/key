@@ -31,7 +31,6 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.label.TermLabelWildcard;
 import de.uka.ilkd.key.rule.tacletbuilder.FindTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
@@ -145,14 +144,6 @@ public abstract class FindTaclet extends Taclet {
             term = resultUpdateMatch.termWithoutMatchedUpdates;
             matchCond = resultUpdateMatch.matchCond;
         }
-        
-        // at the moment we do not support complex match patterns for term labels
-        // The current implementation assumes an implicit wild card at the the top level term
-        // which is matched
-        assert find.getLabels().size() == 1 && 
-                find.getLabels().get(0) == TermLabelWildcard.WILDCARD : "Find terms with labels not yet supported" + name() + ":" + find;
-        matchCond = matchCond.setInstantiations(matchCond.getInstantiations().add(TermLabelWildcard.WILDCARD, 
-                term.getLabels(), services));
         
         return match(term, find(), matchCond, services);
     }

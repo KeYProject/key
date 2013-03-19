@@ -42,7 +42,6 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.label.TermLabelWildcard;
 import de.uka.ilkd.key.util.Pair;
 
 
@@ -154,11 +153,10 @@ public class TacletGenerator {
         final Sequent addedSeq =
                 Sequent.createAnteSequent(
                 Semisequent.EMPTY_SEMISEQUENT.insertFirst(guardedSchemaAxiom).semisequent());
-        final Term findTerm = TB.label(
+        final Term findTerm = 
                  target.isStatic()
                               ? TB.func(target, TB.var(heapSV))
-                              : TB.func(target, TB.var(heapSV), TB.var(selfSV)), 
-                 TermLabelWildcard.WILDCARD);
+                              : TB.func(target, TB.var(heapSV), TB.var(selfSV));
         final RewriteTacletGoalTemplate axiomTemplate =
                 new RewriteTacletGoalTemplate(addedSeq,
                                               ImmutableSLList.<Taclet>nil(),
@@ -228,9 +226,8 @@ public class TacletGenerator {
 
         //create taclet
         final RewriteTacletBuilder tacletBuilder = new RewriteTacletBuilder();
-        tacletBuilder.setFind(TB.label(schemaLhs, TermLabelWildcard.WILDCARD));
-        Term updatedRhs = TB.label(makeUpdatedRHS(limitedRhs, heap, heapSV, services), 
-                TermLabelWildcard.WILDCARD);
+        tacletBuilder.setFind(schemaLhs);
+        Term updatedRhs = makeUpdatedRHS(limitedRhs, heap, heapSV, services);
         tacletBuilder.addTacletGoalTemplate(
                 new RewriteTacletGoalTemplate(Sequent.EMPTY_SEQUENT,
                                               ImmutableSLList.<Taclet>nil(),
@@ -288,9 +285,9 @@ public class TacletGenerator {
             final SchemaVariable heapSV, final SchemaVariable selfSV,
             final TermAndBoundVarPair schemaRepresents,
             final RewriteTacletBuilder tacletBuilder) {
-        final Term axiomSatisfiable = TB.label(functionalRepresentsSatisfiability(
-                target, services, heapSV, selfSV, schemaRepresents,
-                tacletBuilder), TermLabelWildcard.WILDCARD);
+        final Term axiomSatisfiable = functionalRepresentsSatisfiability(
+              target, services, heapSV, selfSV, schemaRepresents,
+              tacletBuilder);
         SequentFormula addedCf = new SequentFormula(axiomSatisfiable);
         final Semisequent addedSemiSeq = Semisequent.EMPTY_SEMISEQUENT.insertFirst(
                 addedCf).semisequent();
@@ -372,7 +369,7 @@ public class TacletGenerator {
         //limit observers
         final Pair<Term, ImmutableSet<Taclet>> limited =
                 limitTerm(schemaAxiom.term, toLimit, services);
-        final Term limitedAxiom = TB.label(limited.first, TermLabelWildcard.WILDCARD);
+        final Term limitedAxiom = limited.first;
         result = result.union(limited.second);
 
         //create added sequent
@@ -390,7 +387,7 @@ public class TacletGenerator {
                             eqVersion
                             ? TB.var(eqSV)
                             : TB.var(selfSV));        
-        tacletBuilder.setFind(TB.label(invTerm, TermLabelWildcard.WILDCARD));
+        tacletBuilder.setFind(invTerm);
         tacletBuilder.addTacletGoalTemplate(
                 new TacletGoalTemplate(addedSeq,
                                        ImmutableSLList.<Taclet>nil()));
@@ -654,9 +651,7 @@ public class TacletGenerator {
                                            tacletBuilder, services)
                                            : TB.tt();
         //assemble formula
-        final Term guardedAxiom =
-                TB.label(TB.imp(TB.and(exactInstance, axiomSatisfiable), schemaAxiom), 
-                        TermLabelWildcard.WILDCARD);
+        final Term guardedAxiom = TB.imp(TB.and(exactInstance, axiomSatisfiable), schemaAxiom);
         final SequentFormula guardedAxiomCf =
                 new SequentFormula(guardedAxiom);
         return guardedAxiomCf;

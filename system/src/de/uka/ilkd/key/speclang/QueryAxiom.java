@@ -45,7 +45,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.label.TermLabelWildcard;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.util.MiscTools;
@@ -215,14 +214,14 @@ public final class QueryAxiom extends ClassAxiom {
 	for(int i = 0; i < paramSVs.length; i++) {
 	    subs[i + (target.isStatic() ? 1 : 2)] = TB.var(paramSVs[i]);	    
 	}
-	final Term find = TB.label(TB.func(target, subs), TermLabelWildcard.WILDCARD);
+	final Term find = TB.func(target, subs);
 	
 	//create replacewith
-	final Term replacewith = TB.label(TB.var(skolemSV), TermLabelWildcard.WILDCARD);
+	final Term replacewith = TB.var(skolemSV);
 	
 	//create added sequent
 	final Term addedFormula 
-		= TB.label(TB.apply(update, TB.prog(Modality.BOX, jb, post), null), TermLabelWildcard.WILDCARD);
+		= TB.apply(update, TB.prog(Modality.BOX, jb, post), null);
 	final SequentFormula addedCf = new SequentFormula(addedFormula);
 	final Semisequent addedSemiSeq = Semisequent.EMPTY_SEMISEQUENT
 	                                            .insertFirst(addedCf)
