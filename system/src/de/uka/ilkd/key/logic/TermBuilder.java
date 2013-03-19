@@ -420,6 +420,11 @@ public class TermBuilder {
     }
 
 
+    public Term prog(Modality mod, JavaBlock jb, Term t, ImmutableArray<ITermLabel> labels) {
+    return tf.createTerm(mod, new Term[]{t}, null, jb, labels);
+    }
+
+
     public Term box(JavaBlock jb, Term t) {
         return prog(Modality.BOX, jb, t);
     }

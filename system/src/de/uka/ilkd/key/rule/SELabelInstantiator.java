@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.logic.ITermLabel;
@@ -12,29 +13,20 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.util.MiscTools;
 
-public class LabelInstantiator {
-   private PosInOccurrence applicationPosInOccurrence;
-   
-   private Rule rule;
+public final class SELabelInstantiator implements ILabelInstantiator {
+   public static final SELabelInstantiator INSTANCE = new SELabelInstantiator();
 
-   public LabelInstantiator(PosInOccurrence applicationPosInOccurrence, Rule rule) {
-      this.applicationPosInOccurrence = applicationPosInOccurrence;
-      this.rule = rule;
-   }
-
-   public Term getApplicationTerm() {
-      return applicationPosInOccurrence != null ? applicationPosInOccurrence.subTerm() : null;
+   private SELabelInstantiator() {
    }
    
-   public ImmutableArray<ITermLabel> instantiateLabels(Term tacletTerm, 
-                                                            Operator newTermOp, 
-         ImmutableArray<Term> newTermSubs, 
+   @Override
+   public List<ITermLabel> instantiateLabels(Term tacletTerm,
+         PosInOccurrence applicationPosInOccurrence, Term applicationTerm,
+         Rule rule, Operator newTermOp, ImmutableArray<Term> newTermSubs,
          ImmutableArray<QuantifiableVariable> newTermBoundVars,
          JavaBlock newTermJavaBlock) {
-      ArrayList<ITermLabel> instantiatedLabels = new ArrayList<ITermLabel>(10);
-      Term applicationTerm = getApplicationTerm();
+      List<ITermLabel> instantiatedLabels = new LinkedList<ITermLabel>();
       if (applicationTerm != null) {
          applicationTerm = TermBuilder.DF.goBelowUpdates(applicationTerm);
          if (applicationTerm.containsLabel(SymbolicExecutionLabel.INSTANCE)) {
@@ -43,6 +35,6 @@ public class LabelInstantiator {
             }
          }
       }
-      return new ImmutableArray<ITermLabel>(instantiatedLabels);
+      return instantiatedLabels;
    }
 }

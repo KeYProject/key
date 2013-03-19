@@ -14,15 +14,23 @@
 
 package de.uka.ilkd.key.gui.configuration;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringBufferInputStream;
 import java.net.URL;
 import java.util.Properties;
 
-
+import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.rule.ILabelInstantiator;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -69,6 +77,12 @@ public class ProofSettings {
     
     /** profile */
     private Profile profile;
+
+    /**
+     * The {@link ILabelInstantiator} to use when rules are applied during proof.
+     */
+    private ImmutableList<ILabelInstantiator> labelInstantiators;
+
 
 //    private final static int STRATEGY_SETTINGS = 0;
 //    private final static int GENERAL_SETTINGS  = 1;
@@ -300,4 +314,13 @@ public class ProofSettings {
 	    saveSettings();
 	}
     }
+    
+    public ImmutableList<ILabelInstantiator> getLabelInstantiators() {
+       return labelInstantiators;
+    }
+
+   public void setLabelInstantiators(
+         ImmutableList<ILabelInstantiator> labelInstantiators) {
+      this.labelInstantiators = labelInstantiators;
+   }
 }

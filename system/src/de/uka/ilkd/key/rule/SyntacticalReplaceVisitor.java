@@ -75,7 +75,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
     private TypeConverter typeConverter = null;
     private final boolean allowPartialReplacement;
     private final boolean resolveSubsts;
-    private final LabelInstantiator labelInstantiator;
+    private final LabelInstantiatorDispatcher labelInstantiator;
 
     /**
      * the stack contains the subterms that will be added in the next step of
@@ -97,7 +97,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
      */
     public SyntacticalReplaceVisitor(Services services, 
 				                         SVInstantiations svInst,
-				                         LabelInstantiator labelInstantiator,
+				                         LabelInstantiatorDispatcher labelInstantiator,
                                      Constraint metavariableInst,
                                      boolean allowPartialReplacement,
                                      boolean  resolveSubsts) { 
@@ -112,13 +112,13 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
 
     public SyntacticalReplaceVisitor(Services services, 
 				                         SVInstantiations svInst,
-				                         LabelInstantiator labelInstantiator) { 
+				                         LabelInstantiatorDispatcher labelInstantiator) { 
        this(services, svInst, labelInstantiator, Constraint.BOTTOM, false, true);
     }
 
     public SyntacticalReplaceVisitor(Services services, 
 				                         Constraint metavariableInst,
-				                         LabelInstantiator labelInstantiator) { 
+				                         LabelInstantiatorDispatcher labelInstantiator) { 
        this(services,
             SVInstantiations.EMPTY_SVINSTANTIATIONS,
             labelInstantiator,
@@ -127,7 +127,7 @@ public final class SyntacticalReplaceVisitor extends DefaultVisitor {
             true);
     }
 
-    public SyntacticalReplaceVisitor(Constraint metavariableInst, LabelInstantiator labelInstantiator) { 
+    public SyntacticalReplaceVisitor(Constraint metavariableInst, LabelInstantiatorDispatcher labelInstantiator) { 
        this(null, metavariableInst, labelInstantiator);
     }
 

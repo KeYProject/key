@@ -520,44 +520,46 @@ public class SymbolicExecutionTreeBuilder {
                                                                           SourceElement statement) {
       AbstractExecutionNode result = null;
       // Make sure that a statement (SourceElement) is available.
-      if (statement != null && SymbolicExecutionUtil.hasSymbolicExecutionLabel(node.getAppliedRuleApp())) {
-         // Get position information
-         PositionInfo posInfo = statement.getPositionInfo();
-         // Determine the node representation and create it if one is available
-         if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
-            result = new ExecutionMethodCall(mediator, node);
-         }
-         else if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp())) {
-            // Find the Node in the proof tree of KeY for that this Node is the return
-            Node callNode = findMethodCallNode(node, node.getAppliedRuleApp());
-            if (callNode != null) {
-               // Find the call Node representation in SED, if not available ignore it.
-               IExecutionNode callSEDNode = keyNodeMapping.get(callNode);
-               if (callSEDNode instanceof IExecutionMethodCall) { // Could be the start node if the initial sequent already contains some method frames.
-                  result = new ExecutionMethodReturn(mediator, node, (IExecutionMethodCall)callSEDNode);
+      if (SymbolicExecutionUtil.hasSymbolicExecutionLabel(node.getAppliedRuleApp())) {
+         if (statement != null) {
+            // Get position information
+            PositionInfo posInfo = statement.getPositionInfo();
+            // Determine the node representation and create it if one is available
+            if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement)) {
+               result = new ExecutionMethodCall(mediator, node);
+            }
+            else if (SymbolicExecutionUtil.isMethodReturnNode(node, node.getAppliedRuleApp())) {
+               // Find the Node in the proof tree of KeY for that this Node is the return
+               Node callNode = findMethodCallNode(node, node.getAppliedRuleApp());
+               if (callNode != null) {
+                  // Find the call Node representation in SED, if not available ignore it.
+                  IExecutionNode callSEDNode = keyNodeMapping.get(callNode);
+                  if (callSEDNode instanceof IExecutionMethodCall) { // Could be the start node if the initial sequent already contains some method frames.
+                     result = new ExecutionMethodReturn(mediator, node, (IExecutionMethodCall)callSEDNode);
+                  }
                }
             }
-         }
-         else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
-            result = new ExecutionTermination(mediator, node, exceptionVariable);
-         }
-         else if (SymbolicExecutionUtil.isBranchNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
-            result = new ExecutionBranchNode(mediator, node);
-         }
-         else if (SymbolicExecutionUtil.isLoopNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
-            if (SymbolicExecutionUtil.isFirstLoopIteration(node, node.getAppliedRuleApp(), statement)) {
-               result = new ExecutionLoopNode(mediator, node);
+            else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
+               result = new ExecutionTermination(mediator, node, exceptionVariable);
+            }
+            else if (SymbolicExecutionUtil.isBranchNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
+               result = new ExecutionBranchNode(mediator, node);
+            }
+            else if (SymbolicExecutionUtil.isLoopNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
+               if (SymbolicExecutionUtil.isFirstLoopIteration(node, node.getAppliedRuleApp(), statement)) {
+                  result = new ExecutionLoopNode(mediator, node);
+               }
+            }
+            else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
+               result = new ExecutionStatement(mediator, node);
             }
          }
-         else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
-            result = new ExecutionStatement(mediator, node);
+         else if (SymbolicExecutionUtil.isUseOperationContract(node, node.getAppliedRuleApp())) {
+            result = new ExecutionUseOperationContract(mediator, node);
          }
-      }
-      else if (SymbolicExecutionUtil.isUseOperationContract(node, node.getAppliedRuleApp())) {
-         result = new ExecutionUseOperationContract(mediator, node);
-      }
-      else if (SymbolicExecutionUtil.isUseLoopInvariant(node, node.getAppliedRuleApp())) {
-         result = new ExecutionUseLoopInvariant(mediator, node);
+         else if (SymbolicExecutionUtil.isUseLoopInvariant(node, node.getAppliedRuleApp())) {
+            result = new ExecutionUseLoopInvariant(mediator, node);
+         }
       }
       return result;
    }

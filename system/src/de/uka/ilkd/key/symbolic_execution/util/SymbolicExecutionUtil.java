@@ -80,10 +80,12 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
+import de.uka.ilkd.key.rule.ILabelInstantiator;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.SELabelInstantiator;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -1043,7 +1045,13 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} contains the {@link SymbolicExecutionLabel}, {@code false} does not contain the {@link SymbolicExecutionLabel} or the given {@link Term} is {@code null}.
     */
    public static boolean hasSymbolicExecutionLabel(Term term) {
-      return term != null && term.containsLabel(SymbolicExecutionLabel.INSTANCE);
+      if (term != null) {
+         term = TermBuilder.DF.goBelowUpdates(term);
+         return term.containsLabel(SymbolicExecutionLabel.INSTANCE);
+      }
+      else {
+         return false;
+      }
    }
    
    /**
@@ -1904,6 +1912,18 @@ public final class SymbolicExecutionUtil {
          StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
          sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+      }
+   }
+
+   /**
+    * Configures the proof for symbolic execution.
+    * @param proof The proof to configure.
+    */
+   public static void configureProof(Proof proof) {
+      if (proof != null) {
+         ImmutableList<ILabelInstantiator> labelInstantiators = ImmutableSLList.<ILabelInstantiator>nil();
+         labelInstantiators = labelInstantiators.append(SELabelInstantiator.INSTANCE);
+         proof.getSettings().setLabelInstantiators(labelInstantiators);
       }
    }
 }

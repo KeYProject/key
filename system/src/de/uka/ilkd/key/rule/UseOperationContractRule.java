@@ -760,10 +760,13 @@ public final class UseOperationContractRule implements BuiltInRule {
 	}        
         final StatementBlock postSB 
         	= replaceStatement(jb, resultAssign);
-        final Term normalPost 
-            	= TB.apply(anonUpdate, TB.prog(inst.mod,
-        JavaBlock.createJavaBlock(postSB),
-        inst.progPost.sub(0)), null);
+        JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
+        final Term normalPost = TB.apply(anonUpdate, 
+                                         TB.prog(inst.mod, 
+                                                 postJavaBlock, 
+                                                 inst.progPost.sub(0),
+                                                 LabelInstantiatorDispatcher.instantiateLabels(services, ruleApp.posInOccurrence(), this, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)), 
+                                         null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon), 
         	            true, 
         	            false);
@@ -776,10 +779,13 @@ public final class UseOperationContractRule implements BuiltInRule {
         //create "Exceptional Post" branch
         final StatementBlock excPostSB 
             = replaceStatement(jb, new StatementBlock(new Throw(excVar)));
-        final Term excPost
-            = TB.apply(anonUpdate, TB.prog(inst.mod,
-       JavaBlock.createJavaBlock(excPostSB), 
-       inst.progPost.sub(0)), null);
+        JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
+        final Term excPost = TB.apply(anonUpdate, 
+                                      TB.prog(inst.mod, 
+                                              excJavaBlock, 
+                                              inst.progPost.sub(0),
+                                              LabelInstantiatorDispatcher.instantiateLabels(services, ruleApp.posInOccurrence(), this, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)), 
+                                      null);
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon), 
                 	       true, 
                 	       false);        

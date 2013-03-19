@@ -826,11 +826,11 @@ public abstract class Taclet implements Rule, Named {
     protected Term syntacticalReplace(Term term,
 				      Services services,
 				      MatchConditions mc,
-				      PosInOccurrence applicationPosInOccurrence) {	
+				      PosInOccurrence applicationPosInOccurrence) {
 	final SyntacticalReplaceVisitor srVisitor = 
 	    new SyntacticalReplaceVisitor(services,
                                      mc.getInstantiations(),
-                                     new LabelInstantiator(applicationPosInOccurrence, this));
+                                     new LabelInstantiatorDispatcher(applicationPosInOccurrence, this, services.getProof().getSettings().getLabelInstantiators()));
 	term.execPostOrder(srVisitor);
 
 	return srVisitor.getTerm();
