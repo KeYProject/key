@@ -1113,7 +1113,7 @@ public final class MainWindow extends JFrame  {
         
 	private void setToolBarDisabled() {
 	    assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
-	    assert doNotReenable == null : "toolbar disabled w/o prior enable";
+	    //assert doNotReenable == null : "toolbar disabled w/o prior enable";
 	    
 	    doNotReenable = new HashSet<Component>();
 	    Component[] cs = controlToolBar.getComponents();
@@ -1134,7 +1134,7 @@ public final class MainWindow extends JFrame  {
         
         private void setToolBarEnabled() {
             assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
-            assert doNotReenable != null : "toolbar enabled w/o prior disable";
+            //assert doNotReenable != null : "toolbar enabled w/o prior disable";
             
             Component[] cs = controlToolBar.getComponents();
             for (int i = 0; i < cs.length; i++) {
