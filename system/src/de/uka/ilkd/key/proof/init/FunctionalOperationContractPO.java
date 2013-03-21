@@ -32,7 +32,7 @@ import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SymbolicExecutionLabel;
+import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -91,7 +91,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * @param initConfig The {@link InitConfig} to use.
      * @param contract The {@link FunctionalOperationContractPO} to prove.
      * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
-    * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionLabel} to the modality, {@code false} to not label the modality.
+    * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel} to the modality, {@code false} to not label the modality.
      */
     public FunctionalOperationContractPO(InitConfig initConfig,
                                          FunctionalOperationContract contract,

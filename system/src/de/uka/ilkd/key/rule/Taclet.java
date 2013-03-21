@@ -17,12 +17,16 @@ package de.uka.ilkd.key.rule;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.omg.CORBA.ORB;
+
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableMap;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
+import de.uka.ilkd.key.gui.configuration.LabelSettings;
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.ContextStatementBlock;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceData;
@@ -49,6 +53,7 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.inst.GenericSortCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
@@ -830,10 +835,32 @@ public abstract class Taclet implements Rule, Named {
 	final SyntacticalReplaceVisitor srVisitor = 
 	    new SyntacticalReplaceVisitor(services,
                                      mc.getInstantiations(),
-                                     new LabelInstantiatorDispatcher(applicationPosInOccurrence, this, services.getProof().getSettings().getLabelInstantiators()));
+                                     new TermLabelInstantiatorDispatcher(applicationPosInOccurrence, this, getLabelInstantiators(services)));
 	term.execPostOrder(srVisitor);
 
 	return srVisitor.getTerm();
+    }
+    
+    /**
+     * Returns the {@link ITermLabelInstantiator} to use.
+     * @param services The {@link Services} to extract {@link ITermLabelInstantiator} from.
+     * @return The {@link ITermLabelInstantiator} to use or {@code null} if no {@link ITermLabelInstantiator} are available.
+     */
+    protected ImmutableList<ITermLabelInstantiator> getLabelInstantiators(Services services) {
+       ImmutableList<ITermLabelInstantiator> result = null;
+       if (services != null) {
+          Proof proof = services.getProof();
+          if (proof != null) {
+             ProofSettings settings = proof.getSettings();
+             if (settings != null) {
+                LabelSettings labelSettings = settings.getLabelSettings();
+                if (labelSettings != null) {
+                   result = labelSettings.getLabelInstantiators();
+                }
+             }
+          }
+       }
+       return result;
     }
     
 

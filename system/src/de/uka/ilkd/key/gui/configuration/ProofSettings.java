@@ -25,12 +25,10 @@ import java.io.StringBufferInputStream;
 import java.net.URL;
 import java.util.Properties;
 
-import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.smt.ProofDependentSMTSettings;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.rule.ILabelInstantiator;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -78,20 +76,15 @@ public class ProofSettings {
     /** profile */
     private Profile profile;
 
-    /**
-     * The {@link ILabelInstantiator} to use when rules are applied during proof.
-     */
-    private ImmutableList<ILabelInstantiator> labelInstantiators;
-
-
 //    private final static int STRATEGY_SETTINGS = 0;
 //    private final static int GENERAL_SETTINGS  = 1;
 //    private final static int CHOICE_SETTINGS    = 2;
 //    private final static int SMT_SETTINGS      = 3;
 //    private final static int VIEW_SETTINGS      = 4;
     private final static int STRATEGY_SETTINGS = 0;
-    private final static int CHOICE_SETTINGS    = 1;
+    private final static int CHOICE_SETTINGS   = 1;
     private final static int SMT_SETTINGS      = 2;
+    private final static int LABEL_SETTINGS    = 3;
 
     
     /** create a proof settings object. 
@@ -105,7 +98,7 @@ public class ProofSettings {
 	    new ChoiceSettings(),
 	    ProofDependentSMTSettings.getDefaultSettingsData(),
 	 //   new ViewSettings()
-
+       new LabelSettings()
 	};
 	
 	for (int i = 0; i < settings.length; i++) { 
@@ -267,6 +260,15 @@ public class ProofSettings {
         return (StrategySettings) settings[STRATEGY_SETTINGS];
     }
 
+    /**
+     * Returns the {@link LabelSettings}.
+     * @return The {@link LabelSettings}.
+     */
+    public LabelSettings getLabelSettings() {
+        ensureInitialized();
+        return (LabelSettings) settings[LABEL_SETTINGS];
+    }
+
     /** returns the ChoiceSettings object
      * @return the ChoiceSettings object
      */
@@ -314,13 +316,4 @@ public class ProofSettings {
 	    saveSettings();
 	}
     }
-    
-    public ImmutableList<ILabelInstantiator> getLabelInstantiators() {
-       return labelInstantiators;
-    }
-
-   public void setLabelInstantiators(
-         ImmutableList<ILabelInstantiator> labelInstantiators) {
-      this.labelInstantiators = labelInstantiators;
-   }
 }

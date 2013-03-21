@@ -765,7 +765,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                          TB.prog(inst.mod, 
                                                  postJavaBlock, 
                                                  inst.progPost.sub(0),
-                                                 LabelInstantiatorDispatcher.instantiateLabels(services, ruleApp.posInOccurrence(), this, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)), 
+                                                 TermLabelInstantiatorDispatcher.instantiateLabels(services, ruleApp.posInOccurrence(), this, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)), 
                                          null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon), 
         	            true, 
@@ -784,7 +784,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                       TB.prog(inst.mod, 
                                               excJavaBlock, 
                                               inst.progPost.sub(0),
-                                              LabelInstantiatorDispatcher.instantiateLabels(services, ruleApp.posInOccurrence(), this, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)), 
+                                              TermLabelInstantiatorDispatcher.instantiateLabels(services, ruleApp.posInOccurrence(), this, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)), 
                                       null);
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon), 
                 	       true, 

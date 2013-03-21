@@ -480,7 +480,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	useGoal.addFormula(new SequentFormula(uAnonInv), true, false);
 
 	JavaBlock useJavaBlock = JavaTools.removeActiveStatement(inst.progPost.javaBlock(), services);
-	Term restPsi = TB.prog((Modality)inst.progPost.op(), useJavaBlock, inst.progPost.sub(0), LabelInstantiatorDispatcher.instantiateLabels(services, ruleApp.posInOccurrence(), this, null, inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)), null, useJavaBlock));
+	Term restPsi = TB.prog((Modality)inst.progPost.op(), useJavaBlock, inst.progPost.sub(0), TermLabelInstantiatorDispatcher.instantiateLabels(services, ruleApp.posInOccurrence(), this, null, inst.progPost.op(), new ImmutableArray<Term>(inst.progPost.sub(0)), null, useJavaBlock));
 	Term guardFalseRestPsi = TB.box(guardJb, 
 					TB.imp(guardFalseTerm, restPsi));
 	useGoal.changeFormula(new SequentFormula(TB.applySequential(

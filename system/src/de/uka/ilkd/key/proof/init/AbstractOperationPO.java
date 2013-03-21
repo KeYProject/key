@@ -43,7 +43,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SymbolicExecutionLabel;
+import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -96,7 +96,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
    private boolean addUninterpretedPredicate;
 
    /**
-    * If this is {@code true} the {@link SymbolicExecutionLabel} will be added
+    * If this is {@code true} the {@link SymbolicExecutionTermLabel} will be added
     * to the initial modality which is proven.
     */
    private boolean addSymbolicExecutionLabel;
@@ -115,7 +115,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @param initConfig The {@link InitConfig} to use.
     * @param name he name to use.
     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
-    * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionLabel} to the modality, {@code false} to not label the modality.
+    * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel} to the modality, {@code false} to not label the modality.
     */
    public AbstractOperationPO(InitConfig initConfig, 
                               String name, 
@@ -399,7 +399,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
    }
    
    /**
-    * Checks if the modality is labeled with the {@link SymbolicExecutionLabel}.
+    * Checks if the modality is labeled with the {@link SymbolicExecutionTermLabel}.
     * @return {@code true} modality is labled, {@code false} modality is not labled.
     */
    public boolean isAddSymbolicExecutionLabel() {
@@ -483,7 +483,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
       
       // label modality if required 
       if (addSymbolicExecutionLabel) {
-         programTerm = TB.label(programTerm, SymbolicExecutionLabel.INSTANCE);
+         programTerm = TB.label(programTerm, SymbolicExecutionTermLabel.INSTANCE);
       }
 
       // create update

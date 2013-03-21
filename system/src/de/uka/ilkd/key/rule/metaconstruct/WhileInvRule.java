@@ -46,7 +46,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.rule.LabelInstantiatorDispatcher;
+import de.uka.ilkd.key.rule.TermLabelInstantiatorDispatcher;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -263,7 +263,7 @@ public final class WhileInvRule {
         return TermBuilder.DF.prog(loopBodyModality, 
                                    mainJavaBlock, 
                                    result,
-                                   LabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock)); 
+                                   TermLabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock)); 
     }
 
     /**
@@ -364,7 +364,7 @@ public final class WhileInvRule {
         Term executeReturn = TermBuilder.DF.prog(modality, 
                                                  returnJavaBlock, 
                                                  post,
-                                                 LabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, modality, new ImmutableArray<Term>(post), null, returnJavaBlock));
+                                                 TermLabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, modality, new ImmutableArray<Term>(post), null, returnJavaBlock));
         
         return TermBuilder.DF.imp( 
               TermBuilder.DF.equals(typeConv.convertToLogicElement(returnFlag), 
@@ -396,7 +396,7 @@ public final class WhileInvRule {
         Term executeBreak = TermBuilder.DF.prog(modality, 
                                                 executeJavaBlock, 
                                                 post,
-                                                LabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, modality, new ImmutableArray<Term>(post), null, executeJavaBlock));
+                                                TermLabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, modality, new ImmutableArray<Term>(post), null, executeJavaBlock));
         return TermBuilder.DF.imp(TermBuilder.DF.equals(typeConv.convertToLogicElement(breakFlag), 
                                 typeConv.getBooleanLDT().getTrueTerm()), 
                                 executeBreak); 
@@ -445,7 +445,7 @@ public final class WhileInvRule {
         Term throwException = TermBuilder.DF.prog(modality, 
                                                   throwJavaBlock, 
                                                   post,
-                                                  LabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, modality, new ImmutableArray<Term>(post), null, throwJavaBlock));
+                                                  TermLabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, modality, new ImmutableArray<Term>(post), null, throwJavaBlock));
         return TermBuilder.DF.imp( 
               TermBuilder.DF.equals(typeConv.convertToLogicElement(excFlag), 
         	       typeConv.getBooleanLDT().getTrueTerm()), 

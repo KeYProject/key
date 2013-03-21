@@ -13,7 +13,7 @@ public class LabeledTermImplTest extends TestCase {
 						TermFactory.DEFAULT.createTerm(Junctor.FALSE));
 		
 		ImmutableArray<ITermLabel> labels = new ImmutableArray<ITermLabel>(
-				SymbolicExecutionLabel.INSTANCE);
+				SymbolicExecutionTermLabel.INSTANCE);
 		
 		Term labeledTerm = 
 				TermFactory.DEFAULT.createTerm(Junctor.AND, 

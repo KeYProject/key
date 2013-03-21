@@ -9,7 +9,7 @@ package de.uka.ilkd.key.logic;
 public class LabelFactory {
    public static ITermLabel createLabel(String name) throws UnknownLabelException {
       if ("SE".equals(name)) {
-         return SymbolicExecutionLabel.INSTANCE;
+         return SymbolicExecutionTermLabel.INSTANCE;
       }
       else {
          throw new UnknownLabelException(name);

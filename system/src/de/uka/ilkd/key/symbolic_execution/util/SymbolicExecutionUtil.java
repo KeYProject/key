@@ -54,7 +54,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.SymbolicExecutionLabel;
+import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -80,12 +80,12 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
-import de.uka.ilkd.key.rule.ILabelInstantiator;
+import de.uka.ilkd.key.rule.ITermLabelInstantiator;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.SELabelInstantiator;
+import de.uka.ilkd.key.rule.SymbolicExecutionTermLabelInstantiator;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -1026,9 +1026,9 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Checks if the {@link Term} on which the {@link RuleApp} was applied contains the {@link SymbolicExecutionLabel}.
+    * Checks if the {@link Term} on which the {@link RuleApp} was applied contains the {@link SymbolicExecutionTermLabel}.
     * @param ruleApp The {@link RuleApp} to check.
-    * @return {@code true} contains the {@link SymbolicExecutionLabel}, {@code false} does not contain the {@link SymbolicExecutionLabel} or the given {@link RuleApp} is {@code null}.
+    * @return {@code true} contains the {@link SymbolicExecutionTermLabel}, {@code false} does not contain the {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is {@code null}.
     */
    public static boolean hasSymbolicExecutionLabel(RuleApp ruleApp) {
       if (ruleApp != null && ruleApp.posInOccurrence() != null) {
@@ -1040,14 +1040,14 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Checks if the given {@link Term} contains the {@link SymbolicExecutionLabel}.
+    * Checks if the given {@link Term} contains the {@link SymbolicExecutionTermLabel}.
     * @param term The {@link Term} to check.
-    * @return {@code true} contains the {@link SymbolicExecutionLabel}, {@code false} does not contain the {@link SymbolicExecutionLabel} or the given {@link Term} is {@code null}.
+    * @return {@code true} contains the {@link SymbolicExecutionTermLabel}, {@code false} does not contain the {@link SymbolicExecutionTermLabel} or the given {@link Term} is {@code null}.
     */
    public static boolean hasSymbolicExecutionLabel(Term term) {
       if (term != null) {
          term = TermBuilder.DF.goBelowUpdates(term);
-         return term.containsLabel(SymbolicExecutionLabel.INSTANCE);
+         return term.containsLabel(SymbolicExecutionTermLabel.INSTANCE);
       }
       else {
          return false;
@@ -1921,9 +1921,9 @@ public final class SymbolicExecutionUtil {
     */
    public static void configureProof(Proof proof) {
       if (proof != null) {
-         ImmutableList<ILabelInstantiator> labelInstantiators = ImmutableSLList.<ILabelInstantiator>nil();
-         labelInstantiators = labelInstantiators.append(SELabelInstantiator.INSTANCE);
-         proof.getSettings().setLabelInstantiators(labelInstantiators);
+         ImmutableList<ITermLabelInstantiator> labelInstantiators = ImmutableSLList.<ITermLabelInstantiator>nil();
+         labelInstantiators = labelInstantiators.append(SymbolicExecutionTermLabelInstantiator.INSTANCE);
+         proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
       }
    }
 }

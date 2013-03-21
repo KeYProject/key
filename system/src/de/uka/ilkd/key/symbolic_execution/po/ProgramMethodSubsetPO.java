@@ -24,7 +24,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.java.visitor.UndeclaredProgramVariableCollector;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SymbolicExecutionLabel;
+import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -121,7 +121,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
     * @param startPosition The start position.
     * @param endPosition The end position.
     * @param addUninterpretedPredicate {@code true} postcondition contains uninterpreted predicate, {@code false} uninterpreted predicate is not contained in postcondition.
-    * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionLabel} to the modality, {@code false} to not label the modality.
+    * @param addSymbolicExecutionLabel {@code true} to add the {@link SymbolicExecutionTermLabel} to the modality, {@code false} to not label the modality.
     */
    public ProgramMethodSubsetPO(InitConfig initConfig, 
                                 String name, 
