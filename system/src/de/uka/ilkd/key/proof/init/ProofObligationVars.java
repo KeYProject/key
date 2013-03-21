@@ -112,53 +112,53 @@ public class ProofObligationVars {
         ImmutableList<Term> terms =
                 ImmutableSLList.<Term>nil();
         terms = appendIfNotNull(terms, heap);
-        terms = appendIfNotNull(terms, self);
-        terms = appendIfNotNull(terms, selfAtPost);
-        terms = appendIfNotNull(terms, guard);
-        terms = appendIfNotNull(terms, guardAtPost);
-        terms = terms.append(localIns);
-        terms = terms.append(localOuts);
         terms = appendIfNotNull(terms, heapAtPre);
-        terms = appendIfNotNull(terms, heapAtPost);        
+        terms = appendIfNotNull(terms, self);
+        terms = appendIfNotNull(terms, guard);
+        terms = terms.append(localIns);
         terms = appendIfNotNull(terms, result);
-        terms = appendIfNotNull(terms, resultAtPost);
         terms = appendIfNotNull(terms, exception);
-        terms = appendIfNotNull(terms, exceptionAtPost);        
         terms = appendIfNotNull(terms, mbyAtPre);
+        terms = appendIfNotNull(terms, heapAtPost);
+        terms = appendIfNotNull(terms, selfAtPost);
+        terms = appendIfNotNull(terms, guardAtPost);
+        terms = terms.append(localOuts);
+        terms = appendIfNotNull(terms, resultAtPost);
+        terms = appendIfNotNull(terms, exceptionAtPost);
         termList = terms;
 
         ImmutableList<Term> allTerms =
                 ImmutableSLList.<Term>nil();
         allTerms = allTerms.append(heap);
-        allTerms = allTerms.append(self);
-        allTerms = allTerms.append(selfAtPost);
-        allTerms = allTerms.append(guard);
-        allTerms = allTerms.append(guardAtPost);
-        allTerms = allTerms.append(localIns);
-        allTerms = allTerms.append(localOuts);
         allTerms = allTerms.append(heapAtPre);
-        allTerms = allTerms.append(heapAtPost);
+        allTerms = allTerms.append(self);
+        allTerms = allTerms.append(guard);
+        allTerms = allTerms.append(localIns);
         allTerms = allTerms.append(result);
-        allTerms = allTerms.append(resultAtPost);
         allTerms = allTerms.append(exception);
-        allTerms = allTerms.append(exceptionAtPost);        
         allTerms = allTerms.append(mbyAtPre);
+        allTerms = allTerms.append(heapAtPost);
+        allTerms = allTerms.append(selfAtPost);
+        allTerms = allTerms.append(guardAtPost);
+        allTerms = allTerms.append(localOuts);
+        allTerms = allTerms.append(resultAtPost);
+        allTerms = allTerms.append(exceptionAtPost);        
         paddedTermList = allTerms;
 
         ImmutableList<Term> allTermsButLocalVars =
                 ImmutableSLList.<Term>nil();
         allTermsButLocalVars = allTermsButLocalVars.append(heap);
-        allTermsButLocalVars = allTermsButLocalVars.append(self);
-        allTermsButLocalVars = allTermsButLocalVars.append(selfAtPost);
-        allTermsButLocalVars = allTermsButLocalVars.append(guard);
-        allTermsButLocalVars = allTermsButLocalVars.append(guardAtPost);        
         allTermsButLocalVars = allTermsButLocalVars.append(heapAtPre);
-        allTermsButLocalVars = allTermsButLocalVars.append(heapAtPost);
+        allTermsButLocalVars = allTermsButLocalVars.append(self);
+        allTermsButLocalVars = allTermsButLocalVars.append(guard);
         allTermsButLocalVars = allTermsButLocalVars.append(result);
-        allTermsButLocalVars = allTermsButLocalVars.append(resultAtPost);
         allTermsButLocalVars = allTermsButLocalVars.append(exception);
-        allTermsButLocalVars = allTermsButLocalVars.append(exceptionAtPost);        
         allTermsButLocalVars = allTermsButLocalVars.append(mbyAtPre);
+        allTermsButLocalVars = allTermsButLocalVars.append(heapAtPost);
+        allTermsButLocalVars = allTermsButLocalVars.append(selfAtPost);
+        allTermsButLocalVars = allTermsButLocalVars.append(guardAtPost);
+        allTermsButLocalVars = allTermsButLocalVars.append(resultAtPost);
+        allTermsButLocalVars = allTermsButLocalVars.append(exceptionAtPost);
         paddedTermListWithoutLocalVars = allTermsButLocalVars;
     }
 
@@ -345,6 +345,23 @@ public class ProofObligationVars {
                                Services services,
                                boolean local) {
         this(self, null, localIns, localOuts, result, resultAtPost,
+             exception, exceptionAtPost,
+             heap, null, heapAtPost, null, "", services, local);
+    }
+
+    public ProofObligationVars(Term self,
+                               Term selfAtPost,
+                               ImmutableList<Term> localIns,
+                               Term heap,
+                               ImmutableList<Term> localOuts,
+                               Term result,
+                               Term resultAtPost,
+                               Term exception,
+                               Term exceptionAtPost,
+                               Term heapAtPost,
+                               Services services,
+                               boolean local) {
+        this(self, selfAtPost, localIns, localOuts, result, resultAtPost,
              exception, exceptionAtPost,
              heap, null, heapAtPost, null, "", services, local);
     }

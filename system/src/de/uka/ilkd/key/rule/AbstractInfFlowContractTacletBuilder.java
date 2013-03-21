@@ -45,14 +45,6 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         super(services);
     }
 
-    public Term getResultPost() {
-        return contractResultAtPost;
-    }
-
-    public Term getExceptionAtPost() {
-        return exceptionVarAtPost;
-    }
-
     public void setContextUpdate(Term... contextUpdates) {
         this.contextUpdates = contextUpdates;
     }
@@ -94,15 +86,19 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
 
     public void setResult(Term contractResult) {
         this.contractResult = contractResult;
-        this.contractResultAtPost = buildAtPostVar(contractResult, services);
     }
 
+    public void setResultAtPost(Term resultAtPost) {
+        this.contractResultAtPost = resultAtPost;
+    }
 
     public void setException(Term exceptionVar) {
         this.exceptionVar = exceptionVar;
-        //this.exceptionVarAtPost = buildAtPostVar(exceptionVar, services);
     }
 
+    public void setExceptionAtPost(Term exceptionAtPost) {
+        this.exceptionVarAtPost = exceptionAtPost;
+    }
 
     // TODO: add exception var
     public Term buildContractApplPredTerm(boolean local) {

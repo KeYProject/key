@@ -230,7 +230,7 @@ public interface BlockContract extends SpecificationElement {
         private static final String CONTINUE_FLAG_BASE_NAME = "continued";
         private static final String RETURN_FLAG_NAME = "returned";
         private static final String FLAG_INFIX = "To";
-        private static final String REMEMBRANCE_SUFFIX = "BeforeBlock";
+        private static final String REMEMBRANCE_SUFFIX = "Before_BLOCK";
 
         private final StatementBlock block;
         private final List<Label> labels;
@@ -307,7 +307,7 @@ public interface BlockContract extends SpecificationElement {
             final Map<LocationVariable, LocationVariable> result =
                     new LinkedHashMap<LocationVariable, LocationVariable>();
             for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                result.put(heap, heapAtPreVar(heap + REMEMBRANCE_SUFFIX, heap.sort(), false));
+                result.put(heap, heapAtPreVar(heap + "_" + REMEMBRANCE_SUFFIX, heap.sort(), false));
             }
             return result;
         }
@@ -320,7 +320,7 @@ public interface BlockContract extends SpecificationElement {
             for (ProgramVariable localOutVariable : localOutVariables) {
                 result.put(
                     (LocationVariable) localOutVariable,
-                    createVariable(localOutVariable.name() + REMEMBRANCE_SUFFIX,
+                    createVariable(localOutVariable.name() + "_" + REMEMBRANCE_SUFFIX,
                                    localOutVariable.getKeYJavaType()));
             }
             return result;

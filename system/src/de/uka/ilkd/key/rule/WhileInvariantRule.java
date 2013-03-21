@@ -209,12 +209,12 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (!suffix.equalsIgnoreCase("")) {
             suffix = new String("_" + suffix);
         }
-        String name = TermBuilder.DF.newName(services, varTerm.toString() + "Before" + suffix);
-        LocationVariable varAtPostVar =
+        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before" + suffix);
+        LocationVariable varAtPreVar =
                 new LocationVariable(new ProgramElementName(name), resultType);
-        register(varAtPostVar, services);
-        Term varAtPost = TermBuilder.DF.var(varAtPostVar);
-        return varAtPost;
+        register(varAtPreVar, services);
+        Term varAtPre = TermBuilder.DF.var(varAtPreVar);
+        return varAtPre;
     }
 
     private static Term buildAtPostVar(Term varTerm,
@@ -229,7 +229,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         if (!suffix.equalsIgnoreCase("")) {
             suffix = new String("_" + suffix);
         }
-        String name = TermBuilder.DF.newName(services, varTerm.toString() + "After" + suffix);
+        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_After" + suffix);
         LocationVariable varAtPostVar =
                 new LocationVariable(new ProgramElementName(name), resultType);
         register(varAtPostVar, services);
@@ -325,7 +325,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                           Goal infFlowGoal) {        
         // generate proof obligation variables
         final ProofObligationVars instantiationVars =
-                new ProofObligationVars(infFlowData.self,
+                new ProofObligationVars(infFlowData.selfTerm,
                                         infFlowData.selfAtPost,
                                         infFlowData.guardAtPre,
                                         infFlowData.newIns,
@@ -388,7 +388,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                                        TB.box(infData.guardJb,
                                               TB.equals(infData.guardAtPost,
                                                         infData.guardTerm)),
-                                       TB.equals(infData.selfAtPost, infData.self));
+                                       TB.equals(infData.selfAtPost, infData.selfTerm));
         Iterator<Term> newOuts = infData.newOuts.iterator();        
         for (Term locOut: infData.localOuts) {
             afterAssumptions = TB.and(afterAssumptions, TB.equals(newOuts.next(), locOut));
@@ -581,10 +581,10 @@ public final class WhileInvariantRule implements BuiltInRule {
             = new LocationVariable(new ProgramElementName(pvBeforeLoopName), 
                     pv.getKeYJavaType());
             services.getNamespaces().programVariables().addSafely(pvBeforeLoop);
-            beforeLoopUpdate = TB.parallel(beforeLoopUpdate, 
-                    TB.elementary(services, 
-                            pvBeforeLoop, 
-                            TB.var(pv)));
+            beforeLoopUpdate = TB.parallel(beforeLoopUpdate,
+                                           TB.elementary(services,
+                                                         pvBeforeLoop, 
+                                                         TB.var(pv)));
             heapToBeforeLoop.get(services.getTypeConverter().getHeapLDT().getHeap())
                     .put(TB.var(pv), TB.var(pvBeforeLoop));
         }
@@ -711,7 +711,8 @@ public final class WhileInvariantRule implements BuiltInRule {
             final Term baseHeap = anonUpdateData.loopHeapAtPre;
                     //heapContext.get(0);
             final Term guardTerm = TB.var(guardVar);
-            inst.inv.setGuard(guardTerm);
+            final Term selfTerm = inst.selfTerm;
+            inst.inv.setGuard(guardTerm, services);
             services.getSpecificationRepository().setLoopInvariant(inst.inv);
 
             final Term heapAtPre =
@@ -719,9 +720,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                                            baseHeap.sort(), false));
             final Term heapAtPost = anonUpdateData.loopHeap;
             final Term guardAtPre = buildBeforeVar(guardTerm, services);
-            final Term guardAtPost = buildAfterVar(guardTerm, services);
-            final Term selfAtPre = inst.selfTerm;
-            final Term selfAtPost = buildAtPostVar(inst.selfTerm, "LOOP", services);
+            final Term guardAtPost = buildAfterVar(guardTerm, services);            
+            final Term selfAtPost = buildAtPostVar(selfTerm, "LOOP", services);
             final ImmutableList<Term> localInTerms = MiscTools.toTermList(localIns);
             final ImmutableList<Term> newLocalIns = buildLocalIns(localInTerms, services);
             final ImmutableList<Term> localOutTerms = MiscTools.toTermList(localOuts);
@@ -737,7 +737,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             ifInvariantBuilder.setContextUpdate(/*inst.u*/);
             ifInvariantBuilder.setHeapAtPre(heapAtPre);
             ifInvariantBuilder.setHeapAtPost(heapAtPost);
-            ifInvariantBuilder.setSelf(selfAtPre);
+            ifInvariantBuilder.setSelf(selfTerm);
             ifInvariantBuilder.setSelfAtPost(selfAtPost);
             ifInvariantBuilder.setLocalIns(newLocalIns);
             ifInvariantBuilder.setLocalOuts(newLocalOuts);
@@ -750,7 +750,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                     ifInvariantBuilder.buildContractApplTaclet(true);
 
             infFlowData = new InfFlowData(heapAtPre, heapAtPost, baseHeap, services,
-                                          inst.selfTerm, selfAtPost,
+                                          selfTerm, selfAtPost,
                                           guardAtPre, guardAtPost, guardJb, guardTerm,
                                           localInTerms, newLocalIns, localOutTerms, newLocalOuts,
                                           updates, loopInvApplPredTerm, informationFlowInvariantApp);
@@ -923,7 +923,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         public final Term heapAtPost;
         public final Term baseHeap;
         public final Services services;
-        public final Term self;
+        public final Term selfTerm;
         public final Term selfAtPost;
         public final Term guardAtPre;
         public final Term guardAtPost;
@@ -943,7 +943,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             this.heapAtPost = null;
             this.baseHeap = null;
             this.services = null;
-            this.self = null;
+            this.selfTerm = null;
             this.selfAtPost = null;
             this.guardAtPre = null;
             this.guardAtPost = null;
@@ -960,18 +960,16 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         public InfFlowData(Term heapAtPre, Term heapAtPost, Term baseHeap, Services services,
-                           Term self, Term selfAtPost,
+                           Term selfTerm, Term selfAtPost,
                            Term guardAtPre, Term guardAtPost, JavaBlock guardJb, Term guardTerm,
-                           ImmutableList<Term> localIns,
-                           ImmutableList<Term> newIns,
-                           ImmutableList<Term> localOuts,
-                           ImmutableList<Term> newOuts,
+                           ImmutableList<Term> localIns, ImmutableList<Term> newIns,
+                           ImmutableList<Term> localOuts, ImmutableList<Term> newOuts,
                            Pair<Term, Term> updates, Term applPredTerm, Taclet infFlowApp) {
             this.heapAtPre = heapAtPre;
             this.heapAtPost = heapAtPost;
             this.baseHeap = baseHeap;
             this.services = services;
-            this.self = self;
+            this.selfTerm = selfTerm;
             this.selfAtPost = selfAtPost;
             this.guardAtPre = guardAtPre;
             this.guardAtPost = guardAtPost;

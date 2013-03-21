@@ -23,8 +23,8 @@ class BlockCallWithPreconditionPredicateSnippet
                                  StatementBlock block,
                                  LoopInvariant loopInv) {
         String nameString =
-                MiscTools.toValidTacletName("EXECUTION_OF_BLOCK_" + block.toString() +
-                                            "_WITH_PRE").toString();
+                MiscTools.toValidTacletName("EXECUTION_OF_BLOCK_"  + block.getUniqueName() +
+                                            "_in_" + pm.getFullName() + "_WITH_PRE").toString();
         return nameString;
     }
 }

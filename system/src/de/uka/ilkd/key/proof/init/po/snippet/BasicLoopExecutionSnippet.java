@@ -13,12 +13,10 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.util.Pair;
@@ -32,26 +30,23 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         ImmutableList<Term> posts = ImmutableSLList.<Term>nil();
         if (poVars.selfAtPost != null)
             posts = posts.append(d.tb.equals(poVars.selfAtPost, poVars.self));
-        
+
         if (poVars.guard != null) {
             final JavaBlock guardJb = buildJavaBlock(d).second;
             posts = posts.append(d.tb.box(guardJb,
                                           d.tb.equals(poVars.guardAtPost,
                                                       d.origVars.guard)));
         }
-
-        Iterator<Term> itOut = poVars.localOuts.iterator();
-        Iterator<Term> itIn = d.origVars.localIns.iterator();
-        while (itIn.hasNext()) {
-            posts = posts.append(d.tb.equals(itOut.next(), itIn.next()));
-        }
-        
+        Iterator<Term> out = poVars.localOuts.iterator();
+        Iterator<Term> in = d.origVars.localIns.iterator();
+        while (in.hasNext()) {
+            posts = posts.append(d.tb.equals(out.next(), in.next()));
+        }        
         posts = posts.append(d.tb.equals(poVars.heapAtPost, d.tb.getBaseHeap()));
         
         final Term prog = buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
         return prog;
     }
-
 
     private Term buildProgramTerm(BasicSnippetData d,
                                   ProofObligationVars vs,
@@ -63,27 +58,6 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
         }
         LoopInvariant inv = (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         Services services = d.tb.getServices();
-        //create formal parameters
-        ImmutableList<LocationVariable> formalParamVars =
-                ImmutableSLList.<LocationVariable>nil();
-        for (Term param : vs.localIns) {
-            ProgramVariable paramVar = param.op(ProgramVariable.class);
-            ProgramElementName pen = new ProgramElementName("_"
-                    + paramVar.name());
-            LocationVariable formalParamVar =
-                    new LocationVariable(pen, paramVar.getKeYJavaType());
-            formalParamVars = formalParamVars.append(formalParamVar);
-            register(formalParamVar, tb.getServices());
-        }
-        if (vs.guard != null) {
-            ProgramVariable paramVar = vs.guard.op(ProgramVariable.class);
-            ProgramElementName pen = new ProgramElementName("_"
-                    + paramVar.name());
-            LocationVariable formalParamVar =
-                    new LocationVariable(pen, paramVar.getKeYJavaType());
-            formalParamVars = formalParamVars.append(formalParamVar);
-            register(formalParamVar, tb.getServices());
-        }
 
         //create java block
         Modality modality =
@@ -108,8 +82,8 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
 
         //create update
         Term update = tb.skip();
-        Iterator<Term> paramIt = vs.localIns./*append(vs.guard).*/iterator();
-        Iterator<Term> origParamIt = d.origVars.localIns./*append(d.origVars.guard).*/iterator();
+        Iterator<Term> paramIt = vs.localIns.iterator();
+        Iterator<Term> origParamIt = d.origVars.localIns.iterator();
         while (paramIt.hasNext()) {
             Term paramUpdate =
                     d.tb.elementary(d.tb.getServices(), origParamIt.next(), paramIt.next());
@@ -141,14 +115,13 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod
                 : new MethodFrame(null, 
                         context,
                         new StatementBlock(guardVarDecl));
-        
+
         //create java block
         final JavaBlock guardJb
-        = JavaBlock.createJavaBlock(new StatementBlock(
-                guardVarMethodFrame));
+        = JavaBlock.createJavaBlock(new StatementBlock(guardVarMethodFrame));
         final Statement s = new MethodFrame(null, context, sb);
         final JavaBlock res = JavaBlock.createJavaBlock(new StatementBlock(s));
 
-        return new Pair<JavaBlock, JavaBlock>(res, guardJb);        
+        return new Pair<JavaBlock, JavaBlock>(res, guardJb);
     }
 }

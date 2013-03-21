@@ -10,6 +10,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
 /**
@@ -37,28 +38,34 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
 
         // the respects-sequents evaluated in the pre-state
         Triple<Term[],Term[],Term[]>[] respectsAtPre1 = replace(origRespects, d.origVars, poVars1);
-        Triple<Term[],Term[],Term[]>[] respectsAtPre2 = replace(origRespects, d.origVars, poVars2);
+        
+        Triple<Term[],Term[],Term[]>[] respectsAtPre2 = replace(origRespects, d.origVars, poVars2);        
         // the respects-sequents evaluated in the post-state
-        Triple<Term[],Term[],Term[]>[] respectsAtPost1 =
-                replace(respectsAtPre1,
-                        new Term[]{poVars1.heap,
-                                   poVars1.self,
-                                   poVars1.result,
-                                   poVars1.exception},
-                        new Term[]{poVars1.heapAtPost,
-                                   poVars1.selfAtPost,
-                                   poVars1.resultAtPost,
-                                   poVars1.exceptionAtPost});
-        Triple<Term[],Term[],Term[]>[] respectsAtPost2 =
-                replace(respectsAtPre2,
-                        new Term[]{poVars2.heap,
-                                   poVars2.self,
-                                   poVars2.result,
-                                   poVars2.exception},
-                        new Term[]{poVars2.heapAtPost,
-                                   poVars2.selfAtPost,
-                                   poVars2.resultAtPost,
-                                   poVars2.exceptionAtPost});
+        Triple<Term[],Term[],Term[]>[]
+                respectsAtPost1 = replace(respectsAtPre1,
+                                          new Term[] {poVars1.heap,
+                                                      poVars1.self,
+                                                      poVars1.guard,
+                                                      poVars1.result,
+                                                      poVars1.exception},
+                                          new Term[] {poVars1.heapAtPost,
+                                                      poVars1.selfAtPost,
+                                                      poVars1.guardAtPost,
+                                                      poVars1.resultAtPost,
+                                                      poVars1.exceptionAtPost});
+
+        Triple<Term[],Term[],Term[]>[]
+                respectsAtPost2 = replace(respectsAtPre2,
+                                          new Term[] {poVars2.heap,
+                                                      poVars2.self,
+                                                      poVars2.guard,
+                                                      poVars2.result,
+                                                      poVars2.exception},
+                                          new Term[] {poVars2.heapAtPost,
+                                                      poVars2.selfAtPost,
+                                                      poVars2.guardAtPost,
+                                                      poVars2.resultAtPost,
+                                                      poVars2.exceptionAtPost});
         // create input-output-relations
         final Term[] relations = new Term[respectsAtPre1.length];
         for (int i = 0; i < respectsAtPre1.length; i++) {
@@ -101,38 +108,63 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         //      Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_DEP);
         Term[] eqAtLocs =
                 new Term[respects1.first.length +
-                         respects1.second.length +
-                         (vs1.guard != null ? 1 : 0)];
-        Iterator<Term> in1 = vs1.localIns.iterator();
-        Iterator<Term> in2 = vs2.localIns.iterator();
-        SearchVisitor search = new SearchVisitor(vs1.result, vs1.resultAtPost);
-        respects1.first[0].execPreOrder(search);
-        if (!search.termFound) {
-            // refLocTerms which contain \result are not included in
-            // the precondition
-            eqAtLocs[0] = d.tb.equals(respects1.first[0], respects2.first[0]);
-        } else {
-            eqAtLocs[0] = d.tb.tt();
-        }
-        for(int i = 1; in1.hasNext() && respects1.first.length > i; i++) {
-            eqAtLocs[i] = d.tb.equals(in1.next(), in2.next());
+                         respects1.second.length];        
+
+        for (int i = 0; i < respects1.first.length; i++) {
+            SearchVisitor search = new SearchVisitor(vs1.result, vs1.resultAtPost);
+            respects1.first[i].execPreOrder(search);
+            if (!search.termFound) {
+                // refLocTerms which contain \result are not included in
+                // the precondition
+                 boolean locVar = false;
+                Iterator<Term> in1 = vs1.localIns.iterator();
+                Iterator<Term> in2 = vs2.localIns.iterator();
+                Iterator<Term> out1 = vs1.localOuts.iterator();
+                Pair<Term, Term> j =
+                        new Pair<Term, Term> (d.tb.tt(), d.tb.tt());
+                while (in1.hasNext() && in2.hasNext() && !locVar) {
+                    j = new Pair<Term, Term> (in1.next(), in2.next());
+                    if(out1.hasNext() && respects1.first[i].equalsModRenaming(out1.next())) {
+                        locVar = true;
+                        eqAtLocs[i] = d.tb.equals(j.first, j.second);
+                    }
+                }
+                if(!locVar) { 
+                    eqAtLocs[i] = d.tb.equals(respects1.first[i], respects2.first[i]);
+                }
+            } else {
+                eqAtLocs[i] = d.tb.tt();
+            }
         }
         for (int i = 0; i < respects1.second.length; i++) {
-            search = new SearchVisitor(vs1.result, vs1.resultAtPost);
+            SearchVisitor search = new SearchVisitor(vs1.result, vs1.resultAtPost);
             respects1.second[i].execPreOrder(search);
             if (!search.termFound) {
                 // refLocTerms which contain \result are not included in
                 // the precondition
-                eqAtLocs[i + respects1.first.length] =
-                        d.tb.equals(respects1.second[i], respects2.second[i]);
+                boolean locVar = false;
+                Iterator<Term> in1 = vs1.localIns.iterator();
+                Iterator<Term> in2 = vs2.localIns.iterator();
+                Iterator<Term> out1 = vs1.localOuts.iterator();
+                Pair<Term, Term> j =
+                        new Pair<Term, Term> (d.tb.tt(), d.tb.tt());
+                while (in1.hasNext() && in2.hasNext() && !locVar) {
+                    j = new Pair<Term, Term> (in1.next(), in2.next());
+                    if(out1.hasNext() && respects1.second[i].equalsModRenaming(out1.next())) {
+                        locVar = true;
+                        eqAtLocs[i + respects1.first.length] =
+                                d.tb.equals(j.first, j.second);
+                    }
+                }
+                if(!locVar) {
+                    eqAtLocs[i + respects1.first.length] =
+                            d.tb.equals(respects1.second[i], respects2.second[i]);
+                }                
             } else {
                 eqAtLocs[i + respects1.first.length] = d.tb.tt();
             }
         }
-        if (vs1.guard != null) {
-            eqAtLocs[respects1.first.length + respects1.second.length]
-                             = d.tb.equals(vs1.guard, vs2.guard);
-        }
+
         return d.tb.and(eqAtLocs);
     }
 
@@ -147,26 +179,15 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         //        Term framingLocs2 = f2.create(BasicPOSnippetFactory.Snippet.CONTRACT_MOD);
 
         Term[] eqAtLocs = new Term[respects1.first.length +
-                                   respects1.third.length +
-                                   /*((vs1.localOuts != null && !vs1.localOuts.isEmpty())
-                                           ? vs1.localOuts.size() : 0) +*/
-                                   (vs1.guardAtPost != null ? 1 : 0)];
+                                   respects1.third.length];
         for (int i = 0; i < respects1.first.length; i++) {
-            if ((d.origVars.local || i != 1)) {
-                eqAtLocs[i] = d.tb.equals(respects1.first[i], respects2.first[i]);
-            } else {
-                eqAtLocs[i] = d.tb.tt();
-            }
+            eqAtLocs[i] = d.tb.equals(respects1.first[i], respects2.first[i]);
         }
         for (int i = 0; i < respects1.third.length; i++) {
             eqAtLocs[i + respects1.first.length] =
                     d.tb.equals(respects1.third[i], respects2.third[i]);
         }
 
-        if (vs1.guardAtPost != null) {
-            eqAtLocs[respects1.first.length + respects1.third.length]
-                             = d.tb.equals(vs1.guardAtPost, vs2.guardAtPost);
-        }
         return d.tb.and(eqAtLocs);
     }
 

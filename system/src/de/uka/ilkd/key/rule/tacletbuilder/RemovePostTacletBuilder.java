@@ -51,6 +51,8 @@ public class RemovePostTacletBuilder {
         } else if (post.op() == Junctor.AND) {
             postParts.addAll(extractPostParts(post.sub(0)));
             postParts.addAll(extractPostParts(post.sub(1)));
+        } else if (post.depth() == 1) {
+            postParts.add(post); // TODO: Not sure about this
         } else {
             throw new IllegalArgumentException("error while extracting post " +
                                                "parts: information flowpost term malformed.");

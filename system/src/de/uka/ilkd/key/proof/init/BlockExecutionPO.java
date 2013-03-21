@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InformationFlowContractImpl;
 import java.io.IOException;
@@ -45,7 +46,11 @@ public class BlockExecutionPO extends AbstractOperationPO
                             ProofObligationVars symbExecVars,
                             Goal initiatingGoal,
                             ExecutionContext context) {
-        super(initConfig, contract.getName());
+        super(initConfig,
+              ContractFactory.generateContractName(contract.getName(), contract.getKJT(),
+                                                   contract.getTarget(),
+                                                   contract.getTarget().getContainerType(),
+                                                   contract.getBlock().getStartPosition().getLine()));
         this.contract = contract;
         this.generatedIFContract =
                 new InformationFlowContractImpl(contract, services);

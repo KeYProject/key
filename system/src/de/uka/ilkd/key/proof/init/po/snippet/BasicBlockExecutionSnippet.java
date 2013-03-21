@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.proof.init.po.snippet;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
@@ -33,6 +35,11 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
         if (poVars.selfAtPost != null) {
             posts = posts.append(d.tb.equals(poVars.selfAtPost, poVars.self));
         }
+        Iterator<Term> out = poVars.localOuts.iterator();
+        Iterator<Term> in = d.origVars.localIns.iterator();
+        while (in.hasNext()) {
+            posts = posts.append(d.tb.equals(out.next(), in.next()));
+        }
         if (poVars.resultAtPost != null) {
             posts = posts.append(d.tb.equals(poVars.resultAtPost,
                                              poVars.result));
@@ -42,11 +49,12 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
                                              poVars.exception));
         }
         posts = posts.append(d.tb.equals(poVars.heapAtPost, d.tb.getBaseHeap()));
-        final Term prog = buildProgramTerm(d, d.tb.and(posts), d.tb);
+        final Term prog = buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
         return prog;
     }
 
     private Term buildProgramTerm(BasicSnippetData d,
+                                  ProofObligationVars vs,
                                   Term postTerm,
                                   TermBuilder.Serviced tb) {
         if (d.get(BasicSnippetData.Key.MODALITY) == null) {
@@ -68,7 +76,16 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
         }
         final Term programTerm = tb.prog(symbExecMod, jb, postTerm);
 
-        return programTerm;
+        //create update
+        Term update = tb.skip();
+        Iterator<Term> paramIt = vs.localIns.iterator();
+        Iterator<Term> origParamIt = d.origVars.localIns.iterator();
+        while (paramIt.hasNext()) {
+            Term paramUpdate =
+                    d.tb.elementary(d.tb.getServices(), origParamIt.next(), paramIt.next());
+            update = tb.parallel(update, paramUpdate);
+        }
+        return tb.apply(update, programTerm);
     }
 
 

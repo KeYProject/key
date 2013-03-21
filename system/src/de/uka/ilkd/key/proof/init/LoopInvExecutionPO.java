@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InformationFlowContractImpl;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -38,7 +39,11 @@ public class LoopInvExecutionPO extends AbstractOperationPO
                               ProofObligationVars symbExecVars,
                               Goal initiatingGoal,
                               ExecutionContext context) {
-        super(initConfig, loopInv.getName());
+        super(initConfig,
+              ContractFactory.generateContractName(loopInv.getName(), loopInv.getKJT(),
+                                                   loopInv.getTarget(),
+                                                   loopInv.getTarget().getContainerType(),
+                                                   loopInv.getLoop().getStartPosition().getLine()));
         this.generatedIFContract =
                 new InformationFlowContractImpl(loopInv, services);
         this.loopInvariant = loopInv;
@@ -125,7 +130,7 @@ public class LoopInvExecutionPO extends AbstractOperationPO
 
     @Override
     protected String buildPOName(boolean transactionFlag) {
-        return getLoopInvariant().getName();
+        return getContract().getName();
     }
 
     /**

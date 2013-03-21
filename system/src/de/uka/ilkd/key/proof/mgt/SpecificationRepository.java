@@ -1124,7 +1124,7 @@ public final class SpecificationRepository {
     public void setLoopInvariant(LoopInvariant inv) {
         LoopStatement loop = inv.getLoop();
         loopInvs.put(loop, inv);
-        loopInvariantsByName.put(inv.getName(), inv);
+        loopInvariantsByName.put(inv.getUniqueName(), inv);
     }
     
     

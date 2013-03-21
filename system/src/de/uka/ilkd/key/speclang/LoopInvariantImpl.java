@@ -423,8 +423,24 @@ public final class LoopInvariantImpl implements LoopInvariant {
     }
 
     @Override
-    public void setGuard(Term guardTerm) {
+    public void setGuard(Term guardTerm, Services services) {
+        assert this.guard == null;
         this.guard = guardTerm;
+        
+        ImmutableList<Triple<ImmutableList<Term>,
+                             ImmutableList<Term>,
+                             ImmutableList<Term>>> respects = getRespects(services);
+        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        originalRespects.remove(baseHeap);
+        respects =
+                respects.tail()
+                    .prepend(new Triple<ImmutableList<Term>,
+                                        ImmutableList<Term>,
+                                        ImmutableList<Term>>
+                    (respects.head().first.append(guardTerm),
+                     respects.head().second,
+                     respects.head().third));
+        originalRespects.put(baseHeap, respects);
     }
 
     @Override
@@ -480,7 +496,7 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     @Override
     public String getDisplayName() {
-	return "loop invariant";
+	return "Loop Invariant";
     }
 
 
@@ -490,15 +506,18 @@ public final class LoopInvariantImpl implements LoopInvariant {
 	return pm.getContainerType();
     }
 
-
     @Override
     public String getName() {
-        if (pm != null)
-            return "loop_invariant__"  + "at_line_" + getLoop().getStartPosition().getLine()
-                    + "_in_" + pm.getFullName();
-        else // TODO: We should always know the target, maybe generate earlier?
-            return "loop_invariant__"  + "at_line_" + getLoop().getStartPosition().getLine()
-                    + "_" + Math.abs(loop.hashCode()); // Make this case unique, just in case
+        return "Loop Invariant";
+    }
+
+    @Override
+    public String getUniqueName() {
+        if (pm != null) // TODO: We should always know the target, maybe generate earlier?
+            return "at_line_" + getLoop().getStartPosition().getLine() + "_in_" + pm.getFullName();
+        else
+            return "at_line_" + getLoop().getStartPosition().getLine() + "_" +
+                    Math.abs(loop.hashCode()); // Make this case unique, just in case
     }
 
 

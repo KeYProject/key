@@ -2,6 +2,7 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -36,6 +37,7 @@ import de.uka.ilkd.key.speclang.BlockContract.Terms;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 
 import java.util.*;
 
@@ -75,6 +77,148 @@ public class BlockContractRule implements BuiltInRule {
                                       instantiation.block,
                                       instantiation.modality, goal);
     }
+    
+    private static Term buildAtPreVar(Term varTerm,
+                                      String suffix,
+                                      Services services) {
+        if (varTerm == null) {
+            return null;
+        }
+        assert varTerm.op() instanceof LocationVariable;
+
+        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+        if (!suffix.equalsIgnoreCase("")) {
+            suffix = new String("_" + suffix);
+        }
+        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before" + suffix);
+        LocationVariable varAtPostVar =
+                new LocationVariable(new ProgramElementName(name), resultType);
+        register(varAtPostVar, services);
+        Term varAtPost = TermBuilder.DF.var(varAtPostVar);
+        return varAtPost;
+    }
+
+    private static Term buildAtPostVar(Term varTerm,
+                                       String suffix,
+                                       Services services) {
+        if (varTerm == null) {
+            return null;
+        }
+        assert varTerm.op() instanceof LocationVariable;
+
+        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+        if (!suffix.equalsIgnoreCase("")) {
+            suffix = new String("_" + suffix);
+        }
+        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_AtPost" + suffix);
+        LocationVariable varAtPostVar =
+                new LocationVariable(new ProgramElementName(name), resultType);
+        register(varAtPostVar, services);
+        Term varAtPost = TermBuilder.DF.var(varAtPostVar);
+        return varAtPost;
+    }
+
+    private static Term buildBeforeVar(Term varTerm,
+                                       Services services) {
+        if (varTerm == null) {
+            return null;
+        }
+        assert varTerm.op() instanceof LocationVariable;        
+
+        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before");
+        LocationVariable varAtPreVar =
+                new LocationVariable(new ProgramElementName(name), resultType);
+        register(varAtPreVar, services);
+        Term varAtPre = TermBuilder.DF.var(varAtPreVar);
+        return varAtPre;
+    }
+
+    private static Term buildAfterVar(Term varTerm,
+                                      Services services) {
+        if (varTerm == null) {
+            return null;
+        }
+        assert varTerm.op() instanceof LocationVariable;        
+
+        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_After");
+        LocationVariable varAtPostVar =
+                new LocationVariable(new ProgramElementName(name), resultType);
+        register(varAtPostVar, services);
+        Term varAtPost = TermBuilder.DF.var(varAtPostVar);
+        return varAtPost;
+    }
+
+    private static Term buildAfterVar(Term varTerm,
+                                      String suffix,
+                                      Services services) {
+        if (varTerm == null) {
+            return null;
+        }
+        assert varTerm.op() instanceof LocationVariable;        
+
+        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+        if (!suffix.equalsIgnoreCase("")) {
+            suffix = new String("_" + suffix);
+        }
+        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_After" + suffix);
+        LocationVariable varAtPostVar =
+                new LocationVariable(new ProgramElementName(name), resultType);
+        register(varAtPostVar, services);
+        Term varAtPost = TermBuilder.DF.var(varAtPostVar);
+        return varAtPost;
+    }
+
+    private static ImmutableList<Term> buildLocalIns(ImmutableList<Term> varTerms,
+                                                     Services services) {
+        if (varTerms == null || varTerms.isEmpty()) {
+            return varTerms;
+        }
+        ImmutableList<Term> renamedLocalIns = ImmutableSLList.<Term>nil();
+        for(Term varTerm: varTerms) {
+            assert varTerm.op() instanceof LocationVariable;        
+
+            KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+
+            String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before");
+            LocationVariable varAtPreVar =
+                    new LocationVariable(new ProgramElementName(name), resultType);
+            register(varAtPreVar, services);
+            Term varAtPre = TermBuilder.DF.var(varAtPreVar);
+            renamedLocalIns = renamedLocalIns.append(varAtPre);
+        }
+        return renamedLocalIns;
+    }
+
+    private static ImmutableList<Term> buildLocalOuts(ImmutableList<Term> varTerms,
+                                                      Services services) {
+        if (varTerms == null || varTerms.isEmpty()) {
+            return varTerms;
+        }
+        ImmutableList<Term> renamedLocalOuts = ImmutableSLList.<Term>nil();
+        for(Term varTerm: varTerms) {
+            assert varTerm.op() instanceof LocationVariable;        
+
+            KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
+
+            String name = TermBuilder.DF.newName(services, varTerm.toString() + "_After");
+            LocationVariable varAtPostVar =
+                    new LocationVariable(new ProgramElementName(name), resultType);
+            register(varAtPostVar, services);
+            Term varAtPost = TermBuilder.DF.var(varAtPostVar);
+            renamedLocalOuts = renamedLocalOuts.append(varAtPost);
+        }
+        return renamedLocalOuts;
+    }
+
+    static void register(ProgramVariable pv,
+                         Services services) {
+        Namespace progVarNames = services.getNamespaces().programVariables();
+        if (pv != null && progVarNames.lookup(pv.name()) == null) {
+            progVarNames.addSafely(pv);
+        }
+    }
 
     private static ImmutableSet<BlockContract>
                         getApplicableContracts(final SpecificationRepository specifications,
@@ -89,7 +233,8 @@ public class BlockContractRule implements BuiltInRule {
         }
         else if (modality == Modality.BOX_TRANSACTION) {
             collectedContracts =
-                    collectedContracts.union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
+                    collectedContracts.union(specifications
+                            .getBlockContracts(block, Modality.DIA_TRANSACTION));
         }
         return filterAppliedContracts(collectedContracts, goal);
     }
@@ -156,6 +301,25 @@ public class BlockContractRule implements BuiltInRule {
         return !contracts.isEmpty();
     }
 
+    private Pair<Term, Term> buildInfFlowAssumptions(InfFlowData infData) {
+        Term beforeAssumptions = TB.equals(infData.heapAtPre, infData.baseHeap);
+        Iterator<Term> newIns = infData.newIns.iterator();
+        for (Term locIn: infData.localIns) {
+            beforeAssumptions = TB.and(beforeAssumptions, TB.equals(newIns.next(), locIn));
+        }
+
+        Term afterAssumptions = TB.and(TB.equals(infData.heapAtPost, infData.baseHeap),
+                                       TB.equals(infData.selfAtPost, infData.self),
+                                       TB.equals(infData.resultAtPost, infData.result),
+                                       TB.equals(infData.exceptionAtPost, infData.exception));
+        Iterator<Term> newOuts = infData.newOuts.iterator();        
+        for (Term locOut: infData.localOuts) {
+            afterAssumptions = TB.and(afterAssumptions, TB.equals(newOuts.next(), locOut));
+        }
+        afterAssumptions = TB.and(afterAssumptions, infData.applPredTerm);        
+        
+        return new Pair<Term, Term> (beforeAssumptions, afterAssumptions);
+    }
 
     private InfFlowValidityData
                 buildInfFlowValidityGoal(final Goal goal,
@@ -180,15 +344,23 @@ public class BlockContractRule implements BuiltInRule {
                                                     "setting";
 
             final Terms vars = contract.getVariablesAsTerms();
-            final LocationVariable baseheap = services.getTypeConverter().getHeapLDT().getHeap();
-            final Term heapAtPre = TB.var(variables.remembranceHeaps.get(baseheap));
+            final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+            final Term heapAtPre = TB.var(variables.remembranceHeaps.get(baseHeap));
             final Name heapAtPostName =
-                    new Name(TB.newName(services, "heapAfterBlock"));
+                    new Name(TB.newName(services, "heap_After_BLOCK"));
             final Term heapAtPost =
                     TB.func(new Function(heapAtPostName, heapAtPre.sort(), true));
 
-            final Term heapAtPostEq =
-                    TB.equals(heapAtPost, TB.var(heaps.get(0))); // TB.var(heaps.get(0)) will be made anonymous by setUpUsageGoal
+            final Term self = vars.self;
+            final Term selfAtPost = buildAfterVar(self, "BLOCK", services);
+            final ImmutableList<Term> localInTerms = MiscTools.toTermList(localInVariables);
+            final ImmutableList<Term> newLocalIns = buildLocalIns(localInTerms, services);
+            final ImmutableList<Term> localOutTerms = MiscTools.toTermList(localOutVariables);
+            final ImmutableList<Term> newLocalOuts = buildLocalOuts(localOutTerms, services);
+            final Term result = vars.result;
+            final Term resultAtPost = buildAfterVar(result, "BLOCK", services);
+            final Term exception = vars.exception;
+            final Term exceptionAtPost = buildAfterVar(exception, "BLOCK", services);
 
             final InfFlowBlockContractTacletBuilder ifContractBuilder =
                     new InfFlowBlockContractTacletBuilder(services);
@@ -196,11 +368,14 @@ public class BlockContractRule implements BuiltInRule {
             ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
             ifContractBuilder.setHeapAtPre(heapAtPre);
             ifContractBuilder.setHeapAtPost(heapAtPost);
-            ifContractBuilder.setSelf(vars.self);
-            ifContractBuilder.setLocalIns(MiscTools.toTermList(localInVariables));
-            ifContractBuilder.setLocalOuts(MiscTools.toTermList(localOutVariables));
-            ifContractBuilder.setResult(vars.result);
-            ifContractBuilder.setException(vars.exception);
+            ifContractBuilder.setSelf(self);
+            ifContractBuilder.setSelfAtPost(selfAtPost);
+            ifContractBuilder.setLocalIns(newLocalIns);
+            ifContractBuilder.setLocalOuts(newLocalOuts);
+            ifContractBuilder.setResult(result);
+            ifContractBuilder.setResultAtPost(resultAtPost);
+            ifContractBuilder.setException(exception);
+            ifContractBuilder.setExceptionAtPost(exceptionAtPost);
 
             // generate information flow contract application predicate
             // and associated taclet
@@ -208,21 +383,34 @@ public class BlockContractRule implements BuiltInRule {
                     ifContractBuilder.buildContractApplPredTerm(true);
             Taclet informationFlowContractApp =
                     ifContractBuilder.buildContractApplTaclet(true);
+            
+            InfFlowData infFlowData = new InfFlowData(heapAtPre, heapAtPost, TB.var(heaps.get(0)),
+                                                      self, selfAtPost,
+                                                      localInTerms, newLocalIns,
+                                                      localOutTerms, newLocalOuts,
+                                                      result, resultAtPost,
+                                                      exception, exceptionAtPost,
+                                                      contractApplTerm);
+            // TB.var(heaps.get(0)) will be made anonymous by setUpUsageGoal
 
             // set infFlowAssumptions
-            Term infFlowAssumptions = TB.and(heapAtPostEq, contractApplTerm);
+            Pair<Term, Term> infFlowAssumptions = buildInfFlowAssumptions(infFlowData);
 
             // create information flow validity goal
 
             // generate proof obligation variables
             final ProofObligationVars instantiationVars =
-                    new ProofObligationVars(vars.self,
-                                            MiscTools.toTermList(localInVariables),
+                    new ProofObligationVars(self,
+                                            selfAtPost,
+                                            newLocalIns,
                                             heapAtPre,
-                                            MiscTools.toTermList(localOutVariables),
-                                            vars.result, ifContractBuilder.getResultPost(),
-                                            vars.exception, ifContractBuilder.getExceptionAtPost(),
-                                            heapAtPost, services, true);
+                                            newLocalOuts,
+                                            result,
+                                            resultAtPost,
+                                            exception,
+                                            exceptionAtPost,
+                                            heapAtPost,
+                                            services, true);
             final IFProofObligationVars ifVars =
                     new IFProofObligationVars(instantiationVars, services, true);
             application.update(ifVars, instantiation.context);
@@ -287,7 +475,8 @@ public class BlockContractRule implements BuiltInRule {
         final boolean isStrictlyPure = !application.getContract().hasModifiesClause();
         final Map<LocationVariable, Function> anonymisationHeaps =
                 createAndRegisterAnonymisationVariables(heaps, isStrictlyPure, services);
-        //final Map<LocationVariable, Function> anonymisationLocalVariables = createAndRegisterAnonymisationVariables(localOutVariables, services);
+        //final Map<LocationVariable, Function> anonymisationLocalVariables =
+        //createAndRegisterAnonymisationVariables(localOutVariables, services);
 
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(
             goal, contract.getPlaceholderVariables(), services
@@ -357,7 +546,8 @@ public class BlockContractRule implements BuiltInRule {
             result.head(),
             new Term[] {contextUpdate, remembranceUpdate, anonymisationUpdate},
             new Term[] {postcondition, wellFormedAnonymisationHeapsCondition, reachableOutCondition,
-                        atMostOneFlagSetCondition, infFlowValitidyData.assumptions},
+                        atMostOneFlagSetCondition},
+            infFlowValitidyData.assumptions,
             infFlowValitidyData.taclet
         );
         return result;
@@ -637,7 +827,8 @@ public class BlockContractRule implements BuiltInRule {
         }
 
         public Term buildAnonymisationUpdate(final Map<LocationVariable, Function> anonymisationHeaps,
-                                             /*final Map<LocationVariable, Function> anonymisationLocalVariables,*/
+                                             /*final Map<LocationVariable, Function>
+                                              anonymisationLocalVariables,*/
                                              final Map<LocationVariable, Term> modifiesClauses) {
             Term result = buildLocalVariablesAnonymisationUpdate(/*anonymisationLocalVariables*/);
             for (Map.Entry<LocationVariable, Function> anonymisationHeap
@@ -669,8 +860,10 @@ public class BlockContractRule implements BuiltInRule {
             }
             return result;
             /*Term result = skip();
-            for (Map.Entry<LocationVariable, Function> anonymisationLocalVariable : anonymisationLocalVariables.entrySet()) {
-                result = parallel(result, elementary(anonymisationLocalVariable.getKey(), func(anonymisationLocalVariable.getValue())));
+            for (Map.Entry<LocationVariable, Function> anonymisationLocalVariable :
+            anonymisationLocalVariables.entrySet()) {
+                result = parallel(result, elementary(anonymisationLocalVariable.getKey(),
+                func(anonymisationLocalVariable.getValue())));
             }
             return result;*/
         }
@@ -928,10 +1121,23 @@ public class BlockContractRule implements BuiltInRule {
         }
 
         public void setUpUsageGoal(final Goal goal, final Term[] updates,
-                                   final Term[] assumptions, final Taclet informationFlowContractApp) {
+                                   final Term[] assumptions, final Pair<Term, Term> infFlowAssumptions,
+                                   final Taclet informationFlowContractApp) {
             goal.setBranchLabel("Usage");
-            goal.addFormula(new SequentFormula(TB.applySequential(updates, TB.and(assumptions))),
-                                               true, false);
+
+            Term uAssumptions = TB.tt();
+            if (infFlowAssumptions.equals(new Pair<Term, Term> (TB.tt(), TB.tt()))) {
+                uAssumptions =
+                        TB.and(TB.applySequential(updates, TB.and(assumptions)));
+            } else {
+                uAssumptions =
+                        TB.and(TB.applySequential(updates, TB.and(assumptions)),
+                               TB.applySequential(new Term[] {updates[0], updates[1]},
+                                        TB.and(infFlowAssumptions.first,
+                                               TB.apply(updates[2], infFlowAssumptions.second))));
+            }
+
+            goal.addFormula(new SequentFormula(uAssumptions), true, false);
             goal.changeFormula(new SequentFormula(TB.applySequential(updates, buildUsageFormula())),
                                                   occurrence);
             if (informationFlowContractApp != null) {
@@ -1041,12 +1247,14 @@ public class BlockContractRule implements BuiltInRule {
         }
 
         private void declareExceptionNull() {
-            statements.add(KeYJavaASTFactory.declare(variables.exception, NullLiteral.NULL, variables.exception.getKeYJavaType()));
+            statements.add(KeYJavaASTFactory.declare(variables.exception, NullLiteral.NULL,
+                                                     variables.exception.getKeYJavaType()));
         }
 
         private void executeBlockSafely() {
             final Label breakOutLabel = new ProgramElementName("breakOut");
-            final StatementBlock almostSafeBlock = replaceOuterBreaksContinuesAndReturns(block, breakOutLabel);
+            final StatementBlock almostSafeBlock =
+                    replaceOuterBreaksContinuesAndReturns(block, breakOutLabel);
             final Statement labeledAlmostSafeBlock = label(almostSafeBlock, labels);
             final Statement safeStatement = wrapInTryCatch(labeledAlmostSafeBlock);
             statements.add(new LabeledStatement(breakOutLabel, safeStatement));
@@ -1087,22 +1295,21 @@ public class BlockContractRule implements BuiltInRule {
 
     }
 
-
     private class InfFlowValidityData {
-        final Term assumptions;
+        final Pair<Term, Term> assumptions;
         final Taclet taclet;
         final Goal goal;
 
 
         public InfFlowValidityData() {
-            assumptions = TB.tt();
+            assumptions = new Pair<Term, Term> (TB.tt(), TB.tt());
             taclet = null;
             goal = null;
         }
 
-        public InfFlowValidityData(final Term assumptions,
-                               final Taclet taclet,
-                               final Goal goal) {
+        public InfFlowValidityData(final Pair<Term, Term> assumptions,
+                                   final Taclet taclet,
+                                   final Goal goal) {
             this.assumptions = assumptions;
             this.taclet = taclet;
             this.goal = goal;
@@ -1110,6 +1317,62 @@ public class BlockContractRule implements BuiltInRule {
 
         boolean hasInfFlowGoal() {
             return goal != null;
+        }
+    }
+
+    private static final class InfFlowData {
+        public final Term heapAtPre;
+        public final Term heapAtPost;
+        public final Term baseHeap;
+        public final Term self;
+        public final Term selfAtPost;        
+        public final ImmutableList<Term> localIns;
+        public final ImmutableList<Term> newIns;
+        public final ImmutableList<Term> localOuts;
+        public final ImmutableList<Term> newOuts;
+        public final Term result;
+        public final Term resultAtPost;
+        public final Term exception;
+        public final Term exceptionAtPost;
+        public final Term applPredTerm;
+
+        public InfFlowData() {
+            this.heapAtPre = null;
+            this.heapAtPost = null;
+            this.baseHeap = null;
+            this.self = null;
+            this.selfAtPost = null;
+            this.localIns = ImmutableSLList.<Term>nil();
+            this.newIns = ImmutableSLList.<Term>nil();
+            this.localOuts = ImmutableSLList.<Term>nil();
+            this.newOuts = ImmutableSLList.<Term>nil();
+            this.result = null;
+            this.resultAtPost = null;
+            this.exception = null;
+            this.exceptionAtPost = null;
+            this.applPredTerm = null;
+        }
+
+        public InfFlowData(Term heapAtPre, Term heapAtPost, Term baseHeap,
+                           Term self, Term selfAtPost,
+                           ImmutableList<Term> localIns, ImmutableList<Term> newIns,
+                           ImmutableList<Term> localOuts, ImmutableList<Term> newOuts,
+                           Term result, Term resultAtPost, Term exception, Term exceptionAtPost,
+                           Term applPredTerm) {
+            this.heapAtPre = heapAtPre;
+            this.heapAtPost = heapAtPost;
+            this.baseHeap = baseHeap;
+            this.self = self;
+            this.selfAtPost = selfAtPost;
+            this.localIns = localIns;
+            this.newIns = newIns;
+            this.localOuts = localOuts;
+            this.newOuts = newOuts;
+            this.result = result;
+            this.resultAtPost = resultAtPost;
+            this.exception = exception;
+            this.exceptionAtPost = exceptionAtPost;
+            this.applPredTerm = applPredTerm;
         }
     }
 }

@@ -93,8 +93,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
                                             ? vs.result.op(ProgramVariable.class)
                                             : null,
                                             vs.exception != null
-                                            ? vs.exception.op(
-                ProgramVariable.class)
+                                            ? vs.exception.op(ProgramVariable.class)
                                             : null);
 
         //create program term

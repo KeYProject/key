@@ -130,7 +130,7 @@ public interface LoopInvariant extends SpecificationElement {
 
     public LoopInvariant setExecutionContext(ExecutionContext execCont);
 
-    public void setGuard(Term guardTerm);
+    public void setGuard(Term guardTerm, Services services);
 
     /**
      * Returns a new loop invariant where the invariant formula has been
@@ -148,4 +148,6 @@ public interface LoopInvariant extends SpecificationElement {
      * perform some action/transformation on this element.
      */
     public void visit(Visitor v);
+    
+    public String getUniqueName();
 }

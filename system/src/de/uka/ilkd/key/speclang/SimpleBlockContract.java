@@ -296,12 +296,12 @@ public final class SimpleBlockContract implements BlockContract {
 
     @Override
     public String getName() {
-        return "Block Contract";
+        return "Block Contract ";
     }
 
     @Override
     public String getDisplayName() {
-        return getName();
+        return "Block Contract";
     }
 
     @Override

@@ -157,23 +157,23 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
     public InformationFlowContractImpl(BlockContract bc, Services services) {
 
-        this(bc.getName(), null, bc.getKJT(), bc.getMethod(), bc.getKJT(),
+        this(bc.getName(), null, bc.getKJT(), bc.getMethod(), bc.getTarget().getContainerType(),
              bc.getModality(), bc.getPre(services), null, bc.getMod(services),
              bc.hasModifiesClause(), bc.getVariablesAsTerms().self,
              ImmutableSLList.<Term>nil(), bc.getVariablesAsTerms().result,
              bc.getVariablesAsTerms().exception, null, bc.getRespects(),
-             false, INVALID_ID);
+             false, bc.getBlock().getStartPosition().getLine());
     }
     
     
     public InformationFlowContractImpl(LoopInvariant li, Services services) {
 
-        this(li.getName(), null, li.getKJT(), li.getTarget(), li.getKJT(),
+        this(li.getName(), null, li.getKJT(), li.getTarget(), li.getTarget().getContainerType(),
              Modality.BOX, li.getInvariant(services), null, li.getModifies(),
              (li.getModifies() != TB.lessThanNothing()), li.getInternalSelfTerm(),
              ImmutableSLList.<Term>nil(), null, // TODO: Why here no localIns?
              TB.var(TB.excVar(services, li.getTarget(), true)), null,
-             li.getRespects(services), false, INVALID_ID);
+             li.getRespects(services), false, li.getLoop().getStartPosition().getLine());
     }
 
 

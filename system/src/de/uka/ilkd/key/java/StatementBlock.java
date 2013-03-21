@@ -219,6 +219,10 @@ public class StatementBlock extends JavaStatement
 	v.performActionOnStatementBlock(this);
     }
 
+    public String getUniqueName() {
+        return "at_line_" + getStartPosition().getLine();
+    }
+
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printStatementBlock(this);
     }
@@ -248,8 +252,4 @@ public class StatementBlock extends JavaStatement
         }
         return firstActiveChildPos;
     }
- 
-
-
-
 }
