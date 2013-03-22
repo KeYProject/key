@@ -3,9 +3,9 @@
    <methodCall name="self.compute();" pathCondition="true" pathConditionChanged="false">
       <statement name="this.value=1;" pathCondition="true" pathConditionChanged="false">
          <statement name="this.next.value=2;" pathCondition="true" pathConditionChanged="false">
-            <branchCondition name="!self.next = null" pathCondition="!self.next = null" pathConditionChanged="true" branchCondition="!self.next = null" mergedBranchCondition="false">
+            <branchCondition name="!self.next = null" pathCondition="!self.next = null" pathConditionChanged="true" branchCondition="!self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="this.next.next.value=3;" pathCondition="!self.next = null" pathConditionChanged="false">
-                  <branchCondition name="!self.next.next = null" pathCondition="!self.next = null &amp; !self.next.next = null" pathConditionChanged="true" branchCondition="!self.next.next = null" mergedBranchCondition="false">
+                  <branchCondition name="!self.next.next = null" pathCondition="!self.next = null &amp; !self.next.next = null" pathConditionChanged="true" branchCondition="!self.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <statement name="return this.value+this.next.value+this.next.next.value;" pathCondition="!self.next = null &amp; !self.next.next = null" pathConditionChanged="false">
                         <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="!self.next = null &amp; !self.next.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  3
 + \if (self.next.next = self)
@@ -21,13 +21,13 @@
                         </methodReturn>
                      </statement>
                   </branchCondition>
-                  <branchCondition name="self.next.next = null" pathCondition="!self.next = null &amp; self.next.next = null" pathConditionChanged="true" branchCondition="self.next.next = null" mergedBranchCondition="false">
+                  <branchCondition name="self.next.next = null" pathCondition="!self.next = null &amp; self.next.next = null" pathConditionChanged="true" branchCondition="self.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!self.next = null &amp; self.next.next = null" pathConditionChanged="false" exceptionalTermination="true">
                      </termination>
                   </branchCondition>
                </statement>
             </branchCondition>
-            <branchCondition name="self.next = null" pathCondition="self.next = null" pathConditionChanged="true" branchCondition="self.next = null" mergedBranchCondition="false">
+            <branchCondition name="self.next = null" pathCondition="self.next = null" pathConditionChanged="true" branchCondition="self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="self.next = null" pathConditionChanged="false" exceptionalTermination="true">
                </termination>
             </branchCondition>

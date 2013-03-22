@@ -2,9 +2,9 @@
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.compute(current);" pathCondition="true" pathConditionChanged="false">
       <statement name="Node newParent = current.right;" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="!current = null" pathCondition="!current = null" pathConditionChanged="true" branchCondition="!current = null" mergedBranchCondition="false">
+         <branchCondition name="!current = null" pathCondition="!current = null" pathConditionChanged="true" branchCondition="!current = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="Node oldLeft = newParent.left;" pathCondition="!current = null" pathConditionChanged="false">
-               <branchCondition name="!current.right = null" pathCondition="!current = null &amp; !current.right = null" pathConditionChanged="true" branchCondition="!current.right = null" mergedBranchCondition="false">
+               <branchCondition name="!current.right = null" pathCondition="!current = null &amp; !current.right = null" pathConditionChanged="true" branchCondition="!current.right = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="newParent.left=current;" pathCondition="!current = null &amp; !current.right = null" pathConditionChanged="false">
                      <statement name="newParent.height=0;" pathCondition="!current = null &amp; !current.right = null" pathConditionChanged="false">
                         <statement name="current.height=0;" pathCondition="!current = null &amp; !current.right = null" pathConditionChanged="false">
@@ -12,7 +12,7 @@
                               <branchNode name="if (oldLeft!=null) {   oldLeft.parent=current.right; }" pathCondition="!current = null &amp; !current.right = null" pathConditionChanged="false">
                                  <branchCondition name="!current.right.left = null" pathCondition="  !current = null
 &amp; !current.right = null
-&amp; !current.right.left = null" pathConditionChanged="true" branchCondition="!current.right.left = null" mergedBranchCondition="false">
+&amp; !current.right.left = null" pathConditionChanged="true" branchCondition="!current.right.left = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                     <statement name="oldLeft.parent=current.right;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null" pathConditionChanged="false">
@@ -31,7 +31,7 @@
   = null" pathConditionChanged="true" branchCondition="  \if (current.right.left = current)
       \then (current.right.left)
       \else (current.parent)
-= null" mergedBranchCondition="false">
+= null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                              <statement name="root=newParent;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
@@ -93,7 +93,7 @@
    = null" pathConditionChanged="true" branchCondition="!  \if (current.right.left = current)
        \then (current.right.left)
        \else (current.parent)
- = null" mergedBranchCondition="false">
+ = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                              <statement name="current.parent.right=newParent;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
@@ -148,14 +148,14 @@
                                  </branchCondition>
                                  <branchCondition name="current.right.left = null" pathCondition="  !current = null
 &amp; !current.right = null
-&amp; current.right.left = null" pathConditionChanged="true" branchCondition="current.right.left = null" mergedBranchCondition="false">
+&amp; current.right.left = null" pathConditionChanged="true" branchCondition="current.right.left = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                     <branchNode name="if (current.parent==null) {   root=newParent;   newParent.parent=null; }else  {   current.parent.right=newParent;   newParent.parent=current.parent; }" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null" pathConditionChanged="false">
                                        <branchCondition name="current.parent = null" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null
-&amp; current.parent = null" pathConditionChanged="true" branchCondition="current.parent = null" mergedBranchCondition="false">
+&amp; current.parent = null" pathConditionChanged="true" branchCondition="current.parent = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                           <statement name="root=newParent;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null
@@ -190,7 +190,7 @@
                                        <branchCondition name="!current.parent = null" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null
-&amp; !current.parent = null" pathConditionChanged="true" branchCondition="!current.parent = null" mergedBranchCondition="false">
+&amp; !current.parent = null" pathConditionChanged="true" branchCondition="!current.parent = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                           <statement name="current.parent.right=newParent;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null
@@ -230,13 +230,13 @@
                      </statement>
                   </statement>
                </branchCondition>
-               <branchCondition name="current.right = null" pathCondition="!current = null &amp; current.right = null" pathConditionChanged="true" branchCondition="current.right = null" mergedBranchCondition="false">
+               <branchCondition name="current.right = null" pathCondition="!current = null &amp; current.right = null" pathConditionChanged="true" branchCondition="current.right = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!current = null &amp; current.right = null" pathConditionChanged="false" exceptionalTermination="true">
                   </termination>
                </branchCondition>
             </statement>
          </branchCondition>
-         <branchCondition name="current = null" pathCondition="current = null" pathConditionChanged="true" branchCondition="current = null" mergedBranchCondition="false">
+         <branchCondition name="current = null" pathCondition="current = null" pathConditionChanged="true" branchCondition="current = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="current = null" pathConditionChanged="false" exceptionalTermination="true">
             </termination>
          </branchCondition>

@@ -3,7 +3,7 @@
    <methodCall name="self.min(i,j);" pathCondition="true" pathConditionChanged="false">
       <statement name="int result;" pathCondition="true" pathConditionChanged="false">
          <branchNode name="if (i&lt;j) {   result_1=i; }else  {   result_1=j; }" pathCondition="true" pathConditionChanged="false">
-            <branchCondition name="!j &lt;= i" pathCondition="!j &lt;= i" pathConditionChanged="true" branchCondition="!j &lt;= i" mergedBranchCondition="false">
+            <branchCondition name="!j &lt;= i" pathCondition="!j &lt;= i" pathConditionChanged="true" branchCondition="!j &lt;= i" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="result_1=i;" pathCondition="!j &lt;= i" pathConditionChanged="false">
                   <statement name="return result_1;" pathCondition="!j &lt;= i" pathConditionChanged="false">
                      <methodReturn name="&lt;return of self.min(i,j);&gt;" pathCondition="!j &lt;= i" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;i&apos; as result of self.min(i,j);&gt;" isReturnValueComputed="true">
@@ -13,7 +13,7 @@
                   </statement>
                </statement>
             </branchCondition>
-            <branchCondition name="!j &gt;= 1 + i" pathCondition="!j &gt;= 1 + i" pathConditionChanged="true" branchCondition="!j &gt;= 1 + i" mergedBranchCondition="false">
+            <branchCondition name="!j &gt;= 1 + i" pathCondition="!j &gt;= 1 + i" pathConditionChanged="true" branchCondition="!j &gt;= 1 + i" mergedBranchCondition="false" isBranchConditionComputed="true">
                <statement name="result_1=j;" pathCondition="!j &gt;= 1 + i" pathConditionChanged="false">
                   <statement name="return result_1;" pathCondition="!j &gt;= 1 + i" pathConditionChanged="false">
                      <methodReturn name="&lt;return of self.min(i,j);&gt;" pathCondition="!j &gt;= 1 + i" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;j&apos; as result of self.min(i,j);&gt;" isReturnValueComputed="true">

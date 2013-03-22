@@ -2,20 +2,20 @@
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.compute(a);" pathCondition="true" pathConditionChanged="false">
       <branchNode name="if (x==1) {if (next.x==2) {if (next.next.x==3) {if (instance.x==4) {if (instance.next.x==5) {if (instance.next.next.x==6) {return 42;           }else  {return              -600;           }         }else  {return            -500;         }       }else  {return          -400;       }     }else  {return        -300;     }   }else  {return      -200;   } }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="self.x = 1" pathCondition="self.x = 1" pathConditionChanged="true" branchCondition="self.x = 1" mergedBranchCondition="false">
+         <branchCondition name="self.x = 1" pathCondition="self.x = 1" pathConditionChanged="true" branchCondition="self.x = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
             <branchNode name="if (next.x==2) {if (next.next.x==3) {if (instance.x==4) {if (instance.next.x==5) {if (instance.next.next.x==6) {return 42;         }else  {return            -600;         }       }else  {return          -500;       }     }else  {return        -400;     }   }else  {return      -300;   } }else  {return    -200; }" pathCondition="self.x = 1" pathConditionChanged="false">
-               <branchCondition name="!self.next = null" pathCondition="self.x = 1 &amp; !self.next = null" pathConditionChanged="true" branchCondition="!self.next = null" mergedBranchCondition="false">
-                  <branchCondition name="self.next.x = 2" pathCondition="self.x = 1 &amp; !self.next = null &amp; self.next.x = 2" pathConditionChanged="true" branchCondition="self.next.x = 2" mergedBranchCondition="false">
+               <branchCondition name="!self.next = null" pathCondition="self.x = 1 &amp; !self.next = null" pathConditionChanged="true" branchCondition="!self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <branchCondition name="self.next.x = 2" pathCondition="self.x = 1 &amp; !self.next = null &amp; self.next.x = 2" pathConditionChanged="true" branchCondition="self.next.x = 2" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <branchNode name="if (next.next.x==3) {if (instance.x==4) {if (instance.next.x==5) {if (instance.next.next.x==6) {return 42;       }else  {return          -600;       }     }else  {return        -500;     }   }else  {return      -400;   } }else  {return    -300; }" pathCondition="self.x = 1 &amp; !self.next = null &amp; self.next.x = 2" pathConditionChanged="false">
                         <branchCondition name="!self.next.next = null" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
-&amp; !self.next.next = null" pathConditionChanged="true" branchCondition="!self.next.next = null" mergedBranchCondition="false">
+&amp; !self.next.next = null" pathConditionChanged="true" branchCondition="!self.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <branchCondition name="self.next.next.x = 3" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
 &amp; !self.next.next = null
-&amp; self.next.next.x = 3" pathConditionChanged="true" branchCondition="self.next.next.x = 3" mergedBranchCondition="false">
+&amp; self.next.next.x = 3" pathConditionChanged="true" branchCondition="self.next.next.x = 3" mergedBranchCondition="false" isBranchConditionComputed="true">
                               <branchNode name="if (instance.x==4) {if (instance.next.x==5) {if (instance.next.next.x==6) {return 42;     }else  {return        -600;     }   }else  {return      -500;   } }else  {return    -400; }" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -26,14 +26,14 @@
 &amp; self.next.x = 2
 &amp; !self.next.next = null
 &amp; self.next.next.x = 3
-&amp; !ObjectConditionTest.instance = null" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance = null" mergedBranchCondition="false">
+&amp; !ObjectConditionTest.instance = null" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                     <branchCondition name="ObjectConditionTest.instance.x = 4" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
 &amp; !self.next.next = null
 &amp; self.next.next.x = 3
 &amp; !ObjectConditionTest.instance = null
-&amp; ObjectConditionTest.instance.x = 4" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.x = 4" mergedBranchCondition="false">
+&amp; ObjectConditionTest.instance.x = 4" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.x = 4" mergedBranchCondition="false" isBranchConditionComputed="true">
                                        <branchNode name="if (instance.next.x==5) {if (instance.next.next.x==6) {return 42;   }else  {return      -600;   } }else  {return    -500; }" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -48,7 +48,7 @@
 &amp; self.next.next.x = 3
 &amp; !ObjectConditionTest.instance = null
 &amp; ObjectConditionTest.instance.x = 4
-&amp; !ObjectConditionTest.instance.next = null" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance.next = null" mergedBranchCondition="false">
+&amp; !ObjectConditionTest.instance.next = null" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                              <branchCondition name="ObjectConditionTest.instance.next.x = 5" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -57,7 +57,7 @@
 &amp; !ObjectConditionTest.instance = null
 &amp; ObjectConditionTest.instance.x = 4
 &amp; !ObjectConditionTest.instance.next = null
-&amp; ObjectConditionTest.instance.next.x = 5" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.next.x = 5" mergedBranchCondition="false">
+&amp; ObjectConditionTest.instance.next.x = 5" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.next.x = 5" mergedBranchCondition="false" isBranchConditionComputed="true">
                                                 <branchNode name="if (instance.next.next.x==6) {return 42; }else  {return    -600; }" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -76,7 +76,7 @@
 &amp; ObjectConditionTest.instance.x = 4
 &amp; !ObjectConditionTest.instance.next = null
 &amp; ObjectConditionTest.instance.next.x = 5
-&amp; !ObjectConditionTest.instance.next.next = null" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance.next.next = null" mergedBranchCondition="false">
+&amp; !ObjectConditionTest.instance.next.next = null" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                                       <branchCondition name="ObjectConditionTest.instance.next.next.x = 6" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -87,7 +87,7 @@
 &amp; !ObjectConditionTest.instance.next = null
 &amp; ObjectConditionTest.instance.next.x = 5
 &amp; !ObjectConditionTest.instance.next.next = null
-&amp; ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.next.next.x = 6" mergedBranchCondition="false">
+&amp; ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.next.next.x = 6" mergedBranchCondition="false" isBranchConditionComputed="true">
                                                          <statement name="return 42;" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -135,7 +135,7 @@
 &amp; !ObjectConditionTest.instance.next = null
 &amp; ObjectConditionTest.instance.next.x = 5
 &amp; !ObjectConditionTest.instance.next.next = null
-&amp; !ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance.next.next.x = 6" mergedBranchCondition="false">
+&amp; !ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance.next.next.x = 6" mergedBranchCondition="false" isBranchConditionComputed="true">
                                                          <statement name="return -600;" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -183,7 +183,7 @@
 &amp; ObjectConditionTest.instance.x = 4
 &amp; !ObjectConditionTest.instance.next = null
 &amp; ObjectConditionTest.instance.next.x = 5
-&amp; ObjectConditionTest.instance.next.next = null" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.next.next = null" mergedBranchCondition="false">
+&amp; ObjectConditionTest.instance.next.next = null" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                                       <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -206,7 +206,7 @@
 &amp; !ObjectConditionTest.instance = null
 &amp; ObjectConditionTest.instance.x = 4
 &amp; !ObjectConditionTest.instance.next = null
-&amp; !ObjectConditionTest.instance.next.x = 5" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance.next.x = 5" mergedBranchCondition="false">
+&amp; !ObjectConditionTest.instance.next.x = 5" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance.next.x = 5" mergedBranchCondition="false" isBranchConditionComputed="true">
                                                 <statement name="return -500;" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -246,7 +246,7 @@
 &amp; self.next.next.x = 3
 &amp; !ObjectConditionTest.instance = null
 &amp; ObjectConditionTest.instance.x = 4
-&amp; ObjectConditionTest.instance.next = null" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.next = null" mergedBranchCondition="false">
+&amp; ObjectConditionTest.instance.next = null" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                              <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -265,7 +265,7 @@
 &amp; !self.next.next = null
 &amp; self.next.next.x = 3
 &amp; !ObjectConditionTest.instance = null
-&amp; !ObjectConditionTest.instance.x = 4" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance.x = 4" mergedBranchCondition="false">
+&amp; !ObjectConditionTest.instance.x = 4" pathConditionChanged="true" branchCondition="!ObjectConditionTest.instance.x = 4" mergedBranchCondition="false" isBranchConditionComputed="true">
                                        <statement name="return -400;" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -297,7 +297,7 @@
 &amp; self.next.x = 2
 &amp; !self.next.next = null
 &amp; self.next.next.x = 3
-&amp; ObjectConditionTest.instance = null" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance = null" mergedBranchCondition="false">
+&amp; ObjectConditionTest.instance = null" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                     <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -312,7 +312,7 @@
 &amp; !self.next = null
 &amp; self.next.x = 2
 &amp; !self.next.next = null
-&amp; !self.next.next.x = 3" pathConditionChanged="true" branchCondition="!self.next.next.x = 3" mergedBranchCondition="false">
+&amp; !self.next.next.x = 3" pathConditionChanged="true" branchCondition="!self.next.next.x = 3" mergedBranchCondition="false" isBranchConditionComputed="true">
                               <statement name="return -300;" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -336,7 +336,7 @@
                         <branchCondition name="self.next.next = null" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
-&amp; self.next.next = null" pathConditionChanged="true" branchCondition="self.next.next = null" mergedBranchCondition="false">
+&amp; self.next.next = null" pathConditionChanged="true" branchCondition="self.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -345,7 +345,7 @@
                         </branchCondition>
                      </branchNode>
                   </branchCondition>
-                  <branchCondition name="!self.next.x = 2" pathCondition="self.x = 1 &amp; !self.next = null &amp; !self.next.x = 2" pathConditionChanged="true" branchCondition="!self.next.x = 2" mergedBranchCondition="false">
+                  <branchCondition name="!self.next.x = 2" pathCondition="self.x = 1 &amp; !self.next = null &amp; !self.next.x = 2" pathConditionChanged="true" branchCondition="!self.next.x = 2" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <statement name="return -200;" pathCondition="self.x = 1 &amp; !self.next = null &amp; !self.next.x = 2" pathConditionChanged="false">
                         <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="self.x = 1 &amp; !self.next = null &amp; !self.next.x = 2" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-200&apos; as result of self.compute(a);&gt;" isReturnValueComputed="true">
                            <termination name="&lt;end&gt;" pathCondition="self.x = 1 &amp; !self.next = null &amp; !self.next.x = 2" pathConditionChanged="false" exceptionalTermination="false">
@@ -354,13 +354,13 @@
                      </statement>
                   </branchCondition>
                </branchCondition>
-               <branchCondition name="self.next = null" pathCondition="self.x = 1 &amp; self.next = null" pathConditionChanged="true" branchCondition="self.next = null" mergedBranchCondition="false">
+               <branchCondition name="self.next = null" pathCondition="self.x = 1 &amp; self.next = null" pathConditionChanged="true" branchCondition="self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="self.x = 1 &amp; self.next = null" pathConditionChanged="false" exceptionalTermination="true">
                   </termination>
                </branchCondition>
             </branchNode>
          </branchCondition>
-         <branchCondition name="!self.x = 1" pathCondition="!self.x = 1" pathConditionChanged="true" branchCondition="!self.x = 1" mergedBranchCondition="false">
+         <branchCondition name="!self.x = 1" pathCondition="!self.x = 1" pathConditionChanged="true" branchCondition="!self.x = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return -100;" pathCondition="!self.x = 1" pathConditionChanged="false">
                <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="!self.x = 1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-100&apos; as result of self.compute(a);&gt;" isReturnValueComputed="true">
                   <termination name="&lt;end&gt;" pathCondition="!self.x = 1" pathConditionChanged="false" exceptionalTermination="false">

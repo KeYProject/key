@@ -356,7 +356,7 @@ public class ExecutionNodeReader {
     */
    protected AbstractKeYlessExecutionNode createExecutionNode(IExecutionNode parent, String uri, String localName, String qName, Attributes attributes) throws SAXException {
       if (ExecutionNodeWriter.TAG_BRANCH_CONDITION.equals(qName)) {
-         return new KeYlessBranchCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getBranchCondition(attributes), isMergedBranchCondition(attributes));
+         return new KeYlessBranchCondition(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getBranchCondition(attributes), isMergedBranchCondition(attributes), isBranchConditionComputed(attributes));
       }
       else if (ExecutionNodeWriter.TAG_BRANCH_NODE.equals(qName)) {
          return new KeYlessBranchNode(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
@@ -454,6 +454,15 @@ public class ExecutionNodeReader {
     */
    protected boolean isReturnValueComputed(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_RETURN_VALUE_COMPUTED));
+   }
+
+   /**
+    * Returns the is branch condition computed value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isBranchConditionComputed(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_BRANCH_CONDITION_COMPUTED));
    }
    
    /**
@@ -787,6 +796,11 @@ public class ExecutionNodeReader {
       private boolean mergedBranchCondition;
       
       /**
+       * Indicates if branch condition is computed or not.
+       */
+      private boolean branchConditionComputed;
+      
+      /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
        * @param name The name of this node.
@@ -794,16 +808,19 @@ public class ExecutionNodeReader {
        * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param formatedBranchCondition The formated branch condition.
        * @param mergedBranchCondition Merged branch condition?
+       * @param branchConditionComputed Is branch condition computed?
        */
       public KeYlessBranchCondition(IExecutionNode parent, 
                                     String name, 
                                     String formatedPathCondition, 
                                     boolean pathConditionChanged,
                                     String formatedBranchCondition,
-                                    boolean mergedBranchCondition) {
+                                    boolean mergedBranchCondition,
+                                    boolean branchConditionComputed) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.formatedBranchCondition = formatedBranchCondition;
          this.mergedBranchCondition = mergedBranchCondition;
+         this.branchConditionComputed = branchConditionComputed;
       }
 
       /**
@@ -852,6 +869,14 @@ public class ExecutionNodeReader {
       @Override
       public Term[] getMergedBranchCondtions() throws ProofInputException {
          return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isBranchConditionComputed() {
+         return branchConditionComputed;
       }
    }
 

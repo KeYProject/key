@@ -10,7 +10,7 @@
                         <statement name="this.value=var_1;" pathCondition="true" pathConditionChanged="false">
                            <methodReturn name="&lt;return of InstanceCreationTestWrapper(var_1);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of InstanceCreationTestWrapper(var_1);&gt;" isReturnValueComputed="false">
                               <branchNode name="if (next!=null) {   next.instanceWrapper=new InstanceCreationTestWrapper (3);InstanceCreationTestWrapper localWrapper = new InstanceCreationTestWrapper (4);return    classWrapper.value+instanceWrapper.value+next.instanceWrapper.value+localWrapper.value; }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
-                                 <branchCondition name="!self.next = null" pathCondition="!self.next = null" pathConditionChanged="true" branchCondition="!self.next = null" mergedBranchCondition="false">
+                                 <branchCondition name="!self.next = null" pathCondition="!self.next = null" pathConditionChanged="true" branchCondition="!self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                     <statement name="next.instanceWrapper=new InstanceCreationTestWrapper (3);" pathCondition="!self.next = null" pathConditionChanged="false">
                                        <methodCall name="InstanceCreationTestWrapper(var_2);" pathCondition="!self.next = null" pathConditionChanged="false">
                                           <statement name="this.value=var_2;" pathCondition="!self.next = null" pathConditionChanged="false">
@@ -53,7 +53,7 @@
                                        </methodCall>
                                     </statement>
                                  </branchCondition>
-                                 <branchCondition name="self.next = null" pathCondition="self.next = null" pathConditionChanged="true" branchCondition="self.next = null" mergedBranchCondition="false">
+                                 <branchCondition name="self.next = null" pathCondition="self.next = null" pathConditionChanged="true" branchCondition="self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                     <statement name="return -100;" pathCondition="self.next = null" pathConditionChanged="false">
                                        <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="self.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-100&apos; as result of self.compute();&gt;" isReturnValueComputed="true">
                                           <termination name="&lt;end&gt;" pathCondition="self.next = null" pathConditionChanged="false" exceptionalTermination="false">
