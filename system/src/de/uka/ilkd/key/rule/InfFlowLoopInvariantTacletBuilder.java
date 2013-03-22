@@ -40,7 +40,9 @@ public final class InfFlowLoopInvariantTacletBuilder
     @Override
     Name generateName() {
         return MiscTools.toValidTacletName("Use information flow contract for " +
-                                           loopinvariant.getName().toString());
+                                           loopinvariant.getName().toString() + " " +
+                                           loopinvariant.getLoop().getStartPosition().getLine() + " : " +
+                                           loopinvariant.getTarget().getFullName());
     }
 
     @Override
