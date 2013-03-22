@@ -131,6 +131,14 @@ public class ExecutionMethodReturn extends AbstractExecutionStateNode<SourceElem
       }
       return returnValue;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isReturnValueComputed() {
+      return returnValue != null;
+   }
    
    /**
     * Computes the return value lazily when

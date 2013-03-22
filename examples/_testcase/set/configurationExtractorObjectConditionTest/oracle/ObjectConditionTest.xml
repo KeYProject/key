@@ -109,7 +109,7 @@
 &amp; !ObjectConditionTest.instance.next = null
 &amp; ObjectConditionTest.instance.next.x = 5
 &amp; !ObjectConditionTest.instance.next.next = null
-&amp; ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.compute(a);&gt;">
+&amp; ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of self.compute(a);&gt;" isReturnValueComputed="true">
                                                                <termination name="&lt;end&gt;" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -157,7 +157,7 @@
 &amp; !ObjectConditionTest.instance.next = null
 &amp; ObjectConditionTest.instance.next.x = 5
 &amp; !ObjectConditionTest.instance.next.next = null
-&amp; !ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-600&apos; as result of self.compute(a);&gt;">
+&amp; !ObjectConditionTest.instance.next.next.x = 6" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-600&apos; as result of self.compute(a);&gt;" isReturnValueComputed="true">
                                                                <termination name="&lt;end&gt;" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -224,7 +224,7 @@
 &amp; !ObjectConditionTest.instance = null
 &amp; ObjectConditionTest.instance.x = 4
 &amp; !ObjectConditionTest.instance.next = null
-&amp; !ObjectConditionTest.instance.next.x = 5" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-500&apos; as result of self.compute(a);&gt;">
+&amp; !ObjectConditionTest.instance.next.x = 5" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-500&apos; as result of self.compute(a);&gt;" isReturnValueComputed="true">
                                                       <termination name="&lt;end&gt;" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -279,7 +279,7 @@
 &amp; !self.next.next = null
 &amp; self.next.next.x = 3
 &amp; !ObjectConditionTest.instance = null
-&amp; !ObjectConditionTest.instance.x = 4" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-400&apos; as result of self.compute(a);&gt;">
+&amp; !ObjectConditionTest.instance.x = 4" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-400&apos; as result of self.compute(a);&gt;" isReturnValueComputed="true">
                                              <termination name="&lt;end&gt;" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -322,7 +322,7 @@
 &amp; !self.next = null
 &amp; self.next.x = 2
 &amp; !self.next.next = null
-&amp; !self.next.next.x = 3" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-300&apos; as result of self.compute(a);&gt;">
+&amp; !self.next.next.x = 3" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-300&apos; as result of self.compute(a);&gt;" isReturnValueComputed="true">
                                     <termination name="&lt;end&gt;" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -347,7 +347,7 @@
                   </branchCondition>
                   <branchCondition name="!self.next.x = 2" pathCondition="self.x = 1 &amp; !self.next = null &amp; !self.next.x = 2" pathConditionChanged="true" branchCondition="!self.next.x = 2" mergedBranchCondition="false">
                      <statement name="return -200;" pathCondition="self.x = 1 &amp; !self.next = null &amp; !self.next.x = 2" pathConditionChanged="false">
-                        <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="self.x = 1 &amp; !self.next = null &amp; !self.next.x = 2" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-200&apos; as result of self.compute(a);&gt;">
+                        <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="self.x = 1 &amp; !self.next = null &amp; !self.next.x = 2" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-200&apos; as result of self.compute(a);&gt;" isReturnValueComputed="true">
                            <termination name="&lt;end&gt;" pathCondition="self.x = 1 &amp; !self.next = null &amp; !self.next.x = 2" pathConditionChanged="false" exceptionalTermination="false">
                            </termination>
                         </methodReturn>
@@ -362,7 +362,7 @@
          </branchCondition>
          <branchCondition name="!self.x = 1" pathCondition="!self.x = 1" pathConditionChanged="true" branchCondition="!self.x = 1" mergedBranchCondition="false">
             <statement name="return -100;" pathCondition="!self.x = 1" pathConditionChanged="false">
-               <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="!self.x = 1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-100&apos; as result of self.compute(a);&gt;">
+               <methodReturn name="&lt;return of self.compute(a);&gt;" pathCondition="!self.x = 1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-100&apos; as result of self.compute(a);&gt;" isReturnValueComputed="true">
                   <termination name="&lt;end&gt;" pathCondition="!self.x = 1" pathConditionChanged="false" exceptionalTermination="false">
                   </termination>
                </methodReturn>

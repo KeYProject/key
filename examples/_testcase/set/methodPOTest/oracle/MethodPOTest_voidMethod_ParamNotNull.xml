@@ -2,7 +2,7 @@
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="MethodPOTest.voidMethod(param);" pathCondition="true" pathConditionChanged="false">
       <statement name="int value = param.x;" pathCondition="true" pathConditionChanged="false">
-         <methodReturn name="&lt;return of MethodPOTest.voidMethod(param);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodPOTest.voidMethod(param);&gt;">
+         <methodReturn name="&lt;return of MethodPOTest.voidMethod(param);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodPOTest.voidMethod(param);&gt;" isReturnValueComputed="false">
             <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
             </termination>
          </methodReturn>

@@ -41,7 +41,7 @@
    &amp; array.length = 1
    &amp; !array[0] = null
    &amp; array[0].length = 1
-   &amp; array[0][0] = 42" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;5&apos; as result of MultiArrayIndexReadWriteAccess.compute(array);&gt;">
+   &amp; array[0][0] = 42" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;5&apos; as result of MultiArrayIndexReadWriteAccess.compute(array);&gt;" isReturnValueComputed="true">
                                           <termination name="&lt;end&gt;" pathCondition="   array[0].length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !array = null
    &amp; array.length = 1
@@ -70,7 +70,7 @@
    &amp; array.length = 1
    &amp; !array[0] = null
    &amp; array[0].length = 1
-   &amp; !array[0][0] = 42" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-400&apos; as result of MultiArrayIndexReadWriteAccess.compute(array);&gt;">
+   &amp; !array[0][0] = 42" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-400&apos; as result of MultiArrayIndexReadWriteAccess.compute(array);&gt;" isReturnValueComputed="true">
                                        <termination name="&lt;end&gt;" pathCondition="   array[0].length &gt;= 0 &amp; array.length &gt;= 0
 -&gt;   !array = null
    &amp; array.length = 1
@@ -97,7 +97,7 @@
 -&gt;   !array = null
    &amp; array.length = 1
    &amp; !array[0] = null
-   &amp; !array[0].length = 1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-300&apos; as result of MultiArrayIndexReadWriteAccess.compute(array);&gt;">
+   &amp; !array[0].length = 1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-300&apos; as result of MultiArrayIndexReadWriteAccess.compute(array);&gt;" isReturnValueComputed="true">
                                  <termination name="&lt;end&gt;" pathCondition="   array.length &gt;= 0 &amp; array[0].length &gt;= 0
 -&gt;   !array = null
    &amp; array.length = 1
@@ -118,7 +118,7 @@
                </branchCondition>
                <branchCondition name="!array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="true" branchCondition="!array.length = 1" mergedBranchCondition="false">
                   <statement name="return -200;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of MultiArrayIndexReadWriteAccess.compute(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-200&apos; as result of MultiArrayIndexReadWriteAccess.compute(array);&gt;">
+                     <methodReturn name="&lt;return of MultiArrayIndexReadWriteAccess.compute(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-200&apos; as result of MultiArrayIndexReadWriteAccess.compute(array);&gt;" isReturnValueComputed="true">
                         <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" exceptionalTermination="false">
                         </termination>
                      </methodReturn>
@@ -128,7 +128,7 @@
          </branchCondition>
          <branchCondition name="array = null" pathCondition="array = null" pathConditionChanged="true" branchCondition="array = null" mergedBranchCondition="false">
             <statement name="return -100;" pathCondition="array = null" pathConditionChanged="false">
-               <methodReturn name="&lt;return of MultiArrayIndexReadWriteAccess.compute(array);&gt;" pathCondition="array = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-100&apos; as result of MultiArrayIndexReadWriteAccess.compute(array);&gt;">
+               <methodReturn name="&lt;return of MultiArrayIndexReadWriteAccess.compute(array);&gt;" pathCondition="array = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-100&apos; as result of MultiArrayIndexReadWriteAccess.compute(array);&gt;" isReturnValueComputed="true">
                   <termination name="&lt;end&gt;" pathCondition="array = null" pathConditionChanged="false" exceptionalTermination="false">
                   </termination>
                </methodReturn>

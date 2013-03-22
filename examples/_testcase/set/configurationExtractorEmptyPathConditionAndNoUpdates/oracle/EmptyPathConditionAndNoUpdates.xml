@@ -3,7 +3,7 @@
    <methodCall name="EmptyPathConditionAndNoUpdates.compute(obj);" pathCondition="true" pathConditionChanged="false">
       <statement name="return obj.x;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="!obj = null" pathCondition="!obj = null" pathConditionChanged="true" branchCondition="!obj = null" mergedBranchCondition="false">
-            <methodReturn name="&lt;return of EmptyPathConditionAndNoUpdates.compute(obj);&gt;" pathCondition="!obj = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;obj.x&apos; as result of EmptyPathConditionAndNoUpdates.compute(obj);&gt;">
+            <methodReturn name="&lt;return of EmptyPathConditionAndNoUpdates.compute(obj);&gt;" pathCondition="!obj = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;obj.x&apos; as result of EmptyPathConditionAndNoUpdates.compute(obj);&gt;" isReturnValueComputed="true">
                <termination name="&lt;end&gt;" pathCondition="!obj = null" pathConditionChanged="false" exceptionalTermination="false">
                </termination>
             </methodReturn>

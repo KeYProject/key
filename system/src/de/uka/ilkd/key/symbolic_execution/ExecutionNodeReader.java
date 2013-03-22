@@ -371,7 +371,7 @@ public class ExecutionNodeReader {
          return new KeYlessMethodCall(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_METHOD_RETURN.equals(qName)) {
-         return new KeYlessMethodReturn(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getNameIncludingReturnValue(attributes));
+         return new KeYlessMethodReturn(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getNameIncludingReturnValue(attributes), isReturnValueComputed(attributes));
       }
       else if (ExecutionNodeWriter.TAG_START_NODE.equals(qName)) {
          return new KeYlessStartNode(getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
@@ -439,12 +439,21 @@ public class ExecutionNodeReader {
    }
    
    /**
-    * Returns the has not nullc heck value.
+    * Returns the has not null check value.
     * @param attributes The {@link Attributes} which provides the content.
     * @return The value.
     */
    protected boolean isHasNotNullCheck(Attributes attributes) {
       return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_HAS_NOT_NULL_CHECK));
+   }
+   
+   /**
+    * Returns the is return value computed value.
+    * @param attributes The {@link Attributes} which provides the content.
+    * @return The value.
+    */
+   protected boolean isReturnValueComputed(Attributes attributes) {
+      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_RETURN_VALUE_COMPUTED));
    }
    
    /**
@@ -637,6 +646,14 @@ public class ExecutionNodeReader {
       @Override
       public String toString() {
          return getElementType() + " " + getName();
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isDisposed() {
+         return false;
       }
    }
    
@@ -1198,6 +1215,11 @@ public class ExecutionNodeReader {
        * The name including the return value.
        */
       private String nameIncludingReturnValue;
+      
+      /**
+       * Defines if the return value is computed or not.
+       */
+      private boolean returnValueComputed;
 
       /**
        * Constructor.
@@ -1206,14 +1228,17 @@ public class ExecutionNodeReader {
        * @param formatedPathCondition The formated path condition.
        * @param pathConditionChanged Is the path condition changed compared to parent?
        * @param nameIncludingReturnValue The name including the return value.
+       * @param returnValueComputed Is the return value computed?
        */
       public KeYlessMethodReturn(IExecutionNode parent, 
                                  String name, 
                                  String formatedPathCondition, 
                                  boolean pathConditionChanged,
-                                 String nameIncludingReturnValue) {
+                                 String nameIncludingReturnValue,
+                                 boolean returnValueComputed) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
          this.nameIncludingReturnValue = nameIncludingReturnValue;
+         this.returnValueComputed = returnValueComputed;
       }
 
       /**
@@ -1254,6 +1279,14 @@ public class ExecutionNodeReader {
       @Override
       public String getElementType() {
          return "Method Return";
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isReturnValueComputed() {
+         return returnValueComputed;
       }
    }
 

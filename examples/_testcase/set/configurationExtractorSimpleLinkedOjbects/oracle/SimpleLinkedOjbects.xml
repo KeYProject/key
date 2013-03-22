@@ -12,7 +12,7 @@
 + \if (x.next.next = x)
       \then (3)
       \else (\if (x.next = x)  \then (2)  \else (1))
-+ \if (x.next.next = x.next)  \then (3)  \else (2)&apos; as result of SimpleLinkedOjbects.compute(x);&gt;">
++ \if (x.next.next = x.next)  \then (3)  \else (2)&apos; as result of SimpleLinkedOjbects.compute(x);&gt;" isReturnValueComputed="true">
                               <termination name="&lt;end&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" exceptionalTermination="false">
                               </termination>
                            </methodReturn>

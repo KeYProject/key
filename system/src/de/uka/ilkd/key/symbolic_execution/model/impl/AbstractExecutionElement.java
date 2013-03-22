@@ -113,4 +113,12 @@ public abstract class AbstractExecutionElement implements IExecutionElement {
          return getElementType() + " " + e.getMessage();
       }
    }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isDisposed() {
+      return getProof().isDisposed();
+   }
 }

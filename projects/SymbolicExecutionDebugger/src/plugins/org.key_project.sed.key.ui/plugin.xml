@@ -158,6 +158,7 @@
                               value="org.eclipse.debug.core.ILaunch">
                         </instanceof>
                         <test
+                              args="notTerminated"
                               forcePluginActivation="true"
                               property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
                         </test>
@@ -167,6 +168,7 @@
                               value="org.eclipse.debug.core.model.IDebugElement">
                         </instanceof>
                         <test
+                              args="notTerminated"
                               forcePluginActivation="true"
                               property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
                         </test>
@@ -188,6 +190,7 @@
                               value="org.key_project.sed.key.core.model.IKeYSEDDebugNode">
                         </instanceof>
                         <test
+                              args="notDisposed"
                               forcePluginActivation="true"
                               property="org.key_project.sed.key.core.keySedDebugNodeHasExecutionStateNode">
                         </test>
@@ -333,6 +336,7 @@
                                  value="org.key_project.sed.key.core.model.IKeYSEDDebugNode">
                            </instanceof>
                            <test
+                                 args="notDisposed"
                                  forcePluginActivation="true"
                                  property="org.key_project.sed.key.core.keySedDebugNodeHasExecutionStateNode">
                            </test>
@@ -356,6 +360,7 @@
                                  value="org.eclipse.debug.core.ILaunch">
                            </instanceof>
                            <test
+                                 args="notTerminated"
                                  forcePluginActivation="true"
                                  property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
                            </test>
@@ -365,6 +370,7 @@
                                  value="org.eclipse.debug.core.model.IDebugElement">
                            </instanceof>
                            <test
+                                 args="notTerminated"
                                  forcePluginActivation="true"
                                  property="org.key_project.sed.key.ui.isSingleKeyDebugTarget">
                            </test>

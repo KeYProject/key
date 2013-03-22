@@ -66,7 +66,7 @@
 &amp;   \if (current.right.left = current)
         \then (current.right.left)
         \else (current.parent)
-  = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;current&apos; as result of self.compute(current);&gt;">
+  = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;current&apos; as result of self.compute(current);&gt;" isReturnValueComputed="true">
                                                             <termination name="&lt;end&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
@@ -128,7 +128,7 @@
 &amp; !  \if (current.right.left = current)
          \then (current.right.left)
          \else (current.parent)
-   = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;current&apos; as result of self.compute(current);&gt;">
+   = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;current&apos; as result of self.compute(current);&gt;" isReturnValueComputed="true">
                                                             <termination name="&lt;end&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
@@ -175,7 +175,7 @@
                                                       <methodReturn name="&lt;return of self.compute(current);&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null
-&amp; current.parent = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;current&apos; as result of self.compute(current);&gt;">
+&amp; current.parent = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;current&apos; as result of self.compute(current);&gt;" isReturnValueComputed="true">
                                                          <termination name="&lt;end&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null
@@ -210,7 +210,7 @@
                                                       <methodReturn name="&lt;return of self.compute(current);&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null
-&amp; !current.parent = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;current&apos; as result of self.compute(current);&gt;">
+&amp; !current.parent = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;current&apos; as result of self.compute(current);&gt;" isReturnValueComputed="true">
                                                          <termination name="&lt;end&gt;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null

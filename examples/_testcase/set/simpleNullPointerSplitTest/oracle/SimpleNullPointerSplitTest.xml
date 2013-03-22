@@ -3,7 +3,7 @@
    <methodCall name="self.main(instance);" pathCondition="true" pathConditionChanged="false">
       <statement name="return instance.x;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="!instance = null" pathCondition="!instance = null" pathConditionChanged="true" branchCondition="!instance = null" mergedBranchCondition="false">
-            <methodReturn name="&lt;return of self.main(instance);&gt;" pathCondition="!instance = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;instance.x&apos; as result of self.main(instance);&gt;">
+            <methodReturn name="&lt;return of self.main(instance);&gt;" pathCondition="!instance = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;instance.x&apos; as result of self.main(instance);&gt;" isReturnValueComputed="true">
                <termination name="&lt;end&gt;" pathCondition="!instance = null" pathConditionChanged="false" exceptionalTermination="false">
                </termination>
             </methodReturn>

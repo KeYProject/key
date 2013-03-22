@@ -360,6 +360,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       else if (expected instanceof IExecutionMethodReturn) {
          assertTrue("Expected IExecutionMethodReturn but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionMethodReturn);
          assertTrue(((IExecutionMethodReturn)expected).getNameIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getNameIncludingReturnValue(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getNameIncludingReturnValue(), ((IExecutionMethodReturn)current).getNameIncludingReturnValue()));
+         assertEquals(((IExecutionMethodReturn)expected).isReturnValueComputed(), ((IExecutionMethodReturn)current).isReturnValueComputed());
          assertVariables((IExecutionMethodReturn)expected, (IExecutionMethodReturn)current, compareVariables);
       }
       else if (expected instanceof IExecutionStatement) {
