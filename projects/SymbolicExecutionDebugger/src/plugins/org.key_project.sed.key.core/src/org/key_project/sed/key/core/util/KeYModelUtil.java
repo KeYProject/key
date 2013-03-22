@@ -435,7 +435,7 @@ public final class KeYModelUtil {
     */
    public static KeYVariable[] createVariables(IKeYSEDDebugNode<?> debugNode, 
                                                IExecutionStateNode<?> executionNode) {
-      if (executionNode != null && debugNode != null) {
+      if (executionNode != null && !executionNode.isDisposed() && debugNode != null) {
          IExecutionVariable[] variables = executionNode.getVariables();
          if (variables != null) {
             KeYVariable[] result = new KeYVariable[variables.length];

@@ -51,7 +51,7 @@
       \else (\if (x.next[0] = x)  \then (2)  \else (1))
 + \if (x.next[0].next[0] = x.next[0])
       \then (3)
-      \else (2)&apos; as result of SimpleLinkedArrays.compute(x);&gt;">
+      \else (2)&apos; as result of SimpleLinkedArrays.compute(x);&gt;" isReturnValueComputed="true">
                                     <termination name="&lt;end&gt;" pathCondition="   x.next[0].next.length &gt;= 0 &amp; x.next.length &gt;= 0
 -&gt;   !x = null
    &amp; !(x.next = null | x.next.length &lt;= 0)

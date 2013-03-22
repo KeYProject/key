@@ -3,7 +3,7 @@
    <methodCall name="MethodPOTest.voidMethod(param);" pathCondition="true" pathConditionChanged="false">
       <statement name="int value = param.x;" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="!param = null" pathCondition="!param = null" pathConditionChanged="true" branchCondition="!param = null" mergedBranchCondition="false">
-            <methodReturn name="&lt;return of MethodPOTest.voidMethod(param);&gt;" pathCondition="!param = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodPOTest.voidMethod(param);&gt;">
+            <methodReturn name="&lt;return of MethodPOTest.voidMethod(param);&gt;" pathCondition="!param = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of MethodPOTest.voidMethod(param);&gt;" isReturnValueComputed="false">
                <termination name="&lt;end&gt;" pathCondition="!param = null" pathConditionChanged="false" exceptionalTermination="false">
                </termination>
             </methodReturn>

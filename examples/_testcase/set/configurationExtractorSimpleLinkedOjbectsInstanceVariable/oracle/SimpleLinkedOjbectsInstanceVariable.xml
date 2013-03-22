@@ -15,7 +15,7 @@
                  \else (1))
 + \if (self.next.next = self.next)
       \then (3)
-      \else (2)&apos; as result of self.compute();&gt;">
+      \else (2)&apos; as result of self.compute();&gt;" isReturnValueComputed="true">
                            <termination name="&lt;end&gt;" pathCondition="!self.next = null &amp; !self.next.next = null" pathConditionChanged="false" exceptionalTermination="false">
                            </termination>
                         </methodReturn>

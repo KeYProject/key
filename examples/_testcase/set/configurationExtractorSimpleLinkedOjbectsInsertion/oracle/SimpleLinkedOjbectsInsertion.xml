@@ -9,7 +9,7 @@
                      <branchCondition name="!x.next.next = null" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="true" branchCondition="!x.next.next = null" mergedBranchCondition="false">
                         <statement name="SimpleLinkedOjbectsInsertion y = new SimpleLinkedOjbectsInsertion ();" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
                            <methodCall name="SimpleLinkedOjbectsInsertion();" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
-                              <methodReturn name="&lt;return of SimpleLinkedOjbectsInsertion();&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of SimpleLinkedOjbectsInsertion();&gt;">
+                              <methodReturn name="&lt;return of SimpleLinkedOjbectsInsertion();&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of SimpleLinkedOjbectsInsertion();&gt;" isReturnValueComputed="false">
                                  <statement name="y.value=4;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
                                     <statement name="y.next=x.next;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
                                        <statement name="x.next=y;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
@@ -182,7 +182,7 @@
                                                                         \else (\if (  x
                                                                                     = s_5)
                                                                                    \then (null)
-                                                                                   \else (x.next)).next)).value))))&apos; as result of SimpleLinkedOjbectsInsertion.compute(x);&gt;">
+                                                                                   \else (x.next)).next)).value))))&apos; as result of SimpleLinkedOjbectsInsertion.compute(x);&gt;" isReturnValueComputed="true">
                                                 <termination name="&lt;end&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" exceptionalTermination="false">
                                                 </termination>
                                              </methodReturn>

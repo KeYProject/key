@@ -55,4 +55,10 @@ public interface IExecutionElement {
     * @return The human readable element type.
     */
    public String getElementType();
+   
+   /**
+    * Checks if the proof is disposed.
+    * @return {@code true} proof is disposed, {@code false} proof is not disposed and still valid.
+    */
+   public boolean isDisposed();
 }

@@ -84,7 +84,7 @@
                      </variable>
                   </value>
                </variable>
-               <methodReturn name="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of UnknownTest();&gt;">
+               <methodReturn name="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of UnknownTest();&gt;" isReturnValueComputed="false">
                   <variable name="u" arrayIndex="-1" isArrayIndex="false">
                      <value name="u {true}" typeString="endless.UnknownTest" valueString="u_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="next" arrayIndex="-1" isArrayIndex="false">
@@ -175,7 +175,7 @@
                               </variable>
                            </value>
                         </variable>
-                        <methodReturn name="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of UnknownTest();&gt;">
+                        <methodReturn name="&lt;return of UnknownTest();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of UnknownTest();&gt;" isReturnValueComputed="false">
                            <variable name="u_5" arrayIndex="-1" isArrayIndex="false">
                               <value name="u_5 {true}" typeString="endless.UnknownTest" valueString="u_7" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                  <variable name="next" arrayIndex="-1" isArrayIndex="false">
@@ -359,7 +359,7 @@
                                                 \else (\if (  u_7
                                                             = self)
                                                            \then (null)
-                                                           \else (u_2)).next))))&apos; as result of self.main();&gt;">
+                                                           \else (u_2)).next))))&apos; as result of self.main();&gt;" isReturnValueComputed="true">
                                  <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                     <value name="self {    !u_7 = self
   &amp; (!u_2 = self &amp; (u_2.next = null &amp; u_2.next = null))

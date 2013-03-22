@@ -12,7 +12,7 @@
                               <methodReturn name="&lt;return of SimpleLinkedOjbectsDeletion.compute(x);&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  3
 + \if (x.next.next = x)
       \then (3)
-      \else (\if (x.next = x)  \then (2)  \else (1))&apos; as result of SimpleLinkedOjbectsDeletion.compute(x);&gt;">
+      \else (\if (x.next = x)  \then (2)  \else (1))&apos; as result of SimpleLinkedOjbectsDeletion.compute(x);&gt;" isReturnValueComputed="true">
                                  <termination name="&lt;end&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" exceptionalTermination="false">
                                  </termination>
                               </methodReturn>

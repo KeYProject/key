@@ -11,7 +11,7 @@
                         <methodReturn name="&lt;return of SimpleStaticAttributes.compute(newInstance);&gt;" pathCondition="  !newInstance = null
 &amp; !SimpleStaticAttributes.finalInstance = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;  43
 + newInstance.x
-+ SimpleStaticAttributes.finalInstance.x&apos; as result of SimpleStaticAttributes.compute(newInstance);&gt;">
++ SimpleStaticAttributes.finalInstance.x&apos; as result of SimpleStaticAttributes.compute(newInstance);&gt;" isReturnValueComputed="true">
                            <termination name="&lt;end&gt;" pathCondition="  !newInstance = null
 &amp; !SimpleStaticAttributes.finalInstance = null" pathConditionChanged="false" exceptionalTermination="false">
                            </termination>
