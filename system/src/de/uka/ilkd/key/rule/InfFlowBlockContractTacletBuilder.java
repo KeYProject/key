@@ -44,7 +44,7 @@ public final class InfFlowBlockContractTacletBuilder
     @Override
     Name generateName() {
         return MiscTools.toValidTacletName("Use information flow contract for " +
-                                           blockContract.getBlock().toString() + " " +
+                                           blockContract.getName() + " " +
                                            blockContract.getBlock().getStartPosition().getLine() + " : " +
                                            blockContract.getTarget().getFullName());
     }
