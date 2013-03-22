@@ -10,7 +10,7 @@ pre: x &gt;= 0 &amp; self.&lt;inv&gt;
 post: result = 42 &amp; self.&lt;inv&gt; &amp; exc = null
 mod: allLocs
 termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="true">
-                     <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false">
+                     <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <statement name="int magicNumberCopy = magicNumber;" pathCondition="true" pathConditionChanged="false">
                            <statement name="return magicNumber+magicNumberCopy;" pathCondition="true" pathConditionChanged="false">
                               <methodReturn name="&lt;return of UseOperationContractInvalidPreconditionTest.main();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;84&apos; as result of UseOperationContractInvalidPreconditionTest.main();&gt;" isReturnValueComputed="true">

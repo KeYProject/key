@@ -2,11 +2,11 @@
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="SimpleLinkedOjbectsInsertion.compute(x);" pathCondition="true" pathConditionChanged="false">
       <statement name="x.value=1;" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="!x = null" pathCondition="!x = null" pathConditionChanged="true" branchCondition="!x = null" mergedBranchCondition="false">
+         <branchCondition name="!x = null" pathCondition="!x = null" pathConditionChanged="true" branchCondition="!x = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="x.next.value=2;" pathCondition="!x = null" pathConditionChanged="false">
-               <branchCondition name="!x.next = null" pathCondition="!x = null &amp; !x.next = null" pathConditionChanged="true" branchCondition="!x.next = null" mergedBranchCondition="false">
+               <branchCondition name="!x.next = null" pathCondition="!x = null &amp; !x.next = null" pathConditionChanged="true" branchCondition="!x.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="x.next.next.value=3;" pathCondition="!x = null &amp; !x.next = null" pathConditionChanged="false">
-                     <branchCondition name="!x.next.next = null" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="true" branchCondition="!x.next.next = null" mergedBranchCondition="false">
+                     <branchCondition name="!x.next.next = null" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="true" branchCondition="!x.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <statement name="SimpleLinkedOjbectsInsertion y = new SimpleLinkedOjbectsInsertion ();" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
                            <methodCall name="SimpleLinkedOjbectsInsertion();" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false">
                               <methodReturn name="&lt;return of SimpleLinkedOjbectsInsertion();&gt;" pathCondition="!x = null &amp; !x.next = null &amp; !x.next.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of SimpleLinkedOjbectsInsertion();&gt;" isReturnValueComputed="false">
@@ -194,19 +194,19 @@
                            </methodCall>
                         </statement>
                      </branchCondition>
-                     <branchCondition name="x.next.next = null" pathCondition="!x = null &amp; !x.next = null &amp; x.next.next = null" pathConditionChanged="true" branchCondition="x.next.next = null" mergedBranchCondition="false">
+                     <branchCondition name="x.next.next = null" pathCondition="!x = null &amp; !x.next = null &amp; x.next.next = null" pathConditionChanged="true" branchCondition="x.next.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; !x.next = null &amp; x.next.next = null" pathConditionChanged="false" exceptionalTermination="true">
                         </termination>
                      </branchCondition>
                   </statement>
                </branchCondition>
-               <branchCondition name="x.next = null" pathCondition="!x = null &amp; x.next = null" pathConditionChanged="true" branchCondition="x.next = null" mergedBranchCondition="false">
+               <branchCondition name="x.next = null" pathCondition="!x = null &amp; x.next = null" pathConditionChanged="true" branchCondition="x.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="!x = null &amp; x.next = null" pathConditionChanged="false" exceptionalTermination="true">
                   </termination>
                </branchCondition>
             </statement>
          </branchCondition>
-         <branchCondition name="x = null" pathCondition="x = null" pathConditionChanged="true" branchCondition="x = null" mergedBranchCondition="false">
+         <branchCondition name="x = null" pathCondition="x = null" pathConditionChanged="true" branchCondition="x = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="x = null" pathConditionChanged="false" exceptionalTermination="true">
             </termination>
          </branchCondition>

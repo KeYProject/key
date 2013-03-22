@@ -126,6 +126,11 @@ public class ExecutionNodeWriter extends AbstractWriter {
    public static final String ATTRIBUTE_RETURN_VALUE_COMPUTED = "isReturnValueComputed";
 
    /**
+    * Attribute name to store {@link IExecutionBranchCondition#isBranchConditionComputed()}.
+    */
+   public static final String ATTRIBUTE_BRANCH_CONDITION_COMPUTED = "isBranchConditionComputed";
+   
+   /**
     * Attribute name to store {@link IExecutionUseOperationContract#isNotNullCheckComplied()}.
     */
    public static final String ATTRIBUTE_NOT_NULL_CHECK_COMPLIED = "notNullCheckComplied";
@@ -346,6 +351,7 @@ public class ExecutionNodeWriter extends AbstractWriter {
       attributeValues.put(ATTRIBUTE_PATH_CONDITION_CHANGED, node.isPathConditionChanged() + "");
       attributeValues.put(ATTRIBUTE_BRANCH_CONDITION, node.getFormatedBranchCondition());
       attributeValues.put(ATTRIBUTE_MERGED_BRANCH_CONDITION, node.isMergedBranchCondition() + "");
+      attributeValues.put(ATTRIBUTE_BRANCH_CONDITION_COMPUTED, node.isBranchConditionComputed() + "");
       appendStartTag(level, TAG_BRANCH_CONDITION, attributeValues, sb);
       appendCallStack(level + 1, node, saveCallStack, sb);
       appendChildren(level + 1, node, saveVariables, saveCallStack, sb);
