@@ -207,13 +207,13 @@ public class SymbolicExecutionTreeBuilder {
          sequentFormula.formula().execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(Term visited) {
-               if (visited.op() instanceof Modality) {
+               if (visited.op() instanceof Modality && SymbolicExecutionUtil.hasSymbolicExecutionLabel(visited)) {
                   modalityTerms.add(visited);
                }
             }
          });
       }
-      // Make sure that at least one modality was found
+      // Make sure that at most one modality was found
       if (modalityTerms.size() >= 2) {
          throw new IllegalStateException("Sequent contains multiple modalities.");
       }
@@ -496,9 +496,10 @@ public class SymbolicExecutionTreeBuilder {
     */
    protected void updateCallStack(Node node, 
                                   SourceElement statement) {
-      if (SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement, true)) {
+      if (SymbolicExecutionUtil.hasSymbolicExecutionLabel(node.getAppliedRuleApp()) &&
+          SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement, true)) {
          // Remove outdated methods from call stack
-         int currentLevel = SymbolicExecutionUtil.computeStackSize(node, node.getAppliedRuleApp());
+         int currentLevel = SymbolicExecutionUtil.computeStackSize(node.getAppliedRuleApp());
          while (methodCallStack.size() > currentLevel) {
             methodCallStack.removeLast();
          }
@@ -573,7 +574,7 @@ public class SymbolicExecutionTreeBuilder {
     */
    protected IExecutionNode[] createCallStack(Node node, RuleApp ruleApp, SourceElement statement) {
       // Compute number of call stack size
-      int size = SymbolicExecutionUtil.computeStackSize(node, ruleApp);
+      int size = SymbolicExecutionUtil.computeStackSize(ruleApp);
       // Add call stack entries
       List<IExecutionNode> callStack = new LinkedList<IExecutionNode>();
       Iterator<Node> stackIter = methodCallStack.iterator();
@@ -596,7 +597,7 @@ public class SymbolicExecutionTreeBuilder {
     */
    protected Node findMethodCallNode(Node currentNode, RuleApp ruleApp) {
       // Compute the stack frame size before the method is called
-      final int returnStackSize = SymbolicExecutionUtil.computeStackSize(currentNode, ruleApp) - 1;
+      final int returnStackSize = SymbolicExecutionUtil.computeStackSize(ruleApp) - 1;
       // Return the method from the call stack
       if (returnStackSize >= 0) {
          return methodCallStack.get(returnStackSize);

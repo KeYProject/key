@@ -769,7 +769,7 @@ public final class SymbolicExecutionUtil {
     * @return The found {@link IProgramVariable} with the current {@code this}/{@code self} reference or {@code null} if no one is available.
     */
    public static IProgramVariable findSelfTerm(Node node) {
-      Term term = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+      Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
       term = TermBuilder.DF.goBelowUpdates(term);
       JavaBlock jb = term.javaBlock();
       Services services = node.proof().getServices();
@@ -937,7 +937,7 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isFirstLoopIteration(Node node, RuleApp ruleApp, SourceElement statement) {
       // Compute stack size of current node
-      int stackSize = computeStackSize(node, ruleApp);
+      int stackSize = computeStackSize(ruleApp);
       // Iterate over all parents until another loop iteration is found or the current method was called
       boolean firstLoop = true;
       Node parent = node.parent();
@@ -949,7 +949,7 @@ public final class SymbolicExecutionUtil {
          parent = parent.parent();
          // Check if the next parent is the method call of the current method, in this case iteration can stop
          if (isMethodCallNode(parent, parent.getAppliedRuleApp(), parent.getNodeInfo().getActiveStatement(), true) &&
-             computeStackSize(parent, parent.getAppliedRuleApp()) < stackSize) {
+             computeStackSize(parent.getAppliedRuleApp()) < stackSize) {
             // Stop iteration because further parents are before the current method is called
             parent = null;
          }
@@ -1105,7 +1105,7 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} is in implicit method, {@code false} is not in implicit method.
     */
    public static boolean isInImplicitMethod(Node node, RuleApp ruleApp) {
-      Term term = ruleApp.posInOccurrence().constrainedFormula().formula();
+      Term term = ruleApp.posInOccurrence().subTerm();
       term = TermBuilder.DF.goBelowUpdates(term);
       JavaBlock block = term.javaBlock();
       IExecutionContext context = JavaTools.getInnermostExecutionContext(block, node.proof().getServices());
@@ -1113,21 +1113,20 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Compute the stack size of the given {@link Node} in the proof tree of KeY.
-    * @param node The {@link Node} to compute stack size for.
-    * @param ruleApp The {@link RuleApp} which is or should be applied in the {@link Node}.
+    * Compute the stack size of the given {@link Term} described by the given {@link RuleApp}.
+    * @param ruleApp The {@link RuleApp} which defines the {@link Term} to compute its stack size.
     * @return The stack size.
     */
-   public static int computeStackSize(Node node, RuleApp ruleApp) {
+   public static int computeStackSize(RuleApp ruleApp) {
       int result = 0;
-      if (node != null && ruleApp != null) {
+      if (ruleApp != null) {
          PosInOccurrence posInOc = ruleApp.posInOccurrence();
-         if (posInOc != null && posInOc.constrainedFormula() != null) {
-            Term term = posInOc.constrainedFormula().formula();
-            if (term != null && term.subs().size() == 2) {
-               Term sub = term.sub(1);
-               if (sub != null) {
-                  JavaBlock block = sub.javaBlock();
+         if (posInOc != null) {
+            Term subTerm = posInOc.subTerm();
+            if (subTerm != null) {
+               Term modality = TermBuilder.DF.goBelowUpdates(subTerm);
+               if (modality != null) {
+                  JavaBlock block = modality.javaBlock();
                   if (block != null) {
                      JavaProgramElement element = block.program();
                      if (element instanceof StatementBlock) {
@@ -1213,7 +1212,7 @@ public final class SymbolicExecutionUtil {
    public static Node findMethodCallNode(Node node) {
       if (node != null && node.getAppliedRuleApp() != null) {
          // Get current program method
-         Term term = node.getAppliedRuleApp().posInOccurrence().constrainedFormula().formula();
+         Term term = node.getAppliedRuleApp().posInOccurrence().subTerm();
          term = TermBuilder.DF.goBelowUpdates(term);
          Services services = node.proof().getServices();
          MethodFrame mf = JavaTools.getInnermostMethodFrame(term.javaBlock(), services);
