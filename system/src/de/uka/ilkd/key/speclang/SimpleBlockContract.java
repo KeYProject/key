@@ -37,9 +37,9 @@ public final class SimpleBlockContract implements BlockContract {
     private final Map<LocationVariable, Term> preconditions;
     private final Map<LocationVariable, Term> postconditions;
     private final Map<LocationVariable, Term> modifiesClauses;
-    private final ImmutableList<Triple<ImmutableList<Term>,
-                                       ImmutableList<Term>,
-                                       ImmutableList<Term>>> respects;
+    private ImmutableList<Triple<ImmutableList<Term>,
+                                 ImmutableList<Term>,
+                                 ImmutableList<Term>>> respects;
 
 
     private final Variables variables;
@@ -80,7 +80,7 @@ public final class SimpleBlockContract implements BlockContract {
         this.modality = modality;
         this.preconditions = preconditions;
         this.postconditions = postconditions;
-        this.modifiesClauses = modifiesClauses;
+        this.modifiesClauses = modifiesClauses;        
         this.respects = respects;
         this.variables = variables;
         this.transactionApplicable = transactionApplicable;
@@ -289,6 +289,14 @@ public final class SimpleBlockContract implements BlockContract {
 
 
     @Override
+    public void setRespects(ImmutableList<Triple<ImmutableList<Term>,
+                                                 ImmutableList<Term>,
+                                                 ImmutableList<Term>>> resp) {
+        this.respects = resp;
+    }
+
+
+    @Override
     public void visit(final Visitor visitor) {
         assert visitor != null;
         visitor.performActionOnBlockContract(this);
@@ -296,7 +304,7 @@ public final class SimpleBlockContract implements BlockContract {
 
     @Override
     public String getName() {
-        return "Block Contract ";
+        return "Block Contract";
     }
 
     @Override
@@ -868,8 +876,7 @@ public final class SimpleBlockContract implements BlockContract {
         private final Map<LocationVariable, Term> postconditions;
         private final Map<LocationVariable, Term> modifiesClauses;
 
-        public Combinator(final ImmutableSet<BlockContract> contracts, final Services services)
-        {
+        public Combinator(final ImmutableSet<BlockContract> contracts, final Services services) {
             super(services);
             this.contracts = sort(contracts);
             preconditions = new LinkedHashMap<LocationVariable, Term>();
@@ -909,10 +916,11 @@ public final class SimpleBlockContract implements BlockContract {
             for (int i = 1; i < contracts.length && !hasMod; i++) {
                 hasMod = contracts[i].hasModifiesClause();
             }
-            
+
             // The information flow part of the contracts can't be combined on
             // the contract level in a reasonable way. Therefore we omit it
             // in the combined contract by adding an empty list.
+            // FIXME: Does not really work like this
             ImmutableList<Triple<ImmutableList<Term>,
                                  ImmutableList<Term>,
                                  ImmutableList<Term>>> emptyResp =
@@ -922,7 +930,7 @@ public final class SimpleBlockContract implements BlockContract {
 
             return new SimpleBlockContract(
                     head.getBlock(), head.getLabels(), head.getMethod(), head.getModality(),
-                    preconditions, postconditions, modifiesClauses, emptyResp,
+                    preconditions, postconditions, modifiesClauses, head.getRespects(),
                     placeholderVariables, head.isTransactionApplicable(), hasMod);
         }
 

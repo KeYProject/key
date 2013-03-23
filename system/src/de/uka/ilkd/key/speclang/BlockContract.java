@@ -73,7 +73,7 @@ public interface BlockContract extends SpecificationElement {
                                 Map<LocationVariable,Term> newModifiesClauses,
                                 final ImmutableList<Triple<ImmutableList<Term>,
                                                            ImmutableList<Term>,
-                                                           ImmutableList<Term>>> respects,
+                                                           ImmutableList<Term>>> newRespects,
                                 Variables newVariables);
 
     /**
@@ -112,6 +112,11 @@ public interface BlockContract extends SpecificationElement {
     public ImmutableList<Triple<ImmutableList<Term>,
                                 ImmutableList<Term>,
                                 ImmutableList<Term>>> getRespects();
+
+
+    public void setRespects(ImmutableList<Triple<ImmutableList<Term>,
+                                                 ImmutableList<Term>,
+                                                 ImmutableList<Term>>> resp);
 
 
     /**

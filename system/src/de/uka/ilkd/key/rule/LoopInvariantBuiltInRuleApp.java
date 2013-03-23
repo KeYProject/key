@@ -43,12 +43,13 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     }
 
     protected LoopInvariantBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts,
-            LoopInvariant inv, List<LocationVariable> heapContext) {
+                                          PosInOccurrence pio,
+                                          ImmutableList<PosInOccurrence> ifInsts,
+                                          LoopInvariant inv,
+                                          List<LocationVariable> heapContext) {
         super(rule, pio, ifInsts);
         assert pio != null;
-        this.loop = (While) JavaTools.getActiveStatement(programTerm()
-                .javaBlock());
+        this.loop = (While) JavaTools.getActiveStatement(programTerm().javaBlock());
         assert loop != null;
         this.inv = instantiateIndexValues(inv);
         this.heapContext = heapContext;
@@ -79,7 +80,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     	assert guard.getChildCount() == 1 : "child count: "+guard.getChildCount();
     	ProgramElement guardStatement = guard.getChildAt(0);
     	skipIndex = !(guardStatement instanceof LessThan);
-    	Expression loopIndex = skipIndex? null: (Expression) ((LessThan)guard.getChildAt(0)).getChildAt(0);
+    	Expression loopIndex =
+    	        skipIndex? null: (Expression) ((LessThan)guard.getChildAt(0)).getChildAt(0);
     	skipIndex = skipIndex || !( loopIndex instanceof ProgramVariable);
     	final Term loopIdxVar = skipIndex? null: tb.var((ProgramVariable)loopIndex);
 
@@ -87,7 +89,9 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     	Statement body = loop.getBody();
     	skipValues = !(body instanceof StatementBlock);
     	StatementBlock block = skipValues? null: ((StatementBlock)body);
-    	Statement last = (skipValues || block.getStatementCount() < 2) ? null: block.getStatementAt(1); // get the second statement
+    	Statement last =
+    	        (skipValues || block.getStatementCount() < 2) ?
+    	                null: block.getStatementAt(1); // get the second statement
     	skipValues = skipValues || !(last instanceof CopyAssignment);
     	CopyAssignment assignment = skipValues? null: ((CopyAssignment) last);
     	ProgramElement lhs = skipValues? null: assignment.getChildAt(0);
@@ -247,8 +251,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         return new LoopInvariantBuiltInRuleApp(builtInRule, newPos, ifInsts, inv, heapContext);
     }
 
-    public LoopInvariant retrieveLoopInvariantFromSpecification(
-            Services services) {
+    public LoopInvariant retrieveLoopInvariantFromSpecification(Services services) {
         return services.getSpecificationRepository().getLoopInvariant(loop);
     }
 
@@ -277,7 +280,8 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
         LoopInvariant inv = retrieveLoopInvariantFromSpecification(services);
         Modality m = (Modality)programTerm().op();
         boolean transaction = (m == Modality.DIA_TRANSACTION || m == Modality.BOX_TRANSACTION); 
-        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv, HeapContext.getModHeaps(services, transaction));
+        return new LoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv,
+                                               HeapContext.getModHeaps(services, transaction));
     }
 
     public boolean variantAvailable() {

@@ -29,10 +29,15 @@ public class LoopInvExecutionPO extends AbstractOperationPO
         implements ContractPO, InfFlowRelatedPO {
     
     private final LoopInvariant loopInvariant;
+
     private final InformationFlowContract generatedIFContract;
+
     private final ProofObligationVars symbExecVars;
+
     private final Goal initiatingGoal;
+
     private final ExecutionContext context;
+
 
     public LoopInvExecutionPO(InitConfig initConfig,
                               LoopInvariant loopInv,

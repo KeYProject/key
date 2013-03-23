@@ -103,7 +103,8 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
         } else {
             symbExecMod = Modality.BOX;
         }
-        final Term programTerm = tb.prog(symbExecMod, jb, postTerm);
+        //final Term programTerm = tb.prog(symbExecMod, jb, postTerm);
+        final Term programTerm = tb.not(tb.prog(modality, jb, tb.not(postTerm)));
 
         //create update
         Term update = tb.skip();

@@ -35,7 +35,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
             origRespects =
                 (ImmutableList<Triple<ImmutableList<Term>,
                  ImmutableList<Term>,ImmutableList<Term>>>) d.get(BasicSnippetData.Key.RESPECTS);
-        
+
         // the respects-sequents evaluated in the pre-state
         ProofObligationVars p1 = new ProofObligationVars(poVars1.self,
                                                          poVars1.selfAtPost,
@@ -132,6 +132,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         }
         Triple<Term[],Term[],Term[]>[]
                 respectsAtPost2 = replace(respectsAtPre2, pre, post);
+
         // create input-output-relations
         final Term[] relations = new Term[respectsAtPre1.length];
         for (int i = 0; i < respectsAtPre1.length; i++) {
@@ -141,6 +142,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                                                     respectsAtPost1[i],
                                                     respectsAtPost2[i]);
         }
+
         return d.tb.and(relations);
     }
 

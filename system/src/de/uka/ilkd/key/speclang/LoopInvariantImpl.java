@@ -513,13 +513,13 @@ public final class LoopInvariantImpl implements LoopInvariant {
 
     @Override
     public String getUniqueName() {
-        if (pm != null) // TODO: We should always know the target, maybe generate earlier?
-            return "at_line_" + getLoop().getStartPosition().getLine() + "_in_" + pm.getFullName();
+        if (pm != null)
+            return "Loop Invariant " + getLoop().getStartPosition().getLine() +
+                    " " + getTarget().getFullName();
         else
-            return "at_line_" + getLoop().getStartPosition().getLine() + "_" +
-                    Math.abs(loop.hashCode()); // Make this case unique, just in case
+            return "Loop Invariant " + getLoop().getStartPosition().getLine() +
+                    " " + Math.abs(loop.hashCode());
     }
-
 
     @Override
     public VisibilityModifier getVisibility() {

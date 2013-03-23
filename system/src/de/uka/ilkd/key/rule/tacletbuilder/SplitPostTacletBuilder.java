@@ -55,7 +55,9 @@ public class SplitPostTacletBuilder {
             postParts.addAll(extractPostParts(post.sub(0)));
             postParts.addAll(extractPostParts(post.sub(1)));
         } else if (post.depth() == 1) {
-            postParts.add(post); // TODO: Not sure about this
+            postParts.add(post);
+        } else if (post.op() == Junctor.TRUE) {
+            // do nothing
         } else {
             throw new IllegalArgumentException("error while extracting post " +
                                                "parts: information flowpost " +

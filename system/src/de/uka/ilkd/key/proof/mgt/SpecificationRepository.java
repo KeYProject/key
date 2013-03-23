@@ -526,8 +526,8 @@ public final class SpecificationRepository {
                ? DefaultImmutableSet.<Contract>nil() 
                : result;
     }
-    
-    
+
+
     /**
      * Returns all registered (atomic) operation contracts for the passed 
      * operation.
@@ -1161,8 +1161,7 @@ public final class SpecificationRepository {
         }
     }
 
-    public void addBlockContract(final BlockContract contract)
-    {
+    public void addBlockContract(final BlockContract contract) {
         final StatementBlock block = contract.getBlock();
         blockContracts.put(block, getBlockContracts(block).add(contract));
     }
@@ -1193,10 +1192,8 @@ public final class SpecificationRepository {
             }
         }
     }
-    
-    
-    public Pair<IObserverFunction,ImmutableSet<Taclet>> limitObs(
-	    					IObserverFunction obs) {
+
+    public Pair<IObserverFunction,ImmutableSet<Taclet>> limitObs(IObserverFunction obs) {
 	assert limitedToUnlimited.get(obs) == null 
 	       : " observer is already limited: " + obs;
 	if(!(obs instanceof IObserverFunction && !(obs instanceof IProgramMethod))) {
@@ -1232,8 +1229,7 @@ public final class SpecificationRepository {
 	
 	assert limited != null;
 	assert taclets != null;
-	return new Pair<IObserverFunction,ImmutableSet<Taclet>>(limited, 
-							       taclets);
+	return new Pair<IObserverFunction,ImmutableSet<Taclet>>(limited, taclets);
     }
     
     

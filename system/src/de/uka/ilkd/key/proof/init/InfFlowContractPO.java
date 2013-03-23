@@ -58,7 +58,6 @@ public class InfFlowContractPO extends AbstractOperationPO
         ifVars = new IFProofObligationVars(symbExecVars, services, contract == null);
     }
 
-
     @Override
     public void readProblem() throws ProofInputException {
         // create proof obligation
@@ -69,7 +68,6 @@ public class InfFlowContractPO extends AbstractOperationPO
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
         Term post =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
-
         // register final term, taclets and collect class axioms
         assignPOTerms(TB.imp(selfComposedExec, post));
         collectClassAxioms(contract.getKJT());

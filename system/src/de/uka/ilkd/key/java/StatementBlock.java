@@ -80,13 +80,22 @@ public class StatementBlock extends JavaStatement
 	this(new ImmutableArray<Statement>(body));
     }
 
+    @Override    
+    public boolean equals(Object o) {
+        assert o instanceof StatementBlock;
+        StatementBlock b = (StatementBlock) o;
+        return super.equals(o) &&
+                this.getStartPosition().getLine() == b.getStartPosition().getLine();
+    }
+
     private ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b) {
         return computePrefixElements(b,0,this);
     }
 
     /** computes the prefix elements for the given array of statement block */
-    public static ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b, 
-            int offset, ProgramPrefix current) {
+    public static ImmutableArray<ProgramPrefix>
+                        computePrefixElements(ImmutableArray<? extends Statement> b, 
+                                              int offset, ProgramPrefix current) {
         final ProgramPrefix[] pp;
 
         if (b.size()>0 && b.get(0) instanceof ProgramPrefix) {
@@ -217,10 +226,6 @@ public class StatementBlock extends JavaStatement
      */
     public void visit(Visitor v) {
 	v.performActionOnStatementBlock(this);
-    }
-
-    public String getUniqueName() {
-        return "at_line_" + getStartPosition().getLine();
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

@@ -41,8 +41,8 @@ public final class InfFlowLoopInvariantTacletBuilder
     Name generateName() {
         return MiscTools.toValidTacletName("Use information flow contract for " +
                                            loopinvariant.getName() + " " +
-                                           loopinvariant.getLoop().getStartPosition().getLine() + " : " +
-                                           loopinvariant.getTarget().getFullName());
+                                           loopinvariant.getLoop().getStartPosition().getLine() +
+                                           " in " + loopinvariant.getTarget().getFullName());
     }
 
     @Override
@@ -78,7 +78,7 @@ public final class InfFlowLoopInvariantTacletBuilder
 
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(ifContract, contAppData,
-                                                       contAppData2, services);
+                                                   contAppData2, services);
         Term contractApplication =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_LOOP_INVARIANT_APPL);
 

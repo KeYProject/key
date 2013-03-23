@@ -15,6 +15,7 @@ import java.util.Map;
 
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -57,8 +58,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         assert pe != null;
 
         //collect all loops in the innermost method frame
-        final Triple<MethodFrame,ImmutableSet<LoopStatement>,ImmutableSet<StatementBlock>> frameAndLoopsAndBlocks
-            = new JavaASTVisitor(pe, services) {
+        final Triple<MethodFrame,
+                     ImmutableSet<LoopStatement>,
+                     ImmutableSet<StatementBlock>> frameAndLoopsAndBlocks =
+              new JavaASTVisitor(pe, services) {
             private MethodFrame frame = null;
             private ImmutableSet<LoopStatement> loops
                 = DefaultImmutableSet.<LoopStatement>nil();
@@ -74,9 +77,13 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     blocks = blocks.add((StatementBlock) node);
                 }
             }
-            public Triple<MethodFrame,ImmutableSet<LoopStatement>,ImmutableSet<StatementBlock>> run() {
+            public Triple<MethodFrame,
+                          ImmutableSet<LoopStatement>,
+                          ImmutableSet<StatementBlock>> run() {
                 walk(root());
-                return new Triple<MethodFrame,ImmutableSet<LoopStatement>,ImmutableSet<StatementBlock>>(
+                return new Triple<MethodFrame,
+                                  ImmutableSet<LoopStatement>,
+                                  ImmutableSet<StatementBlock>>(
                         frame, loops, blocks);
             }
         }.run();
@@ -100,9 +107,11 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
         Term atPreUpdate = null;
         Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
-        Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
+        Map<LocationVariable,LocationVariable> atPreVars =
+                new LinkedHashMap<LocationVariable, LocationVariable>();
         for(LocationVariable heap : HeapContext.getModHeaps(services,transaction)) {
-          final LocationVariable l = TB.heapAtPreVar(services, heap.name()+"Before_" + methodName, heap.sort(), true);
+          final LocationVariable l =
+                  TB.heapAtPreVar(services, heap.name()+"Before_" + methodName, heap.sort(), true);
           final Term u = TB.elementary(services,
             l,
             TB.var(heap));
@@ -168,9 +177,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             }
         }
 
-        //update block contracts
-        /*for (StatementBlock block : blocks) {
-            ImmutableSet<BlockContract> contracts = services.getSpecificationRepository().getBlockContracts(block);
+        /*//update block contracts
+        for (StatementBlock block : blocks) {
+            ImmutableSet<BlockContract> contracts =
+                    services.getSpecificationRepository().getBlockContracts(block);
             for (BlockContract contract : contracts) {
                 final BlockContract.Variables variables = contract.getPlaceholderVariables();
                 final BlockContract.Variables newVariables = new BlockContract.Variables(
@@ -183,15 +193,33 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                         atPreVars,
                         variables.remembranceLocalVariables
                 );
-                final Map<LocationVariable, Term> newPreconditions = new LinkedHashMap<LocationVariable, Term>();
-                final Map<LocationVariable, Term> newPostconditions = new LinkedHashMap<LocationVariable, Term>();
-                final Map<LocationVariable, Term> newModifiesClauses = new LinkedHashMap<LocationVariable, Term>();
+                final Map<LocationVariable, Term> newPreconditions =
+                        new LinkedHashMap<LocationVariable, Term>();
+                final Map<LocationVariable, Term> newPostconditions =
+                        new LinkedHashMap<LocationVariable, Term>();
+                final Map<LocationVariable, Term> newModifiesClauses =
+                        new LinkedHashMap<LocationVariable, Term>();
+                ImmutableList<Triple<ImmutableList<Term>,
+                                     ImmutableList<Term>,
+                                     ImmutableList<Term>>> newRespectsClause =
+                        ImmutableSLList.<Triple<ImmutableList<Term>,
+                                                ImmutableList<Term>,
+                                                ImmutableList<Term>>>nil();
                 for (LocationVariable heap : HeapContext.getModHeaps(services, transaction)) {
-                    newPreconditions.put(heap, contract.getPrecondition(heap, newVariables.self, atPreVars, services));
-                    newPostconditions.put(heap, contract.getPostcondition(heap, newVariables, services));
-                    newModifiesClauses.put(heap, contract.getModifiesClause(heap, newVariables.self, services));
+                    newPreconditions.put(heap,
+                                         contract.getPrecondition(heap, newVariables.self,
+                                                                  atPreVars, services));
+                    newPostconditions.put(heap,
+                                          contract.getPostcondition(heap, newVariables, services));
+                    newModifiesClauses.put(heap,
+                                           contract.getModifiesClause(heap, newVariables.self,
+                                                                      services));
+                    newRespectsClause = contract.getRespectsClause(newVariables.self,
+                                                                   services);
                 }
-                final BlockContract newBlockContract = contract.update(block, newPreconditions, newPostconditions, newModifiesClauses, newVariables);
+                final BlockContract newBlockContract =
+                        contract.update(block, newPreconditions, newPostconditions,
+                                        newModifiesClauses, newRespectsClause, newVariables);
                 services.getSpecificationRepository().addBlockContract(newBlockContract);
             }
         }*/

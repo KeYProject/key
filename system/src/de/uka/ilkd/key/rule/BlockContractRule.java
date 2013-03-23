@@ -77,78 +77,6 @@ public class BlockContractRule implements BuiltInRule {
                                       instantiation.block,
                                       instantiation.modality, goal);
     }
-    
-    private static Term buildAtPreVar(Term varTerm,
-                                      String suffix,
-                                      Services services) {
-        if (varTerm == null) {
-            return null;
-        }
-        assert varTerm.op() instanceof LocationVariable;
-
-        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-        if (!suffix.equalsIgnoreCase("")) {
-            suffix = new String("_" + suffix);
-        }
-        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before" + suffix);
-        LocationVariable varAtPostVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
-        register(varAtPostVar, services);
-        Term varAtPost = TermBuilder.DF.var(varAtPostVar);
-        return varAtPost;
-    }
-
-    private static Term buildAtPostVar(Term varTerm,
-                                       String suffix,
-                                       Services services) {
-        if (varTerm == null) {
-            return null;
-        }
-        assert varTerm.op() instanceof LocationVariable;
-
-        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-        if (!suffix.equalsIgnoreCase("")) {
-            suffix = new String("_" + suffix);
-        }
-        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_AtPost" + suffix);
-        LocationVariable varAtPostVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
-        register(varAtPostVar, services);
-        Term varAtPost = TermBuilder.DF.var(varAtPostVar);
-        return varAtPost;
-    }
-
-    private static Term buildBeforeVar(Term varTerm,
-                                       Services services) {
-        if (varTerm == null) {
-            return null;
-        }
-        assert varTerm.op() instanceof LocationVariable;        
-
-        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before");
-        LocationVariable varAtPreVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
-        register(varAtPreVar, services);
-        Term varAtPre = TermBuilder.DF.var(varAtPreVar);
-        return varAtPre;
-    }
-
-    private static Term buildAfterVar(Term varTerm,
-                                      Services services) {
-        if (varTerm == null) {
-            return null;
-        }
-        assert varTerm.op() instanceof LocationVariable;        
-
-        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_After");
-        LocationVariable varAtPostVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
-        register(varAtPostVar, services);
-        Term varAtPost = TermBuilder.DF.var(varAtPostVar);
-        return varAtPost;
-    }
 
     private static Term buildAfterVar(Term varTerm,
                                       String suffix,
@@ -307,10 +235,12 @@ public class BlockContractRule implements BuiltInRule {
         for (Term locIn: infData.localIns) {
             beforeAssumptions = TB.and(beforeAssumptions, TB.equals(newIns.next(), locIn));
         }
-
+        Term resultEq = (infData.resultAtPost == null) ?
+                            TB.tt() :
+                            TB.equals(infData.resultAtPost, infData.result);
         Term afterAssumptions = TB.and(TB.equals(infData.heapAtPost, infData.baseHeap),
                                        TB.equals(infData.selfAtPost, infData.self),
-                                       TB.equals(infData.resultAtPost, infData.result),
+                                       resultEq,
                                        TB.equals(infData.exceptionAtPost, infData.exception));
         Iterator<Term> newOuts = infData.newOuts.iterator();        
         for (Term locOut: infData.localOuts) {
@@ -357,8 +287,12 @@ public class BlockContractRule implements BuiltInRule {
             final ImmutableList<Term> newLocalIns = buildLocalIns(localInTerms, services);
             final ImmutableList<Term> localOutTerms = MiscTools.toTermList(localOutVariables);
             final ImmutableList<Term> newLocalOuts = buildLocalOuts(localOutTerms, services);
-            final Term result = vars.result;
-            final Term resultAtPost = buildAfterVar(result, "BLOCK", services);
+            Term result = vars.result;
+            Term resultAtPost = null;
+            if (result != null &&
+                    result.toString() != TB.NULL(services).toString()) {
+                resultAtPost = buildAfterVar(result, "BLOCK", services);                
+            }
             final Term exception = vars.exception;
             final Term exceptionAtPost = buildAfterVar(exception, "BLOCK", services);
 
@@ -372,8 +306,10 @@ public class BlockContractRule implements BuiltInRule {
             ifContractBuilder.setSelfAtPost(selfAtPost);
             ifContractBuilder.setLocalIns(newLocalIns);
             ifContractBuilder.setLocalOuts(newLocalOuts);
-            ifContractBuilder.setResult(result);
-            ifContractBuilder.setResultAtPost(resultAtPost);
+            if (resultAtPost != null) {
+                ifContractBuilder.setResult(result);
+                ifContractBuilder.setResultAtPost(resultAtPost);
+            }            
             ifContractBuilder.setException(exception);
             ifContractBuilder.setExceptionAtPost(exceptionAtPost);
 
@@ -383,7 +319,7 @@ public class BlockContractRule implements BuiltInRule {
                     ifContractBuilder.buildContractApplPredTerm(true);
             Taclet informationFlowContractApp =
                     ifContractBuilder.buildContractApplTaclet(true);
-            
+
             InfFlowData infFlowData = new InfFlowData(heapAtPre, heapAtPost, TB.var(heaps.get(0)),
                                                       self, selfAtPost,
                                                       localInTerms, newLocalIns,
@@ -417,16 +353,15 @@ public class BlockContractRule implements BuiltInRule {
 
             // create proof obligation
             InfFlowPOSnippetFactory infFlowFactory =
-                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
-                                                   ifVars.c2, services);
+                POSnippetFactory.getInfFlowFactory(contract, ifVars.c1, ifVars.c2, services);
 
-            Sequent seq = buildBodyPreservesSequent(infFlowFactory);
+            Pair<Sequent, Term> seqPostPair = buildBodyPreservesSequent(infFlowFactory);
+            Sequent seq = seqPostPair.first;
+            Term post = seqPostPair.second;
             Goal infFlowGoal = goal.getCleanGoal(seq);
             infFlowGoal.setBranchLabel("Information Flow Validity");
 
             // create and add split-post and remove-post taclets
-            final Term post = infFlowFactory
-                    .create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
             final SplitPostTacletBuilder splitPostTB = new SplitPostTacletBuilder();
             final ArrayList<Taclet> splitPostTaclets = splitPostTB.generateTaclets(post);
             for (final Taclet t : splitPostTaclets) {
@@ -595,14 +530,15 @@ public class BlockContractRule implements BuiltInRule {
         return NAME.toString();
     }
 
-    Sequent buildBodyPreservesSequent(InfFlowPOSnippetFactory f) {
+    Pair<Sequent, Term> buildBodyPreservesSequent(InfFlowPOSnippetFactory f) {
         Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
 
         final Term finalTerm = TB.imp(selfComposedExec, post);
-        return Sequent.createSuccSequent(
-                new Semisequent(new SequentFormula(finalTerm)));
+        Sequent seq = Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
+
+        return new Pair<Sequent, Term> (seq, post);
     }
 
 
@@ -1335,23 +1271,6 @@ public class BlockContractRule implements BuiltInRule {
         public final Term exception;
         public final Term exceptionAtPost;
         public final Term applPredTerm;
-
-        public InfFlowData() {
-            this.heapAtPre = null;
-            this.heapAtPost = null;
-            this.baseHeap = null;
-            this.self = null;
-            this.selfAtPost = null;
-            this.localIns = ImmutableSLList.<Term>nil();
-            this.newIns = ImmutableSLList.<Term>nil();
-            this.localOuts = ImmutableSLList.<Term>nil();
-            this.newOuts = ImmutableSLList.<Term>nil();
-            this.result = null;
-            this.resultAtPost = null;
-            this.exception = null;
-            this.exceptionAtPost = null;
-            this.applPredTerm = null;
-        }
 
         public InfFlowData(Term heapAtPre, Term heapAtPost, Term baseHeap,
                            Term self, Term selfAtPost,

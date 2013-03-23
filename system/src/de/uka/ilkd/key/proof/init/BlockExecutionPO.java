@@ -40,7 +40,6 @@ public class BlockExecutionPO extends AbstractOperationPO
     private final Goal initiatingGoal;
     private final ExecutionContext context;
 
-
     public BlockExecutionPO(InitConfig initConfig,
                             BlockContract contract,
                             ProofObligationVars symbExecVars,
@@ -58,7 +57,6 @@ public class BlockExecutionPO extends AbstractOperationPO
         this.initiatingGoal = initiatingGoal;
         this.context = context;
     }
-
 
     @Override
     public void readProblem() throws ProofInputException {
@@ -92,7 +90,6 @@ public class BlockExecutionPO extends AbstractOperationPO
                                                     .getPOForProof(initiatingProof);
         taclets = initatingPO.getInitialTaclets();
     }
-
 
     @Override
     public boolean implies(ProofOblInput po) {

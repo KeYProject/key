@@ -15,15 +15,15 @@ import de.uka.ilkd.key.util.MiscTools;
  * <p/>
  * @author christoph
  */
-class BlockCallWithPreconditionPredicateSnippet
-        extends TwoStateMethodPredicateSnippet {
+class BlockCallWithPreconditionPredicateSnippet extends TwoStateMethodPredicateSnippet {
 
     @Override
     String generatePredicateName(IProgramMethod pm,
                                  StatementBlock block,
                                  LoopInvariant loopInv) {
         String nameString =
-                MiscTools.toValidTacletName("EXECUTION_OF_BLOCK_"  + block.getUniqueName() +
+                MiscTools.toValidTacletName("EXECUTION_OF_BLOCK_" + "at_line_" +
+                                            block.getStartPosition().getLine() +
                                             "_in_" + pm.getFullName() + "_WITH_PRE").toString();
         return nameString;
     }

@@ -9,6 +9,7 @@
 //
 package de.uka.ilkd.key.rule;
 
+import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.collection.ImmutableSet;
@@ -45,8 +46,8 @@ public final class InfFlowBlockContractTacletBuilder
     Name generateName() {
         return MiscTools.toValidTacletName("Use information flow contract for " +
                                            blockContract.getName() + " " +
-                                           blockContract.getBlock().getStartPosition().getLine() + " : " +
-                                           blockContract.getTarget().getFullName());
+                                           blockContract.getBlock().getStartPosition().getLine() +
+                                           " in " + blockContract.getTarget().getFullName());
     }
 
 
@@ -78,14 +79,13 @@ public final class InfFlowBlockContractTacletBuilder
 
 
     @Override
-    Term buildContractApplications(
-            ProofObligationVars contAppData,
-            ProofObligationVars contAppData2,
-            Services services) {
+    Term buildContractApplications(ProofObligationVars contAppData,
+                                   ProofObligationVars contAppData2,
+                                   Services services) {
         ImmutableSet<BlockContract> ifContracts =
                 services.getSpecificationRepository().getBlockContracts(blockContract.getBlock());
-        ImmutableList<Term> contractsApplications =
-                ImmutableSLList.<Term>nil();
+        ifContracts = filterContracts(ifContracts);
+        ImmutableList<Term> contractsApplications = ImmutableSLList.<Term>nil();
         for (BlockContract cont : ifContracts) {
             InfFlowPOSnippetFactory f =
                     POSnippetFactory.getInfFlowFactory(cont, contAppData,
@@ -94,6 +94,21 @@ public final class InfFlowBlockContractTacletBuilder
                     contractsApplications.append(
                     f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL));
         }
+
         return and(contractsApplications);
+    }
+
+
+    ImmutableSet<BlockContract> filterContracts(ImmutableSet<BlockContract> ifContracts) {
+        ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
+        for (BlockContract cont : ifContracts) {
+            if ((cont.getBlock().getStartPosition().getLine() ==
+                    blockContract.getBlock().getStartPosition().getLine()) &&
+                    cont.getTarget().getFullName()
+                    .equalsIgnoreCase(blockContract.getTarget().getFullName())) {
+                result = result.add(cont);
+            }
+        }
+        return result;
     }
 }

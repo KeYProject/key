@@ -12,7 +12,6 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -244,23 +243,7 @@ abstract class AbstractInfFlowContractTacletBuilder extends TermBuilder.Serviced
         return var(SchemaVariableFactory.createTermSV(name, sort));
 
     }
-    
-    private static Term buildAtPostVar(Term varTerm,
-                                       Services services) {
-        if (varTerm == null) {
-            return null;
-        }
-        assert varTerm.op() instanceof LocationVariable;
 
-        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-        String name = TermBuilder.DF.newName(services, varTerm.toString() + "AtPost");
-        LocationVariable varAtPostVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
-        register(varAtPostVar, services);
-        Term varAtPost = TermBuilder.DF.var(varAtPostVar);
-        return varAtPost;
-    }
-    
     static void register(ProgramVariable pv,
                          Services services) {
         Namespace progVarNames = services.getNamespaces().programVariables();

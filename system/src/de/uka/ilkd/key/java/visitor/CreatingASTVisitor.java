@@ -112,7 +112,8 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    protected void performActionOnBlockContract(final StatementBlock oldBlock, final StatementBlock newBlock) {
+    protected void performActionOnBlockContract(final StatementBlock oldBlock,
+                                                final StatementBlock newBlock) {
         //do nothing
     }
     

@@ -196,26 +196,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         // focus (below update) must be modality term
         return progPost.op() instanceof Modality;
     }
-    
-    private static Term buildAtPreVar(Term varTerm,
-                                      String suffix,
-                                      Services services) {
-        if (varTerm == null) {
-            return null;
-        }
-        assert varTerm.op() instanceof LocationVariable;
-
-        KeYJavaType resultType = ((LocationVariable)varTerm.op()).getKeYJavaType();
-        if (!suffix.equalsIgnoreCase("")) {
-            suffix = new String("_" + suffix);
-        }
-        String name = TermBuilder.DF.newName(services, varTerm.toString() + "_Before" + suffix);
-        LocationVariable varAtPreVar =
-                new LocationVariable(new ProgramElementName(name), resultType);
-        register(varAtPreVar, services);
-        Term varAtPre = TermBuilder.DF.var(varAtPreVar);
-        return varAtPre;
-    }
 
     private static Term buildAtPostVar(Term varTerm,
                                        String suffix,
@@ -348,8 +328,7 @@ public final class WhileInvariantRule implements BuiltInRule {
         Term post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
         final Term finalTerm = TB.imp(selfComposedExec, post);
 
-        Sequent seq = Sequent.createSuccSequent(
-                new Semisequent(new SequentFormula(finalTerm)));
+        Sequent seq = Sequent.createSuccSequent(new Semisequent(new SequentFormula(finalTerm)));
         infFlowGoal = goal.getCleanGoal(seq);
         infFlowGoal.setBranchLabel("Information Flow Validity");
 
@@ -373,8 +352,6 @@ public final class WhileInvariantRule implements BuiltInRule {
                 TB.equals(infData.heapAtPre, infData.baseHeap);
         final Term heapAtPostEq =
                 TB.equals(infData.heapAtPost, infData.baseHeap);
-        /*final Term guardFalseTerm = TB.equals(TB.var((LocationVariable) infData.guardTerm.op()), 
-                TB.FALSE(infData.services));*/
         Term beforeAssumptions = TB.and(heapAtPreEq,
                                         TB.box(infData.guardJb,
                                                TB.equals(infData.guardAtPre,
@@ -449,7 +426,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
             throws RuleAbortException {
-        
+
         final KeYJavaType booleanKJT = services.getTypeConverter().getBooleanType();
         final KeYJavaType intKJT =
                 services.getJavaInfo().getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT);
@@ -475,22 +452,6 @@ public final class WhileInvariantRule implements BuiltInRule {
             final Term m = inst.inv.getModifies(heap, inst.selfTerm, atPres, services);
             mods.put(heap, m);
         }
-
-        /*final Map<LocationVariable,
-                  ImmutableList<Triple<ImmutableList<Term>,
-                                       ImmutableList<Term>,
-                                       ImmutableList<Term>>>> resp =
-                     new LinkedHashMap<LocationVariable,
-                                       ImmutableList<Triple<ImmutableList<Term>,
-                                                            ImmutableList<Term>,
-                                                            ImmutableList<Term>>>>();
-        for(LocationVariable heap : heapContext) {
-            final ImmutableList<Triple<ImmutableList<Term>,
-                                       ImmutableList<Term>,
-                                       ImmutableList<Term>>> r =
-                    inst.inv.getRespects(heap, inst.selfTerm, atPres, services);
-            resp.put(heap, r);
-        }*/
 
         final Term variant = inst.inv.getVariant(inst.selfTerm, atPres, services);
         
@@ -803,7 +764,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             initGoal.setBranchLabel("Invariant Initially Valid");
             useGoal.setBranchLabel("Use Case");
             result = result.append(infFlowGoal);
-            
+
             // set infFlowAssumptions, add term and taclet to post goal
             useGoal = addInfFlowAssumptionsAndTaclet(infFlowData, useGoal);
         }

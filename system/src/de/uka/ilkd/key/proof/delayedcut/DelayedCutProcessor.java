@@ -134,55 +134,41 @@ public class DelayedCutProcessor implements Runnable {
          }     
    
          return delayedCut;
-    }
-    
+    }    
 
-    
-   
-    
-    
-    
-    
-    private ImmutableList<Goal> cut(DelayedCut cut){
+    private ImmutableList<Goal> cut(DelayedCut cut) {
         Goal goal = find(cut.getProof(), cut.getNode());
 
-        TacletFilter filter = new TacletFilter() {
-            
+        TacletFilter filter = new TacletFilter() {            
             @Override
-            protected boolean filter(Taclet taclet) {
-                
+            protected boolean filter(Taclet taclet) {                
                 return taclet.name().toString().equals(CUT_TACLET);
             }
-            
-            
         };
         
-        ImmutableList<NoPosTacletApp> apps =  goal.ruleAppIndex().getNoFindTaclet(filter, cut.getServices());
-        assert apps.size() == 1;
-         
+        ImmutableList<NoPosTacletApp> apps =
+                goal.ruleAppIndex().getNoFindTaclet(filter, cut.getServices());
+        assert apps.size() == 1;         
         TacletApp app = apps.head();
-        
+
         app = app.addCheckedInstantiation(app.uninstantiatedVars().iterator().next(),
-                                    cut.getFormula(),cut.getServices(), true);
+                                          cut.getFormula(),cut.getServices(), true);
         return goal.apply(app);
     }
     
-    private ImmutableList<Goal> apply(final String tacletName,Goal goal, PosInOccurrence pio){
+    private ImmutableList<Goal> apply(final String tacletName,Goal goal, PosInOccurrence pio) {
         TacletFilter filter = new TacletFilter() {
-            
             @Override
             protected boolean filter(Taclet taclet) {
-                
                 return taclet.name().toString().equals(tacletName);
             }
-            
-            
         };
-     
-        ImmutableList<NoPosTacletApp> apps =  goal.ruleAppIndex().getFindTaclet(filter,pio,goal.proof().getServices());
+
+        ImmutableList<NoPosTacletApp> apps =
+                goal.ruleAppIndex().getFindTaclet(filter,pio,goal.proof().getServices());
         assert apps.size() == 1;
         NoPosTacletApp app = apps.head();
-        
+
         PosTacletApp app2 = app.setPosInOccurrence(pio, goal.proof().getServices());
         return goal.apply(app2); 
     }
@@ -216,7 +202,8 @@ public class DelayedCutProcessor implements Runnable {
                      ? "TRUE":"FALSE";
            
             if(goal[i].node().getNodeInfo().getBranchLabel().endsWith(side)){
-                SequentFormula formula = getSequentFormula(goal[i], cut.isDecisionPredicateInAntecendet());
+                SequentFormula formula =
+                        getSequentFormula(goal[i], cut.isDecisionPredicateInAntecendet());
                 if(formula.formula() == cut.getFormula()){
                     return i;
                 }
@@ -296,7 +283,7 @@ public class DelayedCutProcessor implements Runnable {
         	    final SchemaVariable sv = svIt.next();
         	    if(sv instanceof SkolemTermSV) {
         		final Term inst = (Term) insts.getInstantiation(sv);
-        		   		 services.getNamespaces().functions().remove(inst.op().name());
+        		services.getNamespaces().functions().remove(inst.op().name());
         	    }
         	}
         }
@@ -397,11 +384,11 @@ public class DelayedCutProcessor implements Runnable {
 //    		throw new RuntimeException("Cannot apply taclet-app");
     	}
     	
-    	throw new RuntimeException("App is neither a BuiltInApp nor a TacletApp, it's  of type"+app.getClass().getName());
+    	throw new RuntimeException("App is neither a BuiltInApp nor a TacletApp, it's  of type" +
+    	                           app.getClass().getName());
     	
     }
-    
-    
+
     private PosInOccurrence translate(NodeGoalPair pair,Services services){
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
         if(oldRuleApp == null ||oldRuleApp.posInOccurrence() == null){
@@ -415,9 +402,7 @@ public class DelayedCutProcessor implements Runnable {
         return PosInOccurrence.findInSequent(pair.goal.sequent(),
                 formulaNumber, oldRuleApp.posInOccurrence().posInTerm());
     }
-    
-    
-    
+
     /**
      * Used for rebuilding the tree: Joins the node of the old sub trees and the corresponding 
      * goals in the new tree to one object. 
@@ -469,23 +454,4 @@ public class DelayedCutProcessor implements Runnable {
             }
         }
     }
-
-    
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

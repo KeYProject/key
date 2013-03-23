@@ -16,15 +16,14 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
 	protected final PosInOccurrence pio;
 	protected ImmutableList<PosInOccurrence> ifInsts;
 
-	protected AbstractBuiltInRuleApp(BuiltInRule rule,
-            PosInOccurrence pio, ImmutableList<PosInOccurrence> ifInsts) {
+	protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio,
+	                                 ImmutableList<PosInOccurrence> ifInsts) {
         this.builtInRule = rule;
 	    this.pio     = pio;
 	    this.ifInsts = (ifInsts == null ? ImmutableSLList.<PosInOccurrence>nil() : ifInsts);	    
 	}
 
-	protected AbstractBuiltInRuleApp(BuiltInRule rule,
-	        PosInOccurrence pio) {
+	protected AbstractBuiltInRuleApp(BuiltInRule rule, PosInOccurrence pio) {
 	    this(rule, pio, null);
 	}
 	
@@ -34,7 +33,6 @@ public abstract class AbstractBuiltInRuleApp implements IBuiltInRuleApp {
     public void setMutable(ImmutableList<PosInOccurrence> ifInsts) {
         this.ifInsts = ifInsts;
     }
-
 
     /**
      * returns the rule of this rule application

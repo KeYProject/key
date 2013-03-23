@@ -22,7 +22,8 @@ class BlockCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
                                  StatementBlock block,
                                  LoopInvariant loopInv) {
         String nameString =
-                MiscTools.toValidTacletName("RELATED_BY_BLOCK_" + block.getUniqueName() +
+                MiscTools.toValidTacletName("RELATED_BY_BLOCK_" + "at_line_" +
+                                            block.getStartPosition().getLine() +
                                             "_in_" + pm.getFullName()).toString();
         return nameString;
     }
