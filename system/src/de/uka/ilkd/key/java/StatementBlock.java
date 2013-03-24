@@ -35,15 +35,15 @@ public class StatementBlock extends JavaStatement
      */
     private final ImmutableArray<? extends Statement> body;
 
-    
+
     /**
      * contains all program prefix elements below and including itself
      */
     private final ImmutableArray<ProgramPrefix> prefixElementArray;
 
     private PosInProgram firstActiveChildPos = null;
-    
-    
+
+
     public StatementBlock() {
 	body = new ImmutableArray<Statement>();
         prefixElementArray = new ImmutableArray<ProgramPrefix>(this);
@@ -53,24 +53,24 @@ public class StatementBlock extends JavaStatement
      *      Statement block.
      *  @param children an ExtList that contains the children
      */
-    
+
     public StatementBlock(ExtList children) {
         super(children);
         body = new
             ImmutableArray<Statement>(children.collect(Statement.class));
-        
+
         prefixElementArray = computePrefixElements(body);
     }
 
     public StatementBlock(ImmutableArray<? extends Statement> as) {
-	
+
 	// check for non-null elements (bug fix)
 	Debug.assertDeepNonNull(as, "statement block contructor");
-	
+
 	body = as;
         prefixElementArray = computePrefixElements(body);
     }
-        
+
 
     public StatementBlock(Statement as) {
 	this(new ImmutableArray<Statement>(as));
@@ -80,12 +80,15 @@ public class StatementBlock extends JavaStatement
 	this(new ImmutableArray<Statement>(body));
     }
 
-    @Override    
+    @Override
     public boolean equals(Object o) {
-        assert o instanceof StatementBlock;
-        StatementBlock b = (StatementBlock) o;
-        return super.equals(o) &&
-                this.getStartPosition().getLine() == b.getStartPosition().getLine();
+        if (o instanceof SourceElement) {
+            SourceElement b = (SourceElement) o;
+            return super.equals(o) &&
+                    this.getStartPosition().getLine() == b.getStartPosition().getLine();
+        } else {
+            return super.equals(o);
+        }
     }
 
     private ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b) {
@@ -100,20 +103,20 @@ public class StatementBlock extends JavaStatement
 
         if (b.size()>0 && b.get(0) instanceof ProgramPrefix) {
             final ProgramPrefix prefixElement = (ProgramPrefix) b.get(0);
-            
+
             final int prefixLength = 
                 ((ProgramPrefix)b.get(0)).getPrefixLength();
-            pp = new ProgramPrefix[prefixLength + 1];            
-            prefixElement.getPrefixElements().arraycopy(offset, pp, 1, prefixLength);            
+            pp = new ProgramPrefix[prefixLength + 1];
+            prefixElement.getPrefixElements().arraycopy(offset, pp, 1, prefixLength);
         } else {
-            pp = new ProgramPrefix[1];            
-        }                
+            pp = new ProgramPrefix[1];
+        }
         pp[0] = current;
         return new ImmutableArray<ProgramPrefix>(pp);
     }
 
-   
-    
+
+
     /**
      *      Get body.
      *      @return the statement array wrapper.
@@ -132,11 +135,11 @@ public class StatementBlock extends JavaStatement
      *      Returns the number of children of this node.
      *      @return an int giving the number of children of this node
      */
-    
+
     public int getChildCount() {
         return body.size();
     }
-    
+
     /**
      *      Returns the child at the specified index in this node's "virtual"
      *      child array

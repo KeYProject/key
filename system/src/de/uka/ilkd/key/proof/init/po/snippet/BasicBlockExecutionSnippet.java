@@ -74,6 +74,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod
         } else {
             symbExecMod = Modality.BOX;
         }
+        //final Term programTerm = tb.not(tb.prog(modality, jb, tb.not(postTerm)));
         final Term programTerm = tb.prog(symbExecMod, jb, postTerm);
 
         //create update
