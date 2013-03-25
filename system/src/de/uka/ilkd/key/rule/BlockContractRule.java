@@ -273,7 +273,6 @@ public class BlockContractRule implements BuiltInRule {
                                                     "with the non-base-heap " +
                                                     "setting";
 
-            final Terms vars = contract.getVariablesAsTerms();
             final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
             final Term heapAtPre = TB.var(variables.remembranceHeaps.get(baseHeap));
             final Name heapAtPostName =
@@ -281,20 +280,21 @@ public class BlockContractRule implements BuiltInRule {
             final Term heapAtPost =
                     TB.func(new Function(heapAtPostName, heapAtPre.sort(), true));
 
-            final Term self = variables.self != null ? TB.var(variables.self) : vars.self;
-            final Term selfAtPost = buildAfterVar(self, "BLOCK", services);
+            final Term self = variables.self != null ? TB.var(variables.self) : null;
+            final Term selfAtPost =
+                    self != null ? buildAfterVar(self, "BLOCK", services) : null;
             final ImmutableList<Term> localInTerms = MiscTools.toTermList(localInVariables);
             final ImmutableList<Term> newLocalIns = buildLocalIns(localInTerms, services);
             final ImmutableList<Term> localOutTerms = MiscTools.toTermList(localOutVariables);
             final ImmutableList<Term> newLocalOuts = buildLocalOuts(localOutTerms, services);
-            Term result = variables.result != null ? TB.var(variables.result) : vars.result;
+            Term result = variables.result != null ? TB.var(variables.result) : null;
             final Term resultAtPost =
-                    result != null && result.toString() != TB.NULL(services).toString() ?
+                    result != null ?
                             buildAfterVar(result, "BLOCK", services) : null;
             final Term exception =
-                    variables.exception != null ? TB.var(variables.exception) : vars.exception;
+                    variables.exception != null ? TB.var(variables.exception) : null;
             final Term exceptionAtPost =
-                    exception != null && exception.toString() != TB.NULL(services).toString() ?
+                    exception != null ?
                     buildAfterVar(exception, "BLOCK", services) : null;
 
             final InfFlowBlockContractTacletBuilder ifContractBuilder =
