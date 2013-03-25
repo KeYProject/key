@@ -33,13 +33,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.SimpleBlockContract;
-import de.uka.ilkd.key.speclang.BlockContract.Terms;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 import java.util.*;
 
@@ -246,7 +243,7 @@ public class BlockContractRule implements BuiltInRule {
             afterAssumptions = TB.and(afterAssumptions, TB.equals(newOuts.next(), locOut));
         }
         afterAssumptions = TB.and(afterAssumptions, infData.applPredTerm);        
-        
+
         return new Pair<Term, Term> (beforeAssumptions, afterAssumptions);
     }
 
@@ -303,14 +300,20 @@ public class BlockContractRule implements BuiltInRule {
             ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
             ifContractBuilder.setHeapAtPre(heapAtPre);
             ifContractBuilder.setHeapAtPost(heapAtPost);
-            ifContractBuilder.setSelf(self);
-            ifContractBuilder.setSelfAtPost(selfAtPost);
+            if (hasSelf)
+                ifContractBuilder.setSelf(self);
+            if (hasSelf)
+                ifContractBuilder.setSelfAtPost(selfAtPost);
             ifContractBuilder.setLocalIns(newLocalIns);
             ifContractBuilder.setLocalOuts(newLocalOuts);
-            ifContractBuilder.setResult(result);
-            ifContractBuilder.setResultAtPost(resultAtPost);
-            ifContractBuilder.setException(exception);
-            ifContractBuilder.setExceptionAtPost(exceptionAtPost);
+            if (hasRes)
+                ifContractBuilder.setResult(result);
+            if (hasRes)
+                ifContractBuilder.setResultAtPost(resultAtPost);
+            if (hasExc)
+                ifContractBuilder.setException(exception);
+            if (hasExc)
+                ifContractBuilder.setExceptionAtPost(exceptionAtPost);
 
             // generate information flow contract application predicate
             // and associated taclet
@@ -335,15 +338,15 @@ public class BlockContractRule implements BuiltInRule {
 
             // generate proof obligation variables
             final ProofObligationVars instantiationVars =
-                    new ProofObligationVars(self,
-                                            selfAtPost,
+                    new ProofObligationVars(hasSelf ? self : null,
+                                            hasSelf ? selfAtPost : null,
                                             newLocalIns,
                                             heapAtPre,
                                             newLocalOuts,
-                                            result,
-                                            resultAtPost,
-                                            exception,
-                                            exceptionAtPost,
+                                            hasRes ? result : null,
+                                            hasRes ? resultAtPost : null,
+                                            hasExc ? exception : null,
+                                            hasExc ? exceptionAtPost : null,
                                             heapAtPost,
                                             services, true);
             final IFProofObligationVars ifVars =
@@ -1259,7 +1262,7 @@ public class BlockContractRule implements BuiltInRule {
         public final Term heapAtPost;
         public final Term baseHeap;
         public final Term self;
-        public final Term selfAtPost;        
+        public final Term selfAtPost;
         public final ImmutableList<Term> localIns;
         public final ImmutableList<Term> newIns;
         public final ImmutableList<Term> localOuts;
@@ -1274,7 +1277,8 @@ public class BlockContractRule implements BuiltInRule {
                            Term self, Term selfAtPost,
                            ImmutableList<Term> localIns, ImmutableList<Term> newIns,
                            ImmutableList<Term> localOuts, ImmutableList<Term> newOuts,
-                           Term result, Term resultAtPost, Term exception, Term exceptionAtPost,
+                           Term result, Term resultAtPost,
+                           Term exception, Term exceptionAtPost,
                            Term applPredTerm) {
             this.heapAtPre = heapAtPre;
             this.heapAtPost = heapAtPost;
