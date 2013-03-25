@@ -33,11 +33,13 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.RemovePostTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.SplitPostTacletBuilder;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.SimpleBlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Terms;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.util.ExtList;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 import java.util.*;
 
@@ -235,12 +237,10 @@ public class BlockContractRule implements BuiltInRule {
         for (Term locIn: infData.localIns) {
             beforeAssumptions = TB.and(beforeAssumptions, TB.equals(newIns.next(), locIn));
         }
-        Term resultEq = (infData.resultAtPost == null) ?
-                            TB.tt() :
-                            TB.equals(infData.resultAtPost, infData.result);
         Term afterAssumptions = TB.and(TB.equals(infData.heapAtPost, infData.baseHeap),
                                        TB.equals(infData.selfAtPost, infData.self),
-                                       resultEq,
+                                       infData.resultAtPost == null ? TB.tt() :
+                                           TB.equals(infData.resultAtPost, infData.result),
                                        TB.equals(infData.exceptionAtPost, infData.exception));
         Iterator<Term> newOuts = infData.newOuts.iterator();        
         for (Term locOut: infData.localOuts) {
@@ -281,20 +281,21 @@ public class BlockContractRule implements BuiltInRule {
             final Term heapAtPost =
                     TB.func(new Function(heapAtPostName, heapAtPre.sort(), true));
 
-            final Term self = vars.self;
+            final Term self = variables.self != null ? TB.var(variables.self) : vars.self;
             final Term selfAtPost = buildAfterVar(self, "BLOCK", services);
             final ImmutableList<Term> localInTerms = MiscTools.toTermList(localInVariables);
             final ImmutableList<Term> newLocalIns = buildLocalIns(localInTerms, services);
             final ImmutableList<Term> localOutTerms = MiscTools.toTermList(localOutVariables);
             final ImmutableList<Term> newLocalOuts = buildLocalOuts(localOutTerms, services);
-            Term result = vars.result;
-            Term resultAtPost = null;
-            if (result != null &&
-                    result.toString() != TB.NULL(services).toString()) {
-                resultAtPost = buildAfterVar(result, "BLOCK", services);                
-            }
-            final Term exception = vars.exception;
-            final Term exceptionAtPost = buildAfterVar(exception, "BLOCK", services);
+            Term result = variables.result != null ? TB.var(variables.result) : vars.result;
+            final Term resultAtPost =
+                    result != null && result.toString() != TB.NULL(services).toString() ?
+                            buildAfterVar(result, "BLOCK", services) : null;
+            final Term exception =
+                    variables.exception != null ? TB.var(variables.exception) : vars.exception;
+            final Term exceptionAtPost =
+                    exception != null && exception.toString() != TB.NULL(services).toString() ?
+                    buildAfterVar(exception, "BLOCK", services) : null;
 
             final InfFlowBlockContractTacletBuilder ifContractBuilder =
                     new InfFlowBlockContractTacletBuilder(services);
@@ -401,7 +402,6 @@ public class BlockContractRule implements BuiltInRule {
         final BlockContract contract = application.getContract();
         assert contract.getBlock().equals(instantiation.block);
         final Term contextUpdate = instantiation.update;
-
         final List<LocationVariable> heaps = application.getHeapContext();
         final ImmutableSet<ProgramVariable> localInVariables =
                 MiscTools.getLocalIns(instantiation.block, services);
@@ -415,7 +415,7 @@ public class BlockContractRule implements BuiltInRule {
 
         final BlockContract.Variables variables = new VariablesCreatorAndRegistrar(
             goal, contract.getPlaceholderVariables(), services
-        ).createAndRegister();
+        ).createAndRegister(instantiation.self);
 
         final ConditionsAndClausesBuilder conditionsAndClausesBuilder =
                 new ConditionsAndClausesBuilder(contract, heaps, variables,
@@ -685,10 +685,10 @@ public class BlockContractRule implements BuiltInRule {
             this.services = services;
         }
 
-        public BlockContract.Variables createAndRegister()
+        public BlockContract.Variables createAndRegister(Term self)
         {
             return new BlockContract.Variables(
-                null, // TODO Do we really don't know self as program variable?
+                self.op(ProgramVariable.class),
                 createAndRegisterFlags(placeholderVariables.breakFlags),
                 createAndRegisterFlags(placeholderVariables.continueFlags),
                 createAndRegisterVariable(placeholderVariables.returnFlag),

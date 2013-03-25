@@ -26,6 +26,8 @@ import de.uka.ilkd.key.util.MiscTools;
 public class FinishAuxiliaryLoopComputationMacro extends
         AbstractFinishAuxiliaryComputationMacro {
 
+    static int i = 0;
+
     @Override
     public boolean canApplyTo(KeYMediator mediator, PosInOccurrence posInOcc) {
         Proof proof = mediator.getSelectedProof();
@@ -79,7 +81,12 @@ public class FinishAuxiliaryLoopComputationMacro extends
                                          IFProofObligationVars ifVars,
                                          Services services) {
         Name tacletName =
-                MiscTools.toValidTacletName("unfold computed formula");
+                MiscTools.toValidTacletName("unfold computed formula " + i + " of " +
+                                            loopInv.getName() + " " +
+                                            loopInv.getLoop().getStartPosition().getLine() +
+                                            " in " + loopInv.getTarget().getFullName());
+        i++;
+
         // create find term
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(loopInv,

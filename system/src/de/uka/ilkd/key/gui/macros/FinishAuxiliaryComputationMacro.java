@@ -33,6 +33,8 @@ import de.uka.ilkd.key.util.MiscTools;
 public class FinishAuxiliaryComputationMacro
         extends AbstractFinishAuxiliaryComputationMacro {
 
+    static int i = 0;
+
     @Override
     public boolean canApplyTo(KeYMediator mediator,
                               PosInOccurrence posInOcc) {
@@ -77,7 +79,10 @@ public class FinishAuxiliaryComputationMacro
                                          InfFlowContractPO infPO,
                                          Services services) {
         Name tacletName =
-                MiscTools.toValidTacletName("unfold computed formula");
+                MiscTools.toValidTacletName("unfold computed formula " + i + " of " +
+                                            infPO.getContract().getTarget().getFullName());
+        i++;
+
         // create find term
         IFProofObligationVars ifVars = infPO.getIFVars();
         InfFlowPOSnippetFactory f =

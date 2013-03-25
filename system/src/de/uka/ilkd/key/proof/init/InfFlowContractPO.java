@@ -92,7 +92,7 @@ public class InfFlowContractPO extends AbstractOperationPO
             initConfig.getProofEnv().registerRule(t, AxiomJustification.INSTANCE);
         }
     }
-    
+
     /*
     //@Override
     public Term buildProblem(LoopInvariant loopInv, ProofObligationVars appData, Services services)

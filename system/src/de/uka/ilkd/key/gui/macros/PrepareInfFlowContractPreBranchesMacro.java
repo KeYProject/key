@@ -40,7 +40,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
 
     @Override
     public String getDescription() {
-        return "Removes the original post condition form information flow " +
+        return "Removes the original post condition from information flow " +
                "contract application pre-branches.";
     }
 
@@ -59,7 +59,8 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
     protected class RemovePostStrategy implements Strategy {
 
         private final Name NAME =
-                new Name(PrepareInfFlowContractPreBranchesMacro.RemovePostStrategy.class.getSimpleName());
+                new Name(PrepareInfFlowContractPreBranchesMacro
+                                .RemovePostStrategy.class.getSimpleName());
 
 
         public RemovePostStrategy() {
@@ -109,7 +110,7 @@ public class PrepareInfFlowContractPreBranchesMacro extends StrategyProofMacro {
             // abort if
             //  - the parent.parent rule application is an information
             //    flow contract rule application,
-            //  - the parent rule application is an impLeft rule applicatoin
+            //  - the parent rule application is an impLeft rule application
             //    and
             //  - we are in the branch where we have to show the left hand side
             //    of the implication

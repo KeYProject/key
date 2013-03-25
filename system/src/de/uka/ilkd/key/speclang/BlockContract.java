@@ -76,6 +76,8 @@ public interface BlockContract extends SpecificationElement {
                                                            ImmutableList<Term>>> newRespects,
                                 Variables newVariables);
 
+    public BlockContract updateVariables(Variables newVariables);
+
     /**
      * Returns the method in which the block is located.
      */
@@ -112,11 +114,6 @@ public interface BlockContract extends SpecificationElement {
     public ImmutableList<Triple<ImmutableList<Term>,
                                 ImmutableList<Term>,
                                 ImmutableList<Term>>> getRespects();
-
-
-    public void setRespects(ImmutableList<Triple<ImmutableList<Term>,
-                                                 ImmutableList<Term>,
-                                                 ImmutableList<Term>>> resp);
 
 
     /**
@@ -177,16 +174,10 @@ public interface BlockContract extends SpecificationElement {
             return result;
         }
 
-
-        public Terms termify() {
-            return termify(termifyVariable(self));
-        }
-
-
-        public Terms termify(final Term self)
+        public Terms termify(Term self)
         {
             return new BlockContract.Terms(
-                self, /*var(variables.self),*/
+                self,
                 termifyFlags(breakFlags),
                 termifyFlags(continueFlags),
                 termifyVariable(returnFlag),

@@ -151,7 +151,7 @@ public final class SimpleBlockContract implements BlockContract {
 
     @Override
     public Terms getVariablesAsTerms() {
-        return variables.termify();
+        return variables.termify(TermBuilder.DF.var(this.variables.self));
     }
 
 
@@ -289,14 +289,6 @@ public final class SimpleBlockContract implements BlockContract {
 
 
     @Override
-    public void setRespects(ImmutableList<Triple<ImmutableList<Term>,
-                                                 ImmutableList<Term>,
-                                                 ImmutableList<Term>>> resp) {
-        this.respects = resp;
-    }
-
-
-    @Override
     public void visit(final Visitor visitor) {
         assert visitor != null;
         visitor.performActionOnBlockContract(this);
@@ -399,6 +391,13 @@ public final class SimpleBlockContract implements BlockContract {
                                        newModifiesClauses, newRespects,
                                        newVariables,
                                        transactionApplicable, hasMod);
+    }
+
+    @Override
+    public BlockContract updateVariables(final Variables newVariables) {
+        return new SimpleBlockContract(block, labels, method, modality, preconditions,
+                                       postconditions, modifiesClauses, respects,
+                                       newVariables, transactionApplicable, hasMod);
     }
 
     // TODO Implement equals and hashCode properly.
