@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
+import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.LoopBodyTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -9,6 +11,7 @@ import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.ScaleFeature;
+import de.uka.ilkd.key.strategy.termfeature.ContainsLabelFeature;
 
 //TODO: Discuss settings and improve the code layout.
 /**
@@ -49,6 +52,10 @@ public class SymbolicExecutionStrategy extends VBTStrategy {
 
         return res;
     }
+    
+    protected Feature containsTermLabel(ITermLabel label) {
+       return new ContainsLabelFeature(label);
+    }
 
     protected SymbolicExecutionStrategy(Proof p_proof, StrategyProperties props) { // ,List<WatchPoint> watchpoints
 
@@ -85,7 +92,9 @@ public class SymbolicExecutionStrategy extends VBTStrategy {
         final Feature splitF = ScaleFeature.createScaled ( CountBranchFeature.INSTANCE, -400);
         bindRuleSet(d, "split_if", splitF); // The costs of rules in heuristic "split_if" is reduced at runtime by numberOfBranches * -400. The result is that rules of "split_if" preferred to "split_cond" and run and step into has the same behavior
         bindRuleSet(d, "instanceof_to_exists", inftyConst());
-
+        
+        
+        
 //        bindRuleSet(d, "split_cond", ifZero(LabelFeature.INSTANCE,
 //                longConst(-3000), longConst(0)));
 
@@ -108,6 +117,17 @@ public class SymbolicExecutionStrategy extends VBTStrategy {
 //            bindRuleSet(d, ruleSetName, ifZero(inUpdateFeature, inftyConst(),
 //                    longConst(0)));
 //        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Feature setupGlobalF(Feature dispatcher, Proof p_proof) {
+        // Make sure that the modality which executes a loop body is preferred against the modalities which executes special loop terminations like return, exceptions or break. 
+        Feature globalF = super.setupGlobalF(dispatcher, p_proof);
+        return add(globalF, 
+                   ifZero(containsTermLabel(LoopBodyTermLabel.INSTANCE), longConst(-2000)));
     }
 
     public Name name() {

@@ -8,6 +8,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.LoopBodyTermLabel;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
@@ -99,7 +100,16 @@ public class TermLabelInstantiatorDispatcher {
                                                               ImmutableArray<Term> newTermSubs, 
                                                               ImmutableArray<QuantifiableVariable> newTermBoundVars,
                                                               JavaBlock newTermJavaBlock) {
-      return instantiateLabels(services.getProof().getSettings().getLabelSettings().getLabelInstantiators(), applicationPosInOccurrence, rule, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock);
+      return instantiateLabels(getLabelInstantiators(services), applicationPosInOccurrence, rule, tacletTerm, newTermOp, newTermSubs, newTermBoundVars, newTermJavaBlock);
+   }
+   
+   /**
+    * Returns all {@link ITermLabelInstantiator} contained in the {@link Proof} of the given {@link Services}.
+    * @param services The {@link Services} which contains the proof to read {@link ITermLabelInstantiator}s from.
+    * @return The {@link ITermLabelInstantiator}s contained in the {@link Proof} of the given {@link Services}.
+    */
+   public static ImmutableList<ITermLabelInstantiator> getLabelInstantiators(Services services) {
+      return services.getProof().getSettings().getLabelSettings().getLabelInstantiators();
    }
    
    /**
@@ -139,15 +149,28 @@ public class TermLabelInstantiatorDispatcher {
     * <p>
     * This method has to be extended to support new {@link ITermLabelInstantiator}s.
     * </p>
-    * @param name The name of the requrested {@link ITermLabelInstantiator}.
+    * @param name The name of the requested {@link ITermLabelInstantiator}.
     * @return The {@link ITermLabelInstantiator} or {@code null} if not available.
     */
    public static ITermLabelInstantiator getInstantiator(String name) {
       if (SymbolicExecutionTermLabel.NAME.equals(name)) {
          return SymbolicExecutionTermLabelInstantiator.INSTANCE;
       }
+      else if (LoopBodyTermLabel.NAME.equals(name)) {
+         return LoopBodyTermLabelInstantiator.INSTANCE;
+      }
       else {
          return null;
       }
+   }
+
+   /**
+    * Checks if the given {@link ITermLabelInstantiator} is used in the {@link Proof} of the given {@link Services}.
+    * @param services The {@link Services} which provides the {@link Proof}.
+    * @param instantiator The {@link ITermLabelInstantiator} to look for.
+    * @return {@code true} {@link ITermLabelInstantiator} is available, {@code false} {@link ITermLabelInstantiator} is not available.
+    */
+   public static boolean hasInstantiator(Services services, ITermLabelInstantiator instantiator) {
+      return getLabelInstantiators(services).contains(instantiator);
    }
 }

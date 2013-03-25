@@ -904,7 +904,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
 	    ExtList changeList = stack.peek();
 	    if ( changeList.size () > 0 && 
 		 changeList.getFirst() == CHANGED ) {	    
-		changeList.removeFirst();	    
+		changeList.removeFirst();
+		changeList.add(x.getPositionInfo());
 		addNewChild(changeList);
 	    } else {
 		doDefaultAction(x);

@@ -900,7 +900,14 @@ public final class LogicPrinter {
 
     public void printLabels(Term t) throws IOException {
         layouter.beginC().print("<<");
+        boolean afterFirst = false;
         for (ITermLabel l : t.getLabels()) {
+            if (afterFirst) {
+               layouter.print(",").brk(1, 0);
+            }
+            else {
+               afterFirst = true;
+            }
             layouter.print(l.toString());
         }
         layouter.end().print(">>");

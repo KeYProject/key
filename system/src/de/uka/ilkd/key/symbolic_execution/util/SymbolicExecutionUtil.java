@@ -81,6 +81,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.ITermLabelInstantiator;
+import de.uka.ilkd.key.rule.LoopBodyTermLabelInstantiator;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.PosTacletApp;
@@ -1922,6 +1923,7 @@ public final class SymbolicExecutionUtil {
       if (proof != null) {
          ImmutableList<ITermLabelInstantiator> labelInstantiators = ImmutableSLList.<ITermLabelInstantiator>nil();
          labelInstantiators = labelInstantiators.append(SymbolicExecutionTermLabelInstantiator.INSTANCE);
+         labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
          proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
       }
    }

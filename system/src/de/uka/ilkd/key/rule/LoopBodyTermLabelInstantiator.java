@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.ITermLabel;
+import de.uka.ilkd.key.logic.LoopBodyTermLabel;
 import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 
 /**
@@ -8,16 +9,16 @@ import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
  * {@link SymbolicExecutionTermLabel} is maintained.
  * @author Martin Hentschel
  */
-public final class SymbolicExecutionTermLabelInstantiator extends AbstractSymbolicExecutionInstantiator {
+public final class LoopBodyTermLabelInstantiator extends AbstractSymbolicExecutionInstantiator {
    /**
     * The only instance of this class.
     */
-   public static final SymbolicExecutionTermLabelInstantiator INSTANCE = new SymbolicExecutionTermLabelInstantiator();
+   public static final LoopBodyTermLabelInstantiator INSTANCE = new LoopBodyTermLabelInstantiator();
 
    /**
     * Constructor to forbid multiple instances.
     */
-   private SymbolicExecutionTermLabelInstantiator() {
+   private LoopBodyTermLabelInstantiator() {
    }
 
    /**
@@ -25,7 +26,7 @@ public final class SymbolicExecutionTermLabelInstantiator extends AbstractSymbol
     */
    @Override
    protected ITermLabel getTermLabel() {
-      return SymbolicExecutionTermLabel.INSTANCE;
+      return LoopBodyTermLabel.INSTANCE;
    }
 
    /**
@@ -33,6 +34,6 @@ public final class SymbolicExecutionTermLabelInstantiator extends AbstractSymbol
     */
    @Override
    public String getName() {
-      return SymbolicExecutionTermLabel.NAME;
+      return LoopBodyTermLabel.NAME;
    }
 }

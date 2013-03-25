@@ -8,8 +8,11 @@ package de.uka.ilkd.key.logic;
  */
 public class LabelFactory {
    public static ITermLabel createLabel(String name) throws UnknownLabelException {
-      if ("SE".equals(name)) {
+      if (SymbolicExecutionTermLabel.NAME.equals(name)) {
          return SymbolicExecutionTermLabel.INSTANCE;
+      }
+      else if (LoopBodyTermLabel.NAME.equals(name)) {
+         return LoopBodyTermLabel.INSTANCE;
       }
       else {
          throw new UnknownLabelException(name);

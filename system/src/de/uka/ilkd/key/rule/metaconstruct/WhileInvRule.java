@@ -34,7 +34,9 @@ import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.TransactionStatement;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.LoopBodyTermLabel;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -46,6 +48,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.rule.LoopBodyTermLabelInstantiator;
 import de.uka.ilkd.key.rule.TermLabelInstantiatorDispatcher;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -260,10 +263,20 @@ public final class WhileInvRule {
         JavaBlock mainJavaBlock = JavaBlock.createJavaBlock(transaction ? 
                                                             new StatementBlock(new Statement[]{resSta, new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)}) : 
                                                             new StatementBlock(resSta));
+        // Compute labels
+        ImmutableArray<ITermLabel> labels = TermLabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock);
+        // Add loop body term label if required (not already present and loop body instantiator is available)
+        if (!labels.contains(LoopBodyTermLabel.INSTANCE) &&
+            TermLabelInstantiatorDispatcher.hasInstantiator(services, LoopBodyTermLabelInstantiator.INSTANCE)) {
+           ITermLabel[] newLabels = new ITermLabel[labels.size() + 1];
+           labels.arraycopy(0, newLabels, 0, labels.size());
+           newLabels[newLabels.length - 1] = LoopBodyTermLabel.INSTANCE;
+           labels = new ImmutableArray<ITermLabel>(newLabels);
+        }
         return TermBuilder.DF.prog(loopBodyModality, 
                                    mainJavaBlock, 
                                    result,
-                                   TermLabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock)); 
+                                   labels); 
     }
 
     /**
