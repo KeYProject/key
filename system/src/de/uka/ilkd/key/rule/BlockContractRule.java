@@ -274,12 +274,15 @@ public class BlockContractRule implements BuiltInRule {
 
             final LocationVariable baseHeap =
                     services.getTypeConverter().getHeapLDT().getHeap();
+            final boolean hasSelf = variables.self != null;
+            final boolean hasRes = variables.result != null;
+            final boolean hasExc = variables.exception != null;
+
             final Term heapAtPre = TB.var(variables.remembranceHeaps.get(baseHeap));
             final Name heapAtPostName =
                     new Name(TB.newName(services, "heap_After_BLOCK"));
             final Term heapAtPost =
                     TB.func(new Function(heapAtPostName, heapAtPre.sort(), true));
-            final boolean hasSelf = variables.self != null;
             final Term self = hasSelf ? TB.var(variables.self) : TB.NULL(services);
             final Term selfAtPost =
                     hasSelf ? buildAfterVar(self, "BLOCK", services) : TB.NULL(services);
@@ -287,11 +290,9 @@ public class BlockContractRule implements BuiltInRule {
             final ImmutableList<Term> newLocalIns = buildLocalIns(localInTerms, services);
             final ImmutableList<Term> localOutTerms = MiscTools.toTermList(localOutVariables);
             final ImmutableList<Term> newLocalOuts = buildLocalOuts(localOutTerms, services);
-            final boolean hasRes = variables.result != null;
             Term result = hasRes ? TB.var(variables.result) : TB.NULL(services);
             final Term resultAtPost =
                     hasRes ? buildAfterVar(result, "BLOCK", services) : TB.NULL(services);
-            final boolean hasExc = variables.exception != null;
             final Term exception = hasExc ? TB.var(variables.exception) : TB.NULL(services);
             final Term exceptionAtPost =
                     hasExc ? buildAfterVar(exception, "BLOCK", services) : TB.NULL(services);
@@ -302,20 +303,14 @@ public class BlockContractRule implements BuiltInRule {
             ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
             ifContractBuilder.setHeapAtPre(heapAtPre);
             ifContractBuilder.setHeapAtPost(heapAtPost);
-            if (hasSelf) {
-                ifContractBuilder.setSelf(self);
-                ifContractBuilder.setSelfAtPost(selfAtPost);
-            }
+            ifContractBuilder.setSelf(self);
+            ifContractBuilder.setSelfAtPost(selfAtPost);
             ifContractBuilder.setLocalIns(newLocalIns);
             ifContractBuilder.setLocalOuts(newLocalOuts);
-            if (hasRes) {
-                ifContractBuilder.setResult(result);
-                ifContractBuilder.setResultAtPost(resultAtPost);
-            }
-            if (hasExc) {
-                ifContractBuilder.setException(exception);
-                ifContractBuilder.setExceptionAtPost(exceptionAtPost);
-            }            
+            ifContractBuilder.setResult(result);
+            ifContractBuilder.setResultAtPost(resultAtPost);
+            ifContractBuilder.setException(exception);
+            ifContractBuilder.setExceptionAtPost(exceptionAtPost);
 
             // generate information flow contract application predicate
             // and associated taclet
@@ -340,15 +335,15 @@ public class BlockContractRule implements BuiltInRule {
 
             // generate proof obligation variables
             final ProofObligationVars instantiationVars =
-                    new ProofObligationVars(hasSelf ? self : null,
-                                            hasSelf ? selfAtPost : null,
+                    new ProofObligationVars(self,
+                                            selfAtPost,
                                             newLocalIns,
                                             heapAtPre,
                                             newLocalOuts,
-                                            hasRes ? result : null,
-                                            hasRes ? resultAtPost : null,
-                                            hasExc ? exception : null,
-                                            hasExc ? exceptionAtPost : null,
+                                            result,
+                                            resultAtPost,
+                                            exception,
+                                            exceptionAtPost,
                                             heapAtPost,
                                             services, true);
             final IFProofObligationVars ifVars =
