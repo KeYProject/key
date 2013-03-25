@@ -56,7 +56,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
     protected abstract Set<String> getAdmittedRuleNames();
 
     @Override
-    protected PropExpansionStrategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
+    protected Strategy createStrategy(KeYMediator mediator, PosInOccurrence posInOcc) {
         return new PropExpansionStrategy(getAdmittedRuleNames());
     }
     
@@ -98,7 +98,9 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
             if(admittedRuleNames.contains(name) &&
                     ruleApplicationInContextAllowed(ruleApp, pio, goal)) {
                 Strategy javaDlStrategy =
-                        JavaCardDLStrategy.Factory.create(goal.proof(), "JavaCardDLStrategy", new StrategyProperties());
+                        JavaCardDLStrategy.Factory.create(goal.proof(),
+                                                          "JavaCardDLStrategy",
+                                                          new StrategyProperties());
                 return javaDlStrategy.computeCost(ruleApp, pio, goal);
             } else {
                 return TopRuleAppCost.INSTANCE;

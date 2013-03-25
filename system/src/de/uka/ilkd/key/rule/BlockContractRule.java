@@ -239,8 +239,7 @@ public class BlockContractRule implements BuiltInRule {
         }
         Term afterAssumptions = TB.and(TB.equals(infData.heapAtPost, infData.baseHeap),
                                        TB.equals(infData.selfAtPost, infData.self),
-                                       infData.resultAtPost == null ? TB.tt() :
-                                           TB.equals(infData.resultAtPost, infData.result),
+                                       TB.equals(infData.resultAtPost, infData.result),
                                        TB.equals(infData.exceptionAtPost, infData.exception));
         Iterator<Term> newOuts = infData.newOuts.iterator();        
         for (Term locOut: infData.localOuts) {
@@ -273,29 +272,29 @@ public class BlockContractRule implements BuiltInRule {
                                                     "with the non-base-heap " +
                                                     "setting";
 
-            final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+            final LocationVariable baseHeap =
+                    services.getTypeConverter().getHeapLDT().getHeap();
             final Term heapAtPre = TB.var(variables.remembranceHeaps.get(baseHeap));
             final Name heapAtPostName =
                     new Name(TB.newName(services, "heap_After_BLOCK"));
             final Term heapAtPost =
                     TB.func(new Function(heapAtPostName, heapAtPre.sort(), true));
-
-            final Term self = variables.self != null ? TB.var(variables.self) : null;
+            final boolean hasSelf = variables.self != null;
+            final Term self = hasSelf ? TB.var(variables.self) : TB.NULL(services);
             final Term selfAtPost =
-                    self != null ? buildAfterVar(self, "BLOCK", services) : null;
+                    hasSelf ? buildAfterVar(self, "BLOCK", services) : TB.NULL(services);
             final ImmutableList<Term> localInTerms = MiscTools.toTermList(localInVariables);
             final ImmutableList<Term> newLocalIns = buildLocalIns(localInTerms, services);
             final ImmutableList<Term> localOutTerms = MiscTools.toTermList(localOutVariables);
             final ImmutableList<Term> newLocalOuts = buildLocalOuts(localOutTerms, services);
-            Term result = variables.result != null ? TB.var(variables.result) : null;
+            final boolean hasRes = variables.result != null;
+            Term result = hasRes ? TB.var(variables.result) : TB.NULL(services);
             final Term resultAtPost =
-                    result != null ?
-                            buildAfterVar(result, "BLOCK", services) : null;
-            final Term exception =
-                    variables.exception != null ? TB.var(variables.exception) : null;
+                    hasRes ? buildAfterVar(result, "BLOCK", services) : TB.NULL(services);
+            final boolean hasExc = variables.exception != null;
+            final Term exception = hasExc ? TB.var(variables.exception) : TB.NULL(services);
             final Term exceptionAtPost =
-                    exception != null ?
-                    buildAfterVar(exception, "BLOCK", services) : null;
+                    hasExc ? buildAfterVar(exception, "BLOCK", services) : TB.NULL(services);
 
             final InfFlowBlockContractTacletBuilder ifContractBuilder =
                     new InfFlowBlockContractTacletBuilder(services);
@@ -303,16 +302,20 @@ public class BlockContractRule implements BuiltInRule {
             ifContractBuilder.setContextUpdate(); // updates are handled by setUpUsageGoal
             ifContractBuilder.setHeapAtPre(heapAtPre);
             ifContractBuilder.setHeapAtPost(heapAtPost);
-            ifContractBuilder.setSelf(self);
-            ifContractBuilder.setSelfAtPost(selfAtPost);
+            if (hasSelf) {
+                ifContractBuilder.setSelf(self);
+                ifContractBuilder.setSelfAtPost(selfAtPost);
+            }
             ifContractBuilder.setLocalIns(newLocalIns);
             ifContractBuilder.setLocalOuts(newLocalOuts);
-            if (resultAtPost != null) {
+            if (hasRes) {
                 ifContractBuilder.setResult(result);
                 ifContractBuilder.setResultAtPost(resultAtPost);
+            }
+            if (hasExc) {
+                ifContractBuilder.setException(exception);
+                ifContractBuilder.setExceptionAtPost(exceptionAtPost);
             }            
-            ifContractBuilder.setException(exception);
-            ifContractBuilder.setExceptionAtPost(exceptionAtPost);
 
             // generate information flow contract application predicate
             // and associated taclet
@@ -337,15 +340,15 @@ public class BlockContractRule implements BuiltInRule {
 
             // generate proof obligation variables
             final ProofObligationVars instantiationVars =
-                    new ProofObligationVars(self,
-                                            selfAtPost,
+                    new ProofObligationVars(hasSelf ? self : null,
+                                            hasSelf ? selfAtPost : null,
                                             newLocalIns,
                                             heapAtPre,
                                             newLocalOuts,
-                                            result,
-                                            resultAtPost,
-                                            exception,
-                                            exceptionAtPost,
+                                            hasRes ? result : null,
+                                            hasRes ? resultAtPost : null,
+                                            hasExc ? exception : null,
+                                            hasExc ? exceptionAtPost : null,
                                             heapAtPost,
                                             services, true);
             final IFProofObligationVars ifVars =
