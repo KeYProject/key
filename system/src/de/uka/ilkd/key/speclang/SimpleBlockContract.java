@@ -393,16 +393,10 @@ public final class SimpleBlockContract implements BlockContract {
                                        transactionApplicable, hasMod);
     }
 
-    @Override
-    public BlockContract updateVariables(final Variables newVariables) {
-        return new SimpleBlockContract(block, labels, method, modality, preconditions,
-                                       postconditions, modifiesClauses, respects,
-                                       newVariables, transactionApplicable, hasMod);
-    }
-
     @Override 
     public BlockContract setBlock(StatementBlock newBlock) {
-        return update(newBlock, preconditions, postconditions, modifiesClauses, variables);
+        return update(newBlock, preconditions, postconditions, modifiesClauses,
+                      respects, variables);
     }
 
 

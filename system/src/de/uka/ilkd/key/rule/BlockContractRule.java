@@ -890,7 +890,7 @@ public class BlockContractRule implements BuiltInRule {
             for (LocationVariable heap : heaps) {
                 final Term modifiesClause = modifiesClauses.get(heap);
                 final Term frameCondition;
-                if (modifiesClause.equals(strictlyNothing()) && heap == getBaseHeap()) {
+                if (modifiesClause.equals(strictlyNothing()) && var(heap) == getBaseHeap()) {
                     frameCondition = frameStrictlyEmpty(var(heap), remembranceVariables.get(heap));
                 }
                 else {

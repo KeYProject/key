@@ -125,7 +125,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 		  : (ExecutionContext) 
 		          innermostMethodFrame.getExecutionContext();
 	inv = inv.setExecutionContext(innermostExecutionContext);
-	services.getSpecificationRepository().setLoopInvariant(inv);
+	services.getSpecificationRepository().addLoopInvariant(inv);
 
 	//cache and return result
 	Instantiation result = new Instantiation(u, 
@@ -677,7 +677,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             final Term guardTerm = TB.var(guardVar);
             final Term selfTerm = inst.selfTerm;
             inst.inv.setGuard(guardTerm, services);
-            services.getSpecificationRepository().setLoopInvariant(inst.inv);
+            services.getSpecificationRepository().addLoopInvariant(inst.inv);
 
             final Term heapAtPre =
                     TB.var(TB.heapAtPreVar(services, baseHeap + "_Before_LOOP",
