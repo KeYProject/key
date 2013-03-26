@@ -657,7 +657,7 @@ public final class WhileInvariantRule implements BuiltInRule {
                         variantPO}));
         bodyTerm = wir.transform(bodyTerm, svInst, services);
 	final Term guardTrueBody = TB.imp(TB.box(guardJb,guardTrueTerm), 
-					  bodyTerm); 
+					  bodyTerm);
 
         Goal infFlowGoal = null;
         InfFlowData infFlowData = null;
@@ -797,8 +797,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                         inst.progPost.javaBlock(),
                         services),
                         inst.progPost.sub(0));        
-        Term guardFalseRestPsi = TB.box(guardJb,
-                TB.imp(guardFalseTerm, restPsi));
+        Term guardFalseRestPsi = TB.imp(TB.box(guardJb,guardFalseTerm),
+                                        restPsi);
         useGoal.changeFormula(new SequentFormula(TB.applySequential(
                 uAnon,
                 guardFalseRestPsi)),
