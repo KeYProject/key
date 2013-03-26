@@ -12,7 +12,7 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.InfFlowTaclet;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -69,7 +69,7 @@ public class InfFlowImpFeature implements Feature {
     }
 
 
-    private class SubFormulaVisitor extends Visitor {
+    private class SubFormulaVisitor extends DefaultVisitor {
 
         final Term potentialSub;
 

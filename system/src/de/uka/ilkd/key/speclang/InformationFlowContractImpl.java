@@ -170,7 +170,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
 
         this(li.getName(), null, li.getKJT(), li.getTarget(), li.getTarget().getContainerType(),
              Modality.BOX, li.getInvariant(services), null, li.getModifies(),
-             (li.getModifies() != TB.lessThanNothing()), li.getInternalSelfTerm(),
+             (li.getModifies() != TB.strictlyNothing()), li.getInternalSelfTerm(),
              ImmutableSLList.<Term>nil(), null, // TODO: Why here no localIns?
              TB.var(TB.excVar(services, li.getTarget(), true)), null,
              li.getRespects(services), false, li.getLoop().getStartPosition().getLine());
@@ -582,6 +582,13 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public String proofToString(Services services) {
         throw new UnsupportedOperationException("Operation not supported.");
     }
+
+
+    @Override
+    public String getPlainText(Services services) {
+        return getHTMLText(services); // TODO: return real plaintext...
+    }
+
 
 
     // the following code is legacy code

@@ -9,7 +9,7 @@ import java.util.Iterator;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.util.Triple;
 
@@ -228,7 +228,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         return d.tb.and(eqAtLocs);
     }
 
-    private static class SearchVisitor extends Visitor {
+    private static class SearchVisitor extends DefaultVisitor {
 
         private boolean termFound = false;
         private Term[] searchTerms;
