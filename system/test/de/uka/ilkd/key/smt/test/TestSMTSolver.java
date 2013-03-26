@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.smt.test;
 
@@ -236,6 +240,42 @@ public abstract class TestSMTSolver extends TestCommons {
 	Assert.assertTrue(correctResult(testFile + "add1.key", true));
     }
     
+    public void testBSum1() {
+        Assert.assertTrue(correctResult(testFile + "bsum1.key", true));
+    }
+    
+    public void testBSum2() {
+        Assert.assertTrue(correctResult(testFile + "bsum2.key", true));
+    }
+    
+    public void testBSum3() {
+        Assert.assertTrue(correctResult(testFile + "bsum3.key", false));
+    }
+    
+    public void testBProd1() {
+        Assert.assertTrue(correctResult(testFile + "bprod1.key", true));
+    }
+    
+    public void testBProd2() {
+        Assert.assertTrue(correctResult(testFile + "bprod2.key", true));
+    }
+    
+    public void testBProd3() {
+        Assert.assertTrue(correctResult(testFile + "bprod3.key", false));
+    }
+    
+//    public void testBinderPred1() {
+//        Assert.assertTrue(correctResult(testFile + "binder2.key", true));
+//    }
+    
+    public void testBinderPred2() {
+        Assert.assertTrue(correctResult(testFile + "binder4.key", true));
+    }
+    
+    public void testBinderPred3() {
+        Assert.assertTrue(correctResult(testFile + "binder5.key", true));
+    }
+    
     /*public void testAdd2() {
 	Assert.assertTrue(correctResult(testFile + "add2.key", false));
     }*/
@@ -245,7 +285,7 @@ public abstract class TestSMTSolver extends TestCommons {
 	Assert.assertTrue(correctResult(testFile + "mult1.key", true));
     }*/
     
-    private boolean correctResult(String filepath, boolean isValid) {
+    protected boolean correctResult(String filepath, boolean isValid) {
 	if (toolNotInstalled()) {
 	    return true;
 	}

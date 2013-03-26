@@ -6,6 +6,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.AbstractSymbolicExecutionTestCase;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -21,7 +22,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests {@code complicatedMethod} without precondition.
     */
-   public void testComplicatedInnerMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testComplicatedInnerMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
              "TheInnerClass",
              "complicatedInnerMethod",
@@ -33,7 +34,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests {@code complicatedMethod} with precondition.
     */
-   public void testComplicatedMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testComplicatedMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
              "TheClass",
              "complicatedMethod",
@@ -45,7 +46,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests {@code complicatedMethod} without precondition.
     */
-   public void testComplicatedMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testComplicatedMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/fullqualifiedTypeNamesTest/test/my/packageName/TheClass.java",
              "TheClass",
              "complicatedMethod",
@@ -57,7 +58,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests {@code returnMethod} with precondition.
     */
-   public void testReturnMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testReturnMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPOTest/test/MethodPOTest.java",
              "MethodPOTest",
              "returnMethod",
@@ -69,7 +70,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests {@code returnMethod} without precondition.
     */
-   public void testReturnMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testReturnMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPOTest/test/MethodPOTest.java",
              "MethodPOTest",
              "returnMethod",
@@ -81,7 +82,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests {@code voidMethod} with precondition.
     */
-   public void testVoidMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testVoidMethod_Precondition() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPOTest/test/MethodPOTest.java",
              "MethodPOTest",
              "voidMethod",
@@ -93,7 +94,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests {@code voidMethod} without precondition.
     */
-   public void testVoidMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException {
+   public void testVoidMethod() throws IOException, ProofInputException, ParserConfigurationException, SAXException, ProblemLoaderException {
       doTest("examples/_testcase/set/methodPOTest/test/MethodPOTest.java",
              "MethodPOTest",
              "voidMethod",
@@ -110,18 +111,18 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
                          String methodFullName,
                          String oraclePathInBaseDirFile,
                          String precondition,
-                         String expectedTryContent) throws ProofInputException, IOException, ParserConfigurationException, SAXException {
+                         String expectedTryContent) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       String originalRuntimeExceptions = null;
       try {
          // Store original settings of KeY which requires that at least one proof was instantiated.
          if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false);
+            createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false);
          }
          originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
          assertNotNull(originalRuntimeExceptions);
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          // Create proof environment for symbolic execution
-         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false);
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false);
          // Extract and test try content
          String tryContent = getTryContent(env.getProof());
          assertTrue("Expected \"" + expectedTryContent + "\" but is \"" + tryContent + "\".", JavaUtil.equalIgnoreWhiteSpace(expectedTryContent, tryContent));

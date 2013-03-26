@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.ui;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -11,6 +10,7 @@ import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ApplyTacletDialogModel;
 import de.uka.ilkd.key.proof.DefaultProblemLoader;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
@@ -110,10 +110,9 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * @param classPaths The class path entries to use.
      * @param bootClassPath The boot class path to use.
      * @return The opened {@link DefaultProblemLoader}.
-     * @throws IOException Occurred Exception.
-     * @throws ProofInputException Occurred Exception.
+     * @throws ProblemLoaderException Occurred Exception.
      */
-    DefaultProblemLoader load(File file, List<File> classPaths, File bootClassPath) throws IOException, ProofInputException;
+    DefaultProblemLoader load(File file, List<File> classPaths, File bootClassPath) throws ProblemLoaderException;
     
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterface} for the given
@@ -133,6 +132,12 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
     boolean isAutoModeSupported(Proof proof);
     
     /**
+     * Starts the auto mode for the given {@link Proof}.
+     * @param proof The {@link Proof} to start auto mode of.
+     */
+    void startAutoMode(Proof proof);
+    
+    /**
      * Starts the auto mode for the given {@link Proof} and the given {@link Goal}s. 
      * @param proof The {@link Proof} to start auto mode of.
      * @param goals The {@link Goal}s to close.
@@ -149,6 +154,14 @@ public interface UserInterface extends ProblemInitializerListener, ProverTaskLis
      * {@link UserInterface} is active.
      */
     void waitWhileAutoMode();
+    
+    /**
+     * Starts the auto mode for the given proof which must be contained
+     * in this user interface and blocks the current thread until it
+     * has finished.
+     * @param proof The {@link Proof} to start auto mode and to wait for.
+     */
+    void startAndWaitForAutoMode(Proof proof);
     
     /**
      * Removes the given {@link Proof} from this {@link UserInterface}.

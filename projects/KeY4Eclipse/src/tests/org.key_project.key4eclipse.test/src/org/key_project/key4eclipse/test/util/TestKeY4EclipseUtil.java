@@ -16,16 +16,18 @@ public final class TestKeY4EclipseUtil {
    /**
     * Creates an operation contract ID.
     * @param qualifiedName The qualified class name.
+    * @param methodClassQualifiedName The name of the class which contains the method implementation.
     * @param method The method signature.
     * @param id The unique ID.
     * @param behavior The behavior.
     * @return The created operation contract ID:
     */
    public static String createOperationContractId(String qualifiedName,
+                                                  String methodClassQualifiedName,
                                                   String method,
                                                   String id,
                                                   String behavior) {
-      return qualifiedName + "[" + qualifiedName + "::" + method + "].JML " + (StringUtil.isEmpty(behavior) ? "" : behavior + " ") + "operation contract." + id + "";
+      return qualifiedName + "[" + methodClassQualifiedName + "::" + method + "].JML " + (StringUtil.isEmpty(behavior) ? "" : behavior + " ") + "operation contract." + id + "";
    }
 
    /**

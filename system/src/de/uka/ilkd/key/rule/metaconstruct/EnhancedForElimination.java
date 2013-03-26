@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
@@ -146,14 +150,10 @@ public class EnhancedForElimination extends ProgramTransformer {
         assert programVariable instanceof ProgramVariable :
             "Since this is a concrete program, the spec must not be schematic";
         final ProgramVariable lvdVar = (ProgramVariable)programVariable;
-        final Statement declArrayElemVar = makeElemDecl(lvdVar);
 
         final For forLoop = makeLoop(body, itVar, inits, guard, updates, arrayVar, lvdVar);
-
-        // put everything together
-        final Statement[] complete = {declArrayElemVar,forLoop};
         setInvariant(enhancedFor, forLoop);
-        return new StatementBlock(complete);
+        return forLoop;
     }
 
     /** Declare the iterated element. */
@@ -171,8 +171,9 @@ public class EnhancedForElimination extends ProgramTransformer {
             ReferencePrefix array, ProgramVariable lvdVar) {
         final Expression[] arrayAccess = {itVar};
         final Expression nextElement = new ArrayReference(array, arrayAccess);
+        final Statement declArrayElemVar = makeElemDecl(lvdVar);
         final Statement getNextElement = new CopyAssignment(lvdVar, nextElement);
-        final Statement[] newBlock = {getNextElement,body};
+        final Statement[] newBlock = {declArrayElemVar,getNextElement,body};
         body = new StatementBlock(newBlock);
         final For forLoop = new For(inits, guard, updates, body);
         return forLoop;
@@ -363,7 +364,7 @@ public class EnhancedForElimination extends ProgramTransformer {
                 services.getSpecificationRepository().getLoopInvariant(original);
         if (li != null) {
             li = li.setLoop(transformed);
-            services.getSpecificationRepository().setLoopInvariant(li);
+            services.getSpecificationRepository().addLoopInvariant(li);
         }
     }
 }

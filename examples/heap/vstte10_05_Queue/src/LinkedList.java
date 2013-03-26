@@ -15,7 +15,7 @@ class LinkedList {
       @                                    && \subset(tail.*, repr)
       @                                    && \subset(tail.repr, repr)
       @                                    && \disjoint(this.*, tail.repr)
-      @                                    && seq[1..length-1] == tail.seq
+      @                                    && seq[1..length] == tail.seq
       @                                    && tail.\inv;
       @*/
     
@@ -144,7 +144,7 @@ class LinkedList {
     
     /*@ public normal_behaviour
       @   ensures \result.\inv;
-      @   ensures \result.seq == seq[1..seq.length-1];
+      @   ensures \result.seq == seq[1..seq.length];
       @   ensures \fresh(\set_minus(\result.repr, repr));
       @*/
     public /*@pure@*/ LinkedList tail() {

@@ -1,12 +1,15 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License.
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
 
 package de.uka.ilkd.key.java.visitor;
 
@@ -54,7 +57,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * stores the program variables to be replaced as keys and the new
      * program variables as values
      */
-    protected Map replaceMap;
+    protected Map<ProgramVariable, ProgramVariable> replaceMap;
 
 
     /**
@@ -63,7 +66,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * @param st the statement where the prog vars are replaced
      * @param map the HashMap with the replacements
      */
-    public ProgVarReplaceVisitor(ProgramElement st, Map map, Services services) {
+    public ProgVarReplaceVisitor(ProgramElement st, Map<ProgramVariable, ProgramVariable> map, Services services) {
     super(st, true, services);
     this.replaceMap = map;
         assert services != null;
@@ -78,7 +81,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * @param replaceall decides if all variables are to be replaced
      */
     public ProgVarReplaceVisitor(ProgramElement st,
-                                 Map map,
+                                 Map<ProgramVariable, ProgramVariable> map,
                                  boolean replaceall,
                                  Services services) {
         this(st, map, services);
@@ -170,16 +173,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
         if(t.op() instanceof ProgramVariable) {
             if(replaceMap.containsKey(t.op())) {
-                Object o = replaceMap.get(t.op());
-                if(o instanceof ProgramVariable){
-                    return TermFactory.DEFAULT.createTerm
-                    ((ProgramVariable) replaceMap.get(t.op()));
-                }else{
-                    return TermFactory.DEFAULT.createTerm
-                    ((SchemaVariable) replaceMap.get(t.op()));
-                }
+            ProgramVariable replacement = replaceMap.get(t.op());
+            return TermFactory.DEFAULT.createTerm(replacement);
             } else {
-                return t;
+            return t;
             }
         } else {
             Term subTerms[] = new Term[t.arity()];
@@ -201,7 +198,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     t.javaBlock());
         }
     }
-
 
     private ImmutableList<Term> replaceVariablesInTerms(ImmutableList<Term> terms) {
         ImmutableList<Term> res = ImmutableSLList.<Term>nil();
@@ -434,6 +430,6 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                     newLocalIns,
                                     newLocalOuts,
                                     atPres);
-        services.getSpecificationRepository().setLoopInvariant(newInv);
+        services.getSpecificationRepository().addLoopInvariant(newInv);
     }
 }

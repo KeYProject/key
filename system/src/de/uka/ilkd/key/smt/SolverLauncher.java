@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.smt;
 
@@ -416,9 +420,12 @@ public class SolverLauncher implements SolverListener {
      */
     private void notifySolverHasFinished(SMTSolver solver) {
 	lock.lock();
-	session.removeCurrentlyRunning(solver);
-	wait.signal();
-	lock.unlock();
+	try {
+		session.removeCurrentlyRunning(solver);
+		wait.signal();
+	} finally {
+		lock.unlock();
+	}
     }
 
     /**
@@ -507,7 +514,7 @@ class Session {
 	    Iterator<SMTSolver> it = currentlyRunning.iterator();
 	    while (it.hasNext()) {
 		SMTSolver next = it.next();
-		if (next.equals(next)) {
+		if (next.equals(solver)) {
 		    next.interrupt(reason);
 		    it.remove();
 		    break;

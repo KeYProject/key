@@ -2,8 +2,11 @@ package de.uka.ilkd.key.gui.smt;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -73,29 +76,36 @@ public class ProgressDialog extends JDialog{
                 this.listener = listener;
                 this.setLocationByPlatform(true);
                 this.setTitle("SMT Interface");
+                
+                getProgressBar().setMaximum(progressBarMax);
              
                 setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                 setModal(true);
-                this.setLayout(new BoxLayout(this.getContentPane(),BoxLayout.Y_AXIS));
+                Container contentPane = this.getContentPane();
+                contentPane.setLayout(new GridBagLayout());
                 Box buttonBox = Box.createHorizontalBox();
-                Box contentBox = Box.createVerticalBox();
-                
-        
                 buttonBox.add(Box.createHorizontalGlue());
                 buttonBox.add(getStopButton());
                 buttonBox.add(Box.createHorizontalStrut(5));
                 buttonBox.add(getApplyButton());
-                contentBox.add(getProgressBar());
-                contentBox.add(Box.createVerticalStrut(5));
-                contentBox.add(getScrollPane());
-                getProgressBar().setMaximum(progressBarMax);
-                this.getContentPane().add(contentBox);
-                this.getContentPane().add(Box.createVerticalStrut(5));
-                this.getContentPane().add(getStatusMessageBox());
-                this.getContentPane().add(Box.createVerticalStrut(5));
-                this.getContentPane().add(buttonBox);
-                this.getContentPane().add(Box.createVerticalStrut(5));
-              
+                buttonBox.add(Box.createHorizontalStrut(5));
+                
+                GridBagConstraints constraints = new GridBagConstraints(0, 0, 1, 1, 1.0, 0.0, 
+                        GridBagConstraints.CENTER, 
+                        GridBagConstraints.BOTH, 
+                        new Insets(5,5,0,5), 0,0);
+                
+                contentPane.add(getProgressBar(), constraints);
+                constraints.gridy ++;
+                constraints.weighty = 2.0;
+                contentPane.add(getScrollPane(), constraints);
+                constraints.gridy ++;
+                constraints.weighty = 1.0;
+                contentPane.add(getStatusMessageBox(), constraints);
+                constraints.gridy ++;
+                constraints.weighty = 0.0;
+                constraints.insets.bottom = 5;
+                contentPane.add(buttonBox, constraints);
                 this.pack();
         }
         
@@ -325,7 +335,7 @@ class ProgressTable extends JTable{
                 
                 public void setText(String text){
                         getProgressBar().setString(text);
-                        getProgressBar().setStringPainted(text != null && text != "" );
+                        getProgressBar().setStringPainted(text != null && !text.isEmpty() );
                 }
         }
         

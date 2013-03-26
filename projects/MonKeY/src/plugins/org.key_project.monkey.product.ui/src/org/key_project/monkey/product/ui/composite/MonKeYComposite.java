@@ -539,12 +539,14 @@ public class MonKeYComposite extends Composite {
                     }
                     finally {
                         monitor.done();
-                        getDisplay().syncExec(new Runnable() {
-                           @Override
-                           public void run() {
-                              setProofSearchStrategyOptionsEnabled(true);
-                           }
-                        });
+                        if (!isDisposed()) {
+                           getDisplay().syncExec(new Runnable() {
+                              @Override
+                              public void run() {
+                                 setProofSearchStrategyOptionsEnabled(true);
+                              }
+                           });
+                        }
                     }
                 }
             }.schedule();
@@ -709,7 +711,7 @@ public class MonKeYComposite extends Composite {
                             // Remove old proofs
                             if (proofs != null) {
                                for (MonKeYProof proof : proofs) {
-                                  proof.removeProofEnvFromKeY();
+                                  proof.removeProof();
                                }
                             }
                             // Unload old source

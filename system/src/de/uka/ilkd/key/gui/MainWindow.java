@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui;
 
@@ -70,6 +74,7 @@ import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.ExitMainAction;
 import de.uka.ilkd.key.gui.actions.FontSizeAction;
+import de.uka.ilkd.key.gui.actions.GoalBackAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
 import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
 import de.uka.ilkd.key.gui.actions.LicenseAction;
@@ -81,10 +86,12 @@ import de.uka.ilkd.key.gui.actions.OpenFileAction;
 import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
 import de.uka.ilkd.key.gui.actions.ProofManagementAction;
+import de.uka.ilkd.key.gui.actions.PruneProofAction;
 import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
 import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
 import de.uka.ilkd.key.gui.actions.SaveFileAction;
 import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
+import de.uka.ilkd.key.gui.actions.SearchInSequentAction;
 import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
 import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
 import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
@@ -93,11 +100,11 @@ import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
 import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
 import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
 import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
+import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
 import de.uka.ilkd.key.gui.configuration.PathConfig;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.gui.configuration.StrategySettings;
 import de.uka.ilkd.key.gui.nodeviews.NonGoalInfoView;
@@ -114,7 +121,6 @@ import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
 import de.uka.ilkd.key.pp.LogicPrinter;
-import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.proof.Goal;
@@ -129,8 +135,6 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.PreferenceSaver;
-import de.uka.ilkd.key.util.UnicodeHelper;
-
 
 @SuppressWarnings("serial")
 public final class MainWindow extends JFrame  {
@@ -141,7 +145,7 @@ public final class MainWindow extends JFrame  {
     private static final int MAX_RECENT_FILES = 8;
     
     /** size of the tool bar icons */
-    public static final int TOOLBAR_ICON_SIZE = 15;
+    public static final int TOOLBAR_ICON_SIZE = 16;
     
     /** the tab bar at the left */
     private JTabbedPane tabbedPane;
@@ -261,6 +265,8 @@ public final class MainWindow extends JFrame  {
     private ExitMainAction exitMainAction;
 
     private ShowActiveSettingsAction showActiveSettingsAction;
+    
+    private UnicodeToggleAction unicodeToggleAction;
 
     /**
      * creates prover -- private, use {@link #createInstance(String)}
@@ -300,7 +306,8 @@ public final class MainWindow extends JFrame  {
      */
     private void setLaF() {
         try{
-            if (ProofSettings.DEFAULT_SETTINGS.getViewSettings().useSystemLaF()) {
+        	 if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().useSystemLaF()) {
+//            if (ProofSettings.DEFAULT_SETTINGS.getViewSettings().useSystemLaF()) {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
                 // Workarounds for GTK+
@@ -367,7 +374,10 @@ public final class MainWindow extends JFrame  {
     private void layoutMain() {
         // set overall layout manager
         getContentPane().setLayout(new BorderLayout());
-        
+
+        // default size
+        setSize(1000, 750);
+
         // FIXME FIXME
         recentFiles = new RecentFileMenu(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -380,7 +390,8 @@ public final class MainWindow extends JFrame  {
         // FIXME do this NOT in layout of GUI
         // minimize interaction
         final boolean stupidMode = 
-            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
+        		  ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().tacletFilter();
+//            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().tacletFilter();
         mediator.setStupidMode(stupidMode);
         
         // set up actions
@@ -397,12 +408,8 @@ public final class MainWindow extends JFrame  {
         loadUserDefinedTacletsForProvingAction = new LemmaGenerationAction.ProveUserDefinedTaclets(this);
         loadKeYTaclets            = new LemmaGenerationAction.ProveKeYTaclets(this);
         lemmaGenerationBatchModeAction    = new LemmaGenerationBatchModeAction(this);
+        unicodeToggleAction = new UnicodeToggleAction(this);
         
-
-	
-	
-        
-
 	// create empty views
 	createViews();
 	
@@ -457,11 +464,8 @@ public final class MainWindow extends JFrame  {
             }
         });
         
-        // default size
-        setSize(1000, 750);
-        setName("mainWindow");
-        
         // load preferred sizes from system preferences
+        setName("mainWindow");
         prefSaver.load(this);
     }
 
@@ -473,7 +477,7 @@ public final class MainWindow extends JFrame  {
 	        "The currently open goals");
 	pane.addTab("Proof Search Strategy", null, strategySelectionView,
 	        "Select strategy for automated proof search");
-	pane.addTab("Rules", null, new JScrollPane(ruleView),
+	pane.addTab("Rules", null, ruleView,
 	        "All available rules");
 	
         pane.setSelectedIndex(0);
@@ -517,7 +521,8 @@ public final class MainWindow extends JFrame  {
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
         toolBar.addSeparator();
-        toolBar.add(new UndoLastStepAction(this, false));
+        toolBar.add(new GoalBackAction(this, false));
+        toolBar.add(new PruneProofAction(this, false));
         JToggleButton oneStep = new JToggleButton(oneStepSimplAction);
         oneStep.setHideActionText(true);
         toolBar.addSeparator();
@@ -646,6 +651,10 @@ public final class MainWindow extends JFrame  {
 	setStatusLine(s, 0);
     }
     
+    public void selectTab(int tab) {
+    	this.tabbedPane.setSelectedIndex(0);
+    }
+    
 //    /**
 //     * Get the progress monitor that will update a progress bar in a corner of the main window.
 //     */
@@ -763,7 +772,8 @@ public final class MainWindow extends JFrame  {
         
         JMenuItem laf = new JCheckBoxMenuItem("Use system look and feel (experimental)");
         laf.setToolTipText("If checked KeY tries to appear in the look and feel of your window manager, if not in the default Java LaF (aka Metal).");
-        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofSettings.DEFAULT_SETTINGS.getViewSettings();
+//        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofSettings.DEFAULT_SETTINGS.getViewSettings();
+        final de.uka.ilkd.key.gui.configuration.ViewSettings vs = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
         laf.setSelected(vs.useSystemLaF());
         laf.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -776,7 +786,7 @@ public final class MainWindow extends JFrame  {
         
        
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
-        view.add(new JCheckBoxMenuItem(new UnicodeToggleAction(this)));
+        view.add(new JCheckBoxMenuItem(unicodeToggleAction));
         
         view.addSeparator();
         {
@@ -800,6 +810,7 @@ public final class MainWindow extends JFrame  {
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
         proof.add(new SearchInProofTreeAction(this));
+        proof.add(new SearchInSequentAction(this));
         proof.addSeparator();
 	proof.add(new ShowUsedContractsAction(this));
         proof.add(new ShowActiveTactletOptionsAction(this));
@@ -816,7 +827,7 @@ public final class MainWindow extends JFrame  {
 	
 	options.add(new TacletOptionsAction(this));
 	options.add(new SMTOptionsAction(this));
-	options.add(setupSpeclangMenu());
+//	options.add(setupSpeclangMenu()); // legacy since only JML supported
 	options.addSeparator();
         options.add(new JCheckBoxMenuItem(new MinimizeInteraction(this)));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
@@ -925,7 +936,8 @@ public final class MainWindow extends JFrame  {
         JMenu result = new JMenu("Specification Parser");       
         ButtonGroup group = new ButtonGroup();
         GeneralSettings gs 
-            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        =ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
                 
         JRadioButtonMenuItem jmlButton 
             = new JRadioButtonMenuItem("Source File Comments Are JML", gs.useJML());
@@ -935,7 +947,8 @@ public final class MainWindow extends JFrame  {
         jmlButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 GeneralSettings gs 
-                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+                =ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+//                    = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
                 gs.setUseJML(true);
                 gs.setUseOCL(false);
             }
@@ -948,7 +961,8 @@ public final class MainWindow extends JFrame  {
         noneButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
         	GeneralSettings gs 
-        	= ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        	=ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+    //    	= ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
         	gs.setUseJML(false);
         	gs.setUseOCL(false);
             }
@@ -960,6 +974,10 @@ public final class MainWindow extends JFrame  {
     
     public ProofTreeView getProofView(){
         return proofTreeView;
+    }
+    
+    public SequentView getSequentView(){
+    	return sequentView;
     }
     
     
@@ -1095,7 +1113,7 @@ public final class MainWindow extends JFrame  {
         
 	private void setToolBarDisabled() {
 	    assert EventQueue.isDispatchThread() : "toolbar disabled from wrong thread";
-	    assert doNotReenable == null : "toolbar disabled w/o prior enable";
+	    //assert doNotReenable == null : "toolbar disabled w/o prior enable";
 	    
 	    doNotReenable = new HashSet<Component>();
 	    Component[] cs = controlToolBar.getComponents();
@@ -1116,7 +1134,7 @@ public final class MainWindow extends JFrame  {
         
         private void setToolBarEnabled() {
             assert EventQueue.isDispatchThread() : "toolbar enabled from wrong thread";
-            assert doNotReenable != null : "toolbar enabled w/o prior disable";
+            //assert doNotReenable != null : "toolbar enabled w/o prior disable";
             
             Component[] cs = controlToolBar.getComponents();
             for (int i = 0; i < cs.length; i++) {
@@ -1741,6 +1759,10 @@ public final class MainWindow extends JFrame  {
 
     public Action getOpenMostRecentFileAction() {
         return openMostRecentFileAction;
+    }
+    
+    public Action getUnicodeToggleAction() {
+    	return unicodeToggleAction;
     }
 
     public void savePreferences() {

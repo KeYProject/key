@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui.configuration;
 
@@ -51,9 +55,13 @@ public class ViewSelector extends JDialog {
 
     /** lays out the selector */
     protected void layoutViewSelector() {
-    	int maxLinesInt = ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+//    	int maxLinesInt = ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+//				.getMaxTooltipLines();
+//		boolean showWholeTaclet = ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+//				.getShowWholeTaclet();
+    	int maxLinesInt = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
 				.getMaxTooltipLines();
-		boolean showWholeTaclet = ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+		boolean showWholeTaclet = ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
 				.getShowWholeTaclet();
     	
     	getContentPane().setLayout(new BorderLayout());
@@ -81,11 +89,14 @@ public class ViewSelector extends JDialog {
 	
 	 	okButton.addActionListener(new ActionListener() {
 	 		public void actionPerformed(ActionEvent e) {
+//			    int maxSteps = Integer.parseInt(maxTooltipLinesInputField.getText());
+//			    ProofSettings.DEFAULT_SETTINGS.getViewSettings().setMaxTooltipLines(maxSteps);
+//			    boolean ifind = showWholeTacletCB.isSelected();
+//			    ProofSettings.DEFAULT_SETTINGS.getViewSettings().setShowWholeTaclet(ifind);
 			    int maxSteps = Integer.parseInt(maxTooltipLinesInputField.getText());
-			    ProofSettings.DEFAULT_SETTINGS.getViewSettings().setMaxTooltipLines(maxSteps);
+			    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setMaxTooltipLines(maxSteps);
 			    boolean ifind = showWholeTacletCB.isSelected();
-			    ProofSettings.DEFAULT_SETTINGS.getViewSettings().setShowWholeTaclet(ifind);
-			    
+			    ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setShowWholeTaclet(ifind);
 			    setVisible(false);
                             dispose();
 	 		}
@@ -96,7 +107,8 @@ public class ViewSelector extends JDialog {
 	 		public void actionPerformed(ActionEvent e) {
 			    int maxSteps = 
 	                        Integer.parseInt(maxTooltipLinesInputField.getText());
-			    ProofSettings dflt=ProofSettings.DEFAULT_SETTINGS;
+//			    ProofSettings dflt=ProofSettings.DEFAULT_SETTINGS;
+			    ProofIndependentSettings dflt=ProofIndependentSettings.DEFAULT_INSTANCE;
 			    boolean ifind = showWholeTacletCB.isSelected();
 			    dflt.getViewSettings().setMaxTooltipLines(maxSteps);
 			    dflt.getViewSettings().setShowWholeTaclet(ifind);

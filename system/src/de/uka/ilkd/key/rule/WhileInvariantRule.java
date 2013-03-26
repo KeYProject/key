@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.rule;
 
@@ -178,7 +182,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
 	// check for strictly pure loops
 	final Term anonUpdate;
-	if(TB.lessThanNothing().equals(mod)) {
+	if(TB.strictlyNothing().equals(mod)) {
 	    anonUpdate = TB.skip();
 	} else {
 	    anonUpdate = TB.anonUpd(heap, services, mod, anonHeap);
@@ -579,8 +583,7 @@ public final class WhileInvariantRule implements BuiltInRule {
             }
             final Term m = mods.get(heap);
             final Term fc;
-            if(TB.lessThanNothing().equals(m) &&
-                    heap == services.getTypeConverter().getHeapLDT().getHeap()) {
+          if(TB.strictlyNothing().equals(m) && heap == services.getTypeConverter().getHeapLDT().getHeap()) {
                 fc = TB.frameStrictlyEmpty(services, TB.var(heap), heapToBeforeLoop.get(heap)); 
             }else{
                 fc = TB.frame(services, TB.var(heap), heapToBeforeLoop.get(heap), m);
@@ -653,8 +656,8 @@ public final class WhileInvariantRule implements BuiltInRule {
                         frameCondition,
                         variantPO}));
         bodyTerm = wir.transform(bodyTerm, svInst, services);
-        final Term guardTrueBody = TB.box(guardJb,
-                TB.imp(guardTrueTerm, bodyTerm));
+	final Term guardTrueBody = TB.imp(TB.box(guardJb,guardTrueTerm), 
+					  bodyTerm); 
 
         Goal infFlowGoal = null;
         InfFlowData infFlowData = null;

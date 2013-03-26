@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui;
 
@@ -22,6 +26,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -31,6 +39,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -41,6 +50,8 @@ import javax.swing.event.ListSelectionListener;
 
 public final class ExampleChooser extends JDialog {
     
+    private static final String EXAMPLES_PATH =  
+		    "examples" + File.separator + "firstTouch";
     private static final long serialVersionUID = -4405666868752394532L;
     private static final String KEY_FILE_NAME = "project.key";
     private static final String README_NAME = "README.txt";
@@ -69,7 +80,7 @@ public final class ExampleChooser extends JDialog {
 
         @Override 
         public String toString() {
-            return file.getName();
+            return file.getName().substring(3); // remove leading index number
         }
     }
     
@@ -199,22 +210,9 @@ public final class ExampleChooser extends JDialog {
     //-------------------------------------------------------------------------    
     
     private static File lookForExamples() {
-        final ClassLoader loader = ExampleChooser.class.getClassLoader();
-        String path = loader.getResource(".").getPath();
-        if(path.startsWith("file:")) {
-            path = path.substring("file:".length());
-        }
-        int i = path.lastIndexOf("/");
-        while(i > 0) {
-            path = path.substring(0, i);
-            final String resultPath = path + "/examples/heap";
-            final File result = new File(resultPath);
-            if(result.isDirectory()) {
-        	return result;
-            }
-            i = path.lastIndexOf("/");
-        }
-    	return null;
+        
+	// greatly simplified version without parent path lookup.
+        return new File(System.getProperty("key.home"), EXAMPLES_PATH);
     }
     
     
@@ -255,16 +253,23 @@ public final class ExampleChooser extends JDialog {
      */
     public static File showInstance(String examplesDirString) {
 	//get examples directory
-	final File examplesDir;
+	File examplesDir;
 	if(examplesDirString == null) {
 	    examplesDir = lookForExamples();
 	} else {
-	    examplesDir = new File(examplesDirString);
-	}
-	if(examplesDir == null || !examplesDir.isDirectory()) {
-	    return null;
-	}	    
+        examplesDir = new File(examplesDirString);
+    }
 	
+        if (examplesDir == null || !examplesDir.isDirectory()) {
+            JOptionPane.showMessageDialog(MainWindow.getInstance(),
+                    "The examples directory cannot be found.\n"+
+                    "Please install them at " + 
+                            (examplesDirString == null ? System.getProperty("key.home") +"/" : examplesDirString), 
+                    "Error loading examples",
+                    JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+
 	//show dialog
 	if(instance == null) {
 	    instance = new ExampleChooser(examplesDir);

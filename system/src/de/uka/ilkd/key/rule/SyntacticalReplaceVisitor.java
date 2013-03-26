@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 /**
@@ -33,6 +37,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -58,7 +63,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.util.Debug;
 
-public final class SyntacticalReplaceVisitor extends Visitor { 	
+public final class SyntacticalReplaceVisitor extends DefaultVisitor { 	
 
     private final SVInstantiations svInst;
     @Deprecated
@@ -338,7 +343,7 @@ public final class SyntacticalReplaceVisitor extends Visitor {
                 && (! (visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {                
             pushNew(toTerm(svInst.getInstantiation((SchemaVariable) visitedOp)));
         } else if((visitedOp instanceof Metavariable)
-                 && metavariableInst.getInstantiation((Metavariable) visitedOp) != visitedOp) {
+                 && metavariableInst.getInstantiation((Metavariable) visitedOp).op() != visitedOp) {
             pushNew(metavariableInst.getInstantiation((Metavariable) visitedOp));
         } else {
             Operator newOp = instantiateOperator(visitedOp);

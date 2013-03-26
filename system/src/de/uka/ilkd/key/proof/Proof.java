@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.proof;
 
@@ -15,6 +19,7 @@ import java.util.*;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.GUIEvent;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.gui.configuration.SettingsListener;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -81,7 +86,7 @@ public class Proof implements Named {
     private BasicTask task;
     
     private ProofSettings settings;
-
+    private ProofIndependentSettings pis;
     /**
      * when different users load and save a proof this vector fills up with
      * Strings containing the user names.
@@ -120,6 +125,7 @@ public class Proof implements Named {
                     }
                 };
         setSettings(settings);
+        pis = ProofIndependentSettings.DEFAULT_INSTANCE;
     }
 
     /**
@@ -422,7 +428,9 @@ public class Proof implements Named {
     public ProofSettings getSettings() {
         return settings;
     }
-
+    public ProofIndependentSettings getProofIndependentSettings(){
+    	return pis;
+    }
 
     /** 
      * returns the list of open goals

@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 /** common superclass of TacletIfSelectionDialog and TacletMatchCompletionDialog */
 package de.uka.ilkd.key.gui;
@@ -23,6 +27,7 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.collection.ImmutableList;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -69,11 +74,11 @@ public abstract class ApplyTacletDialog extends JDialog {
 	mediator.requestModalAccess(this); 
 	addWindowListener(new WindowAdapter() {
 		public void windowClosed(WindowEvent e) {
-		    //ApplyTacletDialog.this.closeDlg();		    
+		    ApplyTacletDialog.this.closeDlg();		    
 		}
 
 		public void windowClosing(WindowEvent e) {
-		    //ApplyTacletDialog.this.closeDlg();
+		    ApplyTacletDialog.this.closeDlg();
 		}
 	    });
     }
@@ -128,7 +133,8 @@ public abstract class ApplyTacletDialog extends JDialog {
 //        tp.printTaclet(taclet, model[0].tacletApp().instantiations(),
         tp.printTaclet(taclet, 
         	       SVInstantiations.EMPTY_SVINSTANTIATIONS,
-        	       ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(), 
+        	       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(), 
+//        	       ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(), 
         	       false);
         tacletSB.append(backend.getString());
         

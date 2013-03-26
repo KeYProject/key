@@ -772,7 +772,7 @@ public class BlockContractRule implements BuiltInRule {
                     : anonymisationHeaps.entrySet()) {
                 Term anonymisationUpdate = skip();
                 final Term modifiesClause = modifiesClauses.get(anonymisationHeap.getKey());
-                if (!modifiesClause.equals(lessThanNothing())) {
+                if (!modifiesClause.equals(strictlyNothing())) {
                     anonymisationUpdate =
                             anonUpd(anonymisationHeap.getKey(), modifiesClause,
                                     func(anonymisationHeap.getValue()));
@@ -890,7 +890,7 @@ public class BlockContractRule implements BuiltInRule {
             for (LocationVariable heap : heaps) {
                 final Term modifiesClause = modifiesClauses.get(heap);
                 final Term frameCondition;
-                if (modifiesClause.equals(lessThanNothing()) && heap == getBaseHeapFunction()) {
+                if (modifiesClause.equals(strictlyNothing()) && heap == getBaseHeap()) {
                     frameCondition = frameStrictlyEmpty(var(heap), remembranceVariables.get(heap));
                 }
                 else {

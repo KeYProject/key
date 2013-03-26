@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.smt;
 
@@ -145,7 +149,8 @@ public interface SolverType extends PipeListener<SolverCommunication> {
                 };
                 
                 public String[] getSupportedVersions() {
-                	return new String[] {"version 3.2"};
+                	return new String[] {"version 3.2","version 4.1","version 4.3.0"};
+                	// version 4.3.1 is not supported, see bug #1236
                 };
                 
                 public String[] getDelimiters() {
@@ -192,7 +197,9 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 						 }
 						 throw new RuntimeException("Error while executing Z3:\n" +message);
 					 }
-			
+					if (!message.equals("success")) {
+						sc.addMessage(message);
+					}
 			
 				switch (sc.getState()) {
 				case WAIT_FOR_RESULT:
@@ -209,16 +216,16 @@ public interface SolverType extends PipeListener<SolverCommunication> {
 						 sc.setState(WAIT_FOR_DETAILS);
 						
 					 }
-					 if(message.equals("unkown")){
+					 if(message.equals("unknown")){
 						 sc.setFinalResult(SMTSolverResult.createUnknownResult(getName()));
+						 sc.setState(WAIT_FOR_DETAILS);
+						 pipe.sendMessage("(exit)\n");
 					 }
 					break;
 					
 				case WAIT_FOR_DETAILS:
 					if(message.equals("success")){
-						pipe.close();	
-					}else{
-						sc.addMessage(message);
+						pipe.close();
 					}						
 					break;						
 				}
@@ -393,7 +400,7 @@ public interface SolverType extends PipeListener<SolverCommunication> {
         };
         
         /**
-         * Class for the CVC3 solver. It makes use of its own format.
+         * Class for the Simplify solver. It makes use of its own format.
          */
         static public final SolverType SIMPLIFY_SOLVER = new AbstractSolverType() {
 

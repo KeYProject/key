@@ -1,5 +1,7 @@
 package org.key_project.sed.key.ui.test.testcase.swtbot;
 
+import java.io.File;
+
 import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.CoreException;
@@ -202,7 +204,7 @@ public class SWTBotKeYSourceCodeLookupTest extends TestCase {
          ISEDStatement s1 = (ISEDStatement)call.getChildren()[0];
          // Test KeYSourceLookupParticipant directly
          KeYSourceLookupParticipant participant = new KeYSourceLookupParticipant();
-         assertEquals(method.getResource().getName(), participant.getSourceName(s1));
+         assertEquals(File.separator + method.getResource().getName(), participant.getSourceName(s1));
          // Test KeYSourceLookupDirector directly
          KeYSourceLookupDirector director = new KeYSourceLookupDirector();
          director.initializeDefaults(launch.getLaunchConfiguration());

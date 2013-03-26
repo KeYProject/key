@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.LessThan;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -99,7 +100,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     	final Term valuesVar = skipValues? null: tb.var((ProgramVariable)lhs);
     	
     	// set up replacement visitors
-    	final class IndexTermReplacementVisitor extends Visitor {
+    	final class IndexTermReplacementVisitor extends DefaultVisitor {
 
     	    private Term result;
 
@@ -127,7 +128,7 @@ public class LoopInvariantBuiltInRuleApp extends AbstractBuiltInRuleApp {
     	        }
     	    }
     	};
-    	final class ValuesTermReplacementVisitor extends Visitor {
+        final class ValuesTermReplacementVisitor extends DefaultVisitor {
 
     	    private Term result;
 

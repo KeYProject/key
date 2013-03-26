@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui.prooftree;
 
@@ -22,12 +26,15 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.util.Debug;
 
 /** An implementation of TreeModel that can be displayed using the
@@ -188,21 +195,24 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     
 
     public boolean hideClosedSubtrees () {
-        return ProofSettings.DEFAULT_SETTINGS.getViewSettings()
-            .getHideClosedSubtrees();
+    	return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHideClosedSubtrees();
+//        return ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+  //          .getHideClosedSubtrees();
     }
 
     public void setHideClosedSubtrees (boolean hide) {
         if ( hide != hideClosedSubtrees() ) {
-            ProofSettings.DEFAULT_SETTINGS.getViewSettings()
-                .setHideClosedSubtrees(hide);
+        	ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHideClosedSubtrees(hide);
+//            ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+//                .setHideClosedSubtrees(hide);
             updateTree((TreeNode) null);
         }
     }
 
     public boolean isHidingIntermediateProofsteps() {
-        return ProofSettings.DEFAULT_SETTINGS.getViewSettings()
-            .getHideIntermediateProofsteps();
+    	return ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getHideIntermediateProofsteps();
+//        return ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+//            .getHideIntermediateProofsteps();
     }
 
     /**
@@ -211,8 +221,9 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
      */
     public void hideIntermediateProofsteps(boolean hide) {
 	if (hide != isHidingIntermediateProofsteps()) {
-            ProofSettings.DEFAULT_SETTINGS.getViewSettings()
-                .setHideIntermediateProofsteps(hide);
+		ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setHideIntermediateProofsteps(hide);
+//            ProofSettings.DEFAULT_SETTINGS.getViewSettings()
+//                .setHideIntermediateProofsteps(hide);
             updateTree((TreeNode) null);
 	}
     }
@@ -376,14 +387,17 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     }
 
 
-    /** Take the appropriate actions after a change in the Proof.
+    /**
+     * Take the appropriate actions after a change in the Proof.
      * Currently, this means throwing all cached Information away
      * and fire an indiscriminating TreeStructureChanged event.
      * This should probably be made more efficient.
+     *
+     * @param trn tree node to update.
      */
     private void updateTree(TreeNode trn) {
         if (trn == null || trn == getRoot()) { // bigger change, redraw whole tree
-	    proofTreeNodes = new WeakHashMap<Node, GUIProofTreeNode>();
+	    proofTreeNodes = new WeakHashMap<Node, GUIAbstractTreeNode>();
 	    branchNodes    = new WeakHashMap<Node, GUIBranchNode>();
             fireTreeStructureChanged(new Object[]{getRoot()});
             return;
@@ -391,15 +405,18 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
         // otherwise redraw only a certain subtree
         // starting from the parent of trn
         flushCaches ( trn );
+        // also flush the current node, it might be an OSS conceiving children in this step
+        ((GUIAbstractTreeNode)trn).flushCache();
         TreeNode[] path = ((GUIAbstractTreeNode)trn.getParent()).getPath();
         fireTreeStructureChanged(path);
     }
 
     public void updateTree(Node p_node) {
-	if ( p_node == null )
-	    updateTree ( (TreeNode)null );
-	else
-	    updateTree ( getProofTreeNode ( p_node ) );
+        if ( p_node == null ) {
+            updateTree ( (TreeNode)null );
+        } else {
+            updateTree ( getProofTreeNode ( p_node ) );
+        }
     }
 
     private void flushCaches (TreeNode trn) {
@@ -457,21 +474,21 @@ class GUIProofTreeModel implements TreeModel, java.io.Serializable  {
     // caches for the GUIProofTreeNode and GUIBranchNode objects
     // generated to represent the nodes resp. subtrees of the Proof.
     
-    private WeakHashMap<Node, GUIProofTreeNode> proofTreeNodes = new WeakHashMap<Node, GUIProofTreeNode>();
+    private WeakHashMap<Node, GUIAbstractTreeNode> proofTreeNodes = new WeakHashMap<Node, GUIAbstractTreeNode>();
     private WeakHashMap<Node, GUIBranchNode> branchNodes    = new WeakHashMap<Node, GUIBranchNode>();
     
     /** Return the GUIProofTreeNode corresponding to node n, if one
      * has already been generated, and null otherwise.
      */
-    public GUIProofTreeNode find(Node n) {
+    public GUIAbstractTreeNode find(Node n) {
 	return (proofTreeNodes.get(n));
     }
 
     /** Return the GUIProofTreeNode corresponding to node n.
      * Generate one if necessary.
      */
-    public GUIProofTreeNode getProofTreeNode(Node n) {
- 	GUIProofTreeNode res = find(n);
+    public GUIAbstractTreeNode getProofTreeNode(Node n) {
+ 	GUIAbstractTreeNode res = find(n);
 	if ( res == null ) {
 	    res = new GUIProofTreeNode(this,n);
 	    proofTreeNodes.put(n,res);

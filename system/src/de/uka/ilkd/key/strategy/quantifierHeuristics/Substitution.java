@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
@@ -23,6 +27,7 @@ import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.Debug;
 
 /**
  * This class decribes a substitution,which store a map(varMap) from quantifiable 
@@ -62,7 +67,7 @@ class Substitution {
         while ( it.hasNext () ) {
             final Term t = getSubstitutedTerm(it.next ()); 
             if ( t.freeVars ().size () != 0 ) {
-        	System.out.println("evil free vars in term: " + t);
+            	Debug.out("evil free vars in term: " + t);
                 return false;
             }
         }

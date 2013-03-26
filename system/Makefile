@@ -1,10 +1,14 @@
 # This file is part of KeY - Integrated Deductive Software Design 
-# Copyright (C) 2001-2010 Universitaet Karlsruhe, Germany
-#                         Universitaet Koblenz-Landau, Germany
-#                         Chalmers University of Technology, Sweden 
 #
-# The KeY system is protected by the GNU General Public License. 
-# See LICENSE.TXT for details.
+# Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
+#                         Universitaet Koblenz-Landau, Germany
+#                         Chalmers University of Technology, Sweden
+# Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+#                         Technical University Darmstadt, Germany
+#                         Chalmers University of Technology, Sweden
+#
+# The KeY system is protected by the GNU General 
+# Public License. See LICENSE.TXT for details.
 
 SHELL=/bin/sh
 # comon prefix
@@ -98,7 +102,7 @@ JAVACC_MAIN=javacc
 
 ## nice source links
 JAVADOC=javadoc
-JAVADOC_OPTIONS=-use -quiet -breakiterator -linksource -J-Xmx512m
+JAVADOC_OPTIONS=-use -quiet -breakiterator -linksource -J-Xmx1024m
 
 
 ANTLR_PARSER= \
@@ -154,7 +158,7 @@ doc: argfile
 	-windowtitle "KeY API Documentation" \
 	-doctitle "KeY API Documentation ($(KEY_VERSION_LONG))" \
 	-header "KeY $(KEY_VERSION_LONG)" \
-	-private -author -version -J-Xmx256m
+	-private -author -version -J-Xmx512m
 
 
 
@@ -166,21 +170,21 @@ dist:	branding all
 	@mkdir -p dist/key/
 	@cp -r $(BINARYPATH)/* dist/key/
 	@cp -r $(RESOURCEPATH)/* dist/key/
-	@jar cMf dist/key/examples-heap.jar -C ../examples/heap .
+	@jar cMf dist/key/examples.jar -C ../examples/firstTouch .
 # for setup.jar
 	@mkdir -p dist/setup/de/uka/ilkd/key/util/
 	@cp -r $(BINARYPATH)/de/uka/ilkd/key/util/* dist/setup/de/uka/ilkd/key/util/
 	@cp -r $(RESOURCEPATH)/de/uka/ilkd/key/util/install/* dist/setup/de/uka/ilkd/key/util/install/
 	@mkdir -p dist/setup/de/uka/ilkd/key/gui/
 	@cp -r $(BINARYPATH)/de/uka/ilkd/key/gui/IconFactory* dist/setup/de/uka/ilkd/key/gui/
-	@cp -r $(BINARYPATH)/de/uka/ilkd/key/gui/KeYFolderIcon* dist/setup/de/uka/ilkd/key/gui/
-	@cp -r $(BINARYPATH)/de/uka/ilkd/key/gui/KeYControlIcon* dist/setup/de/uka/ilkd/key/gui/
 	@cp -r $(RESOURCEPATH)/de/uka/ilkd/key/gui/* dist/setup/de/uka/ilkd/key/gui/
 	@find dist -name '*~' -exec rm \{\} \; 
 	@echo "[creating jar-file]"
 	@jar cfm key.jar resources/MANIFEST.MF -C dist/key/ .
 	@jar cfm setup.jar resources/de/uka/ilkd/key/util/install/MANIFEST.MF -C dist/setup/ .
-	@tar -czvf ../dist/KeY-$(KEY_VERSION_LONG).tgz key.jar setup.jar -C ../ LICENSE.TXT
+	@tar -czvf ../dist/KeY-$(KEY_VERSION_LONG).tgz key.jar setup.jar \
+			-C ../ LICENSE.TXT -C system/dist/key examples.jar 
+	@zip -j ../dist/KeY-${KEY_VERSION_LONG}.zip key.jar setup.jar dist/key/examples.jar ../LICENSE.TXT 
 	@cp ../README.install.bytecode ../dist/README-$(KEY_VERSION_LONG).txt
 	@echo "[deleting distribution directory structure]"
 	@rm -rf dist
@@ -192,17 +196,18 @@ jar:	all
 
 .PHONY: dist_src
 dist_src: distclean branding javaFiles
+	@mkdir -p ../dist
 	@rm -rf /tmp/keydist-$(USER)
 	@echo "[creating source archive]"
 	@mkdir -p /tmp/keydist-$(USER)
-	@ln -s $(shell cd ..;pwd) /tmp/keydist-$(USER)/key-$(KEY_VERSION_LONG)
+	@ln -s "$(shell cd ..;pwd)" /tmp/keydist-$(USER)/key-$(KEY_VERSION_LONG)
 	@tar -C/tmp/keydist-$(USER) --dereference  \
-        -cvf /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar --exclude=key-$(KEY_VERSION_LONG)/.git/'*' \
+        -cf /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar --exclude=key-$(KEY_VERSION_LONG)/.git/'*' \
 	--exclude=key-$(KEY_VERSION_LONG)/key-ext-jars/'*' --exclude=key-$(KEY_VERSION_LONG)/eclipse key-$(KEY_VERSION_LONG)
 	@tar -rf /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar -C /tmp/keydist-$(USER) key-$(KEY_VERSION_LONG)/eclipse/
 	@gzip /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar
-	@mv /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar.gz ../KeY-$(KEY_VERSION_LONG)-src.tgz
-	@cp /tmp/keydist-$(USER)/key-$(KEY_VERSION_LONG)/README.install.source ../README-$(KEY_VERSION_LONG)-src.txt
+	@mv /tmp/keydist-$(USER)/KeY-$(KEY_VERSION_LONG)-src.tar.gz ../dist/KeY-$(KEY_VERSION_LONG)-src.tgz
+	@cp /tmp/keydist-$(USER)/key-$(KEY_VERSION_LONG)/README.install.source ../dist/README-$(KEY_VERSION_LONG)-src.txt
 	@echo "[done]"
 
 
@@ -301,7 +306,7 @@ javaFiles:
 ifneq ("$(GIT)","")
 	@$(GIT) ls-files | grep "\.java" | grep -v "aspects" | grep -v "gjava" | grep -v "\.java\." | grep -v "resources/" | sort > javaFiles
 else
-	@find de/ -name \*\.java  | grep -v "aspects" | grep -v "gjava" | grep -v "\.java\." | grep -v "resources/" | sort > javaFiles
+	@find $(SRC)/de/ -name \*\.java  | grep -v "aspects" | grep -v "gjava" | grep -v "\.java\." | grep -v "resources/" | sort > javaFiles
 endif
 
 argfile.normal: javaFiles

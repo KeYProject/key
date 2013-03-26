@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.proof.init;
 
@@ -46,11 +50,11 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IProofFileParser;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.io.EnvInput;
+import de.uka.ilkd.key.proof.io.IProofFileParser;
 import de.uka.ilkd.key.proof.io.KeYFile;
 import de.uka.ilkd.key.proof.io.LDTInput;
 import de.uka.ilkd.key.proof.io.LDTInput.LDTInputListener;
@@ -463,19 +467,19 @@ public final class ProblemInitializer {
 	alreadyParsed.clear();
 
         //the first time, read in standard rules
-        if(baseConfig == null || profile != baseConfig.getProfile()) {
-            baseConfig = new InitConfig(services, profile);
-
-	    RuleSource tacletBase = profile.getStandardRules().getTacletBase();
-	    if(tacletBase != null) {
-    	    	KeYFile tacletBaseFile
-    	    	    = new KeYFile("taclet base", 
-    	    		          profile.getStandardRules().getTacletBase(),
-			          progMon);
-    	    	readEnvInput(tacletBaseFile, baseConfig);
-	    }	    
+	if(baseConfig == null || profile != baseConfig.getProfile()) {            
+		InitConfig newBaseConfig = new InitConfig(services, profile);
+			RuleSource tacletBase = profile.getStandardRules().getTacletBase();
+			if(tacletBase != null) {
+				KeYFile tacletBaseFile
+				= new KeYFile("taclet base", 
+						profile.getStandardRules().getTacletBase(),
+						progMon);
+				readEnvInput(tacletBaseFile, newBaseConfig);			
+			}
+			baseConfig = newBaseConfig;
 	}
-	  return prepare(envInput, baseConfig);
+	return prepare(envInput, baseConfig);
 	
 	}
     

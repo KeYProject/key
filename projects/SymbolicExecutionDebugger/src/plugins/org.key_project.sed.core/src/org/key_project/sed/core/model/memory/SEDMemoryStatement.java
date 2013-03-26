@@ -7,11 +7,12 @@ import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IVariable;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.impl.AbstractSEDStatement;
 
 /**
- * Implementation of {@link ISEDThread} that stores all
+ * Implementation of {@link ISEDStatement} that stores all
  * information in the memory.
  * @author Martin Hentschel
  */
@@ -37,9 +38,9 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
    private String pathCondition;
    
    /**
-    * The source name.
+    * The source path.
     */
-   private String sourceName;
+   private String sourcePath;
 
    /**
     * The line number.
@@ -85,8 +86,8 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
-      return sourceName;
+   public String getSourcePath() {
+      return sourcePath;
    }
    
    /**
@@ -197,11 +198,11 @@ public class SEDMemoryStatement extends AbstractSEDStatement implements ISEDMemo
    }
    
    /**
-    * Sets the source name.
-    * @param sourceName The source name to set.
+    * Sets the source path.
+    * @param sourcePath The source path to set.
     */
-   public void setSourceName(String sourceName) {
-      this.sourceName = sourceName;
+   public void setSourcePath(String sourcePath) {
+      this.sourcePath = sourcePath;
    }
 
    /**

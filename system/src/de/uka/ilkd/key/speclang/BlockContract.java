@@ -76,7 +76,7 @@ public interface BlockContract extends SpecificationElement {
                                                            ImmutableList<Term>>> newRespects,
                                 Variables newVariables);
 
-    public BlockContract updateVariables(Variables newVariables);
+    public BlockContract setBlock(StatementBlock newBlock);
 
     /**
      * Returns the method in which the block is located.

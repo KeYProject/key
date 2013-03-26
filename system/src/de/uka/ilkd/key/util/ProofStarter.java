@@ -187,7 +187,8 @@ public class ProofStarter {
         final Profile profile = proof.env().getInitConfig().getProfile();
         proof.setActiveStrategy(profile.getDefaultStrategyFactory().create(proof, strategyProperties));
         
-        if (proof.getSettings().getGeneralSettings().oneStepSimplification()) {
+//        if (proof.getSettings().getGeneralSettings().oneStepSimplification()) {
+        if (proof.getProofIndependentSettings().getGeneralSettings().oneStepSimplification()) {
            OneStepSimplifier simplifier = MiscTools.findOneStepSimplifier(proof);
            if (simplifier != null) {
               simplifier.refresh(proof);

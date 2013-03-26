@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.pp;
 
@@ -17,12 +21,12 @@ import de.uka.ilkd.key.ldt.CharListLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IfExThenElse;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -213,6 +217,7 @@ public final class NotationInfo {
 	tbl.put(Modality.BOX_TRANSACTION,new Notation.ModalityNotation("\\box_transaction","\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
 	tbl.put(Modality.TOUT_TRANSACTION,new Notation.ModalityNotation("\\throughout_transaction","\\endmodality", PRIORITY_MODALITY, PRIORITY_POST_MODALITY));
 	tbl.put(IfThenElse.IF_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\if"));
+	tbl.put(IfExThenElse.IF_EX_THEN_ELSE, new Notation.IfThenElse(PRIORITY_ATOM, "\\ifEx"));
 	tbl.put(WarySubstOp.SUBST,new Notation.Subst());
 	tbl.put(UpdateApplication.UPDATE_APPLICATION, new Notation.UpdateApplicationNotation());
 	tbl.put(UpdateJunctor.PARALLEL_UPDATE, new Notation.ParallelUpdateNotation());	
@@ -278,15 +283,6 @@ public final class NotationInfo {
 	tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());
     tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
 	
-	final Namespace nsf = services.getNamespaces().functions();
-    tbl.put(nsf.lookup("emptySet"), new Notation.Constant("{}", PRIORITY_ATOM));
-    tbl.put(nsf.lookup("single"), new Notation.SingletonNotation());
-    tbl.put(nsf.lookup("cup"), new Notation.Infix("\\cup", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-    tbl.put(nsf.lookup("cap"), new Notation.Infix("\\cap", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-    tbl.put(nsf.lookup("difference"), new Notation.Infix("\\setMinus", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-    tbl.put(nsf.lookup("contains"), new Notation.ElementOfNotation());
-    tbl.put(nsf.lookup("subseteq"), new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-	
 	//string operators
 	final CharListLDT charListLDT 
 		= services.getTypeConverter().getCharListLDT();
@@ -312,8 +308,8 @@ public final class NotationInfo {
         
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();  
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
-        tbl.put(Junctor.TRUE ,new Notation.Constant(""+UnicodeHelper.TOP, PRIORITY_ATOM));
-        tbl.put(Junctor.FALSE,new Notation.Constant(""+UnicodeHelper.BOT, PRIORITY_ATOM));
+//        tbl.put(Junctor.TRUE ,new Notation.Constant(""+UnicodeHelper.TOP, PRIORITY_ATOM));
+//        tbl.put(Junctor.FALSE,new Notation.Constant(""+UnicodeHelper.BOT, PRIORITY_ATOM));
         tbl.put(Junctor.NOT,new Notation.Prefix(""+UnicodeHelper.NEG ,PRIORITY_NEGATION,PRIORITY_NEGATION));
         tbl.put(Junctor.AND,new Notation.Infix(""+UnicodeHelper.AND  ,PRIORITY_AND,PRIORITY_AND,PRIORITY_MODALITY));
         tbl.put(Junctor.OR, new Notation.Infix(""+UnicodeHelper.OR  ,PRIORITY_OR,PRIORITY_OR,PRIORITY_AND));
@@ -329,14 +325,6 @@ public final class NotationInfo {
         tbl.put(setLDT.getSetMinus(), new Notation.Infix(""+UnicodeHelper.SETMINUS, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation(" " + UnicodeHelper.IN + " "));
         tbl.put(setLDT.getSubset(), new Notation.Infix(""+UnicodeHelper.SUBSET, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        final Namespace nsf = services.getNamespaces().functions();
-        tbl.put(nsf.lookup("emptySet"), new Notation.Constant(""+UnicodeHelper.EMPTY, PRIORITY_ATOM));
-        tbl.put(nsf.lookup("single"), new Notation.SingletonNotation());
-        tbl.put(nsf.lookup("cup"), new Notation.Infix(""+UnicodeHelper.UNION, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        tbl.put(nsf.lookup("cap"), new Notation.Infix(""+UnicodeHelper.INTERSECT, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        tbl.put(nsf.lookup("difference"), new Notation.Infix(""+UnicodeHelper.SETMINUS, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        tbl.put(nsf.lookup("contains"), new Notation.ElementOfNotation(" " + UnicodeHelper.IN + " "));
-        tbl.put(nsf.lookup("subseteq"), new Notation.Infix(""+UnicodeHelper.SUBSET, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
         this.notationTable = tbl;
     }
 

@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.Arrays;
@@ -42,6 +46,7 @@ import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
+import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -55,6 +60,7 @@ import de.uka.ilkd.key.util.Triple;
 final class JMLTranslator {
 
     private final static TermBuilder TB = TermBuilder.DF;
+    @SuppressWarnings("unused")
     private Services services;                          // to be used in future
     private SLTranslationExceptionManager excManager;
 
@@ -167,8 +173,7 @@ final class JMLTranslator {
 
                     private static final long serialVersionUID = 1L;
 
-                    @SuppressWarnings("unused")
-                    public JMLTranslationMethod get(JMLKeyWord key) {
+                    public JMLTranslationMethod get(Object key) {
                         JMLTranslationMethod m = super.get(key);
                         if (m != null) {
                             return m;
@@ -634,8 +639,9 @@ final class JMLTranslator {
                     throws SLTranslationException {
                 checkParameters(params, Services.class, SLExpression.class);
                 final Services services = (Services)params[0];
+                IObserverFunction inv = services.getJavaInfo().getInv();
                 Term obj = ((SLExpression) params[1]).getTerm();
-                return new SLExpression(TB.inv(services, obj));
+                return new SLExpression(TB.func(inv, TB.getBaseHeap(services), obj));
             }
         });
         
@@ -857,7 +863,7 @@ final class JMLTranslator {
                 checkSLExpressions(expr1, expr2, excManager, "<=!=>");
                 SLExpression eq =
                         buildEqualityTerm(expr1, expr2, excManager, services);
-                return new SLExpression(TB.not(eq.getTerm()), eq.getType());
+                return new SLExpression(TB.not(eq.getTerm()));
             }
         });
         translationMethods.put(JMLKeyWord.EQ,
@@ -1163,8 +1169,8 @@ final class JMLTranslator {
 
                     try {
                         Term resultTerm = TB.func(function, args, null);
-                        SLExpression result = new SLExpression(resultTerm,
-                                services.getJavaInfo().getKeYJavaType(resultTerm.sort()));
+                        final KeYJavaType type = services.getJavaInfo().getKeYJavaType(resultTerm.sort());
+                        SLExpression result = type==null? new SLExpression(resultTerm) : new SLExpression(resultTerm,type);
                         return result;
                     } catch (TermCreationException ex) {
                         throw excManager.createException("Cannot create term " + function.name() + 
@@ -1388,6 +1394,7 @@ final class JMLTranslator {
                     Object... params)
                     throws SLTranslationException {
                 checkParameters(params, ImmutableList.class, Services.class);
+                @SuppressWarnings("unchecked")
                 ImmutableList<SLExpression> exprList =
                         (ImmutableList<SLExpression>) params[0];
                 Services services = (Services) params[1];
@@ -1398,7 +1405,7 @@ final class JMLTranslator {
                         Term t = expr.getTerm();
                         LocSetLDT locSetLDT =
                                 services.getTypeConverter().getLocSetLDT();
-                        if (!t.equals(locSetLDT.getSingleton())) {
+                        if (!t.op().equals(locSetLDT.getSingleton())) {
                             HeapLDT heapLDT =
                                     services.getTypeConverter().getHeapLDT();
                             if (heapLDT.getSortOfSelect(t.op()) != null) {
@@ -1406,10 +1413,14 @@ final class JMLTranslator {
                                 final Term fieldTerm = t.sub(2);
                                 t = TB.singleton(services, objTerm, fieldTerm);
                                 singletons = singletons.append(t);
+                            } else if (t.op() instanceof ProgramVariable) {
+                                // this case may happen with local variables
+                                addIgnoreWarning("local variable in assignable clause");
+                                Debug.out("Can't create a locset from local variable "+ t + ".\n" +
+                                        "In this version of KeY, you do not need to put them in assignable clauses.");
                             } else {
-                                throw excManager.createException("Can't create a locset from "
-                                                                 + t + ".");
-    }
+                                throw excManager.createException("Can't create a locset from "+ t + ".");
+                            }
                         } else {
                             throw excManager.createException("Can't create a locset of a singleton: "
                                                              + expr);
@@ -1604,9 +1615,9 @@ final class JMLTranslator {
      * @author bruns
      * @since 1.7.2178
      */
-    @SuppressWarnings("unused")
     private void addIgnoreWarning(String feature) {
         String msg = feature + " is not supported and has been silently ignored.";
+        Debug.out(msg);
         // TODO: wasn't there some collection of non-critical warnings ???
     }
 
@@ -1731,7 +1742,7 @@ final class JMLTranslator {
     }
 
     private abstract class JMLBoundedNumericalQuantifierTranslationMethod extends JMLQuantifierTranslationMethod {
-        final static String notBounded = "Only numerical quantifier expressions of form (\\sum int i; l<=i && i<u; t) are permitted";
+        final static String notBounded = "Only numerical quantifier expressions of forms (\\sum int i; l<=i && i<u; t) and (\\product int i; l<=i && i<u; t) are permitted";
         final static String notInt = "Bounded numerical quantifier variable must be of types int or \\bigint.";
 
 
@@ -1982,13 +1993,10 @@ final class JMLTranslator {
      */
     private abstract class JMLArithmeticOperationTranslationMethod implements JMLTranslationMethod {
         
-        @SuppressWarnings("unused")
         protected KeYJavaType bigint;
         
-        @SuppressWarnings("unused")
         protected String BIGINT_NOT_ALLOWED = "Operation "+opName()+" may only be used with primitive Java types, not with \\bigint";
 
-        @SuppressWarnings("unused")
         protected boolean isBigint(SLExpression e) {
             assert bigint != null;
             return e.getType().equals(bigint);

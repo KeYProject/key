@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.logic.op;
 
@@ -79,8 +83,6 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer META_LONG_UNSIGNEDSHIFTRIGHT = new MetaJavaLongUnsignedShiftRight();
 
     public static final AbstractTermTransformer WHILE_INV_RULE = new WhileInvRule();
-    
-    public static final AbstractTermTransformer ENHANCEDFOR_INV_RULE = new EnhancedForInvRule();
 
     public static final AbstractTermTransformer ARRAY_BASE_INSTANCE_OF = new ArrayBaseInstanceOf();
 
@@ -144,6 +146,12 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 	final Operator minus   = intModel.getNegativeNumberSign();
 	// check whether term is really a "literal"
 	
+        //skip any updates that have snuck in (int lits are rigid)
+        while (top==UpdateApplication.UPDATE_APPLICATION) {
+            term = term.sub(1);
+            top = term.op();
+        }
+
 	if (top != numbers) {
 	    Debug.out("abstractmetaoperator: Cannot convert to number:", term);
 	    throw (new NumberFormatException());
@@ -152,16 +160,34 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 	term = term.sub(0);
 	top = term.op();
 
+        //skip any updates that have snuck in (int lits are rigid)
+        while (top==UpdateApplication.UPDATE_APPLICATION) {
+            term = term.sub(1);
+            top = term.op();
+        }
+
 	while (top == minus) {
 	    neg=!neg;
 	    term = term.sub(0);
 	    top = term.op();
+
+            //skip any updates that have snuck in (int lits are rigid)
+            while (top==UpdateApplication.UPDATE_APPLICATION) {
+                term = term.sub(1);
+                top = term.op();
+            }
 	}
 
 	while (top != base) {
 	    result.insert(0, top.name());
 	    term = term.sub(0);
 	    top = term.op();
+
+            //skip any updates that have snuck in (int lits are rigid)
+            while (top==UpdateApplication.UPDATE_APPLICATION) {
+                term = term.sub(1);
+                top = term.op();
+            }
 	}
 	
 	if (neg) {
@@ -170,6 +196,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 	
 	return result.toString();
     }
+
             
     @Override    
     public MatchConditions match(SVSubstitute subst, MatchConditions mc,

@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
 // 
+ 
 
 package de.uka.ilkd.key.collection;
 
@@ -29,6 +33,7 @@ import java.util.Iterator;
  * amortized O(1). This will be done later (if necessary).
  */
 
+@SuppressWarnings("unchecked")
 public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
     /**
@@ -39,7 +44,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 
     /** the empty list */
     public static <T> ImmutableSLList<T> nil() {
-	return (ImmutableSLList<T>) NIL.NIL;
+	     return (ImmutableSLList<T>) NIL.NIL;
     }
 
     /**
@@ -444,7 +449,7 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	 */
 	private static final long serialVersionUID = -4070450212306526804L;
 
-	private final Iterator<S> iterator =  new SLNilListIterator();
+	private final transient Iterator<S> iterator =  new SLNilListIterator();
 
 	private NIL() {
 	}

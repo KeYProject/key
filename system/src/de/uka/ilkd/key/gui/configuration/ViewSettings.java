@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 package de.uka.ilkd.key.gui.configuration;
 
 import java.util.LinkedList;
@@ -22,7 +26,7 @@ import de.uka.ilkd.key.gui.GUIEvent;
  *    instantiated in the displayed tooltip.
  * 3) wether intermediate proofsteps should be hidden in the proof tree view
  */
-public class ViewSettings implements Settings {
+public class ViewSettings implements Settings, Cloneable {
     private static final String MAX_TOOLTIP_LINES_KEY = "[View]MaxTooltipLines";
     private static final String SHOW_WHOLE_TACLET = "[View]ShowWholeTaclet";
     private static final String FONT_INDEX = "[View]FontIndex";
@@ -31,7 +35,9 @@ public class ViewSettings implements Settings {
     private static final String HIDE_CLOSED_SUBTREES =
         "[View]HideClosedSubtrees";
     private static final String USE_SYSTEM_LAF = "[View]UseSystemLookAndFeel";
-
+    private static final String SHOW_JAVA_WARNING = "[View]ShowJavaWarning";
+    private static final String PRETTY_SYNTAX = "[View]PrettySyntax";
+    private static final String USE_UNICODE = "[View]UseUnicodeSymbols";
 
     /** default max number of displayed tooltip lines is 40 */
     private int maxTooltipLines = 40; 
@@ -46,7 +52,10 @@ public class ViewSettings implements Settings {
     private boolean hideClosedSubtrees = false;
     /** whether to use system look and feel */
     private boolean useSystemLaF = false;
-
+    private boolean notifyLoadBehaviour = true;
+    /** Pretty Syntax is true by default, use Unicode symbols not */
+    private boolean usePretty = true;
+    private boolean useUnicode = false;
 
     private LinkedList<SettingsListener> listenerList =
         new LinkedList<SettingsListener>();
@@ -130,6 +139,22 @@ public class ViewSettings implements Settings {
             fireSettingsChanged();
         }
     }
+    
+    /**
+     * When loading a Java file, all other java files in the parent
+     * directory are loaded as well.  
+     * Should there be a notification about this when opening a file?
+     */
+    public boolean getNotifyLoadBehaviour() {
+    	return notifyLoadBehaviour;
+    }
+    
+    /**
+     * @param Whether a notification when opening a file should be shown
+     */
+    public void setNotifyLoadBehaviour(boolean show) {
+    	notifyLoadBehaviour = show;
+    }
 
     /**
      * @return true iff intermediate proofsteps should be hidden
@@ -139,7 +164,7 @@ public class ViewSettings implements Settings {
     }
 
     /**
-     * @param hide Wether intermediate proofsteps should be hidden
+     * @param hide Whether intermediate proofsteps should be hidden
      */
     public void setHideIntermediateProofsteps(boolean hide) {
         if (hide != hideIntermediateProofsteps) {
@@ -177,6 +202,9 @@ public class ViewSettings implements Settings {
 		String val4 = props.getProperty(HIDE_INTERMEDIATE_PROOFSTEPS);
 		String val5 = props.getProperty(HIDE_CLOSED_SUBTREES);
 		String val6 = props.getProperty(USE_SYSTEM_LAF);
+		String val7 = props.getProperty(SHOW_JAVA_WARNING);
+		String val8 = props.getProperty(PRETTY_SYNTAX);
+		String val9 = props.getProperty(USE_UNICODE);
 		if (val1 != null) {
 		        maxTooltipLines = Integer.valueOf(val1).intValue();
 		} 
@@ -196,6 +224,15 @@ public class ViewSettings implements Settings {
 		}
 		if (val6 != null) {
 		    useSystemLaF = Boolean.valueOf(val6).booleanValue();
+		}
+		if (val7 != null) {
+		    notifyLoadBehaviour = Boolean.valueOf(val7).booleanValue();
+		}
+		if (val8 != null) {
+		    usePretty = Boolean.valueOf(val8).booleanValue();
+		}
+		if (val9 != null) {
+		    useUnicode = Boolean.valueOf(val9).booleanValue();
 		}
 	}
 
@@ -218,6 +255,9 @@ public class ViewSettings implements Settings {
     	props.setProperty(HIDE_CLOSED_SUBTREES, "" +
             hideClosedSubtrees);
     	props.setProperty(USE_SYSTEM_LAF, ""+useSystemLaF);
+    	props.setProperty(SHOW_JAVA_WARNING, "" + notifyLoadBehaviour);
+    	props.setProperty(PRETTY_SYNTAX, ""+ usePretty);
+    	props.setProperty(USE_UNICODE, "" + useUnicode);
     }
 
     /** sends the message that the state of this setting has been
@@ -236,5 +276,39 @@ public class ViewSettings implements Settings {
     public void addSettingsListener(SettingsListener l) {
 	listenerList.add(l);
     }
+
+public boolean isUsePretty() {
+	return usePretty;
+}
+
+public void setUsePretty(boolean usePretty) {
+	this.usePretty = usePretty;
+	if(!usePretty){
+	    setUseUnicode(false);
+	}
+	fireSettingsChanged();
+}
+/** 
+ * Use Unicode Symbols is only allowed if pretty syntax is used
+ * @return setting of use unicode symbols (if use pretty syntax is on, return the value which is set, if use retty is false, return false)
+ */
+public boolean isUseUnicode() {
+	if(isUsePretty()){ 
+	return useUnicode;
+	} else {
+	setUseUnicode(false);
+	return false;
+	}
+	
+}
+
+public void setUseUnicode(boolean useUnicode) {
+	if(isUsePretty()){
+	 this.useUnicode = useUnicode;
+	} else {
+	 this.useUnicode = false;	
+	}
+	fireSettingsChanged();
+}
     
 }

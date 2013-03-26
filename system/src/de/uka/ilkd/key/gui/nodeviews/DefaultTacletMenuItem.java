@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui.nodeviews;
 
@@ -15,6 +19,7 @@ import java.io.Writer;
 
 import javax.swing.JMenuItem;
 
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
@@ -54,7 +59,8 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
     				       true);
         tp.printTaclet(connectedTo.taclet(), 
         	       connectedTo.instantiations(),
-        	       ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(),
+        	       ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),
+//        	       ProofSettings.DEFAULT_SETTINGS.getViewSettings().getShowWholeTaclet(),
         	       false);
         
         int nlcount = 0;
@@ -65,11 +71,13 @@ class DefaultTacletMenuItem extends JMenuItem implements TacletMenuItem {
         	nlcount += 1;
             }
         }
-        if (nlcount > ProofSettings.DEFAULT_SETTINGS.getViewSettings().getMaxTooltipLines()) { 
+        if(nlcount > ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines()){
+  //      if (nlcount > ProofSettings.DEFAULT_SETTINGS.getViewSettings().getMaxTooltipLines()) { 
     	    Debug.log4jDebug("No SchemaVariable instantiation printed, linecount is " 
     			 + nlcount + " > " 
-    			 + ProofSettings.DEFAULT_SETTINGS.
-    			 getViewSettings().getMaxTooltipLines(),
+    			 + ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getMaxTooltipLines(),
+//    			 + ProofSettings.DEFAULT_SETTINGS.
+//    			 getViewSettings().getMaxTooltipLines(),
     			 TacletMenu.class.getName());
     	    taclet_sb = new StringBuffer();
     	    w = new StringWriter();

@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.smt;
 
@@ -51,6 +55,8 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     private static StringBuffer MINUSSTRING = new StringBuffer("-");
 
     private static StringBuffer MULTSTRING = new StringBuffer("*");
+    
+    private static StringBuffer DIVSTRING = new StringBuffer("div");
 
     private static StringBuffer LTSTRING = new StringBuffer("<");
 
@@ -346,7 +352,10 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
     @Override
     protected StringBuffer translateIntegerDiv(StringBuffer arg1,
 	    StringBuffer arg2) {
-	return new StringBuffer("unknownOp");
+        ArrayList<StringBuffer> args = new ArrayList<StringBuffer>();
+        args.add(arg1);
+        args.add(arg2);
+        return buildFunction(DIVSTRING, args);
     }
 
     @Override

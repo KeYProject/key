@@ -28,8 +28,11 @@ if [ -z "$JAVA_HOME" ] ; then
     fi
 else
     if [ "$UNAME" = "darwin" ] ; then
-	JRE=$JAVA_HOME/Home
-	JAVA=$JRE/bin/java
+    JAVA=`which java`
+    if [ -z "$JAVA" ] ; then
+	echo "Cannot find JAVA. Please set your PATH or \$JAVA_HOME."
+	exit 1
+    fi
 # other OS
     else
 	JRE=$JAVA_HOME/jre
@@ -76,7 +79,7 @@ keyclasspath="$KEY_HOME/system/key.jar"
 
 for i in $key_ext_jars ; do
     current_jar="$KEY_LIB/$i"
-    if [ ! -f $current_jar ]
+    if [ ! -f "$current_jar" ]
     then
        echo Cannot find $current_jar. 
        echo Copy or link the file into the
@@ -86,12 +89,6 @@ for i in $key_ext_jars ; do
        keyclasspath="${keyclasspath}:$current_jar"
     fi
 done
-
-if [ x$ASPECTJRTPATH != x ]
-then
-  echo "Using AspectJ runtime from:       $ASPECTJRTPATH"
-  keyclasspath=$keyclasspath:$ASPECTJRTPATH
-fi
 
 #
 # KeY-specific command line options
@@ -141,8 +138,8 @@ export PATH
 
 $JAVA $JAVA_OPTIONS $keysysprops \
 -ea:de.uka.ilkd.key... -Xms64m -Xmx1024m \
--Dkey.home=$KEY_HOME \
--Dkey.simplify.logdir=$KEY_SIMPLIFY_LOG_DIR \
--Dkey.ics.logdir=$KEY_ICS_LOG_DIR \
+-Dkey.home="$KEY_HOME" \
+-Dkey.simplify.logdir="$KEY_SIMPLIFY_LOG_DIR" \
+-Dkey.ics.logdir="$KEY_ICS_LOG_DIR" \
 -Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler \
--classpath $keyclasspath de.uka.ilkd.key.gui.Main $keyarg
+-classpath "$keyclasspath" de.uka.ilkd.key.gui.Main $keyarg

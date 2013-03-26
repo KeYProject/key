@@ -1,19 +1,27 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.Image;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.metal.MetalIconFactory.FolderIcon16;
+import javax.swing.plaf.metal.MetalIconFactory.TreeControlIcon;
 
 import de.uka.ilkd.key.util.KeYResourceManager;
 
@@ -31,11 +39,14 @@ public class IconFactory {
     private static Image keyLogoSmall        = getImage("images/key-color-icon-square.png");
     private static Icon provedFolderIcon     = KeYFolderIcon.getKeYFolderIconClosed();
     private static Icon closableFolderIcon   = KeYFolderIcon.getKeYFolderIconClosable();
+    
+    private static Image oneStepSimplifier = getImage("images/toolbar/oneStepSimplifier.png"); 
 
     private static Icon expandedIcon   = KeYControlIcon.getKeYExpandedIcon();
     private static Icon collapsedIcon  = KeYControlIcon.getKeYCollapsedIcon();
 
     private static Image reuse    = getImage("images/toolbar/ff.gif");
+    private static Image prune		= getImage("images/toolbar/pruneProof.png");
     private static Image goalBack = getImage("images/toolbar/goalBack.png");
     private static Image autoResume = getImage("images/toolbar/autoResume.png");
     private static Image autoResumeDisabled = 
@@ -84,10 +95,6 @@ public class IconFactory {
 	return scaleIcon(keyHole,x,y);
     }
     
-
-            
-            
-
     public static ImageIcon keyHoleClosed(int x, int y) {
 	return scaleIcon(keyHoleClosed,x,y);
     }
@@ -135,6 +142,10 @@ public class IconFactory {
     public static ImageIcon simplifyLogo(int size) {
 	return scaleIcon(decisionProcedureSimplify, size, size);
     }
+    
+    public static Icon oneStepSimplifier(int size) {
+        return scaleIcon(oneStepSimplifier, size, size);
+    }
 
     public static ImageIcon junitLogo(int size) {
 	return scaleIcon(junit, size, size);
@@ -150,6 +161,10 @@ public class IconFactory {
 
     public static ImageIcon icsLogo(int size) {
 	return scaleIcon(decisionProcedureICS, size, size);
+    }
+    
+    public static ImageIcon pruneLogo(int size) {
+    	return scaleIcon(prune, size, size);
     }
 
     public static ImageIcon goalBackLogo(int size) {
@@ -195,6 +210,156 @@ public class IconFactory {
 
     public static Icon interactiveAppLogo(int size) {       
        return scaleIcon(interactiveAppLogo, size, size);
+    }
+
+
+    private static class KeYFolderIcon extends FolderIcon16 {
+
+        private static final long serialVersionUID = 5120051888984645985L;
+        private static final Icon closedIcon   = new KeYFolderIcon(Color.green.darker());
+        private static final Icon closableIcon = new KeYFolderIcon(Color.blue.darker());
+        private static final Dimension folderIcon16Size = new Dimension( 16, 16 );
+
+        private final Color frontColor;
+
+        public static Icon getKeYFolderIconClosed() {
+            return closedIcon;
+        }
+
+        public static Icon getKeYFolderIconClosable() {
+            return closableIcon;
+        }
+
+        public KeYFolderIcon ( Color p_frontColor ) {
+            frontColor = p_frontColor;
+        }
+
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            GraphicsConfiguration gc = c.getGraphicsConfiguration();
+            Image image;
+            if (gc != null) {
+                image = gc.createCompatibleImage(getIconWidth(), 
+                        getIconHeight(),
+                        Transparency.BITMASK);
+            } else {
+                image = new BufferedImage(getIconWidth(),
+                        getIconHeight(),
+                        BufferedImage.TYPE_INT_ARGB);
+            }
+            Graphics imageG = image.getGraphics();      
+            paintMe(c,imageG);
+            imageG.dispose();
+
+            g.drawImage(image, x, y+getShift(), null);
+        }
+
+        private void paintMe(Component c, Graphics g) {
+
+            int right = folderIcon16Size.width - 1;
+            int bottom = folderIcon16Size.height - 1;
+
+            // Draw tab top
+            g.setColor( MetalLookAndFeel.getPrimaryControlDarkShadow() );
+            g.setColor(Color.green.darker().darker());
+            g.drawLine( right - 5, 3, right, 3 );
+            g.drawLine( right - 6, 4, right, 4 );
+
+            // Draw folder front
+
+            //g.setColor( MetalLookAndFeel.getPrimaryControl() );
+            g.setColor(frontColor);
+            g.fillRect( 2, 7, 13, 8 );
+
+            // Draw tab bottom
+            g.setColor( MetalLookAndFeel.getPrimaryControlShadow() );
+            g.drawLine( right - 6, 5, right - 1, 5 );
+
+            // Draw outline
+            g.setColor( MetalLookAndFeel.getPrimaryControlInfo() );
+            g.drawLine( 0, 6, 0, bottom );            // left side
+            g.drawLine( 1, 5, right - 7, 5 );         // first part of top
+            g.drawLine( right - 6, 6, right - 1, 6 ); // second part of top
+            g.drawLine( right, 5, right, bottom );    // right side
+            g.drawLine( 0, bottom, right, bottom );   // bottom
+
+            // Draw highlight
+            g.setColor( MetalLookAndFeel.getPrimaryControlHighlight() );
+            g.drawLine( 1, 6, 1, bottom - 1 );
+            g.drawLine( 1, 6, right - 7, 6 );
+            g.drawLine( right - 6, 7, right - 1, 7 );
+
+        }
+
+        public int getShift() { return -1; }
+        public int getAdditionalHeight() { return 2; }
+
+        public int getIconWidth() { return folderIcon16Size.width; }
+        public int getIconHeight() { return folderIcon16Size.height + getAdditionalHeight(); }
+    }
+
+    private static class KeYControlIcon extends TreeControlIcon {
+
+        private static final long serialVersionUID = -929097387090481643L;
+        private static final Icon collapsedIcon   = new KeYControlIcon(true);
+        private static final Icon expandedIcon    = new KeYControlIcon(false);
+
+        private boolean collapsed;
+
+        public static Icon getKeYCollapsedIcon() {
+            return collapsedIcon;
+        }
+
+        public static Icon getKeYExpandedIcon() {
+            return expandedIcon;
+        }
+
+        public KeYControlIcon ( boolean collapsed ) {
+            super( collapsed );
+            this.collapsed = collapsed;
+
+        }
+
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            GraphicsConfiguration gc = c.getGraphicsConfiguration();
+            Image image;
+            if (gc != null) {
+                image = gc.createCompatibleImage(getIconWidth(), 
+                        getIconHeight(),
+                        Transparency.BITMASK);
+            } else {
+                image = new BufferedImage(getIconWidth(),
+                        getIconHeight(),
+                        BufferedImage.TYPE_INT_ARGB);
+            }
+            Graphics imageG = image.getGraphics();      
+            paintMe(c,imageG);
+            imageG.dispose();
+
+            g.drawImage(image, x, y, null);
+        }
+
+        private void paintMe(Component c, Graphics g) {
+            // Draw tab top
+            g.setColor(c.getBackground());
+            g.fillRect(0,0,getIconWidth(), getIconHeight());
+
+            int midx = getIconWidth() / 2;
+            int midy = getIconHeight() / 2;
+
+            int min = getIconWidth() < getIconHeight() ? 
+                    getIconWidth() : getIconHeight();
+
+
+                    g.setColor(c.getGraphics().getColor());
+                    g.drawRect(midx-(min/4), midy-(min/4), (min/2)-1, (min/2)-1);
+
+                    g.drawLine(midx-(min/4 - 2), midy ,
+                            midx+(min/4 - 2), midy);
+                    if (collapsed) {
+                        g.drawLine(midx, midy -(min/4 - 2),
+                                midx, midy +(min/4 - 2));        
+                    }
+        }
     }
 
 }

@@ -4,10 +4,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 
+import javax.swing.JCheckBox;
+import javax.swing.JOptionPane;
+
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.util.GuiUtilities;
+
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 
 public class OpenFileAction extends MainWindowAction {
     
@@ -32,6 +37,16 @@ public class OpenFileAction extends MainWindowAction {
         
         if (loaded) {
             File file = keYFileChooser.getSelectedFile();
+            if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getNotifyLoadBehaviour() && file.toString().endsWith(".java")) {
+                JCheckBox checkbox = new JCheckBox("Don't show this warning again");
+                Object[] message = { "When you load a Java file, all java files in the current",
+                        "directory and all subdirectories will be loaded as well.",
+                        checkbox };
+                JOptionPane.showMessageDialog(mainWindow, message, 
+                        "Please note", JOptionPane.WARNING_MESSAGE);
+                ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setNotifyLoadBehaviour(!checkbox.isSelected());
+                ProofIndependentSettings.DEFAULT_INSTANCE.saveSettings();
+            }
             mainWindow.loadProblem(file);
         }
         

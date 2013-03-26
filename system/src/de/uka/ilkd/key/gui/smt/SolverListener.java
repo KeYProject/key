@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui.smt;
 
@@ -558,18 +562,19 @@ public class SolverListener implements SolverLauncherListener {
 
 		
 		public void addWarning(SolverType type) {
-			String message = "You are using a version of "+type.getName()+
+			StringBuffer message = new StringBuffer();
+			message.append("You are using a version of "+type.getName()+
 					         " which has not been tested for this version of KeY.\nIt can therefore be that" +
 					         " errors occur that would not occur\nusing " +
 					         (type.getSupportedVersions().length > 1 ? 
 					         "one of the following versions:\n" :
-					        	 "the following version:\n");		
-				for(String version : type.getSupportedVersions()){
-					message += version;
-				}
+					        	 "the following version:\n"));
+			for (String v: type.getSupportedVersions()){
+			    message.append(v + ", ");
+			}
+			message.deleteCharAt(message.lastIndexOf(","));
 			
-			
-			progressDialog.addInformation("Warning: Your version of "+type.toString()+" may not be supported by KeY.", Color.ORANGE,message);			
+			progressDialog.addInformation("Warning: Your version of "+type.toString()+" may not be supported by KeY.", Color.ORANGE,message.toString());			
 				
 		
 		}

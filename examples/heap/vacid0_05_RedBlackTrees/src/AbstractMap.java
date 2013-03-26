@@ -23,7 +23,6 @@ public interface AbstractMap{
     
     /*@ protected model instance boolean isEmpty;
       @ protected represents isEmpty = (\forall int i; 0 <= i && i < contents.length; contents[i] == defaultValue);
-      @ invariant contents.length == 999; // just to have some bound
       @*/
 
     //@ initially isEmpty;

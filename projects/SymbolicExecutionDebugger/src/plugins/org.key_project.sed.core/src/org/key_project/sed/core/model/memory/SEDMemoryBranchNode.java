@@ -38,9 +38,9 @@ public class SEDMemoryBranchNode extends AbstractSEDBranchNode implements ISEDMe
    private String pathCondition;
    
    /**
-    * The source name.
+    * The source path.
     */
-   private String sourceName;
+   private String sourcePath;
 
    /**
     * The line number.
@@ -86,8 +86,8 @@ public class SEDMemoryBranchNode extends AbstractSEDBranchNode implements ISEDMe
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
-      return sourceName;
+   public String getSourcePath() {
+      return sourcePath;
    }
    
    /**
@@ -198,11 +198,11 @@ public class SEDMemoryBranchNode extends AbstractSEDBranchNode implements ISEDMe
    }
    
    /**
-    * Sets the source name.
-    * @param sourceName The source name to set.
+    * Sets the source path.
+    * @param sourcePath The source path to set.
     */
-   public void setSourceName(String sourceName) {
-      this.sourceName = sourceName;
+   public void setSourcePath(String sourcePath) {
+      this.sourcePath = sourcePath;
    }
 
    /**

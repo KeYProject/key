@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 /**
  * KeYResourceManager controls the access to the properties
@@ -191,7 +195,8 @@ public class KeYResourceManager {
                 
                 long actualTransferredByte = 0;
 	        try { 
-	            final FileChannel targetStream  = new FileOutputStream (targetFile).getChannel();
+	            @SuppressWarnings("resource") // is closed below
+                final FileChannel targetStream  = new FileOutputStream (targetFile).getChannel();
 	            try { 
 	                actualTransferredByte = targetStream.transferFrom(sourceStream, 0, Long.MAX_VALUE);
 	            } finally {

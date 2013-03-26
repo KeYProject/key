@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.util;
 
@@ -111,6 +115,7 @@ public final class CommandLine {
     private class AdditionalHelpTextParts extends HelpElement {
         private String description;
         private String command;
+        @SuppressWarnings("unused")
         private boolean indentToDescriptionColumn;
 
         @Override
@@ -390,7 +395,7 @@ public final class CommandLine {
             return Integer.decode(value);
         } catch (NumberFormatException e) {
             throw new CommandLineException(param + " expects an integer argument, but received: "
-                                            + option.value);
+                                            + option.value, e);
         }
     }
 
@@ -424,7 +429,7 @@ public final class CommandLine {
             return Long.decode(value);
         } catch (NumberFormatException e) {
             throw new CommandLineException(param + " expects a long integer argument, but received: "
-                                            + option.value);
+                                            + option.value, e);
         }
     }
 

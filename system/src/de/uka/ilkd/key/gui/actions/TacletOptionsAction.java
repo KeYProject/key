@@ -19,6 +19,9 @@ public class TacletOptionsAction extends MainWindowAction {
 	super(mainWindow);
 	setName("Taclet Options...");
 	setAcceleratorLetter(KeyEvent.VK_T);
+	
+	getMediator().enableWhenProof(this);
+
     }
 
     @Override
@@ -28,7 +31,7 @@ public class TacletOptionsAction extends MainWindowAction {
                     new GeneralInformationEvent(
                             "No contracts available.",
                             "If you wish to see the available options "
-                            + "for a proof you have to load one first"));
+                            + "for a proof, you have to load one first."));
         } else {
             new ChoiceSelector
             (ProofSettings.DEFAULT_SETTINGS.getChoiceSettings());

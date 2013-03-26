@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.speclang;
 
@@ -35,6 +39,7 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.GeneralSettings;
+import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -85,8 +90,10 @@ public final class SLEnvInput extends AbstractEnvInput {
     //-------------------------------------------------------------------------
     
     private static String getLanguage() {
-        GeneralSettings gs 
-            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+//        GeneralSettings gs 
+//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();        
+    	GeneralSettings gs 
+        = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
         if(gs.useJML() && gs.useOCL()) {
             return "JML/OCL";
         } else if(gs.useJML()) {
@@ -295,7 +302,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                             specExtractor.extractLoopInvariant(pm,
                         			               (LoopStatement) loop);
                     if(inv != null) {
-                        specRepos.setLoopInvariant(inv);
+                        specRepos.addLoopInvariant(inv);
                     }
                 }
                 
@@ -356,8 +363,10 @@ public final class SLEnvInput extends AbstractEnvInput {
             throw new IllegalStateException("InitConfig not set.");
         }
             
-        final GeneralSettings gs 
-            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
+        final GeneralSettings gs
+        = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings();
+
+//            = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings();
         if(gs.useJML()) {
             createSpecs(new JMLSpecExtractor(initConfig.getServices()));
         }

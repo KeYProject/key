@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.*;
@@ -474,7 +478,7 @@ public class JMLSpecFactory {
                                             services);
             
             // less than nothing is marked by some special term;
-            if(translated == TB.lessThanNothing()) {
+            if(translated == TB.strictlyNothing()) {
                 if(originalClauses.size() > 1) {
                     throw new SLTranslationException(
                             "\"assignable \\less_than_nothing\" does not go with other " +
@@ -673,7 +677,7 @@ public class JMLSpecFactory {
                                             services);
             
             // less than nothing is marked by some special term;
-            if(translated == TB.lessThanNothing()) {
+            if(translated == TB.strictlyNothing()) {
                 return true;
             }
         }

@@ -168,17 +168,21 @@ public class ProofDiffFrame extends JFrame {
 
     /**
      * Sets the to field to the selected node.
-     * Clears the fom field.
+     * Clears the from field.
      */
     private void setSelectedNode() {
+        try {
+            Node node = mainWindow.getMediator().getSelectedNode();
+            if(node == null) {
+                throw new IllegalArgumentException("There is no selected proof node or no proof!");
+            }
 
-        Node node = mainWindow.getMediator().getSelectedNode();
-        if(node == null) {
-            throw new IllegalArgumentException("There is no selected proof node!");
+            from.setText("");
+            to.setText(Integer.toString(node.serialNr()));
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
         }
-
-        from.setText("");
-        to.setText(Integer.toString(node.serialNr()));
     }
 
     /**

@@ -124,9 +124,9 @@ public class KeYLoopNode extends AbstractSEDLoopNode implements IKeYSEDDebugNode
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
+   public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = KeYModelUtil.getSourceName(executionNode.getActivePositionInfo());
+         sourceName = KeYModelUtil.getSourcePath(executionNode.getActivePositionInfo());
       }
       return sourceName;
    }
@@ -193,7 +193,9 @@ public class KeYLoopNode extends AbstractSEDLoopNode implements IKeYSEDDebugNode
     */
    @Override
    public boolean hasVariables() throws DebugException {
-      return super.hasVariables() && getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
+      return !executionNode.isDisposed() && 
+             super.hasVariables() && 
+             getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
    }
 
    /**

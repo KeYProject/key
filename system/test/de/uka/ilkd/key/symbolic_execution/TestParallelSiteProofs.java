@@ -8,6 +8,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
@@ -26,14 +27,14 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests parallel site proofs on a new instantiate proof after applying "resume" on it.
     */
-   public void testNewProof() throws ProofInputException, IOException, ParserConfigurationException, SAXException {
+   public void testNewProof() throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       // Define test settings
       String javaPathInkeyRepDirectory = "examples/_testcase/set/magic42/test/Magic42.java";
       String containerTypeName = "Magic42";
       final String methodFullName = "compute";
       String oraclePathInBaseDirFile = "examples/_testcase/set/magic42/oracle/Magic42.xml";
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false);
+      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, null, false, false, false);
       // Resume
       resume(env.getUi(), env.getBuilder(), oraclePathInBaseDirFile, keyRepDirectory);
       // Do test steps
@@ -43,11 +44,11 @@ public class TestParallelSiteProofs extends AbstractSymbolicExecutionTestCase {
    /**
     * Tests parallel site proofs on a proof reconstructed from a *.proof file.
     */
-   public void testProofFile() throws ProofInputException, IOException {
+   public void testProofFile() throws ProofInputException, IOException, ProblemLoaderException {
       // Define test settings
       String javaPathInkeyRepDirectory = "examples/_testcase/set/magic42/test/Magic42.proof";
       // Create proof environment for symbolic execution
-      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, false);
+      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, false, false, false);
       // Do test steps
       doParallelSiteProofTest(env);
    }

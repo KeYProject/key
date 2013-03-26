@@ -22,7 +22,7 @@ public final class ProofManagementAction extends MainWindowAction {
     public ProofManagementAction(MainWindow mainWindow) {
 	super(mainWindow);
 	setName("Proof Management");
-	setTooltip("Proof Management");
+	setTooltip("Browse contracts and possible proof targets");
 	setAcceleratorLetter(KeyEvent.VK_M);
 
 	setEnabled(enabled());

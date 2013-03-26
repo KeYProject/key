@@ -400,6 +400,12 @@ public final class SimpleBlockContract implements BlockContract {
                                        newVariables, transactionApplicable, hasMod);
     }
 
+    @Override 
+    public BlockContract setBlock(StatementBlock newBlock) {
+        return update(newBlock, preconditions, postconditions, modifiesClauses, variables);
+    }
+
+
     // TODO Implement equals and hashCode properly.
     /*@Override
     public boolean equals(final Object object)

@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui;
 
@@ -33,9 +37,9 @@ public class WebstartMain {
     } 
 
 
-    private static File setupExamples() {
+    public static File setupExamples() {
         try {
-            URL examplesURL = WebstartMain.class.getResource("/examples-heap.jar");	
+            URL examplesURL = WebstartMain.class.getResource("/examples.jar");	
             if(examplesURL == null) {
                 throw new IOException("Missing examples.jar in resources");
             }
@@ -110,7 +114,7 @@ public class WebstartMain {
         if(examplesDir != null) {
             String[] newArgs = new String[args.length + 2];
             System.arraycopy(args, 0, newArgs, 0, args.length);
-            newArgs[args.length] = "EXAMPLES";
+            newArgs[args.length] = "--examples";
             newArgs[args.length + 1] = examplesDir.getAbsolutePath();
             args = newArgs;
         }

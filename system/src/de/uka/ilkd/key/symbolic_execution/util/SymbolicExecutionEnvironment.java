@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -16,21 +15,22 @@ import de.uka.ilkd.key.ui.UserInterface;
  * via an {@link SymbolicExecutionTreeBuilder}.
  * @author Martin Hentschel
  */
-public class SymbolicExecutionEnvironment<U extends UserInterface> {
-   /**
-    * The {@link UserInterface} in which the {@link Proof} is loaded.
-    */
-   private U ui;
-   
-   /**
-    * The loaded project.
-    */
-   private InitConfig initConfig;
-   
+public class SymbolicExecutionEnvironment<U extends UserInterface> extends KeYEnvironment<U> {
    /**
     * The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
     */
    private SymbolicExecutionTreeBuilder builder;
+   
+   /**
+    * Constructor.
+    * @param environment The parent {@link KeYEnvironment}.
+    * @param builder The {@link SymbolicExecutionTreeBuilder} for execution tree extraction.
+    */
+   public SymbolicExecutionEnvironment(KeYEnvironment<U> environment, SymbolicExecutionTreeBuilder builder) {
+      this(environment.getUi(), 
+           environment.getInitConfig(), 
+           builder);
+   }
 
    /**
     * Constructor.
@@ -41,33 +41,8 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> {
    public SymbolicExecutionEnvironment(U ui,
                                        InitConfig initConfig, 
                                        SymbolicExecutionTreeBuilder builder) {
-      this.ui = ui;
-      this.initConfig = initConfig;
+      super(ui, initConfig);
       this.builder = builder;
-   }
-
-   /**
-    * Returns the {@link UserInterface} in which the {@link Proof} is loaded.
-    * @return The {@link UserInterface} in which the {@link Proof} is loaded.
-    */
-   public U getUi() {
-      return ui;
-   }
-
-   /**
-    * Returns the loaded project.
-    * @return The loaded project.
-    */
-   public InitConfig getInitConfig() {
-      return initConfig;
-   }
-
-   /**
-    * Returns the {@link Services} of {@link #getInitConfig()}.
-    * @return The {@link Services} of {@link #getInitConfig()}.
-    */
-   public Services getServices() {
-      return initConfig.getServices();
    }
 
    /**
@@ -90,13 +65,20 @@ public class SymbolicExecutionEnvironment<U extends UserInterface> {
     * Configures the given {@link Proof} to use the symbolic execution strategy.
     * @param proof The {@link Proof} to configure.
     * @param maximalNumberOfNodesPerBranch The maximal number of nodes per branch.
+    * @param methodTreatmentContract {@code true} use operation contracts, {@code false} expand methods.
+    * @param loopTreatmentInvariant {@code true} use invariants, {@code false} expand loops.
     */
-   public static void configureProofForSymbolicExecution(Proof proof, int maximalNumberOfNodesPerBranch) {
+   public static void configureProofForSymbolicExecution(Proof proof, 
+                                                         int maximalNumberOfNodesPerBranch, 
+                                                         boolean methodTreatmentContract,
+                                                         boolean loopTreatmentInvariant) {
       if (proof != null) {
-         StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, false, false, true);
+         StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, true, methodTreatmentContract, loopTreatmentInvariant);
          proof.setActiveStrategy(new SymbolicExecutionStrategy.Factory().create(proof, strategyProperties));
          proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
          proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfNodesPerBranch));
+         SymbolicExecutionUtil.setUseLoopInvariants(proof, methodTreatmentContract);
+         SymbolicExecutionUtil.setUseLoopInvariants(proof, loopTreatmentInvariant);
       }
    }
 }

@@ -1,16 +1,21 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.smt.test;
 
 import de.uka.ilkd.key.smt.SolverType;
+import junit.framework.Assert;
 
 
 public class TestZ3 extends TestSMTSolver {
@@ -52,4 +57,22 @@ public class TestZ3 extends TestSMTSolver {
        }
        return type;
     }
+    
+    //These testcases are z3 specific, because other solver don't support integer division.
+    public void testDiv1() {
+        Assert.assertTrue(correctResult(testFile + "div1.key", true));
+    }
+    
+    public void testDiv3() {
+        Assert.assertTrue(correctResult(testFile + "div3.key", true));
+    }
+    
+    public void testDiv5() {
+        Assert.assertTrue(correctResult(testFile + "div5.key", false));
+    }
+    
+    public void testDiv6() {
+        Assert.assertTrue(correctResult(testFile + "div6.key", false));
+    }
+    
 }
