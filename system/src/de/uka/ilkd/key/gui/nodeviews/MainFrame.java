@@ -27,30 +27,16 @@ public class MainFrame extends JScrollPane {
     public static final Color customRedLight =
             new Color((255 + 250) / 2, (90 + 250) / 2, (90 + 250) / 2);
     public static final Color transparent = new Color(0, 0, 0, 0);
-    public TacletButton tacletButton;
     public SequentView sequentView;
 
     public void setSequentView(SequentView sequentView) {
-        getViewport().add(new MainFrameBody(sequentView));
-        if (sequentView instanceof InnerNodeView) {
-            tacletButton.setTransparent(false);
-        } else {
-            tacletButton.setTransparent(true);
-        }
+        setViewportView(new MainFrameBody(sequentView));
     }
 
     public MainFrame() {
 
-        tacletButton = new TacletButton();
-
         setBorder(new EmptyBorder(0, 0, 0, 0));
-        getVerticalScrollBar().setUnitIncrement(18);
-
-        /*
-         * needs to be called last to prevent null
-         * pointer exceptions
-         */
-        setSequentView(new EmptySequent());
+        getVerticalScrollBar().setUnitIncrement(30);
 
         // FIXME put this somewhere descent
         getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
@@ -61,6 +47,8 @@ public class MainFrame extends JScrollPane {
                 GuiUtilities.copyHighlightToClipboard(MainWindow.getInstance().leafNodeView);
             }
         });
+
+        setSequentView(new EmptySequent());
     }
 
     private class MainFrameBody extends JPanel {
@@ -69,13 +57,11 @@ public class MainFrame extends JScrollPane {
 
             setLayout(new GridBagLayout());
             setBackground(SequentView.BACKGROUND_COLOR);
-            setBorder(new SequentBorder(sequentView.getTitle(),
-                    tacletButton));
 
             GridBagConstraints gbc = new GridBagConstraints();
 
             gbc.fill = GridBagConstraints.HORIZONTAL;
-            gbc.gridx = 0;
+            gbc.gridx = 1;
             gbc.gridy = 0;
             gbc.weightx = 1.0;
             gbc.weighty = 0.0;
@@ -84,13 +70,14 @@ public class MainFrame extends JScrollPane {
             transparentLabel.setOpaque(true);
             add(transparentLabel, gbc);
 
-            gbc.insets = new Insets(0, 0, 4, 0);
+            Insets titleButtonInsets = new Insets(0, 50, 4, 0);
+            gbc.insets = titleButtonInsets;
             gbc.fill = GridBagConstraints.NONE;
-            gbc.gridx = 1;
+            gbc.gridx = 0;
             gbc.gridy = 0;
             gbc.weightx = 0.0;
             gbc.weighty = 0.0;
-            add(tacletButton, gbc);
+            add(sequentView.titleButton, gbc);
 
             gbc.insets = new Insets(0, 0, 0, 0);
             gbc.fill = GridBagConstraints.BOTH;
@@ -101,6 +88,8 @@ public class MainFrame extends JScrollPane {
             gbc.gridwidth = 2;
             add(sequentView, gbc);
             
+            setBorder(new SequentBorder(sequentView.titleButton, titleButtonInsets));
+
         }
     }
 }

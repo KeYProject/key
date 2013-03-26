@@ -5,11 +5,7 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.util.Debug;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
 import java.util.HashMap;
-import javax.swing.JLabel;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
@@ -25,9 +21,11 @@ public abstract class SequentView extends JTextArea {
     // all known highlights
     private HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight =
             new HashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
+    public TitleButton titleButton;
 
     SequentView() {
-        
+
+        titleButton = new TitleButton(this);
         setEditable(false);
         setBackground(BACKGROUND_COLOR);
         Font myFont = UIManager.getFont(Config.KEY_FONT_SEQUENT_VIEW);
