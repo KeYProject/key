@@ -5,7 +5,11 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.util.Debug;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.util.HashMap;
+import javax.swing.AbstractAction;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
@@ -32,9 +36,9 @@ public abstract class SequentView extends JTextArea {
         if (myFont != null) {
             setFont(myFont);
         } else {
-            Debug.out("KEY_FONT_CURRENT_GOAL_VIEW not available. Use standard font.");
+            Debug.out("KEY_FONT_SEQUENT_VIEW not available. Use standard font.");
         }
-
+        
     }
 
     /**

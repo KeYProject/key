@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.configuration.Config;
-import static de.uka.ilkd.key.gui.nodeviews.MainFrame.customRed;
-import static de.uka.ilkd.key.gui.nodeviews.MainFrame.customRedLight;
+import static de.uka.ilkd.key.gui.nodeviews.MainFrame.openGoalRed;
+import static de.uka.ilkd.key.gui.nodeviews.MainFrame.openGoalRedLight;
 import static de.uka.ilkd.key.gui.nodeviews.MainFrame.transparent;
 import static de.uka.ilkd.key.gui.nodeviews.SequentBorder.darkPurple;
 import java.awt.Color;

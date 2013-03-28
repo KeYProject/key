@@ -197,7 +197,7 @@ public class LeafNodeView extends SequentView implements Autoscroll {
         addPropertyChangeListener("font", changeListener);
         addHierarchyBoundsListener(changeListener);
 
-        titleButton.setBorderColor(MainFrame.customRed);
+        titleButton.setBorderColor(MainFrame.openGoalRed);
         titleButton.setToolTipText("Toggle hidden taclets visibility");
 
     }

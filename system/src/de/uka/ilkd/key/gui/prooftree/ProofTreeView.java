@@ -684,7 +684,7 @@ public class ProofTreeView extends JPanel {
 		        ProofTreeView.this.setToolTipText("Disabled Goal");
 		        tree_cell.setToolTipText("Interactive goal - no automatic rule application");
 		    } else {
-			tree_cell.setForeground(Color.red);
+			tree_cell.setForeground(de.uka.ilkd.key.gui.nodeviews.MainFrame.openGoalRed);
 			tree_cell.setIcon(keyHole20x20);
 			ProofTreeView.this.setToolTipText("Open Goal");
 			tree_cell.setToolTipText("An open goal");

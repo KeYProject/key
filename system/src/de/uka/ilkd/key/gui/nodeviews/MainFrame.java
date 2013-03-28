@@ -23,8 +23,8 @@ import javax.swing.border.EmptyBorder;
  */
 public class MainFrame extends JScrollPane {
 
-    public static final Color customRed = new Color(250, 90, 90);
-    public static final Color customRedLight =
+    public static final Color openGoalRed = new Color(250, 90, 90);
+    public static final Color openGoalRedLight =
             new Color((255 + 250) / 2, (90 + 250) / 2, (90 + 250) / 2);
     public static final Color transparent = new Color(0, 0, 0, 0);
     public SequentView sequentView;
@@ -37,6 +37,7 @@ public class MainFrame extends JScrollPane {
 
         setBorder(new EmptyBorder(0, 0, 0, 0));
         getVerticalScrollBar().setUnitIncrement(30);
+        getHorizontalScrollBar().setUnitIncrement(30);
 
         // FIXME put this somewhere descent
         getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
