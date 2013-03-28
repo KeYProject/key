@@ -588,9 +588,9 @@ public class TestTermParser extends TestCase {
      }
     
     public void testParseTermsWithLabels() {
-        Term t = parseTerm("(3 + 2)<<SE>>");
+        Term t = parseTerm("(3 + 2)<<" + LoopBodyTermLabel.NAME + ">>");
         assertTrue(t.hasLabels());
-        t = parseTerm("3 + 2<<SE>>");
+        t = parseTerm("3 + 2<<" + LoopBodyTermLabel.NAME + ">>");
         assertFalse(t.hasLabels());
         assertTrue(t.sub(1).hasLabels());
     }

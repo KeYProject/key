@@ -39,6 +39,8 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.LoopBodyTermLabel;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -52,6 +54,7 @@ import de.uka.ilkd.key.rule.LoopBodyTermLabelInstantiator;
 import de.uka.ilkd.key.rule.TermLabelInstantiatorDispatcher;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 
 public final class WhileInvRule {
@@ -122,7 +125,7 @@ public final class WhileInvRule {
     
     
     /** calculates the resulting term. */
-    public Term transform(WhileInvariantRule rule, PosInOccurrence applicationPos, Term initialPost, Term invariantFramingTermination, SVInstantiations svInst, Services services) {
+    public Term transform(WhileInvariantRule rule, Sequent applicationSequent, PosInOccurrence applicationPos, Term initialPost, Term invariantFramingTermination, SVInstantiations svInst, Services services) {
         
         // global initialisation
         init(initialPost, invariantFramingTermination, services);
@@ -266,17 +269,27 @@ public final class WhileInvRule {
         // Compute labels
         ImmutableArray<ITermLabel> labels = TermLabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock);
         // Add loop body term label if required (not already present and loop body instantiator is available)
+        ITermLabel[] newLabels;
         if (!labels.contains(LoopBodyTermLabel.INSTANCE) &&
             TermLabelInstantiatorDispatcher.hasInstantiator(services, LoopBodyTermLabelInstantiator.INSTANCE)) {
-           ITermLabel[] newLabels = new ITermLabel[labels.size() + 1];
+           newLabels = new ITermLabel[labels.size() + 1];
            labels.arraycopy(0, newLabels, 0, labels.size());
            newLabels[newLabels.length - 1] = LoopBodyTermLabel.INSTANCE;
-           labels = new ImmutableArray<ITermLabel>(newLabels);
+        }
+        else {
+           newLabels = new ITermLabel[labels.size()];
+           labels.arraycopy(0, newLabels, 0, labels.size());
+        }
+        // Replace symbolic execution label with a new one which has a new ID
+        for (int i = 0; i < newLabels.length; i++) {
+           if (newLabels[i] instanceof SymbolicExecutionTermLabel) {
+              newLabels[i] = new SymbolicExecutionTermLabel(SymbolicExecutionUtil.computeNextSymbolicExecutionLabelId(applicationSequent));
+           }
         }
         return TermBuilder.DF.prog(loopBodyModality, 
                                    mainJavaBlock, 
                                    result,
-                                   labels); 
+                                   new ImmutableArray<ITermLabel>(newLabels)); 
     }
 
     /**

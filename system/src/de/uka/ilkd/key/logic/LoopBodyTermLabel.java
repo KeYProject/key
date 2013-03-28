@@ -8,7 +8,7 @@ public class LoopBodyTermLabel implements ITermLabel {
    /**
     * The unique name of this label.
     */
-   public static final String NAME = "LoopBody";
+   public static final Name NAME = new Name("LoopBody");
 
    /**
     * The only instance of this class.
@@ -32,7 +32,7 @@ public class LoopBodyTermLabel implements ITermLabel {
 	 * {@inheritDoc}
 	 */
 	public String toString() {
-		return NAME;
+		return NAME.toString();
 	}
 
    /**
@@ -49,5 +49,13 @@ public class LoopBodyTermLabel implements ITermLabel {
 	@Override
    public int getChildCount() {
       return 0;
+   }
+
+	/**
+	 * {@inheritDoc}
+	 */
+   @Override
+   public Name name() {
+      return NAME;
    }
 }

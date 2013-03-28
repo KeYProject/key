@@ -2933,11 +2933,12 @@ single_label returns [ITermLabel label=null]
   String labelName = "";
   ITermLabel left = null;
   ITermLabel right = null;
+  List<String> parameters = new LinkedList<String>();
 }
 :
-  (name:IDENT {labelName=name.getText();} | star:STAR {labelName=star.getText();} ) (LPAREN param1:IDENT (COMMA param2:IDENT)* RPAREN)? 
+  (name:IDENT {labelName=name.getText();} | star:STAR {labelName=star.getText();} ) (LPAREN param1:STRING_LITERAL {parameters.add(param1.getText().substring(1,param1.getText().length()-1));} (COMMA param2:STRING_LITERAL {parameters.add(param2.getText().substring(1,param2.getText().length()-1));})* RPAREN)? 
   {
-  	label = LabelFactory.createLabel(labelName);
+  	label = LabelFactory.createLabel(labelName, parameters);
   }
  
 ;  exception

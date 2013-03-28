@@ -3,6 +3,7 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.LoopBodyTermLabel;
 import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.Term;
 
 /**
  * The {@link ITermLabelInstantiator} used during prove to define how a
@@ -25,7 +26,7 @@ public final class LoopBodyTermLabelInstantiator extends AbstractSymbolicExecuti
     * {@inheritDoc}
     */
    @Override
-   protected ITermLabel getTermLabel() {
+   protected ITermLabel getTermLabel(Term applicationTerm) {
       return LoopBodyTermLabel.INSTANCE;
    }
 
@@ -34,6 +35,6 @@ public final class LoopBodyTermLabelInstantiator extends AbstractSymbolicExecuti
     */
    @Override
    public String getName() {
-      return LoopBodyTermLabel.NAME;
+      return LoopBodyTermLabel.NAME.toString();
    }
 }

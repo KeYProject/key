@@ -39,6 +39,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -230,6 +231,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp ruleApp) throws RuleAbortException {
+   final Sequent applicationSequent = goal.sequent();
 	final KeYJavaType booleanKJT = services.getTypeConverter()
 	                                       .getBooleanType();
 	final KeYJavaType intKJT 
@@ -460,7 +462,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 //					   TB.and(new Term[]{invTerm2,
 //						   	     frameCondition,
 //						   	     variantPO}));
-	Term bodyTerm = wir.transform(this, ruleApp.posInOccurrence(), inst.progPost, TB.and(new Term[]{invTerm2, frameCondition, variantPO}), svInst, services);
+	Term bodyTerm = wir.transform(this, applicationSequent, ruleApp.posInOccurrence(), inst.progPost, TB.and(new Term[]{invTerm2, frameCondition, variantPO}), svInst, services);
 //	bodyTerm = LabelInstantiatorDispatcher.label(services, this, ruleApp.posInOccurrence(), bodyTerm);
 	final Term guardTrueBody = TB.imp(TB.box(guardJb,guardTrueTerm), 
 					  bodyTerm); 

@@ -46,6 +46,8 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -1041,20 +1043,120 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Checks if the given {@link Term} contains the {@link SymbolicExecutionTermLabel}.
+    * Checks if the given {@link Term} contains a {@link SymbolicExecutionTermLabel}.
     * @param term The {@link Term} to check.
     * @return {@code true} contains the {@link SymbolicExecutionTermLabel}, {@code false} does not contain the {@link SymbolicExecutionTermLabel} or the given {@link Term} is {@code null}.
     */
    public static boolean hasSymbolicExecutionLabel(Term term) {
+      return getSymbolicExecutionLabel(term) != null;
+   }
+   
+   /**
+    * Returns the contained {@link SymbolicExecutionTermLabel} if available.
+    * @param term The {@link Term} to search in.
+    * @return The first found {@link SymbolicExecutionTermLabel} or {@code null} if no {@link SymbolicExecutionTermLabel} is provided.
+    */
+   public static SymbolicExecutionTermLabel getSymbolicExecutionLabel(Term term) {
       if (term != null) {
          term = TermBuilder.DF.goBelowUpdates(term);
-         return term.containsLabel(SymbolicExecutionTermLabel.INSTANCE);
+         return (SymbolicExecutionTermLabel)JavaUtil.search(term.getLabels(), new IFilter<ITermLabel>() {
+            @Override
+            public boolean select(ITermLabel element) {
+               return element instanceof SymbolicExecutionTermLabel;
+            }
+         });
       }
       else {
-         return false;
+         return null;
       }
    }
    
+   /**
+    * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
+    * @param sequent The {@link Sequent} to compute the next unused ID in.
+    * @return The next unused ID of {@link SymbolicExecutionTermLabel}s.
+    */
+   public static int computeNextSymbolicExecutionLabelId(Sequent sequent) {
+      if (sequent != null) {
+         int nextAntecedent = computeNextSymbolicExecutionLabelId(sequent.antecedent());
+         int nextSuccedent = computeNextSymbolicExecutionLabelId(sequent.succedent());
+         return nextAntecedent > nextSuccedent ? nextAntecedent : nextSuccedent;
+      }
+      else {
+         return SymbolicExecutionTermLabel.START_ID;
+      }
+   }
+
+   /**
+    * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
+    * @param semisequent The {@link Semisequent} to compute the next unused ID in.
+    * @return The next unused ID of {@link SymbolicExecutionTermLabel}s.
+    */
+   public static int computeNextSymbolicExecutionLabelId(Semisequent semisequent) {
+      if (semisequent != null) {
+         int nextId = SymbolicExecutionTermLabel.START_ID;
+         for (SequentFormula sf : semisequent) {
+            int nextSfId = computeNextSymbolicExecutionLabelId(sf.formula());
+            if (nextSfId > nextId) {
+               nextId = nextSfId;
+            }
+         }
+         return nextId;
+      }
+      else {
+         return SymbolicExecutionTermLabel.START_ID;
+      }
+   }
+
+   /**
+    * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
+    * @param term The {@link Term} to compute the next unused ID in.
+    * @return The next unused ID of {@link SymbolicExecutionTermLabel}s.
+    */
+   public static int computeNextSymbolicExecutionLabelId(Term term) {
+      if (term != null) {
+         NextSymbolicExecutionLabelIdVisitor visitor = new NextSymbolicExecutionLabelIdVisitor();
+         term.execPreOrder(visitor);
+         return visitor.getNextId();
+      }
+      else {
+         return SymbolicExecutionTermLabel.START_ID;
+      }
+   }
+   
+   /**
+    * Utility class used to compute the next unused ID of {@link SymbolicExecutionTermLabel}s
+    * used by {@link SymbolicExecutionUtil#computeNextSymbolicExecutionLabelId(Term)}.
+    * @author Martin Hentschel
+    */
+   private static class NextSymbolicExecutionLabelIdVisitor extends DefaultVisitor {
+      /**
+       * The next unused ID.
+       */
+      private int nextId = SymbolicExecutionTermLabel.START_ID;
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void visit(Term visited) {
+         SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(visited);
+         if (label != null) {
+            if (label.getId() + 1 > nextId) {
+               nextId = label.getId() + 1;
+            }
+         }
+      }
+
+      /**
+       * Returns the next unused ID.
+       * @return The next unused ID.
+       */
+      public int getNextId() {
+         return nextId;
+      }
+   }
+
    /**
     * Checks if the given {@link Node} in KeY's proof tree represents
     * also a {@link Node} in a symbolic execution tree.

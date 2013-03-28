@@ -33,11 +33,11 @@ public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabe
                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
                                              JavaBlock newTermJavaBlock) {
       List<ITermLabel> instantiatedLabels = new LinkedList<ITermLabel>();
-      if (applicationTerm != null) {
-         applicationTerm = TermBuilder.DF.goBelowUpdates(applicationTerm);
-         ITermLabel termLabel = getTermLabel();
-         if (applicationTerm.containsLabel(termLabel)) {
-            if (newTermOp instanceof Modality) {
+      if (newTermOp instanceof Modality) {
+         if (applicationTerm != null) {
+            applicationTerm = TermBuilder.DF.goBelowUpdates(applicationTerm);
+            ITermLabel termLabel = getTermLabel(applicationTerm);
+            if (applicationTerm.containsLabel(termLabel)) {
                instantiatedLabels.add(termLabel);
             }
          }
@@ -47,7 +47,8 @@ public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabe
    
    /**
     * Returns the {@link ITermLabel} to work with.
+    * @param applicationTerm The {@link Term} to rewrite.
     * @return The {@link ITermLabel} to work with.
     */
-   protected abstract ITermLabel getTermLabel();
+   protected abstract ITermLabel getTermLabel(Term applicationTerm);
 }

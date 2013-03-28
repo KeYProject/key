@@ -9,17 +9,24 @@ public class SymbolicExecutionTermLabel implements ITermLabel {
    /**
     * The unique name of this label.
     */
-   public static final String NAME = "SE";
+   public static final Name NAME = new Name("SE");
 
    /**
-    * The only instance of this class.
+    * The ID for the first modality with this label.
     */
-	public static SymbolicExecutionTermLabel INSTANCE = new SymbolicExecutionTermLabel();
+   public static final int START_ID = 1;
+   
+   /**
+    * The unique ID of this term label in the {@link Sequent}.
+    */
+   private int id;
 	
 	/**
-	 * Constructor to forbid multiple instances.
+	 * Constructor.
+	 * @param id The unique ID of this term label in the {@link Sequent}.
 	 */
-	private SymbolicExecutionTermLabel() {		
+	public SymbolicExecutionTermLabel(int id) {
+	   this.id = id;
 	}
 	
 	/**
@@ -33,15 +40,18 @@ public class SymbolicExecutionTermLabel implements ITermLabel {
 	 * {@inheritDoc}
 	 */
 	public String toString() {
-		return NAME;
+		return NAME.toString();
 	}
 
    /**
     * {@inheritDoc}
     */
 	@Override
-   public ITermLabel getChild(int i) {
-      return null;
+   public Object getChild(int i) {
+	   switch (i) {
+	      case 0 : return getId();
+  	      default : return null;
+	   }
    }
 
    /**
@@ -49,6 +59,22 @@ public class SymbolicExecutionTermLabel implements ITermLabel {
     */
 	@Override
    public int getChildCount() {
-      return 0;
+      return 1;
+   }
+
+	/**
+	 * Returns the unique ID of this label in the {@link Sequent}.
+	 * @return The unique ID of this label in the {@link Sequent}.
+	 */
+   public int getId() {
+      return id;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public Name name() {
+      return NAME;
    }
 }

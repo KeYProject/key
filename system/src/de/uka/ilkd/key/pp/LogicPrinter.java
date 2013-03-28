@@ -908,7 +908,17 @@ public final class LogicPrinter {
             else {
                afterFirst = true;
             }
-            layouter.print(l.toString());
+            layouter.print(l.name().toString());
+            if (l.getChildCount()>0) {
+               layouter.print("(").beginC(2);
+               for (int i = 0; i < l.getChildCount(); i++) {
+                  layouter.print("\"" + l.getChild(i).toString() + "\"");
+                  if (i < l.getChildCount() - 1) {
+                     layouter.print(",").ind(1, 2);
+                  }
+               }
+               layouter.end().print(")");
+            }
         }
         layouter.end().print(">>");
     }

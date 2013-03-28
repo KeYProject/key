@@ -2,6 +2,8 @@ package de.uka.ilkd.key.rule;
 
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * The {@link ITermLabelInstantiator} used during prove to define how a
@@ -24,8 +26,8 @@ public final class SymbolicExecutionTermLabelInstantiator extends AbstractSymbol
     * {@inheritDoc}
     */
    @Override
-   protected ITermLabel getTermLabel() {
-      return SymbolicExecutionTermLabel.INSTANCE;
+   protected ITermLabel getTermLabel(Term applicationTerm) {
+      return SymbolicExecutionUtil.getSymbolicExecutionLabel(applicationTerm);
    }
 
    /**
@@ -33,6 +35,6 @@ public final class SymbolicExecutionTermLabelInstantiator extends AbstractSymbol
     */
    @Override
    public String getName() {
-      return SymbolicExecutionTermLabel.NAME;
+      return SymbolicExecutionTermLabel.NAME.toString();
    }
 }
