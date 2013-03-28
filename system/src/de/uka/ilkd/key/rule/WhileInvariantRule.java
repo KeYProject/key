@@ -188,12 +188,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 	    anonUpdate = TB.anonUpd(heap, services, mod, anonHeap);
 	}
 
-	final Term assumption =
-                TB.equals(TB.anon(services, TB.var(heap), mod, anonHeap),
-                          loopHeap);
-
-	return new AnonUpdateData(
-	        assumption, anonUpdate, loopHeap, TB.getBaseHeap(services), anonHeap);
+	return new AnonUpdateData(anonUpdate, loopHeap, TB.getBaseHeap(services), anonHeap);
     }
 
     private static boolean checkFocus(final Term progPost) {
@@ -556,7 +551,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         //prepare anon update, frame condition, etc.
         Term anonUpdate = createLocalAnonUpdate(localOuts, services); // can still be null
-        Term anonAssumption = null;
+        //Term anonAssumption = null;
         Term wellFormedAnon = null;
         Term frameCondition = null;
         Term reachableState = null;
@@ -566,11 +561,6 @@ public final class WhileInvariantRule implements BuiltInRule {
             final AnonUpdateData tAnon
             = createAnonUpdate(heap, inst.inv, mods.get(heap), services);
             anonUpdateDatas = anonUpdateDatas.append(tAnon);
-            if(anonAssumption == null) {
-                anonAssumption = tAnon.assumption;
-            } else {
-                anonAssumption = TB.and(anonAssumption,tAnon.assumption);
-            }
             if(anonUpdate == null) {
                 anonUpdate = tAnon.anonUpdate;
             }else{
@@ -866,15 +856,13 @@ public final class WhileInvariantRule implements BuiltInRule {
     
     private static class AnonUpdateData {
 
-        public final Term assumption, anonUpdate, anonHeap, loopHeap, loopHeapAtPre;
+        public final Term anonUpdate, anonHeap, loopHeap, loopHeapAtPre;
 
 
-        public AnonUpdateData(Term assumption,
-                              Term anonUpdate,
+        public AnonUpdateData(Term anonUpdate,
                               Term loopHeap,
                               Term loopHeapAtPre,
                               Term anonHeap) {
-            this.assumption = assumption;
             this.anonUpdate = anonUpdate;
             this.loopHeap = loopHeap;
             this.loopHeapAtPre = loopHeapAtPre;
