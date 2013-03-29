@@ -109,6 +109,10 @@
             </with>
          </enabledWhen>
       </handler>
+      <handler
+            class="org.key_project.keyide.ui.handlers.ApplyRuleHandler"
+            commandId="org.key_project.keyide.ui.commands.applyrule">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -270,6 +274,11 @@
             </visibleWhen>
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            class="org.key_project.keyide.ui.editor.TacletContextMenu"
+            locationURI="popup:#KeYEditorContext?after=additions">
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -301,6 +310,12 @@
             description="Prunes the current prove at the selected position."
             id="org.key_project.keyide.ui.commands.pruneProof"
             name="Prune Proof">
+      </command>
+      <command
+            categoryId="org.key_project.keyide.ui.commands.category"
+            description="Applies a Rule"
+            id="org.key_project.keyide.ui.commands.applyrule"
+            name="Apply Rule">
       </command>
    </extension>
    <extension
@@ -414,24 +429,6 @@
             properties="isClosed"
             type="org.eclipse.jface.viewers.StructuredSelection">
       </propertyTester>
-   </extension>
-   <extension
-         point="org.eclipse.ui.popupMenus">
-      <viewerContribution
-            id="org.key_project.keyide.ui.ruleContextMenu"
-            targetID="org.key_project.keyide.ui.editor">
-         <menu
-               icon="icons/releng_gears.gif"
-               id="org.key_project.keyide.ui.rules"
-               label="Applicable rules">
-         </menu>
-         <action
-               class="org.key_project.keyide.ui.Cut"
-               icon="icons/prune.png"
-               id="org.key_project.keyide.ui.cut"
-               label="Cut">
-         </action>
-      </viewerContribution>
    </extension>
 
 </plugin>

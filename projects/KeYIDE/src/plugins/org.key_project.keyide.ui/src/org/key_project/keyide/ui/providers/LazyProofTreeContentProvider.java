@@ -95,8 +95,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void smtDataUpdate(ProofTreeEvent e) {
-         if(!environment.getMediator().autoMode()){ // TODO: Nothing done, remove
-         }
       }
       
       /**
@@ -104,8 +102,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofStructureChanged(ProofTreeEvent e) {
-         if(!environment.getMediator().autoMode()){ // TODO: Nothing done, remove
-         }
       }
       
       /**
@@ -129,8 +125,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofIsBeingPruned(ProofTreeEvent e) {
-         if(!environment.getMediator().autoMode()){ // TODO: Nothing done, remove
-         }
       }
       
       /**
@@ -138,8 +132,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofGoalsChanged(ProofTreeEvent e) {
-         if(!environment.getMediator().autoMode()){ // TODO: Nothing done, remove
-         }
       }
       
       /**
@@ -147,8 +139,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofGoalsAdded(final ProofTreeEvent e) {
-         if(!environment.getMediator().autoMode()){ // TODO: Nothing done, remove
-         }
       }
       
       /**
@@ -156,8 +146,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofGoalRemoved(final ProofTreeEvent e) {
-         if(!environment.getMediator().autoMode()){ // TODO: Nothing done, remove
-         }
       }
       
       /**
@@ -165,18 +153,17 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofExpanded(final ProofTreeEvent e) {
-         if(!environment.getMediator().autoMode()){ // TODO: Nothing done, remove
+         if(!environment.getMediator().autoMode()){
+            viewer.getControl().getDisplay().asyncExec(new Runnable() {
+               
+               @Override
+               public void run() {
+                  viewer.refresh();
+
+               }
+            });
          }
-         Display.getDefault().asyncExec(new Runnable() {
-            
-            /**
-             * {@inheritDoc}
-             */
-            @Override
-            public void run() {
-            }
-            
-         });
+         
       }
       
       /**
@@ -184,8 +171,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
        */
       @Override
       public void proofClosed(final ProofTreeEvent e) {
-         if(!environment.getMediator().autoMode()){ // TODO: Nothing done, remove
-         }
       }
    };
    
@@ -262,6 +247,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       }
       if(element instanceof Node){
          viewer.setChildCount(element, 0); // TODO: Set real number of children, maybe this explains why refresh must be called twice when the auto mode stopps
+         //should already be the right number of children because treeNodes shouldnt have any children.
       }
       if(element instanceof BranchFolder) {
          BranchFolder branchFolder = (BranchFolder) element;
@@ -290,26 +276,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       proof.removeProofTreeListener(proofTreeListener);
       environment.getMediator().removeAutoModeListener(autoModeListener);
    }
-
-
-   /**
-    * Creates the required {@link BranchFolder}s for the given {@link Node}. Ensure that the {@link Node} is the last {@link Node} of its branch and that it has more then one child {@link Node}.
-    * @param node - the last {@link Node} of a branch.
-    */
-   private void createFolder(Node node){ // TODO: Dead code, remove
-      for(int i = 0; i < node.childrenCount(); i++){
-         BranchFolder parentBranchFolder = getBranchFolder(node);
-         BranchFolder branchFolder = new BranchFolder(node.child(i));
-         branchFolders.put(node.child(i), branchFolder);
-         int nodeIndex = getNodeIndexInBranch(node);
-         if(parentBranchFolder == null)
-            viewer.replace(node.proof(), nodeIndex+i+1, branchFolder);
-         else
-            viewer.replace(parentBranchFolder, nodeIndex+i+1, branchFolder);
-         viewer.setChildCount(branchFolder, 1);
-         viewer.replace(branchFolder,0 , node.child(i));
-      }
-   }
    
    
    private void prune(Node node){
@@ -329,71 +295,27 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       }
    }
    
-
-   /**
-    * Manages the whole tree expansion by calling the specified method for the given {@link Node}.
-    * @param node - the {@link Node} that has to be expanded.
-    */
-   @SuppressWarnings("unused")
-   private void expanded(Node node){ // TODO: Dead code, remove
-      if(isBranchNodeRoot(node)){
-         expandedRoot(node);
-      }
-      else expandedFolder(node);
-   }
-   
-   
-   /**
-    * Manages the expansion of the tree when the branch root of the given {@link Node} is a {@link BranchFolder}. 
-    * @param node - the {@link Node} that has to be expanded.
-    */
-   private void expandedFolder(Node node){ // TODO: Dead code, remove
-      BranchFolder branchFolder = getBranchFolder(node);
-      int index = getNodeIndexInBranch(node);
-      int size = getBranchFolderChildCount(node);
-      viewer.setChildCount(branchFolder, size);
-      viewer.replace(branchFolder, index, node);
-      if(index == size-2 && node.childrenCount() == 1){       
-         viewer.replace(branchFolder, index+1, node.child(0));
-      }
-      else if(index == size-1 && node.childrenCount() > 1){
-         createFolder(node);
-      }
-   }
-
-
-   /**
-    * Manages the expansion of the tree when the branch root of the given {@link Node} is a {@link Proof}.
-    * @param node - the {@link Node} that has to be expanded.
-    */
-   private void expandedRoot(Node node){ // TODO: Dead code, remove
-      int index = getNodeIndexInBranch(node);
-      int size = getBranchFolderChildCount(node);
-      viewer.setChildCount(node.proof(), size);
-      viewer.replace(node.proof(), index, node);
-      
-      if(index == size-2 && node.childrenCount() == 1){
-         viewer.replace(node.proof(), index+1, node.child(0));
-      }
-      else if(index == size-1 && node.childrenCount() > 1){
-         viewer.setChildCount(node.proof(), size+node.childrenCount());
-         createFolder(node);
-      }
-   }
-
-
-   /**
-    * Returns the {@link BranchFolder} of the given {@link Node}.
-    * @param node - any {@link Node out of a branch}
-    * @return the {@link BranchFolder} of the given {@link Node}. Null if the branchFolder of the branch is the {@link Proof}.
-    */
-   private BranchFolder getBranchFolder(Node node){
-      Node branchNode = getBranchNode(node);
-      if(branchNode.equals(node.proof().root()))
-         return null;
-      else
-         return branchFolders.get(branchNode);
-   }
+// private void prune(Node node){
+// TreeViewerIterator it = new TreeViewerIterator(viewer);
+// boolean notFound = true;
+// TreeItem element;
+// while(it.hasNext() && notFound){
+//    element = it.next();
+//    System.out.println(element.getData().g);
+//    if(element.getData() instanceof BranchFolder){
+//       if(((BranchFolder)element.getData()).getChild().equals(node)){
+//          viewer.refresh(element);
+//          notFound = false;
+//       }
+//    }
+//    if(element.getData() instanceof Node){
+//       if(element.getData().equals(node)){
+//          viewer.refresh(element);
+//          notFound = false;
+//       }
+//    }
+// }
+//}
    
    
    /**
@@ -500,6 +422,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
                found = true;
             }
             else {
+               
                current = current.child(0);
                index++;
             }
@@ -534,32 +457,6 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
       else return -1;
    }
    
-   
-   /**
-    * Returns the index of the given {@link Node} in its branch.
-    * @param node - any node of a branch.
-    * @return the index of the given {@link Node} in its branch.
-    */
-   private int getNodeIndexInBranch(Node node){
-      Node branchNode = getBranchNode(node);
-      int count = 0;
-      while(!node.equals(branchNode) && branchNode.childrenCount() == 1){
-         branchNode = branchNode.child(0);
-         count += 1;
-      }
-      return count;
-   }
-   
-   
-   /**
-    * Returns true iff the branch{@link Node} of the given {@link Node} is the {@link Proof}s root{@link Node}. Else false.
-    * @param node - any node of a branch
-    * @return true iff the branch{@link Node} of the given {@link Node} is the {@link Proof}s root{@link Node}. Else false.
-    */
-   private boolean isBranchNodeRoot(Node node){
-      node = getBranchNode(node);
-      return node.equals(node.proof().root());
-   }
    
    /**
     * Checks if the viewer is currently refreshed after stopping the auto mode. 

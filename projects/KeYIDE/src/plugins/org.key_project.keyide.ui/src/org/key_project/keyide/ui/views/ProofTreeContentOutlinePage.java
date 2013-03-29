@@ -32,10 +32,15 @@ import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
  * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
  */
 public class ProofTreeContentOutlinePage extends ContentOutlinePage {
+   
    private Proof proof;
    
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    
+   
+   /**
+    * {@link KeYSelectionListener} to sync the KeYSelection with the treeselection.
+    */
    private KeYSelectionListener listener = new KeYSelectionListener() {
       @Override
       public void selectedProofChanged(KeYSelectionEvent e) {

@@ -82,38 +82,7 @@ public class OutlineContentAndLabelProviderTest extends TestCase {
       }
    }
    
-   protected void assertTreeItem(Tree tree, TreeItem item, NodePreorderIterator nodeIter) {
-      // Test item
-      tree.showItem(item);
-      Object obj = item.getData();
-      // TODO: Iterate in parallel over the real proof tree and make sure that the shown item is the expected one based on the current node in the proof tree
-      if (obj instanceof Proof) {
-         System.out.println("Proof: " + obj);
-      }
-      else if (obj instanceof Node) {
-         Node node = (Node)obj;
-         Node proofNode = null;
-         System.out.println("Node: " + node.serialNr());
-         if(nodeIter.hasNext()){
-            proofNode = nodeIter.next();
-         }
-         assertTrue(node.equals(proofNode));
-      }
-      else if (obj instanceof BranchFolder) {
-         BranchFolder bf = (BranchFolder) obj;
-         System.out.println("BranchFolder of " + bf.getChild().serialNr());
-         System.out.println();
-//         assertTrue(bf.getChild().parent().equals(nodeIter));
-      }
-      else {
-         fail("Unexpected Object \"" + obj + "\" of TreeItem \"" + item + "\".");
-      }
-      // Test children
-//      TreeItem[] children = item.getItems();
-//      for (TreeItem child : children) {
-//         assertTreeItem(tree, child, nodeIter);
-//      }
-   }
+
    
    /**
     * Searches a {@link IProgramMethod} in the given {@link Services}.
@@ -137,5 +106,33 @@ public class OutlineContentAndLabelProviderTest extends TestCase {
       });
       assertNotNull(pm);
       return pm;
+   }
+   
+   
+   /**
+    * Compares a TreeViewer tree item with a proof node. 
+    * @param tree - the {@link Tree} of the {@link TreeItem}
+    * @param item - the {@link TreeItem} to be compared.
+    * @param nodeIter - the {@link NodePreorderIterator} of the proof to be compared.
+    */
+   protected void assertTreeItem(Tree tree, TreeItem item, NodePreorderIterator nodeIter) {
+      // Test item
+      tree.showItem(item);
+      Object obj = item.getData();
+      if (obj instanceof Node) {
+         Node node = (Node)obj;
+         Node proofNode = null;
+         if(nodeIter.hasNext()){
+            proofNode = nodeIter.next();
+         }
+         assertTrue(node.equals(proofNode));
+      }
+      else if (obj instanceof BranchFolder) {
+         BranchFolder bf = (BranchFolder) obj;
+         assertTrue(bf.getChild().parent().equals(nodeIter));
+      }
+      else {
+         fail("Unexpected Object \"" + obj + "\" of TreeItem \"" + item + "\".");
+      }
    }
 }
