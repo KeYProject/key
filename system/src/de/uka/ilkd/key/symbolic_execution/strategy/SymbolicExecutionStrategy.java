@@ -3,15 +3,20 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.LoopBodyTermLabel;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.ScaleFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsLabelFeature;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 //TODO: Discuss settings and improve the code layout.
 /**
@@ -124,10 +129,17 @@ public class SymbolicExecutionStrategy extends VBTStrategy {
      */
     @Override
     protected Feature setupGlobalF(Feature dispatcher, Proof p_proof) {
-        // Make sure that the modality which executes a loop body is preferred against the modalities which executes special loop terminations like return, exceptions or break. 
         Feature globalF = super.setupGlobalF(dispatcher, p_proof);
-        return add(globalF, 
-                   ifZero(containsTermLabel(LoopBodyTermLabel.INSTANCE), longConst(-2000)));
+        // Make sure that modalities without symbolic execution label are executed first because they might forbid rule application on modalities with symbolic execution label (see loop body branches)
+        globalF = add(globalF, ifZero(not(new BinaryFeature() {
+           @Override
+           protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+              return pos != null && SymbolicExecutionUtil.hasSymbolicExecutionLabel(pos.subTerm());
+           }
+        }), longConst(-3000)));
+        // Make sure that the modality which executes a loop body is preferred against the modalities which executes special loop terminations like return, exceptions or break. 
+        globalF = add(globalF, ifZero(containsTermLabel(LoopBodyTermLabel.INSTANCE), longConst(-2000)));
+        return globalF;
     }
 
     public Name name() {
