@@ -153,10 +153,10 @@ public class TermLabelInstantiatorDispatcher {
     * @return The {@link ITermLabelInstantiator} or {@code null} if not available.
     */
    public static ITermLabelInstantiator getInstantiator(String name) {
-      if (SymbolicExecutionTermLabel.NAME.equals(name)) {
+      if (SymbolicExecutionTermLabel.NAME.toString().equals(name)) {
          return SymbolicExecutionTermLabelInstantiator.INSTANCE;
       }
-      else if (LoopBodyTermLabel.NAME.equals(name)) {
+      else if (LoopBodyTermLabel.NAME.toString().equals(name)) {
          return LoopBodyTermLabelInstantiator.INSTANCE;
       }
       else {
