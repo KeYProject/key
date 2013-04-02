@@ -477,7 +477,7 @@ public class SymbolicExecutionTreeBuilder {
                      list.add(condition);
                      keyNodeBranchConditionMapping.put(childNode, condition);
                      // Set call stack on new created node
-                     condition.setCallStack(createCallStack(childNode.getAppliedRuleApp()));
+                     condition.setCallStack(createCallStack(visitedNode.getAppliedRuleApp()));
                   }
                }
             }
