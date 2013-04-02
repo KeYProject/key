@@ -37,7 +37,7 @@ public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabe
          if (applicationTerm != null) {
             applicationTerm = TermBuilder.DF.goBelowUpdates(applicationTerm);
             ITermLabel termLabel = getTermLabel(applicationTerm);
-            if (applicationTerm.containsLabel(termLabel)) {
+            if (termLabel != null && applicationTerm.containsLabel(termLabel)) {
                instantiatedLabels.add(termLabel);
             }
          }
