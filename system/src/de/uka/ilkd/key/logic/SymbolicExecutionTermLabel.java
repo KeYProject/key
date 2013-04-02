@@ -40,7 +40,7 @@ public class SymbolicExecutionTermLabel implements ITermLabel {
 	 * {@inheritDoc}
 	 */
 	public String toString() {
-		return NAME.toString();
+		return NAME.toString() + "(" + getId() + ")";
 	}
 
    /**

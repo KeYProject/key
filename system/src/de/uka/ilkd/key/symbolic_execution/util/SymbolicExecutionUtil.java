@@ -1029,23 +1029,32 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Checks if the {@link Term} on which the {@link RuleApp} was applied contains the {@link SymbolicExecutionTermLabel}.
+    * Checks if the {@link Term} on which the {@link RuleApp} was applied contains a {@link SymbolicExecutionTermLabel}.
     * @param ruleApp The {@link RuleApp} to check.
-    * @return {@code true} contains the {@link SymbolicExecutionTermLabel}, {@code false} does not contain the {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is {@code null}.
+    * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not contain a {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is {@code null}.
     */
    public static boolean hasSymbolicExecutionLabel(RuleApp ruleApp) {
+      return getSymbolicExecutionLabel(ruleApp) != null;
+   }
+   
+   /**
+    * Returns the contained {@link SymbolicExecutionTermLabel} if available.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @return The first found {@link SymbolicExecutionTermLabel} or {@code null} if no {@link SymbolicExecutionTermLabel} is provided.
+    */
+   public static SymbolicExecutionTermLabel getSymbolicExecutionLabel(RuleApp ruleApp) {
       if (ruleApp != null && ruleApp.posInOccurrence() != null) {
-         return hasSymbolicExecutionLabel(ruleApp.posInOccurrence().subTerm());
+         return getSymbolicExecutionLabel(ruleApp.posInOccurrence().subTerm());
       }
       else {
-         return false;
+         return null;
       }
    }
    
    /**
     * Checks if the given {@link Term} contains a {@link SymbolicExecutionTermLabel}.
     * @param term The {@link Term} to check.
-    * @return {@code true} contains the {@link SymbolicExecutionTermLabel}, {@code false} does not contain the {@link SymbolicExecutionTermLabel} or the given {@link Term} is {@code null}.
+    * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not contain a {@link SymbolicExecutionTermLabel} or the given {@link Term} is {@code null}.
     */
    public static boolean hasSymbolicExecutionLabel(Term term) {
       return getSymbolicExecutionLabel(term) != null;
@@ -1071,6 +1080,118 @@ public final class SymbolicExecutionUtil {
       }
    }
    
+   /**
+    * Searches the modality {@link Term} with the maximal {@link SymbolicExecutionTermLabel} ID
+    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Sequent}.
+    * @param sequent The {@link Sequent} to search in.
+    * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
+    */
+   public static Term findModalityWithMaxSymbolicExecutionLabelId(Sequent sequent) {
+      if (sequent != null) {
+         Term nextAntecedent = findModalityWithMaxSymbolicExecutionLabelId(sequent.antecedent());
+         Term nextSuccedent = findModalityWithMaxSymbolicExecutionLabelId(sequent.succedent());
+         if (nextAntecedent != null) {
+            if (nextSuccedent != null) {
+               SymbolicExecutionTermLabel antecedentLabel = getSymbolicExecutionLabel(nextAntecedent);
+               SymbolicExecutionTermLabel succedentLabel = getSymbolicExecutionLabel(nextSuccedent);
+               return antecedentLabel.getId() > succedentLabel.getId() ? nextAntecedent : nextSuccedent;
+            }
+            else {
+               return nextAntecedent;
+            }
+         }
+         else {
+            return nextSuccedent;
+         }
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Searches the modality {@link Term} with the maximal {@link SymbolicExecutionTermLabel} ID
+    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Semisequent}.
+    * @param semisequent The {@link Semisequent} to search in.
+    * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
+    */
+   public static Term findModalityWithMaxSymbolicExecutionLabelId(Semisequent semisequent) {
+      if (semisequent != null) {
+         int maxId = Integer.MIN_VALUE;
+         Term modality = null;
+         for (SequentFormula sf : semisequent) {
+            Term current = findModalityWithMaxSymbolicExecutionLabelId(sf.formula());
+            if (current != null) {
+               SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(current);
+               if (modality == null || label.getId() > maxId) {
+                  modality = current;
+                  maxId = label.getId();
+               }
+            }
+         }
+         return modality;
+      }
+      else {
+         return null;
+      }
+   }
+
+   /**
+    * Searches the modality {@link Term} with the maximal {@link SymbolicExecutionTermLabel} ID
+    * {@link SymbolicExecutionTermLabel#getId()} in the given {@link Term}.
+    * @param term The {@link Term} to search in.
+    * @return The modality {@link Term} with the maximal ID if available or {@code null} otherwise.
+    */
+   public static Term findModalityWithMaxSymbolicExecutionLabelId(Term term) {
+      if (term != null) {
+         FindModalityWithMaxSymbolicExecutionLabelId visitor = new FindModalityWithMaxSymbolicExecutionLabelId();
+         term.execPreOrder(visitor);
+         return visitor.getModality();
+      }
+      else {
+         return null;
+      }
+   }
+   
+   /**
+    * Utility class used to find the maximal modality Term
+    * used by {@link SymbolicExecutionUtil#findModalityWithMaxSymbolicExecutionLabelId(Term)}.
+    * @author Martin Hentschel
+    */
+   private static final class FindModalityWithMaxSymbolicExecutionLabelId extends DefaultVisitor {
+      /**
+       * The modality {@link Term} with the maximal ID.
+       */
+      private Term modality;
+      
+      /**
+       * The maximal ID.
+       */
+      private int maxId;
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void visit(Term visited) {
+         SymbolicExecutionTermLabel label = getSymbolicExecutionLabel(visited);
+         if (label != null) {
+            if (modality == null || label.getId() > maxId) {
+               modality = visited;
+               maxId = label.getId();
+            }
+         }
+      }
+
+      /**
+       * Returns the modality {@link Term} with the maximal ID.
+       * @return The modality {@link Term} with the maximal ID.
+       */
+      public Term getModality() {
+         return modality;
+      }
+   }
+
    /**
     * Computes the next unused ID of {@link SymbolicExecutionTermLabel}s.
     * @param sequent The {@link Sequent} to compute the next unused ID in.
@@ -1129,7 +1250,7 @@ public final class SymbolicExecutionUtil {
     * used by {@link SymbolicExecutionUtil#computeNextSymbolicExecutionLabelId(Term)}.
     * @author Martin Hentschel
     */
-   private static class NextSymbolicExecutionLabelIdVisitor extends DefaultVisitor {
+   private static final class NextSymbolicExecutionLabelIdVisitor extends DefaultVisitor {
       /**
        * The next unused ID.
        */

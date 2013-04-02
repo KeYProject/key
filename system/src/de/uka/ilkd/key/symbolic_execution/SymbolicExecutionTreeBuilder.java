@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -20,6 +21,7 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -152,9 +154,10 @@ public class SymbolicExecutionTreeBuilder {
    private Map<Node, ExecutionBranchCondition> keyNodeBranchConditionMapping = new HashMap<Node, ExecutionBranchCondition>();
    
    /**
-    * Represents the method call stack of the current branch in KeY's proof tree.
+    * Contains the method call stacks for each tracked symbolic execution modality.
+    * As key is {@link SymbolicExecutionTermLabel#getId()} used.
     */
-   private LinkedList<Node> methodCallStack = new LinkedList<Node>();
+   private Map<Integer, LinkedList<Node>> methodCallStackMap = new HashMap<Integer, LinkedList<Node>>();
    
    /**
     * Contains the exception variable which is used to check if the executed program in proof terminates normally.
@@ -217,11 +220,17 @@ public class SymbolicExecutionTreeBuilder {
       if (modalityTerms.size() >= 2) {
          throw new IllegalStateException("Sequent contains multiple modalities.");
       }
+      // Make sure that modality has symbolic execution label
+      Term modalityTerm = modalityTerms.get(0);
+      SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(modalityTerm);
+      if (label == null) {
+         throw new IllegalStateException("Modality \"" + modalityTerm + "\" has no symbolic execution term label.");
+      }
       // Check if modality contains method frames
       if (!modalityTerms.isEmpty()) {
-         Term modalityTerm = modalityTerms.get(0);
          JavaBlock javaBlock = modalityTerm.javaBlock();
          final ProgramElement program = javaBlock.program(); 
+         final LinkedList<Node> methodCallStack = getMethodCallStack(label);
          new JavaASTVisitor(program, services) {
             @Override
             protected void doDefaultAction(SourceElement node) {
@@ -238,7 +247,47 @@ public class SymbolicExecutionTreeBuilder {
          }.run();
       }
    }
-   
+
+   /**
+    * Returns the method call stack. If not already
+    * available an empty method call stack is created.
+    * @param ruleApp The {@link RuleApp} which modifies a modality {@link Term} with a {@link SymbolicExecutionTermLabel}.
+    * @return The method call stack of the ID of the modified modality {@link Term} with a {@link SymbolicExecutionTermLabel}.
+    */
+   protected LinkedList<Node> getMethodCallStack(RuleApp ruleApp) {
+      SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(ruleApp);
+      return getMethodCallStack(label);
+   }
+
+   /**
+    * Returns the method call stack. If not already
+    * available an empty method call stack is created.
+    * @param label The {@link SymbolicExecutionTermLabel} which provides the ID.
+    * @return The method call stack of the ID of the given {@link SymbolicExecutionTermLabel}.
+    */
+   protected LinkedList<Node> getMethodCallStack(SymbolicExecutionTermLabel label) {
+      assert label != null : "No symbolic execuion term label provided";
+      return getMethodCallStack(label.getId());
+   }
+
+   /**
+    * Returns the method call stack used for the given ID. If not already
+    * available an empty method call stack is created.
+    * @param id The ID.
+    * @return The method call stack of the given ID.
+    */
+   protected LinkedList<Node> getMethodCallStack(int id) {
+      synchronized (methodCallStackMap) {
+         Integer key = Integer.valueOf(id);
+         LinkedList<Node> result = methodCallStackMap.get(key);
+         if (result == null) {
+            result = new LinkedList<Node>();
+            methodCallStackMap.put(key, result);
+         }
+         return result;
+      }
+   }
+
    /**
     * Frees all resources. If this method is called it is no longer possible
     * to use the {@link SymbolicExecutionTreeBuilder} instance! Later usage
@@ -257,9 +306,9 @@ public class SymbolicExecutionTreeBuilder {
          keyNodeBranchConditionMapping.clear();
          keyNodeBranchConditionMapping = null;
       }
-      if (methodCallStack!= null) {
-         methodCallStack.clear();
-         methodCallStack = null;
+      if (methodCallStackMap != null) {
+         methodCallStackMap.clear();
+         methodCallStackMap = null;
       }
       exceptionVariable = null;
       proof = null;
@@ -373,7 +422,7 @@ public class SymbolicExecutionTreeBuilder {
                      list.add(condition);
                      keyNodeBranchConditionMapping.put(childNode, condition);
                      // Set call stack on new created node
-                     condition.setCallStack(createCallStack(childNode, childNode.getAppliedRuleApp(), childNode.getNodeInfo().getActiveStatement()));
+                     condition.setCallStack(createCallStack(childNode.getAppliedRuleApp()));
                   }
                }
             }
@@ -462,7 +511,7 @@ public class SymbolicExecutionTreeBuilder {
                keyNodeMapping.put(node, executionNode);
                parentToAddTo = executionNode;
                // Set call stack on new created node
-               executionNode.setCallStack(createCallStack(node, node.getAppliedRuleApp(), statement));
+               executionNode.setCallStack(createCallStack(node.getAppliedRuleApp()));
             }
          }
          else {
@@ -479,7 +528,7 @@ public class SymbolicExecutionTreeBuilder {
                   addChild(parentToAddTo, condition);
                   keyNodeLoopConditionMapping.put(node, condition);
                   // Set call stack on new created node
-                  condition.setCallStack(createCallStack(node, node.getAppliedRuleApp(), statement));
+                  condition.setCallStack(createCallStack(node.getAppliedRuleApp()));
                }
                parentToAddTo = condition;
             }
@@ -496,10 +545,12 @@ public class SymbolicExecutionTreeBuilder {
     */
    protected void updateCallStack(Node node, 
                                   SourceElement statement) {
-      if (SymbolicExecutionUtil.hasSymbolicExecutionLabel(node.getAppliedRuleApp()) &&
+      SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(node.getAppliedRuleApp());
+      if (label != null && 
           SymbolicExecutionUtil.isMethodCallNode(node, node.getAppliedRuleApp(), statement, true)) {
          // Remove outdated methods from call stack
          int currentLevel = SymbolicExecutionUtil.computeStackSize(node.getAppliedRuleApp());
+         LinkedList<Node> methodCallStack = getMethodCallStack(label);
          while (methodCallStack.size() > currentLevel) {
             methodCallStack.removeLast();
          }
@@ -560,33 +611,109 @@ public class SymbolicExecutionTreeBuilder {
          }
          else if (SymbolicExecutionUtil.isUseLoopInvariant(node, node.getAppliedRuleApp())) {
             result = new ExecutionUseLoopInvariant(mediator, node);
+            // Initialize new call stack of the preserves loop invariant branch
+            initNewLoopBodyMethodCallStack(node);
          }
       }
       return result;
    }
    
    /**
-    * Computes the method call stack of the given {@link Node}.
-    * @param node The {@link Node}.
-    * @param ruleApp The applied {@link RuleApp} on the given {@link Node}.
-    * @param statement The active statement of the given {@link Node}.
+    * This method initializes the method call stack of loop body modalities
+    * with the values from the original call stack. For each {@link MethodFrame}
+    * in the new modality is its method call {@link Node} added to the new
+    * method call stack.
+    * @param node The {@link Node} on which the loop invariant rule is applied.
+    */
+   protected void initNewLoopBodyMethodCallStack(Node node) {
+      Term newModality = SymbolicExecutionUtil.findModalityWithMaxSymbolicExecutionLabelId(node.child(1).sequent());
+      assert newModality != null;
+      SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(newModality);
+      assert label != null;
+      JavaBlock jb = newModality.javaBlock();
+      MethodFrameCounterJavaASTVisitor counter = new MethodFrameCounterJavaASTVisitor(jb.program(), proof.getServices());
+      int count = counter.run();
+      LinkedList<Node> currentMethodCallStack = getMethodCallStack(node.getAppliedRuleApp());
+      LinkedList<Node> newMethodCallStack = getMethodCallStack(label.getId());
+      assert newMethodCallStack.isEmpty() : "Method call stack is not empty.";
+      ListIterator<Node> currentIter = currentMethodCallStack.listIterator(currentMethodCallStack.size());
+      for (int i = 0; i < count; i++) {
+         assert currentIter.hasPrevious();
+         newMethodCallStack.add(currentIter.previous());
+      }
+   }
+   
+   /**
+    * Utility class used in {@link SymbolicExecutionTreeBuilder#initNewLoopBodyMethodCallStack(Node)}
+    * to compute the number of available {@link MethodFrame}s.
+    * @author Martin Hentschel
+    */
+   private static final class MethodFrameCounterJavaASTVisitor extends JavaASTVisitor {
+      /**
+       * The number of {@link MethodFrame}s.
+       */
+      private int count = 0;
+      
+      /**
+       * Constructor.
+       * @param root The {@link ProgramElement} to count the contained {@link MethodFrame}s.
+       * @param services The {@link Services} to use.
+       */
+      public MethodFrameCounterJavaASTVisitor(ProgramElement root, Services services) {
+         super(root, services);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      protected void doDefaultAction(SourceElement node) {
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public void performActionOnMethodFrame(MethodFrame x) {
+         count++;
+      }
+
+      /**
+       * Performs the counting of {@link MethodFrame}s.
+       * @return The number of found {@link MethodFrame}s.
+       */
+      public int run() {
+         walk(root());
+         return count;
+      }
+   }
+   
+   /**
+    * Computes the method call stack of the given {@link RuleApp}.
+    * @param ruleApp The applied {@link RuleApp}.
     * @return The computed method call stack.
     */
-   protected IExecutionNode[] createCallStack(Node node, RuleApp ruleApp, SourceElement statement) {
+   protected IExecutionNode[] createCallStack(RuleApp ruleApp) {
       // Compute number of call stack size
       int size = SymbolicExecutionUtil.computeStackSize(ruleApp);
-      // Add call stack entries
-      List<IExecutionNode> callStack = new LinkedList<IExecutionNode>();
-      Iterator<Node> stackIter = methodCallStack.iterator();
-      for (int i = 0; i < size; i++) {
-         Node stackEntry = stackIter.next();
-         if (stackEntry != proof.root()) { // Ignore call stack entries provided by the initial sequent
-            IExecutionNode executionNode = getExecutionNode(stackEntry);
-            assert executionNode != null : "Can't find execution node for KeY's proof node \"" + stackEntry + "\".";
-            callStack.add(executionNode);
+      if (size >= 1) {
+         // Add call stack entries
+         List<IExecutionNode> callStack = new LinkedList<IExecutionNode>();
+         LinkedList<Node> methodCallStack = getMethodCallStack(ruleApp);
+         Iterator<Node> stackIter = methodCallStack.iterator();
+         for (int i = 0; i < size; i++) {
+            Node stackEntry = stackIter.next();
+            if (stackEntry != proof.root()) { // Ignore call stack entries provided by the initial sequent
+               IExecutionNode executionNode = getExecutionNode(stackEntry);
+               assert executionNode != null : "Can't find execution node for KeY's proof node \"" + stackEntry + "\".";
+               callStack.add(executionNode);
+            }
          }
+         return callStack.toArray(new IExecutionNode[callStack.size()]);
       }
-      return callStack.toArray(new IExecutionNode[callStack.size()]);
+      else {
+         return new IExecutionNode[0];
+      }
    }
 
    /**
@@ -597,9 +724,10 @@ public class SymbolicExecutionTreeBuilder {
     */
    protected Node findMethodCallNode(Node currentNode, RuleApp ruleApp) {
       // Compute the stack frame size before the method is called
-      final int returnStackSize = SymbolicExecutionUtil.computeStackSize(ruleApp) - 1;
+      int returnStackSize = SymbolicExecutionUtil.computeStackSize(ruleApp) - 1;
       // Return the method from the call stack
       if (returnStackSize >= 0) {
+         LinkedList<Node> methodCallStack = getMethodCallStack(ruleApp);
          return methodCallStack.get(returnStackSize);
       }
       else {
