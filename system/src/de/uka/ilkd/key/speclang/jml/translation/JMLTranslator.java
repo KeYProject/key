@@ -117,6 +117,7 @@ final class JMLTranslator {
         VALUES ("\\values"),
         INDEX ("\\index"),
         INDEX_OF ("\\indexOf"),
+        SEQ_CONST ("\\seq"),
         SEQ_GET ("\\seq_get"),
         SEQ_CONCAT ("\\seq_concat"),
         REACH ("reach"),
@@ -133,6 +134,8 @@ final class JMLTranslator {
         BREAKS ("breaks"),
         CONTINUES ("continues"),
         RETURNS ("returns"),
+
+        // information flow
         RESPECTS ("respects");
 
         private final String jmlName;
@@ -716,6 +719,32 @@ final class JMLTranslator {
             }
         });
         
+        translationMethods.put(JMLKeyWord.SEQ_CONST, new JMLTranslationMethod() {
+
+            @Override
+            public Object translate(SLTranslationExceptionManager excManager,
+                                    Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, ImmutableList.class, Services.class);
+                ImmutableList<SLExpression> exprList =
+                        (ImmutableList<SLExpression>) params[0];
+                Services services = (Services) params[1];
+
+                ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
+                for (SLExpression expr : exprList) {
+                    if (expr.isTerm()) {
+                        Term t = expr.getTerm();
+                        terms = terms.append(t);
+                    } else {
+                        throw excManager.createException("Not a term: " + expr);
+                    }
+                }
+                final KeYJavaType seqtype =
+                        services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
+                return new SLExpression(TB.seq(services, terms), seqtype);
+            }
+        });
+
         translationMethods.put(JMLKeyWord.SEQ_GET, new JMLTranslationMethod() {
 
             @Override
