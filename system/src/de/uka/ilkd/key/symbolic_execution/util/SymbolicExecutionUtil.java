@@ -49,6 +49,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.LoopBodyTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -1026,6 +1027,27 @@ public final class SymbolicExecutionUtil {
       return ruleApp != null && // Do not handle open goal nodes without applied rule
              statement instanceof LoopStatement && 
              !(statement instanceof EnhancedFor); // For each loops have no loop condition
+   }
+   
+   /**
+    * Checks if the {@link Term} on which the {@link RuleApp} was applied contains a {@link SymbolicExecutionTermLabel}.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not contain a {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is {@code null}.
+    */
+   public static boolean hasLoopBodyLabel(RuleApp ruleApp) {
+      if (ruleApp != null && ruleApp.posInOccurrence() != null) {
+         Term term = ruleApp.posInOccurrence().subTerm();
+         if (term != null) {
+            term = TermBuilder.DF.goBelowUpdates(term);
+            return term.containsLabel(LoopBodyTermLabel.INSTANCE);
+         }
+         else {
+            return false;
+         }
+      }
+      else {
+         return false;
+      }
    }
    
    /**

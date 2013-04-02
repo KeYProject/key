@@ -2,12 +2,14 @@ package de.uka.ilkd.key.symbolic_execution;
 
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -158,7 +160,13 @@ public class SymbolicExecutionTreeBuilder {
     * As key is {@link SymbolicExecutionTermLabel#getId()} used.
     */
    private Map<Integer, LinkedList<Node>> methodCallStackMap = new HashMap<Integer, LinkedList<Node>>();
-   
+
+   /**
+    * Contains {@link Node}s of method calls which return statements should be ignored. 
+    * As key is {@link SymbolicExecutionTermLabel#getId()} used.
+    */
+   private Map<Integer, Set<Node>> methodReturnsToIgnoreMap = new HashMap<Integer, Set<Node>>();
+
    /**
     * Contains the exception variable which is used to check if the executed program in proof terminates normally.
     */
@@ -247,6 +255,49 @@ public class SymbolicExecutionTreeBuilder {
          }.run();
       }
    }
+   
+   /**
+    * Returns the method {@link Node}s of method calls for
+    * which its return should be ignored. If not already
+    * available an empty method {@link Set} is created.
+    * @param ruleApp The {@link RuleApp} which modifies a modality {@link Term} with a {@link SymbolicExecutionTermLabel}.
+    * @return The {@link Set} of {@link Node}s to ignore its return.
+    */
+   protected Set<Node> getMethodReturnsToIgnore(RuleApp ruleApp) {
+      SymbolicExecutionTermLabel label = SymbolicExecutionUtil.getSymbolicExecutionLabel(ruleApp);
+      return getMethodReturnsToIgnore(label);
+   }
+
+   /**
+    * Returns the method {@link Node}s of method calls for
+    * which its return should be ignored. If not already
+    * available an empty method {@link Set} is created.
+    * @param label The {@link SymbolicExecutionTermLabel} which provides the ID.
+    * @return The {@link Set} of {@link Node}s to ignore its return.
+    */
+   protected Set<Node> getMethodReturnsToIgnore(SymbolicExecutionTermLabel label) {
+      assert label != null : "No symbolic execuion term label provided";
+      return getMethodReturnsToIgnore(label.getId());
+   }
+   
+   /**
+    * Returns the method {@link Node}s of method calls for
+    * which its return should be ignored. If not already
+    * available an empty method {@link Set} is created.
+    * @param id The ID.
+    * @return The {@link Set} of {@link Node}s to ignore its return.
+    */
+   protected Set<Node> getMethodReturnsToIgnore(int id) {
+      synchronized (methodReturnsToIgnoreMap) {
+         Integer key = Integer.valueOf(id);
+         Set<Node> result = methodReturnsToIgnoreMap.get(key);
+         if (result == null) {
+            result = new HashSet<Node>();
+            methodReturnsToIgnoreMap.put(key, result);
+         }
+         return result;
+      }
+   }
 
    /**
     * Returns the method call stack. If not already
@@ -309,6 +360,10 @@ public class SymbolicExecutionTreeBuilder {
       if (methodCallStackMap != null) {
          methodCallStackMap.clear();
          methodCallStackMap = null;
+      }
+      if (methodReturnsToIgnoreMap != null) {
+         methodReturnsToIgnoreMap.clear();
+         methodReturnsToIgnoreMap = null;
       }
       exceptionVariable = null;
       proof = null;
@@ -584,15 +639,21 @@ public class SymbolicExecutionTreeBuilder {
                // Find the Node in the proof tree of KeY for that this Node is the return
                Node callNode = findMethodCallNode(node, node.getAppliedRuleApp());
                if (callNode != null) {
-                  // Find the call Node representation in SED, if not available ignore it.
-                  IExecutionNode callSEDNode = keyNodeMapping.get(callNode);
-                  if (callSEDNode instanceof IExecutionMethodCall) { // Could be the start node if the initial sequent already contains some method frames.
-                     result = new ExecutionMethodReturn(mediator, node, (IExecutionMethodCall)callSEDNode);
+                  // Make sure that the return should not be ignored
+                  Set<Node> methodReturnsToIgnore = getMethodReturnsToIgnore(node.getAppliedRuleApp()); 
+                  if (!methodReturnsToIgnore.contains(callNode)) {
+                     // Find the call Node representation in SED, if not available ignore it.
+                     IExecutionNode callSEDNode = keyNodeMapping.get(callNode);
+                     if (callSEDNode instanceof IExecutionMethodCall) { // Could be the start node if the initial sequent already contains some method frames.
+                        result = new ExecutionMethodReturn(mediator, node, (IExecutionMethodCall)callSEDNode);
+                     }
                   }
                }
             }
             else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
-               result = new ExecutionTermination(mediator, node, exceptionVariable);
+               if (!SymbolicExecutionUtil.hasLoopBodyLabel(node.getAppliedRuleApp())) {
+                  result = new ExecutionTermination(mediator, node, exceptionVariable);
+               }
             }
             else if (SymbolicExecutionUtil.isBranchNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
                result = new ExecutionBranchNode(mediator, node);
@@ -635,14 +696,17 @@ public class SymbolicExecutionTreeBuilder {
       int count = counter.run();
       LinkedList<Node> currentMethodCallStack = getMethodCallStack(node.getAppliedRuleApp());
       LinkedList<Node> newMethodCallStack = getMethodCallStack(label.getId());
+      Set<Node> currentIgnoreSet = getMethodReturnsToIgnore(label.getId());
       assert newMethodCallStack.isEmpty() : "Method call stack is not empty.";
       ListIterator<Node> currentIter = currentMethodCallStack.listIterator(currentMethodCallStack.size());
       for (int i = 0; i < count; i++) {
          assert currentIter.hasPrevious();
-         newMethodCallStack.add(currentIter.previous());
+         Node previous = currentIter.previous();
+         newMethodCallStack.add(previous);
+         currentIgnoreSet.add(previous);
       }
    }
-   
+
    /**
     * Utility class used in {@link SymbolicExecutionTreeBuilder#initNewLoopBodyMethodCallStack(Node)}
     * to compute the number of available {@link MethodFrame}s.
