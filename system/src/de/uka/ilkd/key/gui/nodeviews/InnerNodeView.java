@@ -168,8 +168,8 @@ public class InnerNodeView extends SequentView {
                 mediator.getServices());
         printer.printSequent(null, filter);
         sequentOnly = printer.toString();
-        tacletDescription = getTacletDescription(mediator, node, filter);
         setText(sequentOnly);
+        tacletDescription = getTacletDescription(mediator, node, filter);
         posTable = printer.getInitialPositionTable();
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
         updateUI();

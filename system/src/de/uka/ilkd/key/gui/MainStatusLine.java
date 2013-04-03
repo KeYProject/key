@@ -25,7 +25,7 @@ import javax.swing.*;
 import javax.swing.border.BevelBorder;
 
 class MainStatusLine extends JPanel {
-    private static final String DEFAULT_STATUSLINE = "Integrated Deductive Software Design: Ready  (Hint: type F3 to search in proof trees or sequents.)";
+    private static final String DEFAULT_STATUSLINE = "Integrated Deductive Software Design: Ready  (Hint: Press STRG+F to search in sequents.)";
     private static final long serialVersionUID = -4324361226332870737L;
     private JLabel       text;
     private JPanel       progressPanel;
