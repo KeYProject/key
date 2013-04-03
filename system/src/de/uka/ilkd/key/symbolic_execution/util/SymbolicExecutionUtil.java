@@ -61,6 +61,7 @@ import de.uka.ilkd.key.logic.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -1574,7 +1575,7 @@ public final class SymbolicExecutionUtil {
       }
       
       int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
-      if (childIndex >= 2) {
+      if (childIndex >= 3) {
          throw new ProofInputException("Branch condition of precondition check and null pointer check are not supported."); 
       }
       // Assumption: Pre -> Post & ExcPre -> Signals terms are added to last semisequent in antecedent.
@@ -1584,19 +1585,36 @@ public final class SymbolicExecutionUtil {
       Term workingTerm = sf.formula();
       workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
       if (workingTerm.op() != Junctor.AND) {
-         throw new ProofInputException("And operation expacted, implementation of UseOperationContractRule might has changed!"); 
+         throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
       }
       workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is the combination of all normal and exceptional preconditon postcondition implications
       workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
       if (workingTerm.op() != Junctor.AND) {
-         throw new ProofInputException("And operation expacted, implementation of UseOperationContractRule might has changed!"); 
+         throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
       }
-      // Find Term exc_n = null which is added negated to all exceptional preconditions
-      Term definitions = workingTerm.sub(0);
-      if (definitions.op() != Junctor.AND) {
-         throw new ProofInputException("And operation expacted, implementation of UseOperationContractRule might has changed!"); 
+      // Find Term exc_n = null which is added (maybe negated) to all exceptional preconditions
+      Term exceptionDefinition = workingTerm;
+      while (exceptionDefinition.op() == Junctor.AND) {
+         exceptionDefinition = exceptionDefinition.sub(0);
       }
-      Term exceptionDefinition = definitions.sub(0);
+      // Make sure that exception equality was found
+      Term exceptionEquality;
+      if (exceptionDefinition.op() == Junctor.NOT) {
+         exceptionEquality = exceptionDefinition.sub(0);
+      }
+      else {
+         exceptionEquality = exceptionDefinition;
+      }
+      if (exceptionEquality.op() != Equality.EQUALS || exceptionEquality.arity() != 2) {
+         throw new ProofInputException("Equality expected, implementation of UseOperationContractRule might has changed!"); 
+      }
+      if (!isNullSort(exceptionEquality.sub(1).sort(), parent.proof().getServices())) {
+         throw new ProofInputException("Null expected, implementation of UseOperationContractRule might has changed!"); 
+      }
+      KeYJavaType exceptionType = parent.proof().getServices().getJavaInfo().getKeYJavaType(exceptionEquality.sub(0).sort());
+      if (!parent.proof().getServices().getJavaInfo().isSubtype(exceptionType, parent.proof().getServices().getJavaInfo().getKeYJavaType("java.lang.Throwable"))) {
+         throw new ProofInputException("Throwable expected, implementation of UseOperationContractRule might has changed!"); 
+      }
       // Collect all implications for normal or exceptional preconditions
       Term implications = workingTerm.sub(1);
       ImmutableList<Term> implicationTerms = collectPreconditionImpliesPostconditionTerms(ImmutableSLList.<Term>nil(), exceptionDefinition, childIndex == 1, implications);
@@ -1609,7 +1627,7 @@ public final class SymbolicExecutionUtil {
          
          Term result = TermBuilder.DF.or(condtionTerms);
          if (simplify) {
-            workingTerm = simplify(node.proof(), result);
+            result = simplify(node.proof(), result);
          }
          return result;
       }
@@ -1644,11 +1662,13 @@ public final class SymbolicExecutionUtil {
          }
          // Update result
          if (exceptionalExecution) {
+            // Collect only exceptional terms
             if (isExceptionCondition) {
                toFill = toFill.append(root);
             }
          }
          else {
+            // Collect only normal terms
             if (!isExceptionCondition) {
                toFill = toFill.append(root);
             }
