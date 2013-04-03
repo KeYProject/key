@@ -196,9 +196,6 @@ public final class MainWindow extends JFrame  {
     /** the status line */
     private MainStatusLine statusLine;
     
-    /** the main progress monitor */
-//    private ProgressMonitor progressMonitor = new MainProgressMonitor();
-    
     /** listener to global proof events */
     private MainProofListener proofListener;
     
@@ -253,9 +250,7 @@ public final class MainWindow extends JFrame  {
     /** for locking of threads waiting for the prover to exit */
     public final Object monitor = new Object();
     
-    private static MainWindow instance = null;    
-    
-//    private ProverTaskListener taskListener;
+    private static MainWindow instance = null;
     
     private NotificationManager notificationManager;
     
@@ -354,13 +349,6 @@ public final class MainWindow extends JFrame  {
         mediator.addAutoModeListener(proofListener);
         mediator.addGUIListener(guiListener);
     }
-    
-//    /** unregister several listeners */
-//    private void unregisterMediatorListeners() {
-//        mediator.removeKeYSelectionListener(proofListener);
-//        mediator.removeAutoModeListener(proofListener);
-//        mediator.removeGUIListener(guiListener);
-//    }
     
     /**
      * return the mediator
@@ -589,10 +577,6 @@ public final class MainWindow extends JFrame  {
         return p;    
     }
     
-//    public ProverTaskListener getProverTaskListener() {
-//        return taskListener;
-//    }
-    
     /**
      * @return the status line object
      */
@@ -650,13 +634,6 @@ public final class MainWindow extends JFrame  {
     public void selectTab(int tab) {
     	this.tabbedPane.setSelectedIndex(0);
     }
-    
-//    /**
-//     * Get the progress monitor that will update a progress bar in a corner of the main window.
-//     */
-//    public ProgressMonitor getProgressMonitor() {
-//        return progressMonitor;
-//    }
     
     /**
      * Freeze the main window by blocking all input events, except those for the status line (i.e.
@@ -831,19 +808,6 @@ public final class MainWindow extends JFrame  {
         
         return options;
         
-//	// dnd direction sensitive		
-//        final boolean dndDirectionSensitivity = 
-//            ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().isDndDirectionSensitive();
-//        final JMenuItem dndDirectionSensitivityOption =
-//            new JCheckBoxMenuItem("DnD Direction Sensitive", dndDirectionSensitivity);
-//        dndDirectionSensitivityOption.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                boolean b = ((JCheckBoxMenuItem)e.getSource()).isSelected();           
-//                ProofSettings.DEFAULT_SETTINGS.
-//                getGeneralSettings().setDnDDirectionSensitivity(b);           
-//        }});
-//        registerAtMenu(options, dndDirectionSensitivityOption);
-        
     }
     
 
@@ -878,8 +842,6 @@ public final class MainWindow extends JFrame  {
 	}else{
 	    updateDPSelectionMenu(solverUnions);
 	}
-	
-
 
     }
     
@@ -1259,129 +1221,7 @@ public final class MainWindow extends JFrame  {
     void displayResults(String message){
             setStatusLine(message);
     }
-    
-//    /**
-//     * called when the batch mode has been finished 
-//     * @param result the Object encapsulating informtation about the result, e.g.
-//     * String "Error" if an error has occurred. 
-//     * @param proof the Proof to which <tt>appliedRules</tt> rules have been 
-//     * applied requiring <tt>time</tt> ms
-//     * @param time the long giving the needed time in ms 
-//     * @param appliedRules the int giving the number of applied rules
-//     */
-//    private void finishedBatchMode (Object result, 
-//            Proof proof, long time, int appliedRules) {
-//
-//        if ( Main.getStatisticsFile() != null )
-//            printStatistics ( Main.getStatisticsFile(), result, time, appliedRules );
-//
-//        if ("Error".equals ( result ) ) {
-//            // Error in batchMode. Terminate with status -1.
-//            System.exit ( -1 );
-//        }
-//
-//        // Save the proof before exit.
-//
-//        String baseName = Main.getFileNameOnStartUp();
-//        int idx = baseName.indexOf(".key");        
-//        if (idx == -1) {
-//            idx = baseName.indexOf(".proof");
-//        }        
-//        baseName = baseName.substring(0, idx==-1 ? baseName.length() : idx);
-//
-//        File f; 
-//        int counter = 0;
-//        do {           
-//
-//            f = new File(baseName + ".auto."+ counter +".proof");
-//            counter++;
-//        } while (f.exists());
-//
-//        MainWindow.getInstance ().saveProof ( f.getAbsolutePath() );
-//        if (proof.openGoals ().size () == 0) {
-//            // Says that all Proofs have succeeded
-//            if (proof.getBasicTask().getStatus().getProofClosedButLemmasLeft()) {
-//                // Says that the proof is closed by depends on (unproved) lemmas                
-//                System.exit ( 0 ); //XXX, was: 2 
-//            }
-//            System.exit ( 0 ); 
-//        } else {
-//            // Says that there is at least one open Proof
-//            System.exit ( 1 );
-//        }
-//    }
 
-//    class MainTaskListenerBatchMode implements ProverTaskListener { // XXX
-//        public void taskStarted(String message, int size) {
-//            System.out.print(message+" ... ");
-//        }
-//        
-//        public void setProgress(int position) {
-//        }
-//        
-//        public void taskFinished(TaskFinishedInfo info) {
-//            System.out.println("[ DONE ]");
-//            if (info.getSource() instanceof ApplyStrategy) {
-//                finishedBatchMode ( info.getResult(), 
-//                        info.getProof(), info.getTime(), 
-//                        info.getAppliedRules());
-//                Debug.fail ( "Control flow should not reach this point." );
-//            } else if (info.getSource() instanceof ProblemLoader) {
-//                if (!"".equals(info.getResult())) {
-//                        System.exit(-1);
-//                } 
-//                if(info.getProof().openGoals().size()==0) {
-//                    System.out.println("proof.openGoals.size=" + 
-//                            info.getProof().openGoals().size());              
-//                    System.exit(0);
-//                }
-//                mediator.startAutoMode();
-//            }
-//        }
-//    }
-    
-//    class MainTaskListener implements ProverTaskListener { // XXX
-//        public void taskStarted(String message, int size) {
-//            final MainStatusLine sl = getStatusLine();
-//            sl.reset();
-//            if (size > 0) {
-//                sl.setProgressPanelVisible(true);
-//                getStatusLine().setProgressBarMaximum(size);
-//            }
-//            sl.setStatusText(message);
-//        }
-//        
-//        public void setProgress(int position) {
-//            getStatusLine().setProgress(position);
-//        }
-//        
-//        public void taskFinished(TaskFinishedInfo info) {
-//            final MainStatusLine sl = getStatusLine();
-//            
-//            if (info.getSource() instanceof ApplyStrategy) {
-//        	sl.reset();
-//                displayResults(info.getTime(), 
-//                	       info.getAppliedRules(), 
-//                	       info.getClosedGoals());                
-//            } else if (info.getSource() instanceof ProblemLoader) {
-//                if (!"".equals(info.getResult())) {
-//                    final KeYExceptionHandler exceptionHandler = 
-//                        ((ProblemLoader)info.getSource()).getExceptionHandler();
-//                            new ExceptionDialog(MainWindow.this,     
-//                                    exceptionHandler.getExceptions());
-//                            exceptionHandler.clear();
-//                } else {
-//                    sl.reset();                    
-//                    mediator.getNotationInfo().refresh(mediator.getServices());
-//                }
-//            } else {
-//        	sl.reset();
-//            }
-//        }
-//    }
-    
-    
-    
     /** Glass pane that only delivers events for the status line (i.e. the abort button)
      * 
      * This has been partly taken from the GlassPaneDemo of the Java Tutorial 
