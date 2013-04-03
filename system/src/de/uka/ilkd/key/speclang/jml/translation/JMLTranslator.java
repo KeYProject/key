@@ -515,7 +515,7 @@ final class JMLTranslator {
             public Term translateQuantifier(QuantifiableVariable qv,
                                             Term t)
                     throws SLTranslationException {
-                Term min = TB.min(qv, t, services);
+                Term min = TB.min(qv, TB.convertToFormula(t, services), services);
                 return min;
             }
 
@@ -540,7 +540,7 @@ final class JMLTranslator {
             public Term translateQuantifier(QuantifiableVariable qv,
                     Term t)
                             throws SLTranslationException {
-                Term max = TB.max(qv, t, services);
+                Term max = TB.max(qv, TB.convertToFormula(t, services), services);
                 return max;
             }
 
