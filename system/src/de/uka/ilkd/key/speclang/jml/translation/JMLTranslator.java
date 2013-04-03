@@ -574,6 +574,7 @@ final class JMLTranslator {
                 SLExpression b = (SLExpression) params[1];
                 SLExpression t = (SLExpression) params[2];
                 KeYJavaType declsType = (KeYJavaType) params[3];
+                @SuppressWarnings("unchecked")
                 ImmutableList<LogicVariable> declVars =
                         (ImmutableList<LogicVariable>) params[4];
                 Services services = (Services) params[5];
