@@ -35,4 +35,4 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
             }
         }
     }
-}    
+}

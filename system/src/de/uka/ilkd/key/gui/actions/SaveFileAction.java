@@ -2,12 +2,14 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
 
 import de.uka.ilkd.key.gui.IconFactory;
 import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.util.GuiUtilities;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Saves the current selected proof.
@@ -38,9 +40,17 @@ public final class SaveFileAction extends MainWindowAction {
             		                            .name()
             		                            .toString()).toString();
             
-            boolean saved = jFC.showSaveDialog(mainWindow, defaultName + ".proof");
+            Pair<Boolean, Pair<File, Boolean>> res =
+                    jFC.showSaveDialog(mainWindow, defaultName + ".proof");
+            boolean saved = res.first;
+            boolean newDir = res.second.second;
             if (saved) {
                 mainWindow.saveProof(jFC.getSelectedFile());
+            } else if (newDir) {
+                File dir = res.second.first;
+                if (!dir.delete()) {
+                    dir.deleteOnExit();
+                }
             }
         } else {
             mainWindow.popupWarning("No proof.", "Oops...");

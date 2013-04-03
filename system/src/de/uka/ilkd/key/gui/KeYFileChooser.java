@@ -20,6 +20,8 @@ import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
+import de.uka.ilkd.key.util.Pair;
+
 public class KeYFileChooser {
 
     private final JFileChooser fileChooser;
@@ -81,16 +83,28 @@ public class KeYFileChooser {
 		                         : JFileChooser.FILES_AND_DIRECTORIES);        
     }
 
-    public boolean showSaveDialog(Component parent, String defaultName) {
+    public Pair<Boolean, Pair<File, Boolean>> showSaveDialog(Component parent, String defaultName) {
 	if(defaultName != null) {
 	    File file = new File(fileChooser.getCurrentDirectory(), 
 		    		 defaultName);
 	    fileChooser.setSelectedFile(file);
 	}
-	
         setSaveDialog(true);
+
+        String proofDir = new String(fileChooser.getSelectedFile().getParent() + "/proof");
+        File dir = new File(proofDir);
+        boolean newDir = !dir.exists();
+        if (newDir) {
+            dir.mkdir();
+        }
+        File file = new File(proofDir,
+                             fileChooser.getSelectedFile().getName());
+        fileChooser.setSelectedFile(file);
+
 	int result = fileChooser.showSaveDialog(parent);
-	return (result == JFileChooser.APPROVE_OPTION);
+
+	return new Pair<Boolean, Pair<File, Boolean>> ((result == JFileChooser.APPROVE_OPTION),
+	                                               new Pair<File, Boolean> (dir, newDir));
     }
 
     public boolean showOpenDialog(Component component) {
