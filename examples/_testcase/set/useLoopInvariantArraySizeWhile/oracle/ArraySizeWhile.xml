@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="ArraySizeWhile.size(array);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
+         <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
+            <useLoopInvariant name="invariants: {savedHeap=null, heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,i)))};
+modifies: {heap=false, savedHeap=null};
+variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+               <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of ArraySizeWhile.size(array);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;i_0&apos; as result of ArraySizeWhile.size(array);&gt;" isReturnValueComputed="true">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                     </termination>
+                  </methodReturn>
+               </statement>
+            </useLoopInvariant>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>

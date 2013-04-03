@@ -94,7 +94,7 @@ public class SymbolicExecutionStrategy extends VBTStrategy {
        
 //        }
         
-        final Feature splitF = ScaleFeature.createScaled ( CountBranchFeature.INSTANCE, -400);
+        final Feature splitF = ScaleFeature.createScaled ( CountBranchFeature.INSTANCE, -4000);
         bindRuleSet(d, "split_if", splitF); // The costs of rules in heuristic "split_if" is reduced at runtime by numberOfBranches * -400. The result is that rules of "split_if" preferred to "split_cond" and run and step into has the same behavior
         bindRuleSet(d, "instanceof_to_exists", inftyConst());
         

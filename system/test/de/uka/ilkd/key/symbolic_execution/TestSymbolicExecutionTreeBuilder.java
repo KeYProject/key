@@ -65,75 +65,141 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    }
    
    /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySizeDoWhile
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testUseLoopInvariantArraySizeDoWhile() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantArraySizeDoWhile/test/ArraySizeDoWhile.java", 
+             "ArraySizeDoWhile", 
+             "size", 
+             "array != null",
+             "examples/_testcase/set/useLoopInvariantArraySizeDoWhile/oracle/ArraySizeDoWhile.xml",
+             false,
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             true,
+             true);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySizeWhile
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testUseLoopInvariantArraySizeWhile() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantArraySizeWhile/test/ArraySizeWhile.java", 
+             "ArraySizeWhile", 
+             "size", 
+             "array != null",
+             "examples/_testcase/set/useLoopInvariantArraySizeWhile/oracle/ArraySizeWhile.xml",
+             false,
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             true,
+             true);
+   }
+   
+   /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantArraySumFor
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
     */
    public void testUseLoopInvariantArraySumFor() throws Exception {
-      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
-//      doTest(keyRepDirectory, 
-//             "examples/_testcase/set/useLoopInvariantArraySumFor/test/ArraySumFor.java", 
-//             "ArraySumFor", 
-//             "sum", 
-//             "examples/_testcase/set/useLoopInvariantArraySumFor/oracle/ArraySumFor.xml",
-//             false,
-//             false,
-//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
-//             false,
-//             true,
-//             true);
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantArraySumFor/test/ArraySumFor.java", 
+             "ArraySumFor", 
+             "sum", 
+             "array != null",
+             "examples/_testcase/set/useLoopInvariantArraySumFor/oracle/ArraySumFor.xml",
+             false,
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             true,
+             true);
    }
    
    /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantArraySumForEach
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
     */
    public void testUseLoopInvariantArraySumForEach() throws Exception {
-      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
-//      doTest(keyRepDirectory, 
-//             "examples/_testcase/set/useLoopInvariantArraySumForEach/test/ArraySumForEach.java", 
-//             "ArraySumForEach", 
-//             "sum", 
-//             "examples/_testcase/set/useLoopInvariantArraySumForEach/oracle/ArraySumForEach.xml",
-//             false,
-//             false,
-//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
-//             false,
-//             true,
-//             true);
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantArraySumForEach/test/ArraySumForEach.java", 
+             "ArraySumForEach", 
+             "sum", 
+             "array != null",
+             "examples/_testcase/set/useLoopInvariantArraySumForEach/oracle/ArraySumForEach.xml",
+             false,
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             true,
+             true);
    }
    
    /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhile
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
     */
    public void testUseLoopInvariantArraySumWhile() throws Exception {
-      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
-//      doTest(keyRepDirectory, 
-//             "examples/_testcase/set/useLoopInvariantArraySumWhile/test/ArraySumWhile.java", 
-//             "ArraySumWhile", 
-//             "sum", 
-//             "examples/_testcase/set/useLoopInvariantArraySumWhile/oracle/ArraySumWhile.xml",
-//             false,
-//             false,
-//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
-//             false,
-//             true,
-//             true);
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantArraySumWhile/test/ArraySumWhile.java", 
+             "ArraySumWhile", 
+             "sum", 
+             "array != null",
+             "examples/_testcase/set/useLoopInvariantArraySumWhile/oracle/ArraySumWhile.xml",
+             false,
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             false,
+             true);
    }
    
    /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
     */
    public void testUseLoopInvariantArraySumWhileInitiallyInvalid() throws Exception {
-      // TODO: Activate test if loop invariants are supported (branch condition is implemented)
-//      doTest(keyRepDirectory, 
-//             "examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid/test/ArraySumWhileInitiallyInvalid.java", 
-//             "ArraySumWhileInitiallyInvalid", 
-//             "sum", 
-//             "examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid/oracle/ArraySumWhileInitiallyInvalid.xml",
-//             false,
-//             false,
-//             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
-//             false,
-//             true,
-//             true);
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid/test/ArraySumWhileInitiallyInvalid.java", 
+             "ArraySumWhileInitiallyInvalid", 
+             "sum", 
+             "array != null",
+             "examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid/oracle/ArraySumWhileInitiallyInvalid.xml",
+             false,
+             false,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             true,
+             true);
    }
    
    /**
@@ -144,6 +210,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/useOperationContractAllBranchesOpenTest/test/UseOperationContractAllBranchesOpenTest.java", 
              "UseOperationContractAllBranchesOpenTest", 
              "main", 
+             null,
              "examples/_testcase/set/useOperationContractAllBranchesOpenTest/oracle/UseOperationContractAllBranchesOpenTest.xml",
              false,
              false,
@@ -161,6 +228,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/useOperationContractExceptionalNoPreconditionWithNullCheckTest/test/UseOperationContractExceptionalNoPreconditionWithNullCheckTest.java", 
              "UseOperationContractExceptionalNoPreconditionWithNullCheckTest", 
              "main", 
+             null,
              "examples/_testcase/set/useOperationContractExceptionalNoPreconditionWithNullCheckTest/oracle/UseOperationContractExceptionalNoPreconditionWithNullCheckTest.xml",
              false,
              false,
@@ -178,6 +246,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/useOperationContractFalsePreconditionTest/test/UseOperationContractFalsePreconditionTest.java", 
              "UseOperationContractFalsePreconditionTest", 
              "main", 
+             null,
              "examples/_testcase/set/useOperationContractFalsePreconditionTest/oracle/UseOperationContractFalsePreconditionTest.xml",
              false,
              false,
@@ -195,6 +264,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/useOperationContractFixedNormalPostTest/test/UseOperationContractFixedNormalPostTest.java", 
              "UseOperationContractFixedNormalPostTest", 
              "main", 
+             null,
              "examples/_testcase/set/useOperationContractFixedNormalPostTest/oracle/UseOperationContractFixedNormalPostTest.xml",
              false,
              false,
@@ -212,6 +282,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/useOperationContractInvalidPreconditionOnObjectTest/test/UseOperationContractInvalidPreconditionOnObjectTest.java", 
              "UseOperationContractInvalidPreconditionOnObjectTest", 
              "main", 
+             null,
              "examples/_testcase/set/useOperationContractInvalidPreconditionOnObjectTest/oracle/UseOperationContractInvalidPreconditionOnObjectTest.xml",
              false,
              false,
@@ -229,6 +300,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/useOperationContractInvalidPreconditionTest/test/UseOperationContractInvalidPreconditionTest.java", 
              "UseOperationContractInvalidPreconditionTest", 
              "main", 
+             null,
              "examples/_testcase/set/useOperationContractInvalidPreconditionTest/oracle/UseOperationContractInvalidPreconditionTest.xml",
              false,
              false,
@@ -246,6 +318,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/useOperationContractNoExceptionTest/test/UseOperationContractNoExceptionTest.java", 
              "UseOperationContractNoExceptionTest", 
              "main", 
+             null,
              "examples/_testcase/set/useOperationContractNoExceptionTest/oracle/UseOperationContractNoExceptionTest.xml",
              false,
              false,
@@ -263,6 +336,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/useOperationContractNoPreconditionTest/test/UseOperationContractNoPreconditionTest.java", 
              "UseOperationContractNoPreconditionTest", 
              "main", 
+             null,
              "examples/_testcase/set/useOperationContractNoPreconditionTest/oracle/UseOperationContractNoPreconditionTest.xml",
              false,
              false,
@@ -280,6 +354,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/useOperationContractNoPreconditionWithNullCheckTest/test/UseOperationContractNoPreconditionWithNullCheckTest.java", 
              "UseOperationContractNoPreconditionWithNullCheckTest", 
              "main", 
+             null,
              "examples/_testcase/set/useOperationContractNoPreconditionWithNullCheckTest/oracle/UseOperationContractNoPreconditionWithNullCheckTest.xml",
              false,
              false,
@@ -297,6 +372,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/useOperationContractNormalAndExceptionalBranchTest/test/UseOperationContractNormalAndExceptionalBranchTest.java", 
              "UseOperationContractNormalAndExceptionalBranchTest", 
              "main", 
+             null,
              "examples/_testcase/set/useOperationContractNormalAndExceptionalBranchTest/oracle/UseOperationContractNormalAndExceptionalBranchTest.xml",
              false,
              false,
@@ -314,6 +390,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/useOperationContractNormalAndExceptionalTogetherTest/test/UseOperationContractNormalAndExceptionalTogetherTest.java", 
              "UseOperationContractNormalAndExceptionalTogetherTest", 
              "main", 
+             null,
              "examples/_testcase/set/useOperationContractNormalAndExceptionalTogetherTest/oracle/UseOperationContractNormalAndExceptionalTogetherTest.xml",
              false,
              false,
@@ -331,6 +408,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/complexConstructorTest/test/ComplexConstructorTest.java", 
              "ComplexConstructorTest", 
              "main", 
+             null,
              "examples/_testcase/set/complexConstructorTest/oracle/ComplexConstructorTest.xml",
              false,
              true,
@@ -348,6 +426,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/simpleConstructorTest/test/SimpleConstructorTest.java", 
              "SimpleConstructorTest", 
              "main", 
+             null,
              "examples/_testcase/set/simpleConstructorTest/oracle/SimpleConstructorTest.xml",
              false,
              true,
@@ -365,6 +444,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/variablesUnknownTest/test/UnknownTest.java", 
              "UnknownTest", 
              "main", 
+             null,
              "examples/_testcase/set/variablesUnknownTest/oracle/UnknownTest.xml",
              true,
              false,
@@ -382,6 +462,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/variablesParameterAttributesChange/test/VariablesParameterAttributesChange.java", 
              "VariablesParameterAttributesChange", 
              "main", 
+             null,
              "examples/_testcase/set/variablesParameterAttributesChange/oracle/VariablesParameterAttributesChange.xml",
              true,
              false,
@@ -399,6 +480,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/elseIfTest/test/ElseIfTest.java", 
              "ElseIfTest", 
              "elseIf", 
+             null,
              "examples/_testcase/set/elseIfTest/oracle/ElseIfTestMergedBranchConditions.xml",
              false,
              false,
@@ -416,6 +498,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/switchCaseTest/test/SwitchCaseTest.java", 
              "SwitchCaseTest", 
              "switchCase", 
+             null,
              "examples/_testcase/set/switchCaseTest/oracle/SwitchCaseTestMergedBranchConditions.xml",
              false,
              false,
@@ -433,6 +516,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/loopIterationTest/test/LoopIterationTest.java", 
              "LoopIterationTest", 
              "loopMultipleTimes", 
+             null,
              "examples/_testcase/set/loopIterationTest/oracle/LoopIterationTest_loopMultipleTimes.xml",
              false,
              false,
@@ -450,6 +534,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/loopIterationTest/test/LoopIterationTest.java", 
              "LoopIterationTest", 
              "mainWorks", 
+             null,
              "examples/_testcase/set/loopIterationTest/oracle/LoopIterationTest_mainWorks.xml",
              false,
              false,
@@ -467,6 +552,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/loopIterationTest/test/LoopIterationTest.java", 
              "LoopIterationTest", 
              "main", 
+             null,
              "examples/_testcase/set/loopIterationTest/oracle/LoopIterationTest_main.xml",
              false,
              false,
@@ -484,6 +570,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/variablesArrayTest/test/VariablesArrayTest.java", 
              "VariablesArrayTest", 
              "main", 
+             null,
              "examples/_testcase/set/variablesArrayTest/oracle/VariablesArrayTest.xml",
              true,
              false,
@@ -501,6 +588,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/variablesInstanceVariableTest/test/VariablesInstanceVariableTest.java", 
              "VariablesInstanceVariableTest", 
              "main", 
+             null,
              "examples/_testcase/set/variablesInstanceVariableTest/oracle/VariablesInstanceVariableTest.xml",
              true,
              false,
@@ -518,6 +606,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/variablesLocalTest/test/VariablesLocalTest.java", 
              "VariablesLocalTest", 
              "main", 
+             null,
              "examples/_testcase/set/variablesLocalTest/oracle/VariablesLocalTest.xml",
              true,
              false,
@@ -535,6 +624,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/variablesStaticTest/test/VariablesStaticTest.java", 
              "VariablesStaticTest", 
              "main", 
+             null,
              "examples/_testcase/set/variablesStaticTest/oracle/VariablesStaticTest.xml",
              true,
              false,
@@ -552,6 +642,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/complexFlatSteps/test/ComplexFlatSteps.java", 
              "ComplexFlatSteps", 
              "doSomething", 
+             null,
              "examples/_testcase/set/complexFlatSteps/oracle/ComplexFlatSteps.xml",
              false,
              false,
@@ -569,6 +660,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/complexIf/test/ComplexIf.java", 
              "ComplexIf", 
              "min", 
+             null,
              "examples/_testcase/set/complexIf/oracle/ComplexIf.xml",
              false,
              false,
@@ -586,6 +678,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/doWhileFalseTest/test/DoWhileFalseTest.java", 
              "DoWhileFalseTest", 
              "main", 
+             null,
              "examples/_testcase/set/doWhileFalseTest/oracle/DoWhileFalseTest.xml",
              false,
              false,
@@ -603,6 +696,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/doWhileTest/test/DoWhileTest.java", 
              "DoWhileTest", 
              "main", 
+             null,
              "examples/_testcase/set/doWhileTest/oracle/DoWhileTest.xml",
              false,
              false,
@@ -620,6 +714,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/elseIfDifferentVariables/test/ElseIfDifferentVariables.java", 
              "ElseIfDifferentVariables", 
              "main", 
+             null,
              "examples/_testcase/set/elseIfDifferentVariables/oracle/ElseIfDifferentVariables.xml",
              false,
              false,
@@ -637,6 +732,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/elseIfTest/test/ElseIfTest.java", 
              "ElseIfTest", 
              "elseIf", 
+             null,
              "examples/_testcase/set/elseIfTest/oracle/ElseIfTest.xml",
              false,
              false,
@@ -654,6 +750,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/fixedRecursiveMethodCallTest/test/FixedRecursiveMethodCallTest.java", 
              "FixedRecursiveMethodCallTest", 
              "decreaseValue", 
+             null,
              "examples/_testcase/set/fixedRecursiveMethodCallTest/oracle/FixedRecursiveMethodCallTest.xml",
              false,
              false,
@@ -671,6 +768,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/forEachTest/test/ForEachTest.java", 
              "ForEachTest", 
              "main", 
+             null,
              "examples/_testcase/set/forEachTest/oracle/ForEachTest.xml",
              false,
              false,
@@ -688,6 +786,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/forFalseTest/test/ForFalseTest.java", 
              "ForFalseTest", 
              "main", 
+             null,
              "examples/_testcase/set/forFalseTest/oracle/ForFalseTest.xml",
              false,
              false,
@@ -705,6 +804,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/forTest/test/ForTest.java", 
              "ForTest", 
              "main", 
+             null,
              "examples/_testcase/set/forTest/oracle/ForTest.xml",
              false,
              false,
@@ -722,6 +822,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/functionalDoWhileTest/test/FunctionalDoWhileTest.java", 
              "FunctionalDoWhileTest", 
              "main", 
+             null,
              "examples/_testcase/set/functionalDoWhileTest/oracle/FunctionalDoWhileTest.xml",
              false,
              false,
@@ -739,6 +840,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/functionalForTest/test/FunctionalForTest.java", 
              "FunctionalForTest", 
              "main", 
+             null,
              "examples/_testcase/set/functionalForTest/oracle/FunctionalForTest.xml",
              false,
              false,
@@ -756,6 +858,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/functionalIf/test/FunctionalIf.java", 
              "FunctionalIf", 
              "min", 
+             null,
              "examples/_testcase/set/functionalIf/oracle/FunctionalIf.xml",
              false,
              false,
@@ -773,6 +876,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/functionalWhileTest/test/FunctionalWhileTest.java", 
              "FunctionalWhileTest", 
              "main", 
+             null,
              "examples/_testcase/set/functionalWhileTest/oracle/FunctionalWhileTest.xml",
              false,
              false,
@@ -790,6 +894,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/methodCallOnObject/test/MethodCallOnObject.java", 
              "MethodCallOnObject", 
              "main", 
+             null,
              "examples/_testcase/set/methodCallOnObject/oracle/MethodCallOnObject.xml",
              false,
              false,
@@ -807,6 +912,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/methodCallOnObjectWithException/test/MethodCallOnObjectWithException.java", 
              "MethodCallOnObjectWithException", 
              "main", 
+             null,
              "examples/_testcase/set/methodCallOnObjectWithException/oracle/MethodCallOnObjectWithException.xml",
              false,
              false,
@@ -824,6 +930,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/methodCallParallelTest/test/MethodCallParallelTest.java", 
              "MethodCallParallelTest", 
              "main", 
+             null,
              "examples/_testcase/set/methodCallParallelTest/oracle/MethodCallParallelTest.xml",
              false,
              false,
@@ -841,6 +948,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/methodFormatTest/test/MethodFormatTest.java", 
              "MethodFormatTest", 
              "main", 
+             null,
              "examples/_testcase/set/methodFormatTest/oracle/MethodFormatTest.xml",
              false,
              false,
@@ -858,6 +966,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/methodHierarchyCallTest/test/MethodHierarchyCallTest.java", 
              "MethodHierarchyCallTest", 
              "main", 
+             null,
              "examples/_testcase/set/methodHierarchyCallTest/oracle/MethodHierarchyCallTest.xml",
              false,
              true,
@@ -875,6 +984,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/methodHierarchyCallWithExceptionTest/test/MethodHierarchyCallWithExceptionTest.java", 
              "MethodHierarchyCallWithExceptionTest", 
              "main", 
+             null,
              "examples/_testcase/set/methodHierarchyCallWithExceptionTest/oracle/MethodHierarchyCallWithExceptionTest.xml",
              false,
              true,
@@ -892,6 +1002,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/nestedDoWhileTest/test/NestedDoWhileTest.java", 
              "NestedDoWhileTest", 
              "main", 
+             null,
              "examples/_testcase/set/nestedDoWhileTest/oracle/NestedDoWhileTest.xml",
              false,
              false,
@@ -909,6 +1020,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/nestedForTest/test/NestedForTest.java", 
              "NestedForTest", 
              "main", 
+             null,
              "examples/_testcase/set/nestedForTest/oracle/NestedForTest.xml",
              false,
              false,
@@ -926,6 +1038,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/nestedWhileTest/test/NestedWhileTest.java", 
              "NestedWhileTest", 
              "mainNested", 
+             null,
              "examples/_testcase/set/nestedWhileTest/oracle/NestedWhileTest.xml",
              false,
              false,
@@ -949,6 +1062,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/recursiveFibonacci/test/RecursiveFibonacci.java", 
              "RecursiveFibonacci", 
              "fibonacci10", 
+             null,
              "examples/_testcase/set/recursiveFibonacci/oracle/RecursiveFibonacci.xml",
              false,
              false,
@@ -966,6 +1080,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/simpleIf/test/SimpleIf.java", 
              "SimpleIf", 
              "min", 
+             null,
              "examples/_testcase/set/simpleIf/oracle/SimpleIf.xml",
              false,
              false,
@@ -983,6 +1098,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/simpleNullPointerSplitTest/test/SimpleNullPointerSplitTest.java", 
              "SimpleNullPointerSplitTest", 
              "main", 
+             null,
              "examples/_testcase/set/simpleNullPointerSplitTest/oracle/SimpleNullPointerSplitTest.xml",
              false,
              false,
@@ -1000,6 +1116,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/statementKindTest/test/StatementKindTest.java", 
              "StatementKindTest", 
              "main", 
+             null,
              "examples/_testcase/set/statementKindTest/oracle/StatementKindTest.xml",
              false,
              false,
@@ -1017,6 +1134,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/statements/test/FlatSteps.java", 
              "FlatSteps", 
              "doSomething", 
+             null,
              "examples/_testcase/set/statements/oracle/FlatSteps.xml",
              false,
              false,
@@ -1034,6 +1152,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/staticMethodCall/test/StaticMethodCall.java", 
              "StaticMethodCall", 
              "main", 
+             null,
              "examples/_testcase/set/staticMethodCall/oracle/StaticMethodCall.xml",
              false,
              false,
@@ -1051,6 +1170,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/switchCaseTest/test/SwitchCaseTest.java", 
              "SwitchCaseTest", 
              "switchCase", 
+             null,
              "examples/_testcase/set/switchCaseTest/oracle/SwitchCaseTest.xml",
              false,
              false,
@@ -1068,6 +1188,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/throwTest/test/ThrowTest.java", 
              "ThrowTest", 
              "main", 
+             null,
              "examples/_testcase/set/throwTest/oracle/ThrowTest.xml",
              false,
              false,
@@ -1085,6 +1206,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/throwVariableTest/test/ThrowVariableTest.java", 
              "ThrowVariableTest", 
              "main", 
+             null,
              "examples/_testcase/set/throwVariableTest/oracle/ThrowVariableTest.xml",
              false,
              false,
@@ -1102,6 +1224,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/tryCatchFinally/test/TryCatchFinally.java", 
              "TryCatchFinally", 
              "tryCatchFinally", 
+             null,
              "examples/_testcase/set/tryCatchFinally/oracle/TryCatchFinally.xml",
              false,
              false,
@@ -1119,6 +1242,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/whileFalseTest/test/WhileFalseTest.java", 
              "WhileFalseTest", 
              "main", 
+             null,
              "examples/_testcase/set/whileFalseTest/oracle/WhileFalseTest.xml",
              false,
              false,
@@ -1136,6 +1260,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "examples/_testcase/set/whileTest/test/WhileTest.java", 
              "WhileTest", 
              "main", 
+             null,
              "examples/_testcase/set/whileTest/oracle/WhileTest.xml",
              false,
              false,
@@ -1160,6 +1285,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param containerTypeName The java class to test.
     * @param methodFullName The method to test.
+    * @param precondition An optional precondition.
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
     * @param includeVariables Include variables?
     * @param includeCallStack Include call stack?
@@ -1177,6 +1303,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                          String javaPathInBaseDir,
                          String containerTypeName,
                          final String methodFullName,
+                         String precondition,
                          String oraclePathInBaseDirFile,
                          boolean includeVariables,
                          boolean includeCallStack,
@@ -1190,6 +1317,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                 javaPathInBaseDir, 
                 containerTypeName, 
                 methodFullName, 
+                precondition,
                 oraclePathInBaseDirFile, 
                 includeVariables, 
                 includeCallStack,
@@ -1215,6 +1343,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * @param javaPathInBaseDir The path to the java file inside the base directory.
     * @param containerTypeName The java class to test.
     * @param methodFullName The method to test.
+    * @param precondition An optional precondition to use.
     * @param oraclePathInBaseDirFile The path to the oracle file inside the base directory.
     * @param includeVariables Include variables?
     * @param includeCallStack Include call stack?
@@ -1232,6 +1361,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
                          String javaPathInBaseDir,
                          String containerTypeName,
                          final String methodFullName,
+                         String precondition,
                          String oraclePathInBaseDirFile,
                          boolean includeVariables,
                          boolean includeCallStack,
@@ -1253,13 +1383,13 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
          assertTrue(maximalNumberOfExecutedSetNodes >= 1);
          // Store original settings of KeY which requires that at least one proof was instantiated.
          if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
-            createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, mergeBranchConditions, useOperationContracts, useLoopInvariants);
+            createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants);
          }
          originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
          assertNotNull(originalRuntimeExceptions);
          SymbolicExecutionUtil.setChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS, SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS_VALUE_ALLOW);
          // Create proof environment for symbolic execution
-         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, mergeBranchConditions, useOperationContracts, useLoopInvariants);
+         SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, precondition, mergeBranchConditions, useOperationContracts, useLoopInvariants);
          // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
          ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
          env.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);

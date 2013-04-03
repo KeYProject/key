@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="ArraySizeDoWhile.size(array);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
+         <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
+            <loopNode name="do {result_1++;i++;}while ( i&lt;array.length );" pathCondition="true" pathConditionChanged="false">
+               <statement name="result_1++;" pathCondition="true" pathConditionChanged="false">
+                  <statement name="i++;" pathCondition="true" pathConditionChanged="false">
+                     <useLoopInvariant name="invariants: {savedHeap=null, heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,i)))};
+modifies: {heap=false, savedHeap=null};
+variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="false">
+                        <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
+                              <methodReturn name="&lt;return of ArraySizeDoWhile.size(array);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;i_0&apos; as result of ArraySizeDoWhile.size(array);&gt;" isReturnValueComputed="true">
+                                 <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                                 </termination>
+                              </methodReturn>
+                           </statement>
+                        </branchCondition>
+                     </useLoopInvariant>
+                  </statement>
+               </statement>
+            </loopNode>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>
