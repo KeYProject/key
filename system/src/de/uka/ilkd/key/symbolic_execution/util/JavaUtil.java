@@ -1,7 +1,12 @@
 package de.uka.ilkd.key.symbolic_execution.util;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
 /**
@@ -269,6 +274,41 @@ public final class JavaUtil {
       }
       else {
          return second == null;
+      }
+   }
+
+   /**
+    * Converts the given {@link Map} into a {@link String} in which
+    * the entries of the map are sorted by {@code key + "=" + value} pairs.
+    * @param map The {@link Map} to convert into a sorted {@link String}.
+    * @return The {@link String} which shows the sorted map elements or {@code null} if the given map was {@code null}.
+    */
+   public static String toSortedString(Map<?, ?> map) {
+      if (map != null) {
+         // Sort entries
+         List<String> entries = new LinkedList<String>();
+         for (Entry<?, ?> entry : map.entrySet()) {
+            entries.add(entry.getKey() + "=" + entry.getValue());
+         }
+         Collections.sort(entries);
+         // Create result
+         StringBuffer sb = new StringBuffer();
+         sb.append('{');
+         boolean afterFirst = false;
+         for (String entry : entries) {
+            if (afterFirst) {
+               sb.append(", ");
+            }
+            else {
+               afterFirst = true;
+            }
+            sb.append(entry);
+         }
+         sb.append('}');
+         return sb.toString();
+      }
+      else {
+         return null;
       }
    }
 }

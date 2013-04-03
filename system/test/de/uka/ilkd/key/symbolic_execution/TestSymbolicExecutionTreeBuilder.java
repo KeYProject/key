@@ -80,10 +80,10 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "array != null",
              "examples/_testcase/set/useLoopInvariantArraySizeDoWhile/oracle/ArraySizeDoWhile.xml",
              false,
-             false,
+             true,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true,
+             false,
              true);
    }
    
@@ -103,10 +103,10 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "array != null",
              "examples/_testcase/set/useLoopInvariantArraySizeWhile/oracle/ArraySizeWhile.xml",
              false,
-             false,
+             true,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true,
+             false,
              true);
    }
    
@@ -126,10 +126,10 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "array != null",
              "examples/_testcase/set/useLoopInvariantArraySumFor/oracle/ArraySumFor.xml",
              false,
-             false,
+             true,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true,
+             false,
              true);
    }
    
@@ -149,10 +149,10 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "array != null",
              "examples/_testcase/set/useLoopInvariantArraySumForEach/oracle/ArraySumForEach.xml",
              false,
-             false,
+             true,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
-             true,
+             false,
              true);
    }
    
@@ -172,7 +172,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "array != null",
              "examples/_testcase/set/useLoopInvariantArraySumWhile/oracle/ArraySumWhile.xml",
              false,
-             false,
+             true,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
              false,
@@ -195,11 +195,29 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              "array != null",
              "examples/_testcase/set/useLoopInvariantArraySumWhileInitiallyInvalid/oracle/ArraySumWhileInitiallyInvalid.xml",
              false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
+             false,
+             true);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/useOperationContractQueryTest
+    */
+   public void testUseOperationContractQueryTest() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useOperationContractQueryTest/test/UseOperationContractQueryTest.java", 
+             "UseOperationContractQueryTest", 
+             "main", 
+             "value == magicNumber()",
+             "examples/_testcase/set/useOperationContractQueryTest/oracle/UseOperationContractQueryTest.xml",
+             false,
+             true,
              DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
              false,
              true,
-             true);
+             false);
    }
    
    /**
