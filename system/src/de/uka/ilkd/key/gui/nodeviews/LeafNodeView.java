@@ -29,7 +29,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 
@@ -66,7 +65,7 @@ public class LeafNodeView extends SequentView implements Autoscroll {
     public LogicPrinter printer;
     
     // the default tag of the highlight
-    private Object defaultHighlight;
+    public final Object defaultHighlight;
 
     // the current tag of the highlight
     private Object currentHighlight;
@@ -118,7 +117,7 @@ public class LeafNodeView extends SequentView implements Autoscroll {
 	setSelectionColor(getBackground());
 	// sets the painter for the highlightning
 	setHighlighter(new DefaultHighlighter());
-	//sets initial highlight (not visible) and stores its tag
+	//sets initial highlight (not visible) and stores its tag <--???
 
         // REMARK: THE ORDER FOR ADDING HIGHLIGHTS IS CRUCIAL
 	// WHEN USING OVERLAPPING HIGHLIGHTS:
@@ -138,7 +137,7 @@ public class LeafNodeView extends SequentView implements Autoscroll {
 		    // is the ApplyTacletDialog
 		    final boolean enableDnD = e.getSource() instanceof ApplyTacletDialog;
 		    listener.setModalDragNDropEnabled(enableDnD);
-		    listener.setRefreshHighlightning(enableDnD);
+		    listener.refreshHighlightning = enableDnD;
                     
                     // disable drag and drop instantiation of taclets
                     getDropTarget().setActive(false);
@@ -151,7 +150,7 @@ public class LeafNodeView extends SequentView implements Autoscroll {
 			listener.setModalDragNDropEnabled(false);
 		    } 
 
-		    listener.setRefreshHighlightning(true);
+		    listener.refreshHighlightning = true;
 		    
                     
 		    // enable drag and drop instantiation of taclets
@@ -197,6 +196,9 @@ public class LeafNodeView extends SequentView implements Autoscroll {
         addPropertyChangeListener("font", changeListener);
         addHierarchyBoundsListener(changeListener);
 
+        /*
+         * Few custom colors for the button in the top row of each SequentView
+         */
         titleButton.setBorderColor(MainFrame.openGoalRed);
         titleButton.setToolTipText("Toggle hidden taclets visibility");
 
@@ -234,14 +236,6 @@ public class LeafNodeView extends SequentView implements Autoscroll {
     
     protected DragSource getDragSource() {
 	return dragSource;
-    }
-    
-    /**
-     * returns the default tag used for highligthing
-     * @return the default tag used for highlighting
-     */
-    public Object getDefaultHighlight() {
-        return defaultHighlight;
     }
 
     /** 

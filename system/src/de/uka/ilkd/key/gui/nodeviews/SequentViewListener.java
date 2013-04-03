@@ -29,7 +29,6 @@ import java.awt.event.MouseEvent;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
-import javax.swing.event.MouseInputAdapter;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
@@ -42,6 +41,8 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 
 
@@ -53,29 +54,23 @@ import de.uka.ilkd.key.rule.BuiltInRule;
  * highlighted sequent part into some other GUI component (e.g.
  * some Taclet rule instantiation dialog)
  */
-class SequentViewListener extends MouseInputAdapter 
-    implements KeyListener  {  
+class SequentViewListener
+        implements KeyListener, MouseListener, MouseMotionListener {
 	
     private KeYMediator mediator;
     private LeafNodeView seqView;
 
     private TacletMenu menu;
    
-    
-    private boolean refreshHighlightning;
+    public boolean refreshHighlightning;
     private boolean modalDragNDropEnabled;
     private boolean showTermInfo;
-
-    
-    private Object mouseOverHighlight;
 
     /** last registered mouse position */
     PosInSequent mousePos = PosInSequent.createSequentPos();
 
-
     /** hack to block a click event */
     private long block = 0;
-    
 
     private DragGestureListener seqViewDragGestureListener;
 
@@ -83,27 +78,22 @@ class SequentViewListener extends MouseInputAdapter
 			KeYMediator mediator) {
 	this.mediator = mediator;
 	this.seqView = seqView;
-
-        mouseOverHighlight = seqView.getDefaultHighlight();
-	menu = new TacletMenu();     
-
+	menu = new TacletMenu();
 	seqViewDragGestureListener = new SequentViewGestures();
         
-	setRefreshHighlightning(true);
+        refreshHighlightning = true;
 	setModalDragNDropEnabled(false);
     }
 
-    
     private void highlight(Point p) {
         mousePos = seqView.getPosInSequent(p);            
-        seqView.setCurrentHighlight(mouseOverHighlight);
+        seqView.setCurrentHighlight(seqView.defaultHighlight);
         seqView.paintHighlights(p);
         seqView.setLastHighlightedCaretPos(seqView.correctedViewToModel(p));
     }
 	
-    @Override
     public void mouseMoved(MouseEvent me) {
-        if (me.getSource() == seqView && refreshHighlightning()) {
+        if (me.getSource() == seqView && refreshHighlightning) {
             highlight(me.getPoint());
             if (showTermInfo) {
                 final String info = getTermInfo();
@@ -117,9 +107,8 @@ class SequentViewListener extends MouseInputAdapter
         }
     }
     
-    @Override
     public void mouseExited(MouseEvent me) {
-        if (me.getSource() == seqView && refreshHighlightning()) {
+        if (me.getSource() == seqView && refreshHighlightning) {
             seqView.disableHighlights();
         }
     }
@@ -139,8 +128,7 @@ class SequentViewListener extends MouseInputAdapter
         return null;
     }
                 	           
-    @Override
-    public void mouseClicked(MouseEvent me) {                
+    public void mouseClicked(MouseEvent me) {           
         if (!modalDragNDropEnabled()) { 
 	    // if a popup menu is cancelled by a click we do not want to 
 	    // activate another using the same click event 
@@ -178,7 +166,7 @@ class SequentViewListener extends MouseInputAdapter
 					      builtInRules,
 					      mousePos);                               
 
-			setRefreshHighlightning(false);                    
+			refreshHighlightning = false;  
 
 			final JPopupMenu popup = menu.getPopupMenu();
 
@@ -188,12 +176,12 @@ class SequentViewListener extends MouseInputAdapter
 				}
 
 				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-				    setRefreshHighlightning(true);
+				    refreshHighlightning = true;
 				    block = System.currentTimeMillis();
 				}
 			    
 				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-				    setRefreshHighlightning(false);			    
+				    refreshHighlightning = false;			    
 				}
 			    });
                     
@@ -209,8 +197,15 @@ class SequentViewListener extends MouseInputAdapter
 	    }
 	}
     }
+    
+    public void mouseDragged(MouseEvent me) {
+        // Needs to be implemented for MouseMotionListener
+    }
+    
+    public void mousePressed(MouseEvent me){
+        // Needs to be implemented for MouseListener
+    }
 
-    @Override
     public void mouseReleased(MouseEvent me) {                
         if  (!modalDragNDropEnabled() && menu.isPopupMenuVisible() &&      
                 !menu.getPopupMenu().contains(me.getX()-menu.getX(), 
@@ -219,27 +214,16 @@ class SequentViewListener extends MouseInputAdapter
 	}
     }
     
-    @Override
     public void mouseEntered(MouseEvent me) {
-        seqView.requestFocusInWindow();
+        seqView.requestFocusInWindow(); // <-- What for?
     }
     
     public void hideMenu(){
-        menu.setPopupMenuVisible(false);        
+        menu.setPopupMenuVisible(false);
     }
 
-
-    public synchronized void setRefreshHighlightning(boolean doRefresh){
-	refreshHighlightning = doRefresh;
-    }
-	
-    public synchronized boolean refreshHighlightning(){
-	return refreshHighlightning;
-    }
-
-	
-    public synchronized void setModalDragNDropEnabled(boolean allowDragNDrop){
-	modalDragNDropEnabled = allowDragNDrop;
+    public synchronized void setModalDragNDropEnabled(boolean allowDragNDrop) {
+        modalDragNDropEnabled = allowDragNDrop;
     }
 	
     public synchronized boolean modalDragNDropEnabled(){

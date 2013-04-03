@@ -56,13 +56,9 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
-import java.awt.Cursor;
-import java.awt.Font;
 
 public class InnerNodeView extends SequentView {
-
-    // (for titleButton)
-    public static Color lightGreen = new Color(140, 170, 120);
+    
     private SequentPrintFilter filter;
     private InitialPositionTable posTable;
     private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);
@@ -183,7 +179,11 @@ public class InnerNodeView extends SequentView {
             highlightRuleAppPosition(app);
         }
 
-        titleButton.setBorderColor(lightGreen);
+        /*
+         * Few custom options for the button in the top row of each 
+         * SequentView
+         */
+        titleButton.setBorderColor(new Color(140, 170, 120));
         titleButton.setToolTipText("Toggle taclet info");
 
     }

@@ -5,11 +5,7 @@ import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.util.Debug;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
 import java.util.HashMap;
-import javax.swing.AbstractAction;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
@@ -25,6 +21,11 @@ public abstract class SequentView extends JTextArea {
     // all known highlights
     private HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight =
             new HashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
+    
+    /* 
+     * The MainFrame border displays a button in the top-left corner.
+     * Each SequentView has it and can be used for custom actions.
+     */
     public TitleButton titleButton;
 
     SequentView() {

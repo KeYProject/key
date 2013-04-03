@@ -1572,10 +1572,7 @@ public final class MainWindow extends JFrame  {
 	        }
 	    });
 	    thread.start();
-	    
-	
-	    
-
+            
 	}
 	
 	public String toString(){
