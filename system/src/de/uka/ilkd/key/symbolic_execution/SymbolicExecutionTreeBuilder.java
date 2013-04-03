@@ -459,7 +459,8 @@ public class SymbolicExecutionTreeBuilder {
          addToMapping.put(visitedNode, parentToAddTo);
          // Check if the current node has branch conditions which should be added to the execution tree model
          if (!(parentToAddTo instanceof IExecutionStartNode) && // Ignore branch conditions before starting with code execution
-             hasBranchCondition(visitedNode)) {
+             hasBranchCondition(visitedNode) &&
+             SymbolicExecutionUtil.hasSymbolicExecutionLabel(visitedNode.getAppliedRuleApp())) {
             NodeIterator iter = visitedNode.childrenIterator();
             while (iter.hasNext()) {
                Node childNode = iter.next();
