@@ -148,7 +148,6 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
                                                             ImmutableList<Term>,
                                                             ImmutableList<Term>>> respects,
                                        boolean toBeSaved) {
-
         this(baseName, null, forClass, pm, specifiedIn, modality, pre, mby, mod,
              hasRealMod, self, params, result, exc, dep, respects,
              toBeSaved, INVALID_ID);
@@ -433,6 +432,11 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public String getDisplayName() {
         return ContractFactory.generateDisplayName(baseName, forClass, pm,
                                                    specifiedIn, id);
+    }
+
+    @Override
+    public String getPODisplayName() {
+        return "Method Contract";
     }
 
 

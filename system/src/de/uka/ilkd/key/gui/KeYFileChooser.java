@@ -28,6 +28,8 @@ public class KeYFileChooser {
 
     private boolean saveDialog;
 
+    private static final String PROOF_SUBDIRECTORY = "/proof";
+
     public KeYFileChooser(String initDir) {
 	fileChooser = new JFileChooser(new File(initDir)) {
                 /**
@@ -91,14 +93,16 @@ public class KeYFileChooser {
 	}
         setSaveDialog(true);
 
-        String proofDir = new String(fileChooser.getSelectedFile().getParent() + "/proof");
+        String proofDir = new String(fileChooser.getSelectedFile().getParent());
+        if (!fileChooser.getSelectedFile().getParent().endsWith(PROOF_SUBDIRECTORY)) {
+            proofDir = proofDir.concat(PROOF_SUBDIRECTORY);
+        }
         File dir = new File(proofDir);
         boolean newDir = !dir.exists();
         if (newDir) {
             dir.mkdir();
         }
-        File file = new File(proofDir,
-                             fileChooser.getSelectedFile().getName());
+        File file = new File(proofDir, fileChooser.getSelectedFile().getName());
         fileChooser.setSelectedFile(file);
 
 	int result = fileChooser.showSaveDialog(parent);

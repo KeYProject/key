@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.init.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.proof.init.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import java.io.IOException;
 import java.util.List;
@@ -39,7 +40,11 @@ public class SymbolicExecutionPO extends AbstractOperationPO
                                InformationFlowContract contract,
                                ProofObligationVars symbExecVars,
                                Goal initiatingGoal) {
-        super(initConfig, contract.getName());
+        super(initConfig,
+                ContractFactory.generateContractName(contract.getPODisplayName(), contract.getKJT(),
+                                                     contract.getTarget(),
+                                                     contract.getTarget().getContainerType(),
+                                                     contract.getTarget().getStartPosition().getLine()));
         this.contract = contract;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;

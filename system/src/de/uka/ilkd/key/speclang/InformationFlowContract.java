@@ -126,8 +126,15 @@ public interface InformationFlowContract extends Contract {
     
     
     public boolean equals(Contract c);
-    
-    
+
+
+    /**
+     * For generating contract name of SymbolicExecutionPO
+     * @return String "Method Contract"
+     */
+    public String getPODisplayName();
+
+
     /**
      * Returns the dependency set of the contract.
      */
