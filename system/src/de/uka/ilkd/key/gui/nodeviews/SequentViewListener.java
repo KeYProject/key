@@ -21,9 +21,6 @@ import java.awt.dnd.DragSource;
 import java.awt.dnd.DragSourceAdapter;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.InvalidDnDOperationException;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JLabel;
@@ -34,11 +31,8 @@ import javax.swing.event.PopupMenuListener;
 
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
 import de.uka.ilkd.key.gui.macros.ProofMacroMenu;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import java.awt.event.MouseListener;
@@ -55,7 +49,7 @@ import java.awt.event.MouseMotionListener;
  * some Taclet rule instantiation dialog)
  */
 class SequentViewListener
-        implements KeyListener, MouseListener, MouseMotionListener {
+        implements MouseListener, MouseMotionListener {
 	
     private KeYMediator mediator;
     private LeafNodeView seqView;
@@ -64,7 +58,6 @@ class SequentViewListener
    
     public boolean refreshHighlightning;
     private boolean modalDragNDropEnabled;
-    private boolean showTermInfo;
 
     /** last registered mouse position */
     PosInSequent mousePos = PosInSequent.createSequentPos();
@@ -95,15 +88,6 @@ class SequentViewListener
     public void mouseMoved(MouseEvent me) {
         if (me.getSource() == seqView && refreshHighlightning) {
             highlight(me.getPoint());
-            if (showTermInfo) {
-                final String info = getTermInfo();
-
-                if (info == null) {
-                    MainWindow.getInstance().setStandardStatusLine();
-                } else {
-                    MainWindow.getInstance().setStatusLine(info);
-                }
-            }
         }
     }
     
@@ -111,21 +95,6 @@ class SequentViewListener
         if (me.getSource() == seqView && refreshHighlightning) {
             seqView.disableHighlights();
         }
-    }
-
-    private String getTermInfo() {
-        if ((mousePos == null)||
-            ("".equals(seqView.getHighlightedText()))) return null;
-        Term t  ;
-        final PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
-        if (posInOcc != null) {
-            t = posInOcc.subTerm();
-            String tOpClassString = t.op().getClass().toString();
-            String operator = tOpClassString.substring(
-                tOpClassString.lastIndexOf('.')+1);
-            return  operator + ", Sort: " + t.sort() + ", Hash:"+t.hashCode();
-        }
-        return null;
     }
                 	           
     public void mouseClicked(MouseEvent me) {           
@@ -215,7 +184,7 @@ class SequentViewListener
     }
     
     public void mouseEntered(MouseEvent me) {
-        seqView.requestFocusInWindow(); // <-- What for?
+        // Necessary for MouseListener Interface
     }
     
     public void hideMenu(){
@@ -232,44 +201,6 @@ class SequentViewListener
 	
     protected PosInSequent getMousePos() {
 	return mousePos;
-    }	
-    
-    /* (non-Javadoc)
-     * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
-     */
-    public void keyPressed(KeyEvent e) {
-        if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
-            synchronized(this) {
-                showTermInfo = true;	    
-            }
-            final String info = getTermInfo();
-            
-            if (info == null) {
-                MainWindow.getInstance().setStandardStatusLine();
-            } else {                    
-            	MainWindow.getInstance().setStatusLine(info);
-            }
-        }
-    }
-
-
-    /* (non-Javadoc)
-     * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
-     */
-    public void keyReleased(KeyEvent e) {
-        if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK)==0 && showTermInfo) { 
-            synchronized(this) {
-                showTermInfo = false;
-            }
-            MainWindow.getInstance().setStandardStatusLine();
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see java.awt.event.KeyListener#keyTyped(java.awt.event.KeyEvent)
-     */
-    public void keyTyped(KeyEvent e) {                        
-        
     }
    
     public DragGestureListener getDragGestureListener() {

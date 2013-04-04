@@ -60,9 +60,6 @@ public class LeafNodeView extends SequentView implements Autoscroll {
     public static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
 
     public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
-
-    // the used sequentprinter
-    public LogicPrinter printer;
     
     // the default tag of the highlight
     public final Object defaultHighlight;
@@ -72,9 +69,6 @@ public class LeafNodeView extends SequentView implements Autoscroll {
 
     // an additional highlight to mark the first active statement
     private Object additionalHighlight;
-
-    // the used sequent filter
-    private SequentPrintFilter filter;
 
     // the current line width
     int lineWidth;
@@ -164,8 +158,6 @@ public class LeafNodeView extends SequentView implements Autoscroll {
 		 
 	addMouseListener(listener);
 	addMouseMotionListener(listener);	
-	addKeyListener(listener);
-
 
 	// and here comes the drag'n'drop stuff that allows the user to copy
 	// the currently highlighted subterm/formula by mere drag'n'dop actions
@@ -428,37 +420,13 @@ public class LeafNodeView extends SequentView implements Autoscroll {
     public synchronized boolean modalDragNDropEnabled(){
 	return listener.modalDragNDropEnabled();
     }
-    
+
     public String getHighlightedText() {
-       String s;
-       try{
-	   PosInSequent pos = listener.getMousePos();
-	   s = getText(pos.getBounds().start(),
-		       pos.getBounds().length());
-       } catch (Exception ble) { // whatever it is -- forget about it
-	   s="";
-       }
-       return s;
+       return getHighlightedText(listener.getMousePos());
     }
-    
 	
     public PosInSequent getMousePosInSequent() {
        return listener.getMousePos();
-    }
-
-
-    /** Get a PosInSequent object for a given coordinate of the 
-     * displayed sequent. */
-    protected synchronized PosInSequent getPosInSequent(Point p) {
-	String seqText = getText();
-	if (seqText.length() > 0) {
-	    int characterIndex = correctedViewToModel(p);
-	    
-	    return printer().getInitialPositionTable().
-		getPosInSequent(characterIndex, filter);
-	} else {
-	    return null;
-	}
     }
 
     /** Get the character range to be highlighted for the given
@@ -488,36 +456,6 @@ public class LeafNodeView extends SequentView implements Autoscroll {
 	} else {
 	    return null;
 	}
-    }
-
-    /** Return the character index for a certain coordinate.  The
-     * usual viewToModel is focussed on inter-character spaces, not
-     * characters, so it returns the correct index in the
-     * left half of the glyph but one too many in the right half.
-     * Therefore, we get width of character before the one given
-     * by viewToModel, substract it from the given x value, and get
-     * the character at the new position. That is the correct one.  
-     */
-    public int correctedViewToModel(Point p) {
-	String seqText = getText();
-
-	int cursorPosition = viewToModel(p);
-	
-	cursorPosition -= ( cursorPosition > 0 ? 1 : 0);
-	
-	cursorPosition = (cursorPosition >= seqText.length() 
-			  ? seqText.length()-1 :  
-			  cursorPosition);
-	cursorPosition = ( cursorPosition >= 0 ? cursorPosition : 0);
-	int previousCharacterWidth =
-	    getFontMetrics(getFont()).charWidth
-	    (seqText.charAt(cursorPosition));	    	    
-	
-	int characterIndex = viewToModel
-	    (new Point( (int)p.getX() - (previousCharacterWidth/2), 
-			    (int)p.getY())); 
-
-	return characterIndex;
     }
     
     /**

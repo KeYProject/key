@@ -59,7 +59,6 @@ import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
 
 public class InnerNodeView extends SequentView {
     
-    private SequentPrintFilter filter;
     private InitialPositionTable posTable;
     private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);
 
@@ -163,7 +162,7 @@ public class InnerNodeView extends SequentView {
     public InnerNodeView(Node node, KeYMediator mediator) {
 
         filter = new IdentitySequentPrintFilter(node.sequent());
-        LogicPrinter printer = new LogicPrinter(new ProgramPrinter(null),
+        printer = new LogicPrinter(new ProgramPrinter(null),
                 mediator.getNotationInfo(),
                 mediator.getServices());
         printer.printSequent(null, filter);
@@ -365,4 +364,5 @@ public class InnerNodeView extends SequentView {
     public String getTitle() {
         return "Inner Node";
     }
+    
 }
