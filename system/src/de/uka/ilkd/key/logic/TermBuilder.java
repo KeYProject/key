@@ -537,21 +537,27 @@ public class TermBuilder {
     }
 
 
+    /** Translation of JML's \min operator using \ifEx operator. */
     public Term min(QuantifiableVariable qv, Term t, Services services) {
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         final QuantifiableVariable x = new LogicVariable(new Name("x"),intSort);
-        final Term subst = subst(qv, var(x), t);
-        final Term minForm = and(t,all(x,imp(subst,leq(var(qv),var(x), services))));
+        final Term xvar = var(x);
+        final Term subst = subst(qv, xvar, t);
+        final Term lhs = and(inInt(xvar,services),subst);
+        final Term minForm = and(t,all(x,imp(lhs,leq(var(qv),xvar, services))));
         final Term undef = func(new Function(new Name("undefMin"), intSort));
         return ifEx(qv, minForm, var(qv), undef);
     }
 
 
+    /** Translation of JML's \max operator using \ifEx operator. */
     public Term max(QuantifiableVariable qv, Term t, Services services) {
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         final QuantifiableVariable x = new LogicVariable(new Name("x"),intSort);
-        final Term subst = subst(qv, var(x), t);
-        final Term maxForm = and(t,all(x,imp(subst,geq(var(qv),var(x), services))));
+        final Term xvar = var(x);
+        final Term subst = subst(qv, xvar, t);
+        final Term lhs = and(inInt(xvar,services),subst);
+        final Term maxForm = and(t,all(x,imp(lhs,geq(var(qv),xvar, services))));
         final Term undef = func(new Function(new Name("undefMax"), intSort));
         return ifEx(qv, maxForm, var(qv), undef);
     }
