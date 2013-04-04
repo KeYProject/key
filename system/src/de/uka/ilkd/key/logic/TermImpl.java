@@ -14,8 +14,11 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.Iterator;
+
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -46,6 +49,14 @@ final class TermImpl implements Term {
     private ImmutableSet<QuantifiableVariable> freeVars = null;
     private int hashcode = -1;
     
+    /**
+     * This flag indicates that the {@link Term} itself or one
+     * of its children contains a non empty {@link JavaBlock}. 
+     * {@link Term}s which provides a {@link JavaBlock} directly or indirectly
+     * can't be cached because it is possible that the contained meta information
+     * inside the {@link JavaBlock}, e.g. {@link PositionInfo}s, are different.
+     */
+    private boolean containsJavaBlockRecursive = false;
     
     //-------------------------------------------------------------------------
     //constructors
@@ -63,6 +74,7 @@ final class TermImpl implements Term {
 	this.javaBlock = javaBlock == null 
 	                 ? JavaBlock.EMPTY_JAVABLOCK 
 	                 : javaBlock;
+	computeContainsJavaBlockRecursive();
     }
     
 
@@ -71,7 +83,27 @@ final class TermImpl implements Term {
     //internal methods
     //------------------------------------------------------------------------- 
     
-    private void determineFreeVars() {
+    /**
+     * Computes if a non empty {@link JavaBlock} is available in this {@link Term}
+     * or in one of its direct or indirect children. The result is stored in
+     * {@link #containsJavaBlockRecursive} available via {@link #isContainsJavaBlockRecursive()}.
+     */
+    private void computeContainsJavaBlockRecursive() {
+        if (javaBlock != null && !javaBlock.isEmpty()) {
+           containsJavaBlockRecursive = true;
+        }
+        else {
+           Iterator<Term> subIter = subs.iterator();
+           while (!containsJavaBlockRecursive && subIter.hasNext()) {
+              Term next = subIter.next();
+              if (next.isContainsJavaBlockRecursive()) {
+                 containsJavaBlockRecursive = true;
+              }
+           }
+        }
+    }
+
+   private void determineFreeVars() {
 	freeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
         
         if(op instanceof QuantifiableVariable) {
@@ -517,6 +549,12 @@ final class TermImpl implements Term {
     public int serialNumber() {
         return serialNumber;
     }
-
- 
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isContainsJavaBlockRecursive() {
+        return containsJavaBlockRecursive;
+    }
 }

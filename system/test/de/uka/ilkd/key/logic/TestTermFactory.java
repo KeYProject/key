@@ -19,7 +19,17 @@ import junit.framework.TestCase;
 import de.uka.ilkd.key.collection.DefaultImmutableSet;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 
@@ -301,5 +311,29 @@ public class TestTermFactory extends TestCase {
 	assertTrue(exc instanceof TermCreationException);
     }
 
-
+    /**
+     * Tests the caching of {@link Term}s with and without {@link JavaBlock}s.
+     */
+    public void testCaching() {
+       // Create Terms first time
+       Term noJB = tf.createTerm(Junctor.TRUE);
+       Term noJBWithChild = tf.createTerm(Junctor.NOT, noJB);
+       JavaBlock javaBlock = JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
+       Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<Term>(noJB), null, javaBlock);
+       Term withJBChild = tf.createTerm(Junctor.NOT, withJB);
+       Term withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
+       // Create Same terms again
+       Term noJBAgain = tf.createTerm(Junctor.TRUE);
+       Term noJBWithChildAgain = tf.createTerm(Junctor.NOT, noJB);
+       JavaBlock javaBlockAgain = JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
+       Term withJBAgain = tf.createTerm(Modality.DIA, new ImmutableArray<Term>(noJB), null, javaBlockAgain);
+       Term withJBChildAgain = tf.createTerm(Junctor.NOT, withJB);
+       Term withJBChildChildAgain = tf.createTerm(Junctor.NOT, withJBChild);
+       // Test caching
+       assertSame(noJB, noJBAgain);
+       assertSame(noJBWithChild, noJBWithChildAgain);
+       assertNotSame(withJB, withJBAgain);
+       assertNotSame(withJBChild, withJBChildAgain);
+       assertNotSame(withJBChildChild, withJBChildChildAgain);
+    }
 }

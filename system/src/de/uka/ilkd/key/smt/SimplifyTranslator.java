@@ -26,6 +26,8 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 
 
     private static StringBuffer INTSTRING = new StringBuffer("int");
+    
+    private static StringBuffer BOOLSTRING = new StringBuffer("bool");
 
     private static StringBuffer FALSESTRING = new StringBuffer("FALSE");
 
@@ -232,6 +234,10 @@ public class SimplifyTranslator extends AbstractSMTTranslator {
 	return INTSTRING;
     }
 
+    protected StringBuffer getBoolSort() {
+        return BOOLSTRING;
+    }
+    
     @Override
     protected boolean isMultiSorted() {
 	return false;
