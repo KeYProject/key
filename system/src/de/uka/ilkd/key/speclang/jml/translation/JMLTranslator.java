@@ -509,54 +509,59 @@ final class JMLTranslator {
         });
 
         translationMethods.put(JMLKeyWord.MIN,
-                               new JMLQuantifierTranslationMethod() {
+                               new JMLTranslationMethod() {
 
             @Override
-            public Term translateQuantifier(QuantifiableVariable qv,
-                                            Term t)
-                    throws SLTranslationException {
-                Term min = TB.min(qv, TB.convertToFormula(t, services), services);
-                return min;
+            public Object translate(
+                    SLTranslationExceptionManager excManager,
+                    Object... params)
+                            throws SLTranslationException {
+                checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, Services.class);
+                Term guard = (Term) params[0];
+                assert guard.sort() == Sort.FORMULA;
+                final Term body = (Term) params[1];
+                final KeYJavaType type = (KeYJavaType) params[2];
+                if (((ImmutableList<?>)params[3]).size() != 1)
+                    throw new SLTranslationException("\\min may only have one variable");
+                final QuantifiableVariable qv = (QuantifiableVariable)((ImmutableList<?>) params[3]).head();
+                final Services services = (Services) params[5];
+                final KeYJavaType intType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_INT);
+                final KeYJavaType bigIntType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+                final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+                if (!(type == intType || type == bigIntType))
+                    throw new SLTranslationException("\\min variable may only be of type int or \\bigint");
+                assert body.sort() == intSort;
+                return TB.min(qv, guard, body, type==bigIntType, services);
             }
 
 
-            @Override
-            public Term combineQuantifiedTerms(Term t1,
-                                               Term t2)
-                    throws SLTranslationException {
-                throw new SLTranslationException("Only terms of the form (\\min int i; t) are valid");
-            }
-
-
-            @Override
-            protected boolean isGeneralized() {
-                return true;
-            }
         });
         translationMethods.put(JMLKeyWord.MAX,
-                new JMLQuantifierTranslationMethod() {
+                new JMLTranslationMethod() {
 
             @Override
-            public Term translateQuantifier(QuantifiableVariable qv,
-                    Term t)
+            public Object translate(
+                    SLTranslationExceptionManager excManager,
+                    Object... params)
                             throws SLTranslationException {
-                Term max = TB.max(qv, TB.convertToFormula(t, services), services);
-                return max;
+                checkParameters(params, Term.class, Term.class, KeYJavaType.class, ImmutableList.class, Boolean.class, Services.class);
+                Term guard = (Term) params[0];
+                assert guard.sort() == Sort.FORMULA;
+                final Term body = (Term) params[1];
+                final KeYJavaType type = (KeYJavaType) params[2];
+                if (((ImmutableList<?>)params[3]).size() != 1)
+                    throw new SLTranslationException("\\max may only have one variable");
+                final QuantifiableVariable qv = (QuantifiableVariable)((ImmutableList<?>) params[3]).head();
+                final Services services = (Services) params[5];
+                final KeYJavaType intType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_INT);
+                final KeYJavaType bigIntType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+                final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
+                if (!(type == intType || type == bigIntType))
+                    throw new SLTranslationException("\\max variable may only be of type int or \\bigint");
+                assert body.sort() == intSort;
+                return TB.max(qv, guard, body, type==bigIntType, services);
             }
 
-
-            @Override
-            public Term combineQuantifiedTerms(Term t1,
-                    Term t2)
-                            throws SLTranslationException {
-                throw new SLTranslationException("Only terms of the form (\\max int i; t) are valid");
-            }
-
-
-            @Override
-            protected boolean isGeneralized() {
-                return true;
-            }
         });
 
         translationMethods.put(JMLKeyWord.SEQ_DEF, new JMLTranslationMethod() {
