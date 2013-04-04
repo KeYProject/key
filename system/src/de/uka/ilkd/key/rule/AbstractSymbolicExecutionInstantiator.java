@@ -12,14 +12,15 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.proof.Goal;
 
 /**
- * Provides the basic functionality of {@link ITermLabelInstantiator}s
- * which treat {@link ITermLabelInstantiator} added to modalities to 
+ * Provides the basic functionality of {@link ITermLabelWorker}s
+ * which treat {@link ITermLabelWorker} added to modalities to 
  * track symbolic execution.
  * @author Martin Hentschel
  */
-public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabelInstantiator {
+public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabelWorker {
    /**
     * {@inheritDoc}
     */
@@ -28,6 +29,7 @@ public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabe
                                              PosInOccurrence applicationPosInOccurrence, 
                                              Term applicationTerm,
                                              Rule rule, 
+                                             Goal goal,
                                              Operator newTermOp, 
                                              ImmutableArray<Term> newTermSubs,
                                              ImmutableArray<QuantifiableVariable> newTermBoundVars,
@@ -44,7 +46,42 @@ public abstract class AbstractSymbolicExecutionInstantiator implements ITermLabe
       }
       return instantiatedLabels;
    }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public List<ITermLabel> updateLabels(Term tacletTerm, 
+                                        PosInOccurrence applicationPosInOccurrence, 
+                                        Term termToUpdate, 
+                                        Rule rule,
+                                        Goal goal) {
+      if (rule instanceof UseOperationContractRule &&
+          goal.node().getNodeInfo().getBranchLabel().startsWith("Pre")) {
+         return null; // Throw symbolic execution labels away in pre branch of use operation contract rule
+      }
+      else {
+         return keepLabels(termToUpdate);
+      }
+   }
    
+   /**
+    * Keeps the managed {@link ITermLabel} available via {@link #getTermLabel(Term)}
+    * if available.
+    * @param termToUpdate The {@link Term} to update.
+    * @return The {@link ITermLabel}s to keep.
+    */
+   protected List<ITermLabel> keepLabels(Term termToUpdate) {
+      List<ITermLabel> updatedLabels = new LinkedList<ITermLabel>();
+      ITermLabel termLabel = getTermLabel(termToUpdate);
+      if (termLabel != null) {
+         if (termLabel != null && termToUpdate.containsLabel(termLabel)) {
+            updatedLabels.add(termLabel);
+         }
+      }
+      return updatedLabels;
+   }
+
    /**
     * Returns the {@link ITermLabel} to work with.
     * @param applicationTerm The {@link Term} to rewrite.

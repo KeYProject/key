@@ -6,7 +6,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * The {@link ITermLabelInstantiator} used during prove to define how a
+ * The {@link ITermLabelWorker} used during prove to define how a
  * {@link SymbolicExecutionTermLabel} is maintained.
  * @author Martin Hentschel
  */

@@ -835,19 +835,19 @@ public abstract class Taclet implements Rule, Named {
 	final SyntacticalReplaceVisitor srVisitor = 
 	    new SyntacticalReplaceVisitor(services,
                                      mc.getInstantiations(),
-                                     new TermLabelInstantiatorDispatcher(applicationPosInOccurrence, this, getLabelInstantiators(services)));
+                                     new TermLabelWorkerManagement(applicationPosInOccurrence, this, getLabelInstantiators(services)));
 	term.execPostOrder(srVisitor);
 
 	return srVisitor.getTerm();
     }
     
     /**
-     * Returns the {@link ITermLabelInstantiator} to use.
-     * @param services The {@link Services} to extract {@link ITermLabelInstantiator} from.
-     * @return The {@link ITermLabelInstantiator} to use or {@code null} if no {@link ITermLabelInstantiator} are available.
+     * Returns the {@link ITermLabelWorker} to use.
+     * @param services The {@link Services} to extract {@link ITermLabelWorker} from.
+     * @return The {@link ITermLabelWorker} to use or {@code null} if no {@link ITermLabelWorker} are available.
      */
-    protected ImmutableList<ITermLabelInstantiator> getLabelInstantiators(Services services) {
-       ImmutableList<ITermLabelInstantiator> result = null;
+    protected ImmutableList<ITermLabelWorker> getLabelInstantiators(Services services) {
+       ImmutableList<ITermLabelWorker> result = null;
        if (services != null) {
           Proof proof = services.getProof();
           if (proof != null) {

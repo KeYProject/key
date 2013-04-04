@@ -84,7 +84,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.ContractRuleApp;
-import de.uka.ilkd.key.rule.ITermLabelInstantiator;
+import de.uka.ilkd.key.rule.ITermLabelWorker;
 import de.uka.ilkd.key.rule.LoopBodyTermLabelInstantiator;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
@@ -1547,7 +1547,7 @@ public final class SymbolicExecutionUtil {
     * <ul>
     *    <li>Post:    (pre1 | .. | preN)</li>
     *    <li>ExcPost: (excPre1 | ... | excPreM)</li>
-    *    <li>Pre:     !(pre1 | ... | preN | excPre1 | ... | excPreM)</li>
+    *    <li>Pre:     !(pre1 | ... | preN | excPre1 | ... | excPreM) because the branch is only open if all conditions are false</li>
     *    <li>NPE:     caller = null</li>
     * </ul>
     * </p>
@@ -1576,64 +1576,130 @@ public final class SymbolicExecutionUtil {
       
       int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
       if (childIndex >= 3) {
-         throw new ProofInputException("Branch condition of precondition check and null pointer check are not supported."); 
+         throw new ProofInputException("Branch condition of null pointer check is not supported."); 
       }
-      // Assumption: Pre -> Post & ExcPre -> Signals terms are added to last semisequent in antecedent.
-      // Find Term to extract implications from.
-      Semisequent antecedent = node.sequent().antecedent();
-      SequentFormula sf = antecedent.get(antecedent.size() - 1);
-      Term workingTerm = sf.formula();
-      workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
-      if (workingTerm.op() != Junctor.AND) {
-         throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
-      }
-      workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is the combination of all normal and exceptional preconditon postcondition implications
-      workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
-      if (workingTerm.op() != Junctor.AND) {
-         throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
-      }
-      // Find Term exc_n = null which is added (maybe negated) to all exceptional preconditions
-      Term exceptionDefinition = workingTerm;
-      while (exceptionDefinition.op() == Junctor.AND) {
-         exceptionDefinition = exceptionDefinition.sub(0);
-      }
-      // Make sure that exception equality was found
-      Term exceptionEquality;
-      if (exceptionDefinition.op() == Junctor.NOT) {
-         exceptionEquality = exceptionDefinition.sub(0);
+      else if (childIndex == 2) {
+         // Assumption: Original formula in parent is replaced
+         PosInOccurrence pio = parent.getAppliedRuleApp().posInOccurrence();
+         Term workingTerm = posInOccurrenceInOtherNode(parent, pio, node);
+         if (workingTerm == null) {
+            throw new ProofInputException("Term not find in precondition branch, implementation of UseOperationContractRule might has changed!"); 
+         }
+         workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
+         if (workingTerm.op() != Junctor.AND) {
+            throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
+         }
+         Term preconditions = workingTerm.sub(0);
+         return TermBuilder.DF.not(preconditions);
       }
       else {
-         exceptionEquality = exceptionDefinition;
-      }
-      if (exceptionEquality.op() != Equality.EQUALS || exceptionEquality.arity() != 2) {
-         throw new ProofInputException("Equality expected, implementation of UseOperationContractRule might has changed!"); 
-      }
-      if (!isNullSort(exceptionEquality.sub(1).sort(), parent.proof().getServices())) {
-         throw new ProofInputException("Null expected, implementation of UseOperationContractRule might has changed!"); 
-      }
-      KeYJavaType exceptionType = parent.proof().getServices().getJavaInfo().getKeYJavaType(exceptionEquality.sub(0).sort());
-      if (!parent.proof().getServices().getJavaInfo().isSubtype(exceptionType, parent.proof().getServices().getJavaInfo().getKeYJavaType("java.lang.Throwable"))) {
-         throw new ProofInputException("Throwable expected, implementation of UseOperationContractRule might has changed!"); 
-      }
-      // Collect all implications for normal or exceptional preconditions
-      Term implications = workingTerm.sub(1);
-      ImmutableList<Term> implicationTerms = collectPreconditionImpliesPostconditionTerms(ImmutableSLList.<Term>nil(), exceptionDefinition, childIndex == 1, implications);
-      if (!implicationTerms.isEmpty()) {
-         // Implications find, return their conditions as branchconditions
-         ImmutableList<Term> condtionTerms = ImmutableSLList.<Term>nil();
-         for (Term implication : implicationTerms) {
-            condtionTerms = condtionTerms.append(implication.sub(0));
+         // Assumption: Pre -> Post & ExcPre -> Signals terms are added to last semisequent in antecedent.
+         // Find Term to extract implications from.
+         Semisequent antecedent = node.sequent().antecedent();
+         SequentFormula sf = antecedent.get(antecedent.size() - 1);
+         Term workingTerm = sf.formula();
+         workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
+         if (workingTerm.op() != Junctor.AND) {
+            throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
          }
-         
-         Term result = TermBuilder.DF.or(condtionTerms);
-         if (simplify) {
-            result = simplify(node.proof(), result);
+         workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is the combination of all normal and exceptional preconditon postcondition implications
+         workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
+         if (workingTerm.op() != Junctor.AND) {
+            throw new ProofInputException("And operation expected, implementation of UseOperationContractRule might has changed!"); 
          }
-         return result;
+         // Find Term exc_n = null which is added (maybe negated) to all exceptional preconditions
+         Term exceptionDefinition = workingTerm;
+         while (exceptionDefinition.op() == Junctor.AND) {
+            exceptionDefinition = exceptionDefinition.sub(0);
+         }
+         // Make sure that exception equality was found
+         Term exceptionEquality;
+         if (exceptionDefinition.op() == Junctor.NOT) {
+            exceptionEquality = exceptionDefinition.sub(0);
+         }
+         else {
+            exceptionEquality = exceptionDefinition;
+         }
+         if (exceptionEquality.op() != Equality.EQUALS || exceptionEquality.arity() != 2) {
+            throw new ProofInputException("Equality expected, implementation of UseOperationContractRule might has changed!"); 
+         }
+         if (!isNullSort(exceptionEquality.sub(1).sort(), parent.proof().getServices())) {
+            throw new ProofInputException("Null expected, implementation of UseOperationContractRule might has changed!"); 
+         }
+         KeYJavaType exceptionType = parent.proof().getServices().getJavaInfo().getKeYJavaType(exceptionEquality.sub(0).sort());
+         if (!parent.proof().getServices().getJavaInfo().isSubtype(exceptionType, parent.proof().getServices().getJavaInfo().getKeYJavaType("java.lang.Throwable"))) {
+            throw new ProofInputException("Throwable expected, implementation of UseOperationContractRule might has changed!"); 
+         }
+         // Collect all implications for normal or exceptional preconditions
+         Term implications = workingTerm.sub(1);
+         ImmutableList<Term> implicationTerms = collectPreconditionImpliesPostconditionTerms(ImmutableSLList.<Term>nil(), exceptionDefinition, childIndex == 1, implications);
+         if (!implicationTerms.isEmpty()) {
+            // Implications find, return their conditions as branchconditions
+            ImmutableList<Term> condtionTerms = ImmutableSLList.<Term>nil();
+            for (Term implication : implicationTerms) {
+               condtionTerms = condtionTerms.append(implication.sub(0));
+            }
+            
+            Term result = TermBuilder.DF.or(condtionTerms);
+            if (simplify) {
+               result = simplify(node.proof(), result);
+            }
+            return result;
+         }
+         else {
+            // No preconditions available, branchcondition is true
+            return TermBuilder.DF.tt();
+         }
+      }
+   }
+
+   /**
+    * Returns the {@link Term} described by the given {@link PosInOccurrence} of the original {@link Node}
+    * in the {@link Node} to apply on.
+    * @param original The original {@link Node} on which the given {@link PosInOccurrence} works.
+    * @param pio The given {@link PosInOccurrence}.
+    * @param toApplyOn The new {@link Node} to apply the {@link PosInOccurrence} on.
+    * @return The {@link Term} in the other {@link Node} described by the {@link PosInOccurrence} or {@code null} if not available.
+    */
+   public static Term posInOccurrenceInOtherNode(Node original, PosInOccurrence pio, Node toApplyOn) {
+      if (original != null && toApplyOn != null) {
+         return posInOccurrenceInOtherNode(original.sequent(), pio, toApplyOn.sequent());
       }
       else {
-         // No preconditions available, branchcondition is true
-         return TermBuilder.DF.tt();
+         return null;
+      }
+   }
+
+   /**
+    * Returns the {@link Term} described by the given {@link PosInOccurrence} of the original {@link Sequent}
+    * in the {@link Sequent} to apply on.
+    * @param original The original {@link Sequent} on which the given {@link PosInOccurrence} works.
+    * @param pio The given {@link PosInOccurrence}.
+    * @param toApplyOn The new {@link Sequent} to apply the {@link PosInOccurrence} on.
+    * @return The {@link Term} in the other {@link Sequent} described by the {@link PosInOccurrence} or {@code null} if not available.
+    */
+   public static Term posInOccurrenceInOtherNode(Sequent original, PosInOccurrence pio, Sequent toApplyOn) {
+      if (original != null && pio != null && toApplyOn != null) {
+         // Search index of formula in original sequent
+         SequentFormula originalSF = pio.constrainedFormula();
+         boolean antecendet = pio.isInAntec();
+         int index;
+         if (antecendet) {
+            index = original.antecedent().indexOf(originalSF);
+         }
+         else {
+            index = original.succedent().indexOf(originalSF);
+         }
+         if (index >= 0) {
+            SequentFormula toApplyOnSF = (antecendet ? toApplyOn.antecedent() : toApplyOn.succedent()).get(index);
+            return toApplyOnSF.formula().subAt(pio.posInTerm());
+         }
+         else {
+            return null;
+         }
+      }
+      else {
+         return null;
       }
    }
 
@@ -2186,7 +2252,7 @@ public final class SymbolicExecutionUtil {
     */
    public static void configureProof(Proof proof) {
       if (proof != null) {
-         ImmutableList<ITermLabelInstantiator> labelInstantiators = ImmutableSLList.<ITermLabelInstantiator>nil();
+         ImmutableList<ITermLabelWorker> labelInstantiators = ImmutableSLList.<ITermLabelWorker>nil();
          labelInstantiators = labelInstantiators.append(SymbolicExecutionTermLabelInstantiator.INSTANCE);
          labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
          proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);

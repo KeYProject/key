@@ -50,8 +50,9 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.LoopBodyTermLabelInstantiator;
-import de.uka.ilkd.key.rule.TermLabelInstantiatorDispatcher;
+import de.uka.ilkd.key.rule.TermLabelWorkerManagement;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -125,7 +126,7 @@ public final class WhileInvRule {
     
     
     /** calculates the resulting term. */
-    public Term transform(WhileInvariantRule rule, Sequent applicationSequent, PosInOccurrence applicationPos, Term initialPost, Term invariantFramingTermination, SVInstantiations svInst, Services services) {
+    public Term transform(WhileInvariantRule rule, Goal goal, Sequent applicationSequent, PosInOccurrence applicationPos, Term initialPost, Term invariantFramingTermination, SVInstantiations svInst, Services services) {
         
         // global initialisation
         init(initialPost, invariantFramingTermination, services);
@@ -202,6 +203,7 @@ public final class WhileInvRule {
                                      thrownException, 
                                      post,
                                      rule,
+                                     goal,
                                      applicationPos,
                                      services));
         
@@ -212,7 +214,7 @@ public final class WhileInvRule {
                 typeConv.convertToLogicElement(returnFlag);
             resultSubterms.add
             (returnCase(returnFlag, returnType,
-                        returnExpression, post, rule, applicationPos, services));
+                        returnExpression, post, rule, goal, applicationPos, services));
             
             if (returnType != null) {
                 stmnt.add(KeYJavaASTFactory.declare
@@ -229,6 +231,7 @@ public final class WhileInvRule {
             resultSubterms.add(breakCase(breakFlag, post, 
                                          breakIfCascade,
                                          rule,
+                                         goal,
                                          applicationPos,
                                          services)); 
         }
@@ -267,11 +270,11 @@ public final class WhileInvRule {
                                                             new StatementBlock(new Statement[]{resSta, new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)}) : 
                                                             new StatementBlock(resSta));
         // Compute labels
-        ImmutableArray<ITermLabel> labels = TermLabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock);
+        ImmutableArray<ITermLabel> labels = TermLabelWorkerManagement.instantiateLabels(services, applicationPos, rule, goal, null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock);
         // Add loop body term label if required (not already present and loop body instantiator is available)
         ITermLabel[] newLabels;
         if (!labels.contains(LoopBodyTermLabel.INSTANCE) &&
-            TermLabelInstantiatorDispatcher.hasInstantiator(services, LoopBodyTermLabelInstantiator.INSTANCE)) {
+            TermLabelWorkerManagement.hasInstantiator(services, LoopBodyTermLabelInstantiator.INSTANCE)) {
            newLabels = new ITermLabel[labels.size() + 1];
            labels.arraycopy(0, newLabels, 0, labels.size());
            newLabels[newLabels.length - 1] = LoopBodyTermLabel.INSTANCE;
@@ -384,19 +387,17 @@ public final class WhileInvRule {
                             ProgramVariable returnExpression,
                             Term post,
                             WhileInvariantRule rule, 
+                            Goal goal,
                             PosInOccurrence applicationPos, 
                             Services services) {
         JavaBlock returnJavaBlock = addContext(root, new StatementBlock(KeYJavaASTFactory.returnClause(returnExpression)));
         Term executeReturn = TermBuilder.DF.prog(modality, 
                                                  returnJavaBlock, 
                                                  post,
-                                                 TermLabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, modality, new ImmutableArray<Term>(post), null, returnJavaBlock));
+                                                 TermLabelWorkerManagement.instantiateLabels(services, applicationPos, rule, goal, null, modality, new ImmutableArray<Term>(post), null, returnJavaBlock));
         
-        return TermBuilder.DF.imp( 
-              TermBuilder.DF.equals(typeConv.convertToLogicElement(returnFlag), 
-                                typeConv.getBooleanLDT().getTrueTerm()), 
-             executeReturn);
-        
+        return TermBuilder.DF.imp(TermBuilder.DF.equals(typeConv.convertToLogicElement(returnFlag), typeConv.getBooleanLDT().getTrueTerm()),
+                                  executeReturn);
     }
 
 
@@ -416,13 +417,14 @@ public final class WhileInvRule {
                            Term post,
                            ArrayList<If> breakIfCascade,
                            WhileInvariantRule rule, 
+                           Goal goal,
                            PosInOccurrence applicationPos, 
                            Services services) {
         JavaBlock executeJavaBlock = addContext(root, new StatementBlock(breakIfCascade.toArray(new Statement[breakIfCascade.size()])));
         Term executeBreak = TermBuilder.DF.prog(modality, 
                                                 executeJavaBlock, 
                                                 post,
-                                                TermLabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, modality, new ImmutableArray<Term>(post), null, executeJavaBlock));
+                                                TermLabelWorkerManagement.instantiateLabels(services, applicationPos, rule, goal, null, modality, new ImmutableArray<Term>(post), null, executeJavaBlock));
         return TermBuilder.DF.imp(TermBuilder.DF.equals(typeConv.convertToLogicElement(breakFlag), 
                                 typeConv.getBooleanLDT().getTrueTerm()), 
                                 executeBreak); 
@@ -465,13 +467,14 @@ public final class WhileInvRule {
                            ProgramVariable thrownException,
                            Term post,
                            WhileInvariantRule rule, 
+                           Goal goal,
                            PosInOccurrence applicationPos, 
                            Services services) {
         JavaBlock throwJavaBlock = addContext(root, new StatementBlock(KeYJavaASTFactory.throwClause(thrownException)));
         Term throwException = TermBuilder.DF.prog(modality, 
                                                   throwJavaBlock, 
                                                   post,
-                                                  TermLabelInstantiatorDispatcher.instantiateLabels(services, applicationPos, rule, null, modality, new ImmutableArray<Term>(post), null, throwJavaBlock));
+                                                  TermLabelWorkerManagement.instantiateLabels(services, applicationPos, rule, goal, null, modality, new ImmutableArray<Term>(post), null, throwJavaBlock));
         return TermBuilder.DF.imp( 
               TermBuilder.DF.equals(typeConv.convertToLogicElement(excFlag), 
         	       typeConv.getBooleanLDT().getTrueTerm()), 

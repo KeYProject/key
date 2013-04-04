@@ -8,8 +8,8 @@ import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.logic.ITermLabel;
-import de.uka.ilkd.key.rule.ITermLabelInstantiator;
-import de.uka.ilkd.key.rule.TermLabelInstantiatorDispatcher;
+import de.uka.ilkd.key.rule.ITermLabelWorker;
+import de.uka.ilkd.key.rule.TermLabelWorkerManagement;
 
 /**
  * Provides all settings in context of term labels ({@link ITermLabel}).
@@ -27,9 +27,9 @@ public class LabelSettings implements Settings, Cloneable {
    private List<SettingsListener> listeners = new LinkedList<SettingsListener>();
 
    /**
-    * The {@link ITermLabelInstantiator} to use when rules are applied during proof.
+    * The {@link ITermLabelWorker} to use when rules are applied during proof.
     */
-   private ImmutableList<ITermLabelInstantiator> labelInstantiators = ImmutableSLList.<ITermLabelInstantiator>nil();
+   private ImmutableList<ITermLabelWorker> labelInstantiators = ImmutableSLList.<ITermLabelWorker>nil();
    
    /**
     * {@inheritDoc}
@@ -39,9 +39,9 @@ public class LabelSettings implements Settings, Cloneable {
       String instantiatorsValue = props.getProperty(LABEL_INSTANTIATORS_KEY);
       if (instantiatorsValue != null) {
          String[] instantiators = instantiatorsValue.split(",");
-         ImmutableList<ITermLabelInstantiator> loadedInstantiators = ImmutableSLList.<ITermLabelInstantiator>nil();
+         ImmutableList<ITermLabelWorker> loadedInstantiators = ImmutableSLList.<ITermLabelWorker>nil();
          for (String instantiator : instantiators) {
-            ITermLabelInstantiator instance = TermLabelInstantiatorDispatcher.getInstantiator(instantiator.trim());
+            ITermLabelWorker instance = TermLabelWorkerManagement.getInstantiator(instantiator.trim());
             if (instance != null) {
                loadedInstantiators = loadedInstantiators.append(instance);
             }
@@ -57,7 +57,7 @@ public class LabelSettings implements Settings, Cloneable {
    public void writeSettings(Object sender, Properties props) {
       StringBuffer instantiators = new StringBuffer();
       boolean afterFirst = false;
-      for (ITermLabelInstantiator instantiator : labelInstantiators) {
+      for (ITermLabelWorker instantiator : labelInstantiators) {
          if (afterFirst) {
             instantiators.append(", ");
          }
@@ -80,23 +80,23 @@ public class LabelSettings implements Settings, Cloneable {
    }
    
    /**
-    * Returns the {@link ITermLabelInstantiator}s to use when a rule is applied.
-    * @return The {@link ITermLabelInstantiator}s to use when a rule is applied.
+    * Returns the {@link ITermLabelWorker}s to use when a rule is applied.
+    * @return The {@link ITermLabelWorker}s to use when a rule is applied.
     */
-   public ImmutableList<ITermLabelInstantiator> getLabelInstantiators() {
+   public ImmutableList<ITermLabelWorker> getLabelInstantiators() {
       return labelInstantiators;
    }
 
    /**
-    * Sets the {@link ITermLabelInstantiator}s to use when a rule is applied.
-    * @param labelInstantiators The {@link ITermLabelInstantiator}s to use when a rule is applied.
+    * Sets the {@link ITermLabelWorker}s to use when a rule is applied.
+    * @param labelInstantiators The {@link ITermLabelWorker}s to use when a rule is applied.
     */
-   public void setLabelInstantiators(ImmutableList<ITermLabelInstantiator> labelInstantiators) {
+   public void setLabelInstantiators(ImmutableList<ITermLabelWorker> labelInstantiators) {
       if (labelInstantiators != null) {
          this.labelInstantiators = labelInstantiators;
       }
       else {
-         this.labelInstantiators = ImmutableSLList.<ITermLabelInstantiator>nil();
+         this.labelInstantiators = ImmutableSLList.<ITermLabelWorker>nil();
       }
       fireSettingsChanged();
    }

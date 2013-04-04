@@ -66,6 +66,98 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    
    /**
     * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testWhileWithMethodCallAsCondition_preMethodContract() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
+             "WhileWithMethodCallAsCondition", 
+             "size", 
+             "array != null",
+             "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/oracle/WhileWithMethodCallAsCondition_preMethodContract.xml",
+             false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             true,
+             true);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testWhileWithMethodCallAsCondition_preExpandMethods() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
+             "WhileWithMethodCallAsCondition", 
+             "size", 
+             "array != null",
+             "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/oracle/WhileWithMethodCallAsCondition_preExpandMethods.xml",
+             false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             false,
+             true);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testWhileWithMethodCallAsCondition_NoPreMethodContract() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
+             "WhileWithMethodCallAsCondition", 
+             "size", 
+             null,
+             "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/oracle/WhileWithMethodCallAsCondition_NoPreMethodContract.xml",
+             false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             true,
+             true);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition
+    * </p>
+    * <p>
+    * The preserves loop body branch is fulfilled and not contained in the symbolic execution tree!
+    * </p>
+    */
+   public void testWhileWithMethodCallAsCondition_NoPreExpandMethods() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/test/WhileWithMethodCallAsCondition.java", 
+             "WhileWithMethodCallAsCondition", 
+             "size", 
+             null,
+             "examples/_testcase/set/useLoopInvariantWhileWithMethodCallAsCondition/oracle/WhileWithMethodCallAsCondition_NoPreExpandMethods.xml",
+             false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             false,
+             true);
+   }
+   
+   /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantArraySizeDoWhile
     * </p>
     * <p>

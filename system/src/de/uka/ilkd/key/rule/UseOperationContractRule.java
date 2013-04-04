@@ -748,6 +748,9 @@ public final class UseOperationContractRule implements BuiltInRule {
         	                                	   	     reachableState, 
         	                                	   	     mbyOk}))),
                               ruleApp.posInOccurrence());
+        if (TermLabelWorkerManagement.hasInstantiators(services)) {
+           TermLabelWorkerManagement.updateLabels(null, ruleApp.posInOccurrence(), this, preGoal);
+        }
        
         //create "Post" branch
 	final StatementBlock resultAssign;
@@ -765,7 +768,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                          TB.prog(inst.mod, 
                                                  postJavaBlock, 
                                                  inst.progPost.sub(0),
-                                                 TermLabelInstantiatorDispatcher.instantiateLabels(services, ruleApp.posInOccurrence(), this, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)), 
+                                                 TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, postGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, postJavaBlock)), 
                                          null);
         postGoal.addFormula(new SequentFormula(wellFormedAnon), 
         	            true, 
@@ -784,7 +787,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                                       TB.prog(inst.mod, 
                                               excJavaBlock, 
                                               inst.progPost.sub(0),
-                                              TermLabelInstantiatorDispatcher.instantiateLabels(services, ruleApp.posInOccurrence(), this, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)), 
+                                              TermLabelWorkerManagement.instantiateLabels(services, ruleApp.posInOccurrence(), this, excPostGoal, null, inst.mod, new ImmutableArray<Term>(inst.progPost.sub(0)), null, excJavaBlock)), 
                                       null);
         excPostGoal.addFormula(new SequentFormula(wellFormedAnon), 
                 	       true, 

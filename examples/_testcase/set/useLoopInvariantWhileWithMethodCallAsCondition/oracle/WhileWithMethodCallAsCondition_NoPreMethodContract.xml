@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="WhileWithMethodCallAsCondition.size(array);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
+         <callStackEntry path="/0"/>
+         <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
+            <callStackEntry path="/0"/>
+            <useLoopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,i))), savedHeap=null};
+modifies: {heap=false, savedHeap=null};
+variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+               <callStackEntry path="/0"/>
+               <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <callStackEntry path="/0"/>
+                  <branchCondition name="!array = null &amp; i &gt;= 0" pathCondition="!array = null &amp; i &gt;= 0" pathConditionChanged="true" branchCondition="!array = null &amp; i &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <useOperationContract name="result = goOnNice(array, i) catch(exc)
+pre: i &lt; 0 | !array = null &amp; i &gt;= 0
+post: (   i &lt; 0
+   -&gt;   !exc = null
+      &amp;   java.lang.RuntimeException::instance(exc)
+        = TRUE)
+&amp; (   !array = null &amp; i &gt;= 0
+   -&gt; (result = TRUE &lt;-&gt; i &lt; array.length) &amp; exc = null)
+mod: allLocs \cup allLocs \cup allLocs
+          \cup allLocs
+     \cup allLocs
+\cup allLocs
+termination: diamond" pathCondition="!array = null &amp; i &gt;= 0" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
+                        <callStackEntry path="/0"/>
+                        <branchCondition name="!array = null &amp; i &gt;= 0" pathCondition="!array = null &amp; i &gt;= 0" pathConditionChanged="true" branchCondition="!array = null &amp; i &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <callStackEntry path="/0"/>
+                           <branchCondition name="result_4 = TRUE" pathCondition="!array = null &amp; i &gt;= 0 &amp; result_4 = TRUE" pathConditionChanged="true" branchCondition="result_4 = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
+                              <callStackEntry path="/0"/>
+                              <statement name="result_1++;" pathCondition="!array = null &amp; i &gt;= 0 &amp; result_4 = TRUE" pathConditionChanged="false">
+                                 <callStackEntry path="/0"/>
+                                 <statement name="i++;" pathCondition="!array = null &amp; i &gt;= 0 &amp; result_4 = TRUE" pathConditionChanged="false">
+                                    <callStackEntry path="/0"/>
+                                 </statement>
+                              </statement>
+                           </branchCondition>
+                        </branchCondition>
+                        <branchCondition name="!i &gt;= 0" pathCondition="false" pathConditionChanged="true" branchCondition="!i &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <callStackEntry path="/0"/>
+                           <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="false" pathConditionChanged="false" exceptionalTermination="true">
+                           </termination>
+                        </branchCondition>
+                     </useOperationContract>
+                  </branchCondition>
+                  <branchCondition name="!i &gt;= 0" pathCondition="!i &gt;= 0" pathConditionChanged="true" branchCondition="!i &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+                     <useOperationContract name="result = goOnNice(array, i) catch(exc)
+pre: i &lt; 0 | !array = null &amp; i &gt;= 0
+post: (   i &lt; 0
+   -&gt;   !exc = null
+      &amp;   java.lang.RuntimeException::instance(exc)
+        = TRUE)
+&amp; (   !array = null &amp; i &gt;= 0
+   -&gt; (result = TRUE &lt;-&gt; i &lt; array.length) &amp; exc = null)
+mod: allLocs \cup allLocs \cup allLocs
+          \cup allLocs
+     \cup allLocs
+\cup allLocs
+termination: diamond" pathCondition="!i &gt;= 0" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="false" notNullCheckComplied="false">
+                        <callStackEntry path="/0"/>
+                        <branchCondition name="!array = null &amp; i &gt;= 0" pathCondition="i &lt;= -1 &amp; (!array = null &amp; i &gt;= 0)" pathConditionChanged="true" branchCondition="!array = null &amp; i &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <callStackEntry path="/0"/>
+                           <branchCondition name="result_5 = TRUE" pathCondition="i &lt;= -1 &amp; (!array = null &amp; i &gt;= 0) &amp; result_5 = TRUE" pathConditionChanged="true" branchCondition="result_5 = TRUE" mergedBranchCondition="false" isBranchConditionComputed="true">
+                              <callStackEntry path="/0"/>
+                              <statement name="result_1++;" pathCondition="i &lt;= -1 &amp; (!array = null &amp; i &gt;= 0) &amp; result_5 = TRUE" pathConditionChanged="false">
+                                 <callStackEntry path="/0"/>
+                                 <statement name="i++;" pathCondition="i &lt;= -1 &amp; (!array = null &amp; i &gt;= 0) &amp; result_5 = TRUE" pathConditionChanged="false">
+                                    <callStackEntry path="/0"/>
+                                 </statement>
+                              </statement>
+                           </branchCondition>
+                        </branchCondition>
+                        <branchCondition name="!i &gt;= 0" pathCondition="!i &gt;= 0" pathConditionChanged="true" branchCondition="!i &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <callStackEntry path="/0"/>
+                           <termination name="&lt;uncaught java.lang.Exception&gt;" pathCondition="!i &gt;= 0" pathConditionChanged="false" exceptionalTermination="true">
+                           </termination>
+                        </branchCondition>
+                     </useOperationContract>
+                  </branchCondition>
+               </branchCondition>
+               <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                  <callStackEntry path="/0"/>
+                  <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
+                     <callStackEntry path="/0"/>
+                     <branchCondition name="!array = null &amp; i &gt;= 0" pathCondition="!array = null &amp; i &gt;= 0" pathConditionChanged="true" branchCondition="!array = null &amp; i &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <methodReturn name="&lt;return of WhileWithMethodCallAsCondition.size(array);&gt;" pathCondition="!array = null &amp; i &gt;= 0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;i_0&apos; as result of WhileWithMethodCallAsCondition.size(array);&gt;" isReturnValueComputed="true">
+                           <callStackEntry path="/0"/>
+                           <termination name="&lt;end&gt;" pathCondition="!array = null &amp; i &gt;= 0" pathConditionChanged="false" exceptionalTermination="false">
+                           </termination>
+                        </methodReturn>
+                     </branchCondition>
+                  </statement>
+               </branchCondition>
+            </useLoopInvariant>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>
