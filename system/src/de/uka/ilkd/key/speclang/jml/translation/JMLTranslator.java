@@ -522,14 +522,14 @@ final class JMLTranslator {
                 final Term body = (Term) params[1];
                 final KeYJavaType type = (KeYJavaType) params[2];
                 if (((ImmutableList<?>)params[3]).size() != 1)
-                    throw new SLTranslationException("\\min may only have one variable");
+                    throw excManager.createException("\\min may only have one variable");
                 final QuantifiableVariable qv = (QuantifiableVariable)((ImmutableList<?>) params[3]).head();
                 final Services services = (Services) params[5];
                 final KeYJavaType intType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_INT);
                 final KeYJavaType bigIntType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
                 if (!(type == intType || type == bigIntType))
-                    throw new SLTranslationException("\\min variable may only be of type int or \\bigint");
+                    throw excManager.createException("\\min variable may only be of type int or \\bigint");
                 assert body.sort() == intSort;
                 return TB.min(qv, guard, body, type==bigIntType, services);
             }
@@ -550,14 +550,14 @@ final class JMLTranslator {
                 final Term body = (Term) params[1];
                 final KeYJavaType type = (KeYJavaType) params[2];
                 if (((ImmutableList<?>)params[3]).size() != 1)
-                    throw new SLTranslationException("\\max may only have one variable");
+                    throw excManager.createException("\\max may only have one variable");
                 final QuantifiableVariable qv = (QuantifiableVariable)((ImmutableList<?>) params[3]).head();
                 final Services services = (Services) params[5];
                 final KeYJavaType intType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_INT);
                 final KeYJavaType bigIntType = services.getTypeConverter().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
                 if (!(type == intType || type == bigIntType))
-                    throw new SLTranslationException("\\max variable may only be of type int or \\bigint");
+                    throw excManager.createException("\\max variable may only be of type int or \\bigint");
                 assert body.sort() == intSort;
                 return TB.max(qv, guard, body, type==bigIntType, services);
             }
@@ -1022,7 +1022,7 @@ final class JMLTranslator {
                         // get converted prematurely (see bug #1121).
                         // Just check whether there is a cast to boolean.
                         if (type != services.getTypeConverter().getBooleanType()){
-                            excManager.createException("Cannot cast from boolean to "+type+".");
+                            throw excManager.createException("Cannot cast from boolean to "+type+".");
                         }
                     } else if(intHelper.isIntegerTerm(result)) {
                         result = intHelper.buildCastExpression(type, result);
