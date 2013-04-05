@@ -776,7 +776,9 @@ public class TestUtilsUtil {
     */
    public static void expandAll(SWTBotTreeItem item) {
       if (!item.widget.isDisposed()) {
-         item.expand();
+         if (!item.isExpanded()) {
+            item.expand();
+         }
          SWTBotTreeItem[] children = item.getItems();
          for (SWTBotTreeItem child : children) {
             expandAll(child);
