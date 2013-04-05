@@ -33,6 +33,8 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jdt.ui.wizards.JavaCapabilityConfigurationPage;
 import org.eclipse.jface.preference.PreferenceDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TreeItem;
@@ -42,8 +44,11 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException;
 import org.eclipse.swtbot.swt.finder.results.BoolResult;
+import org.eclipse.swtbot.swt.finder.utils.MessageFormat;
+import org.eclipse.swtbot.swt.finder.utils.SWTUtils;
 import org.eclipse.swtbot.swt.finder.waits.DefaultCondition;
 import org.eclipse.swtbot.swt.finder.waits.ICondition;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -271,10 +276,16 @@ public class TestUtilsUtil {
       SWTBotTreeItem lastItem = null;
       for (String segment : toSelects) {
          if (lastItem == null) {
-            lastItem = treeBot.expandNode(segment);
+            lastItem = treeBot.getTreeItem(segment);
+            if (!lastItem.isExpanded()) {
+               lastItem.expand();
+            }
          }
          else {
-            lastItem = lastItem.expandNode(segment);
+            lastItem = lastItem.getNode(segment);
+            if (!lastItem.isExpanded()) {
+               lastItem.expand();
+            }
          }
       }
       treeBot.select(lastItem);
@@ -1073,6 +1084,56 @@ public class TestUtilsUtil {
       @Override
       public String getFailureMessage() {
          return "Element \"" + element + "\" is not selected.";
+      }
+   }
+
+   /**
+    * Clicks on the button with the given text provided by the given
+    * {@link SWTBot} directly without any other events.
+    * @param bot The {@link SWTBot} which provides the button.
+    * @param buttonText The text of the button to click directly on.
+    */
+   public static void clickDirectly(SWTBot bot, String buttonText) {
+      assertNotNull(bot);
+      assertNotNull(buttonText);
+      SWTBotButton button = bot.button(buttonText);
+      clickDirectly(button);
+   }
+   
+   /**
+    * Clicks on the given {@link SWTBotButton} directly without
+    * any other events.
+    * @param button The {@link SWTBotButton} to perform a direct click on.
+    */
+   public static void clickDirectly(SWTBotButton button) {
+      assertNotNull(button);
+      new SWTBotSimpleClickButton(button.widget).click();
+   }
+   
+   /**
+    * Utility method used in {@link TestUtilsUtil#clickDirectly(SWTBotButton)}
+    * to perform a direct click without other events.
+    * @author Martin Hentschel
+    */
+   private static final class SWTBotSimpleClickButton extends SWTBotButton {
+      /**
+       * Constructor.
+       * @param button The {@link Button}.
+       */
+      public SWTBotSimpleClickButton(Button button) {
+         super(button);
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public SWTBotButton click() {
+         log.debug(MessageFormat.format("Clicking on {0}", SWTUtils.getText(widget)));
+         waitForEnabled();
+         notify(SWT.Selection);
+         log.debug(MessageFormat.format("Clicked on {0}", SWTUtils.getText(widget)));
+         return this;
       }
    }
 }
