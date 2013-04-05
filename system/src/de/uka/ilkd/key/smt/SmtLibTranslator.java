@@ -26,6 +26,8 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 
 
     private static StringBuffer INTSTRING = new StringBuffer("Int");
+    
+    private static StringBuffer BOOL = new StringBuffer("Bool");
 
     private static StringBuffer FALSESTRING = new StringBuffer("false");
 
@@ -100,6 +102,10 @@ public class SmtLibTranslator extends AbstractSMTTranslator {
 
     protected StringBuffer translateNullSort() {
 	return NULLSORTSTRING;
+    }
+    
+    protected StringBuffer getBoolSort() {
+        return BOOL;
     }
 
     @Override

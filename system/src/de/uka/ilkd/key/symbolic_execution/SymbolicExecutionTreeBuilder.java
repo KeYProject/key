@@ -225,9 +225,13 @@ public class SymbolicExecutionTreeBuilder {
             }
          });
       }
+      // Make sure that at least one modality was found
+      if (modalityTerms.isEmpty()) {
+         throw new IllegalStateException("Sequent contains no modalities with symbolic execution label.");
+      }
       // Make sure that at most one modality was found
       if (modalityTerms.size() >= 2) {
-         throw new IllegalStateException("Sequent contains multiple modalities.");
+         throw new IllegalStateException("Sequent contains multiple modalities with symbolic execution label.");
       }
       // Make sure that modality has symbolic execution label
       Term modalityTerm = modalityTerms.get(0);

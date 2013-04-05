@@ -26,14 +26,17 @@ import de.uka.ilkd.key.collection.ImmutableSet;
 import de.uka.ilkd.key.gui.KeYSelectionEvent;
 import de.uka.ilkd.key.gui.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
@@ -191,21 +194,22 @@ public final class OneStepSimplifier implements BuiltInRule,
      * the goals' taclet indices.
      */
     private void shutdownIndices() {
-	if(lastProof != null) {
-	   if (!lastProof.isDisposed()) {
-	    for(Goal g : lastProof.openGoals()) {
-		for(NoPosTacletApp app : appsTakenOver) {
-		    g.ruleAppIndex().addNoPosTacletApp(app);
-		}
-		g.getRuleAppManager().clearCache();
-		g.ruleAppIndex().clearIndexes();		
-	    }}
-	    applicabilityCache.clear();
-	    lastProof = null;
-	    appsTakenOver = null;
-	    indices = null;
-	    notSimplifiableCaches = null;
-	}
+        if (lastProof != null) {
+            if (!lastProof.isDisposed()) {
+                for(Goal g : lastProof.openGoals()) {
+                    for(NoPosTacletApp app : appsTakenOver) {
+                        g.ruleAppIndex().addNoPosTacletApp(app);
+                    }
+                    g.getRuleAppManager().clearCache();
+                    g.ruleAppIndex().clearIndexes();    
+                }
+            }
+            applicabilityCache.clear();
+            lastProof = null;
+            appsTakenOver = null;
+            indices = null;
+            notSimplifiableCaches = null;
+        }
     }
     
     

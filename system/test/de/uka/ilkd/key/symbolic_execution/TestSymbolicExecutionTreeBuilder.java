@@ -8,10 +8,16 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionGoalChooser;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
@@ -310,6 +316,52 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
              false,
              true,
              false);
+   }
+   
+   /**
+    * Tests example: examples/_testcase/set/identicalTermsDuringProof
+    */
+   public void testIdenticalTermsDuringProof() throws Exception {
+      // Make sure that correct symbolic execution tree is created.
+      SymbolicExecutionEnvironment<CustomConsoleUserInterface> env = doTest(keyRepDirectory, 
+                                                                            "examples/_testcase/set/identicalTermsDuringProof/test/IdenticalTermsDuringProof.java", 
+                                                                            "IdenticalTermsDuringProof", 
+                                                                            "mid", 
+                                                                            null,
+                                                                            "examples/_testcase/set/identicalTermsDuringProof/oracle/IdenticalTermsDuringProof.xml",
+                                                                            false,
+                                                                            false,
+                                                                            ALL_IN_ONE_RUN,
+                                                                            false,
+                                                                            false,
+                                                                            false);
+      // Find both statements "mid = y;".
+      IExecutionStartNode startNode = env.getBuilder().getStartNode();
+      IExecutionMethodCall methodCall = (IExecutionMethodCall)startNode.getChildren()[0];
+      IExecutionStatement intMidZ = (IExecutionStatement)methodCall.getChildren()[0];
+      IExecutionBranchNode ifYZ = (IExecutionBranchNode)intMidZ.getChildren()[0];
+      IExecutionBranchCondition notXY = (IExecutionBranchCondition)ifYZ.getChildren()[0];
+      IExecutionBranchNode ifXZ = (IExecutionBranchNode)notXY.getChildren()[0];
+      IExecutionBranchCondition not1X = (IExecutionBranchCondition)ifXZ.getChildren()[0];
+      IExecutionStatement midThenBranch = (IExecutionStatement)not1X.getChildren()[0];
+      IExecutionBranchCondition not1Y = (IExecutionBranchCondition)ifYZ.getChildren()[1];
+      IExecutionStatement midElseBranch = (IExecutionStatement)not1Y.getChildren()[0];
+      // Make sure that both statements "mid = y;" have the correct position info.
+      assertNotSame(midThenBranch, midElseBranch);
+      assertNotSame(midThenBranch.getActiveStatement(), midElseBranch.getActiveStatement());
+      PositionInfo thenPosition = midThenBranch.getActivePositionInfo();
+      PositionInfo elsePosition = midElseBranch.getActivePositionInfo();
+      assertNotSame(thenPosition, elsePosition);
+      assertNotSame(PositionInfo.UNDEFINED, thenPosition);
+      assertNotSame(PositionInfo.UNDEFINED, elsePosition);
+      assertEquals(6, thenPosition.getStartPosition().getLine());
+      assertEquals(21, thenPosition.getStartPosition().getColumn());
+      assertEquals(6, thenPosition.getEndPosition().getLine());
+      assertEquals(24, thenPosition.getEndPosition().getColumn());
+      assertEquals(9, elsePosition.getStartPosition().getLine());
+      assertEquals(17, elsePosition.getStartPosition().getColumn());
+      assertEquals(9, elsePosition.getEndPosition().getLine());
+      assertEquals(20, elsePosition.getEndPosition().getColumn());
    }
    
    /**
@@ -1461,24 +1513,26 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
     * @param mergeBranchConditions Merge branch conditions?
     * @param useOperationContracts Use operation contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @return The tested {@link SymbolicExecutionEnvironment}.
     * @throws ProofInputException Occurred Exception
     * @throws IOException Occurred Exception
     * @throws ParserConfigurationException Occurred Exception
     * @throws SAXException Occurred Exception
     * @throws ProblemLoaderException Occurred Exception
+    * @return The proven {@link SymbolicExecutionEnvironment}.
     */
-   protected void doTest(File baseDir,
-                         String javaPathInBaseDir,
-                         String containerTypeName,
-                         final String methodFullName,
-                         String precondition,
-                         String oraclePathInBaseDirFile,
-                         boolean includeVariables,
-                         boolean includeCallStack,
-                         int maximalNumberOfExecutedSetNodes,
-                         boolean mergeBranchConditions,
-                         boolean useOperationContracts,
-                         boolean useLoopInvariants) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
+   protected SymbolicExecutionEnvironment<CustomConsoleUserInterface> doTest(File baseDir,
+                                                                             String javaPathInBaseDir,
+                                                                             String containerTypeName,
+                                                                             final String methodFullName,
+                                                                             String precondition,
+                                                                             String oraclePathInBaseDirFile,
+                                                                             boolean includeVariables,
+                                                                             boolean includeCallStack,
+                                                                             int maximalNumberOfExecutedSetNodes,
+                                                                             boolean mergeBranchConditions,
+                                                                             boolean useOperationContracts,
+                                                                             boolean useLoopInvariants) throws ProofInputException, IOException, ParserConfigurationException, SAXException, ProblemLoaderException {
       String originalRuntimeExceptions = null;
       try {
          // Make sure that parameter are valid.
@@ -1528,6 +1582,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
          assertNotNull(oracleRoot);
          // Make sure that the created symbolic execution tree matches the expected one.
          assertExecutionNodes(oracleRoot, env.getBuilder().getStartNode(), includeVariables, includeCallStack, false);
+         return env;
       }
       finally {
          // Restore runtime option

@@ -76,14 +76,18 @@ public final class TermFactory {
 		= (labels == null || labels.isEmpty() ? 
 				new TermImpl(op, subs, boundVars, javaBlock) : 
 			new LabeledTermImpl(op, subs, boundVars, javaBlock, labels)).checked();
-	
-	Term term = cache.get(newTerm);
-	if(term == null) {
-	    term = newTerm;
-	    cache.put(term, term);
+	// Check if caching is possible. It is not possible if a non empty JavaBlock is available in the term or in one of its children because the meta information like PositionInfos maybe different.
+	if (!newTerm.isContainsJavaBlockRecursive()) {
+	   Term term = cache.get(newTerm);
+	   if(term == null) {
+	       term = newTerm;
+	       cache.put(term, term);
+	   }
+	   return term;
 	}
-
-	return term;
+	else {
+	   return newTerm;
+	}
     } 
     
     
