@@ -21,6 +21,12 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
  */
 public interface IExecutionBranchCondition extends IExecutionNode {
    /**
+    * Returns the optional additional branch label.
+    * @return The additional branch label if available or {@code null} if not available.
+    */
+   public String getAdditionalBranchLabel();
+   
+   /**
     * Checks if the value of {@link #getBranchCondition()} is already computed.
     * @return {@code true} value of {@link #getBranchCondition()} is already computed, {@code false} value of {@link #getBranchCondition()} needs to be computed.
     */

@@ -9,7 +9,7 @@
 modifies: {heap=false, savedHeap=null};
 variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
-               <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
                   <callStackEntry path="/0"/>
                   <useOperationContract name="result = goOnNice(array, i) catch(exc)
 pre: i &lt; 0 | !array = null &amp; i &gt;= 0
@@ -30,7 +30,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
                      </statement>
                   </useOperationContract>
                </branchCondition>
-               <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                   <callStackEntry path="/0"/>
                   <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
                      <callStackEntry path="/0"/>

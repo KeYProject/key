@@ -15,7 +15,7 @@
 modifies: {heap=false, savedHeap=null};
 variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="false">
                         <callStackEntry path="/0"/>
-                        <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+                        <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
                            <callStackEntry path="/0"/>
                            <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
                               <callStackEntry path="/0"/>

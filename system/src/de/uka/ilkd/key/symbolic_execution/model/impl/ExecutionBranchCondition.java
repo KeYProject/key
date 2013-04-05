@@ -48,14 +48,21 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     * Contains the merged branch conditions.
     */
    private Term[] mergedBranchCondtions;
+
+   /**
+    * The optional additional branch label.
+    */
+   private String additionalBranchLabel;
    
    /**
     * Constructor.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
+    * @param additionalBranchLabel The optional additional branch label.
     */
-   public ExecutionBranchCondition(KeYMediator mediator, Node proofNode) {
+   public ExecutionBranchCondition(KeYMediator mediator, Node proofNode, String additionalBranchLabel) {
       super(mediator, proofNode);
+      this.additionalBranchLabel = additionalBranchLabel;
    }
 
    /**
@@ -234,5 +241,13 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
    @Override
    public boolean isMergedBranchCondition() {
       return mergedProofNodes != null && !mergedProofNodes.isEmpty();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getAdditionalBranchLabel() {
+      return additionalBranchLabel;
    }
 }

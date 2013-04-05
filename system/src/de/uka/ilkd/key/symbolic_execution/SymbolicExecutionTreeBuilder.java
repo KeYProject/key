@@ -33,6 +33,7 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
+import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
@@ -466,7 +467,11 @@ public class SymbolicExecutionTreeBuilder {
                if (!keyNodeBranchConditionMapping.containsKey(childNode)) {
                   if (!visitedNode.isClosed()) { // Filter out branches that are closed
                      // Create branch condition
-                     ExecutionBranchCondition condition = new ExecutionBranchCondition(mediator, childNode);
+                     String additionalBranchLabel = null;
+                     if (visitedNode.getAppliedRuleApp().rule() instanceof BuiltInRule) {
+                        additionalBranchLabel = childNode.getNodeInfo().getBranchLabel();
+                     }
+                     ExecutionBranchCondition condition = new ExecutionBranchCondition(mediator, childNode, additionalBranchLabel);
                      // Add branch condition to the branch condition attributes for later adding to the proof tree. This is required for instance to filter out branches after the symbolic execution has finished.
                      List<ExecutionBranchCondition> list = parentToBranchConditionMapping.get(parentToAddTo);
                      if (list == null) {

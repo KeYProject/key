@@ -108,7 +108,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
    protected IExecutionNode createModel() {
       KeYlessStartNode root = new KeYlessStartNode("start", "pc1", true);
       root.addCallStackEntry(root);
-      KeYlessBranchCondition bc = new KeYlessBranchCondition(root, "bc", "pc2", false, "condition of bc", true, true);
+      KeYlessBranchCondition bc = new KeYlessBranchCondition(root, "bc", "pc2", false, "condition of bc", true, true, "myCustomBC");
       bc.addCallStackEntry(root);
       bc.addCallStackEntry(bc);
       root.addChild(bc);

@@ -97,7 +97,13 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
    public String getName() throws DebugException {
       try {
          if (executionNode.isBranchConditionComputed() || !executionNode.isDisposed()) {
-            return executionNode.getName();
+            String additionalBranchLabel = executionNode.getAdditionalBranchLabel();
+            if (additionalBranchLabel != null) {
+               return additionalBranchLabel + ": " + executionNode.getName();
+            }
+            else {
+               return executionNode.getName();
+            }
          }
          else {
             return null;
