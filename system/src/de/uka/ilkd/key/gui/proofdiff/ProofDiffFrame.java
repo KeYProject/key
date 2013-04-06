@@ -236,7 +236,7 @@ public class ProofDiffFrame extends JFrame {
                 if(onlySpaces(diff.text)) {
                     sb.append(diff.text);
                 } else {
-                    sb.append("<span style='background-color: #ff8080;text-decoration: line-through;'>").
+                    sb.append("<span style='background-color: #ff8080;'>").
                     append(toHtml(diff.text)).append("</span>");
                 }
                 break;
@@ -361,8 +361,8 @@ public class ProofDiffFrame extends JFrame {
                 "<p>This window can be used to select one or two sequents of an " +
                 "ongoing or closed proof. All actions refer to the currently selected proof.</p>" +
                 "<p>The textarea shows the <i>in-place diff</i> between two pretty printed " +
-                "sequences. Parts in <span style='background-color: #ff8080;text-decoration: " +
-                "line-through;'>striked-out red</span> are only present in the parent sequent and" +
+                "sequences. Parts in <span style='background-color: #ff8080;'>red</span>" +
+                " are only present in the parent sequent and " +
                 "parts in <span style='background-color: #80ff80;'>green</span> are added in the " +
                 "second proof node.</p>" +
                 "<h3>One node mode</h3>" +
@@ -376,6 +376,7 @@ public class ProofDiffFrame extends JFrame {
                 "component as displayed proof node.";
     }
 
+    // Use this to test the layout of this class.
     public static void main(String[] args) {
         ProofDiffFrame pdf = new ProofDiffFrame(null);
         pdf.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
