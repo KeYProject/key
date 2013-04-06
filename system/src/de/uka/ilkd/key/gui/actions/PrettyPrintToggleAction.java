@@ -30,7 +30,6 @@ public class PrettyPrintToggleAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         boolean selected = ((JCheckBoxMenuItem) e.getSource()).isSelected();
-        System.out.println(selected);
         ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().setUsePretty(selected);
 	NotationInfo.PRETTY_SYNTAX = selected;
 	mainWindow.getUnicodeToggleAction().setEnabled(selected);
