@@ -94,7 +94,8 @@ public class KeYFileChooser {
         fileChooser.setSelectedFile(resetFile);
         setSaveDialog(true);
 
-        final String proofDir = resetFile.getParent().concat(PROOF_SUBDIRECTORY);
+        final String proofDir = resetFile.getParent().endsWith(PROOF_SUBDIRECTORY) ?
+                resetFile.getParent() : resetFile.getParent().concat(PROOF_SUBDIRECTORY);
         final File dir = new File(proofDir);
         boolean newDir = !dir.exists();
         if (newDir) {
@@ -102,7 +103,6 @@ public class KeYFileChooser {
         }
         File newFile = new File(proofDir, resetFile.getName());
         fileChooser.setSelectedFile(newFile);
-
         fileChooser.updateUI(); // Might prevent empty filename suggestion?
 	int result = fileChooser.showSaveDialog(parent);
 
@@ -111,11 +111,10 @@ public class KeYFileChooser {
     }
 
     public void resetPath() {
-        if (resetFile != null) {
-            fileChooser.setSelectedFile(resetFile);
-            fileChooser.updateUI();
-            resetFile = null;
-        }
+        assert resetFile != null;
+        fileChooser.setSelectedFile(resetFile);
+        fileChooser.updateUI();
+        resetFile = null;
     }
 
     public boolean showOpenDialog(Component component) {
