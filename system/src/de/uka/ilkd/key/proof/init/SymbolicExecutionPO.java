@@ -41,10 +41,11 @@ public class SymbolicExecutionPO extends AbstractOperationPO
                                ProofObligationVars symbExecVars,
                                Goal initiatingGoal) {
         super(initConfig,
-                ContractFactory.generateContractName(contract.getPODisplayName(), contract.getKJT(),
-                                                     contract.getTarget(),
-                                                     contract.getTarget().getContainerType(),
-                                                     contract.getTarget().getStartPosition().getLine()));
+              ContractFactory.generateContractName(contract.getPODisplayName(),
+                                                   contract.getKJT(),
+                                                   contract.getTarget(),
+                                                   contract.getTarget().getContainerType(),
+                                                   contract.getTarget().getStartPosition().getLine()));
         this.contract = contract;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;

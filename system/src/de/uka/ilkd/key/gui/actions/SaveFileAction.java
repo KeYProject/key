@@ -34,12 +34,12 @@ public final class SaveFileAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             final KeYFileChooser jFC = GuiUtilities.getFileChooser("Choose filename to save proof");
-            
+
             final String defaultName 
             	= MiscTools.toValidFileName(mainWindow.getMediator().getSelectedProof()
             		                            .name()
             		                            .toString()).toString();
-            
+
             Pair<Boolean, Pair<File, Boolean>> res =
                     jFC.showSaveDialog(mainWindow, defaultName + ".proof");
             boolean saved = res.first;
@@ -52,6 +52,7 @@ public final class SaveFileAction extends MainWindowAction {
                     dir.deleteOnExit();
                 }
             }
+            jFC.resetPath();
         } else {
             mainWindow.popupWarning("No proof.", "Oops...");
         }

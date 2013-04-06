@@ -45,7 +45,8 @@ public class LoopInvExecutionPO extends AbstractOperationPO
                               Goal initiatingGoal,
                               ExecutionContext context) {
         super(initConfig,
-              ContractFactory.generateContractName(loopInv.getName(), loopInv.getKJT(),
+              ContractFactory.generateContractName(loopInv.getName(),
+                                                   loopInv.getKJT(),
                                                    loopInv.getTarget(),
                                                    loopInv.getTarget().getContainerType(),
                                                    loopInv.getLoop().getStartPosition().getLine()));

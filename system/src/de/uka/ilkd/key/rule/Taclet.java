@@ -78,7 +78,7 @@ import de.uka.ilkd.key.util.Debug;
  * <code>B</code>. For a complete description of the syntax and semantics of
  * taclets consult the KeY-Manual.  The objects of this class serve different
  * purposes: First they represent the syntactical structure of a taclet, but 
- * they also include the taclet interpreter isself. The taclet interpreter
+ * they also include the taclet interpreter itself. The taclet interpreter
  * knows two modes: the match and the execution mode. The match mode tries to
  * find a a mapping from schemavariables to a given term or formula. In the
  * execution mode, a given goal is manipulated in the manner as described by the
