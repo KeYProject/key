@@ -36,7 +36,6 @@ import de.uka.ilkd.key.collection.ImmutableSLList;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.ProofIndependentSettings;
-import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -129,6 +128,7 @@ public class DragNDropInstantiator extends DropTargetAdapter {
         seqView.requestFocus();
     }
 
+    @Override
     public void dragOver(DropTargetDragEvent dtde) {       
         seqView.autoscroll(dtde.getLocation());                                          
         seqView.paintHighlights(dtde.getLocation());

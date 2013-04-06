@@ -12,8 +12,9 @@
 // 
 
 
-/** this class offers some methods for assertions, debug output and so
- * on */
+/**
+ * this class offers some methods for assertions, debug output and so on
+ */
 package de.uka.ilkd.key.util;
 
 import java.lang.management.ManagementFactory;
@@ -22,9 +23,6 @@ import javax.management.ObjectName;
 import javax.swing.JOptionPane;
 
 public final class Debug implements DebugMBean {
-
-//    private Debug() {
-//    }
 
     /** has to be set in order to enable assertion */
     public static boolean ENABLE_ASSERTION =

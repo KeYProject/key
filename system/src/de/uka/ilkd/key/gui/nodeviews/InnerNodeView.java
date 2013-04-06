@@ -15,10 +15,7 @@ package de.uka.ilkd.key.gui.nodeviews;
 import java.awt.Color;
 import java.util.Iterator;
 
-import javax.swing.JTextArea;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
-import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
 
 import de.uka.ilkd.key.collection.ImmutableList;
@@ -56,11 +53,39 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
+import javax.swing.text.DefaultHighlighter;
 
 public class InnerNodeView extends SequentView {
     
     private InitialPositionTable posTable;
     private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);
+    
+    public InnerNodeView(Node node, KeYMediator mediator) {
+
+        filter = new IdentitySequentPrintFilter(node.sequent());
+        printer = new LogicPrinter(new ProgramPrinter(null),
+                mediator.getNotationInfo(),
+                mediator.getServices());
+        printer.printSequent(null, filter);
+        sequentOnly = printer.toString();
+        setText(sequentOnly);
+        tacletDescription = getTacletDescription(mediator, node, filter);
+        posTable = printer.getInitialPositionTable();
+        Config.DEFAULT.addConfigChangeListener(configChangeListener);
+        updateUI();
+
+        RuleApp app = node.getAppliedRuleApp();
+        if (app != null) {
+            highlightRuleAppPosition(app);
+        }
+
+        /*
+         * Custom colors for this SequentView.
+         */
+        titleButton.setBorderColor(new Color(140, 170, 120));
+        titleButton.setToolTipText("Toggle taclet info");
+
+    }
 
     private static void writeSVModifiers(StringBuffer out, SchemaVariable sv) {
         boolean started = false;
@@ -159,34 +184,6 @@ public class InnerNodeView extends SequentView {
         }
     }
 
-    public InnerNodeView(Node node, KeYMediator mediator) {
-
-        filter = new IdentitySequentPrintFilter(node.sequent());
-        printer = new LogicPrinter(new ProgramPrinter(null),
-                mediator.getNotationInfo(),
-                mediator.getServices());
-        printer.printSequent(null, filter);
-        sequentOnly = printer.toString();
-        setText(sequentOnly);
-        tacletDescription = getTacletDescription(mediator, node, filter);
-        posTable = printer.getInitialPositionTable();
-        Config.DEFAULT.addConfigChangeListener(configChangeListener);
-        updateUI();
-
-        RuleApp app = node.getAppliedRuleApp();
-        if (app != null) {
-            highlightRuleAppPosition(app);
-        }
-
-        /*
-         * Few custom options for the button in the top row of each 
-         * SequentView
-         */
-        titleButton.setBorderColor(new Color(140, 170, 120));
-        titleButton.setToolTipText("Toggle taclet info");
-
-    }
-
     /**
      * <p>
      * Computes the text to show in this {@link JTextArea} which consists of the
@@ -279,15 +276,13 @@ public class InnerNodeView extends SequentView {
             }
         }
     }
-    static final Highlighter.HighlightPainter RULEAPP_HIGHLIGHTER =
+    static final HighlightPainter RULEAPP_HIGHLIGHTER =
             new DefaultHighlighter.DefaultHighlightPainter(new Color(0.5f, 1.0f, 0.5f, 0.4f));
-    static final Highlighter.HighlightPainter IF_FORMULA_HIGHLIGHTER =
+    static final HighlightPainter IF_FORMULA_HIGHLIGHTER =
             new DefaultHighlighter.DefaultHighlightPainter(new Color(0.8f, 1.0f, 0.8f, 0.5f));
 
     private void highlightRuleAppPosition(RuleApp app) {
         try {
-            setHighlighter(new DefaultHighlighter());
-
             // Set the find highlight first and then the if highlights
             // This seems to make cause the find one to be painted 
             // over the if one.

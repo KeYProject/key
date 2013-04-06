@@ -55,46 +55,27 @@ class SequentViewListener
     private LeafNodeView seqView;
 
     private TacletMenu menu;
-   
-    public boolean refreshHighlightning;
     private boolean modalDragNDropEnabled;
-
-    /** last registered mouse position */
-    PosInSequent mousePos = PosInSequent.createSequentPos();
 
     /** hack to block a click event */
     private long block = 0;
 
     private DragGestureListener seqViewDragGestureListener;
 
-    SequentViewListener(LeafNodeView seqView,
-			KeYMediator mediator) {
+    SequentViewListener(LeafNodeView seqView, KeYMediator mediator) {
 	this.mediator = mediator;
 	this.seqView = seqView;
 	menu = new TacletMenu();
 	seqViewDragGestureListener = new SequentViewGestures();
-        
-        refreshHighlightning = true;
 	setModalDragNDropEnabled(false);
-    }
-
-    private void highlight(Point p) {
-        mousePos = seqView.getPosInSequent(p);            
-        seqView.setCurrentHighlight(seqView.defaultHighlight);
-        seqView.paintHighlights(p);
-        seqView.setLastHighlightedCaretPos(seqView.correctedViewToModel(p));
     }
 	
     public void mouseMoved(MouseEvent me) {
-        if (me.getSource() == seqView && refreshHighlightning) {
-            highlight(me.getPoint());
-        }
+        
     }
     
     public void mouseExited(MouseEvent me) {
-        if (me.getSource() == seqView && refreshHighlightning) {
-            seqView.disableHighlights();
-        }
+        
     }
                 	           
     public void mouseClicked(MouseEvent me) {           
@@ -102,7 +83,7 @@ class SequentViewListener
 	    // if a popup menu is cancelled by a click we do not want to 
 	    // activate another using the same click event 
 	    if (Math.abs(System.currentTimeMillis()-block)>=400) {   
-		mousePos = seqView.getPosInSequent(me.getPoint());  
+		PosInSequent mousePos = seqView.getPosInSequent(me.getPoint());  
 		boolean macroActive = ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().isRightClickMacro();
 //		boolean macroActive = ProofSettings.DEFAULT_SETTINGS.getGeneralSettings().isRightClickMacro();
 		if (mediator!= null && mousePos != null) {
@@ -135,7 +116,7 @@ class SequentViewListener
 					      builtInRules,
 					      mousePos);                               
 
-			refreshHighlightning = false;  
+			seqView.refreshHighlightning = false;  
 
 			final JPopupMenu popup = menu.getPopupMenu();
 
@@ -145,12 +126,12 @@ class SequentViewListener
 				}
 
 				public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-				    refreshHighlightning = true;
+				    seqView.refreshHighlightning = true;
 				    block = System.currentTimeMillis();
 				}
 			    
 				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-				    refreshHighlightning = false;			    
+				    seqView.refreshHighlightning = false;			    
 				}
 			    });
                     
@@ -159,10 +140,10 @@ class SequentViewListener
 		    }
 		} else {
 		    hideMenu();
-		    highlight(me.getPoint());
+		    seqView.highlight(me.getPoint());
 		}
 	    } else {
-		highlight(me.getPoint());
+		seqView.highlight(me.getPoint());
 	    }
 	}
     }
@@ -198,10 +179,6 @@ class SequentViewListener
     public synchronized boolean modalDragNDropEnabled(){
 	return modalDragNDropEnabled;
     }
-	
-    protected PosInSequent getMousePos() {
-	return mousePos;
-    }
    
     public DragGestureListener getDragGestureListener() {
 	return seqViewDragGestureListener;
@@ -214,12 +191,8 @@ class SequentViewListener
 	 */	
 	public void dragGestureRecognized(DragGestureEvent dgEvent) {	
 	    final Object oldHighlight = seqView.getCurrentHighlight();	
-	    final Object dndHighlight =
-                    seqView.getColorHighlight(LeafNodeView.DND_HIGHLIGHT_COLOR);
-	    seqView.setCurrentHighlight(dndHighlight);
-	
+	    seqView.setCurrentHighlight(seqView.dndHighlight);
 	    hideMenu();
-	
 	    Point dragOrigin = dgEvent.getDragOrigin();
 	    PosInSequent localMousePos = seqView.getPosInSequent(dragOrigin);
 	
@@ -235,14 +208,14 @@ class SequentViewListener
 				      public void dragDropEnd(DragSourceDropEvent event) {
 					  // Enable updating the subterm 
 					  // highlightning ...
-					  seqView.removeHighlight(dndHighlight);
+					  seqView.disableHighlight(seqView.dndHighlight);
 					  seqView.setCurrentHighlight(oldHighlight);
 				      }});
 		} catch(InvalidDnDOperationException dnd) {
 		    // system not in proper dnd state
 		    // Enable updating the subterm 
 		    // highlightning ...
-		    seqView.removeHighlight(dndHighlight);
+		    seqView.disableHighlight(seqView.dndHighlight);
 		    seqView.setCurrentHighlight(oldHighlight);		
 		}
 	    }        	    	  

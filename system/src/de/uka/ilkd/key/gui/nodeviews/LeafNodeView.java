@@ -29,8 +29,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.SwingUtilities;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultHighlighter;
 
 import de.uka.ilkd.key.gui.*;
 import de.uka.ilkd.key.gui.configuration.Config;
@@ -40,7 +38,6 @@ import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
@@ -60,15 +57,6 @@ public class LeafNodeView extends SequentView implements Autoscroll {
     public static final Color UPDATE_HIGHLIGHT_COLOR = new Color(0, 150, 130, 38);
 
     public static final Color DND_HIGHLIGHT_COLOR = new Color(0, 150, 130, 104);
-    
-    // the default tag of the highlight
-    public final Object defaultHighlight;
-
-    // the current tag of the highlight
-    private Object currentHighlight;
-
-    // an additional highlight to mark the first active statement
-    private Object additionalHighlight;
 
     // the current line width
     int lineWidth;
@@ -94,9 +82,6 @@ public class LeafNodeView extends SequentView implements Autoscroll {
     // enables this component to be a Drag Source
     DragSource dragSource = null;
 
-    // last highlighted caret position
-    private int lastHighlightedCaretPos;
-
     private static final Insets autoScrollSensitiveRegion = new Insets(20,20,20,20);
     
         
@@ -109,18 +94,6 @@ public class LeafNodeView extends SequentView implements Autoscroll {
 	setMediator(mediator);
 	// disables selection
 	setSelectionColor(getBackground());
-	// sets the painter for the highlightning
-	setHighlighter(new DefaultHighlighter());
-	//sets initial highlight (not visible) and stores its tag <--???
-
-        // REMARK: THE ORDER FOR ADDING HIGHLIGHTS IS CRUCIAL
-	// WHEN USING OVERLAPPING HIGHLIGHTS:
-	// Adding highlight H1 before highlight H2 ensures that 
-	// H1 can overwrite overlapping parts of H2 !!!
-        	        
-	additionalHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR);
-	defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR);
-	currentHighlight = defaultHighlight;
 	listener = new SequentViewListener(this, getMediator());
 	
 	guiListener = new GUIListener(){
@@ -131,7 +104,7 @@ public class LeafNodeView extends SequentView implements Autoscroll {
 		    // is the ApplyTacletDialog
 		    final boolean enableDnD = e.getSource() instanceof ApplyTacletDialog;
 		    listener.setModalDragNDropEnabled(enableDnD);
-		    listener.refreshHighlightning = enableDnD;
+		    refreshHighlightning = enableDnD;
                     
                     // disable drag and drop instantiation of taclets
                     getDropTarget().setActive(false);
@@ -144,7 +117,7 @@ public class LeafNodeView extends SequentView implements Autoscroll {
 			listener.setModalDragNDropEnabled(false);
 		    } 
 
-		    listener.refreshHighlightning = true;
+		    refreshHighlightning = true;
 		    
                     
 		    // enable drag and drop instantiation of taclets
@@ -163,7 +136,6 @@ public class LeafNodeView extends SequentView implements Autoscroll {
 	// the currently highlighted subterm/formula by mere drag'n'dop actions
 	
 	dragSource = new DragSource();
-	
 	dragSource.createDefaultDragGestureRecognizer( this, 
 						       DnDConstants.ACTION_COPY,
 						       listener.getDragGestureListener() );
@@ -189,7 +161,7 @@ public class LeafNodeView extends SequentView implements Autoscroll {
         addHierarchyBoundsListener(changeListener);
 
         /*
-         * Few custom colors for the button in the top row of each SequentView
+         * Custom colors for the button in the top row of each SequentView
          */
         titleButton.setBorderColor(MainFrame.openGoalRed);
         titleButton.setToolTipText("Toggle hidden taclets visibility");
@@ -228,42 +200,6 @@ public class LeafNodeView extends SequentView implements Autoscroll {
     
     protected DragSource getDragSource() {
 	return dragSource;
-    }
-
-    /** 
-     * sets the correct highlighter for the given color  
-     * @param tag the Object used as tag for highlighting     
-     */
-    public void setCurrentHighlight(Object tag) {                
-        currentHighlight = tag;
-    }
-    
-    /**
-     * returns the current tag used for highligthing
-     * @return the current tag used for highlighting
-     */
-    public Object getCurrentHighlight() {        
-        return currentHighlight;
-    }
-
-    /**
-     * removes highlight by setting it to position (0,0)
-     */
-    public void disableHighlight(Object highlight) {
-        try {
-            getHighlighter().changeHighlight(highlight,0,0);
-        } catch (BadLocationException e) {
-            Debug.out("Invalid range for highlight");
-        }
-    }
-    
-    /**
-     * removes the term and first statement highlighter by setting them to 
-     * position (0,0)     
-     */
-    public void disableHighlights() {
-        disableHighlight(currentHighlight);
-        disableHighlight(additionalHighlight);        
     }
 
     /** sets the text being printed */
@@ -321,24 +257,19 @@ public class LeafNodeView extends SequentView implements Autoscroll {
 	addMouseListener(listener);        
 	repaint();
     }
-     
+    
+    // last highlighted caret position
+    private int lastHighlightedCaretPos;
+    
     /** makes the last caret position visible (if possible) */
-    private void restorePosition() {
-	int lastCaretPos = getLastHighlightedCaretPos();
-        if (!(lastCaretPos < 0 || getDocument() == null || 
-	      lastCaretPos > getDocument().getLength())) {
-	    setCaretPosition(lastCaretPos);
+    public void restorePosition() {
+	int lastHighlightedCaretPosTmp = lastHighlightedCaretPos;
+        if (!(lastHighlightedCaretPosTmp < 0 || getDocument() == null || 
+	      lastHighlightedCaretPosTmp > getDocument().getLength())) {
+	    setCaretPosition(lastHighlightedCaretPosTmp);
 	}
     }
-
-    void setLastHighlightedCaretPos(int pos) {
-	lastHighlightedCaretPos = pos;
-    }
-
-    int getLastHighlightedCaretPos() {
-	return lastHighlightedCaretPos;
-    }
-
+    
     /** sets the LogicPrinter to use
      * @param sp the LogicPrinter that is used
      */
@@ -363,7 +294,7 @@ public class LeafNodeView extends SequentView implements Autoscroll {
     /** return used LogicPrinter
      * @return the LogicPrinter that is used
      */
-    public LogicPrinter printer() {
+    public LogicPrinter getPrinter() {
     	return printer;
     }
 
@@ -374,18 +305,6 @@ public class LeafNodeView extends SequentView implements Autoscroll {
     private void setMediator(KeYMediator mediator) {
         Debug.assertTrue(mediator != null, "Mediator must be set");
         this.mediator = mediator;
-    }
-    
-
-    /** the startposition and endposition+1 of the string to be
-     * highlighted
-     * @param p the mouse pointer coordinates
-     */
-    public void paintHighlights(Point p) {
-	// Change highlight for additional Java statement ...
-	paintHighlight(getFirstStatementRange(p), additionalHighlight);
-	// Change Highlighter for currently selected sequent part 
-	paintHighlight(getHighlightRange(p), currentHighlight);
     }
 
     /** returns the mediator of this view
@@ -422,40 +341,11 @@ public class LeafNodeView extends SequentView implements Autoscroll {
     }
 
     public String getHighlightedText() {
-       return getHighlightedText(listener.getMousePos());
+       return getHighlightedText(getPosInSequent(getMousePosition()));
     }
 	
     public PosInSequent getMousePosInSequent() {
-       return listener.getMousePos();
-    }
-
-    /** Get the character range to be highlighted for the given
-     * coordinate in the displayed sequent. */
-    synchronized Range getHighlightRange(Point p) {
-	String seqText = getText();
-	if (seqText.length() > 0) {
-	    int characterIndex = correctedViewToModel(p);	    
-	    return printer().getInitialPositionTable().
-		rangeForIndex(characterIndex);
-	} else {
-	    return null;
-	}
-    }
-
-    /** Get the character range to be highlighted for the first
-     * statement in a java block at the given
-     * coordinate in the displayed sequent.  Returns null
-     * if there is no java block there.*/
-    protected synchronized Range getFirstStatementRange(Point p) {
-	String seqText = getText();
-	if (seqText.length() > 0) {
-	    int characterIndex = correctedViewToModel(p);
-	    
-	    return printer().getInitialPositionTable().
-		firstStatementRangeForIndex(characterIndex);
-	} else {
-	    return null;
-	}
+       return getPosInSequent(getMousePosition());
     }
     
     /**

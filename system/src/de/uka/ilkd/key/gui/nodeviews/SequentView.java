@@ -2,6 +2,8 @@ package de.uka.ilkd.key.gui.nodeviews;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.configuration.Config;
+import static de.uka.ilkd.key.gui.nodeviews.LeafNodeView.ADDITIONAL_HIGHLIGHT_COLOR;
+import static de.uka.ilkd.key.gui.nodeviews.LeafNodeView.DEFAULT_HIGHLIGHT_COLOR;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -30,12 +32,28 @@ import javax.swing.text.Highlighter;
  */
 public abstract class SequentView extends JTextArea
         implements KeyListener, MouseMotionListener, MouseListener {
-
+    
     SequentPrintFilter filter;
     LogicPrinter printer;
+    public boolean refreshHighlightning = true;
+    private boolean showTermInfo = false;
     public static final Color BACKGROUND_COLOR = new Color(249, 249, 249);
     
-    // all known highlights
+    // the default tag of the highlight
+    private final Object defaultHighlight;
+
+    // the current tag of the highlight
+    private Object currentHighlight;
+
+    // an additional highlight to mark the first active java statement
+    private final Object additionalJavaHighlight;
+    
+    // Highlighting color during drag and drop action.
+    public final Object dndHighlight;
+    
+    /*
+     * Store highlights in a HashMap in order to prevent duplicate highlights.
+     */
     private HashMap<Color, DefaultHighlighter.DefaultHighlightPainter> color2Highlight =
             new HashMap<Color, DefaultHighlighter.DefaultHighlightPainter>();
     
@@ -59,15 +77,16 @@ public abstract class SequentView extends JTextArea
         addKeyListener(this);
         addMouseMotionListener(this);
         addMouseListener(this);
+        
+	// sets the painter for the highlightning
+	setHighlighter(new DefaultHighlighter());
+        additionalJavaHighlight = getColorHighlight(ADDITIONAL_HIGHLIGHT_COLOR);
+	defaultHighlight = getColorHighlight(DEFAULT_HIGHLIGHT_COLOR);
+        dndHighlight = getColorHighlight(LeafNodeView.DND_HIGHLIGHT_COLOR);
+	currentHighlight = defaultHighlight;
 
     }
 
-    /**
-     * d a highlighter that marks the regions specified by the returned tag with
-     * the given color
-     *
-     * @param highlight the Object used as tag for the highlight
-     */
     public void removeHighlight(Object highlight) {
         getHighlighter().removeHighlight(highlight);
     }
@@ -81,7 +100,6 @@ public abstract class SequentView extends JTextArea
      */
     void paintHighlight(Range range, Object highlighter) {
         try {
-            // Change highlight for additional Java statement ...
             if (range != null) {
                 getHighlighter()
                         .changeHighlight(highlighter,
@@ -93,7 +111,7 @@ public abstract class SequentView extends JTextArea
         } catch (BadLocationException badLocation) {
             System.err.println("SequentView tried to highlight an area"
                     + "that is not existing.");
-            System.err.println("Exception:" + badLocation);
+            badLocation.printStackTrace();
         }
     }
 
@@ -116,6 +134,7 @@ public abstract class SequentView extends JTextArea
                     getHighlighter().addHighlight(0, 0, hp);
         } catch (BadLocationException e) {
             Debug.out("Highlight range out of scope.");
+            e.printStackTrace();
         }
         return highlight;
     }
@@ -130,7 +149,6 @@ public abstract class SequentView extends JTextArea
         String seqText = getText();
         if (seqText.length() > 0) {
             int characterIndex = correctedViewToModel(p);
-
             return printer.getInitialPositionTable().
                     getPosInSequent(characterIndex, filter);
         } else {
@@ -149,7 +167,6 @@ public abstract class SequentView extends JTextArea
         return s;
     }
 
-    private boolean showTermInfo = false;
     private void showTermInfo(Point p) {
 
         if (showTermInfo) {
@@ -191,24 +208,99 @@ public abstract class SequentView extends JTextArea
      * character at the new position. That is the correct one.
      */
     public int correctedViewToModel(Point p) {
-
         String seqText = getText();
-
         int cursorPosition = viewToModel(p);
-
         cursorPosition -= (cursorPosition > 0 ? 1 : 0);
-
         cursorPosition = (cursorPosition >= seqText.length()
                 ? seqText.length() - 1
                 : cursorPosition);
         cursorPosition = (cursorPosition >= 0 ? cursorPosition : 0);
         int previousCharacterWidth =
                 getFontMetrics(getFont()).charWidth(seqText.charAt(cursorPosition));
-
         int characterIndex = viewToModel(new Point((int) p.getX() - (previousCharacterWidth / 2),
                 (int) p.getY()));
-
         return characterIndex;
+    }
+    
+    /**
+     * removes highlight by setting it to position (0,0)
+     */
+    public void disableHighlight(Object highlight) {
+        try {
+            getHighlighter().changeHighlight(highlight,0,0);
+        } catch (BadLocationException e) {
+            Debug.out("Invalid range for highlight");
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * removes the term and first statement highlighter by setting them to 
+     * position (0,0)     
+     */
+    public void disableHighlights() {
+        disableHighlight(currentHighlight);
+        disableHighlight(additionalJavaHighlight);        
+    }
+    
+    /** 
+     * sets the correct highlighter for the given color  
+     * @param tag the Object used as tag for highlighting     
+     */
+    public void setCurrentHighlight(Object tag) {                
+        currentHighlight = tag;
+    }
+    
+    /**
+     * returns the current tag used for highligthing
+     * @return the current tag used for highlighting
+     */
+    public Object getCurrentHighlight() {        
+        return currentHighlight;
+    }
+    
+    /** the startposition and endposition+1 of the string to be
+     * highlighted
+     * @param p the mouse pointer coordinates
+     */
+    public void paintHighlights(Point p) {
+	// Change highlight for additional Java statement ...
+	paintHighlight(getFirstStatementRange(p), additionalJavaHighlight);
+	// Change Highlighter for currently selected sequent part 
+	paintHighlight(getHighlightRange(p), currentHighlight);
+    }
+    
+    /** Get the character range to be highlighted for the given
+     * coordinate in the displayed sequent. */
+    synchronized Range getHighlightRange(Point p) {
+	String seqText = getText();
+	if (seqText.length() > 0) {
+	    int characterIndex = correctedViewToModel(p);	    
+	    return printer.getInitialPositionTable().
+		rangeForIndex(characterIndex);
+	} else {
+	    return null;
+	}
+    }
+
+    /** Get the character range to be highlighted for the first
+     * statement in a java block at the given
+     * coordinate in the displayed sequent.  Returns null
+     * if there is no java block there.*/
+    protected synchronized Range getFirstStatementRange(Point p) {
+	String seqText = getText();
+	if (seqText.length() > 0) {
+	    int characterIndex = correctedViewToModel(p);
+	    return printer.getInitialPositionTable().
+		firstStatementRangeForIndex(characterIndex);
+	} else {
+	    return null;
+	}
+    }
+    
+    public void highlight(Point p) {
+        setCurrentHighlight(defaultHighlight);
+        paintHighlights(p);
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -230,16 +322,21 @@ public abstract class SequentView extends JTextArea
         requestFocusInWindow();
     }
 
-    public void mouseExited(MouseEvent e) {
-        // Necessary for MouseListener Interface
-    }
-
     public void mouseDragged(MouseEvent me) {
         // Necessary for MouseMotionListener Interface
     }
 
     public void mouseMoved(MouseEvent me) {
         showTermInfo(me.getPoint());
+        if (refreshHighlightning) {
+            highlight(me.getPoint());
+        }
+    }
+    
+    public void mouseExited(MouseEvent e) {
+        if (refreshHighlightning) {
+            disableHighlights();
+        }
     }
 
     public void keyTyped(KeyEvent e) {
