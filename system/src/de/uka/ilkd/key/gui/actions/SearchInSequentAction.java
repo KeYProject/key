@@ -8,8 +8,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import java.awt.Toolkit;
 
 /*
- * Menu option, to show the sequent search bar.
- * Can also be triggered by "F3".
+ * Menu option for showing the sequent search bar.
+ * Keyboard shortcut: STRG+F.
  */
 public class SearchInSequentAction extends MainWindowAction {
 

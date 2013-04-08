@@ -1,10 +1,12 @@
 package de.uka.ilkd.key.gui.actions;
 
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import javax.swing.KeyStroke;
 import de.uka.ilkd.key.gui.MainWindow;
+
+/*
+ * Menu option for showing the proof tree search bar.
+ * Keyboard shortcut: STRG+SHIFT+F.
+ */
 
 public class SearchInProofTreeAction extends MainWindowAction {
 
