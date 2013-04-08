@@ -653,6 +653,10 @@ public class JMLSpecFactory {
                       ? TB.and(TB.convertToFormula(clauses.signals,services), TB.convertToFormula(clauses.signalsOnly,services)) 
                       : TB.imp(TB.not(excNull),TB.and(TB.convertToFormula(clauses.signals,services), TB.convertToFormula(clauses.signalsOnly,services))));
             result.put(heap, heap == services.getTypeConverter().getHeapLDT().getHeap() ? TB.and(post1, post2) : post1);
+          }else{
+            if(clauses.assignables.get(heap) != null) {
+               result.put(heap, TB.tt());
+            }
           }
         }
         return result;
@@ -684,6 +688,10 @@ public class JMLSpecFactory {
            if(clauses.requires.get(heap) != null) {
              final Term pre = TB.convertToFormula(clauses.requires.get(heap), services);
              pres.put(heap, pre);
+           }else{
+             if(clauses.assignables.get(heap) != null) {
+               pres.put(heap, TB.tt());
+             }
            }
         }
         if (clauses.diverges.equals(TB.ff())) {

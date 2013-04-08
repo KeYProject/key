@@ -49,9 +49,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                   SVInstantiations svInst,
                   Services services) {
         final Term target = term.sub(0);
-        final boolean transaction =
-              (target.op() != null &&
-                  (target.op() == Modality.DIA_TRANSACTION || target.op() == Modality.BOX_TRANSACTION));
+        // final boolean transaction = true;
+        //      (target.op() != null &&
+        //          (target.op() == Modality.DIA_TRANSACTION || target.op() == Modality.BOX_TRANSACTION));
+        // Thread.currentThread().dumpStack();
 
         //the target term should have a Java block
         final ProgramElement pe = target.javaBlock().program();
@@ -101,7 +102,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         Term atPreUpdate = null;
         Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
         Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
-        for(LocationVariable heap : HeapContext.getModHeaps(services,transaction)) {
+        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
           final LocationVariable l = TB.heapAtPreVar(services, heap.name()+"Before_" + methodName, heap.sort(), true);
           // buf fix. see #1197
           services.getNamespaces().programVariables().addSafely(l);
@@ -132,7 +133,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
                 Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
                 Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
-                for(LocationVariable heap : HeapContext.getModHeaps(services, transaction)) {
+                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                   final Term m = inv.getModifies(heap, selfTerm, atPres, services);
                   final Term i = inv.getInvariant(heap, selfTerm, atPres, services);
                   newMods.put(heap, m);
