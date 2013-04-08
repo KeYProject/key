@@ -14,16 +14,20 @@
 
 package de.uka.ilkd.key.logic;
 
-import de.uka.ilkd.key.collection.ImmutableSLList;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import junit.framework.TestCase;
-import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.SortImpl;
+import de.uka.ilkd.key.collection.ImmutableArray;
+import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
 
 
@@ -196,6 +200,20 @@ public class TestTerm extends TestCase {
 		      t4 ().isRigid () );
     }
 
-   
-
+   /**
+    * Tests {@link TermImpl#isContainsJavaBlockRecursive()}.
+    */
+   public void testIsContainsJavaBlockRecursive() {
+      Term noJB = tf.createTerm(Junctor.TRUE);
+      Term noJBWithChild = tf.createTerm(Junctor.NOT, noJB);
+      JavaBlock javaBlock = JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
+      Term withJB = tf.createTerm(Modality.DIA, new ImmutableArray<Term>(noJB), null, javaBlock);
+      Term withJBChild = tf.createTerm(Junctor.NOT, withJB);
+      Term withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
+      assertFalse(noJB.isContainsJavaBlockRecursive());
+      assertFalse(noJBWithChild.isContainsJavaBlockRecursive());
+      assertTrue(withJB.isContainsJavaBlockRecursive());
+      assertTrue(withJBChild.isContainsJavaBlockRecursive());
+      assertTrue(withJBChildChild.isContainsJavaBlockRecursive());
+   }
 }

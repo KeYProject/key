@@ -97,5 +97,10 @@ public interface LoopInvariant extends SpecificationElement {
      * perform some action/transformation on this element.
      */
     public void visit(Visitor v);
+    
+    /**
+     * Returns the invariant in pretty plain text format.
+     */
+    public String getPlainText(Services services);
 
 }

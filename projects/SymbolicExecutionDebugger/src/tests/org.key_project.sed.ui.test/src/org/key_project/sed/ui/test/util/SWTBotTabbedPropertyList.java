@@ -98,7 +98,8 @@ public class SWTBotTabbedPropertyList extends AbstractSWTBotControl<TabbedProper
                }
                if (found) {
                   ObjectUtil.invoke(widget, ObjectUtil.findMethod(TabbedPropertyList.class, "select", int.class), i);
-                  return Boolean.TRUE;
+                  widget.redraw();
+                  return Boolean.valueOf(i == widget.getSelectionIndex());
                }
                else {
                   return Boolean.FALSE;

@@ -36,4 +36,5 @@ Bundle-Vendor: KeY Project
 Export-Package: org.key_project.sed.key.ui.jdt,
  org.key_project.sed.key.ui.launch,
  org.key_project.sed.key.ui.presentation,
- org.key_project.sed.key.ui.util
+ org.key_project.sed.key.ui.util,
+ org.key_project.sed.key.ui.view

@@ -124,11 +124,11 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
+   public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = KeYModelUtil.getSourceName(executionNode.getGuardExpressionPositionInfo());
+         sourceName = KeYModelUtil.getSourcePath(executionNode.getGuardExpressionPositionInfo());
          if (sourceName == null) {
-            sourceName = KeYModelUtil.getSourceName(executionNode.getActivePositionInfo()); // Use position info of active statement as fallback because boolean literals (true and false) as expression have no source location.
+            sourceName = KeYModelUtil.getSourcePath(executionNode.getActivePositionInfo()); // Use position info of active statement as fallback because boolean literals (true and false) as expression have no source location.
          }
       }
       return sourceName;
@@ -196,7 +196,9 @@ public class KeYLoopCondition extends AbstractSEDLoopCondition implements IKeYSE
     */
    @Override
    public boolean hasVariables() throws DebugException {
-      return super.hasVariables() && getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
+      return !executionNode.isDisposed() && 
+             super.hasVariables() && 
+             getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
    }
 
    /**

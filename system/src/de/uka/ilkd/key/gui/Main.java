@@ -91,9 +91,9 @@ public class Main {
             KeYResourceManager.getManager().getVersion() +
             " (internal: "+INTERNAL_VERSION+")";
 
-    public static final String COPYRIGHT="(C) Copyright 2001-2011 "
-            +"Universit\u00e4t Karlsruhe, Universit\u00e4t Koblenz-Landau, "
-            +"and Chalmers University of Technology";
+    public static final String COPYRIGHT="(C) Copyright 2001-2013 "
+            +"Karlsruhe Institute of Technology, "
+            +"Chalmers University of Technology, and Technische Universit\u00e4t Darmstadt";
 
     private static final boolean VERBOSE_UI = Boolean.getBoolean("key.verbose-ui");
 

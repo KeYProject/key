@@ -32,7 +32,7 @@ public final class IfExThenElse extends AbstractOperator {
     
     
     private IfExThenElse() {
-	super(new Name("ifEx-then-else"), 
+	super(new Name("ifExThenElse"), 
 	      3,
 	      new Boolean[]{true, true, false},
 	      true);

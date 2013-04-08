@@ -402,7 +402,7 @@
                            </variable>
                         </value>
                      </variable>
-                     <methodReturn name="&lt;return of IntWrapper();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of IntWrapper();&gt;">
+                     <methodReturn name="&lt;return of IntWrapper();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of IntWrapper();&gt;" isReturnValueComputed="false">
                         <variable name="i" arrayIndex="-1" isArrayIndex="false">
                            <value name="i {  param = null &amp; param = null
 | !param = null
@@ -700,7 +700,7 @@
                                        </variable>
                                     </value>
                                  </variable>
-                                 <methodReturn name="&lt;return of IntWrapper();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of IntWrapper();&gt;">
+                                 <methodReturn name="&lt;return of IntWrapper();&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return of IntWrapper();&gt;" isReturnValueComputed="false">
                                     <variable name="i_3" arrayIndex="-1" isArrayIndex="false">
                                        <value name="i_3 {  param = null &amp; param = null
 | !param = null
@@ -895,7 +895,7 @@
 &amp; !param = null">
                                              </value>
                                           </variable>
-                                          <methodReturn name="&lt;return of self.main(param);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;18&apos; as result of self.main(param);&gt;">
+                                          <methodReturn name="&lt;return of self.main(param);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;18&apos; as result of self.main(param);&gt;" isReturnValueComputed="true">
                                              <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                                 <value name="self {  param = null &amp; param = null
 | !param = null

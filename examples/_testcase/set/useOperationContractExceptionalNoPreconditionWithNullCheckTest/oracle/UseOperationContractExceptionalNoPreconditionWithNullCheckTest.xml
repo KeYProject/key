@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int magicNumber = obj.magic(123);" pathCondition="true" pathConditionChanged="false">
+         <useOperationContract name="result = self.magic(x) catch(exc)
+pre: self.&lt;inv&gt;
+post: !exc = null
+&amp; (  (   java.lang.Exception::instance(exc) = TRUE
+      -&gt; self.&lt;inv&gt;)
+   &amp; java.lang.Exception::instance(exc) = TRUE)
+mod: allLocs
+termination: diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="false" hasNotNullCheck="true" notNullCheckComplied="false">
+            <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
+               <statement name="return -1;" pathCondition="true" pathConditionChanged="false">
+                  <methodReturn name="&lt;return of UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-1&apos; as result of UseOperationContractExceptionalNoPreconditionWithNullCheckTest.main(obj);&gt;" isReturnValueComputed="true">
+                     <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                     </termination>
+                  </methodReturn>
+               </statement>
+            </branchCondition>
+         </useOperationContract>
+      </statement>
+   </methodCall>
+</startNode>
