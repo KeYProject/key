@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
 
 /**
  * This {@link IViewPart} shows a thumbnail of the Graphiti editor shown
@@ -25,6 +26,14 @@ public class ExecutionTreeThumbNailView extends AbstractViewBasedThumbNailView {
          handleEditorVisiblePropertyChange(evt);
       }
    };
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   protected boolean shouldHandleBaseViewReference(IViewReference baseViewReference) {
+      return ExecutionTreeView.VIEW_ID.equals(baseViewReference.getId());
+   }
    
    /**
     * {@inheritDoc}

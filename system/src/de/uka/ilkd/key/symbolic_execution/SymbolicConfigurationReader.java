@@ -525,6 +525,26 @@ public class SymbolicConfigurationReader {
       public String getName() {
          return name;
       }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ISymbolicAssociation getAssociation(IProgramVariable programVariable, 
+                                                 boolean isArrayIndex, 
+                                                 int arrayIndex) {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ISymbolicValue getValue(IProgramVariable programVariable, 
+                                     boolean isArrayIndex, 
+                                     int arrayIndex) {
+         return null;
+      }
    }
    
    /**
@@ -584,6 +604,26 @@ public class SymbolicConfigurationReader {
       @Override
       public String getTypeString() {
          return typeString;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ISymbolicAssociation getAssociation(IProgramVariable programVariable, 
+                                                 boolean isArrayIndex, 
+                                                 int arrayIndex) {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public ISymbolicValue getValue(IProgramVariable programVariable, 
+                                     boolean isArrayIndex, 
+                                     int arrayIndex) {
+         return null;
       }
    }
    

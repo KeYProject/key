@@ -107,7 +107,9 @@ public class NodeTabComposite extends AbstractSEDDebugNodeTabComposite {
          if (node != null) {
             name = node.getName();
             type = node.getNodeType();
-            path = node.getPathCondition();
+            if (!node.getDebugTarget().isTerminated()) {
+               path = node.getPathCondition();
+            }
          }
       }
       catch (DebugException e) {

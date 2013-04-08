@@ -279,31 +279,28 @@ public abstract class KeYInstaller {
 	}       
     }
     
-    protected void extractExamples(JarFile jarFile) 
-                                               throws KeYInstallerException {
-	try {
-            Enumeration<JarEntry> en = jarFile.entries();
-            while(en.hasMoreElements()) {
-                JarEntry entry = ((JarEntry)en.nextElement());
-                if (!entry.getName().startsWith("examples/")) continue;
-                
-                File file=new File(keyHome(),entry.getName());
-                if (entry.isDirectory()) {
-                    if (!file.exists()) file.mkdirs();
-                } else {
-                    InputStream in = jarFile.getInputStream(entry);
-                    FileOutputStream out = new FileOutputStream(file);
-                    byte[] buf = new byte[1024];
-                    int i = 0;
-                    while((i=in.read(buf))!=-1) out.write(buf, 0, i);
-                    out.close();
-                    in.close();
+    protected void extractExamples(JarFile jarFile) throws IOException {
+        File targetDir = new File(keyHome(), "examples" + File.separatorChar + "firstTouch");
+        Enumeration<JarEntry> en = jarFile.entries();
+        while(en.hasMoreElements()) {
+            JarEntry entry = ((JarEntry)en.nextElement());
+            File file = new File(targetDir, entry.getName());
+            if (entry.isDirectory()) {
+                if (!file.exists()) {
+                    file.mkdirs();
                 }
+            } else {
+                InputStream in = jarFile.getInputStream(entry);
+                FileOutputStream out = new FileOutputStream(file);
+                byte[] buf = new byte[1024];
+                int i = 0;
+                while ((i = in.read(buf)) != -1) {
+                    out.write(buf, 0, i);
+                }
+                out.close();
+                in.close();
             }
-	} catch ( IOException ioe ) {
-	    throw new KeYInstallerException ( " IOException occurred when trying to extract from jar file. " +
-					      jarFile, ioe );
-	}
+        }
     }
 
     // jar helper methods

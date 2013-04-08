@@ -502,83 +502,118 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 	return or.replace(originalMby);
     }    
     
-    
+    @Override
+    public String getPlainText(Services services) {
+       return getText(false, services);
+    }
     
     @Override
     public String getHTMLText(Services services) {
-    final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-    final LocationVariable baseHeap = heapLDT.getHeap();
-	final StringBuffer sig = new StringBuffer();
-	if(originalResultVar != null) {
-	    sig.append(originalResultVar);
-	    sig.append(" = ");
-	} else if(pm.isConstructor()) {
-	    sig.append(originalSelfVar);
-	    sig.append(" = new ");
-	}
-	if(!pm.isStatic() && !pm.isConstructor()) {
-	    sig.append(originalSelfVar);
-	    sig.append(".");
-	}
-	sig.append(pm.getName());
-	sig.append("(");
-	for(ProgramVariable pv : originalParamVars) {
-	    sig.append(pv.name()).append(", ");
-	}
-	if(!originalParamVars.isEmpty()) {
-	    sig.setLength(sig.length() - 2);
-	}
-	sig.append(")");
-	sig.append(" catch(");
-	sig.append(originalExcVar);
-	sig.append(")");
-	
-        final String mby  = hasMby() 
-        		    ? LogicPrinter.quickPrintTerm(originalMby, services)
-        	            : null;        
-        
-        String mods = "";
-        for(LocationVariable h : heapLDT.getAllHeaps()) {
-           if(originalMods.get(h) != null) {
-             mods = mods +"<br><b>mod"+(h == baseHeap ? "" : "["+h+"]")+"</b> " +
-               LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalMods.get(h), services), false);
-             if(h == baseHeap && !hasRealModifiesClause) {
-               mods = mods + "<b>, creates no new objects</b>";
-             }
-           }
-        }
+       return getText(true, services);
+    }
+    
+   private String getText(boolean includeHtmlMarkup, Services services) {
+      final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+      final LocationVariable baseHeap = heapLDT.getHeap();
+      final StringBuffer sig = new StringBuffer();
+      if (originalResultVar != null) {
+         sig.append(originalResultVar);
+         sig.append(" = ");
+      }
+      else if (pm.isConstructor()) {
+         sig.append(originalSelfVar);
+         sig.append(" = new ");
+      }
+      if (!pm.isStatic() && !pm.isConstructor()) {
+         sig.append(originalSelfVar);
+         sig.append(".");
+      }
+      sig.append(pm.getName());
+      sig.append("(");
+      for (ProgramVariable pv : originalParamVars) {
+         sig.append(pv.name()).append(", ");
+      }
+      if (!originalParamVars.isEmpty()) {
+         sig.setLength(sig.length() - 2);
+      }
+      sig.append(")");
+      sig.append(" catch(");
+      sig.append(originalExcVar);
+      sig.append(")");
 
-        String pres = "";
-        for(LocationVariable h : heapLDT.getAllHeaps()) {
-           if(originalPres.get(h) != null) {
-             pres = pres +"<br><b>pre"+(h == baseHeap ? "" : "["+h+"]")+"</b> " +
-               LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalPres.get(h),services), false);
-           }
-        }
+      final String mby = hasMby() ? LogicPrinter.quickPrintTerm(originalMby, services) : null;
 
-        String posts = "";
-        for(LocationVariable h : heapLDT.getAllHeaps()) {
-           if(originalPres.get(h) != null) {
-             posts = posts +"<br><b>post"+(h == baseHeap ? "" : "["+h+"]")+"</b> " +
-               LogicPrinter.escapeHTML(LogicPrinter.quickPrintTerm(originalPosts.get(h),services), false);
-           }
-        }
+      String mods = "";
+      for (LocationVariable h : heapLDT.getAllHeaps()) {
+         if (originalMods.get(h) != null) {
+            String printMods = LogicPrinter.quickPrintTerm(originalMods.get(h), services);
+            mods = mods
+                  + (includeHtmlMarkup ? "<br><b>" : "\n")
+                  + "mod"
+                  + (h == baseHeap ? "" : "[" + h + "]")
+                  + (includeHtmlMarkup ? "</b> " : ": ")
+                  + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printMods, false) : printMods.trim());
+            if (h == baseHeap && !hasRealModifiesClause) {
+               mods = mods + 
+                      (includeHtmlMarkup ? "<b>" : "") +
+               		 ", creates no new objects" +
+               		 (includeHtmlMarkup ? "</b>" : "");
+            }
+         }
+      }
 
-                      
-        return "<html>"
-                + "<i>" + LogicPrinter.escapeHTML(sig.toString(), false) + "</i>"
-                + pres
-                + posts
-                + mods
-                + (hasMby() 
-                   ? "<br><b>measured-by</b> " + LogicPrinter.escapeHTML(mby, 
-                	   						 false)
-                   : "")                
-                + "<br><b>termination</b> "
-                + getModality()
-                + (transactionApplicableContract() ? "<br><b>transaction applicable</b>" : "")
-                + "</html>";
-    }    
+      String pres = "";
+      for (LocationVariable h : heapLDT.getAllHeaps()) {
+         if (originalPres.get(h) != null) {
+            String printPres = LogicPrinter.quickPrintTerm(originalPres.get(h), services);
+            pres = pres
+                  + (includeHtmlMarkup ? "<br><b>" : "\n")
+                  + "pre"
+                  + (h == baseHeap ? "" : "[" + h + "]")
+                  + (includeHtmlMarkup ? "</b> " : ": ")
+                  + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPres, false) : printPres.trim());
+         }
+      }
+
+      String posts = "";
+      for (LocationVariable h : heapLDT.getAllHeaps()) {
+         if (originalPres.get(h) != null) {
+            String printPosts = LogicPrinter.quickPrintTerm(originalPosts.get(h), services);
+            posts = posts
+                  + (includeHtmlMarkup ? "<br><b>" : "\n")
+                  + "post"
+                  + (h == baseHeap ? "" : "[" + h + "]")
+                  + (includeHtmlMarkup ? "</b> " : ": ")
+                  + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printPosts, false) : printPosts.trim());
+         }
+      }
+
+      if (includeHtmlMarkup) {
+         return "<html>"
+               + "<i>"
+               + LogicPrinter.escapeHTML(sig.toString(), false)
+               + "</i>"
+               + pres
+               + posts
+               + mods
+               + (hasMby() ? "<br><b>measured-by</b> "+ LogicPrinter.escapeHTML(mby, false) : "")
+               + "<br><b>termination</b> "
+               + getModality()
+               + (transactionApplicableContract() ? "<br><b>transaction applicable</b>" : "") + 
+               "</html>";
+         
+      }
+      else {
+         return sig.toString()
+               + pres
+               + posts
+               + mods
+               + (hasMby() ? "\nmeasured-by: "+ mby : "")
+               + "\ntermination: "
+               + getModality()
+               + (transactionApplicableContract() ? "\ntransaction applicable:" : "");
+      }
+   }
     
     
     @Override

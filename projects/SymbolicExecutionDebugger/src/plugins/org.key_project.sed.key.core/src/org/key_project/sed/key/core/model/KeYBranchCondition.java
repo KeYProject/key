@@ -96,7 +96,12 @@ public class KeYBranchCondition extends AbstractSEDBranchCondition implements IK
    @Override
    public String getName() throws DebugException {
       try {
-         return executionNode.getName();
+         if (executionNode.isBranchConditionComputed() || !executionNode.isDisposed()) {
+            return executionNode.getName();
+         }
+         else {
+            return null;
+         }
       }
       catch (ProofInputException e) {
          throw new DebugException(LogUtil.getLogger().createErrorStatus("Can't compute name.", e));

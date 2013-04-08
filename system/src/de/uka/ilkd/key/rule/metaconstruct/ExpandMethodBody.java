@@ -44,8 +44,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 public class ExpandMethodBody extends ProgramTransformer {
 
-    static int counter = 0;
-
     public ExpandMethodBody(SchemaVariable sv) {
         super(new Name("expand-method-body"), (ProgramSV)sv);
     }
