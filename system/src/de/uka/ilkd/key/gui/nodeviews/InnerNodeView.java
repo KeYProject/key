@@ -69,6 +69,7 @@ public class InnerNodeView extends SequentView {
         printer.printSequent(null, filter);
         sequentOnly = printer.toString();
         setText(sequentOnly);
+        setSelectionColor(new Color(10,180,50));
         tacletDescription = getTacletDescription(mediator, node, filter);
         posTable = printer.getInitialPositionTable();
         Config.DEFAULT.addConfigChangeListener(configChangeListener);

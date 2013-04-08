@@ -147,7 +147,7 @@ public abstract class SequentView extends JTextArea
      */
     protected synchronized PosInSequent getPosInSequent(Point p) {
         String seqText = getText();
-        if (seqText.length() > 0) {
+        if (seqText.length() > 0 && p != null) {
             int characterIndex = correctedViewToModel(p);
             return printer.getInitialPositionTable().
                     getPosInSequent(characterIndex, filter);
