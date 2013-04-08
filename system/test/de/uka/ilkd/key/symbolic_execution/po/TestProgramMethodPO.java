@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.key_project.key4eclipse.util.KeYExampleUtil;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.proof.ProblemLoaderException;
@@ -115,7 +116,7 @@ public class TestProgramMethodPO extends AbstractSymbolicExecutionTestCase {
       String originalRuntimeExceptions = null;
       try {
          // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
+         if (!KeYExampleUtil.isChoiceSettingInitialised()) {
             createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false);
          }
          originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);

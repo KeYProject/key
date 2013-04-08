@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -484,5 +485,30 @@ public class SWTUtilTest extends TestCase {
         // Set null
         SWTUtil.setText(label, null);
         assertEquals("", label.getText());
+    }
+    
+    /**
+     * Tests {@link SWTUtil#setText(org.eclipse.swt.widgets.Button, String)}
+     */
+    @Test
+    public void testSetText_Button() {
+        // Create UI
+        Shell shell = new Shell();
+        Button button = new Button(shell, SWT.BORDER);
+        // Set "A"
+        SWTUtil.setText(button, "A");
+        assertEquals("A", button.getText());
+        // Set "B"
+        SWTUtil.setText(button, "B");
+        assertEquals("B", button.getText());
+        // Set ""
+        SWTUtil.setText(button, "");
+        assertEquals("", button.getText());
+        // Set "C"
+        SWTUtil.setText(button, "C");
+        assertEquals("C", button.getText());
+        // Set null
+        SWTUtil.setText(button, null);
+        assertEquals("", button.getText());
     }
 }

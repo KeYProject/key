@@ -17,6 +17,8 @@ import org.eclipse.core.runtime.Status;
 import org.key_project.key4eclipse.Activator;
 import org.osgi.framework.Bundle;
 
+import de.uka.ilkd.key.gui.configuration.ProofSettings;
+
 /**
  * Provides static methods to work with the KeY examples in the Eclipse
  * integration of KeY.
@@ -290,5 +292,13 @@ public class KeYExampleUtil {
                 }
             }
         }
+    }
+    
+    /**
+     * Checks if the choice settings are initialized.
+     * @return {@code true} settings are initialized, {@code false} settings are not initialized.
+     */
+    public static boolean isChoiceSettingInitialised() {
+       return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
     }
 }

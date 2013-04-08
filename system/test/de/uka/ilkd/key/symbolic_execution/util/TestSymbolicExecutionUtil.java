@@ -3,6 +3,9 @@ package de.uka.ilkd.key.symbolic_execution.util;
 import java.util.HashMap;
 
 import junit.framework.TestCase;
+
+import org.key_project.key4eclipse.util.KeYExampleUtil;
+
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 
 /**
@@ -18,7 +21,7 @@ public class TestSymbolicExecutionUtil extends TestCase {
    public void testGetAndSetChoiceSetting() throws Exception {
       String originalValue = null; 
       try {
-         assertTrue(SymbolicExecutionUtil.isChoiceSettingInitialised());
+         assertTrue(KeYExampleUtil.isChoiceSettingInitialised());
          // Store default choice settings
          HashMap<String, String> defaultSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices();
          assertFalse(defaultSettings.isEmpty());

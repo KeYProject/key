@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.key_project.key4eclipse.util.KeYExampleUtil;
 import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.java.PositionInfo;
@@ -1304,7 +1305,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
          }
          assertTrue(maximalNumberOfExecutedSetNodes >= 1);
          // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
+         if (!KeYExampleUtil.isChoiceSettingInitialised()) {
             createSymbolicExecutionEnvironment(baseDir, javaPathInBaseDir, containerTypeName, methodFullName, null, mergeBranchConditions, useOperationContracts, useLoopInvariants);
          }
          originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
