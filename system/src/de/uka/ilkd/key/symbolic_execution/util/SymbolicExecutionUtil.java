@@ -2256,6 +2256,6 @@ public final class SymbolicExecutionUtil {
     * @return {@code true} settings are initialized, {@code false} settings are not initialized.
     */
    public static boolean isChoiceSettingInitialised() {
-      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
+      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices().isEmpty();
    }
 }
