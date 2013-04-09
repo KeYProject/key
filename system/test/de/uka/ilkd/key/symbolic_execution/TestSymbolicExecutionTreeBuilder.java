@@ -72,6 +72,29 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    
    /**
     * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileWithBreak
+    * </p>
+    * <p>
+    * Tests the handling of thrown exceptions when a loop invariant is applied.
+    * </p>
+    */
+   public void testArraySumWhileWithBreak() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantArraySumWhileWithBreak/test/ArraySumWhileWithBreak.java", 
+             "ArraySumWhileWithBreak", 
+             "sum", 
+             null,
+             "examples/_testcase/set/useLoopInvariantArraySumWhileWithBreak/oracle/ArraySumWhileWithBreak.xml",
+             false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             false,
+             true);
+   }
+   
+   /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileWithException
     * </p>
     * <p>

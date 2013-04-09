@@ -17,9 +17,24 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaInfo;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.Branch;
+import de.uka.ilkd.key.java.statement.Break;
+import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.Continue;
+import de.uka.ilkd.key.java.statement.EnhancedFor;
+import de.uka.ilkd.key.java.statement.Guard;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.Return;
+import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -190,7 +205,8 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                         Statement assign =
                                 KeYJavaASTFactory.assign(
                                         b.getProgramVariable(),
-                                        BooleanLiteral.TRUE);
+                                        BooleanLiteral.TRUE,
+                                        x.getPositionInfo()); // Keep the PositionInfo because it is required for symbolic execution tree extraction and this assignment is the only unique representation of the replaced breake
                         stmnts = new Statement[] { assignFlag, assign, breakInnerLabel };
                         replaced = true;
                         addChild(new StatementBlock(stmnts));
