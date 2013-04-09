@@ -72,10 +72,56 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    
    /**
     * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantVoidWhileWithReturn
+    * </p>
+    * <p>
+    * Tests the handling of {@code return} when a loop invariant is applied.
+    * </p>
+    */
+   public void testVoidWhileWithReturn() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantVoidWhileWithReturn/test/VoidWhileWithReturn.java", 
+             "VoidWhileWithReturn", 
+             "sum", 
+             null,
+             "examples/_testcase/set/useLoopInvariantVoidWhileWithReturn/oracle/VoidWhileWithReturn.xml",
+             false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             false,
+             true);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileWithReturn
+    * </p>
+    * <p>
+    * Tests the handling of {@code return} when a loop invariant is applied.
+    * </p>
+    */
+   public void testArraySumWhileWithReturn() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantArraySumWhileWithReturn/test/ArraySumWhileWithReturn.java", 
+             "ArraySumWhileWithReturn", 
+             "sum", 
+             null,
+             "examples/_testcase/set/useLoopInvariantArraySumWhileWithReturn/oracle/ArraySumWhileWithReturn.xml",
+             false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             false,
+             true);
+   }
+   
+   /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileWithBreak
     * </p>
     * <p>
-    * Tests the handling of thrown exceptions when a loop invariant is applied.
+    * Tests the handling of {@code break} when a loop invariant is applied.
     * </p>
     */
    public void testArraySumWhileWithBreak() throws Exception {

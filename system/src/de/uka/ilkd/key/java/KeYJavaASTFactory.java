@@ -216,6 +216,10 @@ public abstract class KeYJavaASTFactory {
 	return new Break(l);
     }
 
+    public static Statement breakStatement(Label label, PositionInfo positionInfo) {
+       return new Break(new ExtList(new Object[] {label, positionInfo}));
+    }
+
     public static Continue continueStatement(Label label) {
         return new Continue(label);
     }

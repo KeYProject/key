@@ -154,12 +154,15 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 if (returnExpr != null) {
                     Statement assignExpr =
                             KeYJavaASTFactory.assign(returnExpr,
-                                    x.getExpression());
+                                                     x.getExpression(),
+                                                     x.getPositionInfo()); // Keep the PositionInfo because it is required for symbolic execution tree extraction and this assignment is the only unique representation of the replaced return
                     stmnts =
                             new Statement[] { assignFlag, assignExpr,
                                     breakInnerLabel };
                 } else
-                    stmnts = new Statement[] { assignFlag, breakInnerLabel };
+                   
+                    stmnts = new Statement[] { assignFlag, 
+                                               KeYJavaASTFactory.breakStatement(breakInnerLabel.getLabel(), x.getPositionInfo()) }; // Keep the PositionInfo because it is required for symbolic execution tree extraction and there is no other unique representation of the replaced return
                 addChild(new StatementBlock(stmnts));
                 changed();
             }
@@ -206,7 +209,7 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                                 KeYJavaASTFactory.assign(
                                         b.getProgramVariable(),
                                         BooleanLiteral.TRUE,
-                                        x.getPositionInfo()); // Keep the PositionInfo because it is required for symbolic execution tree extraction and this assignment is the only unique representation of the replaced breake
+                                        x.getPositionInfo()); // Keep the PositionInfo because it is required for symbolic execution tree extraction and this assignment is the only unique representation of the replaced break
                         stmnts = new Statement[] { assignFlag, assign, breakInnerLabel };
                         replaced = true;
                         addChild(new StatementBlock(stmnts));
