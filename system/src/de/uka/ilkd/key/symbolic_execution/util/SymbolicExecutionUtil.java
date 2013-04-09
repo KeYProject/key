@@ -1879,14 +1879,6 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the choice settings are initialized.
-    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
-    */
-   public static boolean isChoiceSettingInitialised() {
-      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
-   }
-
-   /**
     * This method should be called before the auto mode is started in
     * context of symbolic execution. The method sets {@link StrategyProperties}
     * of the auto mode which are not supported in context of symbolic execution
@@ -2257,5 +2249,13 @@ public final class SymbolicExecutionUtil {
          labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
          proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
       }
+   }
+   
+   /**
+    * Checks if the choice settings are initialized.
+    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
+    */
+   public static boolean isChoiceSettingInitialised() {
+      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
    }
 }

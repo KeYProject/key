@@ -10,6 +10,7 @@ import org.key_project.util.test.testcase.ArrayUtilTest;
 import org.key_project.util.test.testcase.BeanCompositeTest;
 import org.key_project.util.test.testcase.BeanTest;
 import org.key_project.util.test.testcase.BundleUtilTest;
+import org.key_project.util.test.testcase.ButtonViewerTest;
 import org.key_project.util.test.testcase.CollectionUtilTest;
 import org.key_project.util.test.testcase.IOUtilTest;
 import org.key_project.util.test.testcase.JDTUtilTest;
@@ -38,6 +39,7 @@ import org.key_project.util.test.testcase.XMLUtilTest;
     BeanCompositeTest.class,
     BeanTest.class,
     BundleUtilTest.class,
+    ButtonViewerTest.class,
     CollectionUtilTest.class,
     IOUtilTest.class,
     JDTUtilTest.class,
