@@ -25,5 +25,19 @@
          </enabledWhen>
       </page>
    </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.key_project.key4eclipse.common.ui.preference.page.KeYPreferencePage"
+            id="org.key_project.key4eclipse.common.ui.preference.page.KeY"
+            name="KeY">
+      </page>
+      <page
+            category="org.key_project.key4eclipse.common.ui.preference.page.KeY"
+            class="org.key_project.key4eclipse.common.ui.preference.page.TacletOptionsPreferencePage"
+            id="org.key_project.key4eclipse.common.ui.preference.page.TacletOptions"
+            name="Taclet Options">
+      </page>
+   </extension>
 
 </plugin>

@@ -16,5 +16,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.key4eclipse.common.ui.dialog,
  org.key_project.key4eclipse.common.ui.handler,
+ org.key_project.key4eclipse.common.ui.preference.page,
  org.key_project.key4eclipse.common.ui.property,
  org.key_project.key4eclipse.common.ui.provider
