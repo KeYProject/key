@@ -72,6 +72,52 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    
    /**
     * <p>
+    * Tests example: examples/_testcase/set/nestedLoopsWithContinue
+    * </p>
+    * <p>
+    * Tests the handling of {@code continue} when a loop is expanded.
+    * </p>
+    */
+   public void testNestedLoopsWithContinue() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/nestedLoopsWithContinue/test/NestedLoopsWithContinue.java", 
+             "NestedLoopsWithContinue", 
+             "main", 
+             null,
+             "examples/_testcase/set/nestedLoopsWithContinue/oracle/NestedLoopsWithContinue.xml",
+             false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             false,
+             false);
+   }
+   
+   /**
+    * <p>
+    * Tests example: examples/_testcase/set/useLoopInvariantArraySumWhileWithContinue
+    * </p>
+    * <p>
+    * Tests the handling of {@code continue} when a loop invariant is applied.
+    * </p>
+    */
+   public void testArraySumWhileWithContinue() throws Exception {
+      doTest(keyRepDirectory, 
+             "examples/_testcase/set/useLoopInvariantArraySumWhileWithContinue/test/ArraySumWhileWithContinue.java", 
+             "ArraySumWhileWithContinue", 
+             "sum", 
+             null,
+             "examples/_testcase/set/useLoopInvariantArraySumWhileWithContinue/oracle/ArraySumWhileWithContinue.xml",
+             false,
+             true,
+             DEFAULT_MAXIMAL_SET_NODES_PER_RUN,
+             false,
+             false,
+             true);
+   }
+   
+   /**
+    * <p>
     * Tests example: examples/_testcase/set/useLoopInvariantVoidWhileWithReturn
     * </p>
     * <p>

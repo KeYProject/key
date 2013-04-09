@@ -180,7 +180,8 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             } else {
                 Statement assign =
                         KeYJavaASTFactory.assign(cont, BooleanLiteral.TRUE);
-                Statement[] stmnts = { assign, breakInnerLabel };
+                Statement[] stmnts = { assign, 
+                                       KeYJavaASTFactory.breakStatement(breakInnerLabel.getLabel(), x.getPositionInfo()) }; // Keep the PositionInfo because it is required for symbolic execution tree extraction and there is no other unique representation of the replaced continue
                 addChild(new StatementBlock(stmnts));
                 changed();
             }
