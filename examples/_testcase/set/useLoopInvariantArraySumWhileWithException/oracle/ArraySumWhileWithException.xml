@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
+   <methodCall name="ArraySumWhileWithException.sum(array);" pathCondition="true" pathConditionChanged="false">
+      <statement name="int result = 0;" pathCondition="true" pathConditionChanged="false">
+         <callStackEntry path="/0"/>
+         <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
+            <callStackEntry path="/0"/>
+            <useLoopInvariant name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))), savedHeap=null};
+modifies: {heap=false, savedHeap=null};
+variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
+               <callStackEntry path="/0"/>
+               <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
+                  <callStackEntry path="/0"/>
+                  <statement name="result_1+=array[i];" pathCondition="true" pathConditionChanged="false">
+                     <callStackEntry path="/0"/>
+                     <statement name="i++;" pathCondition="true" pathConditionChanged="false">
+                        <callStackEntry path="/0"/>
+                        <branchNode name="if (array.length==3) {throw new RuntimeException (); }" pathCondition="true" pathConditionChanged="false">
+                           <callStackEntry path="/0"/>
+                           <statement name="throw new RuntimeException ();" pathCondition="true" pathConditionChanged="false">
+                              <callStackEntry path="/0"/>
+                              <termination name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="true">
+                              </termination>
+                           </statement>
+                        </branchNode>
+                     </statement>
+                  </statement>
+               </branchCondition>
+               <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Use Case">
+                  <callStackEntry path="/0"/>
+                  <statement name="return result_1;" pathCondition="true" pathConditionChanged="false">
+                     <callStackEntry path="/0"/>
+                     <methodReturn name="&lt;return of ArraySumWhileWithException.sum(array);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;result_1_0&apos; as result of ArraySumWhileWithException.sum(array);&gt;" isReturnValueComputed="true">
+                        <callStackEntry path="/0"/>
+                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                        </termination>
+                     </methodReturn>
+                  </statement>
+               </branchCondition>
+            </useLoopInvariant>
+         </statement>
+      </statement>
+   </methodCall>
+</startNode>
