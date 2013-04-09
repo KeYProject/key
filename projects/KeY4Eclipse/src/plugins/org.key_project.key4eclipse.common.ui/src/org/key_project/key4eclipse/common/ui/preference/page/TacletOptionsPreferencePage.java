@@ -12,6 +12,7 @@ import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
 import de.uka.ilkd.key.proof.ProblemLoaderException;
 import de.uka.ilkd.key.symbolic_execution.util.KeYEnvironment;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
 
 /**
@@ -33,7 +34,7 @@ public class TacletOptionsPreferencePage extends AbstractChoicePreferencePage {
     */
    @Override
    protected boolean isChoiceSettingsLoadingRequired() {
-      return !KeYExampleUtil.isChoiceSettingInitialised();
+      return !SymbolicExecutionUtil.isChoiceSettingInitialised();
    }
 
    /**

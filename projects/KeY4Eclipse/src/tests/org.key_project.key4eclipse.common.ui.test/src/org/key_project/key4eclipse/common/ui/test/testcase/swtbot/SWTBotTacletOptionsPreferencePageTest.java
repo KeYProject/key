@@ -13,12 +13,12 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTabItem;
 import org.junit.Test;
 import org.key_project.key4eclipse.common.ui.preference.page.TacletOptionsPreferencePage;
-import org.key_project.key4eclipse.util.KeYExampleUtil;
 import org.key_project.util.java.ObjectUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
 
 import de.uka.ilkd.key.gui.configuration.ChoiceSettings;
 import de.uka.ilkd.key.gui.configuration.ProofSettings;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * SWTBot tests for {@link TacletOptionsPreferencePage}.
@@ -50,10 +50,10 @@ public class SWTBotTacletOptionsPreferencePageTest extends TestCase {
     */
    protected void doTestShownValuesAndModification(boolean approve) throws Exception{
       // Make sure that runtime options are available
-      if (!KeYExampleUtil.isChoiceSettingInitialised()) {
+      if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
          TacletOptionsPreferencePage.loadChoiceSettings();
       }
-      assertTrue(KeYExampleUtil.isChoiceSettingInitialised());
+      assertTrue(SymbolicExecutionUtil.isChoiceSettingInitialised());
       // Get original settings
       ChoiceSettings oldSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
       assertNotNull(oldSettings);

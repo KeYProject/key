@@ -27,7 +27,6 @@ import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Before;
 import org.key_project.key4eclipse.starter.core.test.util.TestStarterCoreUtil;
-import org.key_project.key4eclipse.util.KeYExampleUtil;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.serialization.SEDXMLWriter;
 import org.key_project.sed.core.test.util.DebugTargetResumeSuspendListener;
@@ -614,7 +613,7 @@ public class AbstractKeYDebugTargetTestCase extends TestCase {
          // Increase timeout
          SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * timeoutFactor;
          // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!KeYExampleUtil.isChoiceSettingInitialised()) {
+         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
             TestStarterCoreUtil.instantiateProofWithGeneratedContract(method, false, false);
          }
          originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);

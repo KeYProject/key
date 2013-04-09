@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.key_project.key4eclipse.util.KeYExampleUtil;
-
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
@@ -515,7 +513,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
          // Define test settings
          final String methodFullName = "compute";
          // Store original settings of KeY which requires that at least one proof was instantiated.
-         if (!KeYExampleUtil.isChoiceSettingInitialised()) {
+         if (!SymbolicExecutionUtil.isChoiceSettingInitialised()) {
             createSymbolicExecutionEnvironment(keyRepDirectory, javaPathInkeyRepDirectory, containerTypeName, methodFullName, precondition, false, false, false);
          }
          originalRuntimeExceptions = SymbolicExecutionUtil.getChoiceSetting(SymbolicExecutionUtil.CHOICE_SETTING_RUNTIME_EXCEPTIONS);
