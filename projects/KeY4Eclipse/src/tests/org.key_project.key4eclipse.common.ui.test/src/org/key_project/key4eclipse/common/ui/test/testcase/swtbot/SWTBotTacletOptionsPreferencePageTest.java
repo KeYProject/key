@@ -71,10 +71,12 @@ public class SWTBotTacletOptionsPreferencePageTest extends TestCase {
          // Test shown categories, values and selected values
          Map<String, String> expectedNewValues = new HashMap<String, String>();
          Set<Entry<String, Set<String>>> entries = oldChoices.entrySet();
+         assertFalse(entries.isEmpty());
          for (Entry<String, Set<String>> entry : entries) {
             String category = entry.getKey();
             SWTBotTabItem tabItem = preferenceShell.bot().tabItem(category);
             tabItem.activate();
+            assertTrue(entries.size() >= 2);
             for (String value : entry.getValue()) {
                SWTBotRadio radio = preferenceShell.bot().radio(value);
                boolean oldSelected = ObjectUtil.equals(oldDefaultChoices.get(category), radio.getText());
