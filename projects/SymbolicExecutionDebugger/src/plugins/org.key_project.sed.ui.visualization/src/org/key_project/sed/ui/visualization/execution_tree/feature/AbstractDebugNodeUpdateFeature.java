@@ -648,18 +648,21 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             ga.setX(xMargin + xStart + (maxWidth - ga.getWidth()) / 2);
          }
          monitor.worked(1);
-         // Center again children if required
+         // Center children again if required
          if (removeChildrenRequired && !ArrayUtil.isEmpty(next.getChildren())) {
             ISEDDebugNode lastChild = ArrayUtil.getLast(next.getChildren());
             int mostRightX = findMostRightXInSubtree(lastChild);
             int offset = (maxWidth - (mostRightX - xStart)) / 2;
-            SEDPreorderIterator iter = new SEDPreorderIterator(next);
-            while (iter.hasNext()) {
-               ISEDDebugElement nextChild = iter.next();
-               if (nextChild != next) {
-                  PictogramElement nextChildPE = getPictogramElementForBusinessObject(nextChild);
-                  if (nextChildPE != null) {
-                     nextChildPE.getGraphicsAlgorithm().setX(nextChildPE.getGraphicsAlgorithm().getX() + offset);
+            // Center children again only if offset is positive, because otherwise an overlap with the branch next to the left is possible
+            if (offset > 0) {
+               SEDPreorderIterator iter = new SEDPreorderIterator(next);
+               while (iter.hasNext()) {
+                  ISEDDebugElement nextChild = iter.next();
+                  if (nextChild != next) {
+                     PictogramElement nextChildPE = getPictogramElementForBusinessObject(nextChild);
+                     if (nextChildPE != null) {
+                        nextChildPE.getGraphicsAlgorithm().setX(nextChildPE.getGraphicsAlgorithm().getX() + offset);
+                     }
                   }
                }
             }
