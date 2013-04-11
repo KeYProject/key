@@ -41,6 +41,8 @@ public class ProofEditorInput implements IStorageEditorInput{
    
    private KeYEnvironment<CustomConsoleUserInterface> environment;
    
+   // TODO: Add IMethod
+   
    /**
     * Constructor
     * @param storage The storage for this {@link IStorageEditorInput}

@@ -422,9 +422,13 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
                found = true;
             }
             else {
-               
-               current = current.child(0);
-               index++;
+               if(current.childrenCount()==0&&current.parent().childrenCount()==2){
+                  current=current.parent().child(1);
+                  index++;
+               }else{
+                  current = current.child(0);
+                  index++;
+               }
             }
          }
       }

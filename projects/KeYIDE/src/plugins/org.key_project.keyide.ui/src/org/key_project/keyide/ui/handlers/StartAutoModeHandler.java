@@ -7,8 +7,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
+import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.keyide.ui.editor.IProofEnvironmentProvider;
 import org.key_project.keyide.ui.job.AbstractKeYEnvironmentJob;
+import org.key_project.keyide.ui.util.KeYIDEUtil;
 
 public class StartAutoModeHandler extends AbstractSaveExecutionHandler {   
    

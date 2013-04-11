@@ -6,6 +6,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.key_project.key4eclipse.common.ui.handler.AbstractSaveExecutionHandler;
 import org.key_project.keyide.ui.providers.BranchFolder;
+import org.key_project.keyide.ui.util.KeYIDEUtil;
+
 import de.uka.ilkd.key.proof.Node;
 
 public class PruneProofHandler extends AbstractSaveExecutionHandler {

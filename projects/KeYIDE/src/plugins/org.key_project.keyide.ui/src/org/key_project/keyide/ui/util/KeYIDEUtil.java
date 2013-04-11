@@ -3,6 +3,7 @@ package org.key_project.keyide.ui.util;
 import java.io.File;
 import java.util.List;
 
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.Assert;
@@ -16,10 +17,12 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.services.IEvaluationService;
 import org.key_project.key4eclipse.common.ui.dialog.ContractSelectionDialog;
 import org.key_project.key4eclipse.common.ui.provider.ImmutableCollectionContentProvider;
@@ -157,7 +160,13 @@ public class KeYIDEUtil {
    
    
 
-   
+   /**
+    * Opens a dialog to select the {@link FunctionalOperationContract} for the selected {@link IMethod}. For the selected contract a {@link Proof} will be created and returned.
+    * @param operationContracts - Set of available {@link FunctionalOperationContract}s
+    * @param environment - the given {@link KeYEnvironment}
+    * @return the created {@link Proof}
+    * @throws ProofInputException
+    */
    private static Proof openDialog(ImmutableSet<FunctionalOperationContract> operationContracts, KeYEnvironment<?> environment) throws ProofInputException 
    {
       Assert.isNotNull(operationContracts);
@@ -241,5 +250,4 @@ public class KeYIDEUtil {
       }
       return switchPerspective;
    }
-
 }
