@@ -11,7 +11,6 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStatement;
-import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicAssociation;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
@@ -533,7 +532,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
                foundReturnStatement++;
             }
          }
-         assertTrue(returnNode instanceof IExecutionMethodReturn || returnNode instanceof IExecutionTermination);
+         assertTrue(returnNode instanceof IExecutionMethodReturn);
          // Get the return statement which is returned in returnNode
          IExecutionNode returnStatement = returnNode.getParent();
          while (!(returnStatement instanceof IExecutionStatement)) {
