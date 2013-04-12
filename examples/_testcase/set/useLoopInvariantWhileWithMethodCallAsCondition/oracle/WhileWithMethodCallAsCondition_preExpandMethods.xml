@@ -14,7 +14,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
                   <statement name="throw new RuntimeException ();" pathCondition="true" pathConditionChanged="false">
                      <callStackEntry path="/0"/>
                      <callStackEntry path="/0/0/0/0/0"/>
-                     <termination name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="true">
+                     <termination name="&lt;uncaught java.lang.RuntimeException&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
                      </termination>
                   </statement>
                </methodCall>

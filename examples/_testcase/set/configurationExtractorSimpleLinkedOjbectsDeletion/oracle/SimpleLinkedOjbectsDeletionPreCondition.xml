@@ -10,7 +10,7 @@
 + \if (x.next.next = x)
       \then (3)
       \else (\if (x.next = x)  \then (2)  \else (1))&apos; as result of SimpleLinkedOjbectsDeletion.compute(x);&gt;" isReturnValueComputed="true">
-                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                        <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                         </termination>
                      </methodReturn>
                   </statement>

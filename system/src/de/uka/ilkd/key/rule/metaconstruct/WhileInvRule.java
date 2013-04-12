@@ -37,6 +37,7 @@ import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.LoopBodyTermLabel;
+import de.uka.ilkd.key.logic.LoopInvariantNormalBehaviorTermLabel;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Sequent;
@@ -46,12 +47,18 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.LoopBodyTermLabelInstantiator;
+import de.uka.ilkd.key.rule.LoopInvariantNormalBehaviorTermLabelInstantiator;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.TermLabelWorkerManagement;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -249,10 +256,10 @@ public final class WhileInvRule {
         
         
         resultSubterms.add
-        (normalCaseAndContinue(contFlagTerm, returnFlagTerm,
-                               breakFlagTerm, excFlagTerm, inv));
+        (normalCaseAndContinue(services, applicationPos, rule, goal, applicationSequent, contFlagTerm, returnFlagTerm,
+                               breakFlagTerm, excFlagTerm, addUninterpretedPredicateIfRequired(services, inv)));
         
-        Term result = createLongJunctorTerm(Junctor.AND, resultSubterms); 
+        Term result = createLongJunctorTerm(Junctor.AND, resultSubterms);
         
         stmnt.add(w.result());
         StatementBlock s = new StatementBlock
@@ -269,30 +276,74 @@ public final class WhileInvRule {
         JavaBlock mainJavaBlock = JavaBlock.createJavaBlock(transaction ? 
                                                             new StatementBlock(new Statement[]{resSta, new TransactionStatement(de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH)}) : 
                                                             new StatementBlock(resSta));
-        // Compute labels
-        ImmutableArray<ITermLabel> labels = TermLabelWorkerManagement.instantiateLabels(services, applicationPos, rule, goal, null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock);
-        // Add loop body term label if required (not already present and loop body instantiator is available)
-        ITermLabel[] newLabels;
-        if (!labels.contains(LoopBodyTermLabel.INSTANCE) &&
-            TermLabelWorkerManagement.hasInstantiator(services, LoopBodyTermLabelInstantiator.INSTANCE)) {
-           newLabels = new ITermLabel[labels.size() + 1];
-           labels.arraycopy(0, newLabels, 0, labels.size());
-           newLabels[newLabels.length - 1] = LoopBodyTermLabel.INSTANCE;
-        }
-        else {
-           newLabels = new ITermLabel[labels.size()];
-           labels.arraycopy(0, newLabels, 0, labels.size());
-        }
-        // Replace symbolic execution label with a new one which has a new ID
-        for (int i = 0; i < newLabels.length; i++) {
-           if (newLabels[i] instanceof SymbolicExecutionTermLabel) {
-              newLabels[i] = new SymbolicExecutionTermLabel(SymbolicExecutionUtil.computeNextSymbolicExecutionLabelId(applicationSequent));
-           }
-        }
         return TermBuilder.DF.prog(loopBodyModality, 
                                    mainJavaBlock, 
                                    result,
-                                   new ImmutableArray<ITermLabel>(newLabels)); 
+                                   computeLoopBodyModalityLabels(services, applicationPos, rule, goal, loopBodyModality, result, mainJavaBlock, applicationSequent)); 
+    }
+    
+    /**
+     * This method adds the uninterpreted predicate to the given {@link Term}
+     * if the used {@link ProofOblInput} is an instance of {@link AbstractOperationPO}
+     * and {@link AbstractOperationPO#isAddUninterpretedPredicate()} is {@code true}.
+     * Otherwise the given {@link Term} is returned.  
+     * @param services The {@link Services} which provides the {@link Proof} and its {@link ProofOblInput}.
+     * @param term The {@link Term} to modify.
+     * @return The modified or original {@link Term}.
+     */
+    private Term addUninterpretedPredicateIfRequired(Services services, Term term) {
+       ProofOblInput problem = services.getSpecificationRepository().getProofOblInput(services.getProof());
+       if (problem instanceof AbstractOperationPO) {
+          AbstractOperationPO operationPO = (AbstractOperationPO)problem;
+          if (operationPO.isAddUninterpretedPredicate()) {
+             term = TermBuilder.DF.and(term, operationPO.getUninterpretedPredicate());
+          }
+       }
+       return term;
+    }
+    
+    /**
+     * Computes the {@link ITermLabel} which should be added to the created
+     * loop body modality {@link Term}.
+     * @param services The {@link Services}.
+     * @param applicationPos The {@link PosInOccurrence} in the {@link Sequent} to rewrite.
+     * @param rule The {@link Rule} to apply.
+     * @param goal The {@link Goal} to compute the result for. 
+     * @param loopBodyModality The {@link Modality} of the loop body.
+     * @param result The postcondition of the modality.
+     * @param mainJavaBlock The {@link JavaBlock} to execute within the modality.
+     * @param applicationSequent The {@link Sequent} to rewrite.
+     * @return The {@link ITermLabel}s to add to the loop body modality {@link Term}.
+     */
+    private ImmutableArray<ITermLabel> computeLoopBodyModalityLabels(Services services, 
+                                                                     PosInOccurrence applicationPos, 
+                                                                     Rule rule, 
+                                                                     Goal goal, 
+                                                                     Operator loopBodyModality, 
+                                                                     Term result, 
+                                                                     JavaBlock mainJavaBlock, 
+                                                                     Sequent applicationSequent) {
+       // Compute labels
+       ImmutableArray<ITermLabel> labels = TermLabelWorkerManagement.instantiateLabels(services, applicationPos, rule, goal, null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock);
+       // Add loop body term label if not already present and loop body instantiator is available
+       ITermLabel[] newLabels;
+       if (!labels.contains(LoopBodyTermLabel.INSTANCE) &&
+           TermLabelWorkerManagement.hasInstantiator(services, LoopBodyTermLabelInstantiator.INSTANCE)) {
+          newLabels = new ITermLabel[labels.size() + 1];
+          labels.arraycopy(0, newLabels, 0, labels.size());
+          newLabels[newLabels.length - 1] = LoopBodyTermLabel.INSTANCE;
+       }
+       else {
+          newLabels = new ITermLabel[labels.size()];
+          labels.arraycopy(0, newLabels, 0, labels.size());
+       }
+       // Replace symbolic execution label with a new one which has a new ID
+       for (int i = 0; i < newLabels.length; i++) {
+          if (newLabels[i] instanceof SymbolicExecutionTermLabel) {
+             newLabels[i] = new SymbolicExecutionTermLabel(SymbolicExecutionUtil.computeNextSymbolicExecutionLabelId(applicationSequent));
+          }
+       }
+       return new ImmutableArray<ITermLabel>(newLabels);
     }
 
     /**
@@ -431,7 +482,12 @@ public final class WhileInvRule {
     }
 
 
-    private Term  normalCaseAndContinue(Term contFlagTerm,
+    private Term  normalCaseAndContinue(Services services,
+                                        PosInOccurrence applicationPos,
+                                        Rule rule,
+                                        Goal goal,
+                                        Sequent applicationSequent,
+                                        Term contFlagTerm,
                                         Term returnFlagTerm,
                                         Term breakFlagTerm,
                                         Term excFlagTerm,
@@ -449,17 +505,58 @@ public final class WhileInvRule {
             al.add(TermBuilder.DF.equals(excFlagTerm, TRUE_TERM));
 
         if (al.size() == 0) {
-            if (contFlagTerm == null)
-                return inv;
-            else 
-                return TermBuilder.DF.imp(contFlagTerm, inv);
+            if (contFlagTerm == null) {
+                ImmutableArray<ITermLabel> labels = computeLoopBodyImplicatonLabels(services, applicationPos, rule, goal, inv.op(), inv.subs(), applicationSequent);
+                return TermBuilder.DF.label(inv, labels);
+            }
+            else {
+                ImmutableArray<ITermLabel> labels = computeLoopBodyImplicatonLabels(services, applicationPos, rule, goal, Junctor.IMP, new ImmutableArray<Term>(contFlagTerm, inv), applicationSequent);
+                return TermBuilder.DF.imp(contFlagTerm, inv, labels);
+            }
         } else {
             Term premiss = TermBuilder.DF.not(createLongJunctorTerm(Junctor.OR, al));
             if (contFlagTerm != null)
                 premiss = TermBuilder.DF.imp(contFlagTerm, premiss);            
             
-            return TermBuilder.DF.imp(premiss, inv);
+            ImmutableArray<ITermLabel> labels = computeLoopBodyImplicatonLabels(services, applicationPos, rule, goal, Junctor.IMP, new ImmutableArray<Term>(premiss, inv), applicationSequent);
+            return TermBuilder.DF.imp(premiss, inv, labels);
         }       
+    }
+    
+    /**
+     * Computes the {@link ITermLabel} which should be added to the implication
+     * of the normal termination branch of a loop body.
+     * @param services The {@link Services}.
+     * @param applicationPos The {@link PosInOccurrence} in the {@link Sequent} to rewrite.
+     * @param rule The {@link Rule} to apply.
+     * @param goal The {@link Goal} to compute the result for. 
+     * @param operator The {@link Operator} of the new {@link Term}.
+     * @param subs The children of the new {@link Term}.
+     * @param applicationSequent The {@link Sequent} to rewrite.
+     * @return The {@link ITermLabel}s to add to the new {@link Term}.
+     */
+    private ImmutableArray<ITermLabel> computeLoopBodyImplicatonLabels(Services services, 
+                                                                       PosInOccurrence applicationPos, 
+                                                                       Rule rule, 
+                                                                       Goal goal, 
+                                                                       Operator operator, 
+                                                                       ImmutableArray<Term> subs, 
+                                                                       Sequent applicationSequent) {
+       // Compute labels
+       ImmutableArray<ITermLabel> labels = TermLabelWorkerManagement.instantiateLabels(services, applicationPos, rule, goal, null, operator, subs, null, null);
+       // Add loop body term label if not already present and loop body instantiator is available
+       ITermLabel[] newLabels;
+       if (!labels.contains(LoopInvariantNormalBehaviorTermLabel.INSTANCE) &&
+           TermLabelWorkerManagement.hasInstantiator(services, LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE)) {
+          newLabels = new ITermLabel[labels.size() + 1];
+          labels.arraycopy(0, newLabels, 0, labels.size());
+          newLabels[newLabels.length - 1] = LoopInvariantNormalBehaviorTermLabel.INSTANCE;
+       }
+       else {
+          newLabels = new ITermLabel[labels.size()];
+          labels.arraycopy(0, newLabels, 0, labels.size());
+       }
+       return new ImmutableArray<ITermLabel>(newLabels);
     }
     
 

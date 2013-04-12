@@ -62,6 +62,7 @@ import org.key_project.sed.core.model.ISEDDebugElement;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -366,7 +367,7 @@ public final class TestSedCoreUtil {
       // Assert termination positive
       SWTBotTreeItem[] positiveTerminationItems = positiveItems[0].getItems();
       TestCase.assertEquals(1, positiveTerminationItems.length);
-      TestCase.assertEquals("<end>", positiveTerminationItems[0].getText());
+      TestCase.assertEquals("<loop body end>", positiveTerminationItems[0].getText());
       TestCase.assertTrue(TestUtilsUtil.getTreeItemData(positiveTerminationItems[0]) instanceof ISEDTermination);
       // Assert termination positive empty
       SWTBotTreeItem[] positiveTerminationEmptyItems = positiveTerminationItems[0].getItems();
@@ -457,7 +458,7 @@ public final class TestSedCoreUtil {
       TestCase.assertEquals("return 1", positiveItems[0].getText());
       TestCase.assertTrue(TestUtilsUtil.getTreeItemData(positiveItems[0]) instanceof ISEDMethodReturn);
       TestCase.assertEquals(0, positiveItems[0].getItems().length);
-      TestCase.assertEquals("<end>", positiveItems[1].getText());
+      TestCase.assertEquals("<loop body end>", positiveItems[1].getText());
       TestCase.assertTrue(TestUtilsUtil.getTreeItemData(positiveItems[1]) instanceof ISEDTermination);
       TestCase.assertEquals(0, positiveItems[1].getItems().length);
    }
@@ -933,6 +934,10 @@ public final class TestSedCoreUtil {
                   TestCase.assertTrue("Expected ISEDExceptionalTermination on " + ((ISEDExceptionalTermination)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDExceptionalTermination);
                   compareExceptionalTermination((ISEDExceptionalTermination)expectedChildren[i], (ISEDExceptionalTermination)currentChildren[i], false, compareId, compareVariables, compareCallStack);
                }
+               else if (expectedChildren[i] instanceof ISEDLoopBodyTermination) {
+                  TestCase.assertTrue("Expected ISEDLoopBodyTermination on " + ((ISEDLoopBodyTermination)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopBodyTermination);
+                  compareLoopBodyTermination((ISEDLoopBodyTermination)expectedChildren[i], (ISEDLoopBodyTermination)currentChildren[i], false, compareId, compareVariables, compareCallStack);
+               }
                else if (expectedChildren[i] instanceof ISEDLoopCondition) {
                   TestCase.assertTrue("Expected ISEDLoopCondition on " + ((ISEDLoopCondition)expectedChildren[i]).getName() + " instance but is " + ObjectUtil.getClass(currentChildren[i]) + ".", currentChildren[i] instanceof ISEDLoopCondition);
                   compareLoopCondition((ISEDLoopCondition)expectedChildren[i], (ISEDLoopCondition)currentChildren[i], false, compareId, compareVariables, compareCallStack);
@@ -1279,6 +1284,25 @@ public final class TestSedCoreUtil {
                                            boolean compareCallStack) throws DebugException {
       compareStackFrame(expected, current, compareVariables);
       compareNode(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
+   }
+
+   /**
+    * Compares the given {@link ISEDLoopBodyTermination}s with each other.
+    * @param expected The expected {@link ISEDLoopBodyTermination}.
+    * @param current The current {@link ISEDLoopBodyTermination}.
+    * @param compareReferences Compare also the containment hierarchy?
+    * @param compareId Compare the value of {@link ISEDDebugElement#getId()}?
+    * @param compareVariables Compare variables?
+    * @param compareCallStack Compare call stack?
+    * @throws DebugException Occurred Exception.
+    */
+   protected static void compareLoopBodyTermination(ISEDLoopBodyTermination expected, 
+                                                    ISEDLoopBodyTermination current, 
+                                                    boolean compareReferences, 
+                                                    boolean compareId, 
+                                                    boolean compareVariables,
+                                                    boolean compareCallStack) throws DebugException {
+      compareTermination(expected, current, compareReferences, compareId, compareVariables, compareCallStack);
    }
 
    /**

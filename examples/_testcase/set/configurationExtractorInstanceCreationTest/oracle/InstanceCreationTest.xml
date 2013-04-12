@@ -40,7 +40,7 @@
                                                   \then (i_11)
                                                   \else (i_6).value))
                             \else (2)))&apos; as result of self.compute();&gt;" isReturnValueComputed="true">
-                                                                  <termination name="&lt;end&gt;" pathCondition="!self.next = null" pathConditionChanged="false" exceptionalTermination="false">
+                                                                  <termination name="&lt;end&gt;" pathCondition="!self.next = null" pathConditionChanged="false" terminationKind="NORMAL">
                                                                   </termination>
                                                                </methodReturn>
                                                             </statement>
@@ -56,7 +56,7 @@
                                  <branchCondition name="self.next = null" pathCondition="self.next = null" pathConditionChanged="true" branchCondition="self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                                     <statement name="return -100;" pathCondition="self.next = null" pathConditionChanged="false">
                                        <methodReturn name="&lt;return of self.compute();&gt;" pathCondition="self.next = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-100&apos; as result of self.compute();&gt;" isReturnValueComputed="true">
-                                          <termination name="&lt;end&gt;" pathCondition="self.next = null" pathConditionChanged="false" exceptionalTermination="false">
+                                          <termination name="&lt;end&gt;" pathCondition="self.next = null" pathConditionChanged="false" terminationKind="NORMAL">
                                           </termination>
                                        </methodReturn>
                                     </statement>

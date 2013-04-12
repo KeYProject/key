@@ -12,7 +12,7 @@ termination: diamond" pathCondition="true" pathConditionChanged="false" precondi
             <callStackEntry path="/0"/>
             <methodReturn name="&lt;return of UseOperationContractQueryTest.main(value);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;84&apos; as result of UseOperationContractQueryTest.main(value);&gt;" isReturnValueComputed="true">
                <callStackEntry path="/0"/>
-               <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+               <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                </termination>
             </methodReturn>
          </useOperationContract>

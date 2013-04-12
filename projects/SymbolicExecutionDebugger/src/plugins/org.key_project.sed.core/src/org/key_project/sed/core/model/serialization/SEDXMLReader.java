@@ -30,6 +30,7 @@ import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryBranchNode;
 import org.key_project.sed.core.model.memory.SEDMemoryDebugTarget;
 import org.key_project.sed.core.model.memory.SEDMemoryExceptionalTermination;
+import org.key_project.sed.core.model.memory.SEDMemoryLoopBodyTermination;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopCondition;
 import org.key_project.sed.core.model.memory.SEDMemoryLoopNode;
 import org.key_project.sed.core.model.memory.SEDMemoryMethodCall;
@@ -374,6 +375,9 @@ public class SEDXMLReader {
       else if (SEDXMLWriter.TAG_EXCEPTIONAL_TERMINATION.equals(qName)) {
          return createExceptionalTermination(target, parent, thread, uri, localName, qName, attributes);
       }
+      else if (SEDXMLWriter.TAG_LOOP_BODY_TERMINATION.equals(qName)) {
+         return createLoopBodyTermination(target, parent, thread, uri, localName, qName, attributes);
+      }
       else if (SEDXMLWriter.TAG_LOOP_CONDITION.equals(qName)) {
          return createLoopCondition(target, parent, thread, uri, localName, qName, attributes);
       }
@@ -493,6 +497,23 @@ public class SEDXMLReader {
     */   
    protected SEDMemoryExceptionalTermination createExceptionalTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
       SEDMemoryExceptionalTermination termination = new SEDMemoryExceptionalTermination(target, parent, thread);
+      fillDebugNode(termination, attributes);
+      return termination;
+   }
+   
+   /**
+    * Creates a {@link SEDMemoryLoopBodyTermination} instance for the content in the given tag.
+    * @param target The parent {@link ISEDDebugTarget} or {@code null} if not available.
+    * @param parent The parent {@link ISEDDebugNode} or {@code null} if not available.
+    * @param thread The parent {@link ISEDThread} or {@code null} if not available.
+    * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if Namespace processing is not being performed.
+    * @param localName  The local name (without prefix), or the empty string if Namespace processing is not being performed.
+    * @param qName The qualified name (with prefix), or the empty string if qualified names are not available.
+    * @param attributes The attributes attached to the element. If there are no attributes, it shall be an empty Attributes object.
+    * @return The created {@link SEDMemoryLoopBodyTermination}.
+    */   
+   protected SEDMemoryLoopBodyTermination createLoopBodyTermination(ISEDDebugTarget target, ISEDDebugNode parent, ISEDThread thread, String uri, String localName, String qName, Attributes attributes) {
+      SEDMemoryLoopBodyTermination termination = new SEDMemoryLoopBodyTermination(target, parent, thread);
       fillDebugNode(termination, attributes);
       return termination;
    }

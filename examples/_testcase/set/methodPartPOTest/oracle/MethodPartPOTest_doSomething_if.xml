@@ -4,7 +4,7 @@
       <branchCondition name="!asdf &gt;= 0" pathCondition="!asdf &gt;= 0" pathConditionChanged="true" branchCondition="!asdf &gt;= 0" mergedBranchCondition="false" isBranchConditionComputed="true">
          <statement name="x=x*-1;" pathCondition="!asdf &gt;= 0" pathConditionChanged="false">
             <statement name="x+=2;" pathCondition="!asdf &gt;= 0" pathConditionChanged="false">
-               <termination name="&lt;end&gt;" pathCondition="!asdf &gt;= 0" pathConditionChanged="false" exceptionalTermination="false">
+               <termination name="&lt;end&gt;" pathCondition="!asdf &gt;= 0" pathConditionChanged="false" terminationKind="NORMAL">
                </termination>
             </statement>
          </statement>
@@ -12,7 +12,7 @@
       <branchCondition name="!asdf &lt;= -1" pathCondition="!asdf &lt;= -1" pathConditionChanged="true" branchCondition="!asdf &lt;= -1" mergedBranchCondition="false" isBranchConditionComputed="true">
          <statement name="x-=42;" pathCondition="!asdf &lt;= -1" pathConditionChanged="false">
             <statement name="return x;" pathCondition="!asdf &lt;= -1" pathConditionChanged="false">
-               <termination name="&lt;end&gt;" pathCondition="!asdf &lt;= -1" pathConditionChanged="false" exceptionalTermination="false">
+               <termination name="&lt;end&gt;" pathCondition="!asdf &lt;= -1" pathConditionChanged="false" terminationKind="NORMAL">
                </termination>
             </statement>
          </statement>

@@ -22,6 +22,7 @@ import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDDebugTarget;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -92,6 +93,11 @@ public class SEDXMLWriter {
     * Tag name to store {@link ISEDExceptionalTermination}s.
     */
    public static final String TAG_EXCEPTIONAL_TERMINATION = "sedExceptionalTermination";
+
+   /**
+    * Tag name to store {@link ISEDLoopBodyTermination}s.
+    */
+   public static final String TAG_LOOP_BODY_TERMINATION = "sedLoopBodyTermination";
 
    /**
     * Tag name to store {@link ISEDLoopCondition}s.
@@ -491,6 +497,9 @@ public class SEDXMLWriter {
       else if (node instanceof ISEDExceptionalTermination) {
          return toXML(level, (ISEDExceptionalTermination)node, saveVariables, saveCallStack);
       }
+      else if (node instanceof ISEDLoopBodyTermination) {
+         return toXML(level, (ISEDLoopBodyTermination)node, saveVariables, saveCallStack);
+      }
       else if (node instanceof ISEDLoopCondition) {
          return toXML(level, (ISEDLoopCondition)node, saveVariables, saveCallStack);
       }
@@ -574,6 +583,24 @@ public class SEDXMLWriter {
                           boolean saveCallStack) throws DebugException {
       StringBuffer sb = new StringBuffer();
       appendNode(level, TAG_EXCEPTIONAL_TERMINATION, exceptionalTermination, saveVariables, saveCallStack, sb);
+      return sb.toString();
+   }
+   
+   /**
+    * Serializes the given {@link ISEDLoopBodyTermination} into a {@link String}.
+    * @param level The level in the tree used for leading white space (formating).
+    * @param loopBodyTermination The {@link ISEDLoopBodyTermination} to serialize.
+    * @param saveVariables Save variables?
+    * @param saveCallStack Save call stack?
+    * @return The serialized {@link String}.
+    * @throws DebugException Occurred Exception.
+    */
+   protected String toXML(int level, 
+                          ISEDLoopBodyTermination loopBodyTermination, 
+                          boolean saveVariables,
+                          boolean saveCallStack) throws DebugException {
+      StringBuffer sb = new StringBuffer();
+      appendNode(level, TAG_LOOP_BODY_TERMINATION, loopBodyTermination, saveVariables, saveCallStack, sb);
       return sb.toString();
    }
    

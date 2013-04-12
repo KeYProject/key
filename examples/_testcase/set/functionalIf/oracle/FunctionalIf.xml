@@ -13,7 +13,7 @@
                                  <statement name="result_1=i;" pathCondition="!j &gt;= i" pathConditionChanged="false">
                                     <statement name="return result_1;" pathCondition="!j &gt;= i" pathConditionChanged="false">
                                        <methodReturn name="&lt;return of self.min(i,j);&gt;" pathCondition="!j &gt;= i" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;i&apos; as result of self.min(i,j);&gt;" isReturnValueComputed="true">
-                                          <termination name="&lt;end&gt;" pathCondition="!j &gt;= i" pathConditionChanged="false" exceptionalTermination="false">
+                                          <termination name="&lt;end&gt;" pathCondition="!j &gt;= i" pathConditionChanged="false" terminationKind="NORMAL">
                                           </termination>
                                        </methodReturn>
                                     </statement>
@@ -23,7 +23,7 @@
                                  <statement name="result_1=j;" pathCondition="!j &lt;= -1 + i" pathConditionChanged="false">
                                     <statement name="return result_1;" pathCondition="!j &lt;= -1 + i" pathConditionChanged="false">
                                        <methodReturn name="&lt;return of self.min(i,j);&gt;" pathCondition="!j &lt;= -1 + i" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;j&apos; as result of self.min(i,j);&gt;" isReturnValueComputed="true">
-                                          <termination name="&lt;end&gt;" pathCondition="!j &lt;= -1 + i" pathConditionChanged="false" exceptionalTermination="false">
+                                          <termination name="&lt;end&gt;" pathCondition="!j &lt;= -1 + i" pathConditionChanged="false" terminationKind="NORMAL">
                                           </termination>
                                        </methodReturn>
                                     </statement>

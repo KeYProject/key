@@ -102,6 +102,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
    private boolean addSymbolicExecutionLabel;
    
    /**
+    * The used uninterpreted predicate created via 
+    * {@link #buildUninterpretedPredicate(ImmutableList, ProgramVariable, String)}
+    * and available via {@link #getUninterpretedPredicate()}.
+    */
+   private Term uninterpretedPredicate;
+   
+   /**
     * Constructor.
     * @param initConfig The {@link InitConfig} to use.
     * @param name The name to use.
@@ -420,11 +427,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @param paramVars The parameters {@link ProgramVariable}s.
     * @param exceptionVar The exception variable.
     * @param name The name of the uninterpreted predicate.
-    * @return The created {@link Term}.
+    * @return The created uninterpreted predicate.
     */
    protected Term buildUninterpretedPredicate(ImmutableList<ProgramVariable> paramVars, 
                                               ProgramVariable exceptionVar, 
                                               String name) {
+      // Make sure that the predicate is not already created
+      if (uninterpretedPredicate != null) {
+         throw new IllegalStateException("The uninterpreted predicate is already available.");
+      }
       // Create parameters for predicate SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
       ImmutableList<Term> arguments = TB.var(paramVars); // Method parameters
       arguments = arguments.prepend(TB.var(exceptionVar)); // Exception variable (As second argument for the predicate)
@@ -436,7 +447,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                 argumentSorts.toArray(new Sort[argumentSorts.size()]));
       services.getNamespaces().functions().addSafely(f);
       // Create term that uses the new predicate
-      return TermBuilder.DF.func(f, arguments.toArray(new Term[arguments.size()]));
+      uninterpretedPredicate = TermBuilder.DF.func(f, arguments.toArray(new Term[arguments.size()]));
+      return uninterpretedPredicate;
+   }
+
+   /**
+    * Returns the used uninterpreted predicate.
+    * @return The used uninterpreted predicate.
+    */
+   public Term getUninterpretedPredicate() {
+      return uninterpretedPredicate;
    }
 
    /**

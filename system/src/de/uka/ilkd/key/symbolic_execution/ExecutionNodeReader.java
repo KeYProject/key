@@ -58,6 +58,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseLoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseOperationContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionValue;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionVariable;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicConfiguration;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 
@@ -380,7 +381,7 @@ public class ExecutionNodeReader {
          return new KeYlessStatement(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes));
       }
       else if (ExecutionNodeWriter.TAG_TERMINATION.equals(qName)) {
-         return new KeYlessTermination(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isExceptionalTermination(attributes));
+         return new KeYlessTermination(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), getTerminationKind(attributes));
       }
       else if (ExecutionNodeWriter.TAG_USE_OPERATION_CONTRACT.equals(qName)) {
          return new KeYlessUseOperationContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes), isHasNotNullCheck(attributes), isNotNullCheckComplied(attributes));
@@ -430,12 +431,12 @@ public class ExecutionNodeReader {
    }
    
    /**
-    * Returns the exceptional termination value.
+    * Returns the termination kind value.
     * @param attributes The {@link Attributes} which provides the content.
     * @return The value.
     */
-   protected boolean isExceptionalTermination(Attributes attributes) {
-      return Boolean.parseBoolean(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_EXCEPTIONAL_TERMINATION));
+   protected TerminationKind getTerminationKind(Attributes attributes) {
+      return TerminationKind.valueOf(attributes.getValue(ExecutionNodeWriter.ATTRIBUTE_TERMINATION_KIND));
    }
    
    /**
@@ -939,9 +940,9 @@ public class ExecutionNodeReader {
     */
    public static class KeYlessTermination extends AbstractKeYlessExecutionNode implements IExecutionTermination {
       /**
-       * Exceptional termination?
+       * The {@link TerminationKind}.
        */
-      private boolean exceptionalTermination;
+      private TerminationKind terminationKind;
       
       /**
        * Constructor.
@@ -955,9 +956,9 @@ public class ExecutionNodeReader {
                                 String name, 
                                 String formatedPathCondition, 
                                 boolean pathConditionChanged, 
-                                boolean exceptionalTermination) {
+                                TerminationKind terminationKind) {
          super(parent, name, formatedPathCondition, pathConditionChanged);
-         this.exceptionalTermination = exceptionalTermination;
+         this.terminationKind = terminationKind;
       }
 
       /**
@@ -975,21 +976,25 @@ public class ExecutionNodeReader {
       public Sort getExceptionSort() {
          return null;
       }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      public boolean isExceptionalTermination() {
-         return exceptionalTermination;
-      }
       
       /**
        * {@inheritDoc}
        */
       @Override
       public String getElementType() {
-         return isExceptionalTermination() ? "Exceptional Termination" : "Termination";
+         switch (getTerminationKind()) {
+            case EXCEPTIONAL : return "Exceptional Termination";
+            case LOOP_BODY : return "Loop Body Termination";
+            default : return "Termination";
+         }
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public TerminationKind getTerminationKind() {
+         return terminationKind;
       }
    }
 

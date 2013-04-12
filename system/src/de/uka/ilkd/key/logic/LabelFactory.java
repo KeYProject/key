@@ -21,6 +21,9 @@ public class LabelFactory {
       else if (LoopBodyTermLabel.NAME.toString().equals(name)) {
          return LoopBodyTermLabel.INSTANCE;
       }
+      else if (LoopInvariantNormalBehaviorTermLabel.NAME.toString().equals(name)) {
+         return LoopInvariantNormalBehaviorTermLabel.INSTANCE;
+      }
       else {
          throw new UnknownLabelException(name);
       }

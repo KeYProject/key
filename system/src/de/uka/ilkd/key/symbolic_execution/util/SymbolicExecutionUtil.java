@@ -50,6 +50,7 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.LoopBodyTermLabel;
+import de.uka.ilkd.key.logic.LoopInvariantNormalBehaviorTermLabel;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -87,7 +88,9 @@ import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.ITermLabelWorker;
 import de.uka.ilkd.key.rule.LoopBodyTermLabelInstantiator;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopInvariantNormalBehaviorTermLabelInstantiator;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SymbolicExecutionTermLabelInstantiator;
@@ -1056,6 +1059,21 @@ public final class SymbolicExecutionUtil {
     * @param ruleApp The {@link RuleApp} to check.
     * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not contain a {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is {@code null}.
     */
+   public static boolean hasLoopBodyTerminationLabel(RuleApp ruleApp) {
+      if (ruleApp != null && ruleApp.posInOccurrence() != null) {
+         Term term = ruleApp.posInOccurrence().subTerm();
+         return term.containsLabel(LoopInvariantNormalBehaviorTermLabel.INSTANCE);
+      }
+      else {
+         return false;
+      }
+   }
+   
+   /**
+    * Checks if the {@link Term} on which the {@link RuleApp} was applied contains a {@link SymbolicExecutionTermLabel}.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} contains a {@link SymbolicExecutionTermLabel}, {@code false} does not contain a {@link SymbolicExecutionTermLabel} or the given {@link RuleApp} is {@code null}.
+    */
    public static boolean hasSymbolicExecutionLabel(RuleApp ruleApp) {
       return getSymbolicExecutionLabel(ruleApp) != null;
    }
@@ -1338,6 +1356,9 @@ public final class SymbolicExecutionUtil {
          else {
             return false;
          }
+      }
+      else if (isLoopBodyTermination(node, ruleApp)) {
+         return true;
       }
       else {
          return false;
@@ -2247,6 +2268,7 @@ public final class SymbolicExecutionUtil {
          ImmutableList<ITermLabelWorker> labelInstantiators = ImmutableSLList.<ITermLabelWorker>nil();
          labelInstantiators = labelInstantiators.append(SymbolicExecutionTermLabelInstantiator.INSTANCE);
          labelInstantiators = labelInstantiators.append(LoopBodyTermLabelInstantiator.INSTANCE);
+         labelInstantiators = labelInstantiators.append(LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE);
          proof.getSettings().getLabelSettings().setLabelInstantiators(labelInstantiators);
       }
    }
@@ -2257,5 +2279,40 @@ public final class SymbolicExecutionUtil {
     */
    public static boolean isChoiceSettingInitialised() {
       return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices().isEmpty();
+   }
+
+   /**
+    * Checks if the given node should be represented as loop body termination.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @return {@code true} represent node as loop body termination, {@code false} represent node as something else. 
+    */
+   public static boolean isLoopBodyTermination(final Node node, RuleApp ruleApp) {
+      boolean result = false;
+      if (ruleApp instanceof OneStepSimplifierRuleApp) {
+         // Check applied rules in protocol
+         OneStepSimplifierRuleApp simplifierApp = (OneStepSimplifierRuleApp)ruleApp;
+         if (simplifierApp.getProtocol() != null) {
+            RuleApp terminationApp = JavaUtil.search(simplifierApp.getProtocol(), new IFilter<RuleApp>() {
+               @Override
+               public boolean select(RuleApp element) {
+                  return isLoopBodyTermination(node, element);
+               }
+            });
+            result = terminationApp != null;
+         }
+      }
+      else if (hasLoopBodyTerminationLabel(ruleApp)) {
+         if ("impRight".equals(MiscTools.getRuleDisplayName(ruleApp))) {
+            result = true; // Implication removed (not done if left part is false)
+         }
+         else {
+            Term term = ruleApp.posInOccurrence().subTerm();
+            if (term.op() == Junctor.IMP && term.sub(0).op() == Junctor.TRUE) {
+               result = true; // Left part is true
+            }
+         }
+      }
+      return result;
    }
 }

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch xmlns="http://key-project.org/sed/serialization">
+   <sedTarget xml:id="_dcbe447c-d3aa-4f67-96a6-2bb2c20300e6" name="sum(int[])" modelIdentifier="org.key_project.sed.key.core">
+      <sedThread xml:id="_2ca93d91-1ffd-4144-9e01-f9f5dd77d836" name="&lt;start&gt;" pathCondition="true">
+         <sedMethodCall xml:id="_46e144fc-dd63-4f24-8d58-2f0f32ad8311" name="ArraySumWhile.sum(array);" pathCondition="true" lineNumber="-1" charStart="166" charEnd="169">
+            <sedStatement xml:id="_87e308c5-895f-4d7d-8b38-ba24308f0f1c" name="int result = 0;" pathCondition="true" lineNumber="-1" charStart="188" charEnd="203">
+               <sedStatement xml:id="_eade0fe8-eec2-4580-9a63-8ed76d02b926" name="int i = 0;" pathCondition="true" lineNumber="-1" charStart="207" charEnd="217">
+                  <sedUseLoopInvariant xml:id="_fb006b10-2e02-4dff-bd09-243a56e5db2c" name="invariants: {heap=and(geq(i,Z(0(#))),and(leq(i,length(array)),equals(result_1,bsum{j:int}(Z(0(#)),i,int::select(heap,array,arr(j)))))), savedHeap=null};
+modifies: {heap=false, savedHeap=null};
+variant: javaSubInt(length(array),i)" pathCondition="true" lineNumber="-1" charStart="407" charEnd="471" initiallyValid="true">
+                     <sedBranchCondition xml:id="_3d9cc19f-3608-4fbd-bc4d-8c6fcec3a063" name="Body Preserves Invariant: true" pathCondition="true">
+                        <sedBranchCondition xml:id="_4cac0791-5928-437b-8ea9-e298f95d127f" name="!array = null" pathCondition="!array = null">
+                           <sedStatement xml:id="_a3a97529-43c1-45ff-9de6-db698f9dd429" name="result_1+=array[i];" pathCondition="!array = null" lineNumber="-1" charStart="438" charEnd="457">
+                              <sedStatement xml:id="_7b73895e-7f04-421c-9d47-9c2934e28108" name="i++;" pathCondition="!array = null" lineNumber="-1" charStart="462" charEnd="466">
+                                 <sedLoopBodyTermination xml:id="_6e4e8712-6394-47c2-9300-a9614096caaa" name="&lt;loop body end&gt;" pathCondition="!array = null">
+                                 </sedLoopBodyTermination>
+                              </sedStatement>
+                           </sedStatement>
+                        </sedBranchCondition>
+                        <sedBranchCondition xml:id="_0fa3923f-f06f-4c48-88ac-037d033a5339" name="array = null" pathCondition="array = null">
+                           <sedExceptionalTermination xml:id="_c9bf6c17-4486-4977-94cd-0f3f35c5955f" name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="array = null">
+                           </sedExceptionalTermination>
+                        </sedBranchCondition>
+                     </sedBranchCondition>
+                     <sedBranchCondition xml:id="_99f76791-0653-4649-a792-dfe34d888983" name="Use Case: true" pathCondition="true">
+                        <sedStatement xml:id="_941dd43d-d972-46c4-8bd6-c76e50980e5a" name="return result_1;" pathCondition="true" lineNumber="-1" charStart="475" charEnd="489">
+                           <sedMethodReturn xml:id="_3fad1e7a-a4ca-4305-9bb0-973222794e4c" name="&lt;return of ArraySumWhile.sum(array);&gt;" pathCondition="true" lineNumber="-1" charStart="166" charEnd="169">
+                              <sedTermination xml:id="_9a23fc35-98d0-4ac3-a32e-bd9db404912a" name="&lt;end&gt;" pathCondition="true">
+                              </sedTermination>
+                           </sedMethodReturn>
+                        </sedStatement>
+                     </sedBranchCondition>
+                  </sedUseLoopInvariant>
+               </sedStatement>
+            </sedStatement>
+         </sedMethodCall>
+      </sedThread>
+   </sedTarget>
+</launch>

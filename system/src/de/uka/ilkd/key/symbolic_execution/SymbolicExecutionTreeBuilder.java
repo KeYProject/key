@@ -40,6 +40,7 @@ import de.uka.ilkd.key.symbolic_execution.model.IExecutionLoopCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionMethodCall;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionStartNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.model.impl.AbstractExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchNode;
@@ -663,7 +664,7 @@ public class SymbolicExecutionTreeBuilder {
             }
             else if (SymbolicExecutionUtil.isTerminationNode(node, node.getAppliedRuleApp())) {
                if (!SymbolicExecutionUtil.hasLoopBodyLabel(node.getAppliedRuleApp())) {
-                  result = new ExecutionTermination(mediator, node, exceptionVariable);
+                  result = new ExecutionTermination(mediator, node, exceptionVariable, null);
                }
             }
             else if (SymbolicExecutionUtil.isBranchNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
@@ -686,6 +687,9 @@ public class SymbolicExecutionTreeBuilder {
             // Initialize new call stack of the preserves loop invariant branch
             initNewLoopBodyMethodCallStack(node);
          }
+      }
+      else if (SymbolicExecutionUtil.isLoopBodyTermination(node, node.getAppliedRuleApp())) {
+         result = new ExecutionTermination(mediator, node, exceptionVariable, TerminationKind.LOOP_BODY);
       }
       return result;
    }

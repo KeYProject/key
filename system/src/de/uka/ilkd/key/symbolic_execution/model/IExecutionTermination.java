@@ -23,9 +23,14 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
  */
 public interface IExecutionTermination extends IExecutionNode {
    /**
-    * The default name of a termination node.
+    * The default name of a termination node with {@link TerminationKind#NORMAL}.
     */
-   public static final String DEFAULT_TERMINATION_NODE_NAME = INTERNAL_NODE_NAME_START + "end" + INTERNAL_NODE_NAME_END;
+   public static final String NORMAL_TERMINATION_NODE_NAME = INTERNAL_NODE_NAME_START + "end" + INTERNAL_NODE_NAME_END;
+   
+   /**
+    * The default name of a termination node with {@link TerminationKind#LOOP_BODY}.
+    */
+   public static final String LOOP_BODY_TERMINATION_NODE_NAME = INTERNAL_NODE_NAME_START + "loop body end" + INTERNAL_NODE_NAME_END;
 
    /**
     * Returns the {@link IProgramVariable} which is used in the {@link Sequent}
@@ -42,8 +47,29 @@ public interface IExecutionTermination extends IExecutionNode {
    public Sort getExceptionSort();
    
    /**
-    * Checks if a normal or an exceptional termination occurred.
-    * @return {@code true} exceptional termination, {@code false} normal termination.
+    * Returns the {@link TerminationKind}.
+    * @return The {@link TerminationKind}.
     */
-   public boolean isExceptionalTermination();
+   public TerminationKind getTerminationKind();
+   
+   /**
+    * Defines the possible termination kinds.
+    * @author Martin Hentschel
+    */
+   public static enum TerminationKind {
+      /**
+       * Normal termination without any exceptions.
+       */
+      NORMAL,
+      
+      /**
+       * Termination with uncaught exception.
+       */
+      EXCEPTIONAL,
+      
+      /**
+       * Partial termination of a loop body.
+       */
+      LOOP_BODY;
+   }
 }

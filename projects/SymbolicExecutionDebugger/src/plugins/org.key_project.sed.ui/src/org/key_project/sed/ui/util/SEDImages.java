@@ -11,6 +11,7 @@ import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDDebugNode;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -102,6 +103,11 @@ public final class SEDImages {
      * The key for the image that is used for use loop invariant.
      */
     public static final String USE_LOOP_INVARIANT_INITIALLY_INVALID = "org.key_project.sed.ui.images.useLoopInvariantInitiallyInvalid";
+    
+    /**
+     * The key for the image that is used for loop body termination.
+     */
+    public static final String LOOP_BODY_TERMINATION = "org.key_project.sed.ui.images.loopBodyTermination";
 
     /**
      * Forbid instances.
@@ -178,6 +184,9 @@ public final class SEDImages {
         else if (USE_LOOP_INVARIANT_INITIALLY_INVALID.equals(key)) {
            path = "icons/use_loop_invariant _initially_invalid.gif";
         }
+        else if (LOOP_BODY_TERMINATION.equals(key)) {
+           path = "icons/loop_body_termination.gif";
+        }
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -231,6 +240,7 @@ public final class SEDImages {
                registry.remove(USE_OPERATION_CONTRACT_NOT_NPC);
                registry.remove(USE_OPERATION_CONTRACT_NOT_PRE);
                registry.remove(USE_OPERATION_CONTRACT_NOT_PRE_NOT_NPC);
+               registry.remove(LOOP_BODY_TERMINATION);
             }
          });
        }
@@ -250,6 +260,9 @@ public final class SEDImages {
        }
        else if (element instanceof ISEDExceptionalTermination) {
           return getImage(SEDImages.EXCEPTIONAL_TERMINATION);
+       }
+       else if (element instanceof ISEDLoopBodyTermination) {
+          return getImage(SEDImages.LOOP_BODY_TERMINATION);
        }
        else if (element instanceof ISEDTermination) {
           return getImage(SEDImages.TERMINATION);

@@ -3,7 +3,7 @@
    <methodCall name="self.main();" pathCondition="true" pathConditionChanged="false">
       <statement name="IllegalArgumentException e = new IllegalArgumentException ();" pathCondition="true" pathConditionChanged="false">
          <statement name="throw e;" pathCondition="true" pathConditionChanged="false">
-            <termination name="&lt;uncaught java.lang.IllegalArgumentException&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="true">
+            <termination name="&lt;uncaught java.lang.IllegalArgumentException&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="EXCEPTIONAL">
             </termination>
          </statement>
       </statement>

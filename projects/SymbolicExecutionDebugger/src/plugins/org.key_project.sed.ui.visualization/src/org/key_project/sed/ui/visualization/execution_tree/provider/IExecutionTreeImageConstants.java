@@ -3,6 +3,7 @@ package org.key_project.sed.ui.visualization.execution_tree.provider;
 import org.key_project.sed.core.model.ISEDBranchCondition;
 import org.key_project.sed.core.model.ISEDBranchNode;
 import org.key_project.sed.core.model.ISEDExceptionalTermination;
+import org.key_project.sed.core.model.ISEDLoopBodyTermination;
 import org.key_project.sed.core.model.ISEDLoopCondition;
 import org.key_project.sed.core.model.ISEDLoopNode;
 import org.key_project.sed.core.model.ISEDMethodCall;
@@ -105,6 +106,11 @@ public interface IExecutionTreeImageConstants {
     * Key of the image for {@link ISEDUseLoopInvariant}s.
     */
    public static final String IMG_USE_LOOP_INVARIANT_INITIALLY_INVALID = PREFIX + "useLoopInvariantInitiallyInvalid";
+
+   /**
+    * Key of the image for {@link ISEDLoopBodyTermination}s.
+    */
+   public static final String IMG_LOOP_BODY_TERMINATION = PREFIX + "loopBodyTermination";
    
    /**
     * Key of the image for {@link ISEDThread}s.

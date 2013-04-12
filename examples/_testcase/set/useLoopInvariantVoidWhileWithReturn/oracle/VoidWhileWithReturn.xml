@@ -15,7 +15,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
                      <callStackEntry path="/0"/>
                      <statement name="break inner_label;" pathCondition="array = null" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
-                        <termination name="&lt;end&gt;" pathCondition="array = null" pathConditionChanged="false" exceptionalTermination="false">
+                        <termination name="&lt;end&gt;" pathCondition="array = null" pathConditionChanged="false" terminationKind="NORMAL">
                         </termination>
                      </statement>
                   </branchCondition>
@@ -23,11 +23,33 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
                      <callStackEntry path="/0"/>
                      <branchNode name="if (i==array.length) { {     rtrn=true;break inner_label;   } }" pathCondition="!array = null" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
-                        <statement name="break inner_label;" pathCondition="!array = null" pathConditionChanged="false">
+                        <branchCondition name="array.length &gt;= 0 -&gt; array.length = i_0" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = i_0" pathConditionChanged="true" branchCondition="array.length &gt;= 0 -&gt; array.length = i_0" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <callStackEntry path="/0"/>
-                           <termination name="&lt;end&gt;" pathCondition="!array = null" pathConditionChanged="false" exceptionalTermination="false">
-                           </termination>
-                        </statement>
+                           <statement name="break inner_label;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = i_0" pathConditionChanged="false">
+                              <callStackEntry path="/0"/>
+                              <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = i_0" pathConditionChanged="false" terminationKind="NORMAL">
+                              </termination>
+                           </statement>
+                        </branchCondition>
+                        <branchCondition name="!(i_0 &gt;= 0 &amp; array.length = i_0)" pathCondition="   array.length &gt;= 0
+-&gt; !array = null &amp; !(i_0 &gt;= 0 &amp; array.length = i_0)" pathConditionChanged="true" branchCondition="!(i_0 &gt;= 0 &amp; array.length = i_0)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <callStackEntry path="/0"/>
+                           <statement name="result+=array[i];" pathCondition="   array.length &gt;= 0
+-&gt; !array = null &amp; !(i_0 &gt;= 0 &amp; array.length = i_0)" pathConditionChanged="false">
+                              <callStackEntry path="/0"/>
+                              <statement name="result+=array[i];" pathCondition="   array.length &gt;= 0
+-&gt; !array = null &amp; !(i_0 &gt;= 0 &amp; array.length = i_0)" pathConditionChanged="false">
+                                 <callStackEntry path="/0"/>
+                                 <statement name="i++;" pathCondition="   array.length &gt;= 0
+-&gt; !array = null &amp; !(i_0 &gt;= 0 &amp; array.length = i_0)" pathConditionChanged="false">
+                                    <callStackEntry path="/0"/>
+                                    <termination name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0
+-&gt; !array = null &amp; !(i_0 &gt;= 0 &amp; array.length = i_0)" pathConditionChanged="false" terminationKind="LOOP_BODY">
+                                    </termination>
+                                 </statement>
+                              </statement>
+                           </statement>
+                        </branchCondition>
                      </branchNode>
                   </branchCondition>
                </branchNode>

@@ -17,7 +17,7 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
                         <callStackEntry path="/0"/>
                         <methodReturn name="&lt;return of ArraySumWhileWithReturn.sum(array);&gt;" pathCondition="array = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;0&apos; as result of ArraySumWhileWithReturn.sum(array);&gt;" isReturnValueComputed="true">
                            <callStackEntry path="/0"/>
-                           <termination name="&lt;end&gt;" pathCondition="array = null" pathConditionChanged="false" exceptionalTermination="false">
+                           <termination name="&lt;end&gt;" pathCondition="array = null" pathConditionChanged="false" terminationKind="NORMAL">
                            </termination>
                         </methodReturn>
                      </statement>
@@ -26,14 +26,36 @@ variant: javaSubInt(length(array),i)" pathCondition="true" pathConditionChanged=
                      <callStackEntry path="/0"/>
                      <branchNode name="if (i==array.length) { {     rtrn=true;     returnExpr=result_1;break inner_label;   } }" pathCondition="!array = null" pathConditionChanged="false">
                         <callStackEntry path="/0"/>
-                        <statement name="returnExpr=result_1;" pathCondition="!array = null" pathConditionChanged="false">
+                        <branchCondition name="array.length &gt;= 0 -&gt; array.length = i_0" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = i_0" pathConditionChanged="true" branchCondition="array.length &gt;= 0 -&gt; array.length = i_0" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <callStackEntry path="/0"/>
-                           <methodReturn name="&lt;return of ArraySumWhileWithReturn.sum(array);&gt;" pathCondition="!array = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;result_1_0&apos; as result of ArraySumWhileWithReturn.sum(array);&gt;" isReturnValueComputed="true">
+                           <statement name="returnExpr=result_1;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = i_0" pathConditionChanged="false">
                               <callStackEntry path="/0"/>
-                              <termination name="&lt;end&gt;" pathCondition="!array = null" pathConditionChanged="false" exceptionalTermination="false">
-                              </termination>
-                           </methodReturn>
-                        </statement>
+                              <methodReturn name="&lt;return of ArraySumWhileWithReturn.sum(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = i_0" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;result_1_0&apos; as result of ArraySumWhileWithReturn.sum(array);&gt;" isReturnValueComputed="true">
+                                 <callStackEntry path="/0"/>
+                                 <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = i_0" pathConditionChanged="false" terminationKind="NORMAL">
+                                 </termination>
+                              </methodReturn>
+                           </statement>
+                        </branchCondition>
+                        <branchCondition name="!(i_0 &gt;= 0 &amp; array.length = i_0)" pathCondition="   array.length &gt;= 0
+-&gt; !array = null &amp; !(i_0 &gt;= 0 &amp; array.length = i_0)" pathConditionChanged="true" branchCondition="!(i_0 &gt;= 0 &amp; array.length = i_0)" mergedBranchCondition="false" isBranchConditionComputed="true">
+                           <callStackEntry path="/0"/>
+                           <statement name="result_1+=array[i];" pathCondition="   array.length &gt;= 0
+-&gt; !array = null &amp; !(i_0 &gt;= 0 &amp; array.length = i_0)" pathConditionChanged="false">
+                              <callStackEntry path="/0"/>
+                              <statement name="result_1+=array[i];" pathCondition="   array.length &gt;= 0
+-&gt; !array = null &amp; !(i_0 &gt;= 0 &amp; array.length = i_0)" pathConditionChanged="false">
+                                 <callStackEntry path="/0"/>
+                                 <statement name="i++;" pathCondition="   array.length &gt;= 0
+-&gt; !array = null &amp; !(i_0 &gt;= 0 &amp; array.length = i_0)" pathConditionChanged="false">
+                                    <callStackEntry path="/0"/>
+                                    <termination name="&lt;loop body end&gt;" pathCondition="   array.length &gt;= 0
+-&gt; !array = null &amp; !(i_0 &gt;= 0 &amp; array.length = i_0)" pathConditionChanged="false" terminationKind="LOOP_BODY">
+                                    </termination>
+                                 </statement>
+                              </statement>
+                           </statement>
+                        </branchCondition>
                      </branchNode>
                   </branchCondition>
                </branchNode>

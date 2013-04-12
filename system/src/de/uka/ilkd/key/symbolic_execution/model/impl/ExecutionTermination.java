@@ -33,16 +33,23 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
     * The {@link Sort} of the uncaught exception.
     */
    private Sort exceptionSort;
+
+   /**
+    * The {@link TerminationKind}.
+    */
+   private TerminationKind terminationKind;
    
    /**
     * Constructor.
     * @param mediator The used {@link KeYMediator} during proof.
     * @param proofNode The {@link Node} of KeY's proof tree which is represented by this {@link IExecutionNode}.
     * @param exceptionVariable Contains the exception variable which is used to check if the executed program in proof terminates normally.
+    * @param terminationKind The {@link TerminationKind} or {@code null} to compute it when it is requested the first time (normal or exceptional termination only).
     */
-   public ExecutionTermination(KeYMediator mediator, Node proofNode, IProgramVariable exceptionVariable) {
+   public ExecutionTermination(KeYMediator mediator, Node proofNode, IProgramVariable exceptionVariable, TerminationKind terminationKind) {
       super(mediator, proofNode);
       this.exceptionVariable = exceptionVariable;
+      this.terminationKind = terminationKind;
    }
 
    /**
@@ -50,9 +57,11 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
     */
    @Override
    protected String lazyComputeName() {
-      return isExceptionalTermination() ? 
-             INTERNAL_NODE_NAME_START + "uncaught " + exceptionSort + INTERNAL_NODE_NAME_END : 
-             DEFAULT_TERMINATION_NODE_NAME;
+      switch (getTerminationKind()) {
+         case EXCEPTIONAL : return INTERNAL_NODE_NAME_START + "uncaught " + exceptionSort + INTERNAL_NODE_NAME_END;
+         case LOOP_BODY : return LOOP_BODY_TERMINATION_NODE_NAME;
+         default : return NORMAL_TERMINATION_NODE_NAME;
+      }
    }
 
    /**
@@ -67,7 +76,18 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
     * {@inheritDoc}
     */
    @Override
-   public boolean isExceptionalTermination() {
+   public TerminationKind getTerminationKind() {
+      if (terminationKind == null) {
+         terminationKind = isExceptionalTermination() ? TerminationKind.EXCEPTIONAL : TerminationKind.NORMAL;
+      }
+      return terminationKind;
+   }
+
+   /**
+    * Checks if is an exceptional termination.
+    * @return {@code true} exceptional termination, {@code false} normal termination.
+    */
+   protected boolean isExceptionalTermination() {
       Sort sort = getExceptionSort();
       return sort != null && !(sort instanceof NullSort);
    }
@@ -138,6 +158,10 @@ public class ExecutionTermination extends AbstractExecutionNode implements IExec
     */
    @Override
    public String getElementType() {
-      return isExceptionalTermination() ? "Exceptional Termination" : "Termination";
+      switch (getTerminationKind()) {
+         case EXCEPTIONAL : return "Exceptional Termination";
+         case LOOP_BODY : return "Loop Body Termination";
+         default : return "Termination";
+      }
    }
 }

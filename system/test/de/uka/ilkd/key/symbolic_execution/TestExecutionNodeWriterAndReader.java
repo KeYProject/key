@@ -27,6 +27,7 @@ import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessUseOperatio
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessValue;
 import de.uka.ilkd.key.symbolic_execution.ExecutionNodeReader.KeYlessVariable;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 
 /**
  * Tests {@link ExecutionNodeWriter} and {@link ExecutionNodeReader}
@@ -112,10 +113,12 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       bc.addCallStackEntry(root);
       bc.addCallStackEntry(bc);
       root.addChild(bc);
-      KeYlessTermination ttrue = new KeYlessTermination(root, "t true", "pc3", true, false);
-      root.addChild(ttrue);
-      KeYlessTermination tfalse = new KeYlessTermination(root, "t false", "pc4", false, true);
-      root.addChild(tfalse);
+      KeYlessTermination tNormal = new KeYlessTermination(root, "t normal", "pc3", true, TerminationKind.NORMAL);
+      root.addChild(tNormal);
+      KeYlessTermination tExceptional = new KeYlessTermination(root, "t exceptional", "pc4", false, TerminationKind.EXCEPTIONAL);
+      root.addChild(tExceptional);
+      KeYlessTermination tloop = new KeYlessTermination(root, "t loop", "pcLoopTermination", false, TerminationKind.LOOP_BODY);
+      root.addChild(tloop);
       KeYlessBranchNode bn = new KeYlessBranchNode(root, "bn", "pc5", true);
       bn.addCallStackEntry(root);
       bn.addCallStackEntry(bc);

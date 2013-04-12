@@ -426,7 +426,7 @@
 &amp; (!u_2.next = null &amp; !u_2.next = null)">
                                     </value>
                                  </variable>
-                                 <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" exceptionalTermination="false">
+                                 <termination name="&lt;end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="NORMAL">
                                  </termination>
                               </methodReturn>
                            </statement>

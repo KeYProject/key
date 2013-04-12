@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ITermLabel;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.LoopBodyTermLabel;
+import de.uka.ilkd.key.logic.LoopInvariantNormalBehaviorTermLabel;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Semisequent;
@@ -170,6 +171,9 @@ public final class TermLabelWorkerManagement {
       }
       else if (LoopBodyTermLabel.NAME.toString().equals(name)) {
          return LoopBodyTermLabelInstantiator.INSTANCE;
+      }
+      else if (LoopInvariantNormalBehaviorTermLabel.NAME.toString().equals(name)) {
+         return LoopInvariantNormalBehaviorTermLabelInstantiator.INSTANCE;
       }
       else {
          return null;
