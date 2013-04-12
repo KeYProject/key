@@ -3527,6 +3527,7 @@ varexp[TacletBuilder b]
         | varcond_enumtype[b, negated]
         | varcond_freeLabelIn[b,negated]         
         | varcond_localvariable[b, negated]        
+        | varcond_thisreference[b, negated]        
         | varcond_reference[b, negated]        
         | varcond_referencearray[b, negated]
         | varcond_static[b,negated]
@@ -3820,6 +3821,20 @@ varcond_reference [TacletBuilder b, boolean isPrimitive]
         tr = type_resolver                           
    RPAREN 
    { b.addVariableCondition(new TypeCondition(tr, !isPrimitive, nonNull)); }
+;
+
+varcond_thisreference [TacletBuilder b, boolean negated]
+{
+  ParsableVariable x = null;
+  String id = null;
+  boolean nonNull = false;
+}
+:
+   ISTHISREFERENCE
+   LPAREN      
+     x = varId                           
+   RPAREN 
+   { b.addVariableCondition(new IsThisReference(x, negated)); }
 ;
 
         
