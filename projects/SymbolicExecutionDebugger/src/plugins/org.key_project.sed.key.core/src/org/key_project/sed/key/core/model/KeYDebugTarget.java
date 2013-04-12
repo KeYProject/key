@@ -273,7 +273,6 @@ public class KeYDebugTarget extends SEDMemoryDebugTarget {
          // Clear cache
          environment.getBuilder().dispose();
          environment = null;
-         executionToDebugMapping.clear();
       }
       // Inform UI that the process is terminated
       super.terminate();

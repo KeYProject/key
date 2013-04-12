@@ -113,7 +113,7 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
    @Override
    public String getName() throws DebugException {
       try {
-         return getDebugTarget().isShowMethodReturnValuesInDebugNodes() ? 
+         return (executionNode.isReturnValueComputed() || !executionNode.isDisposed()) && getDebugTarget().isShowMethodReturnValuesInDebugNodes() ? 
                 executionNode.getNameIncludingReturnValue() : 
                 executionNode.getName();
       }
@@ -126,10 +126,10 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
+   public String getSourcePath() {
       if (sourceName == null) {
          KeYMethodCall debugCallNode = getMethodCall();
-         sourceName = debugCallNode != null ? debugCallNode.getSourceName() : null;
+         sourceName = debugCallNode != null ? debugCallNode.getSourcePath() : null;
       }
       return sourceName;
    }
@@ -212,7 +212,9 @@ public class KeYMethodReturn extends AbstractSEDMethodReturn implements IKeYSEDD
     */
    @Override
    public boolean hasVariables() throws DebugException {
-      return super.hasVariables() && getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
+      return !executionNode.isDisposed() && 
+             super.hasVariables() && 
+             getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
    }
 
    /**

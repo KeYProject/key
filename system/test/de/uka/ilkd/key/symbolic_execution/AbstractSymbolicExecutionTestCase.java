@@ -333,6 +333,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
          assertTrue("Expected IExecutionBranchCondition but is " + current.getClass() + ".", current instanceof IExecutionBranchCondition);
          assertTrue("Expected \"" + ((IExecutionBranchCondition)expected).getFormatedBranchCondition() + "\" but is \"" + ((IExecutionBranchCondition)current).getFormatedBranchCondition() + "\".", JavaUtil.equalIgnoreWhiteSpace(((IExecutionBranchCondition)expected).getFormatedBranchCondition(), ((IExecutionBranchCondition)current).getFormatedBranchCondition()));
          assertEquals(((IExecutionBranchCondition)expected).isMergedBranchCondition(), ((IExecutionBranchCondition)current).isMergedBranchCondition());
+         assertEquals(((IExecutionBranchCondition)expected).isBranchConditionComputed(), ((IExecutionBranchCondition)current).isBranchConditionComputed());
       }
       else if (expected instanceof IExecutionStartNode) {
          assertTrue("Expected IExecutionStartNode but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionStartNode);
@@ -360,6 +361,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       else if (expected instanceof IExecutionMethodReturn) {
          assertTrue("Expected IExecutionMethodReturn but is " + (current != null ? current.getClass() : null) + ".", current instanceof IExecutionMethodReturn);
          assertTrue(((IExecutionMethodReturn)expected).getNameIncludingReturnValue() + " does not match " + ((IExecutionMethodReturn)current).getNameIncludingReturnValue(), JavaUtil.equalIgnoreWhiteSpace(((IExecutionMethodReturn)expected).getNameIncludingReturnValue(), ((IExecutionMethodReturn)current).getNameIncludingReturnValue()));
+         assertEquals(((IExecutionMethodReturn)expected).isReturnValueComputed(), ((IExecutionMethodReturn)current).isReturnValueComputed());
          assertVariables((IExecutionMethodReturn)expected, (IExecutionMethodReturn)current, compareVariables);
       }
       else if (expected instanceof IExecutionStatement) {

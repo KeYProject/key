@@ -49,7 +49,7 @@ public class SWTBotContentWizardNewFileCreationPageTest extends TestCase {
       // Get wizard
       SWTBot bot = new SWTBot();
       SWTBotShell wizard = bot.shell("Test Wizard");
-      wizard.bot().button("Finish").click();
+      TestUtilsUtil.clickDirectly(wizard.bot(), "Finish");
       wizard.bot().waitUntil(Conditions.shellCloses(wizard));
       assertFalse(wizard.isOpen());
       // Make sure that file was created

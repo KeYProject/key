@@ -38,9 +38,9 @@ public class SEDMemoryUseLoopInvariant extends AbstractSEDUseLoopInvariant imple
    private String pathCondition;
    
    /**
-    * The source name.
+    * The source path.
     */
-   private String sourceName;
+   private String sourcePath;
 
    /**
     * The line number.
@@ -91,8 +91,8 @@ public class SEDMemoryUseLoopInvariant extends AbstractSEDUseLoopInvariant imple
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
-      return sourceName;
+   public String getSourcePath() {
+      return sourcePath;
    }
    
    /**
@@ -203,11 +203,11 @@ public class SEDMemoryUseLoopInvariant extends AbstractSEDUseLoopInvariant imple
    }
    
    /**
-    * Sets the source name.
-    * @param sourceName The source name to set.
+    * Sets the source path.
+    * @param sourcePath The source path to set.
     */
-   public void setSourceName(String sourceName) {
-      this.sourceName = sourceName;
+   public void setSourcePath(String sourcePath) {
+      this.sourcePath = sourcePath;
    }
 
    /**

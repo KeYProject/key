@@ -3,8 +3,8 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 
 import javax.swing.JButton;
@@ -40,8 +40,11 @@ public class LicenseAction extends MainWindowAction {
             "LICENSE.TXT"); 
         StringBuffer sb=new StringBuffer();
         try {
-            FileInputStream inp=new FileInputStream(lic.getFile());
-            while (inp.available()>0) sb.append((char)inp.read());	   
+            InputStreamReader inp = new InputStreamReader(lic.openStream(), "utf8");
+            int c;
+            while ((c=inp.read()) > 0) {
+                sb.append((char)c);
+            }
             inp.close();
         } catch (IOException ioe) {
             System.out.println("License file cannot be loaded or is missing: \n"+

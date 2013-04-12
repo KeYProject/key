@@ -21,10 +21,12 @@ import org.eclipse.debug.core.sourcelookup.containers.ExternalArchiveSourceConta
 import org.eclipse.debug.core.sourcelookup.containers.FolderSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.ProjectSourceContainer;
 import org.eclipse.debug.core.sourcelookup.containers.WorkspaceSourceContainer;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.launching.sourcelookup.containers.JavaProjectSourceContainer;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry;
-import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYClassPathEntry.KeYClassPathEntryKind;
+import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties;
 import org.key_project.key4eclipse.starter.core.property.KeYResourceProperties.UseBootClassPathKind;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.sed.key.core.util.LogUtil;
@@ -68,16 +70,22 @@ public class KeYSourcePathComputerDelegate implements ISourcePathComputerDelegat
                  result.add(createSourceContainer(file));
               }
            }
-           // Add source project
-           result.add(new ProjectSourceContainer(project, true));
+           // Add source project, functionality was adapted from JavaSourceLookupUtil
+           IJavaProject javaProject = method.getJavaProject();
+           if (javaProject.exists()) {
+              result.add(new JavaProjectSourceContainer(javaProject));
+           }
+           else {
+              result.add(new ProjectSourceContainer(project, false));
+           }
            return result.toArray(new ISourceContainer[result.size()]);
         }
         else {
            return new ISourceContainer[] {new WorkspaceSourceContainer()};
         }
     }
-
-    /**
+    
+   /**
      * Creates an {@link ISourceContainer} for the given {@link File}.
      * @param resource The {@link File} for that an {@link ISourceContainer} is needed.
      * @return The created {@link ISourceContainer}.
@@ -86,10 +94,10 @@ public class KeYSourcePathComputerDelegate implements ISourcePathComputerDelegat
     protected ISourceContainer createSourceContainer(File file) throws CoreException {
        if (file != null) {
           if (file.isFile()) {
-             return new ExternalArchiveSourceContainer(file.getAbsolutePath(), true);
+             return new ExternalArchiveSourceContainer(file.getAbsolutePath(), false);
           }
           else {
-             return new DirectorySourceContainer(file, true);
+             return new DirectorySourceContainer(file, false);
           }
        }
        else {
@@ -105,13 +113,13 @@ public class KeYSourcePathComputerDelegate implements ISourcePathComputerDelegat
      */
     protected ISourceContainer createSourceContainer(IResource resource) throws CoreException {
        if (resource instanceof IFile) {
-          return new ArchiveSourceContainer((IFile)resource, true);
+          return new ArchiveSourceContainer((IFile)resource, false);
        }
        else if (resource instanceof IProject) {
-          return new ProjectSourceContainer((IProject)resource, true);
+          return new ProjectSourceContainer((IProject)resource, false);
        }
        else if (resource instanceof IContainer) {
-          return new FolderSourceContainer((IContainer)resource, true);
+          return new FolderSourceContainer((IContainer)resource, false);
        }
        else {
           throw new CoreException(LogUtil.getLogger().createErrorStatus("Not supported resource \"" + resource + "\"."));

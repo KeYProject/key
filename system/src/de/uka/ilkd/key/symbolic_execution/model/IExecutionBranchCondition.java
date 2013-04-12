@@ -21,6 +21,12 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionBranchCondition;
  */
 public interface IExecutionBranchCondition extends IExecutionNode {
    /**
+    * Checks if the value of {@link #getBranchCondition()} is already computed.
+    * @return {@code true} value of {@link #getBranchCondition()} is already computed, {@code false} value of {@link #getBranchCondition()} needs to be computed.
+    */
+   public boolean isBranchConditionComputed();
+   
+   /**
     * <p>
     * Returns the branch condition as {@link Term}.
     * </p>
