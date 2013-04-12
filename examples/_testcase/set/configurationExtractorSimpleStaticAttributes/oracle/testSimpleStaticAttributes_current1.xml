@@ -4,7 +4,7 @@
       <term term="newInstance"/>
       <term term="null"/>
    </equivalenceClass>
-   <state name="return instance.x+finalInstance.x+staticInt+finalStaticint;">
+   <state name="return SimpleStaticAttributes.instance.x+SimpleStaticAttributes.finalInstance.x+SimpleStaticAttributes.staticInt+SimpleStaticAttributes.finalStaticint;">
       <value name="newInstance" programVariable="newInstance" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
       <value name="SimpleStaticAttributes::instance" programVariable="SimpleStaticAttributes::instance" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
       <value name="SimpleStaticAttributes::staticInt" programVariable="SimpleStaticAttributes::staticInt" isArrayIndex="false" arrayIndex="-1" value="1" type="int"/>

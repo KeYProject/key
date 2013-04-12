@@ -4,7 +4,7 @@
       <term term="x"/>
       <term term="null"/>
    </equivalenceClass>
-   <state name="return first.value+second.value+tempX.value+tempY.value;">
+   <state name="return this.first.value+this.second.value+tempX.value+tempY.value;">
       <value name="x" programVariable="x" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
       <value name="tempX" programVariable="tempX" isArrayIndex="false" arrayIndex="-1" value="null" type="Null"/>
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>

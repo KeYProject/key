@@ -8,7 +8,7 @@ public class IntegerConditionTest {
 		if (x == 1) {
 			int z = a + 1;
 			if (z == 2) {
-				if (y == 3) {
+				if (IntegerConditionTest.y == 3) {
 					return 42;
 				}
 				else {

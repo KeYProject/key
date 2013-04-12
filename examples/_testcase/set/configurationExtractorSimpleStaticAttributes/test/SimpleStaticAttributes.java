@@ -15,10 +15,10 @@ public class SimpleStaticAttributes {
 	}
 	
 	public static int compute(SimpleStaticAttributes newInstance) {
-		staticInt = 1;
-		if (finalStaticint == 42 && staticInt == 1) {
-			instance = newInstance;
-			return instance.x + finalInstance.x + staticInt + finalStaticint;
+		SimpleStaticAttributes.staticInt = 1;
+		if (SimpleStaticAttributes.finalStaticint == 42 && SimpleStaticAttributes.staticInt == 1) {
+			SimpleStaticAttributes.instance = newInstance;
+			return SimpleStaticAttributes.instance.x + SimpleStaticAttributes.finalInstance.x + SimpleStaticAttributes.staticInt + SimpleStaticAttributes.finalStaticint;
 		}
 		else {
 			return -1;

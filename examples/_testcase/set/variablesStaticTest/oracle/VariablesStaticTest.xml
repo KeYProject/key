@@ -5,7 +5,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="z=2;" pathCondition="true" pathConditionChanged="false">
+      <statement name="VariablesStaticTest.z=2;" pathCondition="true" pathConditionChanged="false">
          <variable name="self" arrayIndex="-1" isArrayIndex="false">
             <value name="self {true}" typeString="VariablesStaticTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
             </value>
@@ -44,7 +44,7 @@
                   <value name="VariablesStaticTest::z {true}" typeString="int" valueString="2" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                   </value>
                </variable>
-               <statement name="return z+StaticFields.a+StaticFields.b;" pathCondition="true" pathConditionChanged="false">
+               <statement name="return VariablesStaticTest.z+StaticFields.a+StaticFields.b;" pathCondition="true" pathConditionChanged="false">
                   <variable name="self" arrayIndex="-1" isArrayIndex="false">
                      <value name="self {true}" typeString="VariablesStaticTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      </value>

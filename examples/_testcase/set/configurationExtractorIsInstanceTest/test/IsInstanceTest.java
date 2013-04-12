@@ -7,7 +7,7 @@ public class IsInstanceTest {
 	  @ ensures true;
 	  @*/
 	public static int compute(IsInstanceTest obj) {
-		if (obj == A) {
+		if (obj == IsInstanceTest.A) {
 			return 1;
 		}
 		else {

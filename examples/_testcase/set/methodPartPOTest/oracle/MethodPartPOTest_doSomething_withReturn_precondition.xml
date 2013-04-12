@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <statement name="x=1*asdf;" pathCondition="true" pathConditionChanged="false">
-      <statement name="int y = 2+CONSTANT+field;" pathCondition="true" pathConditionChanged="false">
+      <statement name="int y = 2+MethodPartPOTest.CONSTANT+this.field;" pathCondition="true" pathConditionChanged="false">
          <statement name="int doubleValue = doubleValue(x);" pathCondition="true" pathConditionChanged="false">
             <methodCall name="self.doubleValue(value);" pathCondition="true" pathConditionChanged="false">
                <statement name="int result;" pathCondition="true" pathConditionChanged="false">

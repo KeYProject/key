@@ -33,23 +33,23 @@ public class FieldReference extends VariableReference
     
 
     protected FieldReference() {
+	prefix = new ThisReference();
     }
 
     public FieldReference(ProgramVariable pv, ReferencePrefix prefix) {
 	super(pv);
-	this.prefix = prefix;
+	this.prefix = prefix != null ? prefix : new ThisReference();
     }
 
     public FieldReference(ExtList children, ReferencePrefix prefix) {
 	super(children);
-	this.prefix = prefix;
+	this.prefix = prefix != null ? prefix : new ThisReference();
     }
 
 
     public FieldReference(ProgramVariable pv, ReferencePrefix prefix, PositionInfo pi) {
         super(pv, pi);
-        this.prefix = prefix;
-        
+	this.prefix = prefix != null ? prefix : new ThisReference();
     }
 
     /**

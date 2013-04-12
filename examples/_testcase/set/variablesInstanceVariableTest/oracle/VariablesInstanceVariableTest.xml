@@ -78,7 +78,7 @@
 &amp; !param = null">
             </value>
          </variable>
-         <statement name="a=x;" pathCondition="true" pathConditionChanged="false">
+         <statement name="this.a=x;" pathCondition="true" pathConditionChanged="false">
             <variable name="self" arrayIndex="-1" isArrayIndex="false">
                <value name="self {  param = null &amp; param = null
 | !param = null
@@ -155,7 +155,7 @@
 &amp; !param = null">
                </value>
             </variable>
-            <statement name="b=3;" pathCondition="true" pathConditionChanged="false">
+            <statement name="this.b=3;" pathCondition="true" pathConditionChanged="false">
                <variable name="self" arrayIndex="-1" isArrayIndex="false">
                   <value name="self {  param = null &amp; param = null
 | !param = null
@@ -518,7 +518,7 @@
 &amp; !param = null">
                               </value>
                            </variable>
-                           <statement name="wrapper=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
+                           <statement name="this.wrapper=new IntWrapper ();" pathCondition="true" pathConditionChanged="false">
                               <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                  <value name="self {  param = null &amp; param = null
 | !param = null
@@ -749,7 +749,7 @@
                                           </variable>
                                        </value>
                                     </variable>
-                                    <statement name="wrapper.value=4;" pathCondition="true" pathConditionChanged="false">
+                                    <statement name="this.wrapper.value=4;" pathCondition="true" pathConditionChanged="false">
                                        <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                           <value name="self {  param = null &amp; param = null
 | !param = null
@@ -822,7 +822,7 @@
 &amp; !param = null">
                                           </value>
                                        </variable>
-                                       <statement name="return a+b+x+wrapper.value+param.value;" pathCondition="true" pathConditionChanged="false">
+                                       <statement name="return this.a+this.b+x+this.wrapper.value+param.value;" pathCondition="true" pathConditionChanged="false">
                                           <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                              <value name="self {  param = null &amp; param = null
 | !param = null

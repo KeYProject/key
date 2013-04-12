@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="self.compute(a);" pathCondition="true" pathConditionChanged="false">
-      <branchNode name="if (x==1) {if (next.x==2) {if (next.next.x==3) {if (instance.x==4) {if (instance.next.x==5) {if (instance.next.next.x==6) {return 42;           }else  {return              -600;           }         }else  {return            -500;         }       }else  {return          -400;       }     }else  {return        -300;     }   }else  {return      -200;   } }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
+      <branchNode name="if (this.x==1) {if (this.next.x==2) {if (this.next.next.x==3) {if (ObjectConditionTest.instance.x==4) {if (ObjectConditionTest.instance.next.x==5) {if (ObjectConditionTest.instance.next.next.x==6) {return 42;           }else  {return              -600;           }         }else  {return            -500;         }       }else  {return          -400;       }     }else  {return        -300;     }   }else  {return      -200;   } }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
          <branchCondition name="self.x = 1" pathCondition="self.x = 1" pathConditionChanged="true" branchCondition="self.x = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
-            <branchNode name="if (next.x==2) {if (next.next.x==3) {if (instance.x==4) {if (instance.next.x==5) {if (instance.next.next.x==6) {return 42;         }else  {return            -600;         }       }else  {return          -500;       }     }else  {return        -400;     }   }else  {return      -300;   } }else  {return    -200; }" pathCondition="self.x = 1" pathConditionChanged="false">
+            <branchNode name="if (this.next.x==2) {if (this.next.next.x==3) {if (ObjectConditionTest.instance.x==4) {if (ObjectConditionTest.instance.next.x==5) {if (ObjectConditionTest.instance.next.next.x==6) {return 42;         }else  {return            -600;         }       }else  {return          -500;       }     }else  {return        -400;     }   }else  {return      -300;   } }else  {return    -200; }" pathCondition="self.x = 1" pathConditionChanged="false">
                <branchCondition name="!self.next = null" pathCondition="self.x = 1 &amp; !self.next = null" pathConditionChanged="true" branchCondition="!self.next = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <branchCondition name="self.next.x = 2" pathCondition="self.x = 1 &amp; !self.next = null &amp; self.next.x = 2" pathConditionChanged="true" branchCondition="self.next.x = 2" mergedBranchCondition="false" isBranchConditionComputed="true">
-                     <branchNode name="if (next.next.x==3) {if (instance.x==4) {if (instance.next.x==5) {if (instance.next.next.x==6) {return 42;       }else  {return          -600;       }     }else  {return        -500;     }   }else  {return      -400;   } }else  {return    -300; }" pathCondition="self.x = 1 &amp; !self.next = null &amp; self.next.x = 2" pathConditionChanged="false">
+                     <branchNode name="if (this.next.next.x==3) {if (ObjectConditionTest.instance.x==4) {if (ObjectConditionTest.instance.next.x==5) {if (ObjectConditionTest.instance.next.next.x==6) {return 42;       }else  {return          -600;       }     }else  {return        -500;     }   }else  {return      -400;   } }else  {return    -300; }" pathCondition="self.x = 1 &amp; !self.next = null &amp; self.next.x = 2" pathConditionChanged="false">
                         <branchCondition name="!self.next.next = null" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
@@ -16,7 +16,7 @@
 &amp; self.next.x = 2
 &amp; !self.next.next = null
 &amp; self.next.next.x = 3" pathConditionChanged="true" branchCondition="self.next.next.x = 3" mergedBranchCondition="false" isBranchConditionComputed="true">
-                              <branchNode name="if (instance.x==4) {if (instance.next.x==5) {if (instance.next.next.x==6) {return 42;     }else  {return        -600;     }   }else  {return      -500;   } }else  {return    -400; }" pathCondition="  self.x = 1
+                              <branchNode name="if (ObjectConditionTest.instance.x==4) {if (ObjectConditionTest.instance.next.x==5) {if (ObjectConditionTest.instance.next.next.x==6) {return 42;     }else  {return        -600;     }   }else  {return      -500;   } }else  {return    -400; }" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
 &amp; !self.next.next = null
@@ -34,7 +34,7 @@
 &amp; self.next.next.x = 3
 &amp; !ObjectConditionTest.instance = null
 &amp; ObjectConditionTest.instance.x = 4" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.x = 4" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                       <branchNode name="if (instance.next.x==5) {if (instance.next.next.x==6) {return 42;   }else  {return      -600;   } }else  {return    -500; }" pathCondition="  self.x = 1
+                                       <branchNode name="if (ObjectConditionTest.instance.next.x==5) {if (ObjectConditionTest.instance.next.next.x==6) {return 42;   }else  {return      -600;   } }else  {return    -500; }" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
 &amp; !self.next.next = null
@@ -58,7 +58,7 @@
 &amp; ObjectConditionTest.instance.x = 4
 &amp; !ObjectConditionTest.instance.next = null
 &amp; ObjectConditionTest.instance.next.x = 5" pathConditionChanged="true" branchCondition="ObjectConditionTest.instance.next.x = 5" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                                <branchNode name="if (instance.next.next.x==6) {return 42; }else  {return    -600; }" pathCondition="  self.x = 1
+                                                <branchNode name="if (ObjectConditionTest.instance.next.next.x==6) {return 42; }else  {return    -600; }" pathCondition="  self.x = 1
 &amp; !self.next = null
 &amp; self.next.x = 2
 &amp; !self.next.next = null

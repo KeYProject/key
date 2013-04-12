@@ -16,7 +16,7 @@
                                     <statement name="oldLeft.parent=current.right;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null" pathConditionChanged="false">
-                                       <branchNode name="if (current.parent==null) {   root=newParent;   newParent.parent=null; }else  {   current.parent.right=newParent;   newParent.parent=current.parent; }" pathCondition="  !current = null
+                                       <branchNode name="if (current.parent==null) {   this.root=newParent;   newParent.parent=null; }else  {   current.parent.right=newParent;   newParent.parent=current.parent; }" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null" pathConditionChanged="false">
                                           <branchCondition name="  \if (current.right.left = current)
@@ -32,7 +32,7 @@
       \then (current.right.left)
       \else (current.parent)
 = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                             <statement name="root=newParent;" pathCondition="  !current = null
+                                             <statement name="this.root=newParent;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; !current.right.left = null
 &amp;   \if (current.right.left = current)
@@ -149,14 +149,14 @@
                                  <branchCondition name="current.right.left = null" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null" pathConditionChanged="true" branchCondition="current.right.left = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                    <branchNode name="if (current.parent==null) {   root=newParent;   newParent.parent=null; }else  {   current.parent.right=newParent;   newParent.parent=current.parent; }" pathCondition="  !current = null
+                                    <branchNode name="if (current.parent==null) {   this.root=newParent;   newParent.parent=null; }else  {   current.parent.right=newParent;   newParent.parent=current.parent; }" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null" pathConditionChanged="false">
                                        <branchCondition name="current.parent = null" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null
 &amp; current.parent = null" pathConditionChanged="true" branchCondition="current.parent = null" mergedBranchCondition="false" isBranchConditionComputed="true">
-                                          <statement name="root=newParent;" pathCondition="  !current = null
+                                          <statement name="this.root=newParent;" pathCondition="  !current = null
 &amp; !current.right = null
 &amp; current.right.left = null
 &amp; current.parent = null" pathConditionChanged="false">

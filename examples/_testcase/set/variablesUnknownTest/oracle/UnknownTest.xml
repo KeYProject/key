@@ -5,7 +5,7 @@
          <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
          </value>
       </variable>
-      <statement name="previous=null;" pathCondition="true" pathConditionChanged="false">
+      <statement name="this.previous=null;" pathCondition="true" pathConditionChanged="false">
          <variable name="self" arrayIndex="-1" isArrayIndex="false">
             <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                <variable name="next" arrayIndex="-1" isArrayIndex="false">
@@ -30,7 +30,7 @@
             <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
             </value>
          </variable>
-         <statement name="next=new UnknownTest ();" pathCondition="true" pathConditionChanged="false">
+         <statement name="this.next=new UnknownTest ();" pathCondition="true" pathConditionChanged="false">
             <variable name="self" arrayIndex="-1" isArrayIndex="false">
                <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="next" arrayIndex="-1" isArrayIndex="false">
@@ -101,7 +101,7 @@
                      <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                      </value>
                   </variable>
-                  <statement name="next.next=new UnknownTest ();" pathCondition="true" pathConditionChanged="false">
+                  <statement name="this.next.next=new UnknownTest ();" pathCondition="true" pathConditionChanged="false">
                      <variable name="self" arrayIndex="-1" isArrayIndex="false">
                         <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="next" arrayIndex="-1" isArrayIndex="false">
@@ -204,7 +204,7 @@
                                  </variable>
                               </value>
                            </variable>
-                           <statement name="return next.next;" pathCondition="true" pathConditionChanged="false">
+                           <statement name="return this.next.next;" pathCondition="true" pathConditionChanged="false">
                               <variable name="self" arrayIndex="-1" isArrayIndex="false">
                                  <value name="self {true}" typeString="endless.UnknownTest" valueString="self" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                                     <variable name="next" arrayIndex="-1" isArrayIndex="false">

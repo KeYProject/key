@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <model>
-   <state name="return classWrapper.value+instanceWrapper.value+next.instanceWrapper.value+localWrapper.value;">
+   <state name="return InstanceCreationTest.classWrapper.value+this.instanceWrapper.value+this.next.instanceWrapper.value+localWrapper.value;">
       <association name="self" programVariable="self" isArrayIndex="false" arrayIndex="-1" target="o1"/>
       <association name="InstanceCreationTest::classWrapper" programVariable="InstanceCreationTest::classWrapper" isArrayIndex="false" arrayIndex="-1" target="o6"/>
       <association name="localWrapper" programVariable="localWrapper" isArrayIndex="false" arrayIndex="-1" target="o3"/>
