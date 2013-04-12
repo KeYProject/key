@@ -48,7 +48,6 @@ public final class IsThisReference extends VariableConditionAdapter {
 	    		 SVSubstitute instCandidate,
 	    		 SVInstantiations instMap, 
 	    		 Services services) {
-    
         boolean isThisRef = instMap.getInstantiation(var) instanceof ThisReference;
         return negated ? !isThisRef  : isThisRef;
     }
