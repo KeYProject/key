@@ -66,10 +66,7 @@ public class MainFrame extends JScrollPane {
             gbc.gridy = 0;
             gbc.weightx = 1.0;
             gbc.weighty = 0.0;
-            JLabel transparentLabel = new JLabel();
-            transparentLabel.setBackground(transparent);
-            transparentLabel.setOpaque(true);
-            add(transparentLabel, gbc);
+            add( javax.swing.Box.createGlue(), gbc);
 
             Insets titleButtonInsets = new Insets(0, 50, 4, 0);
             gbc.insets = titleButtonInsets;
@@ -81,14 +78,25 @@ public class MainFrame extends JScrollPane {
             add(sequentView.titleButton, gbc);
 
             gbc.insets = new Insets(0, 0, 0, 0);
-            gbc.fill = GridBagConstraints.BOTH;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
             gbc.gridx = 0;
             gbc.gridy = 1;
             gbc.weightx = 1.0;
-            gbc.weighty = 1.0;
+            gbc.weighty = 0.0;
             gbc.gridwidth = 2;
             add(sequentView, gbc);
+
+            if (sequentView instanceof InnerNodeView) {
+                gbc.gridy = 2;
+                add(((InnerNodeView) sequentView).tacletInfo, gbc);
+            }
             
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            gbc.weighty = 1.0;
+            add( javax.swing.Box.createGlue(), gbc);
+
             setBorder(new SequentBorder(sequentView.titleButton, titleButtonInsets));
 
         }

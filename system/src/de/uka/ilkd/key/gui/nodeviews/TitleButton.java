@@ -25,7 +25,7 @@ public class TitleButton extends JLabel
         implements MouseListener {
 
     private static char turnstile = '\u22A2';
-    private boolean isActivated = false;
+    private boolean isActivated;
     Color borderColor;
     SequentView sequentView;
 
@@ -35,6 +35,9 @@ public class TitleButton extends JLabel
             setBackground(borderColor);
         } else {
             setBackground(transparent);
+        }
+        if(sequentView instanceof InnerNodeView){
+            ((InnerNodeView)sequentView).tacletInfo.setVisible(b);
         }
     }
 

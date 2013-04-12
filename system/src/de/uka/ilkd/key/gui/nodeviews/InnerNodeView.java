@@ -53,12 +53,18 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
+import java.awt.Insets;
+import javax.swing.JTextArea;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.MatteBorder;
 import javax.swing.text.DefaultHighlighter;
 
 public class InnerNodeView extends SequentView {
     
     private InitialPositionTable posTable;
     private ConfigChangeListener configChangeListener = new ConfigChangeAdapter(this);
+    final JTextArea tacletInfo;
     
     public InnerNodeView(Node node, KeYMediator mediator) {
 
@@ -67,10 +73,16 @@ public class InnerNodeView extends SequentView {
                 mediator.getNotationInfo(),
                 mediator.getServices());
         printer.printSequent(null, filter);
-        sequentOnly = printer.toString();
-        setText(sequentOnly);
+        setText(printer.toString());
         setSelectionColor(new Color(10,180,50));
-        tacletDescription = getTacletDescription(mediator, node, filter);
+        
+        tacletInfo = new JTextArea(getTacletDescription(mediator, node, filter));
+        tacletInfo.setBackground(BACKGROUND_COLOR);
+        tacletInfo.setBorder(new CompoundBorder(
+                new MatteBorder(3,0,0,0,Color.black),
+                new EmptyBorder(new Insets(4,0,0,0))));
+        
+        titleButton.setActivated(false);
         posTable = printer.getInitialPositionTable();
         Config.DEFAULT.addConfigChangeListener(configChangeListener);
         updateUI();
@@ -170,18 +182,6 @@ public class InnerNodeView extends SequentView {
                 out.append(";\n");
             }
             out.append("}\n");
-        }
-    }
-    String sequentOnly;
-    String tacletDescription;
-    public boolean showTaclet = false;
-
-    void toggleText() {
-        showTaclet = !showTaclet;
-        if (showTaclet) {
-            setText(sequentOnly + "\n" + tacletDescription);
-        } else {
-            setText(sequentOnly);
         }
     }
 
