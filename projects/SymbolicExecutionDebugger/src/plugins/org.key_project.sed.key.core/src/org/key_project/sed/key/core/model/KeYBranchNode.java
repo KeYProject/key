@@ -193,7 +193,9 @@ public class KeYBranchNode extends AbstractSEDBranchNode implements IKeYSEDDebug
     */
    @Override
    public boolean hasVariables() throws DebugException {
-      return super.hasVariables() && getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
+      return !executionNode.isDisposed() && 
+             super.hasVariables() && 
+             getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
    }
 
    /**

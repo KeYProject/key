@@ -2,17 +2,17 @@
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="ObjectArrayIndexReadAccess.compute(array);" pathCondition="true" pathConditionChanged="false">
       <branchNode name="if (array!=null) {if (array.length==1) {if (array[0].value==42) {return 42;     }else  {return        -300;     }   }else  {return      -200;   } }else  {return    -100; }" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="!array = null" pathCondition="!array = null" pathConditionChanged="true" branchCondition="!array = null" mergedBranchCondition="false">
+         <branchCondition name="!array = null" pathCondition="!array = null" pathConditionChanged="true" branchCondition="!array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <branchNode name="if (array.length==1) {if (array[0].value==42) {return 42;   }else  {return      -300;   } }else  {return    -200; }" pathCondition="!array = null" pathConditionChanged="false">
-               <branchCondition name="array.length &gt;= 0 -&gt; array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="true" branchCondition="array.length &gt;= 0 -&gt; array.length = 1" mergedBranchCondition="false">
+               <branchCondition name="array.length &gt;= 0 -&gt; array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="true" branchCondition="array.length &gt;= 0 -&gt; array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <branchNode name="if (array[0].value==42) {return 42; }else  {return    -300; }" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; array.length = 1" pathConditionChanged="false">
                      <branchCondition name="!array[0] = null" pathCondition="   array.length &gt;= 0
--&gt; !array = null &amp; array.length = 1 &amp; !array[0] = null" pathConditionChanged="true" branchCondition="!array[0] = null" mergedBranchCondition="false">
+-&gt; !array = null &amp; array.length = 1 &amp; !array[0] = null" pathConditionChanged="true" branchCondition="!array[0] = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <branchCondition name="array[0].value = 42" pathCondition="   array.length &gt;= 0
 -&gt;   !array = null
    &amp; array.length = 1
    &amp; !array[0] = null
-   &amp; array[0].value = 42" pathConditionChanged="true" branchCondition="array[0].value = 42" mergedBranchCondition="false">
+   &amp; array[0].value = 42" pathConditionChanged="true" branchCondition="array[0].value = 42" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <statement name="return 42;" pathCondition="   array.length &gt;= 0
 -&gt;   !array = null
    &amp; array.length = 1
@@ -22,7 +22,7 @@
 -&gt;   !array = null
    &amp; array.length = 1
    &amp; !array[0] = null
-   &amp; array[0].value = 42" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of ObjectArrayIndexReadAccess.compute(array);&gt;">
+   &amp; array[0].value = 42" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;42&apos; as result of ObjectArrayIndexReadAccess.compute(array);&gt;" isReturnValueComputed="true">
                                  <termination name="&lt;end&gt;" pathCondition="   array.length &gt;= 0
 -&gt;   !array = null
    &amp; array.length = 1
@@ -36,7 +36,7 @@
 -&gt;   !array = null
    &amp; array.length = 1
    &amp; !array[0] = null
-   &amp; !array[0].value = 42" pathConditionChanged="true" branchCondition="!array[0].value = 42" mergedBranchCondition="false">
+   &amp; !array[0].value = 42" pathConditionChanged="true" branchCondition="!array[0].value = 42" mergedBranchCondition="false" isBranchConditionComputed="true">
                            <statement name="return -300;" pathCondition="   array.length &gt;= 0
 -&gt;   !array = null
    &amp; array.length = 1
@@ -46,7 +46,7 @@
 -&gt;   !array = null
    &amp; array.length = 1
    &amp; !array[0] = null
-   &amp; !array[0].value = 42" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-300&apos; as result of ObjectArrayIndexReadAccess.compute(array);&gt;">
+   &amp; !array[0].value = 42" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-300&apos; as result of ObjectArrayIndexReadAccess.compute(array);&gt;" isReturnValueComputed="true">
                                  <termination name="&lt;end&gt;" pathCondition="   array.length &gt;= 0
 -&gt;   !array = null
    &amp; array.length = 1
@@ -58,16 +58,16 @@
                         </branchCondition>
                      </branchCondition>
                      <branchCondition name="array[0] = null" pathCondition="   array.length &gt;= 0
--&gt; !array = null &amp; array.length = 1 &amp; array[0] = null" pathConditionChanged="true" branchCondition="array[0] = null" mergedBranchCondition="false">
+-&gt; !array = null &amp; array.length = 1 &amp; array[0] = null" pathConditionChanged="true" branchCondition="array[0] = null" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="   array.length &gt;= 0
 -&gt; !array = null &amp; array.length = 1 &amp; array[0] = null" pathConditionChanged="false" exceptionalTermination="true">
                         </termination>
                      </branchCondition>
                   </branchNode>
                </branchCondition>
-               <branchCondition name="!array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="true" branchCondition="!array.length = 1" mergedBranchCondition="false">
+               <branchCondition name="!array.length = 1" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="true" branchCondition="!array.length = 1" mergedBranchCondition="false" isBranchConditionComputed="true">
                   <statement name="return -200;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false">
-                     <methodReturn name="&lt;return of ObjectArrayIndexReadAccess.compute(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-200&apos; as result of ObjectArrayIndexReadAccess.compute(array);&gt;">
+                     <methodReturn name="&lt;return of ObjectArrayIndexReadAccess.compute(array);&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-200&apos; as result of ObjectArrayIndexReadAccess.compute(array);&gt;" isReturnValueComputed="true">
                         <termination name="&lt;end&gt;" pathCondition="array.length &gt;= 0 -&gt; !array = null &amp; !array.length = 1" pathConditionChanged="false" exceptionalTermination="false">
                         </termination>
                      </methodReturn>
@@ -75,9 +75,9 @@
                </branchCondition>
             </branchNode>
          </branchCondition>
-         <branchCondition name="array = null" pathCondition="array = null" pathConditionChanged="true" branchCondition="array = null" mergedBranchCondition="false">
+         <branchCondition name="array = null" pathCondition="array = null" pathConditionChanged="true" branchCondition="array = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <statement name="return -100;" pathCondition="array = null" pathConditionChanged="false">
-               <methodReturn name="&lt;return of ObjectArrayIndexReadAccess.compute(array);&gt;" pathCondition="array = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-100&apos; as result of ObjectArrayIndexReadAccess.compute(array);&gt;">
+               <methodReturn name="&lt;return of ObjectArrayIndexReadAccess.compute(array);&gt;" pathCondition="array = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;-100&apos; as result of ObjectArrayIndexReadAccess.compute(array);&gt;" isReturnValueComputed="true">
                   <termination name="&lt;end&gt;" pathCondition="array = null" pathConditionChanged="false" exceptionalTermination="false">
                   </termination>
                </methodReturn>

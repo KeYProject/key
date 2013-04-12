@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -155,6 +156,17 @@ public final class SWTUtil {
                     event.gc.drawText(text, event.x + textMargin, event.y + yOffset, true);
                 }
             });
+        }
+    }
+    
+    /**
+     * Sets the given text in the given {@link Button} control.
+     * @param control The {@link Button} control o set text in.
+     * @param text The text to set.
+     */
+    public static void setText(Button control, String text) {
+        if (control != null) {
+            control.setText(text != null ? text : StringUtil.EMPTY_STRING);
         }
     }
     

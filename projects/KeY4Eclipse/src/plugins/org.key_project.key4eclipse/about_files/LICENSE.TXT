@@ -1,15 +1,23 @@
        KeY - INTEGRATED DEDUCTIVE SOFTWARE DESIGN 
-            
-       Copyright (C) 2001-2010 Karlsruhe Institute of Technology, Germany 
+
+       Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
                                Universitaet Koblenz-Landau, Germany
                                Chalmers University of Technology, Sweden
-
+       Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+                               Technical University Darmstadt, Germany
+                               Chalmers University of Technology, Sweden
 
        Karlsruhe Institute of Technology
        Institute for Theoretical Computer Science
        Prof. Dr. Bernhard Beckert / Prof. Dr. Peter H. Schmitt
        Am Fasanengarten 5
        D-76131 Karlsruhe
+       Germany
+
+       Technische Universität Darmstadt
+       Fachgebiet Software Engineering
+       Hochschulstr. 10
+       D-64289 Darmstadt 
        Germany
 
        Chalmers University of Technology

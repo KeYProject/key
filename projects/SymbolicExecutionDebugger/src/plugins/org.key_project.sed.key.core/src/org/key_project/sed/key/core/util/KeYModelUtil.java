@@ -260,32 +260,58 @@ public final class KeYModelUtil {
     * Tries to update the given {@link SourceLocation} of the given
     * {@link IStackFrame} with the location provided by JDT. If possible
     * the new location is returned and the original location otherwise.
-    * @param frame The {@link IStackFrame} which provides the given {@link SourceLocation}.
-    * @param sourceLocation The initial {@link SourceLocation}.
+    * @param frame The {@link IStackFrame} which defines the file to parse.
+    * @param sourceLocation The {@link SourceLocation} which describes the {@link ASTNode} to update location from.
     * @return The updated {@link SourceLocation} or the initial {@link SourceLocation}.
     * @throws DebugException Occurred Exception.
     */
    public static SourceLocation updateLocationFromAST(IStackFrame frame,
                                                       SourceLocation sourceLocation) throws DebugException {
       try {
-         SourceLocation result = sourceLocation;
-         if (sourceLocation != null && sourceLocation.getCharEnd() >= 0) {
-            ICompilationUnit compilationUnit = findCompilationUnit(frame);
-            if (compilationUnit != null) {
-               ASTNode root = JDTUtil.parse(compilationUnit, sourceLocation.getCharStart(), sourceLocation.getCharEnd() - sourceLocation.getCharStart());
-               ASTNode statementNode = ASTNodeByEndIndexSearcher.search(root, sourceLocation.getCharEnd());
-               if (statementNode != null) {
-                  result = new SourceLocation(-1, 
-                                              statementNode.getStartPosition(), 
-                                              statementNode.getStartPosition() + statementNode.getLength());
-               }
-            }
-         }
-         return result;
+         ASTNode statementNode = findASTNode(frame, sourceLocation);
+         return updateLocationFromAST(sourceLocation, statementNode);
       }
       catch (Exception e) {
          throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
       }
+   }
+   
+   /**
+    * Tries to update the given {@link SourceLocation} of the given
+    * {@link IStackFrame} with the location provided by JDT. If possible
+    * the new location is returned and the original location otherwise.    * @param locationToUpdate The {@link SourceLocation} to return if no {@link ASTNode} is defined.
+    * @param nodeToExtractLocationFrom An optional {@link ASTNode} which source location should replace the given one.
+    * @return The updated {@link SourceLocation} or the initial {@link SourceLocation}.
+    */
+   public static SourceLocation updateLocationFromAST(SourceLocation locationToUpdate,
+                                                      ASTNode nodeToExtractLocationFrom) {
+      SourceLocation result = locationToUpdate;
+      if (nodeToExtractLocationFrom != null) {
+         result = new SourceLocation(-1, 
+                                     nodeToExtractLocationFrom.getStartPosition(), 
+                                     nodeToExtractLocationFrom.getStartPosition() + nodeToExtractLocationFrom.getLength());
+      }
+      return result;
+   }
+   
+   /**
+    * Searches the {@link ASTNode} in JDT which described by the given 
+    * {@link IStackFrame} and the {@link SourceLocation}.
+    * @param frame The {@link IStackFrame} which defines the file to parse.
+    * @param sourceLocation The {@link SourceLocation} which describes the {@link ASTNode} to return.
+    * @return The found {@link ASTNode} or {@code null} if not available.
+    */
+   public static ASTNode findASTNode(IStackFrame frame,
+                                     SourceLocation sourceLocation) {
+      ASTNode statementNode = null;
+      if (sourceLocation != null && sourceLocation.getCharEnd() >= 0) {
+         ICompilationUnit compilationUnit = findCompilationUnit(frame);
+         if (compilationUnit != null) {
+            ASTNode root = JDTUtil.parse(compilationUnit, sourceLocation.getCharStart(), sourceLocation.getCharEnd() - sourceLocation.getCharStart());
+            statementNode = ASTNodeByEndIndexSearcher.search(root, sourceLocation.getCharEnd());
+         }
+      }
+      return statementNode;
    }
 
    /**
@@ -409,7 +435,7 @@ public final class KeYModelUtil {
     */
    public static KeYVariable[] createVariables(IKeYSEDDebugNode<?> debugNode, 
                                                IExecutionStateNode<?> executionNode) {
-      if (executionNode != null && debugNode != null) {
+      if (executionNode != null && !executionNode.isDisposed() && debugNode != null) {
          IExecutionVariable[] variables = executionNode.getVariables();
          if (variables != null) {
             KeYVariable[] result = new KeYVariable[variables.length];

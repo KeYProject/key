@@ -3,9 +3,7 @@ package org.key_project.sed.key.core.model;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.ISourceRange;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.core.model.ISEDUseLoopInvariant;
 import org.key_project.sed.core.model.impl.AbstractSEDUseLoopInvariant;
@@ -13,6 +11,7 @@ import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.KeYModelUtil.SourceLocation;
 import org.key_project.sed.key.core.util.LogUtil;
 
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionUseLoopInvariant;
@@ -129,8 +128,7 @@ public class KeYUseLoopInvariant extends AbstractSEDUseLoopInvariant implements 
    @Override
    public String getSourcePath() {
       if (sourceName == null) {
-         // TODO: Use position info of original loop statement instead of the replaced while instance.
-         sourceName = KeYModelUtil.getSourcePath(executionNode.getLoopStatement().getPositionInfo());
+         sourceName = KeYModelUtil.getSourcePath(computeGuardPositionInfo());
       }
       return sourceName;
    }
@@ -169,31 +167,25 @@ public class KeYUseLoopInvariant extends AbstractSEDUseLoopInvariant implements 
    }
    
    /**
+    * Returns the {@link PositionInfo} of the guard, because it is always
+    * the correct position even if it is reused in transformed while loops.
+    * @return The {@link PositionInfo} of the guard.
+    */
+   protected PositionInfo computeGuardPositionInfo() {
+      return executionNode.getLoopStatement().getGuardExpression().getPositionInfo();
+   }
+   
+   /**
     * Computes the {@link SourceLocation} which values are returned via
     * {@link #getLineNumber()}, {@link #getCharStart()} and {@link #getCharEnd()}.
     * @return The computed {@link SourceLocation}.
     * @throws DebugException Occurred Exception.
     */
    protected SourceLocation computeSourceLocation() throws DebugException {
-      // TODO: Use position info of original loop statement instead of the replaced while instance.
-      SourceLocation location = KeYModelUtil.convertToSourceLocation(executionNode.getLoopStatement().getPositionInfo());
-      // Try to update the position info with the position of the method name provided by JDT.
-      try {
-         if (location.getCharEnd() >= 0) {
-            ICompilationUnit compilationUnit = KeYModelUtil.findCompilationUnit(this);
-            if (compilationUnit != null) {
-               IMethod method = KeYModelUtil.findJDTMethod(compilationUnit, location.getCharEnd());
-               if (method != null) {
-                  ISourceRange range = method.getNameRange();
-                  location = new SourceLocation(-1, range.getOffset(), range.getOffset() + range.getLength());
-               }
-            }
-         }
-         return location;
-      }
-      catch (Exception e) {
-         throw new DebugException(LogUtil.getLogger().createErrorStatus(e));
-      }
+      SourceLocation guardLocation = KeYModelUtil.convertToSourceLocation(computeGuardPositionInfo());
+      // Return location of loop using JDT
+      ASTNode guardASTNode = KeYModelUtil.findASTNode(this, guardLocation);
+      return KeYModelUtil.updateLocationFromAST(guardLocation, guardASTNode.getParent());
    }
 
    /**
@@ -214,7 +206,9 @@ public class KeYUseLoopInvariant extends AbstractSEDUseLoopInvariant implements 
     */
    @Override
    public boolean hasVariables() throws DebugException {
-      return super.hasVariables() && getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
+      return !executionNode.isDisposed() && 
+             super.hasVariables() && 
+             getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
    }
 
    /**

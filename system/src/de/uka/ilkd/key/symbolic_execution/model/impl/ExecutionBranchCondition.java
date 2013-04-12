@@ -89,6 +89,14 @@ public class ExecutionBranchCondition extends AbstractExecutionNode implements I
     * {@inheritDoc}
     */
    @Override
+   public boolean isBranchConditionComputed() {
+      return branchCondition != null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public Term getBranchCondition() throws ProofInputException {
       if (branchCondition == null) {
          lazyComputeBranchCondition();

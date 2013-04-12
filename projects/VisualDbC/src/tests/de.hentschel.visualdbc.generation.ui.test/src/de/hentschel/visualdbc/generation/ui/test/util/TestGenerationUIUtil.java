@@ -56,7 +56,7 @@ public final class TestGenerationUIUtil {
       TestUtilsUtil.menuClick(bot, "File", "New", "Other...");
       SWTBotShell shell = bot.shell("New");
       TestUtilsUtil.selectInTree(shell.bot().tree(), "Visual DbC", "DbC Diagram from Data Source");
-      shell.bot().button("Next >").click();
+      TestUtilsUtil.clickDirectly(shell.bot(), "Next >");
       return shell;
    }
 
@@ -100,11 +100,11 @@ public final class TestGenerationUIUtil {
       // Handle diagram page
       TestUtilsUtil.selectInTree(shell.bot().tree(), diagramContainer.getFullPath().segments());
       shell.bot().textWithLabel("File name:").setText(diagramFileName);
-      shell.bot().button("Next >").click();
+      TestUtilsUtil.clickDirectly(shell.bot(), "Next >");
       // Handle model page
       TestUtilsUtil.selectInTree(shell.bot().tree(), modelContainer.getFullPath().segments());
       shell.bot().textWithLabel("File name:").setText(modelFileName);
-      shell.bot().button("Next >").click();
+      TestUtilsUtil.clickDirectly(shell.bot(), "Next >");
       // Handle driver page
       shell.bot().comboBoxWithLabel("Data Source").setSelection(driver.getName());
       // Optionally manipulate settings
@@ -114,7 +114,7 @@ public final class TestGenerationUIUtil {
       // Click finish or cancel
       if (finish) {
          // Finish wizard
-         shell.bot().button("Finish").click();
+         TestUtilsUtil.clickDirectly(shell.bot(), "Finish");
          shell.bot().waitUntil(Conditions.shellCloses(shell));
          // Make sure that correct files are created
          IFile diagramFile = diagramContainer.getFile(new Path(diagramFileName));
@@ -135,7 +135,7 @@ public final class TestGenerationUIUtil {
       }
       else {
          // Cancel wizard
-         shell.bot().button("Cancel").click();
+         TestUtilsUtil.clickDirectly(shell.bot(), "Cancel");
          shell.bot().waitUntil(Conditions.shellCloses(shell));
          // Make sure that no file was created
          TestCase.assertFalse(diagramContainer.getFile(new Path(diagramFileName)).exists());
