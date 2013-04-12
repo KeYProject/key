@@ -17,6 +17,7 @@ import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicObject;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicState;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicValue;
+import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.ui.CustomConsoleUserInterface;
@@ -49,6 +50,24 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
 //             ".xml",
 //             "x != null & x.next != null & x.next.next != null & a != null & a.x == 42 & b != null");
 //   }
+
+   /**
+    * Tests "configurationExtractorAssociationSourceIsNotRepresentativeTermOfEquivalenceClass" without precondition.
+    * @throws Exception Occurred Exception.
+    */
+   public void testAssociationSourceIsNotRepresentativeTermOfEquivalenceClass() throws Exception {
+      doTest("examples/_testcase/set/configurationExtractorAssociationSourceIsNotRepresentativeTermOfEquivalenceClass/test/AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.java",
+             "AssociationSourceIsNotRepresentativeTermOfEquivalenceClass",
+             "examples/_testcase/set/configurationExtractorAssociationSourceIsNotRepresentativeTermOfEquivalenceClass/oracle/",
+             "AssociationSourceIsNotRepresentativeTermOfEquivalenceClass.xml",
+             "testAssociationSourceIsNotRepresentativeTermOfEquivalenceClass_initial",
+             ".xml",
+             "testAssociationSourceIsNotRepresentativeTermOfEquivalenceClass_current",
+             ".xml",
+             null,
+             1,
+             3);
+   }
    
    /**
     * Tests "configurationExtractorArrayInstanceCreationTest" without precondition.
@@ -688,7 +707,7 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
    public static void assertEquivalenceClass(ISymbolicEquivalenceClass expected, ISymbolicEquivalenceClass current) {
       if (expected != null) {
          assertNotNull(current);
-         assertListEquals(expected.getTermStrings(), current.getTermStrings());
+         assertStringListEqualsIgnoreWhiteSpace(expected.getTermStrings(), current.getTermStrings());
          assertEquals(expected.getRepresentativeString(), current.getRepresentativeString());
       }
       else {
@@ -697,18 +716,20 @@ public class TestSymbolicConfigurationExtractor extends AbstractSymbolicExecutio
    }
    
    /**
-    * Compares the given {@link ImmutableList}s.
+    * Compares the given {@link ImmutableList}s ignoring white space.
     * @param expected The expected instance.
     * @param current The current instance.
     */
-   public static <T> void assertListEquals(ImmutableList<T> expected, ImmutableList<T> current) {
+   public static void assertStringListEqualsIgnoreWhiteSpace(ImmutableList<String> expected, ImmutableList<String> current) {
       assertNotNull(expected);
       assertNotNull(current);
       assertEquals(expected.size(), current.size());
-      Iterator<T> expectedIter = expected.iterator();
-      Iterator<T> currentIter = current.iterator();
+      Iterator<String> expectedIter = expected.iterator();
+      Iterator<String> currentIter = current.iterator();
       while (expectedIter.hasNext() && currentIter.hasNext()) {
-         assertEquals(expectedIter.next(), currentIter.next());
+         String nextExpected = expectedIter.next();
+         String nextCurrent = currentIter.next();
+         assertTrue("\"" + nextExpected + "\" does not match \"" + nextCurrent + "\"", JavaUtil.equalIgnoreWhiteSpace(nextExpected, nextCurrent));
       }
       assertFalse(expectedIter.hasNext());
       assertFalse(currentIter.hasNext());

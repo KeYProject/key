@@ -108,7 +108,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
    protected IExecutionNode createModel() {
       KeYlessStartNode root = new KeYlessStartNode("start", "pc1", true);
       root.addCallStackEntry(root);
-      KeYlessBranchCondition bc = new KeYlessBranchCondition(root, "bc", "pc2", false, "condition of bc", true);
+      KeYlessBranchCondition bc = new KeYlessBranchCondition(root, "bc", "pc2", false, "condition of bc", true, true);
       bc.addCallStackEntry(root);
       bc.addCallStackEntry(bc);
       root.addChild(bc);
@@ -137,7 +137,7 @@ public class TestExecutionNodeWriterAndReader extends TestCase {
       KeYlessMethodCall mc = new KeYlessMethodCall(ln, "mc", "pc8", false);
       mc.addCallStackEntry(mc);
       ln.addChild(mc);
-      KeYlessMethodReturn mr = new KeYlessMethodReturn(mc, "mr", "pc9", true, "mc with return value");
+      KeYlessMethodReturn mr = new KeYlessMethodReturn(mc, "mr", "pc9", true, "mc with return value", true);
       mc.addCallStackEntry(mc);
       mc.addChild(mr);
       KeYlessUseOperationContract useContract = new KeYlessUseOperationContract(root, "useOperationContract", "pcUse", true, false, true, false);

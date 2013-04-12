@@ -48,8 +48,14 @@ public class VisualizeConfigurationsCommand extends AbstractHandler {
     * @throws DebugException Occurred Exception.
     */
    public static boolean canVisualize(Object element) throws DebugException {
-      return element instanceof IKeYSEDDebugNode<?> &&
-             ((IKeYSEDDebugNode<?>)element).getExecutionNode() instanceof IExecutionStateNode<?>;
+      if (element instanceof IKeYSEDDebugNode<?>) {
+         IKeYSEDDebugNode<?> node = (IKeYSEDDebugNode<?>)element;
+         return !node.getExecutionNode().isDisposed() &&
+                node.getExecutionNode() instanceof IExecutionStateNode<?>;
+      }
+      else {
+         return false;
+      }
    }
 
    /**

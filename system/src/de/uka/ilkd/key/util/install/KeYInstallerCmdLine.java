@@ -318,7 +318,17 @@ public class KeYInstallerCmdLine extends KeYInstallerUI {
  		    "and redo the installation afterwards.\n Detail: " + kie );
  	    System.exit ( -1 );
  	}
-	
+
+        File examplesFile = new File(keyJarPath(), EXAMPLES_JAR_FILE);
+        try {
+            JarFile examplesJarFile = new JarFile(examplesFile);
+            extractExamples(examplesJarFile);
+        } catch (IOException e) {
+            todo.append("Could not unpack the examples. Please " +
+                    "resolve the problem first " +
+                    "and redo the installation afterwards.\nDetail:" + e);
+        }
+
 	if ( "linux".equals ( os () ) ) {
 	    try {
 		Runtime.getRuntime ().exec ( "chmod a+x " + startProverScriptFilePath () );
@@ -349,6 +359,13 @@ public class KeYInstallerCmdLine extends KeYInstallerUI {
 	    todo.append ( "\n" );
 	} 
    
+//	File examplesJarFile = new File(keyJarPath(), EXAMPLES_FILE);
+//	if(examplesJarFile.canRead()) {
+//		extract(examplesJarFile, keyHome());
+//	} else {
+//		todo.append("Cannot extract " + EXAMPLES_FILE + " containing the KeY examples. " +
+//				"Please install them manually if you want to use them.\n");
+//	}
 
 	if ( todo.length () > 0 ) {
 	    print ( trim ( "Some things are left to do. Please read carefully.", 72 ) );
@@ -358,12 +375,14 @@ public class KeYInstallerCmdLine extends KeYInstallerUI {
 			   "and execute " + startProverScriptFileName (), 72 ) );
 	} else 
 	    print ( trim ( "Installation finished. To start change to directory"
-			   + " " + binaryPath () +  
-			   "\n and execute " + startProverScriptFileName (), 72 ) );
-	
+			   + " " + binaryPath () + 
+			   " and execute " + startProverScriptFileName (), 72 ) );
+	    print ( trim ( "Typical examples for KeY can be opened from 'Load Examples' " +
+	    		"in the 'File' menu.", 72 ) );
     }
 
-    // error handling
+
+// error handling
 
     private void error ( String msg ) {
 	System.err.println ( makeTitle ( "An Error Occured." ) ); 
@@ -377,7 +396,7 @@ public class KeYInstallerCmdLine extends KeYInstallerUI {
 	   ( "A critical error has occured. Please send a bug "+
 	     "report to: key@ira.uka.de\n" +  
 	     "The bug report should include:\n" + 
-	     "\t Error Classification: Developer Heart Attack\n" +
+	     "\t Error Classification " /*+ ": Developer Heart Attack"*/ + "\n" +
 	     "\t Operating system \n" + 
 	     "\t Java Version \n" + 
 	     "\t Steps to reproduce ( if possible ) \n" + 

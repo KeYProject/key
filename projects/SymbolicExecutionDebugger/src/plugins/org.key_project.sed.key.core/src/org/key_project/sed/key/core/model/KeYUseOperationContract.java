@@ -127,9 +127,9 @@ public class KeYUseOperationContract extends AbstractSEDUseOperationContract imp
     * {@inheritDoc}
     */
    @Override
-   public String getSourceName() {
+   public String getSourcePath() {
       if (sourceName == null) {
-         sourceName = KeYModelUtil.getSourceName(executionNode.getContractProgramMethod().getPositionInfo());
+         sourceName = KeYModelUtil.getSourcePath(executionNode.getContractProgramMethod().getPositionInfo());
       }
       return sourceName;
    }
@@ -212,7 +212,9 @@ public class KeYUseOperationContract extends AbstractSEDUseOperationContract imp
     */
    @Override
    public boolean hasVariables() throws DebugException {
-      return super.hasVariables() && getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
+      return !executionNode.isDisposed() && 
+             super.hasVariables() && 
+             getDebugTarget().getLaunchSettings().isShowVariablesOfSelectedDebugNode();
    }
 
    /**

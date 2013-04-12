@@ -30,6 +30,10 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
     * Launches a method from the outline.
     */
    public void testLaunchFromOutlineView() throws Exception {
+      // Get current settings to restore them in finally block
+      long originalTimeout = SWTBotPreferences.TIMEOUT;
+      // Increase timeout
+      SWTBotPreferences.TIMEOUT = SWTBotPreferences.TIMEOUT * 4;
       // Create bot
       SWTWorkbenchBot bot = new SWTWorkbenchBot();
       TestUtilsUtil.closeWelcomeView(bot);
@@ -64,6 +68,8 @@ public class SWTBotKeYLaunchConfigurationDelegateTest extends AbstractKeYDebugTa
          assertDebugTargetViaOracle(target, "data/methodPartPOTest/oracle/MethodPartPOTest_methodName.xml", false, false);
       }
       finally {
+         // Restore timeout
+         SWTBotPreferences.TIMEOUT = originalTimeout;
          // Close opened editor.
          if (editor != null) {
             editor.close();

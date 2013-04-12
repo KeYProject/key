@@ -451,7 +451,9 @@ public final class SymbolicExecutionUtil {
    public static ApplyStrategyInfo startSideProof(Proof proof, ProofStarter starter, String splittingOption) {
       assert starter != null;
       starter.setMaxRuleApplications(1000);
-      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); // Is a clone that can be modified
+      StrategyProperties sp = !proof.isDisposed() ? 
+                              proof.getSettings().getStrategySettings().getActiveStrategyProperties() : // Is a clone that can be modified
+                              new StrategyProperties();
       sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, splittingOption); // Logical Splitting: Off is faster and avoids splits, but Normal allows to determine that two objects are different.
       sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE); // Method Treatment: Off
       sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF); // Dependency Contracts: Off
@@ -1514,14 +1516,6 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the choice settings are initialized.
-    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
-    */
-   public static boolean isChoiceSettingInitialised() {
-      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
-   }
-
-   /**
     * This method should be called before the auto mode is started in
     * context of symbolic execution. The method sets {@link StrategyProperties}
     * of the auto mode which are not supported in context of symbolic execution
@@ -1879,5 +1873,13 @@ public final class SymbolicExecutionUtil {
          sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
          proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
       }
+   }
+   
+   /**
+    * Checks if the choice settings are initialized.
+    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
+    */
+   public static boolean isChoiceSettingInitialised() {
+      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices().isEmpty();
    }
 }

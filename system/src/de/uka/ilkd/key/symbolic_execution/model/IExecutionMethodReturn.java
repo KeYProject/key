@@ -32,6 +32,12 @@ public interface IExecutionMethodReturn extends IExecutionStateNode<SourceElemen
     * @throws ProofInputException Occurred Exception.
     */
    public String getNameIncludingReturnValue() throws ProofInputException;
+
+   /**
+    * Checks if the value of {@link #getReturnValue()} is already computed.
+    * @return {@code true} value of {@link #getReturnValue()} is already computed, {@code false} value of {@link #getReturnValue()} needs to be computed.
+    */
+   public boolean isReturnValueComputed();
    
    /**
     * Returns the return value.
