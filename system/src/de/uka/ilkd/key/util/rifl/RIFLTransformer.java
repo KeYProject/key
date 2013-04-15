@@ -16,8 +16,11 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.*;
 
 import recoder.ParserException;
+import recoder.java.Comment;
 import recoder.java.CompilationUnit;
 import recoder.java.JavaProgramFactory;
+import recoder.list.generic.ASTArrayList;
+import recoder.list.generic.ASTList;
 
 import de.uka.ilkd.key.java.JavaReader;
 import de.uka.ilkd.key.java.recoderext.ProofJavaProgramFactory;
@@ -74,7 +77,7 @@ public class RIFLTransformer {
     }
 
     private void readJava(String source) throws IOException, ParserException {
-        // TODO: collect all Java files at location
+        // TODO: collect all Java files from directory
         final Collection<String> javaFiles = new ArrayList<String>();
         javaFiles.add(source);
         
@@ -83,8 +86,17 @@ public class RIFLTransformer {
             final CompilationUnit cu;
             Reader fr = new BufferedReader(new FileReader(javaFile));
             cu = jpf.parseCompilationUnit(fr);
+            
+            // testing stuff
+            SpecificationInjector si = new SpecificationInjector();
+            cu.accept(si);
+            
             javaCUs.add(cu);
         }
+    }
+    
+    private void writeJava (String target) {
+        
     }
 
     /** Entry point for the stand-alone RIFL to JML* tool.
