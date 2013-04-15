@@ -50,7 +50,15 @@ public class SpecificationInjector extends SourceVisitor {
     }
 
     private static void addComment(JavaProgramElement se, String comment) {
-        // TODO: place comments more appropriately
+        // fixes issue with Recoder that it writes comments _after_ the element
+        NonTerminalProgramElement parent = se.getASTParent();
+        for (int i= 0; i < parent.getChildCount(); i++) {
+            if (i > 0 && parent.getChildAt(i)==se) {
+                // chose previous element
+                se = (JavaProgramElement) parent.getChildAt(i-1);
+            } // TODO: what if se is the 0th child ??
+        }
+        
         final ASTArrayList<Comment> commentList = new ASTArrayList<Comment>();
         ASTList<Comment> oldComments = se.getComments();
         if (oldComments != null) commentList.addAll(oldComments);
