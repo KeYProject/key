@@ -2,13 +2,13 @@
 <startNode name="&lt;start&gt;" pathCondition="true" pathConditionChanged="false">
    <methodCall name="EmptyPathConditionAndNoUpdates.compute(obj);" pathCondition="true" pathConditionChanged="false">
       <statement name="return obj.x;" pathCondition="true" pathConditionChanged="false">
-         <branchCondition name="!obj = null" pathCondition="!obj = null" pathConditionChanged="true" branchCondition="!obj = null" mergedBranchCondition="false">
-            <methodReturn name="&lt;return of EmptyPathConditionAndNoUpdates.compute(obj);&gt;" pathCondition="!obj = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;obj.x&apos; as result of EmptyPathConditionAndNoUpdates.compute(obj);&gt;">
+         <branchCondition name="!obj = null" pathCondition="!obj = null" pathConditionChanged="true" branchCondition="!obj = null" mergedBranchCondition="false" isBranchConditionComputed="true">
+            <methodReturn name="&lt;return of EmptyPathConditionAndNoUpdates.compute(obj);&gt;" pathCondition="!obj = null" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;obj.x&apos; as result of EmptyPathConditionAndNoUpdates.compute(obj);&gt;" isReturnValueComputed="true">
                <termination name="&lt;end&gt;" pathCondition="!obj = null" pathConditionChanged="false" exceptionalTermination="false">
                </termination>
             </methodReturn>
          </branchCondition>
-         <branchCondition name="obj = null" pathCondition="obj = null" pathConditionChanged="true" branchCondition="obj = null" mergedBranchCondition="false">
+         <branchCondition name="obj = null" pathCondition="obj = null" pathConditionChanged="true" branchCondition="obj = null" mergedBranchCondition="false" isBranchConditionComputed="true">
             <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="obj = null" pathConditionChanged="false" exceptionalTermination="true">
             </termination>
          </branchCondition>

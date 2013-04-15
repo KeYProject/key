@@ -94,6 +94,7 @@ public SMTOptionsAction(MainWindow mainWindow) {
                 }
             },bottomComponent);
             dialog.setTitle("Settings for Decision Procedures");
+            dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
 
     }

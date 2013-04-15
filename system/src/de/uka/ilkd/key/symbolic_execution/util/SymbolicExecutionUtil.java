@@ -60,6 +60,7 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -77,6 +78,8 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.ContractRuleApp;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -448,7 +451,9 @@ public final class SymbolicExecutionUtil {
    public static ApplyStrategyInfo startSideProof(Proof proof, ProofStarter starter, String splittingOption) {
       assert starter != null;
       starter.setMaxRuleApplications(1000);
-      StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); // Is a clone that can be modified
+      StrategyProperties sp = !proof.isDisposed() ? 
+                              proof.getSettings().getStrategySettings().getActiveStrategyProperties() : // Is a clone that can be modified
+                              new StrategyProperties();
       sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY, splittingOption); // Logical Splitting: Off is faster and avoids splits, but Normal allows to determine that two objects are different.
       sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_NONE); // Method Treatment: Off
       sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_OFF); // Dependency Contracts: Off
@@ -973,6 +978,26 @@ public final class SymbolicExecutionUtil {
    public static boolean isTerminationNode(Node node, RuleApp ruleApp) {
       return "emptyModality".equals(MiscTools.getRuleDisplayName(ruleApp));
    }
+
+   /**
+    * Checks if the given node should be represented as use operation contract.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @return {@code true} represent node as use operation contract, {@code false} represent node as something else. 
+    */
+   public static boolean isUseOperationContract(Node node, RuleApp ruleApp) {
+      return "Use Operation Contract".equals(MiscTools.getRuleDisplayName(ruleApp));
+   }
+
+   /**
+    * Checks if the given node should be represented as loop invariant.
+    * @param node The current {@link Node} in the proof tree of KeY.
+    * @param ruleApp The {@link RuleApp} may used or not used in the rule.
+    * @return {@code true} represent node as use loop invariant, {@code false} represent node as something else. 
+    */
+   public static boolean isUseLoopInvariant(Node node, RuleApp ruleApp) {
+      return "Loop Invariant".equals(MiscTools.getRuleDisplayName(ruleApp));
+   }
    
    /**
     * Checks if the given node should be represented as method return.
@@ -1024,6 +1049,12 @@ public final class SymbolicExecutionUtil {
             return ((LoopStatement)statement).getGuardExpression().getPositionInfo() != PositionInfo.UNDEFINED &&
                    !isDoWhileLoopCondition(node, statement) && 
                    !isForLoopCondition(node, statement);
+         }
+         else if (isUseOperationContract(node, ruleApp)) {
+            return true;
+         }
+         else if (isUseLoopInvariant(node, ruleApp)) {
+            return true;
          }
          else {
             return false;
@@ -1215,8 +1246,156 @@ public final class SymbolicExecutionUtil {
    public static Term computeBranchCondition(Node node, boolean simplify) throws ProofInputException {
       // Get applied taclet on parent proof node
       Node parent = node.parent();
-      if (!(parent.getAppliedRuleApp() instanceof TacletApp)) { // Splits of built in rules are currently not supported.
-         throw new ProofInputException("Only TacletApp are allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found."); 
+      if (parent.getAppliedRuleApp() instanceof TacletApp) {
+         return computeTacletAppBranchCondition(parent, node, simplify);
+      }
+      else if (parent.getAppliedRuleApp() instanceof ContractRuleApp) {
+        return computeContractRuleAppBranchCondition(parent, node, simplify);
+      }
+      else if (parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
+         return TermBuilder.DF.tt(); // TODO: Implement real branch condition of loop invariants!
+      }
+      else {
+         throw new ProofInputException("Unsupported RuleApp in branch computation \"" + parent.getAppliedRuleApp() + "\"."); 
+      }
+   }
+   
+   /**
+    * <p>
+    * Computes the branch condition of the given {@link Node} which was constructed by a {@link ContractRuleApp}.
+    * </p>
+    * <p>
+    * The branch conditions are:
+    * <ul>
+    *    <li>Post:    (pre1 | .. | preN)</li>
+    *    <li>ExcPost: (excPre1 | ... | excPreM)</li>
+    *    <li>Pre:     !(pre1 | ... | preN | excPre1 | ... | excPreM)</li>
+    *    <li>NPE:     caller = null</li>
+    * </ul>
+    * </p>
+    * <p>
+    * Idea:
+    * <ul>
+    *    <li>Last semisequent in antecedent contains contract</li>
+    *    <li>Contract is defined as {@code exc_0 = null} and {@code pre -> post}/{@code excPre -> !exc_0 = null & signals} terms</li>
+    *    <li>Find {@code exc_0 = null} Term</li>
+    *    <li>List all implications</li>
+    *    <li>Filter implications for post/exceptional post branch based on the negation of {@code exc_0 = null}</li>
+    *    <li>Return disjunction of all filtered implication conditions or return true if no implications were found</li>
+    * </ul>
+    * </p>
+    * @param parent The parent {@link Node} of the given one.
+    * @param node The {@link Node} to compute its branch condition.
+    * @param simplify {@code true} simplify result, {@code false} keep computed non simplified result.
+    * @return The computed branch condition.
+    * @throws ProofInputException Occurred Exception.
+    */
+   private static Term computeContractRuleAppBranchCondition(Node parent, Node node, boolean simplify) throws ProofInputException {
+      // Make sure that a computation is possible
+      if (!(parent.getAppliedRuleApp() instanceof ContractRuleApp)) {
+         throw new ProofInputException("Only ContractRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found."); 
+      }
+      
+      int childIndex = JavaUtil.indexOf(parent.childrenIterator(), node);
+      if (childIndex >= 2) {
+         throw new ProofInputException("Branch condition of precondition check and null pointer check are not supported."); 
+      }
+      // Assumption: Pre -> Post & ExcPre -> Signals terms are added to last semisequent in antecedent.
+      // Find Term to extract implications from.
+      Semisequent antecedent = node.sequent().antecedent();
+      SequentFormula sf = antecedent.get(antecedent.size() - 1);
+      Term workingTerm = sf.formula();
+      workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
+      if (workingTerm.op() != Junctor.AND) {
+         throw new ProofInputException("And operation expacted, implementation of UseOperationContractRule might has changed!"); 
+      }
+      workingTerm = workingTerm.sub(1); // First part is heap equality, use second part which is the combination of all normal and exceptional preconditon postcondition implications
+      workingTerm = TermBuilder.DF.goBelowUpdates(workingTerm);
+      if (workingTerm.op() != Junctor.AND) {
+         throw new ProofInputException("And operation expacted, implementation of UseOperationContractRule might has changed!"); 
+      }
+      // Find Term exc_n = null which is added negated to all exceptional preconditions
+      Term definitions = workingTerm.sub(0);
+      if (definitions.op() != Junctor.AND) {
+         throw new ProofInputException("And operation expacted, implementation of UseOperationContractRule might has changed!"); 
+      }
+      Term exceptionDefinition = definitions.sub(0);
+      // Collect all implications for normal or exceptional preconditions
+      Term implications = workingTerm.sub(1);
+      ImmutableList<Term> implicationTerms = collectPreconditionImpliesPostconditionTerms(ImmutableSLList.<Term>nil(), exceptionDefinition, childIndex == 1, implications);
+      if (!implicationTerms.isEmpty()) {
+         // Implications find, return their conditions as branchconditions
+         ImmutableList<Term> condtionTerms = ImmutableSLList.<Term>nil();
+         for (Term implication : implicationTerms) {
+            condtionTerms = condtionTerms.append(implication.sub(0));
+         }
+         
+         Term result = TermBuilder.DF.or(condtionTerms);
+         if (simplify) {
+            workingTerm = simplify(node.proof(), result);
+         }
+         return result;
+      }
+      else {
+         // No preconditions available, branchcondition is true
+         return TermBuilder.DF.tt();
+      }
+   }
+
+   /**
+    * Lists recursive implications filtered for post or exceptional post branch.
+    * @param toFill The result {@link ImmutableList} to fill.
+    * @param exceptionDefinition The exception definition {@code exc_0 = null}.
+    * @param exceptionalExecution {@code true} exceptional post branch, {@code false} post branch.
+    * @param root The root {@link Term} to start search in.
+    * @return The found implications.
+    */
+   private static ImmutableList<Term> collectPreconditionImpliesPostconditionTerms(ImmutableList<Term> toFill,
+                                                                                   Term exceptionDefinition,
+                                                                                   boolean exceptionalExecution,
+                                                                                   Term root) {
+      if (root.op() == Junctor.IMP) {
+         // Check if first condition is the exceptional definition
+         boolean isExceptionCondition = false;
+         Term toCheck = root.sub(1);
+         while (!isExceptionCondition && !toCheck.subs().isEmpty()) {
+            // Assumption: Implications implies first that exception is not null 
+            if (toCheck == exceptionDefinition) {
+               isExceptionCondition = true;
+            }
+            toCheck = toCheck.sub(0);
+         }
+         // Update result
+         if (exceptionalExecution) {
+            if (isExceptionCondition) {
+               toFill = toFill.append(root);
+            }
+         }
+         else {
+            if (!isExceptionCondition) {
+               toFill = toFill.append(root);
+            }
+         }
+      }
+      else {
+         for (Term sub : root.subs()) {
+            toFill = collectPreconditionImpliesPostconditionTerms(toFill, exceptionDefinition, exceptionalExecution, sub);
+         }
+      }
+      return toFill;
+   }
+
+   /**
+    * Computes the branch condition of the given {@link Node} which was constructed by a {@link TacletApp}.
+    * @param parent The parent {@link Node} of the given one.
+    * @param node The {@link Node} to compute its branch condition.
+    * @param simplify {@code true} simplify result, {@code false} keep computed non simplified result.
+    * @return The computed branch condition.
+    * @throws ProofInputException Occurred Exception.
+    */
+   private static Term computeTacletAppBranchCondition(Node parent, Node node, boolean simplify) throws ProofInputException {
+      if (!(parent.getAppliedRuleApp() instanceof TacletApp)) {
+         throw new ProofInputException("Only TacletApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found."); 
       }
       TacletApp app = (TacletApp)parent.getAppliedRuleApp();
       // Find goal template which has created the represented proof node
@@ -1334,14 +1513,6 @@ public final class SymbolicExecutionUtil {
       clone.putAll(settings);
       clone.put(key, value);
       ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(clone);
-   }
-
-   /**
-    * Checks if the choice settings are initialized.
-    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
-    */
-   public static boolean isChoiceSettingInitialised() {
-      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().isEmpty();
    }
 
    /**
@@ -1670,5 +1841,45 @@ public final class SymbolicExecutionUtil {
          }
       }
       throw new IllegalStateException("Can't extract exception variable from proof.");
+   }
+
+   /**
+    * Configures the proof to use operation contracts or to expand methods instead.
+    * @param proof The {@link Proof} to configure.
+    * @param useOperationContracts {@code true} use operation contracts, {@code false} expand methods.
+    */
+   public static void setUseOperationContracts(Proof proof, boolean useOperationContracts) {
+      if (proof != null && !proof.isDisposed()) {
+         String methodTreatmentValue = useOperationContracts ? 
+                                       StrategyProperties.METHOD_CONTRACT : 
+                                       StrategyProperties.METHOD_EXPAND;
+         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+         sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, methodTreatmentValue);
+         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+      }
+   }
+
+   /**
+    * Configures the proof to use loop invariants or to expand loops instead.
+    * @param proof The {@link Proof} to configure.
+    * @param useLoopInvariants {@code true} use loop invariants, {@code false} expand loops.
+    */
+   public static void setUseLoopInvariants(Proof proof, boolean useLoopInvariants) {
+      if (proof != null && !proof.isDisposed()) {
+         String loopTreatmentValue = useLoopInvariants ? 
+                                     StrategyProperties.LOOP_INVARIANT : 
+                                     StrategyProperties.LOOP_EXPAND;
+         StrategyProperties sp = proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, loopTreatmentValue);
+         proof.getSettings().getStrategySettings().setActiveStrategyProperties(sp);
+      }
+   }
+   
+   /**
+    * Checks if the choice settings are initialized.
+    * @return {@code true} settings are initialized, {@code false} settings are not initialized.
+    */
+   public static boolean isChoiceSettingInitialised() {
+      return !ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices().isEmpty();
    }
 }

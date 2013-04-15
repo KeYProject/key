@@ -19,7 +19,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-public class StrategyContentProvider extends ScrolledForm{
+public class StrategyContentProvider extends ScrolledForm {
    
    private Proof proof;
    

@@ -5,24 +5,24 @@
          <branchNode name="if (invert(i)&lt;invert(j)) {   result_1=i; }else  {   result_1=j; }" pathCondition="true" pathConditionChanged="false">
             <methodCall name="self.invert(a);" pathCondition="true" pathConditionChanged="false">
                <statement name="return a*-1;" pathCondition="true" pathConditionChanged="false">
-                  <methodReturn name="&lt;return of self.invert(a);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;i * -1&apos; as result of self.invert(a);&gt;">
+                  <methodReturn name="&lt;return of self.invert(a);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;i * -1&apos; as result of self.invert(a);&gt;" isReturnValueComputed="true">
                      <methodCall name="self.invert(a_1);" pathCondition="true" pathConditionChanged="false">
                         <statement name="return a_1*-1;" pathCondition="true" pathConditionChanged="false">
-                           <methodReturn name="&lt;return of self.invert(a_1);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;j * -1&apos; as result of self.invert(a_1);&gt;">
-                              <branchCondition name="!j &gt;= i" pathCondition="!j &gt;= i" pathConditionChanged="true" branchCondition="!j &gt;= i" mergedBranchCondition="false">
+                           <methodReturn name="&lt;return of self.invert(a_1);&gt;" pathCondition="true" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;j * -1&apos; as result of self.invert(a_1);&gt;" isReturnValueComputed="true">
+                              <branchCondition name="!j &gt;= i" pathCondition="!j &gt;= i" pathConditionChanged="true" branchCondition="!j &gt;= i" mergedBranchCondition="false" isBranchConditionComputed="true">
                                  <statement name="result_1=i;" pathCondition="!j &gt;= i" pathConditionChanged="false">
                                     <statement name="return result_1;" pathCondition="!j &gt;= i" pathConditionChanged="false">
-                                       <methodReturn name="&lt;return of self.min(i,j);&gt;" pathCondition="!j &gt;= i" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;i&apos; as result of self.min(i,j);&gt;">
+                                       <methodReturn name="&lt;return of self.min(i,j);&gt;" pathCondition="!j &gt;= i" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;i&apos; as result of self.min(i,j);&gt;" isReturnValueComputed="true">
                                           <termination name="&lt;end&gt;" pathCondition="!j &gt;= i" pathConditionChanged="false" exceptionalTermination="false">
                                           </termination>
                                        </methodReturn>
                                     </statement>
                                  </statement>
                               </branchCondition>
-                              <branchCondition name="!j &lt;= -1 + i" pathCondition="!j &lt;= -1 + i" pathConditionChanged="true" branchCondition="!j &lt;= -1 + i" mergedBranchCondition="false">
+                              <branchCondition name="!j &lt;= -1 + i" pathCondition="!j &lt;= -1 + i" pathConditionChanged="true" branchCondition="!j &lt;= -1 + i" mergedBranchCondition="false" isBranchConditionComputed="true">
                                  <statement name="result_1=j;" pathCondition="!j &lt;= -1 + i" pathConditionChanged="false">
                                     <statement name="return result_1;" pathCondition="!j &lt;= -1 + i" pathConditionChanged="false">
-                                       <methodReturn name="&lt;return of self.min(i,j);&gt;" pathCondition="!j &lt;= -1 + i" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;j&apos; as result of self.min(i,j);&gt;">
+                                       <methodReturn name="&lt;return of self.min(i,j);&gt;" pathCondition="!j &lt;= -1 + i" pathConditionChanged="false" nameIncludingReturnValue="&lt;return &apos;j&apos; as result of self.min(i,j);&gt;" isReturnValueComputed="true">
                                           <termination name="&lt;end&gt;" pathCondition="!j &lt;= -1 + i" pathConditionChanged="false" exceptionalTermination="false">
                                           </termination>
                                        </methodReturn>

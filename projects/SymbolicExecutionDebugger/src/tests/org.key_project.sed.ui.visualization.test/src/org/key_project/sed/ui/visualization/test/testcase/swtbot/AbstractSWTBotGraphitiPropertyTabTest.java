@@ -8,6 +8,8 @@ import org.eclipse.swtbot.eclipse.gef.finder.SWTGefBot;
 import org.eclipse.swtbot.eclipse.gef.finder.widgets.SWTBotGefEditor;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IPageLayout;
+import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDMethodReturn;
 import org.key_project.sed.core.model.ISEDStatement;
 import org.key_project.sed.core.model.ISEDThread;
 import org.key_project.sed.ui.test.testcase.swtbot.AbstractSWTBotPropertyTabTest;
@@ -26,36 +28,40 @@ public class AbstractSWTBotGraphitiPropertyTabTest extends AbstractSWTBotPropert
     * {@inheritDoc}
     */
    @Override
-   protected void selectThread(SWTBotTree debugTree) throws Exception {
-      super.selectThread(debugTree);
+   protected ISEDThread selectThread(SWTBotTree debugTree) throws Exception {
+      ISEDThread result = super.selectThread(debugTree);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+      return result;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected void selectStatement(SWTBotTree debugTree) throws Exception {
-      super.selectStatement(debugTree);
+   protected ISEDStatement selectStatement(SWTBotTree debugTree) throws Exception {
+      ISEDStatement result = super.selectStatement(debugTree);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+      return result;
    }
    
    /**
     * {@inheritDoc}
     */
    @Override
-   protected void selectDebugTarget(SWTBotTree debugTree) throws Exception {
-      super.selectDebugTarget(debugTree);
+   protected ISEDDebugTarget selectDebugTarget(SWTBotTree debugTree) throws Exception {
+      ISEDDebugTarget result = super.selectDebugTarget(debugTree);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+      return result;
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   protected void selectMethodReturn(SWTBotTree debugTree) {
-      super.selectMethodReturn(debugTree);
+   protected ISEDMethodReturn selectMethodReturn(SWTBotTree debugTree) {
+      ISEDMethodReturn result = super.selectMethodReturn(debugTree);
       TestVisualizationUtil.setFocusToSymbolicExecutionTreeView();
+      return result;
    }
    
    /**

@@ -158,7 +158,7 @@ public class LazyProofTreeContentProvider implements ILazyTreeContentProvider{
                
                @Override
                public void run() {
-                  viewer.refresh();
+                  viewer.refresh(); // TODO: Update viewer directly, will increase performance?
 
                }
             });

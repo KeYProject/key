@@ -251,7 +251,9 @@ public class ConsoleUserInterface extends AbstractUserInterface {
     */
    @Override
    public void removeProof(Proof proof) {
-      // Nothing to do.
+      if (proof != null) {
+         proof.dispose();
+      }
    }
    
    /**

@@ -16,11 +16,11 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Node;
@@ -45,6 +45,8 @@ import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionMethodReturn;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionStatement;
 import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionUseLoopInvariant;
+import de.uka.ilkd.key.symbolic_execution.model.impl.ExecutionUseOperationContract;
 import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.DefaultEntry;
 import de.uka.ilkd.key.symbolic_execution.util.JavaUtil;
@@ -202,7 +204,7 @@ public class SymbolicExecutionTreeBuilder {
       // Find all modalities in the succedent
       final List<Term> modalityTerms = new LinkedList<Term>();
       for (SequentFormula sequentFormula : root.sequent().succedent()) {
-         sequentFormula.formula().execPreOrder(new Visitor() {
+         sequentFormula.formula().execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(Term visited) {
                if (visited.op() instanceof Modality) {
@@ -550,6 +552,12 @@ public class SymbolicExecutionTreeBuilder {
          else if (SymbolicExecutionUtil.isStatementNode(node, node.getAppliedRuleApp(), statement, posInfo)) {
             result = new ExecutionStatement(mediator, node);
          }
+      }
+      else if (SymbolicExecutionUtil.isUseOperationContract(node, node.getAppliedRuleApp())) {
+         result = new ExecutionUseOperationContract(mediator, node);
+      }
+      else if (SymbolicExecutionUtil.isUseLoopInvariant(node, node.getAppliedRuleApp())) {
+         result = new ExecutionUseLoopInvariant(mediator, node);
       }
       return result;
    }

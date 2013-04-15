@@ -1,18 +1,21 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui.prooftree;
 /** this class implements a TreeModel that can be displayed using the
  * JTree class framework 
  */
-import java.lang.ref.WeakReference;
 
 import javax.swing.tree.TreeNode;
 
@@ -21,14 +24,12 @@ import de.uka.ilkd.key.proof.Node;
 class GUIBranchNode extends GUIAbstractTreeNode 
                     implements TreeNode {
 
-    private WeakReference<Node>   subTreeRef;
     private Object label;
     
     public GUIBranchNode(GUIProofTreeModel tree,
 			 Node subTree,
 			 Object   label) {
-	super ( tree );
-	this.subTreeRef = new WeakReference<Node>(subTree);
+	super (tree, subTree);
 	this.label = label;
     }
 
@@ -64,7 +65,7 @@ class GUIBranchNode extends GUIAbstractTreeNode
         if ( childrenCache.length == 0 || childrenCache[0] != null ) return;
             
         int count = 0;
-        Node n = subTreeRef.get();
+        Node n = getNode();
         if(n==null){
             return;
         }
@@ -84,6 +85,7 @@ class GUIBranchNode extends GUIAbstractTreeNode
         }
     }
 
+    @Override
     public void flushCache() {
         childrenCache = null;
     }
@@ -95,7 +97,7 @@ class GUIBranchNode extends GUIAbstractTreeNode
 
     private int getChildCountHelp() {
         int count = 0;
-        Node n = subTreeRef.get();
+        Node n = getNode();
         if(n==null){
             return 0;
         }
@@ -116,7 +118,7 @@ class GUIBranchNode extends GUIAbstractTreeNode
 
     
     public TreeNode getParent() {
-        Node self = subTreeRef.get();
+        Node self = getNode();
         if(self==null)
             return null;
 	Node n = self.parent();
@@ -131,13 +133,9 @@ class GUIBranchNode extends GUIAbstractTreeNode
 	}
     }
 
-    public Node getNode() {
-	return subTreeRef.get();
-    }
-
     // signalled by GUIProofTreeModel when the user has altered the value
     public void setLabel(String s) {
-	Node n = subTreeRef.get();
+	Node n = getNode();
 	if(n!=null){
 	    n.getNodeInfo().setBranchLabel(s);
 	}
@@ -148,7 +146,7 @@ class GUIBranchNode extends GUIAbstractTreeNode
     }
 
     public String toString() {
-        Node n = subTreeRef.get();
+        Node n = getNode();
         String res;
         if(n!=null){
             res = n.getNodeInfo().getBranchLabel();

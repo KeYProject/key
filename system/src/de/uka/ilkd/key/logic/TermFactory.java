@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 
 package de.uka.ilkd.key.logic;
@@ -70,13 +74,19 @@ public final class TermFactory {
 	
 	final Term newTerm 
 		= new TermImpl(op, subs, boundVars, javaBlock).checked();
-	Term term = cache.get(newTerm);
-	if(term == null) {
-	    term = newTerm;
-	    cache.put(term, term);
-	}
+	// Check if caching is possible. It is not possible if a non empty JavaBlock is available in the term or in one of its children because the meta information like PositionInfos maybe different.
+	if (!newTerm.isContainsJavaBlockRecursive()) {
+	   Term term = cache.get(newTerm);
+	   if(term == null) {
+	       term = newTerm;
+	       cache.put(term, term);
+	   }
 
-	return term;
+	   return term;
+	}
+	else {
+	   return newTerm;
+	}
     } 
     
     

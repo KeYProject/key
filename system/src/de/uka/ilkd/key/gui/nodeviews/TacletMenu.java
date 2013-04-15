@@ -1,12 +1,16 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.gui.nodeviews;
 
@@ -72,7 +76,6 @@ class TacletMenu extends JMenu {
     private static final Set<Name> CLUTTER_RULES = new HashSet<Name>();
 
     static {
-        CLUTTER_RULES.add(new Name("cut_direct"));
         CLUTTER_RULES.add(new Name("cut_direct_r"));
         CLUTTER_RULES.add(new Name("cut_direct_l"));
         CLUTTER_RULES.add(new Name("case_distinction_r"));
@@ -368,7 +371,7 @@ class TacletMenu extends JMenu {
     
     private void addClipboardItem(MenuControl control) {
 	addSeparator();
-	JMenuItem item = new JMenuItem("to clipboard");
+	JMenuItem item = new JMenuItem("copy to clipboard");
 	item.addActionListener(control);
 	add(item);
     }
@@ -505,7 +508,7 @@ class TacletMenu extends JMenu {
 	                                     mediator.getSelectedGoal () );
 	    } else {
 		if (((JMenuItem)e.getSource()).getText()
-		    .startsWith("to clipboard")){
+		    .startsWith("copy to clipboard")){
                     GuiUtilities.copyHighlightToClipboard(sequentView);
 		} else if(((JMenuItem)e.getSource()).getText().
 			  startsWith("Pop method frame")){

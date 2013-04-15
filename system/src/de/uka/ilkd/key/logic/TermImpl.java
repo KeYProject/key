@@ -1,17 +1,22 @@
-// This file is part of KeY - Integrated Deductive Software Design
-// Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
+// This file is part of KeY - Integrated Deductive Software Design 
+//
+// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany 
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
+// Copyright (C) 2011-2013 Karlsruhe Institute of Technology, Germany 
+//                         Technical University Darmstadt, Germany
+//                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License. 
-// See LICENSE.TXT for details.
-//
-//
+// The KeY system is protected by the GNU General 
+// Public License. See LICENSE.TXT for details.
+// 
+
 
 package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.collection.*;
 import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 
@@ -42,6 +47,14 @@ final class TermImpl implements Term {
     private ImmutableSet<QuantifiableVariable> freeVars = null;
     private int hashcode = -1;
     
+    /**
+     * This flag indicates that the {@link Term} itself or one
+     * of its children contains a non empty {@link JavaBlock}. 
+     * {@link Term}s which provides a {@link JavaBlock} directly or indirectly
+     * can't be cached because it is possible that the contained meta information
+     * inside the {@link JavaBlock}, e.g. {@link PositionInfo}s, are different.
+     */
+    private boolean containsJavaBlockRecursive = false;
     
     //-------------------------------------------------------------------------
     //constructors
@@ -59,6 +72,7 @@ final class TermImpl implements Term {
 	this.javaBlock = javaBlock == null 
 	                 ? JavaBlock.EMPTY_JAVABLOCK 
 	                 : javaBlock;
+	computeContainsJavaBlockRecursive();
     }
     
 
@@ -67,7 +81,26 @@ final class TermImpl implements Term {
     //internal methods
     //------------------------------------------------------------------------- 
     
-    private void determineFreeVars() {
+    /**
+     * Computes if a non empty {@link JavaBlock} is available in this {@link Term}
+     * or in one of its direct or indirect children. The result is stored in
+     * {@link #containsJavaBlockRecursive} available via {@link #isContainsJavaBlockRecursive()}.
+     */
+    private void computeContainsJavaBlockRecursive() {
+        if (javaBlock != null && !javaBlock.isEmpty()) {
+           containsJavaBlockRecursive = true;
+        }
+        else {
+	  for (int i = 0; i<subs.size(); i++) {
+              if (subs.get(i).isContainsJavaBlockRecursive()) {
+                 containsJavaBlockRecursive = true;
+		 return;
+              }
+           }
+        }
+    }
+
+   private void determineFreeVars() {
 	freeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
         
         if(op instanceof QuantifiableVariable) {
@@ -500,6 +533,12 @@ final class TermImpl implements Term {
     public int serialNumber() {
         return serialNumber;
     }
-
- 
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isContainsJavaBlockRecursive() {
+        return containsJavaBlockRecursive;
+    }
 }

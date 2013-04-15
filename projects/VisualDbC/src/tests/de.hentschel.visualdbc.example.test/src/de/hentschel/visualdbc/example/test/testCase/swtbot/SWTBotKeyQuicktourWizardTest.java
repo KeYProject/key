@@ -74,12 +74,12 @@ public class SWTBotKeyQuicktourWizardTest extends TestCase {
       SWTBotShell shell = bot.shell("New Example");
       //  Open Banking Example wizard
       TestUtilsUtil.selectInTree(shell.bot().tree(), "Visual DbC", "KeY Quicktour");
-      shell.bot().button("Next >").click();
+      TestUtilsUtil.clickDirectly(shell.bot(), "Next >");
       // Define project name
       SWTBotText text = shell.bot().text(0);
       text.setText(project.getName());
       // Finish wizard
-      shell.bot().button("Finish").click();
+      TestUtilsUtil.clickDirectly(shell.bot(), "Finish");
       shell.bot().waitUntil(Conditions.shellCloses(shell));
       // Make sure that the correct files are added to the new created project
       assertTrue(project.exists());
